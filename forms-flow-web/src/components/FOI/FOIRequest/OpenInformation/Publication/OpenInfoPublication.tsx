@@ -12,6 +12,10 @@ const OpenInfoPublication = ({
   isDataEdited,
   saveData,
   currentOIRequestState,
+  ministryId, 
+  requestId, 
+  bcgovcode, 
+  requestNumber
 }: any) => {
   return (
     <>
@@ -20,6 +24,10 @@ const OpenInfoPublication = ({
         isOIUser={isOIUser}
         handleOIDataChange={handleOIDataChange}
         currentOIRequestState={currentOIRequestState}
+        ministryId={ministryId}
+        requestId={requestId}
+        bcgovcode={bcgovcode}
+        requestNumber={requestNumber}
       />
       <button
         type="button"

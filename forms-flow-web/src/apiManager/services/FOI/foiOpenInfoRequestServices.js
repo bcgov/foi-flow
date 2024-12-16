@@ -124,3 +124,69 @@ export const fetchFOIOpenInfoAdditionalFiles = (foirequestId, foiministryrequest
       });
   }
 };
+
+export const deleteFOIOpenInfoAdditionalFiles = (
+  foiministryrequestid,
+  foirequestId,
+  data,
+  ...rest
+) => {
+  let apiUrl = replaceUrl(
+    replaceUrl(API.FOI_DELETE_OPENINFO_ADDITIONAL_FILES, "<foirequestid>", foirequestId),
+    "<foiministryrequestid>",
+    foiministryrequestid
+  );
+  const done = fnDone(rest);
+  return (dispatch) => {
+    httpPOSTRequest(apiUrl, data)
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+          dispatch(setFOILoader(false));
+        } else {
+          console.log("Error while deleting FOIAdditionalFiles data", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        done(error);
+        console.log("Error while deleting FOIAdditionalFiles data", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+      });
+  };
+};
+
+export const saveFOIOpenInfoAdditionalFiles = (
+  foiministryrequestid,
+  foirequestId,
+  data,
+  ...rest
+) => {
+  let apiUrl = replaceUrl(
+    replaceUrl(API.FOI_OPENINFO_ADDITIONAL_FILES, "<foirequestid>", foirequestId),
+    "<foiministryrequestid>",
+    foiministryrequestid
+  );
+  const done = fnDone(rest);
+  return (dispatch) => {
+    httpPOSTRequest(apiUrl, data)
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+          // dispatch(setFOILoader(false));
+        } else {
+          console.log("Error while saving FOIAdditionalFiles data", res);
+          dispatch(serviceActionError(res));
+          // dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        done(error);
+        console.log("Error while saving FOIAdditionalFiles data", error);
+        dispatch(serviceActionError(error));
+        // dispatch(setFOILoader(false));
+      });
+  };
+};

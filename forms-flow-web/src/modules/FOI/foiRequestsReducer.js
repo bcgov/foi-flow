@@ -157,6 +157,7 @@ const initialState = {
   oiPublicationStatuses: [],
   oiStatuses: [],
   foiOpenInfoRequest: {},
+  foiOpenInfoAdditionalFiles: []
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -357,6 +358,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, oiStatuses: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_OPENINFO_REQUEST:
       return {...state, foiOpenInfoRequest: action.payload}
+    case FOI_ACTION_CONSTANTS.FOI_OPENINFO_ADDITIONAL_FILES:
+      return {...state, foiOpenInfoAdditionalFiles: action.payload}
     default:
       return state;
   }

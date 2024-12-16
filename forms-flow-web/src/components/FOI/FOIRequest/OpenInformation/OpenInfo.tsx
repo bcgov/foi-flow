@@ -24,6 +24,7 @@ const OpenInfo = ({
   userDetail,
   foiministryrequestid,
   foirequestid,
+  bcgovcode,
   toast,
   currentOIRequestState,
 }: any) => {
@@ -36,11 +37,10 @@ const OpenInfo = ({
   const userGroups: string[] = userDetail.groups.map((group: any) =>
     group.slice(1)
   );
-
-  // AH NOTe -> ADJUST THIS OISUER CODE + remove this additoional files and use nicks work
+  let foiOpenInfoAdditionalFiles = useSelector(
+    (state: any) => state.foiRequests.foiOpenInfoAdditionalFiles
+  );
   const isOIUser: boolean = userGroups.includes("OI Team");
-  const oiAdditonalfiles = [];
-
   let foiOITransactionData = useSelector(
     (state: any) => state.foiRequests.foiOpenInfoRequest
   );
@@ -176,7 +176,7 @@ const OpenInfo = ({
     return true;
   };
   const disablePublish = (oiPublicationData: OITransactionObject) : boolean => {
-    const isMissingRequiredInput = !oiPublicationData?.publicationdate && !oiPublicationData?.copyrightsevered && oiAdditonalfiles.length === 0;
+    const isMissingRequiredInput = !oiPublicationData?.publicationdate && !oiPublicationData?.copyrightsevered && foiOpenInfoAdditionalFiles.length === 0;
     const isOIReadyToPublish = currentOIRequestState === "Ready For Publishing";
     if (!isOIReadyToPublish) {
       return true;
@@ -232,6 +232,10 @@ const OpenInfo = ({
             isDataEdited={isDataEdited}
             saveData={saveData}
             currentOIRequestState={currentOIRequestState}
+            ministryId={foiministryrequestid}
+            requestId={foirequestid} 
+            bcgovcode={bcgovcode}
+            requestNumber={requestNumber}
           />
         )}
       </div>
