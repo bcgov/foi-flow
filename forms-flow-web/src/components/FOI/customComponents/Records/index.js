@@ -2242,10 +2242,7 @@ export const RecordsLog = ({
             </Grid> 
             <Grid item xs={2}>
               {
-              (!isHistoricalRequest && (isMinistryCoordinator || (isScanningTeamMember &&
-                MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', "")) &&
-                requestType ===
-                  FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL))) && (
+              (!isHistoricalRequest) && (
                 <button
                   className={clsx("btn", "addAttachment", classes.createButton)}
                   variant="contained"
