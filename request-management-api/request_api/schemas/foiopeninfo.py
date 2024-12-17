@@ -20,7 +20,8 @@ class FOIOpenInfoSchema(Schema):
     pagereference = fields.Str(data_key="pagereference",allow_none=True, missing=None)
     iaorationale = fields.Str(data_key="iaorationale",allow_none=True, missing=None)
     oifeedback = fields.Str(data_key="oifeedback",allow_none=True, missing=None)
-    publicationdate = fields.Date(data_key="publicationdate",allow_none=True, missing=None)
+    publicationdate = fields.Str(data_key="publicationdate",allow_none=True, missing=None)
+    oiexemptiondate = fields.Str(data_key="oiexemptiondate",allow_none=True, missing=None)
     copyrightsevered = fields.Bool(data_key="copyrightsevered",allow_none=True, missing=None)
 
 class FOIOpenInfoAdditionalFilesSchema(Schema):

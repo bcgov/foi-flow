@@ -46,6 +46,7 @@ class FOIOpenInformationRequests(db.Model):
     iaorationale = db.Column(db.String, nullable=True)
     oifeedback = db.Column(db.String, nullable=True)
     publicationdate = db.Column(db.DateTime, nullable=True)
+    oiexemptiondate = db.Column(db.DateTime, nullable=True)
     isactive = db.Column(db.Boolean, nullable=False)
     copyrightsevered = db.Column(db.Boolean, nullable=True)
 
@@ -70,9 +71,6 @@ class FOIOpenInformationRequests(db.Model):
                 foiministryrequest_id=foiopeninforequest["foiministryrequest_id"],
                 foiministryrequestversion_id=foiopeninforequest["foiministryrequestversion_id"],
                 oipublicationstatus_id=foiopeninforequest["oipublicationstatus_id"],
-                oiexemption_id=foiopeninforequest["oiexemption_id"],
-                pagereference=foiopeninforequest["pagereference"],
-                iaorationale=foiopeninforequest["iaorationale"],
                 isactive=True,
                 created_at=createddate,
                 createdby=userid,
@@ -99,6 +97,7 @@ class FOIOpenInformationRequests(db.Model):
                 oiexemptionapproved=foiopeninforequest["oiexemptionapproved"],
                 oifeedback=foiopeninforequest["oifeedback"],
                 publicationdate=foiopeninforequest["publicationdate"],
+                oiexemptiondate=foiopeninforequest["oiexemptiondate"],
                 copyrightsevered=foiopeninforequest["copyrightsevered"],
                 isactive=True,
                 created_at=createddate,
@@ -512,5 +511,6 @@ class FOIOpenInfoRequestSchema(ma.Schema):
     class Meta:
         fields = (
             'foiopeninforequestid', 'version', 'foiministryrequest_id', 'foiministryrequestversion_id', 'oipublicationstatus_id', 'oiexemption_id', 'oiassignedto',
-            'oiexemptionapproved', 'copyrightsevered', 'pagereference', 'iaorationale', 'oifeedback', 'publicationdate', 'created_at', 'updated_at', 'createdby', 'updatedby'
+            'oiexemptionapproved', 'copyrightsevered', 'pagereference', 'iaorationale', 'oifeedback', 'publicationdate', 'created_at', 'updated_at', 'createdby', 'updatedby',
+            "oiexemptiondate"
         )

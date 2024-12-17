@@ -16,6 +16,7 @@ type OITransactionObject = {
   oifeedback: string;
   copyrightsevered: boolean;
   publicationdate: string;
+  oiexemptiondate: string;
 };
 
 const OpenInfo = ({

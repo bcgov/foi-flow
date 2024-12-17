@@ -60,7 +60,7 @@ class FOIOpenInfoRequestById(Resource):
             request_json = request.get_json()
             foiopeninfo = FOIOpenInfoSchema().load(request_json)
             userid = AuthHelper.getuserid()
-            result = openinfoservice().updateopeninforequest(foiopeninfo, userid, foiministryrequestid, foirequestid)
+            result = openinfoservice().updateopeninforequest(foiopeninfo, userid, foiministryrequestid)
             if result.success:
                 return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
         except ValidationError as err:

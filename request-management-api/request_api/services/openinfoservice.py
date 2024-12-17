@@ -29,7 +29,7 @@ class openinfoservice:
         result = FOIOpenInformationRequests().createopeninfo(foiopeninforequest, userid)
         return result
 
-    def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid, foirequestid):
+    def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid):
         prev_foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
         foiministryrequestversion = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
         foiopeninforequest['foiministryrequestversion_id'] = foiministryrequestversion

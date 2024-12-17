@@ -56,6 +56,11 @@ export const saveFOIOpenInfoRequest = (
   return (dispatch) => {
     updateFOIMinistryRequestOIStatus(foiministryrequestid, foirequestId, data, requetsinfo)
       .then((res) => {
+        // If res.data.sucess (meaning BE call to update FOIMinistryRequest oistatusid for IAO OI Exemption purposes is successfull) =>
+        // create and store an exemption date for the related foiopeninfo request
+        if (res.data?.success) {
+          data.oiexemptiondate = new Date();
+        }
         httpPOSTRequest(apiUrl, data)
       .then((res) => {
         if (res.data) {
@@ -88,6 +93,7 @@ const updateFOIMinistryRequestOIStatus = (
     "<ministryid>",
     foiministryrequestid),"<requestid>", foirequestId
   );
+  // Update FOIMinistryRequest oistatusid to "Do Not Publish" if EXEMPTION is required from IAO
   if (!requetsinfo.oistatusid && foiopeninfodata.oiexemption_id !== 5) {
     return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: 2 });
   } else {
