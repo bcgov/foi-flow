@@ -644,7 +644,7 @@ export const ContactApplicant = ({
     setOpenConfirmationModal(true);
     setConfirmationFor("delete-draft")
     setConfirmationTitle("Delete Draft")
-    setConfirmationMessage("Are you sure you want to delete these draft(s)? This can not be undone");
+    setConfirmationMessage("Are you sure you want to delete this draft? This action cannot be undone.");
   }
 
 
