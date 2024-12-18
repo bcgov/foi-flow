@@ -29,14 +29,12 @@ class openinfoservice:
         result = FOIOpenInformationRequests().createopeninfo(foiopeninforequest, userid)
         return result
 
-    def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid):
+    def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid, foirequestid):
         prev_foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
         foiministryrequestversion = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
         foiopeninforequest['foiministryrequestversion_id'] = foiministryrequestversion
         foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
         foiopeninforequest['version'] = prev_foiopeninforequest["version"]
-        foiopeninforequest["created_at"] = prev_foiopeninforequest["created_at"]
-        foiopeninforequest["createdby"] = prev_foiopeninforequest["createdby"]
         result = FOIOpenInformationRequests().updateopeninfo(foiopeninforequest, userid)
         deactivateresult = None
         if result.success == True:
@@ -59,3 +57,14 @@ class openinfoservice:
     
     def deleteopeninfoadditionalfiles(self, fileids, userid):
         return FOIOpenInfoAdditionalFiles.bulkdelete(fileids['fileids'], userid)
+    
+    def updatefoioirequest_onfoirequestchange(self, foiministryrequestid, new_foirequestversion, userid):
+        foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
+        foiopeninforequest['foiministryrequestversion_id'] = new_foirequestversion
+        result = FOIOpenInformationRequests().updateopeninfo(foiopeninforequest, userid)
+        deactivateresult = None
+        if result.success == True:
+            foiopeninfoid = result.identifier
+            deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
+        if result and deactivateresult:
+            return result

@@ -308,6 +308,9 @@ class FOIRequestsById(Resource):
             if (section == "userrecordslockstatus"):
                 foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
                 foirequest['userrecordslockstatus'] = request_json['userrecordslockstatus']
+            if (section == "oistatusid"):
+                foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
+                foirequest['oistatusid'] = request_json['oistatusid']
             foirequestschema = FOIRequestWrapperSchema().load(foirequest)
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:

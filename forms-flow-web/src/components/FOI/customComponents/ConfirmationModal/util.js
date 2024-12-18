@@ -139,6 +139,15 @@ import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConst
     }
   }
 
+  export const getMessageForOITeam = (state, openinfo, additionalfiles) => {
+    if (state === 'Ready to Publish') {
+      if (openinfo.copyrightsevered === null || openinfo.publicationdate === null || additionalfiles.length === 0) {
+        return {title: "Changing the state", body: "Unable to update state: please make sure a publication date is set, the copyright is selected and at least one file is uploaded."}
+      }
+    }
+    return {title: "Changing the state", body: "Are you sure you want to change the state of this request to " + state + "?"}
+  }
+
 
   export const getProcessingTeams = (_processingTeamList, _selectedMinistries) => {
     const updatedList = _processingTeamList.filter(listItem => _selectedMinistries.includes(listItem.bcgovcode))?.map(item => item.team);

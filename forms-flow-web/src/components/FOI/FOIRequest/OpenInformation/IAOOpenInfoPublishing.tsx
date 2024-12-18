@@ -1,10 +1,8 @@
 import { useState, useEffect } from "react";
 import "./iaoopeninfo.scss";
 import IAOOpenInfoHeader from "./IAOOpenInfoHeader";
-import IAOOpenInfoMain from "./IAOOpenInfoMain";
-import IAOOpenInfoSaveModal from "./IAOOpenInfoSaveModal";
-import OAOpenInfoApproveModal from "./OAOpenInfoApproveModal";
-import OAOpenInfoDeniedModal from "./OAOpenInfoDeniedModal";
+import OAOpenInfoApproveModal from "./OpenInfoApproveModal";
+import OAOpenInfoDeniedModal from "./OpenInfoDeniedModal";
 import { saveFOIOpenInfoRequest } from "../../../../apiManager/services/FOI/foiOpenInfoRequestServices";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -151,11 +149,6 @@ const IAOOpenInfoPublishing = ({
         foirequestid={foirequestid}
         toast={toast}
       />
-      <IAOOpenInfoMain
-        handleOIDataChange={handleOIDataChange}
-        oiPublicationData={oiPublicationData}
-        isOIUser={isOIUser}
-      />
       <button
         type="button"
         className="btn btn-bottom"
@@ -164,11 +157,6 @@ const IAOOpenInfoPublishing = ({
       >
         Save
       </button>
-      <IAOOpenInfoSaveModal
-        showModal={showSaveModal}
-        saveData={saveData}
-        setShowModal={setShowSaveModal}
-      />
       <OAOpenInfoApproveModal
         showApproveModal={showApproveModal}
         saveData={saveData}

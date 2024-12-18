@@ -173,5 +173,7 @@ const API = {
   FOI_GET_OPENINFO_REQUEST: `${FOI_BASE_API_URL}/api/foiopeninfo/ministryrequest/<ministryrequestid>`,
   FOI_POST_OPENINFO_REQUEST: `${FOI_BASE_API_URL}/api/foiopeninfo/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>`,
   FOI_GET_COMMENT_TYPES: `${FOI_BASE_API_URL}/api/foiflow/commenttypes`,
+  FOI_OPENINFO_ADDITIONAL_FILES: `${FOI_BASE_API_URL}/api/foiopeninfoadditionalfiles/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>`,
+  FOI_DELETE_OPENINFO_ADDITIONAL_FILES: `${FOI_BASE_API_URL}/api/foiopeninfoadditionalfiles/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>/delete`
 };
 export default API;

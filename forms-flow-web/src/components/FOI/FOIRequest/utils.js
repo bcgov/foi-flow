@@ -150,7 +150,7 @@ export const getTabBG = (_tabStatus, _requestState) => {
 };
 
 export const getOITabBG = (OIRequestStatusId, OIStatuses) => {
-  if (OIRequestStatusId && OIStatuses) {
+  if (OIStatuses) {
     var OIStatusName = OIStatuses.find(s => s.oistatusid === OIRequestStatusId)?.name
     switch (OIStatusName) {
       case "First Review":

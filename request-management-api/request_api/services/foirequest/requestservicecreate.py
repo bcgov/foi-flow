@@ -15,6 +15,7 @@ from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMa
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.RequestorType import RequestorType
 from request_api.utils.enums import StateName
+from request_api.services.openinfoservice import openinfoservice
 
 import json
 class requestservicecreate:
@@ -66,6 +67,7 @@ class requestservicecreate:
             result = self.saverequest(foirequestschema, userid, foirequestid,ministryid,filenumber,activeversion,_foirequest["foirawrequestid"],_foirequest["wfinstanceid"])
             if result.success == True:
                 FOIMinistryRequest.deActivateFileNumberVersion(ministryid, filenumber, userid)
+                self.__updatefoiopeninforequest(ministryid, activeversion, userid)
             return result
     
     def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype = None):        
@@ -85,6 +87,7 @@ class requestservicecreate:
         result = FOIRequest.saverequest(foirequest)
         if result.success == True:
             FOIMinistryRequest.deActivateFileNumberVersion(ministryid, _foiministryrequest['filenumber'], userid)
+            self.__updatefoiopeninforequest(ministryid, _foirequest['version']+1, userid)
         return result       
     
     def __prepareministries(self,foirequestschema, activeversion, filenumber,ministryid, userid):
@@ -205,4 +208,8 @@ class requestservicecreate:
                     watcherservice().createministryrequestwatcher(watcherschema, userid, None)
 
     def __getkeyvalue(self, inputschema, property):
-        return inputschema[property] if inputschema is not None and inputschema.get(property) is not None  else ''   
+        return inputschema[property] if inputschema is not None and inputschema.get(property) is not None  else ''
+    
+    def __updatefoiopeninforequest(self, ministryid, version, userid):
+        result = openinfoservice().updatefoioirequest_onfoirequestchange(ministryid, version, userid)
+        return result

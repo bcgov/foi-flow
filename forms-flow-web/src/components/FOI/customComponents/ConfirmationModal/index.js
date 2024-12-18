@@ -18,9 +18,9 @@ import './confirmationmodal.scss';
 import { StateEnum, StateTransitionCategories } from '../../../../constants/FOI/statusEnum';
 import FileUpload from '../FileUpload'
 import MinistryApprovalModal from './MinistryApprovalModal';
-import { formatDate, calculateDaysRemaining, ConditionalComponent, isMinistryLogin } from "../../../../helper/FOI/helper";
+import { formatDate, calculateDaysRemaining, ConditionalComponent, isMinistryLogin, isOITeam } from "../../../../helper/FOI/helper";
 import { MimeTypeList, MaxFileSizeInMB, MaxNumberOfFiles } from "../../../../constants/FOI/enum";
-import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo } from './util';
+import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo, getMessageForOITeam } from './util';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -81,6 +81,9 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const userGroups = user?.groups?.map(group => group.slice(1));
     let isMinistry = isMinistryLogin(userGroups);
     
+    
+    const openInfo = useSelector((reduxState) => reduxState.foiRequests.foiOpenInfoRequest);
+    const additionalFiles = useSelector((reduxState) => reduxState.foiRequests.foiOpenInfoAdditionalFiles);
     const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
     const cfrFeeData = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata);
     const actualsFeeDataFields = [
@@ -118,6 +121,13 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
 
     const isBtnDisabled = () => {
+      if (isOITeam) {        
+        if (state === 'Ready to Publish') {
+          return (openInfo.copyrightsevered === null || openInfo.publicationdate === null || additionalFiles.length === 0)            
+        } else {
+          return false;
+        }
+      }
       if ((state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && cfrStatus === 'init')
             || (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && estimatedTotalDue === 0)
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && amountDue === 0)
@@ -183,7 +193,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
 
     let message = userGroups.includes("OI Team") ? 
-      {title: "Changing the state", body: "Are you sure you want to change the state of this request to " + state + "?"}
+      getMessageForOITeam(state, openInfo, additionalFiles)
       : getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalDue);
     const attchmentFileNameList = attachmentsArray?.map(_file => _file.filename);
 

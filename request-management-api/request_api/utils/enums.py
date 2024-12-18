@@ -141,6 +141,7 @@ class DocumentPathMapperCategory(Enum):
     Attachments = "Attachments"
     Records = "Records"
     Historical = "Historical"
+    AdditionalFiles = "AdditionalFiles"
 
 class ServiceName(Enum):
     payonline = "payonline"

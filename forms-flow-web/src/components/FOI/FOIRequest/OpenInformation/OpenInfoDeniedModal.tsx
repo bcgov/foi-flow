@@ -8,19 +8,19 @@ import {
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 
-const IAOOpenInfoSaveModal = ({ showModal, saveData, setShowModal }: any) => {
+const OAOpenInfoDeniedModal = ({ showDeniedModal, saveData, setShowDeniedModal }: any) => {
   const handleSave = () => {
     saveData();
-    setShowModal(false);
+    setShowDeniedModal(false);
   };
   const handleClose = () => {
-    setShowModal(false);
+    setShowDeniedModal(false);
   };
 
   return (
     <div className="state-change-dialog">
       <Dialog
-        open={showModal}
+        open={showDeniedModal}
         onClose={() => {
           handleClose()
         }}
@@ -30,7 +30,7 @@ const IAOOpenInfoSaveModal = ({ showModal, saveData, setShowModal }: any) => {
         fullWidth={true}
       >
         <DialogTitle disableTypography id="state-change-dialog-title">
-          <h2 className="state-change-header">{"Exemption Request"}</h2>
+          <h2 className="state-change-header">{"Exemption Denied"}</h2>
           <IconButton className="title-col3" onClick={handleClose}>
             <i className="dialog-close-button">Close</i>
             <CloseIcon />
@@ -39,9 +39,9 @@ const IAOOpenInfoSaveModal = ({ showModal, saveData, setShowModal }: any) => {
         <DialogContent>
           <DialogContentText id="restricted-modal-text" component={"span"}>
             <div className="modal-msg">
-              <div className="confirmation-message">{"Are you sure you want to change the state to Exemption Request?"}</div>
+              <div className="confirmation-message">{"Are you sure you want to deny this exemption?"}</div>
               <div className="modal-msg-description">
-                <i><span>This will assign the request to the Open Information Queue.</span></i>
+                <i><span>The request will not be eligible for publication and will remain in the OI Queue.</span></i>
               </div>
             </div>
           </DialogContentText>
@@ -63,4 +63,4 @@ const IAOOpenInfoSaveModal = ({ showModal, saveData, setShowModal }: any) => {
   );
 };
 
-export default IAOOpenInfoSaveModal;
+export default OAOpenInfoDeniedModal;

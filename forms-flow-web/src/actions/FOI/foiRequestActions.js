@@ -562,3 +562,10 @@ export const setFOICommentTypes = (data) => (dispatch) => {
     payload: data,
   });
 };
+
+export const setFOIOpenInfoAdditionalFiles = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_OPENINFO_ADDITIONAL_FILES,
+    payload: data,
+  });
+};

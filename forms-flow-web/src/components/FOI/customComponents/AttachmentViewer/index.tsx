@@ -5,14 +5,14 @@ import './index.scss'
 import {getFOIS3DocumentPreSignedUrl} from '../../../../apiManager/services/FOI/foiOSSServices'
 
 
-export  const AttachmentViewer = ({filepath, ministryrequestid}:params) => {
+export  const AttachmentViewer = ({filepath, ministryrequestid, filetype, bcgovcode}:params) => {
 const dispatch = useDispatch();
 const [presignedUrl, setpresignedUrl] = React.useState(filepath);
 
     React.useEffect(() => {
             if(filepath)
             {
-                  const response = getFOIS3DocumentPreSignedUrl(filepath,ministryrequestid, dispatch)
+                  const response = getFOIS3DocumentPreSignedUrl(filepath,ministryrequestid, dispatch, () => {}, filetype, bcgovcode)
                   response.then((result)=>{                        
                         var viwerUrl =   result.data
                         if(filepath.toLowerCase().indexOf('.docx') >-1 ||filepath.toLowerCase().indexOf('.doc') >-1 || filepath.toLowerCase().indexOf('.xls') >-1 || filepath.toLowerCase().indexOf('.xlsx')>-1)

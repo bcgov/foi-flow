@@ -1,10 +1,12 @@
-import TextField from '@material-ui/core/TextField';
+// import TextField from '@material-ui/core/TextField';
+import { TextField } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import { getMenuItems } from "../FOIRequestHeader/utils";
 import { saveFOIOpenInfoRequest } from "../../../../apiManager/services/FOI/foiOpenInfoRequestServices";
 import { useDispatch } from "react-redux";
+import "./openinfo.scss";
 
 const OIAssignedToStyles = makeStyles((theme: Theme) => ({
     formControl: {
@@ -124,12 +126,10 @@ const [selectedOIAssignedTo, setOIAssignedTo] = useState("Unassigned");
 
 useEffect(() => {
   const oiTeam = iaoassignedToList?.find((team: any) => team.name === 'OI Team');
-  console.log("oiTeam : ",oiTeam);
   const member = oiTeam?.members?.find(
     (member: any) => member.username === foiOITransactionData?.oiassignedto
   );
-  console.log("member : ",member);
-  
+
   if(isOIUser){
     const currentAssignee = member 
       ? `${oiTeam.name}|${member.username}|${member.firstname}|${member.lastname}`

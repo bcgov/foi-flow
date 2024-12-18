@@ -65,6 +65,7 @@ import {
   fetchPDFStitchStatusForConsults,
 } from "../../../apiManager/services/FOI/foiRecordServices";
 import {
+  fetchFOIOpenInfoAdditionalFiles,
   fetchFOIOpenInfoRequest,
 } from "../../../apiManager/services/FOI/foiOpenInfoRequestServices";
 import { makeStyles } from "@material-ui/core/styles";
@@ -121,7 +122,7 @@ import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
-import IAOOpenInfoPublishing from "./OpenInformation/IAOOpenInfoPublishing";
+import OpenInfo from "./OpenInformation/OpenInfo";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -191,9 +192,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let requestApplicantProfile = useSelector(
     (state) => state.foiRequests.foiRequestApplicantProfile
   )
-  let foiOITransactionData = useSelector(
-    (state) => state.foiRequests.foiOpenInfoRequest
-  );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
@@ -385,6 +383,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
     if (isOITeam) {
       dispatch(fetchOpenInfoStatuses());
+      dispatch(fetchFOIOpenInfoAdditionalFiles(requestId, ministryId));
     }
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
@@ -1244,7 +1243,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     name="Open Information"
                     onClick={() => tabclick("OpenInformation")}
                   >
-                    Open Information
+                    Publication
                   </div>
                 )}
                 {showContactApplicantTab() && (
@@ -1796,13 +1795,15 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 [classes.hidden]: !tabLinksStatuses.OpenInformation.display,
               })}
             >
-              <IAOOpenInfoPublishing
+              <OpenInfo
                 toast={toast}
                 requestNumber={requestNumber}
                 requestDetails={requestDetails}
                 userDetail={userDetail}
+                currentOIRequestState={getOIRequestState()}
                 foirequestid={requestId}
                 foiministryrequestid={ministryId}
+                bcgovcode={JSON.parse(bcgovcode)}
               />
             </div>
           )}
