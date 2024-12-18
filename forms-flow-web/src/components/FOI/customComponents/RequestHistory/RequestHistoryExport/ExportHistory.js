@@ -265,7 +265,7 @@ const ExportHistory = ({
         selectedExportOptions.isApplicantCorrespondenceChecked &&
         <div style={{ pageBreakInside: 'avoid' }}>
           <div className="export_title">
-            <h1 className="foi-review-request-text foi-ministry-requestheadertext">Application Correspondence</h1>
+            <h1 className="foi-review-request-text foi-ministry-requestheadertext">Applicant Correspondence</h1>
           </div>
           <div> {applicantCorrespondence.length === 0 ? (
             <div className="nofiltermessage">No communications under this filter category</div>
