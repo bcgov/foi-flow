@@ -979,9 +979,7 @@ class FOIRawRequest(db.Model):
             return FOIRawRequest.__getfilterforapplicantname(params)
         elif(params['search'] == 'assigneename'):
             return FOIRawRequest.__getfilterforassigneename(params)
-        elif(params['search'] == 'idnumber'):
-            return FOIRawRequest.__getfilterforidnumber(params)
-        elif(params['search'] == 'axisrequest_number'):
+        elif(params['search'] == 'idnumber' or params['search'] == 'axisrequest_number'):
             return FOIRawRequest.__getfilterforaxisnumber(params)
         else:
             searchcondition = []
