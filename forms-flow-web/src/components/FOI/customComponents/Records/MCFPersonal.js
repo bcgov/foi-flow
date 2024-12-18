@@ -20,6 +20,7 @@ import TextField from '@material-ui/core/TextField';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import _ from 'lodash';
 import { MCFPopularSections } from "../../../../constants/FOI/enum";
+import Draggable from 'react-draggable';
 
 const MCFPersonal = ({
     editTagModalOpen,
@@ -34,7 +35,8 @@ const MCFPersonal = ({
     divisionModalTagValue,
     divisions=[],
     isMinistryCoordinator,
-    currentEditRecord
+    currentEditRecord,
+    isBulkEdit
 }) => {
     const [personalAttributes, setPersonalAttributes] = useState();
     useEffect(() => {
@@ -81,16 +83,26 @@ const MCFPersonal = ({
     }
 
     useEffect(() => {
-      setDisableSave(
-        personalAttributes?.person === undefined
-         || personalAttributes?.person === ""
-         || personalAttributes?.filetype === undefined
-         || personalAttributes?.filetype === ""
-         || personalAttributes?.trackingid === undefined
-         || personalAttributes?.trackingid === ""
-         || (!isMinistryCoordinator && comparePersonalAttributes(personalAttributes, curPersonalAttributes))
-         || (isMinistryCoordinator && comparePersonalAttributes(personalAttributes, curPersonalAttributes) && compareDivision(currentEditRecord.attributes.divisions[0].divisionid, divisionModalTagValue))
+      if (isBulkEdit) {
+        setDisableSave(
+           personalAttributes?.person === ""
+           && personalAttributes?.filetype === ""
+           && personalAttributes?.trackingid === ""
+           && personalAttributes?.personaltag === ""
+           && personalAttributes?.volume === ""
+          );
+      } else {
+        setDisableSave(
+          personalAttributes?.person === undefined
+          || personalAttributes?.person === ""
+          || personalAttributes?.filetype === undefined
+          || personalAttributes?.filetype === ""
+          || personalAttributes?.trackingid === undefined
+          || personalAttributes?.trackingid === ""
+          || (!isMinistryCoordinator && comparePersonalAttributes(personalAttributes, curPersonalAttributes))
+          || (isMinistryCoordinator && comparePersonalAttributes(personalAttributes, curPersonalAttributes) && compareDivision(currentEditRecord.attributes.divisions[0].divisionid, divisionModalTagValue))
         );
+      }
     },[personalAttributes, divisionModalTagValue])
 
     useEffect(() => {
@@ -277,12 +289,21 @@ const MCFPersonal = ({
       setFileTypeSearchValue("");
     };
 
+    const PaperComponent = (props) => {
+      return (
+        <Draggable handle="#state-change-dialog-title" cancel={'[class*="MuiDialogContent-root"]'}>
+          <Paper {...props} />
+        </Draggable>
+      );
+    }
+
     return (
 
       <div className="state-change-dialog">
         <Dialog
           open={editTagModalOpen}
           onClose={() => handleClose()}
+          PaperComponent={PaperComponent}
           aria-labelledby="state-change-dialog-title"
           aria-describedby="state-change-dialog-description"
           maxWidth={"md"}
@@ -637,20 +658,31 @@ const MCFPersonal = ({
             </DialogContentText>
           </DialogContent>
           <DialogActions>
+            {!isBulkEdit && 
+            <>
+              <button
+                className={`btn-bottom btn-save btn`}
+                onClick={() => {updatePersonalAttributes();reset();}}
+                disabled={disableSave}
+              >
+                Update for Individual
+              </button>
+              <button
+                className={`btn-bottom btn-save btn`}
+                onClick={() => {updatePersonalAttributes(true);reset();}}
+                disabled={disableSave || isMinistryCoordinator}
+              >
+                Update for All
+              </button>
+            </>}
+            {isBulkEdit &&
             <button
               className={`btn-bottom btn-save btn`}
               onClick={() => {updatePersonalAttributes();reset();}}
               disabled={disableSave}
             >
-              Update for Individual
-            </button>
-            <button
-              className={`btn-bottom btn-save btn`}
-              onClick={() => {updatePersonalAttributes(true);reset();}}
-              disabled={disableSave || isMinistryCoordinator}
-            >
-              Update for All
-            </button>
+              Continue
+            </button>}
             <button
               className="btn-bottom btn-cancel"
               onClick={() => handleClose()}
