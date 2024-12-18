@@ -1759,9 +1759,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 toast={toast}
                 requestNumber={requestNumber}
                 requestDetails={requestDetails}
-                userDetail={userDetail}
                 currentOIRequestState={getOIRequestState()}
                 foirequestid={requestId}
+                isOITeam={isOITeam}
                 foiministryrequestid={ministryId}
                 bcgovcode={JSON.parse(bcgovcode)}
               />

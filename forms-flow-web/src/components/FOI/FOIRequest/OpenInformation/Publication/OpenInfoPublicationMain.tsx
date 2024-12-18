@@ -39,13 +39,14 @@ const OpenInfoPublicationMain = ({
   requestId,
   ministryId,
   oiPublicationData,
-  isOIUser,
   currentOIRequestState,
   handleOIDataChange,
   bcgovcode,
   requestNumber,
 }: any) => {  
   const dispatch = useDispatch();
+
+  //App State
   const oiPublicationStatuses: OIPublicationStatus[] = useSelector(
     (state: any) => state.foiRequests.oiPublicationStatuses
   );
@@ -69,6 +70,7 @@ const OpenInfoPublicationMain = ({
   });
   const classes = useStyles();
 
+  //Local State
   const [additionalFiles, setAdditionalFiles] = useState([]);
   const [openModal, setOpenModal] = useState(false);
 
@@ -76,6 +78,7 @@ const OpenInfoPublicationMain = ({
     setAdditionalFiles(foiOpenInfoAdditionalFiles);
   }, [foiOpenInfoAdditionalFiles])
 
+  //Functions
   const deleteFile = (_index: any) => {
     let file: any = additionalFiles[_index];
     dispatch(setFOILoader(true));
@@ -243,6 +246,8 @@ const OpenInfoPublicationMain = ({
     window.open(url, "_blank")?.focus();
   }
 
+  const disableUserInput = !oiPublicationData?.oiexemptionapproved && oiPublicationData.oipublicationstatus_id === 1;
+
   return (
     <div className="request-accordian">
       <Accordion defaultExpanded={true}>
@@ -262,8 +267,9 @@ const OpenInfoPublicationMain = ({
                 name="oipublicationstatus_id"
                 label="Publication Status"
                 variant="outlined"
-                value={oiPublicationData?.oipublicationstatus_id || 2}
+                value={oiPublicationData?.oipublicationstatus_id === 1 ? 2 : oiPublicationData?.oipublicationstatus_id}
                 select
+                disabled={disableUserInput}
                 required
                 InputLabelProps={{ shrink: true }}
                 onChange={(event) =>
@@ -271,9 +277,9 @@ const OpenInfoPublicationMain = ({
                 }
               >
                 {oiPublicationStatuses.map((status) => {
-                  // if (status.oipublicationstatusid === 1) {
-                  //   return null;
-                  // }
+                  if (status.oipublicationstatusid === 1) {
+                    return null;
+                  }
                   return (
                     <MenuItem
                       key={status.oipublicationstatusid}
@@ -291,7 +297,7 @@ const OpenInfoPublicationMain = ({
                 name="publicationdate"
                 label="Publication Date"
                 variant="outlined"
-                disabled={["OI Review", "Exemption Request", "Do Not Publish", "Publication Review"].includes(currentOIRequestState)}
+                disabled={disableUserInput || ["OI Review", "Exemption Request", "Do Not Publish", "Publication Review"].includes(currentOIRequestState)}
                 InputLabelProps={{ shrink: true }}
                 onChange={(event) =>
                   handleOIDataChange(event.target.value, event.target.name)
@@ -307,6 +313,7 @@ const OpenInfoPublicationMain = ({
                 name="row-radio-buttons-group"
               >
                 <FormControlLabel
+                  disabled={disableUserInput}
                   value={true}
                   name="copyrightsevered"
                   control={
@@ -321,6 +328,7 @@ const OpenInfoPublicationMain = ({
                   label="Copyright Severed"
                 />
                 <FormControlLabel
+                  disabled={disableUserInput}
                   value={false}
                   name="copyrightsevered"
                   control={
@@ -336,7 +344,8 @@ const OpenInfoPublicationMain = ({
                 />
               </RadioGroup>
             </Grid>
-          </Grid>          
+          </Grid>
+          {!disableUserInput &&         
           <div className="oi-main-text">
           <section
             className={clsx("file-upload-container")}
@@ -382,6 +391,7 @@ const OpenInfoPublicationMain = ({
             </div>
           </section>
           </div>
+          }
         </AccordionDetails>
       </Accordion>
       <AttachmentModal
