@@ -1019,15 +1019,6 @@ class FOIRawRequest(db.Model):
             searchcondition2.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
             searchcondition3.append(FOIRawRequest.assignedgroup.ilike('%'+keyword+'%'))
         return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3))
-
-    @classmethod
-    def __getfilterforidnumber(cls,params):
-        searchcondition = []
-        for keyword in params['keywords']:
-            keyword = keyword.lower()
-            keyword = keyword.replace('u-00', '')
-            searchcondition.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
-        return and_(*searchcondition)
     
     @classmethod
     def __getfilterforaxisnumber(cls,params):
