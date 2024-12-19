@@ -139,10 +139,10 @@ import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConst
     }
   }
 
-  export const getMessageForOITeam = (state, openinfo, additionalfiles) => {
+  export const getMessageForOITeam = (state, openinfo, additionalfiles, requestnumber) => {
     if (state === 'Ready to Publish') {
-      if (openinfo.copyrightsevered === null || openinfo.publicationdate === null || additionalfiles.length === 0) {
-        return {title: "Changing the state", body: "Unable to update state: please make sure a publication date is set, the copyright is selected and at least one file is uploaded."}
+      if (openinfo.copyrightsevered === null || openinfo.publicationdate === null || additionalfiles.findIndex(f => f.filename.includes("Response_Letter_" + requestnumber)) < 0) {
+        return {title: "Changing the state", body: 'Unable to update state: please make sure a publication date is set, the copyright is selected and a response letter is uploaded with the file name format "Response_Letter_{Request No.}.pdf"'}
       }
     }
     return {title: "Changing the state", body: "Are you sure you want to change the state of this request to " + state + "?"}

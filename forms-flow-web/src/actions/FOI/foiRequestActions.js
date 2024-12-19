@@ -153,6 +153,13 @@ export const setFOIPDFStitchedRecordForResponsePackage =
       payload: data,
     });
   };
+export const setFOIPDFStitchedOIPackage =
+  (data) => (dispatch) => {
+    dispatch({
+      type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_OI_PACKAGE,
+      payload: data,
+    });
+  };
 export const setFOIPDFStitchedRecordForOipcRedlineReview = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_OIPCREDLINEREVIEW,
@@ -181,6 +188,12 @@ export const setFOIPDFStitchStatusForRedlines = (data) => (dispatch) => {
 export const setFOIPDFStitchStatusForResponsePackage = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_RESPONSEPACKAGE,
+    payload: data,
+  });
+};
+export const setFOIPDFStitchStatusForOIPackage = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OI_PACKAGE,
     payload: data,
   });
 };

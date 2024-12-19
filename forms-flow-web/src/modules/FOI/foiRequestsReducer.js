@@ -157,7 +157,9 @@ const initialState = {
   oiPublicationStatuses: [],
   oiStatuses: [],
   foiOpenInfoRequest: {},
-  foiOpenInfoAdditionalFiles: []
+  foiOpenInfoAdditionalFiles: [],
+  foiPDFStitchedOIPackage: {},
+  foiPDFStitchStatusForOIPackage: "not started"
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -360,6 +362,10 @@ const foiRequests = (state = initialState, action) => {
       return {...state, foiOpenInfoRequest: action.payload}
     case FOI_ACTION_CONSTANTS.FOI_OPENINFO_ADDITIONAL_FILES:
       return {...state, foiOpenInfoAdditionalFiles: action.payload}
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_OI_PACKAGE:
+      return {...state, foiPDFStitchedOIPackage: action.payload}
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OI_PACKAGE:
+      return {...state, foiPDFStitchStatusForOIPackage: action.payload}
     default:
       return state;
   }

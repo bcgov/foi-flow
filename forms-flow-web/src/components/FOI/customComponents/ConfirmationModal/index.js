@@ -123,7 +123,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const isBtnDisabled = () => {
       if (isOITeam) {        
         if (state === 'Ready to Publish') {
-          return (openInfo.copyrightsevered === null || openInfo.publicationdate === null || additionalFiles.length === 0)            
+          return (openInfo.copyrightsevered === null || openInfo.publicationdate === null || additionalFiles.findIndex(f => f.filename.includes("Response_Letter_" + requestNumber)) < 0)            
         } else {
           return false;
         }
