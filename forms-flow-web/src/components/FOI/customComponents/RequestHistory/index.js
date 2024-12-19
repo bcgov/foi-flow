@@ -158,7 +158,7 @@ export const RequestHistorySection = ({
     // Options for html2pdf
     const options = {
       margin: 5,
-      filename: `Request History - ${requestNumber?requestNumber:`U-00${requestid}`} - ${selectedCategory}.pdf`,
+      filename: `Request History - ${requestNumber || `U-00${requestid}`} - ${selectedCategory}.pdf`,
       image: { type: 'png', quality: 0.97 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress:true },
