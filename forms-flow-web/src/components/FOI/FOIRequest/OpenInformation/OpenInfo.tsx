@@ -102,25 +102,44 @@ const OpenInfo = ({
       oiPublicationData?.oipublicationstatus_id === 1 &&
       oiPublicationData?.oiexemption_id !== 5
     ) {
-      setConfirmationModal((prev : any) => ({
-        ...prev, 
-        show: true,
-        title: "Exemption Request",
-        description: "Are you sure you want to change the state to Exemption Request?",
-        message: "This will assign the request to the Open Information Queue.",
-        confirmButtonTitle: "Save Changes"
-      }));
+      if (isOIUser && oiPublicationData?.oiexemptionapproved != null) {
+        setConfirmationModal((prev: any) => ({
+          ...prev,
+          show: true,
+          title: oiPublicationData.oiexemptionapproved ? "Exemption Approved" : "Exemption Denied",
+          description: oiPublicationData.oiexemptionapproved 
+            ? "Are you sure you want to approve this exemption?"
+            : "Are you sure you want to deny this exemption? ",
+          message: oiPublicationData.oiexemptionapproved ? "The request will not be eligible for publication and will be removed from the OI Queue." : "The request will still be eligible for publication and will remain in the OI Queue.",
+          confirmButtonTitle: "Save Change"
+        }));
+      } else {
+        setConfirmationModal((prev: any) => ({
+          ...prev,
+          show: true,
+          title: "Exemption Request",
+          description: "Are you sure you want to change the state to Exemption Request?",
+          message: "This will assign the request to the Open Information Queue.",
+          confirmButtonTitle: "Save Changes"
+        }));
+      }
     } else {
       saveData();
     }
   };
   const saveData = () => {
     const toastID = toast.loading("Saving FOI OpenInformation request...");
+    const formattedData = {
+      ...oiPublicationData,
+      publicationdate: oiPublicationData.publicationdate ? 
+        new Date(oiPublicationData.publicationdate).toISOString().split('T')[0] : 
+        null
+    };
     dispatch(
       saveFOIOpenInfoRequest(
         foiministryrequestid,
         foirequestid,
-        oiPublicationData,
+        formattedData,
         requestDetails,
         (err: any, _res: any) => {
           if (!err) {
@@ -207,6 +226,9 @@ const OpenInfo = ({
           requestNumber={requestNumber}
           isOIUser={isOIUser}
           assignedToList={assignedToList}
+          foiministryrequestid={foiministryrequestid}
+          foirequestid={foirequestid}
+          toast={toast}
         />
         <OpenInfoTab tabValue={tabValue} handleTabSelect={handleTabSelect} />
         {tabValue === 1 ? (

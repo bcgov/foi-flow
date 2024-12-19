@@ -20,6 +20,12 @@ const OpenInfoConfirmationModal = ({
     if (modal.title === "Change Publication Date") {
       confirm(modal.confirmationData);
     }
+    if (modal.title === "Exemption Approved") {
+      confirm();
+    } 
+    if (modal.title === "Exemption Denied") {
+      confirm();
+    }
     setModal((prev : any) => ({
       ...prev,     
       show: false, 

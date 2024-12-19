@@ -72,26 +72,37 @@ const IAOOpenInfoHeader = ({
 
   const [selectedAssignedTo, setAssignedTo] = useState(() => getFullName());
 
-  //const menuItems = ["this", "that"]; // NEED TO ADJUST THIS FOR OI TEAM
-
 const handleOIAssigneeUpdate = async (event: any) => {
   const assigneeValue = event?.target?.value;
   const [groupName, username, firstName, lastName] = assigneeValue.split('|');
   const fullName = firstName !== "" ? `${lastName}, ${firstName}` : username;;
 
-  const updatedOpenInfoRequest = {
-    ...foiOITransactionData,  
-    oiassignedto: username    
-  };
-
   // Update the selected assignee in the dropdown
   setOIAssignedTo(assigneeValue);
   
+  const assigneeDetails = {
+    assignedGroup: groupName,
+    assignedTo: username,
+    assignedToFirstName: firstName,
+    assignedToLastName: lastName,
+    assignedToName: fullName
+  };
+
+  const updatedOpenInfoRequest = {
+    ...foiOITransactionData,  
+    oiassignedto: username,
+    assigneeDetails:assigneeDetails,
+    publicationdate: foiOITransactionData.publicationdate ? 
+    new Date(foiOITransactionData.publicationdate).toISOString().split('T')[0] : 
+    null
+  };
+
   dispatch(
     saveFOIOpenInfoRequest(
       foiministryrequestid, 
       foirequestid, 
       updatedOpenInfoRequest, 
+      requestDetails,
       (err: any, res: any) => {
       if (!err) {
         toast.success("Assignee has been saved successfully.", {
@@ -102,7 +113,7 @@ const handleOIAssigneeUpdate = async (event: any) => {
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-        });
+        });  
       } else {
         toast.error(
           "Temporarily unable to save the assignee. Please try again in a few minutes.",

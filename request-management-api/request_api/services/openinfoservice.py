@@ -4,6 +4,7 @@ from request_api.models.OpenInformationStatuses import OpenInformationStatuses
 from request_api.models.FOIOpenInformationRequests import FOIOpenInformationRequests
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIOpenInfoAdditionalFiles import FOIOpenInfoAdditionalFiles
+from request_api.models.FOIAssignees import FOIAssignee
 from datetime import datetime
 
 class openinfoservice:
@@ -29,7 +30,21 @@ class openinfoservice:
         result = FOIOpenInformationRequests().createopeninfo(foiopeninforequest, userid)
         return result
 
-    def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid, foirequestid):
+    def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid, foirequestid, assigneedetails):
+        # Check and save assignee first if exists
+        if 'oiassignedto' in foiopeninforequest and foiopeninforequest['oiassignedto'] not in (None, '') and assigneedetails:
+            _assignee = foiopeninforequest['oiassignedto']
+            # Get assignee info from FOIAssignee table
+            existing_assignee = FOIAssignee.query.filter_by(username=_assignee).first()
+            if not existing_assignee and assigneedetails:
+                # If exists, use existing assignee info
+                FOIAssignee.saveassignee(
+                    _assignee,
+                    assigneedetails.get('assignedToFirstName', ''),
+                    '',  # middlename
+                    assigneedetails.get('assignedToLastName', '')
+                )
+        
         prev_foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
         foiministryrequestversion = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
         foiopeninforequest['foiministryrequestversion_id'] = foiministryrequestversion
