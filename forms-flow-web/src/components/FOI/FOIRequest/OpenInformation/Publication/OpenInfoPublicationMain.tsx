@@ -76,7 +76,7 @@ const OpenInfoPublicationMain = ({
   }, [foiPDFStitchStatusForOIPackage])
 
   useEffect(() => {
-    setPackageCreatedAt(foiPDFStitchedOIPackage.createdat_datetime)    
+    setPackageCreatedAt(foiPDFStitchedOIPackage?.createdat_datetime || 'N/A')    
   }, [foiPDFStitchedOIPackage])
 
   //Styling
