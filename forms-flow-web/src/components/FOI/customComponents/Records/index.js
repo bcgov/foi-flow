@@ -1977,6 +1977,20 @@ export const RecordsLog = ({
       );
     }
 
+    if(isMinistryCoordinator
+      && selectedRecords.length > 1
+      && divisionModalTagValue !== -1
+    )
+      for (let selectedRecord of selectedRecords) {
+        updateDivisionForRecords.push(
+          {
+            recordid: selectedRecord.recordid,
+            documentmasterid: selectedRecord.documentmasterid,
+            filepath: selectedRecord.s3uripath
+          }
+        );
+      }
+
     if(currentEditRecord || selectedRecords.length > 1) {
       if(updateRecords.length > 0 && !comparePersonalAttributes(newPersonalAttributes, curPersonalAttributes)) {
         dispatch(
@@ -2685,6 +2699,7 @@ export const RecordsLog = ({
                         trackingid: "",
                         personaltag: ""
                       });
+                      setDivisionModalTagValue(-1);
                       setEditTagModalOpen(true);
                     }}
                     disabled={lockRecords || isBulkEditDisabled()}
