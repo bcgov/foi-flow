@@ -90,6 +90,7 @@ const MCFPersonal = ({
            && personalAttributes?.trackingid === ""
            && personalAttributes?.personaltag === ""
            && personalAttributes?.volume === ""
+           && divisionModalTagValue === -1
           );
       } else {
         setDisableSave(
