@@ -6,6 +6,7 @@ import OpenInfoPublication from "./Publication/OpenInfoPublication";
 import IAOOpenInfoHeader from "./IAOOpenInfoHeader";
 import OpenInfoTab from "./OpenInfoTab";
 import "./openinfo.scss";
+import { isReadyForPublishing } from "../utils";
 
 type OITransactionObject = {
   oipublicationstatus_id: number;
@@ -179,9 +180,9 @@ const OpenInfo = ({
     }
     return true;
   };
-  const disablePublish = (oiPublicationData: OITransactionObject) : boolean => {
-    const isMissingRequiredInput = oiPublicationData?.copyrightsevered === null || foiOpenInfoAdditionalFiles.length === 0;
-    const isOIReadyToPublish = currentOIRequestState === "Ready For Publishing";
+  const disablePublish = (oiPublicationData: OITransactionObject) : boolean => {    
+    const isMissingRequiredInput = !isReadyForPublishing(oiPublicationData, foiOpenInfoAdditionalFiles, requestNumber);
+    const isOIReadyToPublish = currentOIRequestState === "Ready to Publish";
     if (!isOIReadyToPublish) {
       return true;
     }
