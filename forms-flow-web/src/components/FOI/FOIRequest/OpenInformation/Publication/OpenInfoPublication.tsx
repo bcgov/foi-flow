@@ -23,6 +23,7 @@ const OpenInfoPublication = ({
   const publishConfirmation = () => {
     const todaysDate = formatDateInPst(new Date());
     handleOIDataChange(todaysDate, "publicationdate");
+    saveData();
   }
 
   return (
