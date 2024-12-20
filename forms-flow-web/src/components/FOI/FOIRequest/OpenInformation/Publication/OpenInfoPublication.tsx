@@ -1,21 +1,30 @@
 import OpenInfoPublicationMain from "./OpenInfoPublicationMain";
 import OpenInfoConfirmationModal from "../OpenInfoConfirmationModal";
+import { formatDateInPst } from "../../../../../helper/FOI/helper";
 
 const OpenInfoPublication = ({
   oiPublicationData,
   handleOIDataChange,
   disablePublish,
-  confirmDateModal,
+  confirmModal,
   handleDateConfirmation,
-  setConfirmDateModal,
+  setConfirmationModal,
   isDataEdited,
   saveData,
   currentOIRequestState,
   ministryId, 
   requestId, 
   bcgovcode, 
-  requestNumber
+  requestNumber,
+  handlePublishNow,
 }: any) => {
+
+  //Functions
+  const publishConfirmation = () => {
+    const todaysDate = formatDateInPst(new Date());
+    handleOIDataChange(todaysDate, "publicationdate");
+  }
+
   return (
     <>
       <OpenInfoPublicationMain
@@ -39,14 +48,14 @@ const OpenInfoPublication = ({
         type="button"
         disabled={disablePublish()}
         className="btn btn-bottom"
-        // onClick={handleSave}
+        onClick={handlePublishNow}
       >
         Publish Now
       </button>
       <OpenInfoConfirmationModal
-        modal={confirmDateModal}
-        confirm={handleDateConfirmation}
-        setModal={setConfirmDateModal}
+        modal={confirmModal}
+        confirm={(confirmModal.title === "Change Publication Date" && handleDateConfirmation) || (confirmModal.title === "Publish Now" && publishConfirmation)}
+        setModal={setConfirmationModal}
       />
     </>
   );

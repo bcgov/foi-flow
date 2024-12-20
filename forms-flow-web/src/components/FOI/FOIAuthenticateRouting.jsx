@@ -33,7 +33,7 @@ const FOIAuthenticateRouting = React.memo((props) => {
   }
 
   useEffect(()=>{
-    console.log('authenticate')
+    // console.log('authenticate')
     if(props.store){
       UserService.initKeycloak(props.store, (_err, res) => {
         dispatch(setUserAuth(res.authenticated));
@@ -50,8 +50,6 @@ const FOIAuthenticateRouting = React.memo((props) => {
     isMinistry = isMinistryLogin(userGroups);
     //isOITeam = isOITeamLogin(userGroups);
   }
-  console.log("isMinistry : ",isMinistry)
-  //console.log("isOITeam : ",isOITeam)
   return (
       <>
         {isAuth && Object.entries(userDetail).length !== 0 ? (
