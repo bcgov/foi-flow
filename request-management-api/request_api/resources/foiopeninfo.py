@@ -19,9 +19,9 @@ TRACER = Tracer.get_instance()
 EXCEPTION_MESSAGE_NOTFOUND_REQUEST='Record not found'
 CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 
-#RESTRICT ALL ACESS TO ONLY IAO AND OI USERS FOR ALL ROUTES. NO MINISTRY ALLOWED!
+#RESTRICT ACESS TO ONLY IAO AND OI USERS FOR ALL ROUTES. EXCLUDE MINISTRY USERS
 # GET CALL for oi data -> ALLOWABLE = IAO, OI. RESTRCIT = Ministry
-# POST CALL (Create + update oi data) -> ALLOWABLE = IAO (exemption speicifc data), OI (exemption + publicaiton data). RESTRCIT = Ministry. Sepcific data (exemption or publkicaton) done in FE
+# POST CALL (Create + update oi data) -> ALLOWABLE = IAO (exemption speicifc data), OI (exemption + publicaiton data). RESTRCIT = Ministry. Specific data (exemption or pulibcation) done in FE
 # POST, GET, DELETE for additional files -> Allowable = ONLY OI
 
 @cors_preflight('GET,OPTIONS')
@@ -33,7 +33,7 @@ class FOIOpenInfoRequest(Resource):
     @cross_origin(origins=allowedorigins())
     @TRACER.trace()
     @auth.require
-    @auth.ismemberofgroups(getrequiredmemberships())
+    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
     def get(foiministryrequestid, usertype=None):
         try:
             result = openinfoservice().getcurrentfoiopeninforequest(foiministryrequestid)
@@ -56,7 +56,7 @@ class FOIOpenInfoRequestById(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    @auth.ismemberofgroups(getrequiredmemberships())
+    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
     def post(foiministryrequestid, foirequestid, usertype):
         try:
             request_json = request.get_json()
