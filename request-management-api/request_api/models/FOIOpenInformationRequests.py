@@ -188,7 +188,6 @@ class FOIOpenInformationRequests(db.Model):
         oifilter = cls.getgroupfilters(groups)
 
         # result, err = cls.getdatafromOILayerpagecounts(FOIRequest.foirequestid, FOIMinistryRequest.foiministryrequestid)
-        # print("헤이이이이이 result: ", result)
 
         # Define the selected columns
         selectedcolumns = [
@@ -215,7 +214,7 @@ class FOIOpenInformationRequests(db.Model):
             .join(subquery_maxversion, and_(*joincondition))
             .join(FOIMinistryRequest, and_(
                 FOIMinistryRequest.foiministryrequestid == cls.foiministryrequest_id, 
-                FOIMinistryRequest.version == cls.foiministryrequestversion_id,
+                # FOIMinistryRequest.version == cls.foiministryrequestversion_id,
                 FOIMinistryRequest.isactive == True))
             .join(FOIRequest, and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id))
             .join(ApplicantCategory,and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True))
