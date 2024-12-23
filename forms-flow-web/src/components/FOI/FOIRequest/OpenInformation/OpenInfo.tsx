@@ -6,6 +6,7 @@ import OpenInfoPublication from "./Publication/OpenInfoPublication";
 import IAOOpenInfoHeader from "./IAOOpenInfoHeader";
 import OpenInfoTab from "./OpenInfoTab";
 import "./openinfo.scss";
+import { isReadyForPublishing } from "../utils";
 
 type OITransactionObject = {
   oipublicationstatus_id: number;
@@ -68,16 +69,22 @@ const OpenInfo = ({
     if (!isDataEdited) {
       setIsDataEdited(true);
     }
+    //Reset foi oi data if publication status goes back to publication.
     if (oiDataKey === "oipublicationstatus_id" && value === 2) {
       setOiPublicationData((prev: any) => ({
         ...prev,
         [oiDataKey]: 2,
-        iaorationale: "",
+        iaorationale: null,
         oiexemption_id: null,
-        pagereference: "",
+        pagereference: null,
+        oiexemptionapproved: null,
+        copyrightsevered: null,
+        publicationdate: null,
+        oiexemptiondate: null,
+        oifeedback: null,
       }));
     } else if (oiDataKey === "publicationdate" && requestDetails.closedate 
-      && typeof(value) === "string" && calculateDaysBetweenDates(value, requestDetails.closeddate) <= 10) {
+      && typeof(value) === "string" && calculateDaysBetweenDates(value, requestDetails.closedate) >= 1 && calculateDaysBetweenDates(value, requestDetails.closedate) <= 10) {
       setConfirmationModal((prev : any) => ({
         ...prev, 
         show: true,
@@ -155,7 +162,7 @@ const OpenInfo = ({
               progress: undefined,
             });
             if (!isOITeam && oiPublicationData.oipublicationstatus_id === 1 && oiPublicationData.oiexemption_id !== 5) {
-              requestDetails.oistatusid = 2;
+              requestDetails.oistatusid = 8;
             }
           } else {
             toast.error(
@@ -179,7 +186,7 @@ const OpenInfo = ({
     const isDoNotPublish = oiPublicationData?.oipublicationstatus_id === 1;
     const hasExemption = oiPublicationData?.oiexemption_id !== null;
     const isMissingRequiredFields =
-      !oiPublicationData?.iaorationale && !oiPublicationData?.pagereference;
+      !oiPublicationData?.iaorationale || !oiPublicationData?.pagereference;
     const hasOutOfScopeExemption = oiPublicationData?.oiexemption_id === 5;
     if (isDoNotPublish && hasOutOfScopeExemption) {
       return false;
@@ -187,11 +194,14 @@ const OpenInfo = ({
     if (isDoNotPublish && hasExemption) {
       return isMissingRequiredFields;
     }
+    if (isDataEdited) {
+      return false;
+    }
     return true;
   };
-  const disablePublish = (oiPublicationData: OITransactionObject) : boolean => {
-    const isMissingRequiredInput = !oiPublicationData?.publicationdate && !oiPublicationData?.copyrightsevered && foiOpenInfoAdditionalFiles.length === 0;
-    const isOIReadyToPublish = currentOIRequestState === "Ready For Publishing";
+  const disablePublish = (oiPublicationData: OITransactionObject) : boolean => {    
+    const isMissingRequiredInput = !isReadyForPublishing(oiPublicationData, foiOpenInfoAdditionalFiles, requestNumber);
+    const isOIReadyToPublish = currentOIRequestState === "Ready to Publish";
     if (!isOIReadyToPublish) {
       return true;
     }
@@ -212,6 +222,20 @@ const OpenInfo = ({
   const calculateDaysBetweenDates = (date1: string, date2: string) => {
     return Math.round((new Date(date1).getTime() - new Date(date2).getTime()) / (1000 * 3600 *24));
   }
+  const handlePublishNow = () => {
+    setConfirmationModal((prev : any) => ({
+      ...prev, 
+      show: true,
+      title: "Publish Now",
+      description: "Are you sure you want to Publish this request now?",
+      message: "",
+      confirmButtonTitle: "Publish Now",
+    }));
+  }
+
+  console.log("req", requestDetails)
+  console.log("oi info", oiPublicationData)
+  console.log("isOIUser", isOITeam)
 
   return (
     <>
@@ -225,7 +249,7 @@ const OpenInfo = ({
           foirequestid={foirequestid}
           toast={toast}
         />
-        <OpenInfoTab tabValue={tabValue} handleTabSelect={handleTabSelect} isOIUser={isOITeam}/>
+        <OpenInfoTab tabValue={tabValue} handleTabSelect={handleTabSelect} isOIUser={isOITeam} isOIUser={isOITeam}/>
         {tabValue === 1 ? (
           <IAOOpenInfoPublishing
             handleOIDataChange={handleOIDataChange}
@@ -242,9 +266,9 @@ const OpenInfo = ({
             oiPublicationData={oiPublicationData}
             handleOIDataChange={handleOIDataChange}
             disablePublish={disablePublish}
-            confirmDateModal={confirmationModal}
+            confirmModal={confirmationModal}
             handleDateConfirmation={handleDateConfirmation}
-            setConfirmDateModal={setConfirmationModal}
+            setConfirmationModal={setConfirmationModal}
             isDataEdited={isDataEdited}
             saveData={saveData}
             currentOIRequestState={currentOIRequestState}
@@ -252,6 +276,7 @@ const OpenInfo = ({
             requestId={foirequestid} 
             bcgovcode={bcgovcode}
             requestNumber={requestNumber}
+            handlePublishNow={handlePublishNow}
           />
         )}
       </div>

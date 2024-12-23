@@ -490,3 +490,7 @@ export const getUniqueIdentifier = (obj) => {
   return (obj.extensionstatusid+formatDate(obj.extendedduedate, "MMM dd yyyy")+obj.extensionreasonid).replace(/\s+/g, '');
 }
 
+export const isReadyForPublishing = (openinfo, additionalfiles, requestnumber) => {
+  return !(openinfo?.copyrightsevered === null || openinfo?.publicationdate === null || additionalfiles?.findIndex(f => f.filename.includes("Response_Letter_" + requestnumber + ".pdf")) < 0)
+}
+

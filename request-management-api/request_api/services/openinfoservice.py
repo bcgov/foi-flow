@@ -24,8 +24,6 @@ class openinfoservice:
        return FOIOpenInformationRequests().getcurrentfoiopeninforequest(foiministryrequestid)
     
     def createopeninforequest(self, foiopeninforequest, userid, foiministryrequestid):
-        version = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
-        foiopeninforequest['foiministryrequestversion_id'] = version
         foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
         result = FOIOpenInformationRequests().createopeninfo(foiopeninforequest, userid)
         return result
@@ -36,8 +34,6 @@ class openinfoservice:
             self.updateopeninfoassignee(foiopeninforequest['oiassignedto'], assigneedetails)
         
         prev_foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
-        foiministryrequestversion = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
-        foiopeninforequest['foiministryrequestversion_id'] = foiministryrequestversion
         foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
         foiopeninforequest['version'] = prev_foiopeninforequest["version"]
         result = FOIOpenInformationRequests().updateopeninfo(foiopeninforequest, userid)
@@ -77,14 +73,3 @@ class openinfoservice:
     
     def deleteopeninfoadditionalfiles(self, fileids, userid):
         return FOIOpenInfoAdditionalFiles.bulkdelete(fileids['fileids'], userid)
-    
-    def updatefoioirequest_onfoirequestchange(self, foiministryrequestid, new_foirequestversion, userid):
-        foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
-        foiopeninforequest['foiministryrequestversion_id'] = new_foirequestversion
-        result = FOIOpenInformationRequests().updateopeninfo(foiopeninforequest, userid)
-        deactivateresult = None
-        if result.success == True:
-            foiopeninfoid = result.identifier
-            deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
-        if result and deactivateresult:
-            return result

@@ -18,7 +18,11 @@ API = Namespace('FOIOPENINFO', description='Endpoints for FOI OpenInformation ma
 TRACER = Tracer.get_instance()
 EXCEPTION_MESSAGE_NOTFOUND_REQUEST='Record not found'
 CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
-#RESTRICT ALL ACESS TO ONLY IAO AND OI USERS FOR ALL ROUTES. NO MINISTRY ALLOWED??
+
+#RESTRICT ACESS TO ONLY IAO AND OI USERS FOR ALL ROUTES. EXCLUDE MINISTRY USERS
+# GET CALL for oi data -> ALLOWABLE = IAO, OI. RESTRCIT = Ministry
+# POST CALL (Create + update oi data) -> ALLOWABLE = IAO (exemption speicifc data), OI (exemption + publicaiton data). RESTRCIT = Ministry. Specific data (exemption or pulibcation) done in FE
+# POST, GET, DELETE for additional files -> Allowable = ONLY OI
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>', defaults={'usertype':None})
@@ -29,10 +33,9 @@ class FOIOpenInfoRequest(Resource):
     @cross_origin(origins=allowedorigins())
     @TRACER.trace()
     @auth.require
-    @auth.ismemberofgroups(getrequiredmemberships())
+    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
     def get(foiministryrequestid, usertype=None):
         try:
-            #Do we need any other restriction logic to gather data??
             result = openinfoservice().getcurrentfoiopeninforequest(foiministryrequestid)
             if result in (None, {}):
                 return {"status": False, "message": "Could not find FOIOpenInfoRequest"}, 404
@@ -44,7 +47,6 @@ class FOIOpenInfoRequest(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
-# PUT AND POST ROUTES. IF FE DATA CONTAINS OR SENDS FOIOPENINFO DATA WITH A EXISTING FOIOPENINFOREQUESTID use PUT ROUTE AND USE UPDATESERVICE. IF POST route sent and fe data does not contain a foiopeninforequetst id use post route and createfoiopen service
 @cors_preflight('POST, PUT, OPTIONS') 
 @API.route('/foiopeninfo/foirequest/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>', defaults={'usertype':None})
 @API.route('/foiopeninfo/foirequest/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
@@ -54,7 +56,7 @@ class FOIOpenInfoRequestById(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    @auth.ismemberofgroups(getrequiredmemberships())
+    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
     def post(foiministryrequestid, foirequestid, usertype):
         try:
             request_json = request.get_json()
@@ -82,7 +84,7 @@ class FOIOpenInfoAdditionalFiles(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    @auth.ismemberofgroups(IAOTeamWithKeycloackGroup.oi)
+    @auth.ismemberofgroups(IAOTeamWithKeycloackGroup.oi.value)
     def get(foiministryrequestid, foirequestid):
         try:
             result = openinfoservice().fetchopeninfoadditionalfiles(foiministryrequestid)
@@ -99,7 +101,7 @@ class FOIOpenInfoAdditionalFiles(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    @auth.ismemberofgroups(IAOTeamWithKeycloackGroup.oi)
+    @auth.ismemberofgroups(IAOTeamWithKeycloackGroup.oi.value)
     def post(foiministryrequestid, foirequestid):
         try:
             request_json = request.get_json()
@@ -123,7 +125,7 @@ class FOIOpenInfoAdditionalFilesDelete(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    @auth.ismemberofgroups(IAOTeamWithKeycloackGroup.oi)
+    @auth.ismemberofgroups(IAOTeamWithKeycloackGroup.oi.value)
     def post(foiministryrequestid, foirequestid):
         try:
             request_json = request.get_json()

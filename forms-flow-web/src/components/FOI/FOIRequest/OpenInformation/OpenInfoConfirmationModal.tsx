@@ -14,11 +14,10 @@ const OpenInfoConfirmationModal = ({
   modal,
 }: any) => {
   const handleConfirmation = () => {
-    if (modal.title === "Exemption Request") {
-      confirm();
-    }
     if (modal.title === "Change Publication Date") {
       confirm(modal.confirmationData);
+    } else {
+      confirm();
     }
     if (modal.title === "Exemption Approved") {
       confirm();

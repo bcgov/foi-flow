@@ -21,6 +21,7 @@ import MinistryApprovalModal from './MinistryApprovalModal';
 import { formatDate, calculateDaysRemaining, ConditionalComponent, isMinistryLogin, isOITeam } from "../../../../helper/FOI/helper";
 import { MimeTypeList, MaxFileSizeInMB, MaxNumberOfFiles } from "../../../../constants/FOI/enum";
 import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo, getMessageForOITeam } from './util';
+import { isReadyForPublishing } from '../../FOIRequest/utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -123,7 +124,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const isBtnDisabled = () => {
       if (isOITeam) {        
         if (state === 'Ready to Publish') {
-          return (openInfo.copyrightsevered === null || openInfo.publicationdate === null || additionalFiles.findIndex(f => f.filename.includes("Response_Letter_" + requestNumber)) < 0)            
+          return !isReadyForPublishing(openInfo, additionalFiles, axisRequestId)
         } else {
           return false;
         }
@@ -192,7 +193,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
 
     let message = userGroups.includes("OI Team") ? 
-      getMessageForOITeam(state, openInfo, additionalFiles)
+      getMessageForOITeam(state, openInfo, additionalFiles, axisRequestId)
       : getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalDue);
     const attchmentFileNameList = attachmentsArray?.map(_file => _file.filename);
 

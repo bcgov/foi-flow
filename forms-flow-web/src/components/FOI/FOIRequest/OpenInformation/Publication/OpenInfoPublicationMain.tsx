@@ -76,7 +76,7 @@ const OpenInfoPublicationMain = ({
   }, [foiPDFStitchStatusForOIPackage])
 
   useEffect(() => {
-    setPackageCreatedAt(foiPDFStitchedOIPackage.createdat_datetime)    
+    setPackageCreatedAt(foiPDFStitchedOIPackage?.createdat_datetime || 'N/A')    
   }, [foiPDFStitchedOIPackage])
 
   //Styling
@@ -394,7 +394,7 @@ const OpenInfoPublicationMain = ({
                 name="publicationdate"
                 label="Publication Date"
                 variant="outlined"
-                disabled={disableUserInput || ["OI Review", "Exemption Request", "Do Not Publish", "Publication Review"].includes(currentOIRequestState)}
+                disabled={disableUserInput || currentOIRequestState === "First Review"}
                 InputLabelProps={{ shrink: true }}
                 onChange={(event) =>
                   handleOIDataChange(event.target.value, event.target.name)
