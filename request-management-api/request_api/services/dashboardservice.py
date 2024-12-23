@@ -92,7 +92,7 @@ class dashboardservice:
         for request in requests.items:
             if is_oi_team:
                 # Handle OI requests format
-                print("===============heyhey : oi team=============")
+                print("===============DashboardService getrequestqueuepagination: OI team=============")
                 requestqueue.append(self.__handle_oi_request(request))
             else:
                 # Handle Raw requests format
@@ -238,50 +238,48 @@ class dashboardservice:
             return idprefix + filenumber
         return ""
     
-    def getoirequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):        
-        requests = FOIOpenInformationRequests.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.getusertype())
-        requestqueue = []                
-        for request in requests.items:
-            _receiveddate = None
-            if request.created_at:
-                maya_dt = maya.parse(request.created_at)
-                received_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
-                _receiveddate = received_dt.strftime("%b %d %Y")
+    # def getoirequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):        
+    #     print("===================getoirequestqueuepagination====================")
+    #     requests = FOIOpenInformationRequests.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.getusertype())
+    #     requestqueue = []                
+    #     for request in requests.items:
+    #         _receiveddate = None
+    #         if request.closedate:
+    #             maya_dt = maya.parse(request.closedate)
+    #             received_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
+    #             _receiveddate = received_dt.strftime("%b %d %Y")
 
-            if request.publicationdate is None:
-                _publicationdate = 'N/A'
-            else:
-                maya_dt = maya.parse(request.publicationdate)
-                publication_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
-                _publicationdate = publication_dt.strftime("%b %d %Y")
+    #         if request.publicationdate is None:
+    #             _publicationdate = 'N/A'
+    #         else:
+    #             maya_dt = maya.parse(request.publicationdate)
+    #             publication_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
+    #             _publicationdate = publication_dt.strftime("%b %d %Y")
             
-            _from_closed = self.__calculate_from_closed(request.closedate)
-            
-            _oirequest = self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed)
+    #         _from_closed = self.__calculate_from_closed(request.closedate)
+    #         print("_receiveddate : ", _receiveddate)
+    #         _oirequest = self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed)
+    #         # isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
+    #         # _oirequest.update({'isiaorestricted': isiaorestricted})
 
-            print("request : ",request)
+    #         # if isiaorestricted == True:
+    #         #     _oirequest.update({'lastName': 'Restricted', 'firstName': 'Request'})
 
-            # isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
-            # _oirequest.update({'isiaorestricted': isiaorestricted})
+    #         requestqueue.append(_oirequest)   
 
-            # if isiaorestricted == True:
-            #     _oirequest.update({'lastName': 'Restricted', 'firstName': 'Request'})
+    #     meta = {
+    #         'page': requests.page,
+    #         'pages': requests.pages,
+    #         'total': requests.total,
+    #         'prev_num': requests.prev_num,
+    #         'next_num': requests.next_num,
+    #         'has_next': requests.has_next,
+    #         'has_prev': requests.has_prev,
+    #     }
 
-            requestqueue.append(_oirequest)   
+    #     return jsonify({'data': requestqueue, 'meta': meta})
 
-        meta = {
-            'page': requests.page,
-            'pages': requests.pages,
-            'total': requests.total,
-            'prev_num': requests.prev_num,
-            'next_num': requests.next_num,
-            'has_next': requests.has_next,
-            'has_prev': requests.has_prev,
-        }
-
-        return jsonify({'data': requestqueue, 'meta': meta})
-
-    def __preparefoioirequestinfo(self, request, receivedDate, publicationDate , fromClosed):
+    def __preparefoioirequestinfo(self, request, receivedDate, publicationDate, fromClosed, oilayerpagecount):
         return {
             'id': request.id,
             'idNumber': request.idNumber,
@@ -297,47 +295,61 @@ class dashboardservice:
             'applicantType': request.applicantcategory,
             'version': request.version,
             'foiopeninforequestid': request.foiopeninforequestid,
-            'currentState': request.currentState
+            'currentState': request.currentState,
+            'oilayerpagecount': oilayerpagecount if oilayerpagecount else '0',
         }
 
     def __calculate_from_closed(self, closedate):
+        """Calculate business days from close date to today"""
+
         if not closedate:
             return 'N/A'
+        try:
+            today = dt.datetime.now(tz=pytz.timezone('America/Vancouver')).date()
+            closed_date = closedate.date() if isinstance(closedate, dt.datetime) else closedate
+            business_days = 0
         
-        today = dt.datetime.now(tz=pytz.timezone('America/Vancouver')).date()
-        closedate = closedate.date() if isinstance(closedate, dt.datetime) else closedate
+            while closed_date < today:
+                if closed_date.weekday() < 5:  # Only count Monday through Friday
+                    business_days += 1
+                closed_date += dt.timedelta(days=1)
         
-        business_days = 0
-        current_date = closedate
-        
-        while current_date <= today:
-            if current_date.weekday() < 5:  # Monday = 0, Friday = 4
-                business_days += 1
-            current_date += dt.timedelta(days=1)
-    
-        return str(business_days) if business_days > 0 else 'N/A'   
+            return str(business_days) if business_days > 0 else 'N/A'   
+        except Exception as e:
+            print("Error in calculate_from_closed: ", e)
+            return 'N/A'
 
     def __handle_oi_request(self, request):
         """Formats request data for OI team view with received date, publication date, and days since closure"""
 
-        # Format received date to "MMM DD YYYY"
         _receiveddate = None
-        if request.created_at:
-            maya_dt = maya.parse(request.created_at)
-            received_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
-            _receiveddate = received_dt.strftime("%b %d %Y")
+        _publicationdate = 'N/A'
 
-        # Format publication date to "MMM DD YYYY"
-        _publicationdate = None
-        if request.publicationdate is None:
-            _publicationdate = 'N/A'
-        else:
-            maya_dt = maya.parse(request.publicationdate)
-            publication_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
-            _publicationdate = publication_dt.strftime("%b %d %Y")
+        # Handle close date
+        if request.closedate:
+            _receiveddate = request.closedate.strftime("%b %d %Y") if request.closedate else None
         
-        # Calculate the number of business days from the closed date
+        # Handle publication date
+        if request.publicationdate:
+            _publicationdate = request.publicationdate.strftime("%b %d %Y") if request.publicationdate else None
+        
+        # Calculate business days
         _from_closed = self.__calculate_from_closed(request.closedate)
-    
-        return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed)
+
+        # Get page counts from OI Layer
+        page_counts, err = FOIOpenInformationRequests.getdatafromOILayerpagecounts(
+            request.id,
+            request.ministryrequestid
+        )
+        # Get the page count value from the dictionary with error handling
+        oilayerpagecount = '0'
+        try:
+            if not err and isinstance(page_counts, dict) and page_counts:
+                first_value = next(iter(page_counts.values()))
+                oilayerpagecount = str(first_value) if first_value is not None else '0'
+        except Exception as e:
+            logging.error(f"Error extracting page count: {str(e)}")
+            oilayerpagecount = '0'
+            
+        return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed, oilayerpagecount)
           

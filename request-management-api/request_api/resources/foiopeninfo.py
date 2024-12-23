@@ -60,9 +60,12 @@ class FOIOpenInfoRequestById(Resource):
     def post(foiministryrequestid, foirequestid, usertype):
         try:
             request_json = request.get_json()
-            foiopeninfo = FOIOpenInfoSchema().load(request_json)
+            assignee_details = request_json.get('assigneeDetails', {})
+            schema_data = request_json.copy()
+            schema_data.pop('assigneeDetails', None)
+            foiopeninfo = FOIOpenInfoSchema().load(schema_data)   
             userid = AuthHelper.getuserid()
-            result = openinfoservice().updateopeninforequest(foiopeninfo, userid, foiministryrequestid)
+            result = openinfoservice().updateopeninforequest(foiopeninfo, userid, foiministryrequestid, assignee_details)
             if result.success:
                 return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
         except ValidationError as err:

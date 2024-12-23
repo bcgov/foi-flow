@@ -2,6 +2,7 @@ import {
   FOI_BASE_API_URL,
   AXIS_API_URL,
   DOC_REVIEWER_BASE_API_URL,
+  FOI_HISTORICAL_API_URL
 } from "./config";
 
 const API = {
@@ -50,6 +51,12 @@ const API = {
   FOI_GET_APPLICANT_HISTORY: `${FOI_BASE_API_URL}/api/foiapplicants/history/<applicantid>`,
   FOI_GET_APPLICANT_REQUEST_HISTORY: `${FOI_BASE_API_URL}/api/foiapplicants/requests/<applicantid>`,
   FOI_GET_APPLICANT_INFO: `${FOI_BASE_API_URL}/api/foiapplicants/applicantid/<applicantid>`,
+
+  FOI_HISTORICAL_REQUEST_API: `${FOI_HISTORICAL_API_URL}/api/foihistoricalrequest`,
+  FOI_HISTORICAL_REQUEST_DESCRIPTION_API: `${FOI_HISTORICAL_API_URL}/api/foihistoricalrequest/descriptionhistory`,
+  FOI_HISTORICAL_REQUEST_EXTENSIONS_API: `${FOI_HISTORICAL_API_URL}/api/foihistoricalrequest/extensions`,
+  FOI_HISTORICAL_RECORDS_API: `${FOI_BASE_API_URL}/api/foirecord/historical/<axisrequestid>`,
+  FOI_HISTORICAL_SEARCH_API: `${FOI_HISTORICAL_API_URL}/api/advancedsearch`,
 
   FOI_GET_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/divisions`,
   FOI_POST_PROGRAMAREADIVISION: `${FOI_BASE_API_URL}/api/foiadmin/division`,
@@ -155,6 +162,9 @@ const API = {
   FOI_DOWNLOAD_RECORDS_FOR_OIPCREDLINE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/oipcredline`,
   FOI_PDF_STITCH_STATUS_FOR_OIPCREDLINE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/oipcredline/pdfstitchjobstatus`,
 
+  FOI_DOWNLOAD_RECORDS_FOR_CONSULTPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/consultpackage`,
+  FOI_PDF_STITCH_STATUS_FOR_CONSULTPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/consultpackage/pdfstitchjobstatus`,
+
   FOI_GET_OIPC_OUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/outcomes`,
   FOI_GET_OIPC_STATUSES: `${FOI_BASE_API_URL}/api/foiflow/oipc/statuses`,
   FOI_GET_OIPC_REVIEWTYPES: `${FOI_BASE_API_URL}/api/foiflow/oipc/reviewtypes`,
@@ -165,6 +175,7 @@ const API = {
   FOI_GET_OI_STATUSES: `${FOI_BASE_API_URL}/api/foiflow/openinfo/statuses`,
   FOI_GET_OPENINFO_REQUEST: `${FOI_BASE_API_URL}/api/foiopeninfo/ministryrequest/<ministryrequestid>`,
   FOI_POST_OPENINFO_REQUEST: `${FOI_BASE_API_URL}/api/foiopeninfo/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>`,
+  FOI_GET_COMMENT_TYPES: `${FOI_BASE_API_URL}/api/foiflow/commenttypes`,
   FOI_OPENINFO_ADDITIONAL_FILES: `${FOI_BASE_API_URL}/api/foiopeninfoadditionalfiles/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>`,
   FOI_DELETE_OPENINFO_ADDITIONAL_FILES: `${FOI_BASE_API_URL}/api/foiopeninfoadditionalfiles/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>/delete`
 };
