@@ -225,7 +225,7 @@ const OpenInfo = ({
           foirequestid={foirequestid}
           toast={toast}
         />
-        <OpenInfoTab tabValue={tabValue} handleTabSelect={handleTabSelect} />
+        <OpenInfoTab tabValue={tabValue} handleTabSelect={handleTabSelect} isOIUser={isOITeam}/>
         {tabValue === 1 ? (
           <IAOOpenInfoPublishing
             handleOIDataChange={handleOIDataChange}

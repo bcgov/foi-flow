@@ -102,6 +102,7 @@ const handleOIAssigneeUpdate = async (event: any) => {
       foiministryrequestid, 
       foirequestid, 
       updatedOpenInfoRequest, 
+      isOIUser,
       requestDetails,
       (err: any, res: any) => {
       if (!err) {
@@ -136,34 +137,46 @@ const [menuItems, setMenuItems] = useState<any>([]);
 const [selectedOIAssignedTo, setOIAssignedTo] = useState("Unassigned");
 
 useEffect(() => {
+  // Find OI Team from the assignedToList
   const oiTeam = iaoassignedToList?.find((team: any) => team.name === 'OI Team');
+
+  // Find specific member if request is assigned to individual
   const member = oiTeam?.members?.find(
     (member: any) => member.username === foiOITransactionData?.oiassignedto
   );
 
   if(isOIUser){
-    const currentAssignee = member 
-      ? `${oiTeam.name}|${member.username}|${member.firstname}|${member.lastname}`
-      : "Unassigned";
-    setOIAssignedTo(currentAssignee);
+    /* For OI users, Mapping for assignee display values:
+     - 'OI Team': When assigned to entire OI Team
+     - 'member': When assigned to specific OI Team member
+     - 'default': When unassigned */
+    const assigneeMap = {
+      'OI Team': 'OI Team|OI Team',
+      'member': member && `${oiTeam.name}|${member.username}|${member.firstname}|${member.lastname}`,
+      'default': 'Unassigned'
+    };
 
-    const oiTeamOnly = iaoassignedToList?.filter((team: any) => team.name === 'OI Team');
+    const currentAssignee = assigneeMap[foiOITransactionData?.oiassignedto === 'OI Team' ? 'OI Team' : member ? 'member' : 'default'];
+    setOIAssignedTo(currentAssignee);
 
     // Generate menu items for the dropdown with OI Team members only
     setMenuItems(
       getMenuItems({ 
         classes, 
-        assignedToList: oiTeamOnly, 
+        assignedToList: iaoassignedToList?.filter((team: any) => team.name === 'OI Team'), 
         selectedAssignedTo: currentAssignee,
         isIAORestrictedRequest: false 
       })
     );
   } else {
       // For non-OI users, just set the formatted name
-      const displayName = member 
-        ? `${member.lastname}, ${member.firstname}`
-        : "Unassigned";
-      setOIAssignedTo(displayName);
+      const displayMap = {
+        'OI Team': 'OI Team|OI Team',
+        'member': member && `${member.lastname}, ${member.firstname}`,
+        'default': 'Unassigned'
+      };
+  
+      setOIAssignedTo(displayMap[foiOITransactionData?.oiassignedto === 'OI Team' ? 'OI Team' : member ? 'member' : 'default']);
   }
 }, [iaoassignedToList, foiOITransactionData, isOIUser]);
 

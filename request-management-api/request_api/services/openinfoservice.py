@@ -31,19 +31,9 @@ class openinfoservice:
         return result
 
     def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid, assigneedetails):
-        # Check and save assignee first if exists
-        if 'oiassignedto' in foiopeninforequest and foiopeninforequest['oiassignedto'] not in (None, '') and assigneedetails:
-            _assignee = foiopeninforequest['oiassignedto']
-            # Get assignee info from FOIAssignee table
-            existing_assignee = FOIAssignee.query.filter_by(username=_assignee).first()
-            if not existing_assignee and assigneedetails:
-                # If exists, use existing assignee info
-                FOIAssignee.saveassignee(
-                    _assignee,
-                    assigneedetails.get('assignedToFirstName', ''),
-                    '',  # middlename
-                    assigneedetails.get('assignedToLastName', '')
-                )
+        # Handle assignee update
+        if 'oiassignedto' in foiopeninforequest:
+            self.updateopeninfoassignee(foiopeninforequest['oiassignedto'], assigneedetails)
         
         prev_foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
         foiministryrequestversion = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
@@ -56,7 +46,22 @@ class openinfoservice:
             foiopeninfoid = result.identifier
             deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
         if result and deactivateresult:
-            return result            
+            return result     
+
+    def updateopeninfoassignee(self, assignee, assigneedetails):
+        if not assignee or not assigneedetails:
+            return
+        
+        # Get assignee info from FOIAssignee table    
+        existing_assignee = FOIAssignee.query.filter_by(username=assignee).first()
+        if not existing_assignee and assigneedetails:
+            FOIAssignee.saveassignee(
+                assignee,
+                assigneedetails.get('assignedToFirstName', ''),
+                '',
+                assigneedetails.get('assignedToLastName', '')
+            )
+        return assignee
     
     def fetchopeninfoadditionalfiles(self, foiministryrequestid):
         return FOIOpenInfoAdditionalFiles.fetch(foiministryrequestid)
