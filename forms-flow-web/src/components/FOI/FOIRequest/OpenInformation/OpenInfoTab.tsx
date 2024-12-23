@@ -11,18 +11,18 @@ const OpenInfoTab = ({ tabValue, handleTabSelect, isOIUser }: any) => {
         <Typography
           onClick={() => handleTabSelect(1)}
           id="exemption-tab"
-          // disabled={!isOIUser}
         >Exemption</Typography>
       </div>
+      {isOIUser && 
       <div
         className={tabValue === 2 ? "openinfotab-selected" : "openinfotab-select"}
         >
         <Typography
           onClick={() => handleTabSelect(2)}
           id="openinformation-tab"
-          // disabled={!isOIUser}
         >Open Information</Typography>
       </div>
+      }
     </div>
   );
 };

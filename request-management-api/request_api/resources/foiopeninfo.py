@@ -63,7 +63,7 @@ class FOIOpenInfoRequestById(Resource):
             schema_data.pop('assigneeDetails', None)
             foiopeninfo = FOIOpenInfoSchema().load(schema_data)   
             userid = AuthHelper.getuserid()
-            result = openinfoservice().updateopeninforequest(foiopeninfo, userid, foiministryrequestid, foirequestid, assignee_details)
+            result = openinfoservice().updateopeninforequest(foiopeninfo, userid, foiministryrequestid, assignee_details)
             if result.success:
                 return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
         except ValidationError as err:

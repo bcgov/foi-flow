@@ -22,12 +22,16 @@ import { setFOILoader } from "../../../../../actions/FOI/foiRequestActions";
 import AttachmentModal from "../../../customComponents/Attachments/AttachmentModal";
 import {
   saveFilesinS3,
+  getFileFromS3,
   postFOIS3DocumentPreSignedUrl,
+  getFOIS3DocumentPreSignedUrl,
   completeMultiPartUpload,
 } from "../../../../../apiManager/services/FOI/foiOSSServices";
 import { toast } from "react-toastify";
 import { readUploadedFileAsBytes } from "../../../../../helper/FOI/helper";
 import { OSS_S3_CHUNK_SIZE } from "../../../../../constants/constants";
+import { RecordDownloadStatus } from "../../../../../constants/FOI/enum"; 
+import Tooltip from "@mui/material/Tooltip";
 
 type OIPublicationStatus = {
   oipublicationstatusid: number;
@@ -39,19 +43,41 @@ const OpenInfoPublicationMain = ({
   requestId,
   ministryId,
   oiPublicationData,
-  isOIUser,
   currentOIRequestState,
   handleOIDataChange,
   bcgovcode,
   requestNumber,
 }: any) => {  
   const dispatch = useDispatch();
+
+  //App State
   const oiPublicationStatuses: OIPublicationStatus[] = useSelector(
     (state: any) => state.foiRequests.oiPublicationStatuses
   );
   let foiOpenInfoAdditionalFiles = useSelector(
     (state: any) => state.foiRequests.foiOpenInfoAdditionalFiles
   );
+  
+  let foiPDFStitchedOIPackage = useSelector(
+    (state: any) => state.foiRequests.foiPDFStitchedOIPackage
+  );
+  
+  let foiPDFStitchStatusForOIPackage = useSelector(
+    (state: any) => state.foiRequests.foiPDFStitchStatusForOIPackage
+  );
+
+  const [downloadDisabled, setDownloadDisabled] = useState(true)
+  const [packageCreatedAt, setPackageCreatedAt] = useState("N/A");
+
+  useEffect(() => {
+    if (foiPDFStitchStatusForOIPackage === RecordDownloadStatus.completed) {
+      setDownloadDisabled(false)
+    }
+  }, [foiPDFStitchStatusForOIPackage])
+
+  useEffect(() => {
+    setPackageCreatedAt(foiPDFStitchedOIPackage.createdat_datetime)    
+  }, [foiPDFStitchedOIPackage])
 
   //Styling
   const useStyles = makeStyles({
@@ -69,6 +95,7 @@ const OpenInfoPublicationMain = ({
   });
   const classes = useStyles();
 
+  //Local State
   const [additionalFiles, setAdditionalFiles] = useState([]);
   const [openModal, setOpenModal] = useState(false);
 
@@ -76,6 +103,7 @@ const OpenInfoPublicationMain = ({
     setAdditionalFiles(foiOpenInfoAdditionalFiles);
   }, [foiOpenInfoAdditionalFiles])
 
+  //Functions
   const deleteFile = (_index: any) => {
     let file: any = additionalFiles[_index];
     dispatch(setFOILoader(true));
@@ -173,7 +201,7 @@ const OpenInfoPublicationMain = ({
                     parts: parts,
                   },
                   ministryId,
-                  "records",
+                  "additionalfiles",
                   bcgovcode,
                   dispatch,
                   (_err: any, _res: any) => {
@@ -243,6 +271,80 @@ const OpenInfoPublicationMain = ({
     window.open(url, "_blank")?.focus();
   }
 
+  const disableUserInput = !oiPublicationData?.oiexemptionapproved && oiPublicationData.oipublicationstatus_id === 1;
+  
+  var saveAs = (blob: any, filename: any) => {
+    const fileURL = URL.createObjectURL(blob);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = fileURL;
+    downloadLink.download = filename;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    URL.revokeObjectURL(fileURL);
+  }
+
+  const downloadPackage = () => {
+    const toastID = toast.loading("Downloading file (0%)");
+    const s3filepath = foiPDFStitchedOIPackage?.finalpackagepath;
+    getFOIS3DocumentPreSignedUrl(
+      s3filepath.split("/").slice(4).join("/"),
+      ministryId,
+      dispatch,
+      (err: any, res: any) => {
+        if (!err) {
+          getFileFromS3(
+            { filepath: res },
+            (_err: any, response: any) => {
+              let blob = new Blob([response.data], {
+                type: "application/octet-stream",
+              });
+              const filename = requestNumber + ".zip";
+              saveAs(blob, filename);
+              toast.update(toastID, {
+                render: _err ? "File download failed" : "Download complete",
+                type: _err ? "error" : "success",
+                className: "file-upload-toast",
+                isLoading: false,
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                closeButton: true,
+              });
+            },
+            (progressEvent: any) => {
+              toast.update(toastID, {
+                render:
+                  "Downloading file (" +
+                  Math.floor(
+                    (progressEvent.loaded / progressEvent.total) * 100
+                  ) +
+                  "%)",
+                isLoading: true,
+              });
+            }
+          );
+        } else {
+          toast.update(toastID, {
+            render: "File download failed",
+            type: "error",
+            className: "file-upload-toast",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            closeButton: true,
+          });
+        }
+      },
+      "additionalfiles",
+      bcgovcode
+    );
+  }
+
   return (
     <div className="request-accordian">
       <Accordion defaultExpanded={true}>
@@ -262,8 +364,9 @@ const OpenInfoPublicationMain = ({
                 name="oipublicationstatus_id"
                 label="Publication Status"
                 variant="outlined"
-                value={oiPublicationData?.oipublicationstatus_id || 2}
+                value={oiPublicationData?.oipublicationstatus_id === 1 ? 2 : oiPublicationData?.oipublicationstatus_id}
                 select
+                disabled={disableUserInput}
                 required
                 InputLabelProps={{ shrink: true }}
                 onChange={(event) =>
@@ -271,9 +374,9 @@ const OpenInfoPublicationMain = ({
                 }
               >
                 {oiPublicationStatuses.map((status) => {
-                  // if (status.oipublicationstatusid === 1) {
-                  //   return null;
-                  // }
+                  if (status.oipublicationstatusid === 1) {
+                    return null;
+                  }
                   return (
                     <MenuItem
                       key={status.oipublicationstatusid}
@@ -291,12 +394,16 @@ const OpenInfoPublicationMain = ({
                 name="publicationdate"
                 label="Publication Date"
                 variant="outlined"
-                disabled={["OI Review", "Exemption Request", "Do Not Publish", "Publication Review"].includes(currentOIRequestState)}
+                disabled={disableUserInput || ["OI Review", "Exemption Request", "Do Not Publish", "Publication Review"].includes(currentOIRequestState)}
                 InputLabelProps={{ shrink: true }}
                 onChange={(event) =>
                   handleOIDataChange(event.target.value, event.target.name)
                 }
-                value={oiPublicationData?.publicationdate ? formatDate(new Date(oiPublicationData?.publicationdate)) : ""}
+                value={
+                  oiPublicationData?.publicationdate
+                    ? formatDate(new Date(oiPublicationData?.publicationdate))
+                    : ""
+                }
                 type="date"
               ></TextField>
             </Grid>
@@ -307,6 +414,7 @@ const OpenInfoPublicationMain = ({
                 name="row-radio-buttons-group"
               >
                 <FormControlLabel
+                  disabled={disableUserInput}
                   value={true}
                   name="copyrightsevered"
                   control={
@@ -321,6 +429,7 @@ const OpenInfoPublicationMain = ({
                   label="Copyright Severed"
                 />
                 <FormControlLabel
+                  disabled={disableUserInput}
                   value={false}
                   name="copyrightsevered"
                   control={
@@ -336,30 +445,50 @@ const OpenInfoPublicationMain = ({
                 />
               </RadioGroup>
             </Grid>
-          </Grid>          
-          <div className="oi-main-text">
-          <section
-            className={clsx("file-upload-container")}
-            style={{padding: 0}}
-          >
-            <div
-              className={clsx("row", "file-upload-preview")}              
-              style={{margin: 0, width: "100%"}}
+          </Grid>
+          <Grid container spacing={3}>
+            <Grid item md={6}>
+              <span style={{ fontWeight: "bold", verticalAlign: "middle" }}>Files to be Published:</span>
+            </Grid>
+            <Grid item md={6}>
+              <Tooltip title={"Created At: " + packageCreatedAt}>
+                <button
+                  style={{ width: "auto" }}
+                  className="btn foi-export-button"
+                  color="primary"
+                  onClick={downloadPackage}
+                  disabled={downloadDisabled}
+                >
+                  Download Files
+                </button>
+              </Tooltip>
+            </Grid>
+          </Grid>
+          {!disableUserInput && 
+          <div style={{marginTop: 15}}>
+            <span style={{ fontWeight: "bold", verticalAlign: "middle", position: "relative", bottom: 10 }}>Additional Files:</span>
+            <section
+              className={clsx("file-upload-container")}
+              style={{ padding: 0 }}
             >
-              <div className="file-upload-column">
-                {(
-                  <FilePreviewContainer 
-                    files={additionalFiles.map((f: any) => {
-                      f.fileName = f.filename;
-                      return f;
-                    })} 
-                    removeFile={deleteFile}
-                    clickHandler={openDocuemnt}                    
-                  />
-                )}
-              </div>
-              <div className="file-upload-column file-upload-column-2">
-                {/* <input
+              <div
+                className={clsx("row", "file-upload-preview")}
+                style={{ margin: 0, width: "100%" }}
+              >
+                <div className="file-upload-column">
+                  {
+                    <FilePreviewContainer
+                      files={additionalFiles.map((f: any) => {
+                        f.fileName = f.filename;
+                        return f;
+                      })}
+                      removeFile={deleteFile}
+                      clickHandler={openDocuemnt}
+                    />
+                  }
+                </div>
+                <div className="file-upload-column file-upload-column-2">
+                  {/* <input
                 id="fileupload"
                 aria-label="fileUpload"
                 className={"file-upload-input-multiple"}
@@ -370,18 +499,22 @@ const OpenInfoPublicationMain = ({
                 multiple={multipleFiles}
                 accept={mimeTypes}
                 /> */}
-              </div>
-              <div className="file-upload-column file-upload-column-3">
-                {
-                <button className="btn-add-files" type="button" 
-                onClick={() => setOpenModal(true)}
-                >              
+                </div>
+                <div className="file-upload-column file-upload-column-3">
+                  {
+                    <button
+                      className="btn-add-files"
+                      type="button"
+                      onClick={() => setOpenModal(true)}
+                    >
                       Add Files
-                </button>}
+                    </button>
+                  }
+                </div>
               </div>
-            </div>
-          </section>
+            </section>
           </div>
+          }
         </AccordionDetails>
       </Accordion>
       <AttachmentModal
@@ -391,7 +524,7 @@ const OpenInfoPublicationMain = ({
         multipleFiles={true}
         requestNumber={requestNumber}
         requestId={requestId}
-        attachmentsArray={[]}
+        attachmentsArray={additionalFiles}
         existingDocuments={[]}
         attachment={{}}
         handleRename={undefined}

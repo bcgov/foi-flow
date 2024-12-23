@@ -30,7 +30,7 @@ class openinfoservice:
         result = FOIOpenInformationRequests().createopeninfo(foiopeninforequest, userid)
         return result
 
-    def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid, foirequestid, assigneedetails):
+    def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid, assigneedetails):
         # Check and save assignee first if exists
         if 'oiassignedto' in foiopeninforequest and foiopeninforequest['oiassignedto'] not in (None, '') and assigneedetails:
             _assignee = foiopeninforequest['oiassignedto']

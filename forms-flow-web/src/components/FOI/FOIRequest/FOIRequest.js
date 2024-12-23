@@ -63,6 +63,8 @@ import {
   fetchPDFStitchedStatusForOIPCRedline,
   fetchHistoricalRecords,
   fetchPDFStitchStatusForConsults,
+  fetchPDFStitchedPackage,
+  fetchPDFStitchedStatus
 } from "../../../apiManager/services/FOI/foiRecordServices";
 import {
   fetchFOIOpenInfoAdditionalFiles,
@@ -118,7 +120,7 @@ import { DISABLE_GATHERINGRECORDS_TAB } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
 import ApplicantProfileModal from "./ApplicantProfileModal";
-import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
+import { setFOIRequestDetail, setFOIPDFStitchedOIPackage, setFOIPDFStitchStatusForOIPackage } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
@@ -384,6 +386,12 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     if (isOITeam) {
       dispatch(fetchOpenInfoStatuses());
       dispatch(fetchFOIOpenInfoAdditionalFiles(requestId, ministryId));
+      dispatch(fetchPDFStitchedStatus(requestId, ministryId, "openinfo", (err, res) => {
+        dispatch(setFOIPDFStitchStatusForOIPackage(res))
+      }));
+      dispatch(fetchPDFStitchedPackage(requestId, ministryId, "openinfo", (err, res) => {
+        dispatch(setFOIPDFStitchedOIPackage(res))
+      }));
     }
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
@@ -1799,9 +1807,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 toast={toast}
                 requestNumber={requestNumber}
                 requestDetails={requestDetails}
-                userDetail={userDetail}
                 currentOIRequestState={getOIRequestState()}
                 foirequestid={requestId}
+                isOITeam={isOITeam}
                 foiministryrequestid={ministryId}
                 bcgovcode={JSON.parse(bcgovcode)}
               />

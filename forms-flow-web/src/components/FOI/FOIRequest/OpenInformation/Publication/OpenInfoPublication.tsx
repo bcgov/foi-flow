@@ -3,7 +3,6 @@ import OpenInfoConfirmationModal from "../OpenInfoConfirmationModal";
 
 const OpenInfoPublication = ({
   oiPublicationData,
-  isOIUser,
   handleOIDataChange,
   disablePublish,
   confirmDateModal,
@@ -21,7 +20,6 @@ const OpenInfoPublication = ({
     <>
       <OpenInfoPublicationMain
         oiPublicationData={oiPublicationData}
-        isOIUser={isOIUser}
         handleOIDataChange={handleOIDataChange}
         currentOIRequestState={currentOIRequestState}
         ministryId={ministryId}

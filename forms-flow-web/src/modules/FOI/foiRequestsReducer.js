@@ -161,6 +161,8 @@ const initialState = {
   oiStatuses: [],
   foiOpenInfoRequest: {},
   foiOpenInfoAdditionalFiles: [],
+  foiPDFStitchedOIPackage: {},
+  foiPDFStitchStatusForOIPackage: "not started",
   foiadvancedsearchfilter:"foimod",
   foiCommentTypes:[]
 };
@@ -381,6 +383,10 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiadvancedsearchfilter: action.payload };    
     case FOI_ACTION_CONSTANTS.FOI_COMMENT_TYPES:
       return { ...state, foiCommentTypes: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_OI_PACKAGE:
+      return {...state, foiPDFStitchedOIPackage: action.payload}
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OI_PACKAGE:
+      return {...state, foiPDFStitchStatusForOIPackage: action.payload}
     default:
       return state;
   }

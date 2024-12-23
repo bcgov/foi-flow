@@ -16,31 +16,28 @@ type OITransactionObject = {
   oifeedback: string;
   copyrightsevered: boolean;
   publicationdate: string;
+  oiexemptiondate: string;
 };
 
 const OpenInfo = ({
   requestNumber,
   requestDetails,
-  userDetail,
   foiministryrequestid,
   foirequestid,
   bcgovcode,
   toast,
   currentOIRequestState,
+  isOITeam,
 }: any) => {
   const dispatch = useDispatch();
 
-  //Global State
+  //App State
   const assignedToList = useSelector(
     (state: any) => state.foiRequests.foiFullAssignedToList
-  );
-  const userGroups: string[] = userDetail.groups.map((group: any) =>
-    group.slice(1)
   );
   let foiOpenInfoAdditionalFiles = useSelector(
     (state: any) => state.foiRequests.foiOpenInfoAdditionalFiles
   );
-  const isOIUser: boolean = userGroups.includes("OI Team");
   let foiOITransactionData = useSelector(
     (state: any) => state.foiRequests.foiOpenInfoRequest
   );
@@ -56,7 +53,7 @@ const OpenInfo = ({
     confirmButtonTitle: "",
     confirmationData: null,
   });
-  const [tabValue, setTabValue] = useState(isOIUser ? 2 : 1);
+  const [tabValue, setTabValue] = useState(isOITeam ? 2 : 1);
   const [isDataEdited, setIsDataEdited] = useState(false);
 
   useEffect(() => {
@@ -102,7 +99,7 @@ const OpenInfo = ({
       oiPublicationData?.oipublicationstatus_id === 1 &&
       oiPublicationData?.oiexemption_id !== 5
     ) {
-      if (isOIUser && oiPublicationData?.oiexemptionapproved != null) {
+      if (isOITeam && oiPublicationData?.oiexemptionapproved != null) {
         setConfirmationModal((prev: any) => ({
           ...prev,
           show: true,
@@ -140,6 +137,7 @@ const OpenInfo = ({
         foiministryrequestid,
         foirequestid,
         formattedData,
+        isOITeam,
         requestDetails,
         (err: any, _res: any) => {
           if (!err) {
@@ -156,10 +154,7 @@ const OpenInfo = ({
               draggable: true,
               progress: undefined,
             });
-            if (
-              !requestDetails.oistatusid &&
-              oiPublicationData.oiexemption_id !== 5
-            ) {
+            if (!isOITeam && oiPublicationData.oipublicationstatus_id === 1 && oiPublicationData.oiexemption_id !== 5) {
               requestDetails.oistatusid = 2;
             }
           } else {
@@ -215,7 +210,7 @@ const OpenInfo = ({
     }));
   }
   const calculateDaysBetweenDates = (date1: string, date2: string) => {
-    return Math.round((new Date(date1).getTime() - new Date(date2).getTime()) / (1000 * 3600 *24))
+    return Math.round((new Date(date1).getTime() - new Date(date2).getTime()) / (1000 * 3600 *24));
   }
 
   return (
@@ -224,7 +219,7 @@ const OpenInfo = ({
         <IAOOpenInfoHeader
           requestDetails={requestDetails}
           requestNumber={requestNumber}
-          isOIUser={isOIUser}
+          isOIUser={isOITeam}
           assignedToList={assignedToList}
           foiministryrequestid={foiministryrequestid}
           foirequestid={foirequestid}
@@ -237,7 +232,7 @@ const OpenInfo = ({
             oiPublicationData={oiPublicationData}
             handleExemptionSave={handleExemptionSave}
             disableSave={disableSave}
-            isOIUser={isOIUser}
+            isOIUser={isOITeam}
             saveModal={confirmationModal}
             saveData={saveData}
             setSaveModal={setConfirmationModal}
@@ -245,7 +240,6 @@ const OpenInfo = ({
         ) : (
           <OpenInfoPublication
             oiPublicationData={oiPublicationData}
-            isOIUser={isOIUser}
             handleOIDataChange={handleOIDataChange}
             disablePublish={disablePublish}
             confirmDateModal={confirmationModal}

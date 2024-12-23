@@ -249,7 +249,7 @@ const FileUpload = ({
           </div>
         </div>
       </section>
-      {modalFor === "add" && (<div className="tag-message-container">
+      {modalFor === "add" && uploadFor !== "additionalFiles" && (<div className="tag-message-container">
         <p>When uploading more than one {uploadFor}, all {uploadFor}s will have the same selected tag.</p>
       </div>)}
       <ul className="error-message-ul">
