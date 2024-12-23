@@ -33,7 +33,7 @@ export const fetchHistoricalSearchData = ({
       size: size,
       sortingitem: sort[0]['field'],
       sortingorder: sort[0]['sort'],
-      search: search,
+      search: (keywords.length === 1 && keywords[0] === "") ? null : search,
       keywords: keywords,
       requestType: requestType,
       requestFlags: requestFlags,
