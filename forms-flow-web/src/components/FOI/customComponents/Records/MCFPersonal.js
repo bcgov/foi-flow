@@ -290,13 +290,14 @@ const MCFPersonal = ({
       setFileTypeSearchValue("");
     };
 
-    const PaperComponent = (props) => {
-      return (
-        <Draggable handle="#state-change-dialog-title" cancel={'[class*="MuiDialogContent-root"]'}>
-          <Paper {...props} />
-        </Draggable>
-      );
-    }
+    // Disabling draggable modal - this causing issues with the modal refocusing at the top
+    // const PaperComponent = (props) => {
+    //   return (
+    //     <Draggable handle="#state-change-dialog-title" cancel={'[class*="MuiDialogContent-root"]'}>
+    //       <Paper {...props} />
+    //     </Draggable>
+    //   );
+    // }
 
     return (
 
@@ -304,7 +305,7 @@ const MCFPersonal = ({
         <Dialog
           open={editTagModalOpen}
           onClose={() => handleClose()}
-          PaperComponent={PaperComponent}
+          // PaperComponent={PaperComponent}
           aria-labelledby="state-change-dialog-title"
           aria-describedby="state-change-dialog-description"
           maxWidth={"md"}
