@@ -37,6 +37,7 @@ class FOIOpenInformationRequests(db.Model):
     foiopeninforequestid = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     version = db.Column(db.Integer, primary_key=True, nullable=False)
     foiministryrequest_id = db.Column(db.Integer, ForeignKey('FOIMinistryRequests.foiministryrequestid'), nullable=False)
+    foiministryrequestversion_id = db.Column(db.Integer, ForeignKey('FOIMinistryRequests.version'), nullable=False)
     oipublicationstatus_id = db.Column(db.Integer, ForeignKey('OpenInfoPublicationStatuses.oipublicationstatusid'), nullable=False)
     oiexemption_id = db.Column(db.Integer, ForeignKey('OpenInformationExemptions.oiexemptionid'), nullable=True)
     oiassignedto = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), nullable=True)
@@ -69,6 +70,7 @@ class FOIOpenInformationRequests(db.Model):
             new_foiopeninforequest = FOIOpenInformationRequests(
                 version=1,
                 foiministryrequest_id=foiopeninforequest["foiministryrequest_id"],
+                foiministryrequestversion_id=foiopeninforequest["foiministryrequestversion_id"],
                 oipublicationstatus_id=foiopeninforequest["oipublicationstatus_id"],
                 isactive=True,
                 created_at=createddate,
@@ -87,6 +89,7 @@ class FOIOpenInformationRequests(db.Model):
             updated_foiopeninforequest = FOIOpenInformationRequests(
                 version=foiopeninforequest['version']+1,
                 foiministryrequest_id=foiopeninforequest["foiministryrequest_id"],
+                foiministryrequestversion_id=foiopeninforequest["foiministryrequestversion_id"],
                 oipublicationstatus_id=foiopeninforequest["oipublicationstatus_id"],
                 oiexemption_id=foiopeninforequest["oiexemption_id"],
                 iaorationale=foiopeninforequest["iaorationale"],
@@ -210,7 +213,8 @@ class FOIOpenInformationRequests(db.Model):
             _session.query(*selectedcolumns)
             .join(subquery_maxversion, and_(*joincondition))
             .join(FOIMinistryRequest, and_(
-                FOIMinistryRequest.foiministryrequestid == cls.foiministryrequest_id,
+                FOIMinistryRequest.foiministryrequestid == cls.foiministryrequest_id, 
+                FOIMinistryRequest.version == cls.foiministryrequestversion_id,
                 FOIMinistryRequest.isactive == True))
             .join(FOIRequest, and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id))
             .join(ApplicantCategory,and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True))
@@ -477,7 +481,7 @@ class FOIOpenInformationRequests(db.Model):
 class FOIOpenInfoRequestSchema(ma.Schema):
     class Meta:
         fields = (
-            'foiopeninforequestid', 'version', 'foiministryrequest_id', 'oipublicationstatus_id', 'oiexemption_id', 'oiassignedto',
+            'foiopeninforequestid', 'version', 'foiministryrequest_id', 'foiministryrequestversion_id', 'oipublicationstatus_id', 'oiexemption_id', 'oiassignedto',
             'oiexemptionapproved', 'copyrightsevered', 'pagereference', 'iaorationale', 'oifeedback', 'publicationdate', 'created_at', 'updated_at', 'createdby', 'updatedby',
             "oiexemptiondate"
         )
