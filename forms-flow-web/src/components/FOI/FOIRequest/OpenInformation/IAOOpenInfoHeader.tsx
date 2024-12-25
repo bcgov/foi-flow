@@ -79,46 +79,35 @@ const handleOIAssigneeUpdate = async (event: any) => {
 
   // Update the selected assignee in the dropdown
   setOIAssignedTo(assigneeValue);
+
+  if(username != 'OI Team'){
+    const assigneeDetails = {
+      assignedGroup: groupName,
+      assignedTo: username,
+      assignedToFirstName: firstName,
+      assignedToLastName: lastName,
+      assignedToName: fullName
+    };
   
-  const assigneeDetails = {
-    assignedGroup: groupName,
-    assignedTo: username,
-    assignedToFirstName: firstName,
-    assignedToLastName: lastName,
-    assignedToName: fullName
-  };
-
-  const updatedOpenInfoRequest = {
-    ...foiOITransactionData,  
-    oiassignedto: username,
-    assigneeDetails:assigneeDetails,
-    publicationdate: foiOITransactionData.publicationdate ? 
-    new Date(foiOITransactionData.publicationdate).toISOString().split('T')[0] : 
-    null
-  };
-
-  dispatch(
-    saveFOIOpenInfoRequest(
-      foiministryrequestid, 
-      foirequestid, 
-      updatedOpenInfoRequest, 
-      isOIUser,
-      requestDetails,
-      (err: any, res: any) => {
-      if (!err) {
-        toast.success("Assignee has been saved successfully.", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });  
-      } else {
-        toast.error(
-          "Temporarily unable to save the assignee. Please try again in a few minutes.",
-          {
+    const updatedOpenInfoRequest = {
+      ...foiOITransactionData,  
+      oiassignedto: username,
+      assigneeDetails:assigneeDetails,
+      publicationdate: foiOITransactionData.publicationdate ? 
+      new Date(foiOITransactionData.publicationdate).toISOString().split('T')[0] : 
+      null
+    };
+  
+    dispatch(
+      saveFOIOpenInfoRequest(
+        foiministryrequestid, 
+        foirequestid, 
+        updatedOpenInfoRequest, 
+        isOIUser,
+        requestDetails,
+        (err: any, res: any) => {
+        if (!err) {
+          toast.success("Assignee has been saved successfully.", {
             position: "top-right",
             autoClose: 3000,
             hideProgressBar: true,
@@ -126,11 +115,28 @@ const handleOIAssigneeUpdate = async (event: any) => {
             pauseOnHover: true,
             draggable: true,
             progress: undefined,
-          }
-        );
-      }
-    })
-  );
+          });  
+        } else {
+          toast.error(
+            "Temporarily unable to save the assignee. Please try again in a few minutes.",
+            {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            }
+          );
+        }
+      })
+    );
+  }else{
+    console.log("username is OI Team");
+  }
+  
+  
 }
 
 const [menuItems, setMenuItems] = useState<any>([]);
@@ -153,10 +159,10 @@ useEffect(() => {
     const assigneeMap = {
       'OI Team': 'OI Team|OI Team',
       'member': member && `${oiTeam.name}|${member.username}|${member.firstname}|${member.lastname}`,
-      'default': 'Unassigned'
+      'default': 'OI Team|OI Team'
     };
 
-    const currentAssignee = assigneeMap[foiOITransactionData?.oiassignedto === 'OI Team' ? 'OI Team' : member ? 'member' : 'default'];
+    const currentAssignee = assigneeMap[foiOITransactionData?.oiassignedto === null ? 'OI Team' : member ? 'member' : 'default'];
     setOIAssignedTo(currentAssignee);
 
     // Generate menu items for the dropdown with OI Team members only
@@ -171,12 +177,12 @@ useEffect(() => {
   } else {
       // For non-OI users, just set the formatted name
       const displayMap = {
-        'OI Team': 'OI Team|OI Team',
+        'OI Team': 'OI Team',
         'member': member && `${member.lastname}, ${member.firstname}`,
-        'default': 'Unassigned'
+        'default': 'OI Team'
       };
   
-      setOIAssignedTo(displayMap[foiOITransactionData?.oiassignedto === 'OI Team' ? 'OI Team' : member ? 'member' : 'default']);
+      setOIAssignedTo(displayMap[foiOITransactionData?.oiassignedto === null ? 'OI Team' : member ? 'member' : 'default']);
   }
 }, [iaoassignedToList, foiOITransactionData, isOIUser]);
 
