@@ -325,9 +325,9 @@ class dashboardservice:
         _receiveddate = None
         _publicationdate = 'N/A'
 
-        # Handle close date
-        if request.closedate:
-            _receiveddate = request.closedate.strftime("%b %d %Y") if request.closedate else None
+        # Handle received date
+        if request.receivedDate:
+            _receiveddate = request.receivedDate.strftime("%b %d %Y") if request.receivedDate else None
         
         # Handle publication date
         if request.publicationdate:
