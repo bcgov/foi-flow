@@ -347,8 +347,7 @@ class FOIOpenInformationRequests(db.Model):
                 # 2. Publication reviews (oistatus_id = 4)
                 # 3. Other requests
                 case(
-                    [(FOIMinistryRequest.oistatus_id == 2, 0),     # Exemption requests first
-                    (FOIMinistryRequest.oistatus_id == 4, 1)],    # Publication reviews second
+                    [(FOIMinistryRequest.oistatus_id == 8, 0)],     # Exemption requests first
                     else_=2                                         # Other requests last
                 ),
                 desc(FOIMinistryRequest.closedate)

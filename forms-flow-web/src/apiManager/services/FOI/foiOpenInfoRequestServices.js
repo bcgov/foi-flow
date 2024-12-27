@@ -97,7 +97,7 @@ const updateFOIMinistryRequestOIStatus = (
   );
   // Update FOIMinistryRequest oistatusid to "Do Not Publish" if EXEMPTION is required from IAO
   if (!isOIUser && foiopeninfodata.oipublicationstatus_id === 1 && foiopeninfodata.oiexemption_id !== 5) {
-    return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: 2 });
+    return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: 8 });
   } else {
     return Promise.resolve("API call to adjust foiministryrequest not needed");
   }

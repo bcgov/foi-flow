@@ -84,7 +84,7 @@ const OpenInfo = ({
         oifeedback: null,
       }));
     } else if (oiDataKey === "publicationdate" && requestDetails.closedate 
-      && typeof(value) === "string" && calculateDaysBetweenDates(value, requestDetails.closeddate) <= 10) {
+      && typeof(value) === "string" && calculateDaysBetweenDates(value, requestDetails.closedate) >= 1 && calculateDaysBetweenDates(value, requestDetails.closedate) <= 10) {
       setConfirmationModal((prev : any) => ({
         ...prev, 
         show: true,
@@ -143,7 +143,7 @@ const OpenInfo = ({
               progress: undefined,
             });
             if (!isOITeam && oiPublicationData.oipublicationstatus_id === 1 && oiPublicationData.oiexemption_id !== 5) {
-              requestDetails.oistatusid = 2;
+              requestDetails.oistatusid = 8;
             }
           } else {
             toast.error(
