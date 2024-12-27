@@ -13,7 +13,6 @@ import {
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { makeStyles } from "@material-ui/styles";
 import { useSelector } from "react-redux";
-// import { useState, useEffect } from "react";
 
 type OIPublicationStatus = {
   oipublicationstatusid: number;
@@ -37,16 +36,6 @@ const IAOOpenInfoMain = ({
   const oiExemptions: OIExemption[] = useSelector(
     (state: any) => state.foiRequests.oiExemptions
   );
-
-  // let foiOITransactionData = useSelector(
-  //   (state: any) => state.foiRequests.foiOpenInfoRequest
-  // ); 
-  
-  // const [oiPublicationData, setOiPublicationData] = useState(foiOITransactionData);
-
-  // useEffect(() => {
-  //   setOiPublicationData(foiOITransactionData);
-  // }, [foiOITransactionData, oiPublicationStatuses, oiExemptions]);
 
   const disableIAOField =
     oiPublicationData?.oipublicationstatus_id === 2 || isOIUser;
@@ -164,6 +153,8 @@ const IAOOpenInfoMain = ({
                   !oiPublicationData?.pagereference
                 }
                 disabled={disableIAOField}
+                multiline
+                minRows={1}
               ></TextField>
             </Grid>
             <Grid item md={6}>

@@ -3,7 +3,7 @@ import { saveFOIOpenInfoRequest } from "../../../../apiManager/services/FOI/foiO
 import { useDispatch, useSelector } from "react-redux";
 import IAOOpenInfoPublishing from "./Exemption/IAOOpenInfoPublishing";
 import OpenInfoPublication from "./Publication/OpenInfoPublication";
-import IAOOpenInfoHeader from "./IAOOpenInfoHeader";
+import OpenInfoHeader from "./OpenInfoHeader";
 import OpenInfoTab from "./OpenInfoTab";
 import "./openinfo.scss";
 import { isReadyForPublishing } from "../utils";
@@ -74,14 +74,10 @@ const OpenInfo = ({
       setOiPublicationData((prev: any) => ({
         ...prev,
         [oiDataKey]: 2,
-        iaorationale: null,
         oiexemption_id: null,
-        pagereference: null,
-        oiexemptionapproved: null,
         copyrightsevered: null,
         publicationdate: null,
         oiexemptiondate: null,
-        oifeedback: null,
       }));
     } else if (oiDataKey === "publicationdate" && requestDetails.closedate 
       && typeof(value) === "string" && calculateDaysBetweenDates(value, requestDetails.closedate) >= 1 && calculateDaysBetweenDates(value, requestDetails.closedate) <= 10) {
@@ -191,6 +187,9 @@ const OpenInfo = ({
     if (isDoNotPublish && hasOutOfScopeExemption) {
       return false;
     }
+    if (isDoNotPublish && !hasExemption) {
+      return true;
+    }
     if (isDoNotPublish && hasExemption) {
       return isMissingRequiredFields;
     }
@@ -240,7 +239,7 @@ const OpenInfo = ({
   return (
     <>
       <div className="oi-section">
-        <IAOOpenInfoHeader
+        <OpenInfoHeader
           requestDetails={requestDetails}
           requestNumber={requestNumber}
           isOIUser={isOITeam}
@@ -249,7 +248,7 @@ const OpenInfo = ({
           foirequestid={foirequestid}
           toast={toast}
         />
-        <OpenInfoTab tabValue={tabValue} handleTabSelect={handleTabSelect} isOIUser={isOITeam}/>
+        <OpenInfoTab tabValue={tabValue} handleTabSelect={handleTabSelect} isOIUser={isOITeam} />
         {tabValue === 1 ? (
           <IAOOpenInfoPublishing
             handleOIDataChange={handleOIDataChange}
