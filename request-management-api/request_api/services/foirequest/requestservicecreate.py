@@ -16,12 +16,13 @@ from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.RequestorType import RequestorType
 from request_api.utils.enums import StateName
 from request_api.services.openinfoservice import openinfoservice
+from request_api.schemas.foiopeninfo import FOIOpenInfoSchema
+from request_api.utils.constants import SKIP_OPENINFO_MINISTRIES
 
 import json
 class requestservicecreate:
     """ This class consolidates the creation of new FOI request upon scenarios: open, save by both iao and ministry. 
-    """
-
+    """    
     def saverequest(self,foirequestschema, userid, foirequestid=None, ministryid=None, filenumber=None, version=None, rawrequestid=None, wfinstanceid=None):
         activeversion = 1 if version is None else version
         
@@ -49,8 +50,17 @@ class requestservicecreate:
         if foirequestid is not None:         
            openfoirequest.foirequestid = foirequestid
         openfoirequest.wfinstanceid = wfinstanceid if wfinstanceid is not None else None
-        openfoirequest.createdby = userid  
-        return FOIRequest.saverequest(openfoirequest) 
+        openfoirequest.createdby = userid          
+        result = FOIRequest.saverequest(openfoirequest)
+        #Create FOIOpenInfoRequest after FOIMinistryRequest has successfully been created and set to Open state
+        if foirequestschema["requestType"] == 'general' and foirequestschema["selectedMinistries"][0]["code"].upper() not in SKIP_OPENINFO_MINISTRIES:
+            foiministryrequest = result.args[0]
+            default_foiopeninforequest = {
+                "oipublicationstatus_id": 2,
+            }
+            foiopeninforequestschema = FOIOpenInfoSchema().load(default_foiopeninforequest)
+            openinfoservice().createopeninforequest(foiopeninforequestschema, userid, foiministryrequest[0]['id'])        
+        return result
     
     
     def saverequestversion(self,foirequestschema, foirequestid , ministryid, userid):

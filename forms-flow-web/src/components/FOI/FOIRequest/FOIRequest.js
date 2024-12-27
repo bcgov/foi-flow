@@ -116,7 +116,7 @@ import { toast } from "react-toastify";
 import HomeIcon from "@mui/icons-material/Home";
 import { RecordsLog } from "../customComponents/Records";
 import { UnsavedModal } from "../customComponents";
-import { DISABLE_GATHERINGRECORDS_TAB } from "../../../constants/constants";
+import { DISABLE_GATHERINGRECORDS_TAB, SKIP_OPENINFO_MINISTRIES } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
 import ApplicantProfileModal from "./ApplicantProfileModal";
@@ -381,8 +381,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     dispatch(fetchOIPCStatuses());
     dispatch(fetchOIPCReviewtypes());
     dispatch(fetchOIPCInquiryoutcomes());
-    dispatch(fetchFOIOpenInfoRequest(ministryId)); // AH NOTE -> Need to stop get call from happening if request === general or if bcgovcode in this arr ["CLB", "HSA", "IIO", "MGC", "OBC", "TIC"]
-
+    if (!SKIP_OPENINFO_MINISTRIES.split(",").includes(bcgovcode.toUpperCase()) && requestDetails.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
+      dispatch(fetchFOIOpenInfoRequest(ministryId));
+    }
     if (isOITeam) {
       dispatch(fetchOpenInfoStatuses());
       dispatch(fetchFOIOpenInfoAdditionalFiles(requestId, ministryId));
@@ -1132,7 +1133,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const showOpenInformationTab = () => {
     return (
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
-      !["CLB", "HSA", "IIO", "MGC", "OBC", "TIC"].includes(requestDetails?.bcgovcode) &&
+      !SKIP_OPENINFO_MINISTRIES.includes(requestDetails?.bcgovcode) &&
       requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name
     );
