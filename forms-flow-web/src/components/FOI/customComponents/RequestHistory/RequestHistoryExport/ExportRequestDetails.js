@@ -1,10 +1,8 @@
 import 'reactjs-popup/dist/index.css';
-import ApplicantDetails from '../../../FOIRequest/MinistryReview/ApplicantDetails';
 import ChildDetails from '../../../FOIRequest/MinistryReview/ChildDetails';
 import OnBehalfDetails from '../../../FOIRequest/MinistryReview/OnBehalfDetails';
 import RequestDescription from '../../../FOIRequest/MinistryReview/RequestDescription';
 import RequestDetails from '../../../FOIRequest/MinistryReview/RequestDetails';
-import AdditionalApplicantDetails from '../../../FOIRequest/MinistryReview/AdditionalApplicantDetails';
 import ExtensionDetails from '../../../FOIRequest/MinistryReview/ExtensionDetails';
 import OIPCDetails from '../../../FOIRequest/OIPCDetails/Index';
 import { getHeaderText } from '../../../FOIRequest/MinistryReview/utils';
@@ -16,6 +14,8 @@ import { Card, CardContent, Grid } from '@material-ui/core';
 import './exportrequestdetails.scss';
 import { Col, Row } from 'react-bootstrap';
 import AddressAndContactInfo from './AddressAndContactInfo';
+import AdditionalApplicantDetails from './AdditionalApplicantDetails';
+import ApplicantDetails from './ApplicantDetails';
 
 
 
