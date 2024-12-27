@@ -76,6 +76,9 @@ class MinistryTeamWithKeycloackGroup(Enum):
     COR = "COR Ministry Team"
     HSG = "HSG Ministry Team"
     LSB = "LSB Ministry Team"
+    INF = "INF Ministry Team"
+    MCM = "MCM Ministry Team"
+    ECS = "ECS Ministry Team"
 
     @staticmethod
     def list():
@@ -170,6 +173,7 @@ class StateName(Enum):
     readytoscan = "Ready to Scan"
     appfeeowing = "App Fee Owing"
     section5pending = "Section 5 Pending"
+    onholdother = "On Hold - Other"
 class CacheUrls(Enum):
     keycloakusers= "/api/foiassignees"
     programareas= "/api/foiflow/programareas"

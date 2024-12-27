@@ -174,6 +174,16 @@ class FOIOpenInformationRequests(db.Model):
             else_= literal("0").label("recordspagecount")
         )
 
+        oistatusname = case(
+            [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
+            else_=OpenInformationStatuses.name
+        ).label('oiStatusName')
+
+        receiveddate = case(
+            [(FOIMinistryRequest.oistatus_id.is_(None), FOIMinistryRequest.closedate)],
+            else_=cls.oiexemptiondate
+        ).label('receivedDate')
+
         assignedToFormatted = case([
                 (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
                 func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
@@ -189,7 +199,6 @@ class FOIOpenInformationRequests(db.Model):
         oifilter = cls.getgroupfilters(groups)
 
         # result, err = cls.getdatafromOILayerpagecounts(FOIRequest.foirequestid, FOIMinistryRequest.foiministryrequestid)
-        # print("헤이이이이이 result: ", result)
 
         # Define the selected columns
         selectedcolumns = [
@@ -201,7 +210,9 @@ class FOIOpenInformationRequests(db.Model):
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             ApplicantCategory.name.label('applicantcategory'),
             recordspagecount.label('recordspagecount'),  
-            OpenInformationStatuses.name.label('oiStatusName'), 
+            #OpenInformationStatuses.name.label('oiStatusName'), 
+            oistatusname.label('oiStatusName'),
+            receiveddate.label('receivedDate'),
             cls.publicationdate,
             cls.created_at, 
             assignedToFormatted, 
@@ -217,10 +228,11 @@ class FOIOpenInformationRequests(db.Model):
             .join(FOIMinistryRequest, and_(
                 FOIMinistryRequest.foiministryrequestid == cls.foiministryrequest_id, 
                 FOIMinistryRequest.version == cls.foiministryrequestversion_id,
-                FOIMinistryRequest.isactive == True))
+                FOIMinistryRequest.isactive == True,
+                ))
             .join(FOIRequest, and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id))
             .join(ApplicantCategory,and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True))
-            .join(OpenInformationStatuses, OpenInformationStatuses.oistatusid == FOIMinistryRequest.oistatus_id)
+            .outerjoin(OpenInformationStatuses, OpenInformationStatuses.oistatusid == FOIMinistryRequest.oistatus_id)
             .join(FOIRequestStatus, FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid)
             .join(FOIRestrictedMinistryRequest,
                                 and_(
@@ -239,22 +251,31 @@ class FOIOpenInformationRequests(db.Model):
             basequery = basequery.join(
                 subquery_watchby, 
                 subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid
-            ).filter(FOIMinistryRequest.isactive == True ,cls.oiassignedto == userid)
+            )
         elif additionalfilter == 'myRequests':
             print("foi open info inside: myRequests ")
             basequery = basequery.filter(
                 and_(
-                    FOIMinistryRequest.assignedgroup == 'OI Team',
                     cls.oiassignedto == userid
                 )
             ).order_by(
-                # Exemption requests first (1 if no exemption, 0 if has exemption)
                 case(
-                    [(cls.oiexemption_id.isnot(None), 0)],
+                    [(FOIMinistryRequest.oistatus_id == 8, 0)],
                     else_=1
                 ),
-                desc(FOIMinistryRequest.closedate)  # Then sort by closedate (newest to oldest)
+                case(
+                    [(FOIMinistryRequest.oistatus_id.isnot(None), cls.oiexemptiondate)],
+                    else_=FOIMinistryRequest.closedate
+                ).desc()
             )
+            # .order_by(
+            #     # Exemption requests first (1 if no exemption, 0 if has exemption)
+            #     case(
+            #         [(cls.oiexemption_id.isnot(None), 0)],
+            #         else_=1
+            #     ),
+            #     desc(FOIMinistryRequest.closedate)  # Then sort by closedate (newest to oldest)
+            # )
             
             # basequery = (basequery
             #     .filter(cls.oiassignedto == userid)
@@ -264,63 +285,67 @@ class FOIOpenInformationRequests(db.Model):
             #     ))
         elif additionalfilter == 'unassignedRequests':
             print("foi open info inside: unassignedRequests ")
-            #basequery = basequery.filter(cls.oiassignedto == None)
-
-            # List of program area IDs to exclude           
+            
+             # List of program area IDs to exclude           
             excluded_program_areas = [24, 29, 32, 33, 34]  # CLB(24), IIO(29), TIC(32), OBC(33), MGC(34)
 
             # List of eligible close reason IDs
             eligible_close_reasons = [4, 7]  # Full Disclosure(4), Partial Disclosure(7)
 
             basequery = basequery.filter(
-                and_(
-                    FOIMinistryRequest.assignedgroup == 'OI Team',      # Requests assigned to OI Team
-                    FOIMinistryRequest.isactive == True,                # Active requests only
                     cls.oiassignedto.is_(None),                         # Unassigned requests (no user assigned)
-                    and_(
-                        FOIRequest.requesttype != 'personal',           # Non-personal requests (General requests only)
-                        FOIMinistryRequest.programareaid.notin_(excluded_program_areas), # Exclude CLB, IIO, TIC, OBC, MGC
-                        or_(
-                            # Does NOT have an 'Approved' Exemption
-                            cls.oiexemptionapproved.is_(None),
-                            cls.oiexemptionapproved == False
+                    or_(
+                        # Case 1: Requests with oistatus_id (Exemption requests) - must NOT be closed
+                        and_(
+                            FOIMinistryRequest.oistatus_id.isnot(None),
+                            FOIMinistryRequest.requeststatuslabel != 'closed'  # 추가: closed가 아닌 것만
                         ),
                         
+                        # Case 2: Requests without oistatus_id that meet specific criteria
                         and_(
-                            # Closed with Full or Partial Disclosure
-                            FOIMinistryRequest.requeststatuslabel == 'closed',
-                            FOIMinistryRequest.closereasonid.in_(eligible_close_reasons)
+                            FOIMinistryRequest.oistatus_id.is_(None),  # No oistatus_id
+                            FOIRequest.requesttype != 'personal',  # Non-personal requests only
+                            FOIMinistryRequest.programareaid.notin_(excluded_program_areas),  # Exclude specific areas
+                            cls.oiexemptionapproved.is_(None),  # No exemption approved
+                            FOIMinistryRequest.requeststatuslabel == 'closed',  # Must be closed
+                            FOIMinistryRequest.closereasonid.in_(eligible_close_reasons)  # Must have eligible close reasons
                         )
                     )
-                )
             ).order_by(
-                # Priority order: 
-                # 1. Exemption requests (oistatus_id = 2)
-                # 2. Publication reviews (oistatus_id = 4)
-                # 3. Other requests
                 case(
-                    [(FOIMinistryRequest.oistatus_id == 8, 0)],     # Exemption requests first
-                    else_=2                                         # Other requests last
+                    [(FOIMinistryRequest.oistatus_id == 8, 0)],
+                    else_=1
                 ),
-                desc(FOIMinistryRequest.closedate)
+                case(
+                    [(FOIMinistryRequest.oistatus_id.isnot(None), cls.oiexemptiondate)],
+                    else_=FOIMinistryRequest.closedate
+                ).desc()
             )
+
+            
         elif additionalfilter == 'teamRequests':
             print("foi open info inside: teamRequests ")
 
             basequery = basequery.filter(
-            and_(
-                FOIMinistryRequest.assignedgroup == 'OI Team',  # Requests assigned to OI Team
-                FOIMinistryRequest.isactive == True,            # Active requests only
-                # cls.oiassignedto.isnot(None),                   # Requests that are assigned to a user
-            )
+                
             ).order_by(
-                # Exemption requests first (1 if no exemption, 0 if has exemption)
                 case(
-                    [(cls.oiexemption_id.isnot(None), 0)],
+                    [(FOIMinistryRequest.oistatus_id == 8, 0)],
                     else_=1
                 ),
-                desc(FOIMinistryRequest.closedate)  # Then sort by creation date (newest to oldest)
+                case(
+                    [(FOIMinistryRequest.oistatus_id.isnot(None), cls.oiexemptiondate)],
+                    else_=FOIMinistryRequest.closedate
+                ).desc()
             )
+            # .order_by(
+            #     # Exemption requests first (1 if no exemption, 0 if has exemption)
+            #     case(
+            #         [(cls.oiexemption_id.isnot(None), 0)],
+            #         else_=1
+            #     ),
+            #     desc(FOIMinistryRequest.closedate)  # Then sort by creation date (newest to oldest)
+            # )
 
         print("additionalfilter basequery : ",basequery)
         
