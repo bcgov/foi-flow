@@ -36,10 +36,6 @@ class notificationservice:
     
     def createnotification(self, message, requestid, requesttype, notificationtype, userid, iscleanup=True):
         foirequest = self.getrequest(requestid, requesttype)
-        print("requesttype:",requesttype)
-        print("notif:",notificationtype['name'])
-        print("foirequest:",foirequest)
-        print("message:",message)
         if iscleanup == True:
             self.__cleanupnotifications(requesttype, notificationtype['name'], foirequest)
         return self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
@@ -304,6 +300,7 @@ class notificationservice:
         notification.isdeleted = False
 
         notificationusers = notificationuser().getnotificationusers(notificationtype['name'], requesttype, userid, foirequest, requestjson)
+        print("****notificationusers:",notificationusers)
         users = []
         for _notificationuser in notificationusers:
             users.append(self.__preparenotificationuser(requesttype, _notificationuser, userid, mutenotification, ministryusers))

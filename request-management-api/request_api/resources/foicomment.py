@@ -50,8 +50,8 @@ class CreateFOIRequestComment(Resource):
     def post():      
         try:
             requestjson = request.get_json() 
-            minrquescommentschema = FOIMinistryRequestCommentSchema().load(requestjson)  
-            result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getuserid())
+            minrquescommentschema = FOIMinistryRequestCommentSchema().load(requestjson) 
+            result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getuserid(), minrquescommentschema["commenttypeid"])
             if result.success == True:
                 asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "ministryrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
@@ -74,7 +74,7 @@ class CreateFOIRawRequestComment(Resource):
         try:
             requestjson = request.get_json() 
             rawrqcommentschema = FOIRawRequestCommentSchema().load(requestjson)  
-            result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getuserid())
+            result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getuserid(), rawrqcommentschema["commenttypeid"])
             if result.success == True:
                 asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200

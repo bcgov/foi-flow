@@ -78,7 +78,6 @@ class DashboardPagination(Resource):
             #     requests = dashboardservice().getoirequestqueuepagination(groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
             else:
                 statuscode = 401   
-            print("requests : ",requests)
             
             return requests, statuscode
         except BusinessException as exception:

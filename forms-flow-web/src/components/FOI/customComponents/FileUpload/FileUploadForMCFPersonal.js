@@ -83,8 +83,8 @@ const FileUploadForMCFPersonal = ({
       isMinistryCoordinator?MCFPeople?.people.filter((p)=>{return p.name !== 'PERSON 1'}):MCFPeople?.people.filter((p)=>{return p.name !== 'APPLICANT'})
     );
     const [allVolumes, setAllVolumes] = useState(MCFVolumes?.volumes);
-    const [fileTypes, setFileTypes] = useState(MCFFiletypes?.filetypes.slice(0, 6));
-    const [otherFileTypes, setOtherFileTypes] = useState(MCFFiletypes?.filetypes.slice(6, MCFFiletypes?.filetypes.length));
+    const [fileTypes, setFileTypes] = useState(MCFFiletypes?.filetypes.slice(0, 8));
+    const [otherFileTypes, setOtherFileTypes] = useState(MCFFiletypes?.filetypes.slice(8, MCFFiletypes?.filetypes.length));
     const [people, setPeople] = useState(allPeople.slice(0, 5));
     const [volumes, setVolumes] = useState(allVolumes.slice(0, 5));
     const [showAllPeople, setShowAllPeople] = useState(false);
@@ -212,13 +212,9 @@ const FileUploadForMCFPersonal = ({
     const fileDrop = (e) => {
       e.preventDefault();
 
-      if(modalFor === "add" && (!isPersonSelected || ((isMinistryCoordinator && tagValue == "")))) {
-        return
-      } else {
-        const newFiles = e.dataTransfer.files;
-        const totalNoOfFiles = Object.entries(files).length + newFiles.length; 
-        validateFiles(newFiles, totalNoOfFiles);
-      }
+      const newFiles = e.dataTransfer.files;
+      const totalNoOfFiles = Object.entries(files).length + newFiles.length; 
+      validateFiles(newFiles, totalNoOfFiles);
     }
     const removeFile = (fileName) => {
         const _file = files[fileName];
@@ -712,12 +708,11 @@ const FileUploadForMCFPersonal = ({
             value=""
             multiple={multipleFiles}
             accept={mimeTypes}
-            disabled={modalFor === "add" && (!isPersonSelected || ((isMinistryCoordinator && tagValue == "")))}
             />
           </div>
           <div className="file-upload-column file-upload-column-3">
             {(Object.entries(files).length === 0 && !multipleFiles) || multipleFiles ?
-            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick} disabled={modalFor === "add" && (!isPersonSelected || ((isMinistryCoordinator && tagValue == "")))}>
+            <button className="btn-add-files" type="button" onClick={handleUploadBtnClick}>
                   Add Files
             </button>  : null}
           </div>
