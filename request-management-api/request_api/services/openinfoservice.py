@@ -82,7 +82,6 @@ class openinfoservice:
     def updatefoioirequest_onfoirequestchange(self, foiministryrequestid, new_foirequestversion, userid):
         foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
         foiopeninforequest['foiministryrequestversion_id'] = new_foirequestversion
-        print("LIQUID",foiopeninforequest )
         result = FOIOpenInformationRequests().updateopeninfo(foiopeninforequest, userid)
         deactivateresult = None
         if result.success == True:
