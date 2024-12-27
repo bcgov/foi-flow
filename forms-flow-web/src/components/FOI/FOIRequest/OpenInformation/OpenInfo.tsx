@@ -74,14 +74,10 @@ const OpenInfo = ({
       setOiPublicationData((prev: any) => ({
         ...prev,
         [oiDataKey]: 2,
-        iaorationale: null,
         oiexemption_id: null,
-        pagereference: null,
-        oiexemptionapproved: null,
         copyrightsevered: null,
         publicationdate: null,
         oiexemptiondate: null,
-        oifeedback: null,
       }));
     } else if (oiDataKey === "publicationdate" && requestDetails.closedate 
       && typeof(value) === "string" && calculateDaysBetweenDates(value, requestDetails.closedate) >= 1 && calculateDaysBetweenDates(value, requestDetails.closedate) <= 10) {
