@@ -40,6 +40,7 @@ class openinfoservice:
         foiopeninforequest['foiministryrequestversion_id'] = foiministryrequestversion
         foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
         foiopeninforequest['version'] = prev_foiopeninforequest["version"]
+        foiopeninforequest['foiopeninforequestid'] = prev_foiopeninforequest["foiopeninforequestid"]
         result = FOIOpenInformationRequests().updateopeninfo(foiopeninforequest, userid)
         deactivateresult = None
         if result.success == True:
@@ -81,6 +82,7 @@ class openinfoservice:
     def updatefoioirequest_onfoirequestchange(self, foiministryrequestid, new_foirequestversion, userid):
         foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
         foiopeninforequest['foiministryrequestversion_id'] = new_foirequestversion
+        print("LIQUID",foiopeninforequest )
         result = FOIOpenInformationRequests().updateopeninfo(foiopeninforequest, userid)
         deactivateresult = None
         if result.success == True:

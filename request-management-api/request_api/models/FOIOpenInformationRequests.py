@@ -87,6 +87,7 @@ class FOIOpenInformationRequests(db.Model):
         try:
             createddate = datetime2.now().isoformat()
             updated_foiopeninforequest = FOIOpenInformationRequests(
+                foiopeninforequestid=foiopeninforequest['foiopeninforequestid'],
                 version=foiopeninforequest['version']+1,
                 foiministryrequest_id=foiopeninforequest["foiministryrequest_id"],
                 foiministryrequestversion_id=foiopeninforequest["foiministryrequestversion_id"],

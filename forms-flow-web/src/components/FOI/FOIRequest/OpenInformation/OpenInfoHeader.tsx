@@ -25,7 +25,7 @@ const OIAssignedToStyles = makeStyles((theme: Theme) => ({
     }
   }));
 
-const IAOOpenInfoHeader = ({
+const OpenInfoHeader = ({
   requestNumber,
   requestDetails,
   isOIUser,
@@ -195,24 +195,23 @@ useEffect(() => {
           value={selectedAssignedTo}
           variant="outlined"
           fullWidth
+          disabled={isOIUser}
         ></TextField>
         <TextField
           id="oiAssignedTo"
           label={"OI Assigned To"}
           inputProps={{
-            "aria-labelledby": "assignedTo-label",
-            readOnly: !isOIUser,
+            "aria-labelledby": "assignedTo-label"
           }}
           InputLabelProps={{ shrink: true }}
-          select={isOIUser}
           value={selectedOIAssignedTo}
           onChange={handleOIAssigneeUpdate}
-          //input={<Input />}
           variant="outlined"
           fullWidth
+          select={isOIUser}
           required={isOIUser}
-          // disabled={disableHeaderInput}
-          error={selectedOIAssignedTo.toLowerCase().includes("unassigned")}
+          disabled={!isOIUser}
+          error={isOIUser && selectedOIAssignedTo.toLowerCase().includes("unassigned")}
         >
           {menuItems}
         </TextField>
@@ -221,4 +220,4 @@ useEffect(() => {
   );
 };
 
-export default IAOOpenInfoHeader;
+export default OpenInfoHeader;
