@@ -2,7 +2,7 @@ import { useState } from 'react';
 import '../requesthistory.scss';
 import 'reactjs-popup/dist/index.css';
 import { ClickableChip } from '../../../Dashboard/utils';
-import { addToFullnameList, getCommentTypeIdByName, getFullnameList } from '../../../../../helper/FOI/helper';
+import { addToFullnameList, convertSTRToDate, getCommentTypeIdByName, getFullnameList } from '../../../../../helper/FOI/helper';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
@@ -114,7 +114,7 @@ const ExportHistory = ({
         c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review")
     )
     const sortedCommentsHistory = [...filteredRequestNotes].sort((a, b) =>
-      new Date(b.created_at || b.dateUF) - new Date(a.created_at || a.dateUF)
+       new Date(a.created_at || a.dateUF) - new Date(b.created_at || b.dateUF)
     );
 
     return sortedCommentsHistory.map((item, index) => {
@@ -138,7 +138,8 @@ const ExportHistory = ({
     if (!fullnameList?.length) return null;
 
     const sortedCommunications = [...applicantCorrespondence].sort((a, b) =>
-      new Date(b.created_at || b.dateUF) - new Date(a.created_at || a.dateUF)
+      
+      new Date(convertSTRToDate(a.created_at) || a.dateUF) - new Date(convertSTRToDate(b.created_at) || b.dateUF)
     );
 
     return sortedCommunications.map((item, index) => {
