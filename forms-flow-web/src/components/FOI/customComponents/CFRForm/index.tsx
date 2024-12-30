@@ -545,7 +545,9 @@ export const CFRForm = ({
   }
 
   const isFeeWaiverDisabled = () => {
-    if(isMinistry || requestState === StateEnum.peerreview.name || (!isMinistry && (requestState !== StateEnum.onhold.name || requestState !== StateEnum.onholdother.name || formData?.formStatus !== 'approved')))
+    if(isMinistry || 
+      requestState === StateEnum.peerreview.name || 
+      (!isMinistry && (requestState !== StateEnum.onhold.name && requestState !== StateEnum.onholdother.name || formData?.formStatus !== 'approved')))
       return true;
     else
       return false;

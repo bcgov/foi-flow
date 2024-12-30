@@ -1888,7 +1888,23 @@ export const RecordsLog = ({
               && a?.trackingid === b?.trackingid;
   };
 
+  const [isBulkEdit, setIsBulkEdit] = React.useState(false);
+
+  useEffect(() => {
+    let selectedRecords = records.filter((record) => record.isselected);
+    setIsBulkEdit(selectedRecords.length > 1);
+  }, [records])
+
+  const isBulkEditDisabled = () => {
+    if (isBulkEdit) {
+    return false;
+    } else {
+      return true;
+    }
+  }
+
   const updatePersonalAttributes = (_all = false) => {
+    const selectedRecords = records.filter((record) => record.isselected);
     setEditTagModalOpen(false);
     var updateRecords = [];
     var updateDivisionForRecords = [];
@@ -1927,7 +1943,17 @@ export const RecordsLog = ({
             }
           }
         }
-      } else {
+      } else if (selectedRecords.length > 1 && !currentEditRecord) {
+        for (let selectedRecord of selectedRecords) {
+          updateRecords.push(
+            {
+              recordid: selectedRecord.recordid,
+              documentmasterid: selectedRecord.documentmasterid,
+              filepath: selectedRecord.s3uripath
+            }
+          );
+        }
+      } else if (currentEditRecord) {
         updateRecords.push(
           {
             recordid: currentEditRecord.recordid,
@@ -1939,6 +1965,7 @@ export const RecordsLog = ({
     }
 
     if(isMinistryCoordinator
+      && currentEditRecord
       && currentEditRecord.attributes.divisions[0].divisionname != "TBD"
       && currentEditRecord.attributes.divisions[0].divisionid != divisionModalTagValue) {
       updateDivisionForRecords.push(
@@ -1950,7 +1977,21 @@ export const RecordsLog = ({
       );
     }
 
-    if(currentEditRecord) {
+    if(isMinistryCoordinator
+      && selectedRecords.length > 1
+      && divisionModalTagValue !== -1
+    )
+      for (let selectedRecord of selectedRecords) {
+        updateDivisionForRecords.push(
+          {
+            recordid: selectedRecord.recordid,
+            documentmasterid: selectedRecord.documentmasterid,
+            filepath: selectedRecord.s3uripath
+          }
+        );
+      }
+
+    if(currentEditRecord || selectedRecords.length > 1) {
       if(updateRecords.length > 0 && !comparePersonalAttributes(newPersonalAttributes, curPersonalAttributes)) {
         dispatch(
           editPersonalAttributes(
@@ -2128,7 +2169,7 @@ export const RecordsLog = ({
               </h1>
             </Grid>
             {validLockRecordsState() ?
-            <Grid item xs={isScanningTeamMember ? 1 : 2}>
+            <Grid item xs={isScanningTeamMember ? 1 : 1}>
               <Tooltip 
                 enterDelay={1000} 
                 title={isMinistryCoordinator ? "Only the IAO analyst can manually lock or unlock the records log, please contact the assigned analyst for assistance" : "Manually unlock or lock the records log"}
@@ -2155,12 +2196,12 @@ export const RecordsLog = ({
                 </span>
                 }
               </Tooltip>
-            </Grid> :  <Grid item xs={isScanningTeamMember ? 1 : 2}></Grid>
+            </Grid> :  <Grid item xs={isScanningTeamMember ? 1 : 1}></Grid>
             }
             {(isMinistryCoordinator == false &&
               records?.length > 0 &&
               DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
-                <Grid item xs={isScanningTeamMember ? 1 : 2}>
+                <Grid item xs={isScanningTeamMember ? 1 : 1}>
                 <a
                   href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
                   target="_blank"
@@ -2242,10 +2283,7 @@ export const RecordsLog = ({
             </Grid> 
             <Grid item xs={2}>
               {
-              (!isHistoricalRequest && (isMinistryCoordinator || (isScanningTeamMember &&
-                MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', "")) &&
-                requestType ===
-                  FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL))) && (
+              (!isHistoricalRequest) && (
                 <button
                   className={clsx("btn", "addAttachment", classes.createButton)}
                   variant="contained"
@@ -2634,6 +2672,49 @@ export const RecordsLog = ({
                 </span>
               </Tooltip>
               )}
+              {(isMCFPersonal) && (
+              <Tooltip
+                title={
+                  isBulkEditDisabled() ? (
+                    <div style={{ fontSize: "11px" }}>
+                      To bulk edit tags, please select two or more files, otherwise please use the 'Edit Tags' option from the ellipses dropdown next to the individual file
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: "11px" }}>Edit Tags</div>
+                  )
+                }
+                sx={{ fontSize: "11px" }}
+              >
+                <span>
+                  <button
+                    className={` btn`}
+                    onClick={() => {
+                      setCurPersonalAttributes({
+                        person: "",
+                        filetype: "",
+                        volume: "",
+                        trackingid: "",
+                        personaltag: ""
+                      });
+                      setDivisionModalTagValue(-1);
+                      setEditTagModalOpen(true);
+                    }}
+                    disabled={lockRecords || isBulkEditDisabled()}
+                    style={
+                      lockRecords || isBulkEditDisabled()
+                        ? { pointerEvents: "none" }
+                        : {}
+                    }
+                  >
+                    <FontAwesomeIcon
+                      icon={faPenToSquare}
+                      size="lg"
+                      color="#38598A"
+                    />
+                  </button>
+                </span>
+              </Tooltip>
+              )}
               <Tooltip title={<div style={{ fontSize: "11px" }}>Delete</div>}>
                 <span>
                   <button
@@ -2826,6 +2907,7 @@ export const RecordsLog = ({
               divisions={divisions}
               isMinistryCoordinator={isMinistryCoordinator}
               currentEditRecord={currentEditRecord}
+              isBulkEdit={isBulkEdit}
             />
           ):(
             <div className="state-change-dialog">
