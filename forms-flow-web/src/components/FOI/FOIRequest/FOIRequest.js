@@ -381,9 +381,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     dispatch(fetchOIPCStatuses());
     dispatch(fetchOIPCReviewtypes());
     dispatch(fetchOIPCInquiryoutcomes());
-    if (!SKIP_OPENINFO_MINISTRIES.split(",").includes(bcgovcode.toUpperCase()) && requestDetails.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL) {
-      dispatch(fetchFOIOpenInfoRequest(ministryId));
-    }
     if (isOITeam) {
       dispatch(fetchOpenInfoStatuses());
       dispatch(fetchFOIOpenInfoAdditionalFiles(requestId, ministryId));
@@ -397,6 +394,12 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
+
+  useEffect(() => {
+    if (!SKIP_OPENINFO_MINISTRIES.split(",").includes(requestDetails?.bcgovcode?.toUpperCase()) && requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL) {
+      dispatch(fetchFOIOpenInfoRequest(ministryId));
+    }
+  }, [requestId, ministryId, requestDetails])
 
   const validLockRecordsState = (currentState=requestDetails.currentState) => {
     return (
