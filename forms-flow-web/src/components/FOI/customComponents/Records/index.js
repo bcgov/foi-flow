@@ -2169,7 +2169,7 @@ export const RecordsLog = ({
               </h1>
             </Grid>
             {validLockRecordsState() ?
-            <Grid item xs={isScanningTeamMember ? 1 : 2}>
+            <Grid item xs={isScanningTeamMember ? 1 : 1}>
               <Tooltip 
                 enterDelay={1000} 
                 title={isMinistryCoordinator ? "Only the IAO analyst can manually lock or unlock the records log, please contact the assigned analyst for assistance" : "Manually unlock or lock the records log"}
@@ -2196,12 +2196,12 @@ export const RecordsLog = ({
                 </span>
                 }
               </Tooltip>
-            </Grid> :  <Grid item xs={isScanningTeamMember ? 1 : 2}></Grid>
+            </Grid> :  <Grid item xs={isScanningTeamMember ? 1 : 1}></Grid>
             }
             {(isMinistryCoordinator == false &&
               records?.length > 0 &&
               DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
-                <Grid item xs={isScanningTeamMember ? 1 : 2}>
+                <Grid item xs={isScanningTeamMember ? 1 : 1}>
                 <a
                   href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
                   target="_blank"
