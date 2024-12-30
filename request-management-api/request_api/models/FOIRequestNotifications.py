@@ -39,6 +39,8 @@ class FOIRequestNotification(db.Model):
         
     @classmethod
     def savenotification(cls,foinotification)->DefaultMethodResult:
+        print("여기인것인가? savenotification")
+        print("========= : ",foinotification)
         try:
             db.session.add(foinotification)
             db.session.commit()        
