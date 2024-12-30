@@ -20,7 +20,7 @@ import TextField from '@material-ui/core/TextField';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import _ from 'lodash';
 import { MCFPopularSections } from "../../../../constants/FOI/enum";
-import Draggable from 'react-draggable';
+// import Draggable from 'react-draggable';
 
 const MCFPersonal = ({
     editTagModalOpen,
