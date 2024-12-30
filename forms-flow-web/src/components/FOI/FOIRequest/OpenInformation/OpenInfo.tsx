@@ -74,7 +74,6 @@ const OpenInfo = ({
       setOiPublicationData((prev: any) => ({
         ...prev,
         [oiDataKey]: 2,
-        oiexemption_id: null,
         copyrightsevered: null,
         publicationdate: null,
         oiexemptiondate: null,
