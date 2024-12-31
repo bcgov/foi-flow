@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { saveFOIOpenInfoRequest } from "../../../../apiManager/services/FOI/foiOpenInfoRequestServices";
+import { saveFOIOpenInfoRequest, fetchFOIOpenInfoRequest } from "../../../../apiManager/services/FOI/foiOpenInfoRequestServices";
 import { useDispatch, useSelector } from "react-redux";
 import IAOOpenInfoPublishing from "./Exemption/IAOOpenInfoPublishing";
 import OpenInfoPublication from "./Publication/OpenInfoPublication";
@@ -7,6 +7,7 @@ import OpenInfoHeader from "./OpenInfoHeader";
 import OpenInfoTab from "./OpenInfoTab";
 import "./openinfo.scss";
 import { isReadyForPublishing } from "../utils";
+import { OIPublicationStatus } from "./types";
 
 type OITransactionObject = {
   oipublicationstatus_id: number;
@@ -42,6 +43,9 @@ const OpenInfo = ({
   let foiOITransactionData = useSelector(
     (state: any) => state.foiRequests.foiOpenInfoRequest
   );
+  const oiPublicationStatuses: OIPublicationStatus[] = useSelector(
+    (state: any) => state.foiRequests.oiPublicationStatuses
+  );
 
   //Local State
   const [oiPublicationData, setOiPublicationData] =
@@ -59,9 +63,18 @@ const OpenInfo = ({
 
   useEffect(() => {
     setOiPublicationData(foiOITransactionData);
+    if (isOITeam) {
+      if (foiOITransactionData.oipublicationstatus_id === findOIPublicationState('Do Not Publish')?.oipublicationstatusid) {
+        setTabValue(1)
+      }
+    }
   }, [foiOITransactionData]);
 
   //Functions
+  const findOIPublicationState = (name: string) => {
+    return oiPublicationStatuses.find((s: OIPublicationStatus) => s.name === name)
+  }
+
   const handleOIDataChange = (
     value: number | string | boolean,
     oiDataKey: string
@@ -70,13 +83,14 @@ const OpenInfo = ({
       setIsDataEdited(true);
     }
     //Reset foi oi data if publication status goes back to publication.
-    if (oiDataKey === "oipublicationstatus_id" && value === 2) {
+    if (oiDataKey === "oipublicationstatus_id" && value === findOIPublicationState("Publish")?.oipublicationstatusid) {
       setOiPublicationData((prev: any) => ({
         ...prev,
-        [oiDataKey]: 2,
+        [oiDataKey]: value,
         copyrightsevered: null,
         publicationdate: null,
         oiexemptiondate: null,
+        oiexemption_id: null
       }));
     } else if (oiDataKey === "publicationdate" && requestDetails.closedate 
       && typeof(value) === "string" && calculateDaysBetweenDates(value, requestDetails.closedate) >= 1 && calculateDaysBetweenDates(value, requestDetails.closedate) <= 10) {
@@ -134,6 +148,10 @@ const OpenInfo = ({
         new Date(oiPublicationData.publicationdate).toISOString().split('T')[0] : 
         null
     };
+    if (formattedData.oiexemptionapproved === false) {
+      formattedData.oipublicationstatus_id = findOIPublicationState("Publish")?.oipublicationstatusid || 2;
+      formattedData.oiexemption_id = null;
+    }
     dispatch(
       saveFOIOpenInfoRequest(
         foiministryrequestid,
@@ -165,6 +183,7 @@ const OpenInfo = ({
             if (isValidExemptionDenial || manualPublicationStatusChange) {
               requestDetails.oistatusid = null;
             }
+            dispatch(fetchFOIOpenInfoRequest(foiministryrequestid));
           } else {
             toast.error(
               "Temporarily unable to save FOI OpenInformation request. Please try again in a few minutes.",
