@@ -364,7 +364,7 @@ const OpenInfoPublicationMain = ({
                 name="oipublicationstatus_id"
                 label="Publication Status"
                 variant="outlined"
-                value={oiPublicationData?.oipublicationstatus_id === 1 ? 2 : oiPublicationData?.oipublicationstatus_id}
+                value={(oiPublicationData?.oipublicationstatus_id === 1 ? 2 : oiPublicationData?.oipublicationstatus_id) || 2}
                 select
                 disabled={disableUserInput}
                 required
@@ -399,11 +399,7 @@ const OpenInfoPublicationMain = ({
                 onChange={(event) =>
                   handleOIDataChange(event.target.value, event.target.name)
                 }
-                value={
-                  oiPublicationData?.publicationdate
-                    ? formatDate(new Date(oiPublicationData?.publicationdate))
-                    : ""
-                }
+                value={(oiPublicationData?.publicationdate ? formatDate(new Date(oiPublicationData?.publicationdate)) : "") || ""}
                 type="date"
               ></TextField>
             </Grid>
