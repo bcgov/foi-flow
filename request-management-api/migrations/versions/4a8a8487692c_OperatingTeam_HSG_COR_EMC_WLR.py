@@ -21,9 +21,7 @@ def upgrade():
     op.execute('UPDATE public."OperatingTeams" SET  name=\'EMC Ministry Team\', description=\'EMC Ministry Team\' WHERE name =\'EMBC Ministry Team\';commit;')  
     op.execute('INSERT INTO public."OperatingTeams"(name, description, isactive, type) VALUES (\'HSG Ministry Team\', \'HSG Ministry Team\', True, \'ministry\');commit;')  
     op.execute('INSERT INTO public."OperatingTeams"(name, description, isactive, type) VALUES (\'COR Ministry Team\', \'COR Ministry Team\', True, \'ministry\');commit;')  
-    op.execute('INSERT INTO public."OperatingTeams"(name, description, isactive, type) VALUES (\'OI Team\', \'OI Team\', True, \'iao\');commit;')  
 
 def downgrade():
     op.execute('UPDATE public."OperatingTeams" SET  name=\'LWR Ministry Team\', description=\'LWR Ministry Team\' WHERE name =\'WLR Ministry Team\';commit;')  
     op.execute('UPDATE public."OperatingTeams" SET  name=\'EMBC Ministry Team\', description=\'EMBC Ministry Team\' WHERE name =\'EMC Ministry Team\';commit;')  
-    op.execute('DELETE FROM public."OperatingTeams" WHERE name in (\'HSG Ministry Team\',\'COR Ministry Team\',\'OI Team\');commit;')
