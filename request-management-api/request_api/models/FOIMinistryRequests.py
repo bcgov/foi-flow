@@ -1586,7 +1586,57 @@ class FOIMinistryRequest(db.Model):
         setattr(currequest,'updatedby',userid)
         db.session.commit()  
         return DefaultMethodResult(True,'Request updated',ministryrequestid)
+    
+    @classmethod
+    def getrequestsdetailsforsearch(cls,requestnumbers):
+        requestdetails = []
+        try:
+            csvrequestnumbers = tuple(requestnumbers)            
+            query=f"""SELECT
+                    DISTINCT FMR.foiministryrequestid
+                    ,FMR.axisrequestid
+                    ,FMR.requeststatuslabel
+                    ,FRA.lastname
+                    ,FRA.firstname
+                    ,FMR.closedate
+                    ,FMR.axispagecount
+                    ,FMR.recordspagecount
+                    ,FMR.axislanpagecount
+                    ,FMR.estimatedpagecount
+                    ,FMR.estimatedtaggedpagecount
+                    FROM public."FOIMinistryRequests" FMR INNER JOIN (
+                        SELECT 
+                        DISTINCT FMR.foiministryrequestid as ministryrequestid
+                        ,FMR.foirequest_id as requestid
+                        ,max(FMR.version) as latestversion 
+                        FROM public."FOIMinistryRequests" FMR 
+                        WHERE FMR.axisrequestid in :csvrequestnumbers
+                        GROUP BY FMR.foiministryrequestid,FMR.foirequest_id
+                    ) MaxRequestVersions ON FMR.foiministryrequestid=MaxRequestVersions.ministryrequestid and FMR.version=MaxRequestVersions.latestversion
+                    JOIN public."FOIRequestApplicantMappings" FRAM ON FRAM.foirequest_id=MaxRequestVersions.requestid
+                    JOIN public."FOIRequestApplicants" FRA ON FRA.foirequestapplicantid=FRAM.foirequestapplicantid"""            
+            result = db.session.execute(text(query),{"csvrequestnumbers":csvrequestnumbers})        
+            rows = result.fetchall()            
+            for row in rows:
+                requestdetail={}
+                requestdetail["requeststatus"]=row["requeststatuslabel"]
+                requestdetail["requestnumber"]=row["axisrequestid"]
+                requestdetail["lastname"]=row["lastname"]
+                requestdetail["firstname"]=row["firstname"]
+                requestdetail["closedate"]=row["closedate"]
+                requestdetail["axispagecount"]=row["axispagecount"]
+                requestdetail["recordspagecount"]=row["recordspagecount"]
+                requestdetail["axislanpagecount"]=row["axislanpagecount"]
+                requestdetail["estimatedpagecount"]=row["estimatedpagecount"]
+                requestdetail["estimatedtaggedpagecount"]=row["estimatedtaggedpagecount"]
+                requestdetails.append(requestdetail)
 
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return requestdetails
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
         fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate',
