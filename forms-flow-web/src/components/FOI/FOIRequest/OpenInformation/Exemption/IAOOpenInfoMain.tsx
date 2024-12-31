@@ -66,7 +66,7 @@ const IAOOpenInfoMain = ({
           expandIcon={<ExpandMoreIcon />}
         >
           <Typography className={classes.heading}>
-            PUBLICATION STATUS
+            EXEMPTION STATUS
           </Typography>
         </AccordionSummary>
         <AccordionDetails className={classes.accordionDetails}>
@@ -153,8 +153,6 @@ const IAOOpenInfoMain = ({
                   !oiPublicationData?.pagereference
                 }
                 disabled={disableIAOField}
-                multiline
-                minRows={1}
               ></TextField>
             </Grid>
             <Grid item md={6}>
