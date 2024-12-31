@@ -83,6 +83,14 @@ class recordservice(recordservicebase):
                 record['attributes'] = json.loads(record['attributes'])
                 for attribute in requestdata['newpersonalattributes']:
                     if (requestdata['newpersonalattributes'][attribute] is not None and len(requestdata['newpersonalattributes'][attribute]) > 0):
+                        if 'attributes' in record:
+                            if 'personalattributes' in record['attributes']:
+                                record['attributes']['personalattributes'][attribute] = requestdata['newpersonalattributes'][attribute]
+                            else:
+                                record['attributes']['personalattributes'] = {}
+                        else:
+                            record['attributes'] = {}
+                            record['attributes']['personalattributes'] = {}
                         record['attributes']['personalattributes'][attribute] = requestdata['newpersonalattributes'][attribute]
                 # divisions = divisions + [div for div in record['attributes']['divisions'] if div not in divisions]
                 record.update({'updated_at': datetime.now(), 'updatedby': userid})
