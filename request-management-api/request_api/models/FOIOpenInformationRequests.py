@@ -8,7 +8,7 @@ from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.sqltypes import Date, Integer
 from sqlalchemy.sql.expression import distinct
-from request_api.utils.enums import RequestorType, StateName, ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
+from request_api.utils.enums import RequestorType, StateName, ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup, OICloseReason, ExcludedProgramArea
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIAssignees import FOIAssignee
 from .FOIRequests import FOIRequest, FOIRequestsSchema
@@ -197,6 +197,10 @@ class FOIOpenInformationRequests(db.Model):
             else_ = FOIOpenInformationRequests.oiassignedto).label('assignedToFormatted')
         
         oifilter = cls.getgroupfilters(groups)
+     
+        excluded_program_areas = ExcludedProgramArea.list()
+
+        eligible_close_reasons = OICloseReason.list()
 
         selectedcolumns = [
             FOIRequest.foirequestid.label('id'), 
@@ -218,12 +222,6 @@ class FOIOpenInformationRequests(db.Model):
             FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
         ]   
 
-        # List of program area IDs to exclude           
-        excluded_program_areas = [24, 29, 32, 33, 34]  # CLB(24), IIO(29), TIC(32), OBC(33), MGC(34)
-
-        # List of eligible close reason IDs
-        eligible_close_reasons = [4, 7]  # Full Disclosure(4), Partial Disclosure(7)
-
         basequery = (
             _session.query(*selectedcolumns)
             .join(subquery_maxversion, and_(*joincondition))
@@ -235,11 +233,11 @@ class FOIOpenInformationRequests(db.Model):
                 or_( 
                     and_(
                         FOIMinistryRequest.oistatus_id.isnot(None),
-                        FOIMinistryRequest.requeststatuslabel != 'closed'
+                        FOIMinistryRequest.requeststatuslabel != StateName.closed.name
                     ),
                     and_(
                         FOIMinistryRequest.oistatus_id.is_(None),
-                        FOIMinistryRequest.requeststatuslabel == 'closed',
+                        FOIMinistryRequest.requeststatuslabel == StateName.closed.name,
                         FOIMinistryRequest.closereasonid.in_(eligible_close_reasons)
                     )
                 )
@@ -268,14 +266,12 @@ class FOIOpenInformationRequests(db.Model):
         )
             
         if additionalfilter == 'watchingRequests':
-            print("----------------watchingRequests--------------------- ")
             subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
             basequery = basequery.join(
                 subquery_watchby, 
                 subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid
             )
         elif additionalfilter == 'myRequests':
-            print("----------------myRequests--------------------- ")
             basequery = basequery.filter(
                 and_(
                     cls.oiassignedto == userid
@@ -283,14 +279,12 @@ class FOIOpenInformationRequests(db.Model):
             )
 
         elif additionalfilter == 'unassignedRequests':
-            print("----------------unassignedRequests--------------------- ")
             basequery = basequery.filter(
                     cls.oiassignedto.is_(None),                         
             )
             
         elif additionalfilter == 'teamRequests':
-            print("foi open info inside: teamRequests ")
-            print("additionalfilter basequery : ",basequery)
+            pass
         
         return basequery
 
