@@ -108,7 +108,11 @@ class FOIRequests(Resource):
             
             if rawresult.success == True:
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
-                if result.success == True:
+                if result.success == True:                    
+                    #Create FOIOpenInfoRequest after FOIMinistryRequest has successfully been created and set to Open state                
+                    foiministryrequest = result.args[0]
+                    print("here")
+                    openinfoservice().createopeninforequest(foirequestschema, AuthHelper.getuserid(), foiministryrequest)
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copydocuments(request_json['id'],result.args[0],AuthHelper.getuserid())
