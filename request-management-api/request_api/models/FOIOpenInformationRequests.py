@@ -8,7 +8,7 @@ from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.sql.sqltypes import Date, Integer
 from sqlalchemy.sql.expression import distinct
-from request_api.utils.enums import RequestorType, StateName, ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup, OICloseReason, ExcludedProgramArea
+from request_api.utils.enums import RequestorType, StateName, ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup, OICloseReason, ExcludedProgramArea, OIStatusEnum
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIAssignees import FOIAssignee
 from .FOIRequests import FOIRequest, FOIRequestsSchema
@@ -144,6 +144,7 @@ class FOIOpenInformationRequests(db.Model):
         joincondition = [
             subquery_maxversion.c.foiopeninforequestid == FOIOpenInformationRequests.foiopeninforequestid,
             subquery_maxversion.c.max_version == FOIOpenInformationRequests.version,
+            FOIOpenInformationRequests.isactive == True
         ]
 
         print("subquery_maxversion : ",subquery_maxversion)
@@ -255,7 +256,7 @@ class FOIOpenInformationRequests(db.Model):
             ).outerjoin(FOIAssignee, FOIAssignee.username == cls.oiassignedto) 
             .order_by(  
                 case(
-                    [(FOIMinistryRequest.oistatus_id == 8, 0)],
+                    [(FOIMinistryRequest.oistatus_id == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
                     else_=1
                 ),
                 case(
