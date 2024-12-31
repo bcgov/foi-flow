@@ -205,3 +205,17 @@ class OICloseReason(Enum):
     @staticmethod
     def list():
         return [reason.value for reason in OICloseReason]
+
+class OIStatusEnum(Enum):
+    FIRST_REVIEW = 1
+    PEER_REVIEW = 2
+    READY_TO_PUBLISH = 3
+    PUBLISHED = 4
+    HOLD_PUBLICATION = 5
+    UNPUBLISHED = 6
+    DO_NOT_PUBLISH = 7
+    EXEMPTION_REQUEST = 8
+
+    @classmethod
+    def list(cls):
+        return [status.value for status in cls]
