@@ -156,8 +156,14 @@ const OpenInfo = ({
               draggable: true,
               progress: undefined,
             });
-            if (!isOITeam && oiPublicationData.oipublicationstatus_id === 1 && oiPublicationData.oiexemption_id !== 5) {
+            const isValidExemptionRequest = !isOITeam && formattedData.oipublicationstatus_id === 1 && formattedData.oiexemption_id !== 5;
+            const isValidExemptionDenial = isOITeam && formattedData.oipublicationstatus_id === 1 && formattedData.oiexemption_id !== 5 && formattedData.oiexemptionapproved === false;
+            const manualPublicationStatusChange = requestDetails.oistatusid === 8 && formattedData.oipublicationstatus_id === 2;
+            if (isValidExemptionRequest) {
               requestDetails.oistatusid = 8;
+            }
+            if (isValidExemptionDenial || manualPublicationStatusChange) {
+              requestDetails.oistatusid = null;
             }
           } else {
             toast.error(
