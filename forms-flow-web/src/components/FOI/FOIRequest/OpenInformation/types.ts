@@ -5,6 +5,9 @@ export type OITransactionObject = {
   pagereference: string;
   iaorationale: string;
   oifeedback: string;
+  copyrightsevered: boolean;
+  publicationdate: string;
+  oiexemptiondate: string;
 };
 
 export type OIPublicationStatus = {

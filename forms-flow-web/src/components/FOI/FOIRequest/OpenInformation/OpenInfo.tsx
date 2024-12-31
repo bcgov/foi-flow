@@ -7,19 +7,7 @@ import OpenInfoHeader from "./OpenInfoHeader";
 import OpenInfoTab from "./OpenInfoTab";
 import "./openinfo.scss";
 import { isReadyForPublishing } from "../utils";
-import { OIPublicationStatus } from "./types";
-
-type OITransactionObject = {
-  oipublicationstatus_id: number;
-  oiexemption_id: number | null;
-  oiexemptionapproved: boolean | null;
-  pagereference: string;
-  iaorationale: string;
-  oifeedback: string;
-  copyrightsevered: boolean;
-  publicationdate: string;
-  oiexemptiondate: string;
-};
+import { OIPublicationStatus, OITransactionObject } from "./types";
 
 const OpenInfo = ({
   requestNumber,
