@@ -228,20 +228,8 @@ class FOIOpenInformationRequests(db.Model):
             .join(subquery_maxversion, and_(*joincondition))
             .join(FOIMinistryRequest, and_(
                 FOIMinistryRequest.foiministryrequestid == cls.foiministryrequest_id, 
-                FOIMinistryRequest.version == cls.foiministryrequestversion_id,
                 FOIMinistryRequest.isactive == True,
                 FOIMinistryRequest.programareaid.notin_(excluded_program_areas),
-                or_( 
-                    and_(
-                        FOIMinistryRequest.oistatus_id.isnot(None),
-                        FOIMinistryRequest.requeststatuslabel != StateName.closed.name
-                    ),
-                    and_(
-                        FOIMinistryRequest.oistatus_id.is_(None),
-                        FOIMinistryRequest.requeststatuslabel == StateName.closed.name,
-                        FOIMinistryRequest.closereasonid.in_(eligible_close_reasons)
-                    )
-                )
             ))
             .join(FOIRequest, and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id, FOIRequest.requesttype != 'personal'))
             .join(ApplicantCategory,and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True))
@@ -254,6 +242,19 @@ class FOIOpenInformationRequests(db.Model):
                                     FOIRestrictedMinistryRequest.isactive == True),
                                 isouter=True
             ).outerjoin(FOIAssignee, FOIAssignee.username == cls.oiassignedto) 
+            .filter(
+                or_( 
+                    and_(
+                        FOIMinistryRequest.oistatus_id.isnot(None),
+                        FOIMinistryRequest.requeststatuslabel != StateName.closed.name
+                    ),
+                    and_(
+                        FOIMinistryRequest.oistatus_id.is_(None),
+                        FOIMinistryRequest.requeststatuslabel == StateName.closed.name,
+                        FOIMinistryRequest.closereasonid.in_(eligible_close_reasons)
+                    )
+                )
+            )
             .order_by(  
                 case(
                     [(FOIMinistryRequest.oistatus_id == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
