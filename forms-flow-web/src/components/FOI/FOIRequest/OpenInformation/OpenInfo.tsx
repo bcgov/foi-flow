@@ -8,6 +8,7 @@ import OpenInfoTab from "./OpenInfoTab";
 import "./openinfo.scss";
 import { isReadyForPublishing } from "../utils";
 import { OIPublicationStatus, OITransactionObject } from "./types";
+import { OIStates, OIPublicationStatuses, OIExemptions } from "../../../../helper/openinfo-helper";
 
 const OpenInfo = ({
   requestNumber,
@@ -60,9 +61,8 @@ const OpenInfo = ({
 
   //Functions
   const findOIPublicationState = (name: string) => {
-    return oiPublicationStatuses.find((s: OIPublicationStatus) => s.name === name)
+    return oiPublicationStatuses.find((s: OIPublicationStatus) => s.name === name);
   }
-
   const handleOIDataChange = (
     value: number | string | boolean,
     oiDataKey: string
@@ -100,8 +100,8 @@ const OpenInfo = ({
   };
   const handleExemptionSave = () => {
     if (
-      oiPublicationData?.oipublicationstatus_id === 1 &&
-      oiPublicationData?.oiexemption_id !== 5
+      oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish &&
+      oiPublicationData?.oiexemption_id !== OIExemptions.OutsideScopeOfPublication
     ) {
       if (isOITeam && oiPublicationData?.oiexemptionapproved != null) {
         setConfirmationModal((prev: any) => ({
@@ -137,7 +137,7 @@ const OpenInfo = ({
         null
     };
     if (formattedData.oiexemptionapproved === false) {
-      formattedData.oipublicationstatus_id = findOIPublicationState("Publish")?.oipublicationstatusid || 2;
+      formattedData.oipublicationstatus_id = findOIPublicationState("Publish")?.oipublicationstatusid || OIPublicationStatuses.Publish;
       formattedData.oiexemption_id = null;
     }
     dispatch(
@@ -162,11 +162,11 @@ const OpenInfo = ({
               draggable: true,
               progress: undefined,
             });
-            const isValidExemptionRequest = !isOITeam && formattedData.oipublicationstatus_id === 1 && formattedData.oiexemption_id !== 5;
-            const isValidExemptionDenial = isOITeam && formattedData.oipublicationstatus_id === 1 && formattedData.oiexemption_id !== 5 && formattedData.oiexemptionapproved === false;
-            const manualPublicationStatusChange = requestDetails.oistatusid === 8 && formattedData.oipublicationstatus_id === 2;
+            const isValidExemptionRequest = !isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
+            const isValidExemptionDenial = isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && formattedData.oiexemptionapproved === false;
+            const manualPublicationStatusChange = requestDetails.oistatusid === OIStates.ExemptionRequest && formattedData.oipublicationstatus_id === OIPublicationStatuses.Publish;
             if (isValidExemptionRequest) {
-              requestDetails.oistatusid = 8;
+              requestDetails.oistatusid = OIStates.ExemptionRequest;
             }
             if (isValidExemptionDenial || manualPublicationStatusChange) {
               requestDetails.oistatusid = null;
@@ -191,11 +191,11 @@ const OpenInfo = ({
     );
   };
   const disableSave = (oiPublicationData: OITransactionObject): boolean => {
-    const isDoNotPublish = oiPublicationData?.oipublicationstatus_id === 1;
+    const isDoNotPublish = oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish;
     const hasExemption = oiPublicationData?.oiexemption_id !== null;
     const isMissingRequiredFields =
       !oiPublicationData?.iaorationale || !oiPublicationData?.pagereference;
-    const hasOutOfScopeExemption = oiPublicationData?.oiexemption_id === 5;
+    const hasOutOfScopeExemption = oiPublicationData?.oiexemption_id === OIExemptions.OutsideScopeOfPublication;
     if (isDoNotPublish && hasOutOfScopeExemption) {
       return false;
     }

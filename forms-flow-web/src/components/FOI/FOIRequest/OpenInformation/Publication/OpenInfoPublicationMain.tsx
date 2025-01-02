@@ -32,12 +32,8 @@ import { readUploadedFileAsBytes } from "../../../../../helper/FOI/helper";
 import { OSS_S3_CHUNK_SIZE } from "../../../../../constants/constants";
 import { RecordDownloadStatus } from "../../../../../constants/FOI/enum"; 
 import Tooltip from "@mui/material/Tooltip";
-
-type OIPublicationStatus = {
-  oipublicationstatusid: number;
-  name: string;
-  isactive: boolean;
-};
+import { OIPublicationStatus } from "../types";
+import { OIStates, OIPublicationStatuses, OIExemptions } from "../../../../../helper/openinfo-helper";
 
 const OpenInfoPublicationMain = ({
   requestId,
@@ -271,7 +267,7 @@ const OpenInfoPublicationMain = ({
     window.open(url, "_blank")?.focus();
   }
 
-  const disableUserInput = !oiPublicationData?.oiexemptionapproved && oiPublicationData.oipublicationstatus_id === 1;
+  const disableUserInput = !oiPublicationData?.oiexemptionapproved && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish;
   
   var saveAs = (blob: any, filename: any) => {
     const fileURL = URL.createObjectURL(blob);
@@ -364,7 +360,7 @@ const OpenInfoPublicationMain = ({
                 name="oipublicationstatus_id"
                 label="Publication Status"
                 variant="outlined"
-                value={(oiPublicationData?.oipublicationstatus_id === 1 ? 2 : oiPublicationData?.oipublicationstatus_id) || 2}
+                value={(oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish ? OIPublicationStatuses.Publish : oiPublicationData?.oipublicationstatus_id) || OIPublicationStatuses.Publish}
                 select
                 disabled={disableUserInput}
                 required
@@ -374,7 +370,7 @@ const OpenInfoPublicationMain = ({
                 }
               >
                 {oiPublicationStatuses.map((status) => {
-                  if (status.oipublicationstatusid === 1) {
+                  if (status.oipublicationstatusid === OIPublicationStatuses.DoNotPublish) {
                     return null;
                   }
                   return (

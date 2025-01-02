@@ -10,6 +10,7 @@ import {
 import { fnDone, catchError } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper";
+import { OIStates, OIPublicationStatuses, OIExemptions } from "../../../../helper/openinfo-helper";
 
 export const fetchFOIOpenInfoRequest = (foiministryrequestid) => {
   if (!foiministryrequestid) {
@@ -55,7 +56,7 @@ export const saveFOIOpenInfoRequest = (
     foiministryrequestid
   );
   const done = fnDone(rest);
-  const isValidExemptionRequest = !isOIUser && data.oipublicationstatus_id === 1 && data.oiexemption_id !== 5;
+  const isValidExemptionRequest = !isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && data.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
   return (dispatch) => {
     updateFOIMinistryRequestOIStatus(foiministryrequestid, foirequestId, data, isOIUser, requetsinfo)
       .then((res) => {
@@ -97,12 +98,12 @@ const updateFOIMinistryRequestOIStatus = (
     "<ministryid>",
     foiministryrequestid),"<requestid>", foirequestId
   );
-  const isValidExemptionRequest = !isOIUser && foiopeninfodata.oipublicationstatus_id === 1 && foiopeninfodata.oiexemption_id !== 5;
-  const isValidExemptionDenial = isOIUser && foiopeninfodata.oipublicationstatus_id === 1 && foiopeninfodata.oiexemption_id !== 5 && foiopeninfodata.oiexemptionapproved === false;
-  const manualPublicationStatusChange = requetsinfo.oistatusid === 8 && foiopeninfodata.oipublicationstatus_id === 2;
+  const isValidExemptionRequest = !isOIUser && foiopeninfodata.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && foiopeninfodata.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
+  const isValidExemptionDenial = isOIUser && foiopeninfodata.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && foiopeninfodata.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && foiopeninfodata.oiexemptionapproved === false;
+  const manualPublicationStatusChange = requetsinfo.oistatusid === OIStates.ExemptionRequest && foiopeninfodata.oipublicationstatus_id === OIPublicationStatuses.Publish;
   // Update FOIMinistryRequest oistatusid to "Do Not Publish" if EXEMPTION is required from IAO
   if (isValidExemptionRequest) {
-    return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: 8 });
+    return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: OIStates.ExemptionRequest });
   // Update FOIMinistryRequest oistatusid to "Null" if Exemption Request denied OR if OpenInfo Publication status is manually changed from "Do not Publish" to Publish  
   } else if (isValidExemptionDenial || manualPublicationStatusChange) {
     return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: null });
