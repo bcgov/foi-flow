@@ -1,5 +1,6 @@
 export enum OIStates {
     FirstReview = 1,
+    PeerReview,
     ReadyToPublish,
     Published,
     HoldPublication,
