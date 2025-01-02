@@ -319,7 +319,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           </DialogContent>
           <DialogActions>
             <button className={`btn-bottom btn-save ${isBtnDisabled() ? classes.btndisabled : classes.btnenabled }`} disabled={disableSaveBtn || isBtnDisabled()} onClick={handleSave}>
-              {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ?
+              {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() || isOITeam) ?
               "Save Change" : "Re-Open Request"}
             </button>
             <button className="btn-bottom btn-cancel" onClick={handleClose}>

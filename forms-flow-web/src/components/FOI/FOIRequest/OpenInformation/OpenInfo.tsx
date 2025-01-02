@@ -128,13 +128,14 @@ const OpenInfo = ({
       saveData();
     }
   };
-  const saveData = () => {
+  const saveData = (publicationdate?: any) => {
     const toastID = toast.loading("Saving FOI OpenInformation request...");
+    publicationdate = publicationdate || (oiPublicationData.publicationdate ? 
+      new Date(oiPublicationData.publicationdate).toISOString().split('T')[0] : 
+      null)
     const formattedData = {
       ...oiPublicationData,
-      publicationdate: oiPublicationData.publicationdate ? 
-        new Date(oiPublicationData.publicationdate).toISOString().split('T')[0] : 
-        null
+      publicationdate: publicationdate
     };
     if (formattedData.oiexemptionapproved === false) {
       formattedData.oipublicationstatus_id = findOIPublicationState("Publish")?.oipublicationstatusid || OIPublicationStatuses.Publish;

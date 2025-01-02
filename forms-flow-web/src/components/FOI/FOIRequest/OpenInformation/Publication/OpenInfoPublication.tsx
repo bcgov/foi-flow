@@ -22,8 +22,7 @@ const OpenInfoPublication = ({
   //Functions
   const publishConfirmation = () => {
     const todaysDate = formatDateInPst(new Date());
-    handleOIDataChange(todaysDate, "publicationdate");
-    saveData();
+    saveData(todaysDate);
   }
 
   return (
@@ -41,7 +40,7 @@ const OpenInfoPublication = ({
         type="button"
         className="btn btn-bottom"
         disabled={!isDataEdited}
-        onClick={saveData}
+        onClick={() => saveData()}
       >
         Save
       </button>
