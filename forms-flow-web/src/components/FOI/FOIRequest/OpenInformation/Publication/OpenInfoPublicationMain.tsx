@@ -253,6 +253,19 @@ const OpenInfoPublicationMain = ({
                 closeButton: true,
               });
               setFOILoader(false);
+            } else {              
+              toast.error(
+                err,
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
             }
           }
         );
