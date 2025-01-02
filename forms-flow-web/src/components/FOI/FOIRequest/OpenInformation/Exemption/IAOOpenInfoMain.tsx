@@ -14,7 +14,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { makeStyles } from "@material-ui/styles";
 import { useSelector } from "react-redux";
 import { OIPublicationStatus, OIExemption } from "../types";
-import { OIStates, OIPublicationStatuses, OIExemptions } from "../../../../../helper/openinfo-helper";
+import { OIPublicationStatuses, OIExemptions } from "../../../../../helper/openinfo-helper";
 
 const IAOOpenInfoMain = ({
   oiPublicationData,

@@ -10,7 +10,7 @@ import {
 import { fnDone, catchError } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper";
-import { OIStates, OIPublicationStatuses, OIExemptions } from "../../../../helper/openinfo-helper";
+import { OIStates, OIPublicationStatuses, OIExemptions } from "../../../helper/openinfo-helper";
 
 export const fetchFOIOpenInfoRequest = (foiministryrequestid) => {
   if (!foiministryrequestid) {

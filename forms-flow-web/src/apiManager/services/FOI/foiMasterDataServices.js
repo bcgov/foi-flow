@@ -723,7 +723,7 @@ import {
         .then((res) => {
           if (res.data) {
             const oiExemptions = res.data;
-            oiExemptions.shift({name: "Select Reason", oiexemptionid: 0, isactive: true})
+            oiExemptions.unshift({name: "Select Reason", oiexemptionid: 0, isactive: true})
             dispatch(setOIExemptions(oiExemptions));
             dispatch(setFOILoader(false));
           } else {

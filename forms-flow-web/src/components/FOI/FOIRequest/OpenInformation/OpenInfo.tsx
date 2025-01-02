@@ -192,7 +192,7 @@ const OpenInfo = ({
   };
   const disableSave = (oiPublicationData: OITransactionObject): boolean => {
     const isDoNotPublish = oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish;
-    const hasExemption = oiPublicationData?.oiexemption_id !== null;
+    const hasExemption = oiPublicationData?.oiexemption_id;
     const isMissingRequiredFields =
       !oiPublicationData?.iaorationale || !oiPublicationData?.pagereference;
     const hasOutOfScopeExemption = oiPublicationData?.oiexemption_id === OIExemptions.OutsideScopeOfPublication;

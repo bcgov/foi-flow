@@ -33,7 +33,7 @@ import { OSS_S3_CHUNK_SIZE } from "../../../../../constants/constants";
 import { RecordDownloadStatus } from "../../../../../constants/FOI/enum"; 
 import Tooltip from "@mui/material/Tooltip";
 import { OIPublicationStatus } from "../types";
-import { OIStates, OIPublicationStatuses, OIExemptions } from "../../../../../helper/openinfo-helper";
+import { OIPublicationStatuses } from "../../../../../helper/openinfo-helper";
 
 const OpenInfoPublicationMain = ({
   requestId,
