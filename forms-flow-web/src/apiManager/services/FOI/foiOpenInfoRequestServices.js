@@ -57,13 +57,18 @@ export const saveFOIOpenInfoRequest = (
   );
   const done = fnDone(rest);
   const isValidExemptionRequest = !isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && data.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
+  const isValidExemptionDenial = isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && data.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && data.oiexemptionapproved === false;
+  const manualPublicationStatusChange = requetsinfo.oistatusid === OIStates.ExemptionRequest && data.oipublicationstatus_id === OIPublicationStatuses.Publish;  
   return (dispatch) => {
-    updateFOIMinistryRequestOIStatus(foiministryrequestid, foirequestId, data, isOIUser, requetsinfo)
+    updateFOIMinistryRequestOIStatus(foiministryrequestid, foirequestId, isValidExemptionRequest, isValidExemptionDenial, manualPublicationStatusChange)
       .then((res) => {
         // If res.data.sucess (meaning BE call to update FOIMinistryRequest oistatusid for IAO OI Exemption purposes is successfull) =>
         // create and store an exemption date for the related foiopeninfo request
         if (res.data?.success && isValidExemptionRequest) {
           data.oiexemptiondate = new Date();
+        }
+        if (res.data?.success && (isValidExemptionDenial || manualPublicationStatusChange)) {
+          data.oiexemptiondate = null;
         }
         httpPOSTRequest(apiUrl, data)
       .then((res) => {
@@ -89,18 +94,15 @@ export const saveFOIOpenInfoRequest = (
 const updateFOIMinistryRequestOIStatus = (
   foiministryrequestid, 
   foirequestId, 
-  foiopeninfodata,
-  isOIUser, 
-  requetsinfo
+  isValidExemptionRequest,
+  isValidExemptionDenial,
+  manualPublicationStatusChange,
 ) => {
   let apiUrl= replaceUrl(replaceUrl(
     API.FOI_REQUEST_SECTION_API,
     "<ministryid>",
     foiministryrequestid),"<requestid>", foirequestId
   );
-  const isValidExemptionRequest = !isOIUser && foiopeninfodata.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && foiopeninfodata.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
-  const isValidExemptionDenial = isOIUser && foiopeninfodata.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && foiopeninfodata.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && foiopeninfodata.oiexemptionapproved === false;
-  const manualPublicationStatusChange = requetsinfo.oistatusid === OIStates.ExemptionRequest && foiopeninfodata.oipublicationstatus_id === OIPublicationStatuses.Publish;
   // Update FOIMinistryRequest oistatusid to "Do Not Publish" if EXEMPTION is required from IAO
   if (isValidExemptionRequest) {
     return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: OIStates.ExemptionRequest });
