@@ -147,9 +147,6 @@ class FOIOpenInformationRequests(db.Model):
             FOIOpenInformationRequests.isactive == True
         ]
 
-        print("subquery_maxversion : ",subquery_maxversion)
-        print("userid:", userid)
-
         #aliase for onbehalf of applicant info
         onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
         onbehalf_applicant = aliased(FOIRequestApplicant)
@@ -181,7 +178,13 @@ class FOIOpenInformationRequests(db.Model):
         ).label('oiStatusName')
 
         receiveddate = case(
-            [(FOIMinistryRequest.oistatus_id.is_(None), FOIMinistryRequest.closedate)],
+            [
+                (FOIMinistryRequest.oistatus_id.is_(None), FOIMinistryRequest.closedate),
+                (and_(
+                    FOIMinistryRequest.oistatus_id.isnot(None),
+                    cls.oiexemptiondate.is_(None)
+                ), FOIMinistryRequest.closedate),
+            ],
             else_=cls.oiexemptiondate
         ).label('receivedDate')
 
@@ -246,7 +249,7 @@ class FOIOpenInformationRequests(db.Model):
                 or_( 
                     and_(
                         FOIMinistryRequest.oistatus_id.isnot(None),
-                        FOIMinistryRequest.requeststatuslabel != StateName.closed.name
+                        #FOIMinistryRequest.requeststatuslabel != StateName.closed.name
                     ),
                     and_(
                         FOIMinistryRequest.oistatus_id.is_(None),
