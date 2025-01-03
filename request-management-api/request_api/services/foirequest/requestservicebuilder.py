@@ -80,10 +80,10 @@ class requestservicebuilder(requestserviceconfigurator):
         oistatusid = self.getpropertyvaluefromschema(requestschema, 'oistatusid')
         foiministryrequest.oistatus_id = oistatusid
         foiministryrequest.closedate = self.getpropertyvaluefromschema(requestschema, 'closedate')
-        if oistatusid and not requestschema.get('reopen'):
-            foiministryrequest.closereasonid = current_foiministryrequest['closereasonid']
+        if requestschema.get('reopen'):
+            foiministryrequest.closereasonid = None
         else:
-            foiministryrequest.closereasonid = self.getpropertyvaluefromschema(requestschema, 'closereasonid')
+            foiministryrequest.closereasonid = requestschema.get('closereasonid', current_foiministryrequest.closereasonid)
         if self.getpropertyvaluefromschema(requestschema, 'isofflinepayment') is not None:
             foiministryrequest.isofflinepayment =  self.getpropertyvaluefromschema(requestschema, 'isofflinepayment')    
         return foiministryrequest
