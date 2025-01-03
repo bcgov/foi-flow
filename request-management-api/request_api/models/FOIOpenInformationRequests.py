@@ -263,10 +263,7 @@ class FOIOpenInformationRequests(db.Model):
                     [(FOIMinistryRequest.oistatus_id == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
                     else_=1
                 ),
-                case(
-                    [(FOIMinistryRequest.oistatus_id.isnot(None), cls.oiexemptiondate)],
-                    else_=FOIMinistryRequest.closedate
-                ).desc()
+                receiveddate.desc()
             )
         )
             
@@ -325,13 +322,13 @@ class FOIOpenInformationRequests(db.Model):
                     else:
                         sortingcondition.append(nullsfirst(asc(sortfield)))
         
-        # Default sorting: Received Date (newest to oldest)
         if len(sortingcondition) == 0:
-            sortingcondition.append(asc(cls.created_at))
-            #sortingcondition.append(nullslast(desc(cls.findfield('created_at'))))
-            
+            default_sort = case(
+                [(cls.oiexemptiondate.is_(None), FOIMinistryRequest.closedate)],
+                else_=cls.oiexemptiondate
+            )
+            sortingcondition.append(asc(default_sort))
 
-        # Always sort by id last to prevent pagination collisions
         sortingcondition.append(asc('id'))
         
         return sortingcondition
@@ -380,6 +377,22 @@ class FOIOpenInformationRequests(db.Model):
             return cls.publicationdate
         elif field == 'assignee':
             return cls.oiassignedto
+        elif field == 'duedate':
+            return FOIMinistryRequest.duedate
+        elif field == 'isoipcreview':
+            return FOIMinistryRequest.isoipcreview
+        elif field == 'ministry':
+            return func.upper(ProgramArea.bcgovcode)
+        elif field == 'description':
+            return FOIMinistryRequest.description
+        elif field == 'firstName':
+            return FOIRequestApplicant.firstname
+        elif field == 'lastName':
+            return FOIRequestApplicant.lastname
+        elif field == 'assignedToFirstName':
+            return FOIAssignee.firstname
+        elif field == 'assignedToLastName':
+            return FOIAssignee.lastname
         else:
             return text(field)
 
@@ -446,6 +459,244 @@ class FOIOpenInformationRequests(db.Model):
         except Exception as e:
             logging.error(f"Error getting OI Layer page counts: {str(e)}")
             return None, str(e)
+    
+    @classmethod
+    def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
+        basequery = FOIOpenInformationRequests.getoibasequery(None, userid, isiaorestrictedfilemanager)
+
+        #filter/search
+        filtercondition = FOIOpenInformationRequests.getfilterforadvancedsearch(params)
+        searchquery = basequery.filter(and_(*filtercondition))
+
+        #ministry requests
+        # iaoassignee = aliased(FOIAssignee)
+        # ministryassignee = aliased(FOIAssignee)
+        # subquery_ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee, userid, 'IAO', isiaorestrictedfilemanager)
+
+        #oi requests
+
+        #sorting
+        sortingcondition = FOIOpenInformationRequests.getsorting(params['sortingitems'], params['sortingorders'])
+
+        #rawrequests
+        #query_full_queue = searchquery.union(subquery_ministry_queue)
+        return searchquery.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
+
+    @classmethod
+    def getfilterforadvancedsearch(cls, params):
+        #filter/search
+        filtercondition = []
+        includeclosed = False
+
+        #request state: unopened, call for records, etc.
+        if(len(params['requeststate']) > 0):
+            requeststatecondition = FOIOpenInformationRequests.getfilterforrequeststate(params, includeclosed)
+            filtercondition.append(requeststatecondition['condition'])
+            includeclosed = requeststatecondition['includeclosed']
+        # else:
+        #     filtercondition.append(FOIMinistryRequest.requeststatuslabel != StateName.unopened.name)  #not return Unopened by default
+        
+        if(len(params['requeststatus']) == 1):
+            requeststatuscondition = FOIOpenInformationRequests.getfilterforrequeststatus(params)
+            filtercondition.append(requeststatuscondition)
+
+            # return all except closed
+            if(includeclosed == False):
+                filtercondition.append(FOIMinistryRequest.requeststatuslabel != StateName.closed.name)
+        elif(len(params['requeststatus']) > 1 and includeclosed == False):
+            # return all except closed
+            filtercondition.append(FOIMinistryRequest.requeststatuslabel != StateName.closed.name)
+        
+        #request type: personal, general
+        if(len(params['requesttype']) > 0):
+            requesttypecondition = FOIOpenInformationRequests.getfilterforrequesttype(params)
+            filtercondition.append(or_(*requesttypecondition))
+
+        #request flags: restricted, oipc, phased
+        if(len(params['requestflags']) > 0):
+            requestflagscondition = FOIOpenInformationRequests.getfilterforrequestflags(params)
+            filtercondition.append(or_(*requestflagscondition))
+        
+        #public body: EDUC, etc.
+        if(len(params['publicbody']) > 0):
+            ministrycondition = FOIOpenInformationRequests.getfilterforpublicbody(params)
+            filtercondition.append(ministrycondition)
+
+        #axis request #, raw request #, applicant name, assignee name, request description, subject code
+        if(len(params['keywords']) > 0 and params['search'] is not None):
+            searchcondition = FOIOpenInformationRequests.getfilterforsearch(params)
+            filtercondition.append(searchcondition)
+
+        if(params['daterangetype'] is not None):
+            filterconditionfordate = FOIOpenInformationRequests.getfilterfordate(params)
+            filtercondition += filterconditionfordate
+
+        return filtercondition
+
+
+    @classmethod
+    def getfilterforrequeststate(cls, params, includeclosed):
+        #request state: unopened, call for records, etc.
+        requeststatecondition = []
+        for statelabel in params['requeststate']:
+            requeststatecondition.append(FOIMinistryRequest.requeststatuslabel == statelabel)
+            if(statelabel == StateName.closed.name):
+                includeclosed = True
+        return {'condition': or_(*requeststatecondition), 'includeclosed': includeclosed}
+
+    @classmethod
+    def getfilterforrequeststatus(cls, params):        
+        #request status: overdue || on time
+        if(params['requeststatus'][0] == 'overdue'):
+            #exclude "on hold" for overdue
+            # statelabel = StateName.onhold.name
+            return and_(FOIOpenInformationRequests.findfield('duedate') < datetime.now().date(), and_(FOIMinistryRequest.requeststatuslabel != StateName.onhold.name, FOIMinistryRequest.requeststatuslabel != StateName.onholdother.name))
+        else:
+            return FOIOpenInformationRequests.findfield('duedate') >= datetime.now().date()
+    
+    @classmethod
+    def getfilterforrequesttype(cls, params):  
+        #request type: personal, general
+        requesttypecondition = []
+        for request_type in params['requesttype']:
+            requesttypecondition.append(FOIRequest.requesttype == request_type)
+        return requesttypecondition
+
+    @classmethod
+    def getfilterforrequestflags(cls, params):
+        #request flags: restricted, oipc, phased
+        requestflagscondition = []
+        #alias for getting ministry restricted flag from FOIRestrictedMinistryRequest
+        ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
+
+        for flag in params['requestflags']:
+            if (flag.lower() == 'restricted'):
+                if(iaoassignee):
+                    requestflagscondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
+                elif (ministryassignee):
+                    requestflagscondition.append(ministry_restricted_requests.isrestricted == True)
+            if (flag.lower() == 'oipc'):
+                requestflagscondition.append(FOIOpenInformationRequests.findfield('isoipcreview') == True)
+            if (flag.lower() == 'phased'):
+                continue
+        return or_(*requestflagscondition)
+
+    @classmethod
+    def getfilterforpublicbody(cls, params):
+        #public body: EDUC, etc.
+        publicbodycondition = []
+        for ministry in params['publicbody']:
+            publicbodycondition.append(FOIOpenInformationRequests.findfield('ministry') == ministry)
+        return or_(*publicbodycondition)
+
+    @classmethod
+    def getfilterforsearch(cls, params):
+        #axis request #, raw request #, applicant name, assignee name, request description, subject code
+        if(params['search'] == 'requestdescription'):
+            return FOIOpenInformationRequests.__getfilterfordescription(params)
+        elif(params['search'] == 'applicantname'):
+            return FOIOpenInformationRequests.__getfilterforapplicantname(params)
+        elif(params['search'] == 'assigneename'):
+            return FOIOpenInformationRequests.__getfilterforassigneename(params)
+        elif(params['search'] == 'idnumber'):
+            return FOIOpenInformationRequests.__getfilterforidnumber(params)
+        elif(params['search'] == 'axisrequest_number'):
+            return FOIOpenInformationRequests.__getfilterforaxisnumber(params)
+        else:
+            searchcondition = []
+            for keyword in params['keywords']:
+                searchcondition.append(FOIOpenInformationRequests.findfield(params['search']).ilike('%'+keyword+'%'))
+            return and_(*searchcondition)
+    
+    @classmethod
+    def __getfilterfordescription(cls,params):
+        searchcondition1 = []
+        searchcondition2 = []
+        for keyword in params['keywords']:
+            searchcondition1.append(FOIOpenInformationRequests.findfield('description').ilike('%'+keyword+'%'))
+            #searchcondition2.append(FOIOpenInformationRequests.findfield('descriptionDescription').ilike('%'+keyword+'%'))
+        #return or_(and_(*searchcondition1), and_(*searchcondition2))   
+        return or_(and_(*searchcondition1))   
+
+    @classmethod
+    def __getfilterforapplicantname(cls,params):
+        searchcondition1 = []
+        searchcondition2 = []
+        searchcondition3 = []
+        searchcondition4 = []
+        for keyword in params['keywords']:
+            searchcondition1.append(FOIOpenInformationRequests.findfield('firstName').ilike('%'+keyword+'%'))
+            searchcondition2.append(FOIOpenInformationRequests.findfield('lastName').ilike('%'+keyword+'%'))
+            # searchcondition3.append(FOIOpenInformationRequests.findfield('contactFirstName').ilike('%'+keyword+'%'))
+            # searchcondition4.append(FOIOpenInformationRequests.findfield('contactLastName').ilike('%'+keyword+'%'))
+        #return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3), and_(*searchcondition4))
+        return or_(and_(*searchcondition1), and_(*searchcondition2)) 
+
+    @classmethod        
+    def __getfilterforassigneename(cls,params):
+        searchcondition1 = []
+        searchcondition2 = []
+        searchcondition3 = []
+        for keyword in params['keywords']:
+            searchcondition1.append(FOIOpenInformationRequests.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
+            searchcondition2.append(FOIOpenInformationRequests.findfield('assignedToLastName').ilike('%'+keyword+'%'))
+            searchcondition3.append(FOIMinistryRequest.assignedgroup.ilike('%'+keyword+'%'))
+        return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3))
+
+    @classmethod
+    def __getfilterforidnumber(cls,params):
+        searchcondition = []
+        for keyword in params['keywords']:
+            keyword = keyword.lower()
+            keyword = keyword.replace('u-00', '')
+            searchcondition.append(cls.idNumber.ilike('%'+keyword+'%'))
+        return and_(*searchcondition)
+    
+    @classmethod
+    def __getfilterforaxisnumber(cls,params):
+        searchcondition1 = []
+        searchcondition2 = []
+        for keyword in params['keywords']:
+            keyword = keyword.lower()
+            keyword = keyword.replace('u-00', '')
+            searchcondition1.append(cls.idNumber.ilike('%'+keyword+'%'))
+            searchcondition2.append(cls.axisRequestId.ilike('%'+keyword+'%'))
+        return or_(and_(*searchcondition1), and_(*searchcondition2))
+
+    @classmethod
+    def getfilterfordate(cls, params):
+        filterconditionfordate = []
+        if(params['daterangetype'] == 'closedate'):
+            #no rawrequest returned for this case
+            filterconditionfordate.append(FOIRawRequest.requestid < 0)
+        else:
+            if(params['fromdate'] is not None):
+                if(params['daterangetype'] == 'receivedDate'):
+                    #online form submission has no receivedDate in json - using created_at
+                    filterconditionfordate.append(
+                        or_(
+                            and_(cls.receiveddate.is_(None), FOIOpenInformationRequests.created_at.cast(Date) >= parser.parse(params['fromdate'])),
+                            and_(cls.receiveddate.isnot(None), FOIOpenInformationRequests.findfield(params['daterangetype']).cast(Date) >= parser.parse(params['fromdate'])),
+                        )
+                    )
+                else:
+                    filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']).cast(Date) >= parser.parse(params['fromdate']))
+
+            if(params['todate'] is not None):
+                if(params['daterangetype'] == 'receivedDate'):
+                    #online form submission has no receivedDate in json - using created_at
+                    filterconditionfordate.append(
+                        or_(
+                            and_(cls.receiveddate.is_(None), FOIOpenInformationRequests.created_at.cast(Date) <= parser.parse(params['todate'])),
+                            and_(cls.receiveddate.isnot(None), FOIOpenInformationRequests.findfield(params['daterangetype']).cast(Date) <= parser.parse(params['todate'])),
+                        )
+                    )
+                else:
+                    filterconditionfordate.append(FOIOpenInformationRequests.findfield(params['daterangetype']).cast(Date) <= parser.parse(params['todate']))
+
+        return filterconditionfordate
+
+
 
 class FOIOpenInfoRequestSchema(ma.Schema):
     class Meta:

@@ -92,7 +92,6 @@ class dashboardservice:
         for request in requests.items:
             if is_oi_team:
                 # Handle OI requests format
-                print("===============DashboardService getrequestqueuepagination: OI team=============")
                 requestqueue.append(self.__handle_oi_request(request))
             else:
                 # Handle Raw requests format
@@ -238,46 +237,59 @@ class dashboardservice:
             return idprefix + filenumber
         return ""
     
-    # def getoirequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):        
-    #     print("===================getoirequestqueuepagination====================")
-    #     requests = FOIOpenInformationRequests.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.getusertype())
-    #     requestqueue = []                
-    #     for request in requests.items:
-    #         _receiveddate = None
-    #         if request.closedate:
-    #             maya_dt = maya.parse(request.closedate)
-    #             received_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
-    #             _receiveddate = received_dt.strftime("%b %d %Y")
+    def oiadvancedsearch(self, params={'usertype': 'iao', 'groups':[], 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'requestflags':[], 'publicbody':[], 'daterangetype':None, 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
+        userid = AuthHelper.getuserid()
 
-    #         if request.publicationdate is None:
-    #             _publicationdate = 'N/A'
-    #         else:
-    #             maya_dt = maya.parse(request.publicationdate)
-    #             publication_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
-    #             _publicationdate = publication_dt.strftime("%b %d %Y")
-            
-    #         _from_closed = self.__calculate_from_closed(request.closedate)
-    #         print("_receiveddate : ", _receiveddate)
-    #         _oirequest = self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed)
-    #         # isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
-    #         # _oirequest.update({'isiaorestricted': isiaorestricted})
+        is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
+        
+        if is_oi_team:
+            requests = FOIOpenInformationRequests.advancedsearch(params, userid, AuthHelper.isiaorestrictedfilemanager())
+        elif (params['usertype'] == "iao"):
+            requests = FOIRawRequest.advancedsearch(params, userid, AuthHelper.isiaorestrictedfilemanager())
+        else:
+            requests = FOIMinistryRequest.advancedsearch(params, userid, AuthHelper.isministryrestrictedfilemanager())
+        
+        requestqueue = []
+        for request in requests.items:
+            if is_oi_team:
+                requestqueue.append(self.__handle_oi_request(request))
+            else:    
+                if(request.receivedDateUF is None): #request from online form has no received date in json
+                    _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+                else:
+                    _receiveddate = parser.parse(request.receivedDateUF)
 
-    #         # if isiaorestricted == True:
-    #         #     _oirequest.update({'lastName': 'Restricted', 'firstName': 'Request'})
+                if(request.ministryrequestid == None):
+                    unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
+                    unopenrequest.update({'description':request.description})
+                    unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
+                    unopenrequest.update({'isiaorestricted': request.isiaorestricted})
 
-    #         requestqueue.append(_oirequest)   
+                    requestqueue.append(unopenrequest)
+                else:
+                    _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
+                    _openrequest.update({'ministryrequestid':request.ministryrequestid})
+                    _openrequest.update({'extensions': request.extensions})
+                    _openrequest.update({'description':request.description})
+                    _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
+                    _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
 
-    #     meta = {
-    #         'page': requests.page,
-    #         'pages': requests.pages,
-    #         'total': requests.total,
-    #         'prev_num': requests.prev_num,
-    #         'next_num': requests.next_num,
-    #         'has_next': requests.has_next,
-    #         'has_prev': requests.has_prev,
-    #     }
+                    isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
+                    _openrequest.update({'isiaorestricted': isiaorestricted})
 
-    #     return jsonify({'data': requestqueue, 'meta': meta})
+                    requestqueue.append(_openrequest)
+
+        meta = {
+            'page': requests.page,
+            'pages': requests.pages,
+            'total': requests.total,
+            'prev_num': requests.prev_num,
+            'next_num': requests.next_num,
+            'has_next': requests.has_next,
+            'has_prev': requests.has_prev,
+        }
+
+        return jsonify({'data': requestqueue, 'meta': meta})
 
     def __preparefoioirequestinfo(self, request, receivedDate, publicationDate, fromClosed, oilayerpagecount):
         return {
