@@ -120,9 +120,6 @@ const OpenInfoPublicationMain = ({
   }
 
   const handleModal = (value: any, fileInfoList: any, files: any) => {
-    console.log(value)
-    console.log(fileInfoList)
-    console.log(files)
     setOpenModal(false)
     if (value) {
       saveDocument(value, fileInfoList, files)
@@ -403,8 +400,9 @@ const OpenInfoPublicationMain = ({
                 name="publicationdate"
                 label="Publication Date"
                 variant="outlined"
-                disabled={disableUserInput || currentOIRequestState === "First Review"}
+                disabled={disableUserInput || currentOIRequestState === "First Review" || currentOIRequestState === "Unopened" }
                 InputLabelProps={{ shrink: true }}
+                InputProps={{inputProps: { min: formatDate(new Date())} }}
                 onChange={(event) =>
                   handleOIDataChange(event.target.value, event.target.name)
                 }
