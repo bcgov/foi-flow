@@ -26,9 +26,7 @@ class openinfoservice:
        return FOIOpenInformationRequests().getcurrentfoiopeninforequest(foiministryrequestid)
     
     def createopeninforequest(self, foirequestschema, userid, foiministryrequest):
-        print("inside")
         if foirequestschema["requestType"] == 'general' and foirequestschema["selectedMinistries"][0]["code"].upper() not in SKIP_OPENINFO_MINISTRIES:
-            print("inside2")
             foiministryrequestid = foiministryrequest[0]['id']
             default_foiopeninforequest = {
                 "oipublicationstatus_id": 2,
