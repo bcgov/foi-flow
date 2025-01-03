@@ -71,11 +71,11 @@ class DashboardPagination(Resource):
             if params['keywords'] is None:
                 params['keywords'] = []
 
-            statuscode = 200
-            if (params['usertype'] == "iao" or params['usertype'] == "ministry"):                                                                                           
-                requests = dashboardservice().advancedsearch(params)
-            # TODO: Add oi advanced search
-            elif params['usertype'] == "oi":
+            statuscode = 200 
+
+            if (params['usertype'] == "iao" and 'OI Team' in params['groups']):    
+                requests = dashboardservice().oiadvancedsearch(params)
+            elif (params['usertype'] == "iao" or params['usertype'] == "ministry"):
                 requests = dashboardservice().advancedsearch(params)
             else:
                 statuscode = 401   
