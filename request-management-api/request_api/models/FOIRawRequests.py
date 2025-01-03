@@ -724,7 +724,6 @@ class FOIRawRequest(db.Model):
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
         subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-        print("groups : ",groups)
 
         #sorting
         sortingcondition = FOIRawRequest.getsorting(sortingitems, sortingorders)
@@ -733,7 +732,6 @@ class FOIRawRequest(db.Model):
             # Check if user is in OI Team
             is_oi_team = usertype == "iao" and 'OI Team' in groups if groups else False
             if is_oi_team:
-                print("===============FOIRawRequests getrequestspagination : oi team=============")
                 subquery_oirequest_queue = FOIOpenInformationRequests.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, "OI", isiaorestrictedfilemanager, isministryrestrictedfilemanager)
                 sortingcondition = FOIOpenInformationRequests.getsorting(sortingitems, sortingorders)
                 return subquery_oirequest_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
