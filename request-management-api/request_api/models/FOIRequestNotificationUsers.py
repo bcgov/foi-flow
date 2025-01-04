@@ -274,7 +274,7 @@ class FOIRequestNotificationUser(db.Model):
                             FOIRequests.assignedgroup == group,
                             and_(
                                 FOIRequests.assignedministrygroup == group,
-                                FOIRequests.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.tagging.name,StateName.readytoscan.name])
+                                FOIRequests.requeststatuslabel.in_([StateName.callforrecords.name,StateName.recordsreview.name,StateName.feeestimate.name,StateName.consult.name,StateName.ministrysignoff.name,StateName.onhold.name,StateName.deduplication.name,StateName.harmsassessment.name,StateName.response.name,StateName.tagging.name,StateName.readytoscan.name,StateName.onholdother.name])
                             )
                         )
                     )

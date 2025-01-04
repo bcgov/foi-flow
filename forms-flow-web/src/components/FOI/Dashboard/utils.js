@@ -133,7 +133,7 @@ export const onBehalfFullName = (params) => {
 export const getRecordsDue = (params) => {
   let receivedDateString = params.row.cfrduedate;
   const currentStatus = params.row.currentState;
-  if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
+  if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || currentStatus.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) {
     return "N/A";
   } else if(!receivedDateString) {
     return "";
@@ -145,7 +145,7 @@ export const getRecordsDue = (params) => {
 export const getLDD = (params) => {
   let receivedDateString = params.row.duedate;
   const currentStatus = params.row.currentState;
-  if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
+  if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()||currentStatus.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) {
     return "N/A";
   } else if(!receivedDateString) {
     return "";
@@ -158,7 +158,7 @@ export const getDaysLeft = (params) => {
   const receivedDateString = params.row.duedate;
 
   if (
-    [StateEnum.onhold.name.toLowerCase(), StateEnum.closed.name.toLowerCase()].includes(params.row.currentState.toLowerCase())
+    [StateEnum.onhold.name.toLowerCase(), StateEnum.closed.name.toLowerCase(), StateEnum.onholdother.name.toLowerCase()].includes(params.row.currentState.toLowerCase())
   ) {
     return "N/A";
   } else if(!receivedDateString) {

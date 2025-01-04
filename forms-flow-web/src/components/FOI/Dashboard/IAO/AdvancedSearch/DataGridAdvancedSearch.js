@@ -22,6 +22,7 @@ import {
   isProcessingTeam,
   isFlexTeam,
   isIntakeTeam,
+  isOITeam,
 } from "../../../../../helper/FOI/helper";
 import clsx from "clsx";
 import { push } from "connected-react-router";
@@ -426,6 +427,81 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     },
           
   ];
+
+  const OITeamColumns = [
+    {
+      field: "receivedDate",
+      headerName: "RECEIVED DATE",
+      flex: 1,
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      headerAlign: "left"
+    },
+    {
+      field: "axisRequestId",
+      headerName: "ID NUMBER",
+      flex: 1,
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      headerAlign: "left"
+    },
+    {
+      field: "requestType",
+      headerName: "TYPE",
+      flex: 1,
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      headerAlign: "left",
+    },
+    {
+      field: "oilayerpagecount",
+      headerName: "PAGES",
+      flex: 1,
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      headerAlign: "left",
+    },
+    {
+      field: "publicationStatus",
+      headerName: "PUBLICATION STATUS",
+      flex: 1,
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      headerAlign: "left",
+    },
+    {
+      field: "fromClosed",
+      headerName: "FROM CLOSED",
+      flex: 1,
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      headerAlign: "left",
+    },
+    {
+      field: "publicationDate",
+      headerName: "PUBLICATION DATE",
+      flex: 1,
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      headerAlign: "left",
+    },
+    {
+      field: "assignedTo",
+      headerName: "ASSIGNEE",
+      flex: 1,
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      headerAlign: "left",
+    },
+    {
+      field: "applicantType",
+      headerName: "APPLICANT TYPE",
+      flex: 1,
+      renderCell: hyperlinkRenderCell,
+      cellClassName: 'foi-advanced-search-result-cell',
+      headerAlign: "left",
+    }
+  ];
   
   const defaultTableInfo = {
     columns: IntakeTeamColumns,
@@ -475,6 +551,13 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
           open: "flex--open",
         },
       };
+    }
+
+    if (isOITeam(userGroups)) {
+      defaultTableInfo.columns = OITeamColumns;
+      defaultTableInfo.sort = [
+        { field: "receivedDate", sort: "desc" },  // Default sorting for OI team
+      ];
     }
   
     return defaultTableInfo;

@@ -21,7 +21,7 @@ class CloseReason(db.Model):
 
     @classmethod
     def getclosereason(cls,closereasonid):
-        closereason_schema = CloseReasonSchema(many=True)
+        closereason_schema = CloseReasonSchema(many=False)
         query = db.session.query(CloseReason).filter_by(closereasonid=closereasonid).first()
         return closereason_schema.dump(query)
     

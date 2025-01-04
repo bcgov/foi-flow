@@ -15,12 +15,12 @@ from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMa
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.RequestorType import RequestorType
 from request_api.utils.enums import StateName
+from request_api.services.openinfoservice import openinfoservice
 
 import json
 class requestservicecreate:
     """ This class consolidates the creation of new FOI request upon scenarios: open, save by both iao and ministry. 
-    """
-
+    """    
     def saverequest(self,foirequestschema, userid, foirequestid=None, ministryid=None, filenumber=None, version=None, rawrequestid=None, wfinstanceid=None):
         activeversion = 1 if version is None else version
         
@@ -48,8 +48,9 @@ class requestservicecreate:
         if foirequestid is not None:         
            openfoirequest.foirequestid = foirequestid
         openfoirequest.wfinstanceid = wfinstanceid if wfinstanceid is not None else None
-        openfoirequest.createdby = userid  
-        return FOIRequest.saverequest(openfoirequest) 
+        openfoirequest.createdby = userid          
+        return FOIRequest.saverequest(openfoirequest)
+        
     
     
     def saverequestversion(self,foirequestschema, foirequestid , ministryid, userid):
@@ -205,4 +206,4 @@ class requestservicecreate:
                     watcherservice().createministryrequestwatcher(watcherschema, userid, None)
 
     def __getkeyvalue(self, inputschema, property):
-        return inputschema[property] if inputschema is not None and inputschema.get(property) is not None  else ''   
+        return inputschema[property] if inputschema is not None and inputschema.get(property) is not None  else ''

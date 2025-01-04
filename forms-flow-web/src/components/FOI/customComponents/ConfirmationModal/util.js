@@ -1,6 +1,7 @@
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import { getFullnameList } from "../../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
+import { isReadyForPublishing } from '../../FOIRequest/utils';
 
   export const getAssignedTo = (_saveRequestObject) => {
 
@@ -45,6 +46,9 @@ import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConst
     if ((_currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && _state.toLowerCase() !== StateEnum.closed.name.toLowerCase())) {
       _saveRequestObject.reopen = true;
       return {title: "Re-Open Request", body: <>Are you sure you want to re-open Request # {_requestNumber ? _requestNumber : `U-00${_requestId}`}? <br/> The request will be re-opened to the previous state: {_state} </>};
+    }
+    if ((_currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase())){
+      return {title: "Taking Request off hold", body: "Are you sure you want to take this request off hold? The legislated due date will be recalculated"};
     }
     switch(_state.toLowerCase()) {
       case StateEnum.intakeinprogress.name.toLowerCase():
@@ -134,9 +138,22 @@ import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConst
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.response.name}?`};
           case StateEnum.appfeeowing.name.toLowerCase():
           return {title: "Changing the state", body: `Are you sure you want to change Request #${_requestNumber} to ${StateEnum.appfeeowing.name}?`};
+      case StateEnum.onholdother.name.toLowerCase():
+          return {title: "Change Request to On Hold - Other", 
+                 body: <>Are you sure you want to change Request #{_requestNumber} to {StateEnum.onholdother.name}? This should be used for scenarios 
+                 that are not fee related (such as Third Party notice).<b> This will stop the clock.</b></>};
       default:
           return {title: "", body: ""};
     }
+  }
+
+  export const getMessageForOITeam = (state, openinfo, additionalfiles, requestnumber) => {
+    if (state === 'Ready to Publish') {
+      if (!isReadyForPublishing(openinfo, additionalfiles, requestnumber)) {
+        return {title: "Changing the state", body: 'Unable to update state: please make sure a publication date is set, the copyright is selected and a response letter is uploaded with the file name format "Response_Letter_{Request No.}.pdf"'}
+      }
+    }
+    return {title: "Changing the state", body: "Are you sure you want to change the state of this request to " + state + "?"}
   }
 
 

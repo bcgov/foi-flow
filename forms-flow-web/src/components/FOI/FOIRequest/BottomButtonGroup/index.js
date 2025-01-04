@@ -100,6 +100,13 @@ const BottomButtonGroup = React.memo(
     const assignedToList = useSelector(
       (state) => state.foiRequests.foiAssignedToList
     );
+    
+    const user = useSelector((reduxState) => reduxState.user.userDetail);
+    const userGroups = user?.groups?.map(group => group.slice(1));
+
+    const openInfoStates = useSelector(
+      (state) => state.foiRequests.oiStatuses
+    );
 
     const handleClosingDateChange = (cDate) => {
       setClosingDate(cDate);
@@ -307,7 +314,9 @@ const BottomButtonGroup = React.memo(
     const [documents, setDocuments] = useState([]);
 
     const saveStatusId = () => {
-      if (currentSelectedStatus) {
+      if (userGroups.includes("OI Team")) {
+        saveRequestObject.oistatusid = openInfoStates.find(s => s.name === currentSelectedStatus).oistatusid;
+      } else if (currentSelectedStatus) {
         switch (currentSelectedStatus) {
           case StateEnum.closed.name:
             saveRequestObject.requeststatuslabel = StateEnum.closed.label;
@@ -369,12 +378,13 @@ const BottomButtonGroup = React.memo(
           case StateEnum.peerreview.name:
           case StateEnum.section5pending.name:
           case StateEnum.appfeeowing.name:
+          case StateEnum.onholdother.name:
           case StateEnum.recordsreadyforreview.name:
             const status = Object.values(StateEnum).find(
               (statusValue) => statusValue.name === currentSelectedStatus
             );
             saveRequestObject.requeststatuslabel = status.label;
-            if (currentSelectedStatus === StateEnum.onhold.name && !saveRequestObject.paymentExpiryDate) {
+            if ((currentSelectedStatus === StateEnum.onhold.name) && !saveRequestObject.paymentExpiryDate) {
               saveRequestObject.paymentExpiryDate = dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS);
             }
             break;

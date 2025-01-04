@@ -131,7 +131,8 @@ const AdvancedSearch = ({ userDetail }) => {
     [StateEnum.review.label]: false,
     [StateEnum.signoff.label]: false,
     [StateEnum.closed.label]: false,
-    [StateEnum.callforrecordsoverdue.label]: false
+    [StateEnum.callforrecordsoverdue.label]: false,
+    [StateEnum.onholdother.label]: false
   };
   const [requestState, setRequestState] = useState(() => {
     if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestState.length > 0) {
@@ -622,7 +623,7 @@ const AdvancedSearch = ({ userDetail }) => {
                           return <em>All</em>;
                         }
 
-                        return selected.map(value => StateEnum[value].name).join(", ");
+                        return selected.map(value => Object.values(StateEnum).find(state => state.label === value).name).join(", ");
                       }}
                     >
                       <MenuItem disabled value="" key="request-state-all">
@@ -633,11 +634,11 @@ const AdvancedSearch = ({ userDetail }) => {
                       ].includes(key)).map(([key, value]) => (
                         <MenuItem
                           key={`request-state-type-${key}`}
-                          value={key}
+                          value={value.label}
                         >
                           <Checkbox
                             checked={
-                              requestState.indexOf(key) > -1
+                              requestState.indexOf(value.label) > -1
                             }
                             color="success"
                           />

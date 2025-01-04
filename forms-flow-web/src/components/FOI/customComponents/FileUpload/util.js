@@ -18,7 +18,7 @@ export const generateNewFileName = (newFileName, uploadFileName, attachedFileNam
   return newFileName;
 }
 
-export const getErrorMessage = (_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes, recordUploadLimitReached, totalRecordUploadLimit) => {
+export const getErrorMessage = (_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes, recordUploadLimitReached, totalRecordUploadLimit, uploadFor) => {
   let _errorMessage = [];
   let singleFileUploadAllowedFileExtensions = "pdf, xlsx, docx";
   if(recordUploadLimitReached){
@@ -46,6 +46,8 @@ export const getErrorMessage = (_duplicateFiles, _typeErrorFiles, _overSizedFile
   if (_typeErrorFiles.length > 0) {
     if (hasOnlyPdfMimeTypes(mimeTypes)) {
       _errorMessage.push(<>The specified file(s) <b>{_typeErrorFiles.join(", ")}</b> could not be uploaded. Only PDF filetypes are allowed.</>);
+    } else if (uploadFor === 'additionalFiles') {
+      _errorMessage.push(<>The specified file(s) <b>{_typeErrorFiles.join(", ")}</b> could not be uploaded. Only files with the following extensions are allowed: <b>{'Excel (xls, xlsx, macro), pdf'}</b></>);
     } else {
       _errorMessage.push(<>The specified file(s) <b>{_typeErrorFiles.join(", ")}</b> could not be uploaded. Only files with the following extensions are allowed: <b>{multipleFiles ? 'Excel (xls, xlsx, macro), pdf, image, word, email' : singleFileUploadAllowedFileExtensions}</b></>);
     }

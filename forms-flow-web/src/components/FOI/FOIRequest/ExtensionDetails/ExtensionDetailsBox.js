@@ -67,7 +67,7 @@ const ExtensionDetailsBox = React.memo(() => {
                 setExtensionId(null);
               }}
               disabled={pendingExtensionExists || requestState?.toLowerCase() ===  StateEnum.onhold.name.toLowerCase() || 
-                requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase()}
+                requestState?.toLowerCase() ===  StateEnum.onholdother.name.toLowerCase() || requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase()}
             >
               New Extension
             </button>

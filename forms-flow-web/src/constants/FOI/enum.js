@@ -112,6 +112,13 @@ const MimeTypeList = Object.freeze({
     ".webp",
     ".xlsm",
   ],
+  openInfo: [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-excel",
+    ".xls",
+    ".xlsx",
+  ],
 });
 
 const MaxFileSizeInMB = Object.freeze({

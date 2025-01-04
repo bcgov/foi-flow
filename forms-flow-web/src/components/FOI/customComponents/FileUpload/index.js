@@ -120,7 +120,7 @@ const FileUpload = ({
           }
         }
         setTotalFileSize(_totalFileSizeInMB);
-        let errMsg = getErrorMessage(_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes, recordUploadLimitReached, totalRecordUploadLimit);
+        let errMsg = getErrorMessage(_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes, recordUploadLimitReached, totalRecordUploadLimit, uploadFor);
         setErrorMessage(errMsg);
         return [{...files}, _totalFileSizeInMB, removeFileSize, errMsg];
     };
@@ -249,7 +249,7 @@ const FileUpload = ({
           </div>
         </div>
       </section>
-      {modalFor === "add" && (<div className="tag-message-container">
+      {modalFor === "add" && uploadFor !== "additionalFiles" && (<div className="tag-message-container">
         <p>When uploading more than one {uploadFor}, all {uploadFor}s will have the same selected tag.</p>
       </div>)}
       <ul className="error-message-ul">

@@ -18,9 +18,10 @@ import './confirmationmodal.scss';
 import { StateEnum, StateTransitionCategories } from '../../../../constants/FOI/statusEnum';
 import FileUpload from '../FileUpload'
 import MinistryApprovalModal from './MinistryApprovalModal';
-import { formatDate, calculateDaysRemaining, ConditionalComponent, isMinistryLogin } from "../../../../helper/FOI/helper";
+import { formatDate, calculateDaysRemaining, ConditionalComponent, isMinistryLogin, isOITeam } from "../../../../helper/FOI/helper";
 import { MimeTypeList, MaxFileSizeInMB, MaxNumberOfFiles } from "../../../../constants/FOI/enum";
-import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo } from './util';
+import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo, getMessageForOITeam } from './util';
+import { isReadyForPublishing } from '../../FOIRequest/utils';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -81,6 +82,9 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const userGroups = user?.groups?.map(group => group.slice(1));
     let isMinistry = isMinistryLogin(userGroups);
     
+    
+    const openInfo = useSelector((reduxState) => reduxState.foiRequests.foiOpenInfoRequest);
+    const additionalFiles = useSelector((reduxState) => reduxState.foiRequests.foiOpenInfoAdditionalFiles);
     const cfrStatus = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.status);
     const cfrFeeData = useSelector((reduxState) => reduxState.foiRequests.foiRequestCFRForm.feedata);
     const actualsFeeDataFields = [
@@ -118,6 +122,13 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
 
     const isBtnDisabled = () => {
+      if (isOITeam) {        
+        if (state === 'Ready to Publish') {
+          return !isReadyForPublishing(openInfo, additionalFiles, axisRequestId)
+        } else {
+          return false;
+        }
+      }
       if ((state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && cfrStatus === 'init')
             || (state.toLowerCase() === StateEnum.feeassessed.name.toLowerCase() && estimatedTotalDue === 0)
             || (state.toLowerCase() === StateEnum.onhold.name.toLowerCase() && amountDue === 0)
@@ -169,7 +180,6 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         else if (saveRequestObject.requeststatuslabel === StateEnum.signoff.label
           && state.toLowerCase() === StateEnum.review.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.signoffreview.name;
-
         fileInfoList = files.map(file => {
           return {
             ministrycode: requestNumber.split("-")[0],
@@ -182,11 +192,13 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
       handleModal(true, fileInfoList, files);
     }
 
-    let message = getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalDue);
+    let message = userGroups.includes("OI Team") ? 
+      getMessageForOITeam(state, openInfo, additionalFiles, axisRequestId)
+      : getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalDue);
     const attchmentFileNameList = attachmentsArray?.map(_file => _file.filename);
 
     const getDaysRemaining = () => {
-      if (currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.onhold.name.toLowerCase()) {
+      if (currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && state.toLowerCase() !== StateEnum.onholdother.name.toLowerCase()) {
         return (
           <span> <b> {daysRemainingLDD} DAYS REMAINING </b> </span>
         );
@@ -194,7 +206,9 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
 
     const addorUpdateConfirmationModal = () => {
-      if (state.toLowerCase() === StateEnum.closed.name.toLowerCase() && 
+      if(currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) 
+        return null; 
+      else if (state.toLowerCase() === StateEnum.closed.name.toLowerCase() && 
           currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) {
         return (
           <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
@@ -261,7 +275,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
                 </tr>
               </tbody>
           </table> : null }
-        {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() && [StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase()].includes(state.toLowerCase())) ?
+        {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() && [StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase(), StateEnum.onholdother.name.toLowerCase()].includes(state.toLowerCase())) ?
           <table className="table table-bordered table-assignedto">
             <tbody>
               <tr>
@@ -305,7 +319,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           </DialogContent>
           <DialogActions>
             <button className={`btn-bottom btn-save ${isBtnDisabled() ? classes.btndisabled : classes.btnenabled }`} disabled={disableSaveBtn || isBtnDisabled()} onClick={handleSave}>
-              {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ?
+              {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() || isOITeam) ?
               "Save Change" : "Re-Open Request"}
             </button>
             <button className="btn-bottom btn-cancel" onClick={handleClose}>

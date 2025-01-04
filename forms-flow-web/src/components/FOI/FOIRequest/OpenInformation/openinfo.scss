@@ -1,0 +1,49 @@
+.oi-section{
+    margin-top: 60px;
+    margin-left: 2em;
+    margin-right: 2em;
+    margin-bottom: 60px
+}
+
+.oi-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.oi-assignment {
+    min-width: 400px;
+}
+
+.oi-main-text {
+    margin-top: 40px;
+}
+
+.openinfotab-select{
+    border: 1px solid #036;
+    border-radius: 40px;
+    padding: 0 20px 0 20px;
+    margin-left: 15px;
+    cursor: pointer;
+    color: #036;
+}
+
+.openinfotab-selected{
+    border: 1px solid #036;
+    border-radius: 40px;
+    padding: 0 20px 0 20px;
+    margin-left: 15px;
+    cursor: pointer;
+    color: white;
+    background-color: #036;
+}
+
+.openinfotab {
+    border: 1px solid;
+    border-color: #036;
+    height: 50px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}

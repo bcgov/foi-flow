@@ -168,7 +168,7 @@ const ExtensionsTable = ({ showActions = true }) => {
                       disabled={
                         (index > 0 &&
                         extension.extensionstatus !== extensionStatusId.pending) || requestState?.toLowerCase() ===  StateEnum.onhold.name.toLowerCase() || 
-                        requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase()
+                        requestState?.toLowerCase() ===  StateEnum.onholdother.name.toLowerCase() || requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase()
                       }
                     >
                       <MoreHorizIcon />
