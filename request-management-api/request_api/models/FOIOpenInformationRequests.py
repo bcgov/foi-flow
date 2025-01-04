@@ -249,7 +249,7 @@ class FOIOpenInformationRequests(db.Model):
                 or_( 
                     and_(
                         FOIMinistryRequest.oistatus_id.isnot(None),
-                        #FOIMinistryRequest.requeststatuslabel != StateName.closed.name
+                        FOIMinistryRequest.oistatus_id != OIStatusEnum.PUBLISHED.value
                     ),
                     and_(
                         FOIMinistryRequest.oistatus_id.is_(None),
