@@ -55,6 +55,8 @@ const OpenInfo = ({
     if (isOITeam) {
       if (foiOITransactionData.oipublicationstatus_id === findOIPublicationState('Do Not Publish')?.oipublicationstatusid) {
         setTabValue(1)
+      } else {
+        setTabValue(2)
       }
     }
   }, [foiOITransactionData]);
