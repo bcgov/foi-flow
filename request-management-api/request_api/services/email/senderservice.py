@@ -6,6 +6,8 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
+from email.mime.image import MIMEImage
+
 from email import encoders
 from request_api.services.email.templates.templateconfig import templateconfig
 import imaplib
@@ -14,6 +16,9 @@ import logging
 import email
 import json
 from request_api.services.external.storageservice import storageservice
+from request_api.models.default_method_result import DefaultMethodResult
+from request_api.services.email.templates.embeddedimagehandler import embeddedimagehandler
+import base64
 
 MAIL_SERVER_SMTP = os.getenv('EMAIL_SERVER_SMTP')
 MAIL_SERVER_SMTP_PORT = os.getenv('EMAIL_SERVER_SMTP_PORT')
@@ -30,24 +35,41 @@ class senderservice:
 
     """
 
-    def send(self, subject, content, _messageattachmentlist, requestjson):
-        logging.debug("Begin: Send email for request = "+json.dumps(requestjson))
-        msg = MIMEMultipart()
-        msg['From'] = MAIL_FROM_ADDRESS
-        msg['To'] = requestjson["email"]
+    def send_by_request(self, subject, content, _messageattachmentlist, requestjson):
+        return self.send(subject, content, _messageattachmentlist, requestjson["email"])
+
+    def send(self, subject, content, _messageattachmentlist, emails, from_email = None):
+        logging.debug("Begin: Send email for request ")
+
+        content = content.replace('src=\\\"', 'src="')
+        content = content.replace('\\\">','">')
+        msg = MIMEMultipart('related')
+        if from_email is None:
+            from_email = MAIL_FROM_ADDRESS
+
+        msg['From'] = from_email
+        msg['To'] = ",".join(emails)
         msg['Subject'] = subject
-        part = MIMEText(content, "html")
+        formattedContent, embeddedImages = embeddedimagehandler().formatembeddedimage(content)
+        part = MIMEText(formattedContent, "html")
         msg.attach(part)
-        # Add Attachment and Set mail headers
+        #Add Attachment and Set mail headers
         for attachment in _messageattachmentlist:
+            file = storageservice().download(attachment['url'])
             part = MIMEBase("application", "octet-stream")
-            part.set_payload(attachment.get('file').content)
+            part.set_payload(file.content)
             encoders.encode_base64(part)
             part.add_header(
             "Content-Disposition",
             "attachment", filename= attachment.get('filename')
             )
             msg.attach(part)
+        for embeddedImage in embeddedImages:
+            msgImg = MIMEImage(embeddedImage['bytes'], embeddedImage['type'])
+            msgImg.add_header('Content-ID', embeddedImage['cid'])
+            msgImg.add_header('Content-Disposition', 'inline', filename=embeddedImage['cid']+'.'+embeddedImage['type'])
+            msg.attach(msgImg)
+        
         try:
             with smtplib.SMTP(MAIL_SERVER_SMTP,  MAIL_SERVER_SMTP_PORT) as smtpobj:
                 smtpobj.ehlo()
@@ -56,11 +78,11 @@ class senderservice:
                 #smtpobj.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
                 smtpobj.sendmail(msg['From'],  msg['To'], msg.as_string())
                 smtpobj.quit()
-                logging.debug("End: Send email for request = "+json.dumps(requestjson))
-                return {"success" : True, "message": "Sent successfully"}
+                logging.debug("End: Send email for request")
+                return DefaultMethodResult(True,'Sent successfully', -1)    
         except Exception as e:
             logging.exception(e)
-        return {"success" : False, "message": "Unable to send"}
+        return DefaultMethodResult(False,'Unable to send', -1)    
     
 
     def read_outbox_as_bytes(self, servicekey, requestjson):
