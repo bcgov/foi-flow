@@ -264,7 +264,7 @@ const CommunicationStructure = ({correspondence, currentIndex,
     html2pdf().from(element).outputPdf('blob').then(async (blob) => {
       blobs.push({name: "Email Body.pdf", lastModified: new Date(), input: blob})
       const zipfile = await downloadZip(blobs).blob()
-      saveAs(zipfile, fullName + " " + correspondence.date.replace("|", "") + ".zip");
+      saveAs(zipfile, fullName + " " + correspondence.date.replace(/\|/g, "") + ".zip");
     });
   }
 
