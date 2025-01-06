@@ -228,6 +228,8 @@ class storageservice:
             return '{0}/{1}/{2}/{3}'.format(ministrycode,requestnumber,filestatustransition,uniquefilename)
         elif category.lower() == 'records':
             return '{0}/{1}'.format(requestnumber,uniquefilename)
+        elif category.lower() == 'additionalfiles':
+            return '{0}/openinfo/{1}'.format(requestnumber,uniquefilename)
 
     def download(self, s3uri):
 

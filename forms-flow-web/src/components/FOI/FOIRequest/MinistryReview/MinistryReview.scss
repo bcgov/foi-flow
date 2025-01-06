@@ -85,12 +85,20 @@
 
 .MuiFormLabel-root.Mui-disabled {
     font-family: "BCSans-Bold", sans-serif !important;
-    color: rgba(0, 0, 0, 0.58) !important;
+    color: black !important;
 }
 
-input.MuiInputBase-input.Mui-disabled {
+.MuiInputBase-input.Mui-disabled {
     background-color: #EEEEEE;
-    color: rgba(0, 0, 0, 0.58);
+    color: black;
+}
+
+// .Mui-disabled.MuiInputBase-root {
+//     background-color: #EEEEEE;
+// }
+
+.request-flag .MuiInputBase-input.Mui-disabled {
+    background-color: transparent !important;
 }
 
 .PrivateNotchedOutline-legendLabelled-4 {

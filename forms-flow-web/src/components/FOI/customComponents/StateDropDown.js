@@ -25,8 +25,13 @@ const StateDropDown = ({
   isDivisionalCoordinator,
   isHistoricalRequest,
   disabled,
+  isOITeam,
 }) => {
   const _isMinistryCoordinator = isMinistryCoordinator;
+
+  const openInfoStates = useSelector(
+    (state) => state.foiRequests.oiStatuses
+  );
 
   const [status, setStatus] = useState(requestState);
   const cfrFeeData = useSelector(
@@ -88,6 +93,13 @@ const StateDropDown = ({
   };
 
   const getStatusList = () => {
+    if (isOITeam) {
+      var list = openInfoStates.map(s => {return { status: s.name, isSelected: false }});
+      if (requestState === StateEnum.unopened.name) {
+        list.unshift({ status: 'Unopened', isSelected: false })
+      }
+      return list;
+    }
     let _state = "";
     if (requestState) _state = requestState;
     else if (
@@ -111,7 +123,15 @@ const StateDropDown = ({
     const appendRecordsReadyForReview = (stateList) => {
       const recordsreadyforreview = { status: "Records Ready for Review", isSelected: false };
       let appendedList = stateList.slice();
-      appendedList.splice(-1, 0, recordsreadyforreview);
+      if(previousState === StateEnum.open.name || previousState === StateEnum.response.name)
+        appendedList.splice(-2, 0, recordsreadyforreview);
+      else appendedList.splice(-1, 0, recordsreadyforreview);
+      return appendedList;
+    }
+    const appendPreviousStateForHoldOthers = (stateList, previousStateName) => {
+      const previousStateObject = { status: previousStateName, isSelected: false };
+      let appendedList = stateList.slice();
+      appendedList.splice(-1, 0, previousStateObject);
       return appendedList;
     }
     const isMCFMinistryTeam = userDetail?.groups?.some(str => str.includes("MCF Ministry Team"))
@@ -225,12 +245,18 @@ const StateDropDown = ({
         break;
       case StateEnum.appfeeowing.name.toLowerCase():
         return _stateList.appfeeowing;
-
+      case StateEnum.onholdother.name.toLowerCase():
+        if (!isMinistryCoordinator) {
+          return appendPreviousStateForHoldOthers(_stateList.onholdother, previousState);
+        } else return _stateList.onholdother;
       default:
         return [];
     }
   };
   const getDisableMenuItem = (index, status) => {
+    if (isOITeam) {
+      return status === requestState;
+    }
     if (index === 0) {
       return false;
     }

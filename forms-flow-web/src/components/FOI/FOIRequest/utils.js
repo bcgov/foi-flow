@@ -23,6 +23,7 @@ export const getTabBottomText = ({
     StateEnum.closed.name,
     StateEnum.intakeinprogress.name,
     StateEnum.redirect.name,
+    StateEnum.onholdother.name,
   ];
 
   if (!statusesToNotAppearIn.includes(_status)) {
@@ -143,9 +144,38 @@ export const getTabBG = (_tabStatus, _requestState) => {
         return "foitabheadercollection foitabheaderAppFeeOwingBG";
     case StateEnum.recordsreadyforreview.name:
         return "foitabheadercollection foitabheaderRecordsReadyForReviewBG";
-
+    case StateEnum.onholdother.name:
+        return "foitabheadercollection foitabheaderOnholdOtherBG";
     default:
       return "foitabheadercollection foitabheaderdefaultBG";
+  }
+};
+
+export const getOITabBG = (OIRequestStatusId, OIStatuses) => {
+  if (OIStatuses) {
+    var OIStatusName = OIStatuses.find(s => s.oistatusid === OIRequestStatusId)?.name
+    switch (OIStatusName) {
+      case "First Review":
+        return "foitabheadercollection foitabheaderFirstReviewBG";
+      case "Peer Review":
+        return "foitabheadercollection foitabheaderOIPeerReviewBG";
+      case "Ready to Publish":
+        return "foitabheadercollection foitabheaderReadyToPublishBG";
+      case "Published":
+        return "foitabheadercollection foitabheaderPublishedBG";
+      case "HOLD Publication":
+        return "foitabheadercollection foitabheaderHoldBG";
+      case "Unpublished":
+        return "foitabheadercollection foitabheaderUnpublishedBG";
+      case "Do Not Publish":
+        return "foitabheadercollection foitabheaderDoNotPublishBG";
+      case "Exemption Request":
+        return "foitabheadercollection foitabheaderExemptionBG";
+      
+
+      default:
+        return "foitabheadercollection foitabheaderdefaultBG";
+    }
   }
 };
 
@@ -458,5 +488,9 @@ export const persistRequestFieldsNotInAxis = (newRequestDetails, existingRequest
 
 export const getUniqueIdentifier = (obj) => {
   return (obj.extensionstatusid+formatDate(obj.extendedduedate, "MMM dd yyyy")+obj.extensionreasonid).replace(/\s+/g, '');
+}
+
+export const isReadyForPublishing = (openinfo, additionalfiles, requestnumber) => {
+  return !(openinfo?.copyrightsevered === null || openinfo?.publicationdate === null || additionalfiles?.findIndex(f => f.filename.includes("Response_Letter_" + requestnumber + ".pdf")) < 0)
 }
 

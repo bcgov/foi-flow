@@ -26,6 +26,7 @@ from request_api.exceptions import BusinessException
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
+from request_api.services.openinfoservice import openinfoservice
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema
 from request_api.schemas.foiassignee import FOIRequestAssigneeSchema
 from request_api.utils.enums import StateName
@@ -33,6 +34,7 @@ from marshmallow import Schema, fields, validate, ValidationError
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 import json
 import asyncio
+import traceback
 
 API = Namespace('FOIRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
@@ -106,7 +108,10 @@ class FOIRequests(Resource):
             
             if rawresult.success == True:
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
-                if result.success == True:
+                if result.success == True:                    
+                    #Create FOIOpenInfoRequest after FOIMinistryRequest has successfully been created and set to Open state                
+                    foiministryrequest = result.args[0]
+                    openinfoservice().createopeninforequest(foirequestschema, AuthHelper.getuserid(), foiministryrequest)
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copydocuments(request_json['id'],result.args[0],AuthHelper.getuserid())
@@ -296,13 +301,16 @@ class FOIRequestsById(Resource):
             if (section == "userrecordslockstatus"):
                 foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
                 foirequest['userrecordslockstatus'] = request_json['userrecordslockstatus']
+            if (section == "oistatusid"):
+                foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
+                foirequest['oistatusid'] = request_json['oistatusid']
             foirequestschema = FOIRequestWrapperSchema().load(foirequest)
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
-                return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
+                return {'success': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
         except ValidationError as err:
@@ -349,6 +357,7 @@ class FOIRequestForDocReviewer(Resource):
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as error:
+            traceback.print_exc()
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500

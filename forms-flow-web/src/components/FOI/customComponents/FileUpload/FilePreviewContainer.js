@@ -1,6 +1,6 @@
 import React from "react";
 
-function FilePreviewContainer({files, removeFile}) {
+function FilePreviewContainer({files, removeFile, clickHandler}) {
     return (
       <article className="file-preview-container">     
         <section>
@@ -9,7 +9,7 @@ function FilePreviewContainer({files, removeFile}) {
             let file = files[fileName];
             return (
               <li key={_index} className={`${Object.keys(files).length === 1 ? "ol-display-none": ""}`}>
-                <FilePreviewList key={fileName} file={file} fileName={fileName} removeFile={removeFile} />
+                <FilePreviewList key={fileName} file={file} fileName={fileName} removeFile={removeFile} clickHandler={clickHandler} />
               </li>
             );
           })}
@@ -19,14 +19,14 @@ function FilePreviewContainer({files, removeFile}) {
     );
   }
   
-  function FilePreviewList({file, fileName, removeFile}) {
+  function FilePreviewList({file, fileName, removeFile, clickHandler}) {
     return (
     <section>
       <div>
         <div>
           <aside>  
-            <span className="file-name">{file.filename ? file.filename : file.name}</span>                                       
-            <i className="fas fa-times-circle foi-file-close" onClick={(event) => {event.stopPropagation(); removeFile(fileName);}} />
+            <span style={{cursor: clickHandler ? "pointer" : "auto"}} onClick={() => clickHandler(fileName)} className="file-name">{file.filename ? file.filename : file.name}</span>                                       
+            <i style={{cursor: "pointer"}} className="fas fa-times-circle foi-file-close" onClick={(event) => {event.stopPropagation(); removeFile(fileName);}} />
           </aside>
         </div>
       </div>

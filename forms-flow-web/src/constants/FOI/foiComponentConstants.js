@@ -66,7 +66,7 @@ const FOI_COMPONENT_CONSTANTS = {
     ADDREQUEST: "addrequest",
     HISTORICAL_REQUEST: "historicalrequest",
     RQUESTDETAILS_INITIALVALUES: "initialValues",
-    ASSIGNEE_GROUPS: ["Intake Team", "Flex Team", "Processing Team"],
+    ASSIGNEE_GROUPS: ["Intake Team", "Flex Team", "Processing Team", "OI Team"],
     ONLINE_FORM: "Online Form",
     ADD_REQUEST: "Add Request",
     REVIEW_REQUEST: "Review Request",

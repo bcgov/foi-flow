@@ -213,6 +213,12 @@ const isIntakeTeam = (userGroups) => {
   );
 };
 
+const isOITeam = (userGroups) => {
+  return (
+    userGroups?.map((userGroup) => userGroup.replace("/", "")).indexOf("OI Team") !== -1
+  );
+}
+
 const getMinistryByValue = (userGroups) => {
   const ministryGroup = Object.values(MINISTRYGROUPS).filter((element) =>
     userGroups.includes(element)
@@ -585,6 +591,7 @@ export {
   isScanningTeam,
   isFlexTeam,
   isIntakeTeam,
+  isOITeam,
   encrypt,
   decrypt,
   addToRestrictedRequestTagList,
