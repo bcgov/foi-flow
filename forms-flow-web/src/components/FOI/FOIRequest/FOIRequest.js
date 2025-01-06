@@ -1182,8 +1182,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               isValidationError={isValidationError}
               requestType={requestDetails?.requestType}
               isOITeam={isOITeam}
-              // isDivisionalCoordinator={false}
-              // isHistoricalRequest={isHistoricalRequest}
             />
           </div>
 

@@ -5,13 +5,11 @@ from datetime import datetime
 from sqlalchemy.orm import relationship, backref, aliased
 from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc
 from sqlalchemy.sql.sqltypes import String
-from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy.sql.sqltypes import Date, Integer
-from sqlalchemy.sql.expression import distinct
-from request_api.utils.enums import RequestorType, StateName, ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup, OICloseReason, ExcludedProgramArea, OIStatusEnum
+from sqlalchemy.sql.sqltypes import Date
+from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup, OICloseReason, ExcludedProgramArea, OIStatusEnum
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIAssignees import FOIAssignee
-from .FOIRequests import FOIRequest, FOIRequestsSchema
+from .FOIRequests import FOIRequest
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from .FOIRequestApplicants import FOIRequestApplicant
 from .FOIRequestStatus import FOIRequestStatus
@@ -19,11 +17,7 @@ from .ApplicantCategories import ApplicantCategory
 from .FOIRequestWatchers import FOIRequestWatcher
 from .FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from .ProgramAreas import ProgramArea
-from .FOIRequestExtensions import FOIRequestExtension
 from .OpenInformationStatuses import OpenInformationStatuses
-from .FOIRequestOIPC import FOIRequestOIPC
-from .SubjectCodes import SubjectCode
-from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .FOIRequestStatus import FOIRequestStatus
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.models.FOIRequestRecords import FOIRequestRecord
@@ -249,7 +243,7 @@ class FOIOpenInformationRequests(db.Model):
                 or_( 
                     and_(
                         FOIMinistryRequest.oistatus_id.isnot(None),
-                        #FOIMinistryRequest.requeststatuslabel != StateName.closed.name
+                        FOIMinistryRequest.oistatus_id != OIStatusEnum.PUBLISHED.value
                     ),
                     and_(
                         FOIMinistryRequest.oistatus_id.is_(None),

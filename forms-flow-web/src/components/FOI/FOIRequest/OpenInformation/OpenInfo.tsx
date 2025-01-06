@@ -245,10 +245,6 @@ const OpenInfo = ({
     }));
   }
 
-  console.log("req", requestDetails)
-  console.log("oi info", oiPublicationData)
-  console.log("isOIUser", isOITeam)
-
   return (
     <>
       <div className="oi-section">
