@@ -37,7 +37,7 @@ class applicationfeeformevent:
             appfeestatus = 'Paid'
         elif 'applicationfeestatus' in data and data['applicationfeestatus'].lower()   == 'appfeeowing':
             appfeestatus = 'App Fee Owing'
-        commentmessage = '{} has updated Application fee status to {}'.format(username, appfeestatus)
+        commentmessage = '{} has updated Application Fee Status to {}'.format(username, appfeestatus)
         if ministryrequestid is not None:
             comment = {"comment": commentmessage, "commenttypeid": 2, "ministryrequestid": ministryrequestid}
         else:
@@ -74,10 +74,10 @@ class applicationfeeformevent:
     
     def __feestatusnotificationmessage(self, status):
         if status.lower() == 'na-ige':
-            return 'Application fee status updated to N/A - IGE'
+            return 'Application Fee Status updated to N/A - IGE'
         elif status.lower() == 'paid':
-            return 'Application fee status updated to Paid'
+            return 'Application Fee Status updated to Paid'
         elif status.lower() == 'appfeeowing':
-            return 'Application fee status updated to App Fee Owing'
+            return 'Application Fee Status updated to App Fee Owing'
         else:
-            return 'Application fee status updated to '+ status
+            return 'Application Fee Status updated to '+ status

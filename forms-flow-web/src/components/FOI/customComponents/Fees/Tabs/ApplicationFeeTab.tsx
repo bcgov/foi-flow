@@ -398,6 +398,13 @@ export const ApplicationFeeTab = ({
       return isDisabled;
     }
 
+    const refundAmountFieldError = () => {
+      let refundDateBlank = formData?.refundDate == '' || formData?.refundDate == null
+      if (!refundDateBlank && formData?.refundAmount == 0) return true;
+      if (formData?.refundAmount % 10 != 0 || formData?.refundAmount > formData?.amountPaid) return true
+      return false;
+    }
+
     const [refundAmountHelperText, setRefundAmountHelperText] = useState('')
 
     React.useEffect(() => {
@@ -433,12 +440,19 @@ export const ApplicationFeeTab = ({
             e.target.value = parseFloat(e.target.value).toFixed(2);
           }}
           fullWidth
-          error={formData?.refundAmount % 10 != 0 || formData?.refundAmount > formData?.amountPaid}
+          error={refundAmountFieldError()}
           helperText={refundAmountHelperText}
           disabled={disableRefundFields()}
         />
       </div>
     )
+
+    const refundDateFieldError = () => {
+      if (formData?.refundAmount > 0) {
+        if (formData?.refundDate == '' || formData?.refundDate == null) return true
+      }
+      return false;
+    }
 
     const refundDateField = (
       <div className="col-lg-6 foi-details-col">
@@ -453,6 +467,7 @@ export const ApplicationFeeTab = ({
           InputLabelProps={{
           shrink: true,
           }}
+          error={refundDateFieldError()}
           InputProps={{inputProps: { max: formatDate(new Date())} }}
           variant="outlined"
           fullWidth
