@@ -159,7 +159,7 @@ const initialState = {
   oiExemptions: [],
   oiPublicationStatuses: [],
   oiStatuses: [],
-  foiOpenInfoRequest: {},
+  // foiOpenInfoRequest: {},
   foiOpenInfoAdditionalFiles: [],
   foiPDFStitchedOIPackage: {},
   foiPDFStitchStatusForOIPackage: "not started",

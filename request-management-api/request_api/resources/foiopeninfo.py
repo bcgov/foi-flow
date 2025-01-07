@@ -35,8 +35,8 @@ class FOIOpenInfoRequest(Resource):
     def get(foiministryrequestid, usertype=None):
         try:
             result = openinfoservice().getcurrentfoiopeninforequest(foiministryrequestid)
-            if result in (None, {}):
-                return {"status": False, "message": "Could not find FOIOpenInfoRequest"}, 404
+            # if result in (None, {}):
+            #     return {"status": False, "message": "Could not find FOIOpenInfoRequest"}, 404
             return  json.dumps(result), 200
         except ValidationError as err:
             return {'status': False, 'message': str(err)}, 400
