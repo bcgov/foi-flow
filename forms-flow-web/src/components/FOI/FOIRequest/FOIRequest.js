@@ -1139,9 +1139,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   }
   const showOpenInformationTab = () => {
     return (
-      foiOITransactionData && Object.keys(foiOITransactionData).length > 0 &&
-      requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
-      !SKIP_OPENINFO_MINISTRIES.includes(requestDetails?.bcgovcode) &&
+      foiOITransactionData && 
+      Object.keys(foiOITransactionData).length > 0 &&
+      activePublicationRequest &&
       requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name
     );
