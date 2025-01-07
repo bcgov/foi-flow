@@ -414,7 +414,9 @@ export const Fees = ({
                   },
                 )
               }
-              if (applicationFeeFormData?.applicationFeeStatus == 'appfeeowing') {
+              if (applicationFeeFormData?.applicationFeeStatus == 'appfeeowing' &&
+                (requestState === StateEnum.intakeinprogress.name || requestState === StateEnum.unopened.name)
+              ) {
                 handleStateChange('App Fee Owing');
               }
               setReceiptFileUpload(null)
@@ -484,7 +486,8 @@ export const Fees = ({
             errorToast(errorMessage)
           },
         )
-        if (applicationFeeFormData?.applicationFeeStatus == 'appfeeowing') {
+        if (applicationFeeFormData?.applicationFeeStatus == 'appfeeowing' &&
+          (requestState === StateEnum.intakeinprogress.name || requestState === StateEnum.unopened.name)) {
           handleStateChange('App Fee Owing');
         }
       }
@@ -575,7 +578,7 @@ export const Fees = ({
         if (applicationFeeFormData?.applicationFeeStatus == 'na-ige') {
           setStatusChangeModalMessage('Are you sure you want to set the Application Fee Status to N/A - IGE?');
           setStatusChangeModalOpen(true);
-        } else if (applicationFeeFormData?.applicationFeeStatus == 'appfeeowing') {
+        } else if (applicationFeeFormData?.applicationFeeStatus == 'appfeeowing' && (requestState === StateEnum.unopened.name || requestState === StateEnum.intakeinprogress.name)) {
           setStatusChangeModalMessage(`Are you sure you want to update the Application Fee Status to App Fee Owing? 
             The request status will also be changed to App Fee Owing and you will be prompted to confirm the state change again.`);
           setStatusChangeModalOpen(true);
@@ -700,10 +703,15 @@ export const Fees = ({
                     <div className="foi-request-number-header">
                       <h3 className="foi-review-request-text">{requestNumber}</h3>
                     </div>
+                    {selectedSubtab == FeesSubtabValues.CFRFORM ? 
                     <Chip
                       label={initialCFRFormData.formStatus === 'approved' ? "Version " + formHistory.length : "Version " + (formHistory.length + 1) + " Draft" }
                       sx={{ backgroundColor: '#096DD1', color: '#fff', height: 19}}
-                    />
+                    /> 
+                    : 
+                    <div>
+                      <div style={{height: 25}}></div>
+                    </div>}
                   </div>
                   {selectedSubtab == FeesSubtabValues.CFRFORM && <CFRFormStatus 
                     formData={CFRFormData}
@@ -731,7 +739,7 @@ export const Fees = ({
                     disabled={formHistory.length < 1}
                     onClick={() => setHistoryModal(true)}
                   >
-                    CFR Form History
+                    Processing Fee Form History
                   </button>
                 </div> : 
                 // placeholder for layout
@@ -753,7 +761,6 @@ export const Fees = ({
                   ministryId={ministryId}
                   requestId={requestId}
                   userDetail={userDetail}
-                  setCFRUnsaved={setCFRUnsaved}
                   formData={applicationFeeFormData}
                   setFormData={setApplicationFeeFormData}
                   rerenderFileUpload={rerenderFileUpload}

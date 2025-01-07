@@ -15,7 +15,7 @@ export const CFRFormStatus = ({
   const CFRStatuses = [
     {
       value: 'init',
-      label: 'Select CFR Form Status',
+      label: 'Select Processing Fee Form Status',
       disabled: true,
     },
     {
@@ -64,11 +64,11 @@ export const CFRFormStatus = ({
   return (
     <>
       {<div className='foi-assigned-to-container'>
-                    <div className='foi-assigned-to-inner-container' id="cfrstatuscontainer">
+                    <div className='foi-assigned-to-inner-container' id="processingfeestatuscontainer">
                       <TextField
-                        id="cfrStatus"
-                        label={"CFR Status"}
-                        inputProps={{ "aria-labelledby": "cfrStatus-label"}}
+                        id="processingFeeStatus"
+                        label={"Processing Fee Status"}
+                        inputProps={{ "aria-labelledby": "processingFeeStatus-label"}}
                         InputLabelProps={{ shrink: true }}
                         select
                         name="formStatus"
