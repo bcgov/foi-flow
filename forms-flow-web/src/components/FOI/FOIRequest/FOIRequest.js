@@ -1162,7 +1162,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     }
   }
 
-  return (!isLoading && (activePublicationRequest ? foiOITransactionData : true) &&
+  return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
     isAddRequest ? (
