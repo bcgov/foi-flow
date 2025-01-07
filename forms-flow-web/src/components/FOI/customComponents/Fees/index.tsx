@@ -587,7 +587,7 @@ export const Fees = ({
           saveApplicationFeeTab();
         }
       }
-      if (selectedSubtab == FeesSubtabValues.CFRFORM) {
+      if (selectedSubtab == FeesSubtabValues.PROCESSINGFEE) {
         saveCFRFormTab();
       }
     };
@@ -605,13 +605,13 @@ export const Fees = ({
     const handleStatusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       handleTextChanges(e);
       if (e.target.value === 'review') {
-        setModalMessage(<>By changing the CFR Form Status to <b>"In Review with IAO"</b> you
+        setModalMessage(<>By changing the Processing Fee Form Status to <b>"In Review with IAO"</b> you
         will be sending the form to the IAO user and locking your ability to edit the form.
         Are you sure you would like to continue?</>);
       } else if (e.target.value === 'approved') {
-        setModalMessage(<>Are you sure you want to change the status to <b>"Approved"</b>? Once approved, a CFR form is uneditable. Any changes will require a new CFR form to be created.</>);
+        setModalMessage(<>Are you sure you want to change the status to <b>"Approved"</b>? Once approved, a Processing Fee form is uneditable. Any changes will require a new Processing Fee form to be created.</>);
       } else if (e.target.value === 'clarification') {
-        setModalMessage(<>By changing the CFR Form Status to <b>"Needs Clarification with Ministry" </b> you
+        setModalMessage(<>By changing the Processing Fee Form Status to <b>"Needs Clarification with Ministry" </b> you
         will be sending the form to the Ministry user and locking your ability to edit the form.
         Are you sure you would like to continue?</>);
       }
@@ -652,7 +652,7 @@ export const Fees = ({
       setIsNewCFRForm(true)
     }
   
-    const [selectedSubtab, setSelectedSubtab] = useState(FeesSubtabValues.CFRFORM)
+    const [selectedSubtab, setSelectedSubtab] = useState(FeesSubtabValues.PROCESSINGFEE)
 
     React.useEffect(() => {
       if (!isMinistry) {
@@ -662,7 +662,7 @@ export const Fees = ({
           requestState === StateEnum.appfeeowing.name) {
           setSelectedSubtab(FeesSubtabValues.APPLICATIONFEE);
         } else {
-          setSelectedSubtab(FeesSubtabValues.CFRFORM);
+          setSelectedSubtab(FeesSubtabValues.PROCESSINGFEE);
         }
       }
     }, [requestState])
@@ -703,7 +703,7 @@ export const Fees = ({
                     <div className="foi-request-number-header">
                       <h3 className="foi-review-request-text">{requestNumber}</h3>
                     </div>
-                    {selectedSubtab == FeesSubtabValues.CFRFORM ? 
+                    {selectedSubtab == FeesSubtabValues.PROCESSINGFEE ? 
                     <Chip
                       label={initialCFRFormData.formStatus === 'approved' ? "Version " + formHistory.length : "Version " + (formHistory.length + 1) + " Draft" }
                       sx={{ backgroundColor: '#096DD1', color: '#fff', height: 19}}
@@ -713,7 +713,7 @@ export const Fees = ({
                       <div style={{height: 25}}></div>
                     </div>}
                   </div>
-                  {selectedSubtab == FeesSubtabValues.CFRFORM && <CFRFormStatus 
+                  {selectedSubtab == FeesSubtabValues.PROCESSINGFEE && <CFRFormStatus 
                     formData={CFRFormData}
                     handleStatusChange={handleStatusChange}
                     cfrStatusDisabled={cfrStatusDisabled}
@@ -726,7 +726,7 @@ export const Fees = ({
                   />}
                 </div>
                 {/* CFR Form History */}
-                {selectedSubtab == FeesSubtabValues.CFRFORM ? <div className="cfr-history-button">
+                {selectedSubtab == FeesSubtabValues.PROCESSINGFEE ? <div className="cfr-history-button">
                   <CFRFormHistoryModal
                     modalOpen={historyModalOpen}
                     handleClose={handleHistoryClose}
@@ -767,7 +767,7 @@ export const Fees = ({
                   handleTextChanges={handleTextChanges}
                   updateFilesCb={updateFilesCb}
                 />}
-                {selectedSubtab == FeesSubtabValues.CFRFORM && 
+                {selectedSubtab == FeesSubtabValues.PROCESSINGFEE && 
                 <>
                   <CFRFormTab
                     requestState={requestState}

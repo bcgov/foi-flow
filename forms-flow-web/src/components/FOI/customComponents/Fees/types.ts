@@ -61,5 +61,5 @@ export type modalParams = {
 
 export enum FeesSubtabValues {
   APPLICATIONFEE = "APPLICATIONFEE",
-  CFRFORM = "CFRFORM"
+  PROCESSINGFEE = "PROCESSINGFEE"
 } 

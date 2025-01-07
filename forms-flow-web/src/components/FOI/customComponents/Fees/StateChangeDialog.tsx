@@ -28,7 +28,7 @@ export const StateChangeDialog = ({
             // id="state-change-dialog"
           >
             <DialogTitle disableTypography id="state-change-dialog-title">
-                <h2 className="state-change-header">CFR Form Status</h2>
+                <h2 className="state-change-header">Processing Fee Form Status</h2>
                 <IconButton className="title-col3" onClick={handleClose}>
                   <i className="dialog-close-button">Close</i>
                   <CloseIcon />
@@ -65,7 +65,7 @@ export const StateChangeDialog = ({
             // id="state-change-dialog"
           >
             <DialogTitle disableTypography id="state-change-dialog-title">
-                <h2 className="state-change-header">Create New CFR Form </h2>
+                <h2 className="state-change-header">Create New Processing Fee Form </h2>
                 <IconButton className="title-col3" onClick={handleCreateClose}>
                   <i className="dialog-close-button">Close</i>
                   <CloseIcon />
@@ -74,10 +74,10 @@ export const StateChangeDialog = ({
             <DialogContent className={'dialog-content-nomargin'}>
               <DialogContentText id="state-change-dialog-description" component={'span'}>
                 <span className="confirmation-message create-new-modal-message">
-                  Are you sure you want to create a new, blank CFR form? <br></br>
+                  Are you sure you want to create a new, blank Processing Fee form? <br></br>
                   <em>
                     Any unsaved changes will be lost. The previous version will be locked for editing
-                    and viewable in the CFR Form History.
+                    and viewable in the Processing Fee Form History.
                   </em>
                 </span>
               </DialogContentText>
@@ -106,7 +106,7 @@ export const StateChangeDialog = ({
             // id="state-change-dialog"
           >
             <DialogTitle disableTypography id="state-change-dialog-title">
-                <h2 className="state-change-header">Create New CFR Form </h2>
+                <h2 className="state-change-header">Create New Processing Fee Form </h2>
                 <IconButton className="title-col3" onClick={handleCreateClose}>
                   <i className="dialog-close-button">Close</i>
                   <CloseIcon />
@@ -115,10 +115,10 @@ export const StateChangeDialog = ({
             <DialogContent className={'dialog-content-nomargin'}>
               <DialogContentText id="state-change-dialog-description" component={'span'}>
                 <span className="confirmation-message create-new-modal-message">
-                  Are you sure you want to create a new, blank CFR form? <br></br>
+                  Are you sure you want to create a new, blank Processing Fee form? <br></br>
                   <em>
                     Any unsaved changes will be lost. The previous version will be locked for editing
-                    and viewable in the CFR Form History.
+                    and viewable in the Processing Fee Form History.
                   </em>
                 </span>
               </DialogContentText>
