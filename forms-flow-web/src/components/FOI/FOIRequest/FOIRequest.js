@@ -208,8 +208,13 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const [unsavedPrompt, setUnsavedPrompt] = useState(false);
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
-  const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes); 
+  const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes);
 
+  //get foiopeninfo request details from the store
+  let foiOITransactionData = useSelector(
+    (state) => state.foiRequests.foiOpenInfoRequest
+  );
+  const activePublicationRequest = !SKIP_OPENINFO_MINISTRIES.split(",").includes(requestDetails?.bcgovcode?.toUpperCase()) && requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL;
 
   const handleUnsavedContinue = () => {
     window.removeEventListener("popstate", handleOnHashChange);
@@ -396,7 +401,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   }, [requestId, ministryId, comment, attachments]);
 
   useEffect(() => {
-    if (!SKIP_OPENINFO_MINISTRIES.split(",").includes(requestDetails?.bcgovcode?.toUpperCase()) && requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL) {
+    if (activePublicationRequest) {
       dispatch(fetchFOIOpenInfoRequest(ministryId));
     }
   }, [requestId, ministryId, requestDetails])
@@ -1132,9 +1137,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestState !== StateEnum.appfeeowing.name &&
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
-
   const showOpenInformationTab = () => {
     return (
+      foiOITransactionData && Object.keys(foiOITransactionData).length > 0 &&
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
       !SKIP_OPENINFO_MINISTRIES.includes(requestDetails?.bcgovcode) &&
       requestState !== StateEnum.intakeinprogress.name &&
@@ -1157,7 +1162,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     }
   }
 
-  return (!isLoading &&
+  return (!isLoading && (activePublicationRequest ? foiOITransactionData : true) &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
     isAddRequest ? (
