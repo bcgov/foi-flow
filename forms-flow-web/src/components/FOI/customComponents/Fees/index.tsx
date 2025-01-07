@@ -710,7 +710,7 @@ export const Fees = ({
                     /> 
                     : 
                     <div>
-                      <div style={{height: 25}}></div>
+                      <div style={{height: 29}}></div>
                     </div>}
                   </div>
                   {selectedSubtab == FeesSubtabValues.PROCESSINGFEE && <CFRFormStatus 
