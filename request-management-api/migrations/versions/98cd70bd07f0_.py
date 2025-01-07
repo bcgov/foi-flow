@@ -41,6 +41,9 @@ def upgrade():
     sa.Column('createdby', sa.String(length=120), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('updatedby', sa.String(length=120), nullable=True),
+    sa.Column('processingstatus', sa.String(length=120), nullable=True),
+    sa.Column('processingmessage', sa.String(length=250), nullable=True),
+    sa.Column('sitemap_pages', sa.String(length=120), nullable=True),
     )
 
     op.add_column('FOIMinistryRequests', sa.Column('oistatus_id', sa.Integer(), nullable=True, default=False))
