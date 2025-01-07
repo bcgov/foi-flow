@@ -23,6 +23,7 @@ class requestservicebuilder(requestserviceconfigurator):
     """
 
     def createministry(self, requestschema, ministry, activeversion, userid, filenumber=None, ministryid=None):
+        current_foiministryrequest = FOIMinistryRequest.getrequest(ministryid)
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.__dict__.update(ministry)
         foiministryrequest.requeststatusid = self.__getrequeststatusid(requestschema.get("requeststatuslabel"))
@@ -32,7 +33,7 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.axissyncdate = requestschema.get("axisSyncDate")
         foiministryrequest.axispagecount = requestschema.get("axispagecount")
         foiministryrequest.axislanpagecount = requestschema.get("axislanpagecount")
-        foiministryrequest.recordspagecount = requestschema.get("recordspagecount")
+        foiministryrequest.recordspagecount = current_foiministryrequest["recordspagecount"] if current_foiministryrequest not in (None, {}) else 0
         foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else filenumber
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
         foiministryrequest.description = requestschema.get("description")
@@ -76,9 +77,13 @@ class requestservicebuilder(requestserviceconfigurator):
             if 'subjectCode' in requestschema and requestschema['subjectCode'] is not None and requestschema['subjectCode'] != '':
                 foiministryrequest.subjectcode = requestserviceministrybuilder().createfoirequestsubjectcode(requestschema, ministryid, activeversion, userid)
         foiministryrequest.version = activeversion
-        foiministryrequest.oistatus_id = self.getpropertyvaluefromschema(requestschema, 'oistatusid')
+        oistatusid = self.getpropertyvaluefromschema(requestschema, 'oistatusid')
+        foiministryrequest.oistatus_id = oistatusid
         foiministryrequest.closedate = self.getpropertyvaluefromschema(requestschema, 'closedate')
-        foiministryrequest.closereasonid = self.getpropertyvaluefromschema(requestschema, 'closereasonid')
+        if requestschema.get('reopen'):
+            foiministryrequest.closereasonid = None
+        else:
+            foiministryrequest.closereasonid = requestschema.get('closereasonid', current_foiministryrequest.get('closereasonid'))
         if self.getpropertyvaluefromschema(requestschema, 'isofflinepayment') is not None:
             foiministryrequest.isofflinepayment =  self.getpropertyvaluefromschema(requestschema, 'isofflinepayment')    
         return foiministryrequest

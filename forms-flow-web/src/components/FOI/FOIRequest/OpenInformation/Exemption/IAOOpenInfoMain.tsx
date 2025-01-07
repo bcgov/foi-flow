@@ -13,18 +13,8 @@ import {
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { makeStyles } from "@material-ui/styles";
 import { useSelector } from "react-redux";
-// import { useState, useEffect } from "react";
-
-type OIPublicationStatus = {
-  oipublicationstatusid: number;
-  name: string;
-  isactive: boolean;
-};
-type OIExemption = {
-  oiexemptionid: number;
-  name: string;
-  isactive: boolean;
-};
+import { OIPublicationStatus, OIExemption } from "../types";
+import { OIPublicationStatuses, OIExemptions } from "../../../../../helper/openinfo-helper";
 
 const IAOOpenInfoMain = ({
   oiPublicationData,
@@ -38,20 +28,10 @@ const IAOOpenInfoMain = ({
     (state: any) => state.foiRequests.oiExemptions
   );
 
-  // let foiOITransactionData = useSelector(
-  //   (state: any) => state.foiRequests.foiOpenInfoRequest
-  // ); 
-  
-  // const [oiPublicationData, setOiPublicationData] = useState(foiOITransactionData);
-
-  // useEffect(() => {
-  //   setOiPublicationData(foiOITransactionData);
-  // }, [foiOITransactionData, oiPublicationStatuses, oiExemptions]);
-
   const disableIAOField =
-    oiPublicationData?.oipublicationstatus_id === 2 || isOIUser;
+    oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish || isOIUser;
   const disableOIField =
-    oiPublicationData?.oipublicationstatus_id === 2 || !isOIUser;
+    oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish || !isOIUser;
 
   //Styling
   const useStyles = makeStyles({
@@ -77,31 +57,27 @@ const IAOOpenInfoMain = ({
           expandIcon={<ExpandMoreIcon />}
         >
           <Typography className={classes.heading}>
-            PUBLICATION STATUS
+            EXEMPTION STATUS
           </Typography>
         </AccordionSummary>
         <AccordionDetails className={classes.accordionDetails}>
           <Grid container spacing={3}>
             <Grid item md={6}>
-              {/* <div>{oiPublicationData?.oipublicationstatus_id}</div> */}
               <TextField
                 fullWidth
                 name="oipublicationstatus_id"
                 label="Publication Status"
                 variant="outlined"
-                value={oiPublicationData?.oipublicationstatus_id || 2}
+                value={oiPublicationData?.oipublicationstatus_id || OIPublicationStatuses.Publish}
                 select
                 required
                 InputLabelProps={{ shrink: true }}
                 onChange={(event) =>
                   handleOIDataChange(event.target.value, event.target.name)
                 }
-                // error={
-                //   (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.oipcno === ""
-                // }
               >
                 {oiPublicationStatuses.map((status) => {
-                  if (status.oipublicationstatusid === 3) {
+                  if (status.oipublicationstatusid === OIPublicationStatuses.UnpublishRequest) {
                     return null;
                   }
                   return (
@@ -129,7 +105,7 @@ const IAOOpenInfoMain = ({
                   handleOIDataChange(event.target.value, event.target.name)
                 }
                 error={
-                  oiPublicationData?.oipublicationstatus_id !== 2 &&
+                  oiPublicationData?.oipublicationstatus_id !== OIPublicationStatuses.Publish &&
                   !oiPublicationData?.oiexemption_id
                 }
                 disabled={disableIAOField}
@@ -159,8 +135,8 @@ const IAOOpenInfoMain = ({
                 }
                 required={!isOIUser}
                 error={
-                  oiPublicationData?.oipublicationstatus_id !== 2 &&
-                  oiPublicationData?.oiexemption_id !== 5 &&
+                  oiPublicationData?.oipublicationstatus_id !== OIPublicationStatuses.Publish &&
+                  oiPublicationData?.oiexemption_id !== OIExemptions.OutsideScopeOfPublication &&
                   !oiPublicationData?.pagereference
                 }
                 disabled={disableIAOField}
@@ -216,17 +192,14 @@ const IAOOpenInfoMain = ({
               required={!isOIUser}
               disabled={disableIAOField}
               error={
-                oiPublicationData?.oipublicationstatus_id !== 2 &&
-                oiPublicationData?.oiexemption_id !== 5 &&
+                oiPublicationData?.oipublicationstatus_id !== OIPublicationStatuses.Publish &&
+                oiPublicationData?.oiexemption_id !== OIExemptions.OutsideScopeOfPublication &&
                 !oiPublicationData?.iaorationale
               }
               style={{ paddingBottom: "2%" }}
               onChange={(event) =>
                 handleOIDataChange(event.target.value, event.target.name)
               }
-              // error={
-              //   (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.oipcno === ""
-              // }
               multiline
               minRows={6}
             />
@@ -242,9 +215,6 @@ const IAOOpenInfoMain = ({
               onChange={(event) =>
                 handleOIDataChange(event.target.value, event.target.name)
               }
-              // error={
-              //   (!oipc.outcomeid || oipc.outcomeid === 5) && oipc.oipcno === ""
-              // }
               multiline
               minRows={6}
             />

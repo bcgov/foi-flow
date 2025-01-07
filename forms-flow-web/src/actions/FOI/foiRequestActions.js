@@ -153,6 +153,13 @@ export const setFOIPDFStitchedRecordForResponsePackage =
       payload: data,
     });
   };
+export const setFOIPDFStitchedOIPackage =
+  (data) => (dispatch) => {
+    dispatch({
+      type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_OI_PACKAGE,
+      payload: data,
+    });
+  };
 export const setFOIPDFStitchedRecordForOipcRedlineReview = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_OIPCREDLINEREVIEW,
@@ -162,6 +169,12 @@ export const setFOIPDFStitchedRecordForOipcRedlineReview = (data) => (dispatch) 
 export const setFOIPDFStitchedRecordForOipcRedline = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_OIPCREDLINE,
+    payload: data,
+  });
+}
+export const setFOIPDFStitchedRecordForConsults = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_CONSULTS,
     payload: data,
   });
 }
@@ -184,6 +197,12 @@ export const setFOIPDFStitchStatusForResponsePackage = (data) => (dispatch) => {
     payload: data,
   });
 };
+export const setFOIPDFStitchStatusForOIPackage = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OI_PACKAGE,
+    payload: data,
+  });
+};
 export const setFOIPDFStitchStatusForOipcRedlineReview = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OIPCREDLINEREVIEW,
@@ -193,6 +212,12 @@ export const setFOIPDFStitchStatusForOipcRedlineReview = (data) => (dispatch) =>
 export const setFOIPDFStitchStatusForOipcRedline = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OIPCREDLINE,
+    payload: data,
+  });
+};
+export const setFOIPDFStitchStatusForConsults = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_CONSULTS,
     payload: data,
   });
 };
@@ -526,6 +551,34 @@ export const setOIStatuses = (data) => (dispatch) => {
 export const setFOIOpenInfoRequest = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_OPENINFO_REQUEST,
+    payload: data,
+  });
+};
+
+export const setAdvancedSearchFilter = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_FILTER,
+    payload: data,
+  });
+};
+
+export const setHistoricalSearchParams = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_HISTORIC_SEARCH_PARAMS,
+    payload: data,
+  });
+};
+
+export const setFOICommentTypes = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_COMMENT_TYPES,
+    payload: data,
+  });
+};
+
+export const setFOIOpenInfoAdditionalFiles = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_OPENINFO_ADDITIONAL_FILES,
     payload: data,
   });
 };

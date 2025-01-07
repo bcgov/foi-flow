@@ -27,6 +27,7 @@ def upgrade():
         sa.Column('updatedby', sa.String(length=120), nullable=True), 
         sa.Column('updated_at', sa.DateTime(), nullable=True),
         sa.Column('attributes', sa.Text,nullable=True),
+        sa.Column('isactive', sa.Boolean(), nullable=False),
         sa.PrimaryKeyConstraint('additionalfileid' )
     )
 

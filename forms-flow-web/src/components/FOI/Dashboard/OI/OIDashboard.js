@@ -5,7 +5,6 @@ import "../dashboard.scss";
 import Grid from "@mui/material/Grid";
 import { makeStyles } from "@material-ui/core/styles";
 import Queue from "./Queue";
-// import EventQueue from "../EventQueue"
 import AdvancedSearch from "./AdvancedSearch";
 import clsx from "clsx";
 import Divider from "@mui/material/Divider";

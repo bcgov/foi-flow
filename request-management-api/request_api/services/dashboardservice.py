@@ -92,7 +92,6 @@ class dashboardservice:
         for request in requests.items:
             if is_oi_team:
                 # Handle OI requests format
-                print("===============heyhey : oi team=============")
                 requestqueue.append(self.__handle_oi_request(request))
             else:
                 # Handle Raw requests format
@@ -238,36 +237,47 @@ class dashboardservice:
             return idprefix + filenumber
         return ""
     
-    def getoirequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):        
-        requests = FOIOpenInformationRequests.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.getusertype())
-        requestqueue = []                
+    def oiadvancedsearch(self, params={'usertype': 'iao', 'groups':[], 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'requestflags':[], 'publicbody':[], 'daterangetype':None, 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
+        userid = AuthHelper.getuserid()
+
+        is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
+        
+        if is_oi_team:
+            requests = FOIOpenInformationRequests.advancedsearch(params, userid, AuthHelper.isiaorestrictedfilemanager())
+        elif (params['usertype'] == "iao"):
+            requests = FOIRawRequest.advancedsearch(params, userid, AuthHelper.isiaorestrictedfilemanager())
+        else:
+            requests = FOIMinistryRequest.advancedsearch(params, userid, AuthHelper.isministryrestrictedfilemanager())
+        
+        requestqueue = []
         for request in requests.items:
-            _receiveddate = None
-            if request.created_at:
-                maya_dt = maya.parse(request.created_at)
-                received_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
-                _receiveddate = received_dt.strftime("%b %d %Y")
+            if is_oi_team:
+                requestqueue.append(self.__handle_oi_request(request))
+            else:    
+                if(request.receivedDateUF is None): #request from online form has no received date in json
+                    _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+                else:
+                    _receiveddate = parser.parse(request.receivedDateUF)
 
-            if request.publicationdate is None:
-                _publicationdate = 'N/A'
-            else:
-                maya_dt = maya.parse(request.publicationdate)
-                publication_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
-                _publicationdate = publication_dt.strftime("%b %d %Y")
-            
-            _from_closed = self.__calculate_from_closed(request.closedate)
-            
-            _oirequest = self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed)
+                if(request.ministryrequestid == None):
+                    unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
+                    unopenrequest.update({'description':request.description})
+                    unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
+                    unopenrequest.update({'isiaorestricted': request.isiaorestricted})
 
-            print("request : ",request)
+                    requestqueue.append(unopenrequest)
+                else:
+                    _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
+                    _openrequest.update({'ministryrequestid':request.ministryrequestid})
+                    _openrequest.update({'extensions': request.extensions})
+                    _openrequest.update({'description':request.description})
+                    _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
+                    _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
 
-            # isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
-            # _oirequest.update({'isiaorestricted': isiaorestricted})
+                    isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
+                    _openrequest.update({'isiaorestricted': isiaorestricted})
 
-            # if isiaorestricted == True:
-            #     _oirequest.update({'lastName': 'Restricted', 'firstName': 'Request'})
-
-            requestqueue.append(_oirequest)   
+                    requestqueue.append(_openrequest)
 
         meta = {
             'page': requests.page,
@@ -281,7 +291,7 @@ class dashboardservice:
 
         return jsonify({'data': requestqueue, 'meta': meta})
 
-    def __preparefoioirequestinfo(self, request, receivedDate, publicationDate , fromClosed):
+    def __preparefoioirequestinfo(self, request, receivedDate, publicationDate, fromClosed, oilayerpagecount):
         return {
             'id': request.id,
             'idNumber': request.idNumber,
@@ -297,47 +307,61 @@ class dashboardservice:
             'applicantType': request.applicantcategory,
             'version': request.version,
             'foiopeninforequestid': request.foiopeninforequestid,
-            'currentState': request.currentState
+            'currentState': request.currentState,
+            'oilayerpagecount': oilayerpagecount if oilayerpagecount else '0',
         }
 
     def __calculate_from_closed(self, closedate):
+        """Calculate business days from close date to today"""
+
         if not closedate:
             return 'N/A'
+        try:
+            today = dt.datetime.now(tz=pytz.timezone('America/Vancouver')).date()
+            closed_date = closedate.date() if isinstance(closedate, dt.datetime) else closedate
+            business_days = 0
         
-        today = dt.datetime.now(tz=pytz.timezone('America/Vancouver')).date()
-        closedate = closedate.date() if isinstance(closedate, dt.datetime) else closedate
+            while closed_date < today:
+                if closed_date.weekday() < 5:  # Only count Monday through Friday
+                    business_days += 1
+                closed_date += dt.timedelta(days=1)
         
-        business_days = 0
-        current_date = closedate
-        
-        while current_date <= today:
-            if current_date.weekday() < 5:  # Monday = 0, Friday = 4
-                business_days += 1
-            current_date += dt.timedelta(days=1)
-    
-        return str(business_days) if business_days > 0 else 'N/A'   
+            return str(business_days) if business_days > 0 else 'N/A'   
+        except Exception as e:
+            print("Error in calculate_from_closed: ", e)
+            return 'N/A'
 
     def __handle_oi_request(self, request):
         """Formats request data for OI team view with received date, publication date, and days since closure"""
 
-        # Format received date to "MMM DD YYYY"
         _receiveddate = None
-        if request.created_at:
-            maya_dt = maya.parse(request.created_at)
-            received_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
-            _receiveddate = received_dt.strftime("%b %d %Y")
+        _publicationdate = 'N/A'
 
-        # Format publication date to "MMM DD YYYY"
-        _publicationdate = None
-        if request.publicationdate is None:
-            _publicationdate = 'N/A'
-        else:
-            maya_dt = maya.parse(request.publicationdate)
-            publication_dt = maya_dt.datetime(to_timezone='America/Vancouver', naive=False)
-            _publicationdate = publication_dt.strftime("%b %d %Y")
+        # Handle received date
+        if request.receivedDate:
+            _receiveddate = request.receivedDate.strftime("%b %d %Y") if request.receivedDate else None
         
-        # Calculate the number of business days from the closed date
+        # Handle publication date
+        if request.publicationdate:
+            _publicationdate = request.publicationdate.strftime("%b %d %Y") if request.publicationdate else None
+        
+        # Calculate business days
         _from_closed = self.__calculate_from_closed(request.closedate)
-    
-        return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed)
+
+        # Get page counts from OI Layer
+        page_counts, err = FOIOpenInformationRequests.getdatafromOILayerpagecounts(
+            request.id,
+            request.ministryrequestid
+        )
+        # Get the page count value from the dictionary with error handling
+        oilayerpagecount = '0'
+        try:
+            if not err and isinstance(page_counts, dict) and page_counts:
+                first_value = next(iter(page_counts.values()))
+                oilayerpagecount = str(first_value) if first_value is not None else '0'
+        except Exception as e:
+            logging.error(f"Error extracting page count: {str(e)}")
+            oilayerpagecount = '0'
+            
+        return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed, oilayerpagecount)
           

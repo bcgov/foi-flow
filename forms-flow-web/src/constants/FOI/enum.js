@@ -112,6 +112,13 @@ const MimeTypeList = Object.freeze({
     ".webp",
     ".xlsm",
   ],
+  openInfo: [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-excel",
+    ".xls",
+    ".xlsx",
+  ],
 });
 
 const MaxFileSizeInMB = Object.freeze({
@@ -164,7 +171,8 @@ const MinistryNeedsScanning = [
 
 const MinistryNeedsLANPages = [
   "CFD",
-  "MCF"
+  "MCF",
+  "CAF"
 ]
 
 const RequestTypes = Object.freeze({
@@ -172,7 +180,7 @@ const RequestTypes = Object.freeze({
   personal: "personal"
 });
 
-const MCFPopularSections = 23
+const MCFPopularSections = 21
 const MSDPopularSections = 11
 
 const RecordsDownloadList = [
@@ -182,6 +190,7 @@ const RecordsDownloadList = [
   { id: 3, label: "Download Final Package", disabled: true },
   { id: 4, label: "Download OIPC Redline for Sign Off", disabled: true },
   { id: 5, label: "Download OIPC Redline for OIPC Review", disabled: true },
+  { id: 6, label: "Download Consults", disabled: true },
 ];
 
 const RecordDownloadCategory = Object.freeze({

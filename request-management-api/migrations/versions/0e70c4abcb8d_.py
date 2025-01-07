@@ -1,7 +1,7 @@
 """OpenInformation status master data
 
 Revision ID: 0e70c4abcb8d
-Revises: aa2691fa6c3c
+Revises: 83cfc8047acf
 Create Date: 2024-08-15 16:48:01.934769
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '0e70c4abcb8d'
-down_revision = 'aa2691fa6c3c'
+down_revision = '83cfc8047acf'
 branch_labels = None
 depends_on = None
 

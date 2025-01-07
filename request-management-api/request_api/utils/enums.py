@@ -36,6 +36,7 @@ class MinistryTeamWithKeycloackGroup(Enum):
     AG = "AG Ministry Team"
     BRD = "BRD Ministry Team"
     CAS = "CAS Ministry Team"
+    CAF = "CAF Ministry Team"
     CITZ = "CITZ Ministry Team"
     CLB = "CLB Ministry Team"
     DAS = "DAS Ministry Team"
@@ -74,6 +75,10 @@ class MinistryTeamWithKeycloackGroup(Enum):
     JED = "JED Ministry Team"
     COR = "COR Ministry Team"
     HSG = "HSG Ministry Team"
+    LSB = "LSB Ministry Team"
+    INF = "INF Ministry Team"
+    MCM = "MCM Ministry Team"
+    ECS = "ECS Ministry Team"
 
     @staticmethod
     def list():
@@ -138,6 +143,8 @@ class CommentType(Enum):
 class DocumentPathMapperCategory(Enum):
     Attachments = "Attachments"
     Records = "Records"
+    Historical = "Historical"
+    AdditionalFiles = "AdditionalFiles"
 
 class ServiceName(Enum):
     payonline = "payonline"
@@ -166,6 +173,7 @@ class StateName(Enum):
     readytoscan = "Ready to Scan"
     appfeeowing = "App Fee Owing"
     section5pending = "Section 5 Pending"
+    onholdother = "On Hold - Other"
 class CacheUrls(Enum):
     keycloakusers= "/api/foiassignees"
     programareas= "/api/foiflow/programareas"
@@ -175,3 +183,39 @@ class CacheUrls(Enum):
     extensionreasons= "/api/foiflow/extensionreasons"
     applicantcategories= "/api/foiflow/applicantcategories"
     subjectcodes= "/api/foiflow/subjectcodes"
+
+
+class ExcludedProgramArea(Enum):
+    """Program areas to exclude from OI requests."""
+    CLB = 24
+    IIO = 29
+    TIC = 32
+    OBC = 33
+    MGC = 34
+
+    @staticmethod
+    def list():
+        return [area.value for area in ExcludedProgramArea]
+
+class OICloseReason(Enum):
+    """Open Information eligible close reasons."""
+    FULL_DISCLOSURE = 4
+    PARTIAL_DISCLOSURE = 7
+
+    @staticmethod
+    def list():
+        return [reason.value for reason in OICloseReason]
+
+class OIStatusEnum(Enum):
+    FIRST_REVIEW = 1
+    PEER_REVIEW = 2
+    READY_TO_PUBLISH = 3
+    PUBLISHED = 4
+    HOLD_PUBLICATION = 5
+    UNPUBLISHED = 6
+    DO_NOT_PUBLISH = 7
+    EXEMPTION_REQUEST = 8
+
+    @classmethod
+    def list(cls):
+        return [status.value for status in cls]

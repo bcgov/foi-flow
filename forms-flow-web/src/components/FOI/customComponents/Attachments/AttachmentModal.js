@@ -121,7 +121,7 @@ export default function AttachmentModal({
           : uploadFor === "record" &&
             (modalFor === "replace" || modalFor === "replaceattachment")
           ? replacementfiletypes
-          : recordFormats
+          : uploadFor === "additionalFiles" ? MimeTypeList.openInfo : recordFormats 
         : MimeTypeList.stateTransition
     );
   }, [recordFormats]);
@@ -132,7 +132,7 @@ export default function AttachmentModal({
         : uploadFor === "record" &&
           (modalFor === "replace" || modalFor === "replaceattachment")
         ? replacementfiletypes
-        : recordFormats
+        : uploadFor === "additionalFiles" ? MimeTypeList.openInfo : recordFormats 
       : MimeTypeList.stateTransition
   );
   const maxFileSize =
@@ -385,7 +385,7 @@ export default function AttachmentModal({
       }
       fileInfoList = files?.map((file) => {
         return {
-          ministrycode: uploadFor === "record" ? bcgovcode : "Misc",
+          ministrycode: (uploadFor === "record" || uploadFor === "additionalFiles") ? bcgovcode : "Misc",
           requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
           filestatustransition: fileStatusTransition,
           filename: file.filename ? file.filename : file.name,
@@ -670,7 +670,7 @@ export default function AttachmentModal({
                       MCFPopularSections - 1
                     )}
                     otherTagList={MCFSections?.sections?.slice(
-                      MCFPopularSections
+                      MCFPopularSections - 1
                     )}
                     handleTagChange={handleTagChange}
                     tagValue={tagValue}
@@ -712,7 +712,7 @@ export default function AttachmentModal({
                       MSDPopularSections - 1
                     )}
                     otherTagList={MSDSections?.divisions[0]?.sections?.slice(
-                      MSDPopularSections
+                      MSDPopularSections - 1
                     )}
                     handleTagChange={handleTagChange}
                     tagValue={tagValue}

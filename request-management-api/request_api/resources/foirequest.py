@@ -28,13 +28,13 @@ from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
 from request_api.services.openinfoservice import openinfoservice
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema
-from request_api.schemas.foiopeninfo import FOIOpenInfoSchema
 from request_api.schemas.foiassignee import FOIRequestAssigneeSchema
 from request_api.utils.enums import StateName
 from marshmallow import Schema, fields, validate, ValidationError
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 import json
 import asyncio
+import traceback
 
 API = Namespace('FOIRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
@@ -108,17 +108,10 @@ class FOIRequests(Resource):
             
             if rawresult.success == True:
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
-                if result.success == True:
-                    #Create FOIOpenInfoRequest after FOIMinistryRequest has successfully been created and set to Open state
-                    if foirequestschema["requestType"] == 'general' and foirequestschema["selectedMinistries"][0]["code"] not in ("CLB", "HSA", "IIO", "MGC", "OBC", "TIC"):
-                        foiministryrequest = result.args[0]
-                        default_foiopeninforequest = {
-                            "oipublicationstatus_id": 2,
-                        }
-                        userid = AuthHelper.getuserid()
-                        foiopeninforequestschema = FOIOpenInfoSchema().load(default_foiopeninforequest)
-                        openinfoservice().createopeninforequest(foiopeninforequestschema, userid, foiministryrequest[0]['id'])
-
+                if result.success == True:                    
+                    #Create FOIOpenInfoRequest after FOIMinistryRequest has successfully been created and set to Open state                
+                    foiministryrequest = result.args[0]
+                    openinfoservice().createopeninforequest(foirequestschema, AuthHelper.getuserid(), foiministryrequest)
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copydocuments(request_json['id'],result.args[0],AuthHelper.getuserid())
@@ -289,21 +282,6 @@ class FOIRestrictedMinistryRequest(Resource):
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
-@cors_preflight('GET,POST,OPTIONS')
-@API.route('/foirequests/ministryrequestid/<int:ministryrequestid>', defaults={'usertype':None})
-@API.route('/foirequests/ministryrequestid/<ministryrequestid>/<usertype>')
-class FOIRequestByMinistryId(Resource):
-    """Return request based on ministryrequestid"""
-    @staticmethod
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    def get(ministryrequestid,usertype=None):
-        try :
-            return FOIRequest.get(requestservice().getrequestid(ministryrequestid), ministryrequestid, usertype)
-        except ValueError:
-            return {'status': 500, 'message':"Invalid Request"}, 500
-        except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500
 
 @cors_preflight('POST, DELETE, UPDATE, OPTIONS')
 @API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/section/<string:section>')
@@ -323,18 +301,63 @@ class FOIRequestsById(Resource):
             if (section == "userrecordslockstatus"):
                 foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
                 foirequest['userrecordslockstatus'] = request_json['userrecordslockstatus']
+            if (section == "oistatusid"):
+                foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
+                foirequest['oistatusid'] = request_json['oistatusid']
             foirequestschema = FOIRequestWrapperSchema().load(foirequest)
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
-                return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
+                return {'success': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
         except ValidationError as err:
             return {'status': False, 'message': str(err)}, 400
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+        
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foirequests/ministryrequestid/<int:ministryrequestid>', defaults={'usertype':None})
+@API.route('/foirequests/ministryrequestid/<ministryrequestid>/<usertype>')
+class FOIRequestForDocReviewer(Resource):
+    """Retrieve foi request for opened request - Used
+    in docreviewer"""
+    
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(ministryrequestid,usertype=None):
+        try :
+            jsondata = {}
+            statuscode = 200
+            foirequestid=requestservice().getrequestid(ministryrequestid)
+            if (AuthHelper.getusertype() == "iao") and (usertype is None or (usertype == "iao")):
+                jsondata = requestservice().getrequestdetails(foirequestid,ministryrequestid)
+                assignee = jsondata['assignedTo']
+                isrestricted = jsondata['iaorestricteddetails']['isrestricted'] if ('isrestricted' in jsondata['iaorestricteddetails']) else False
+                if(canrestictdata(ministryrequestid,assignee,isrestricted,False)):
+                    jsondata = {}
+                    statuscode = 401
+            elif usertype is not None and usertype == "ministry" and AuthHelper.getusertype() == "ministry":
+                jsondata = requestservice().getrequestdetailsforministry(foirequestid,ministryrequestid,AuthHelper.getministrygroups())
+                assignee = jsondata['assignedministryperson']
+                isrestricted = jsondata['ministryrestricteddetails']['isrestricted'] if ('isrestricted' in jsondata['ministryrestricteddetails']) else False
+                if(canrestictdata_ministry(ministryrequestid,assignee,isrestricted)):
+                    jsondata = {}
+                    statuscode = 401
+            else:
+                statuscode = 401 
+            return jsondata , statuscode 
+        except ValueError:
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
+        except KeyError as error:
+            traceback.print_exc()
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500

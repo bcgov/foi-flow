@@ -34,13 +34,17 @@ import {
   fetchOpenInfoPublicationStatuses,
   fetchOpenInfoStatuses,
   fetchOpenInfoExemptions,
+  fetchFOICommentTypes
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
   fetchFOIRequestDescriptionList,
   fetchRequestDataFromAxis,
   fetchRestrictedRequestCommentTagList,
-  deleteOIPCDetails
+  deleteOIPCDetails,
+  fetchHistoricalRequestDetails,
+  fetchFOIHistoricalRequestDescriptionList,
+  fetchHistoricalExtensions
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { fetchFOIRequestAttachmentsList } from "../../../apiManager/services/FOI/foiAttachmentServices";
 import { fetchCFRForm } from "../../../apiManager/services/FOI/foiCFRFormServices";
@@ -57,8 +61,13 @@ import {
   fetchPDFStitchStatusForResponsePackage,
   fetchPDFStitchedStatusForOIPCRedlineReview,
   fetchPDFStitchedStatusForOIPCRedline,
+  fetchHistoricalRecords,
+  fetchPDFStitchStatusForConsults,
+  fetchPDFStitchedPackage,
+  fetchPDFStitchedStatus
 } from "../../../apiManager/services/FOI/foiRecordServices";
 import {
+  fetchFOIOpenInfoAdditionalFiles,
   fetchFOIOpenInfoRequest,
 } from "../../../apiManager/services/FOI/foiOpenInfoRequestServices";
 import { makeStyles } from "@material-ui/core/styles";
@@ -97,6 +106,7 @@ import {
   ConditionalComponent,
   formatDate,
   isRequestRestricted,
+  getCommentTypeIdByName
 } from "../../../helper/FOI/helper";
 import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
@@ -106,15 +116,15 @@ import { toast } from "react-toastify";
 import HomeIcon from "@mui/icons-material/Home";
 import { RecordsLog } from "../customComponents/Records";
 import { UnsavedModal } from "../customComponents";
-import { DISABLE_GATHERINGRECORDS_TAB } from "../../../constants/constants";
+import { DISABLE_GATHERINGRECORDS_TAB, SKIP_OPENINFO_MINISTRIES } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
 import ApplicantProfileModal from "./ApplicantProfileModal";
-import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
+import { setFOIRequestDetail, setFOIPDFStitchedOIPackage, setFOIPDFStitchStatusForOIPackage } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
-import IAOOpenInfoPublishing from "./OpenInformation/IAOOpenInfoPublishing";
+import OpenInfo from "./OpenInformation/OpenInfo";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -145,6 +155,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const { requestId, ministryId } = useParams();
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
+  const isHistoricalRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.HISTORICAL_REQUEST) > -1;
   const [isAddRequest, setIsAddRequest] = useState(urlIndexCreateRequest > -1);
   //gets the request detail from the store
   let requestDetails = useSelector(
@@ -164,7 +175,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           "fee estimate - payment receipt",
           "response-onhold",
           "fee balance outstanding - payment receipt",
-        ].indexOf(attachment.category.toLowerCase()) === -1
+        ].indexOf(attachment.category?.toLowerCase()) === -1
       );
     })
   );
@@ -183,9 +194,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let requestApplicantProfile = useSelector(
     (state) => state.foiRequests.foiRequestApplicantProfile
   )
-  let foiOITransactionData = useSelector(
-    (state) => state.foiRequests.foiOpenInfoRequest
-  );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
@@ -200,6 +208,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const [unsavedPrompt, setUnsavedPrompt] = useState(false);
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
+  const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes); 
+
+
   const handleUnsavedContinue = () => {
     window.removeEventListener("popstate", handleOnHashChange);
     window.removeEventListener("beforeunload", handleBeforeUnload);
@@ -283,7 +294,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       StateEnum.intakeinprogress.name.toLowerCase();
   const [axisSyncedData, setAxisSyncedData] = useState({});
   const [checkExtension, setCheckExtension] = useState(true);
-  let bcgovcode = getBCgovCode(ministryId, requestDetails);
+  let bcgovcode = isHistoricalRequest ? "" : getBCgovCode(ministryId, requestDetails);
   const [headerText, setHeaderText] = useState(
     getHeaderText({ requestDetails, ministryId, requestState })
   );
@@ -319,12 +330,18 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     } else if (window.location.href.indexOf("records") > -1) {
       tabclick("Records");
     }
+    dispatch(fetchFOICommentTypes());
   }, []);
 
   useEffect(async () => {
     if (isAddRequest) {
       dispatch(fetchFOIAssignedToList("", "", ""));
       dispatch(fetchFOIProgramAreaList());
+    } else if (isHistoricalRequest) {
+      dispatch(fetchHistoricalRequestDetails(requestId));
+      dispatch(fetchFOIHistoricalRequestDescriptionList(requestId));
+      dispatch(fetchHistoricalExtensions(requestId));
+      dispatch(fetchHistoricalRecords(requestId))
     } else {
       await Promise.all([
         dispatch(fetchFOIProgramAreaList()),
@@ -339,6 +356,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
       dispatch(fetchPDFStitchedStatusForOIPCRedline(requestId, ministryId));
       dispatch(fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId));
+      dispatch(fetchPDFStitchStatusForConsults(requestId, ministryId));
       fetchCFRForm(ministryId, dispatch);
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       dispatch(fetchApplicantCorrespondenceTemplates());
@@ -363,14 +381,25 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     dispatch(fetchOIPCStatuses());
     dispatch(fetchOIPCReviewtypes());
     dispatch(fetchOIPCInquiryoutcomes());
-    dispatch(fetchFOIOpenInfoRequest(ministryId)); // AH NOTE -> Need to stop get call from happening if request === general or if bcgovcode in this arr ["CLB", "HSA", "IIO", "MGC", "OBC", "TIC"]
-
     if (isOITeam) {
       dispatch(fetchOpenInfoStatuses());
+      dispatch(fetchFOIOpenInfoAdditionalFiles(requestId, ministryId));
+      dispatch(fetchPDFStitchedStatus(requestId, ministryId, "openinfo", (err, res) => {
+        dispatch(setFOIPDFStitchStatusForOIPackage(res))
+      }));
+      dispatch(fetchPDFStitchedPackage(requestId, ministryId, "openinfo", (err, res) => {
+        dispatch(setFOIPDFStitchedOIPackage(res))
+      }));
     }
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
+
+  useEffect(() => {
+    if (!SKIP_OPENINFO_MINISTRIES.split(",").includes(requestDetails?.bcgovcode?.toUpperCase()) && requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL) {
+      dispatch(fetchFOIOpenInfoRequest(ministryId));
+    }
+  }, [requestId, ministryId, requestDetails])
 
   const validLockRecordsState = (currentState=requestDetails.currentState) => {
     return (
@@ -382,6 +411,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       currentState === StateEnum.peerreview.name ||
       currentState === StateEnum.signoff.name ||
       currentState === StateEnum.response.name ||
+      currentState === StateEnum.onholdother.name ||
       currentState === StateEnum.closed.name
     );
   }
@@ -389,7 +419,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   useEffect(() => {
     const requestDetailsValue = requestDetails;
     setSaveRequestObject(requestDetailsValue);
-    const assignedTo = getAssignedTo(requestDetails);
+    const assignedTo = isHistoricalRequest ? requestDetails.assignedTo : getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
     if (Object.entries(requestDetails)?.length !== 0) {
        let requestStateFromId = findRequestState(requestDetails.requeststatuslabel)
@@ -903,7 +933,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
-
     if (!_unSaved) {
       setUnSavedRequest(_unSaved);
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
@@ -1059,6 +1088,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   );
 
   const showRecordsTab = () => {
+    if (isHistoricalRequest) {
+      return requestAttachments.length === 0
+    }
     return (
       requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name &&
@@ -1104,10 +1136,17 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const showOpenInformationTab = () => {
     return (
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
-      !["CLB", "HSA", "IIO", "MGC", "OBC", "TIC"].includes(requestDetails?.bcgovcode) &&
+      !SKIP_OPENINFO_MINISTRIES.includes(requestDetails?.bcgovcode) &&
       requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name
     );
+  } 
+  const getCommentsCount = () => {
+    
+      let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
+            c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
+      return '('+commentsCount+')'
+
   }
 
   const getOIRequestState = () => {
@@ -1192,7 +1231,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   onClick={() => tabclick("Comments")}
                 >
                   Comments{" "}
-                  {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""}
+                  {/* {requestNotes?.length > 0 ? `(${requestNotes.length})` : ""} */}
+                  {getCommentsCount()}
                 </div>
                 {showRecordsTab() && (
                   <div
@@ -1213,7 +1253,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     name="Open Information"
                     onClick={() => tabclick("OpenInformation")}
                   >
-                    Open Information
+                    Publication
                   </div>
                 )}
                 {showContactApplicantTab() && (
@@ -1341,7 +1381,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         createSaveRequestObject={createSaveRequestObject}
                         handlestatusudpate={handlestatusudpate}
                         userDetail={userDetail}
-                        disableInput={disableInput}
+                        disableInput={disableInput || isHistoricalRequest}
+                        isHistoricalRequest={isHistoricalRequest}
                         isMinistry={false}
                         isAddRequest={isAddRequest}
                         handleOipcReviewFlagChange={handleOipcReviewFlagChange}
@@ -1372,8 +1413,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           handleApplicantDetailsValue
                         }
                         createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
-                        defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}
+                        disableInput={disableInput || isHistoricalRequest || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
+                        defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}                        
+                        userDetail={userDetail}
                       />
                       {requiredRequestDetailsValues.requestType.toLowerCase() ===
                         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
@@ -1383,7 +1425,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                               requestDetails.additionalPersonalInfo
                             }
                             createSaveRequestObject={createSaveRequestObject}
-                            disableInput={disableInput}
+                            disableInput={disableInput || isHistoricalRequest}
                             userDetail={userDetail}
                             requestType={requestDetails?.requestType}
                           />
@@ -1392,7 +1434,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                               requestDetails.additionalPersonalInfo
                             }
                             createSaveRequestObject={createSaveRequestObject}
-                            disableInput={disableInput}
+                            disableInput={disableInput || isHistoricalRequest}
                           />
                         </>
                       )}
@@ -1405,10 +1447,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           handleContactDetailsInitialValue
                         }
                         handleContanctDetailsValue={handleContanctDetailsValue}
-                        disableInput={disableInput /* || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
+                        disableInput={disableInput || isHistoricalRequest /* || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
                         handleEmailValidation={handleEmailValidation}
                         defaultExpanded={!closeContactInfo(userDetail,requestDetails)}
                         moreInfoAction={openApplicantProfileModal}
+                        userDetail={userDetail}
                       />
 
                       <RequestDescriptionBox
@@ -1428,7 +1471,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           handleInitialRequiredRequestDescriptionValues
                         }
                         createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput}
+                        disableInput={disableInput || isHistoricalRequest}
                       />
                       <RequestDetails
                         requestDetails={requestDetails}
@@ -1438,7 +1481,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           handleRequestDetailsInitialValue
                         }
                         createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput}
+                        disableInput={disableInput || isHistoricalRequest}
+                        isHistoricalRequest={isHistoricalRequest}
                       />
                       {(redactedSections && Object.keys(redactedSections).length > 0 && (
                         <RedactionSummary sections={redactedSections} isoipcreview={isOIPCReview}/>
@@ -1470,6 +1514,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           addOIPC={addOIPC}
                           removeOIPC={removeOIPC}
                           isMinistry={false}
+                          isHistoricalRequest={isHistoricalRequest}
                         />
                       )}
 
@@ -1522,6 +1567,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   iaoassignedToList={iaoassignedToList}
                   ministryAssignedToList={ministryAssignedToList}
                   isMinistryCoordinator={false}
+                  isHistoricalRequest={isHistoricalRequest}
                 />
               </>
             ) : (
@@ -1647,6 +1693,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     isRequestRestricted(requestDetails, ministryId) ? "iao" : ""
                   }
                   isRestricted={isRequestRestricted(requestDetails, ministryId)}
+                  isMinistry={false}
+                  commentTypes={commentTypes}
                 />
               </>
             ) : (
@@ -1733,16 +1781,17 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   iaoassignedToList={iaoassignedToList}
                   ministryAssignedToList={ministryAssignedToList}
                   isMinistryCoordinator={false}
-                  bcgovcode={JSON.parse(bcgovcode)}
+                  bcgovcode={isHistoricalRequest ? "" : JSON.parse(bcgovcode)}
                   setRecordsUploading={setRecordsUploading}
                   divisions={requestDetails.divisions}
                   recordsTabSelect={tabLinksStatuses.Records.active}
                   requestType={requestDetails?.requestType}
+                  handleSaveRequest={handleSaveRequest}
+                  isHistoricalRequest={isHistoricalRequest}
                   lockRecords={lockRecordsTab}
                   setLockRecordsTab={setLockRecordsTab}
                   validLockRecordsState={validLockRecordsState}
                   setSaveRequestObject={setSaveRequestObject}
-                  handleSaveRequest={handleSaveRequest}
                 />
               </>
             )}
@@ -1756,13 +1805,15 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 [classes.hidden]: !tabLinksStatuses.OpenInformation.display,
               })}
             >
-              <IAOOpenInfoPublishing
+              <OpenInfo
                 toast={toast}
                 requestNumber={requestNumber}
                 requestDetails={requestDetails}
-                userDetail={userDetail}
+                currentOIRequestState={getOIRequestState()}
                 foirequestid={requestId}
+                isOITeam={isOITeam}
                 foiministryrequestid={ministryId}
+                bcgovcode={JSON.parse(bcgovcode)}
               />
             </div>
           )}
