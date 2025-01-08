@@ -44,12 +44,9 @@ class openinfoservice:
         if 'oiassignedto' in foiopeninforequest:
             self.updateopeninfoassignee(foiopeninforequest['oiassignedto'], assigneedetails)
         
-        # prev_foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
         foiministryrequestversion = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
         foiopeninforequest['foiministryrequestversion_id'] = foiministryrequestversion
         foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
-        # foiopeninforequest['version'] = prev_foiopeninforequest["version"]
-        # foiopeninforequest['foiopeninforequestid'] = prev_foiopeninforequest["foiopeninforequestid"]
         result = FOIOpenInformationRequests().saveopeninfo(foiopeninforequest, userid)
         if result.success == True and result.message != 'FOIOpenInfo request created':
             foiopeninfoid = result.identifier
