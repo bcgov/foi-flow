@@ -152,10 +152,8 @@ class bpmservice(camundaservice):
 
     def _getUrl_(self, messagetype, definitionkey=None):
         if messagetype is not None:
-            print("messagetype", messagetype)
             return self.bpmengineresturl+"/message"
         elif definitionkey is not None:
-            print("definitionkey", definitionkey)
             return self.bpmengineresturl+"/process-definition/key/"+definitionkey+"/start"
         return self.bpmengineresturl
 
@@ -165,20 +163,14 @@ class bpmservice(camundaservice):
         return None
 
     def _getserviceaccounttoken_(self):
-        print("Bselfbpmtokenurl", self.bpmtokenurl)
-        print("Bselfbpmclientid", self.bpmclientid)
-        print("Bselfbpmclientsecret", self.bpmclientsecret)
         auth_response = requests.post(self.bpmtokenurl, auth=(self.bpmclientid, self.bpmclientsecret), headers={
             'Content-Type': 'application/x-www-form-urlencoded'}, data='grant_type=client_credentials')
         return auth_response.json().get('access_token')
     
     def _getHeaders_(self, token):
-        print("Bpmtoken", token)
         """Generate headers."""
         if token is None:
-            print("Bpmtoken1", token)
             token = self._getserviceaccounttoken_()
-            print("Bpmtoken2", token)
         return {
             "Authorization": "Bearer " + token,
             "Content-Type": "application/json",
