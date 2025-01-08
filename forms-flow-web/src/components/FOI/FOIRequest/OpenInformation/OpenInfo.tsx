@@ -167,16 +167,17 @@ const OpenInfo = ({
             });
             const isValidExemptionRequest = !isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
             const isValidExemptionDenial = isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && formattedData.oiexemptionapproved === false;
+            const isValidExemptionApproved = isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && formattedData.oiexemptionapproved === true;
             const manualPublicationStatusChange = requestDetails.oistatusid === OIStates.ExemptionRequest && formattedData.oipublicationstatus_id === OIPublicationStatuses.Publish;
             const isUnpublish = isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest;
             if (isValidExemptionRequest) {
               requestDetails.oistatusid = OIStates.ExemptionRequest;
             }
-            if (isValidExemptionDenial) {
-              requestDetails.oistatusid = OIPublicationStatuses.DoNotPublish;
-            }
-            if (manualPublicationStatusChange) {
+            if (isValidExemptionDenial || manualPublicationStatusChange) {
               requestDetails.oistatusid = null;
+            }
+            if (isValidExemptionApproved) {
+              requestDetails.oistatusid = OIStates.DoNotPublish
             }
             if (isUnpublish) {
               requestDetails.oistatusid = OIStates.Unpublished

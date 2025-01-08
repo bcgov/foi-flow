@@ -58,10 +58,11 @@ export const saveFOIOpenInfoRequest = (
   const done = fnDone(rest);
   const isValidExemptionRequest = !isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && data.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
   const isValidExemptionDenial = isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && data.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && data.oiexemptionapproved === false;
+  const isValidExemptionApproved = isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && data.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && data.oiexemptionapproved === true;
   const manualPublicationStatusChange = requetsinfo.oistatusid === OIStates.ExemptionRequest && data.oipublicationstatus_id === OIPublicationStatuses.Publish;  
   const isUnpublish = isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest;
   return (dispatch) => {
-    updateFOIMinistryRequestOIStatus(foiministryrequestid, foirequestId, isValidExemptionRequest, isValidExemptionDenial, manualPublicationStatusChange, isUnpublish)
+    updateFOIMinistryRequestOIStatus(foiministryrequestid, foirequestId, isValidExemptionRequest, isValidExemptionDenial, manualPublicationStatusChange, isUnpublish, isValidExemptionApproved)
       .then((res) => {
         // If res.data.sucess (meaning BE call to update FOIMinistryRequest oistatusid for IAO OI Exemption purposes is successfull) =>
         // create and store an exemption date for the related foiopeninfo request
@@ -98,7 +99,8 @@ const updateFOIMinistryRequestOIStatus = (
   isValidExemptionRequest,
   isValidExemptionDenial,
   manualPublicationStatusChange,
-  isUnpublish
+  isUnpublish,
+  isValidExemptionApproved
 ) => {
   let apiUrl= replaceUrl(replaceUrl(
     API.FOI_REQUEST_SECTION_API,
@@ -109,10 +111,10 @@ const updateFOIMinistryRequestOIStatus = (
   if (isValidExemptionRequest) {
     return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: OIStates.ExemptionRequest });
   // Update FOIMinistryRequest oistatusid to "Null" if Exemption Request denied OR if OpenInfo Publication status is manually changed from "Do not Publish" to Publish  
-  } else if (isValidExemptionDenial) {
-    return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: OIStates.DoNotPublish });
-  } else if (manualPublicationStatusChange) {
+  } else if (isValidExemptionDenial || manualPublicationStatusChange) {
     return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: null });
+  } else if (isValidExemptionApproved) {
+    return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: OIStates.DoNotPublish });
   } else if (isUnpublish) {
     return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: OIStates.Unpublished });
   } else {

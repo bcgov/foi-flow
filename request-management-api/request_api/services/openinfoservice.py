@@ -51,7 +51,7 @@ class openinfoservice:
         # foiopeninforequest['version'] = prev_foiopeninforequest["version"]
         # foiopeninforequest['foiopeninforequestid'] = prev_foiopeninforequest["foiopeninforequestid"]
         result = FOIOpenInformationRequests().saveopeninfo(foiopeninforequest, userid)
-        if result.success == True and result.message == 'FOIOpenInfo request created':
+        if result.success == True and result.message != 'FOIOpenInfo request created':
             foiopeninfoid = result.identifier
             deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
             if deactivateresult.success:
