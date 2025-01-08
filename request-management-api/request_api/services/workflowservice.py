@@ -101,7 +101,9 @@ class workflowservice:
         try:
             # Sync and get raw instance details from FOI DB
             raw_metadata = self.__sync_raw_request(requesttype, requestid)
+            print("raw_metadata", raw_metadata)
             if requesttype == "ministryrequest":
+                print("ministryrequest", "ministryrequest")
                 req_metadata = self.__sync_foi_request(requestid, raw_metadata)     
                 # Check foi request instance creation - Reconcile by transition to Open
                 _all_activity_desc = FOIMinistryRequest.getactivitybyid(requestid)             
@@ -109,21 +111,28 @@ class workflowservice:
                 return req_metadata.wfinstanceid            
             return raw_metadata.wfinstanceid 
         except Exception as ex:
+            print("exLOGS", ex)
             logging.error(ex)
         return None
 
     def __sync_raw_request(self, requesttype, requestid):
         # Search for WF ID 
         requestid = int(requestid)
+        print("requesttype", requesttype)
         _raw_metadata = FOIRawRequest.getworkflowinstancebyraw(requestid) if requesttype == "rawrequest" else FOIRawRequest.getworkflowinstancebyministry(requestid)
+        print("_raw_metadata", _raw_metadata)
         wf_rawrequest_pid = self.__get_wf_pid("rawrequest", _raw_metadata)    
+        print("wf_rawrequest_pid", wf_rawrequest_pid)
         # Check for exists - Reconcile with new instance creation
         if wf_rawrequest_pid not in  (None, "") and _raw_metadata.wfinstanceid not in (None, "") and str(_raw_metadata.wfinstanceid) == wf_rawrequest_pid:
+            print("wf_rawrequest_pidNotNone", wf_rawrequest_pid)
             return _raw_metadata
         # WF Instance is not present
         if wf_rawrequest_pid in (None, ""):
+            print("wf_rawrequest_pidNone", wf_rawrequest_pid)
             self.createinstance(RedisPublisherService().foirequestqueueredischannel, json.dumps(self.__prepare_raw_requestobj(_raw_metadata)))
         else:
+            print("wf_rawrequest_pidElse", wf_rawrequest_pid)
             if _raw_metadata.wfinstanceid in (None, "") or str(_raw_metadata.wfinstanceid) != wf_rawrequest_pid:
                 FOIRawRequest.updateworkflowinstance_n(wf_rawrequest_pid, int(_raw_metadata.requestid), "System")
         return FOIRawRequest.getworkflowinstancebyraw(requestid) if requesttype == "rawrequest" else FOIRawRequest.getworkflowinstancebyministry(requestid)      

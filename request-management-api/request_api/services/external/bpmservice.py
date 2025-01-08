@@ -23,6 +23,7 @@ class bpmservice(camundaservice):
                     _variables["variables"][key] = {"type" : _variabletype, "value": message[key]} 
             variableschema = VariableMessageSchema().dump(_variables)
             createresponce =  requests.post(self._getUrl_(None,self._geProcessDefinitionKey_(messagequeue)), data=json.dumps(variableschema), headers = self._getHeaders_(token))
+            print("createresponce", createresponce)
             if createresponce.ok:
                 _createresponce = json.loads(createresponce.content)
                 return _createresponce["id"]
@@ -151,8 +152,10 @@ class bpmservice(camundaservice):
 
     def _getUrl_(self, messagetype, definitionkey=None):
         if messagetype is not None:
+            print("messagetype", messagetype)
             return self.bpmengineresturl+"/message"
         elif definitionkey is not None:
+            print("definitionkey", definitionkey)
             return self.bpmengineresturl+"/process-definition/key/"+definitionkey+"/start"
         return self.bpmengineresturl
 
