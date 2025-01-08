@@ -293,7 +293,6 @@ class FOIOpenInformationRequests(db.Model):
     @classmethod
     def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby, isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
         oibasequery = cls.getoibasequery(additionalfilter, userid, isiaorestrictedfilemanager, groups)
-        
         if len(filterfields) > 0 and keyword is not None:
             filtercondition = cls.getfilterforrequestssubquery(filterfields, keyword)
             return oibasequery.filter(filtercondition)
@@ -393,23 +392,66 @@ class FOIOpenInformationRequests(db.Model):
             return FOIAssignee.firstname
         elif field == 'assignedToLastName':
             return FOIAssignee.lastname
+        elif field == 'idNumber':
+            return cast(FOIMinistryRequest.filenumber, String)
+        elif field == 'axisRequestId':
+            return cast(FOIMinistryRequest.axisrequestid, String)
+        elif field == 'currentState':   
+            return FOIRequestStatus.name
         else:
             return text(field)
 
     @classmethod
     def getfilterforrequestssubquery(cls, filterfields, keyword):
-        return or_(*[cls.getfiltercondition(filterfield, keyword) for filterfield in filterfields])
+        _keywords = []
+        if(keyword is not None):
+            _keywords = keyword.lower().replace(",", " ").split()
+
+        #filter/search
+        filtercondition = []
+        for _keyword in _keywords:
+            onekeywordfiltercondition = []
+            if(_keyword != 'restricted'):
+                for field in filterfields:
+                    field_value = cls.findfield(field)
+                    condition = field_value.ilike('%'+_keyword+'%')
+                    exists_query = db.session.query(field_value).filter(condition).exists()
+                    has_match = db.session.query(exists_query).scalar()
+                    if has_match:
+                        onekeywordfiltercondition.append(condition)                   
+            else:
+                filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
+        
+            filtercondition.append(or_(*onekeywordfiltercondition))
+
+        return and_(*filtercondition)
 
     @classmethod
     def getfiltercondition(cls, filterfield, keyword):
-        if filterfield == 'requestType':
-            return FOIRequest.requesttype.ilike(f'%{keyword}%')
-        elif filterfield == 'publicationStatus':
-            return OpenInformationStatuses.name.ilike(f'%{keyword}%')
-        elif filterfield == 'assignee':
-            return cls.oiassignedto.ilike(f'%{keyword}%')
+
+        # Map filter fields to their corresponding model attributes
+        field_mapping = {
+            'requestType': FOIRequest.requesttype,
+            'publicationStatus': OpenInformationStatuses.name,
+            'assignee': cls.oiassignedto,
+            'idNumber': cast(FOIMinistryRequest.filenumber, String),
+            'axisRequestId': cast(FOIMinistryRequest.axisrequestid, String),
+            'description': FOIMinistryRequest.description,
+            'ministry': ProgramArea.bcgovcode,
+            'firstName': FOIRequestApplicant.firstname,
+            'lastName': FOIRequestApplicant.lastname,
+            'assignedToFirstName': FOIAssignee.firstname,
+            'assignedToLastName': FOIAssignee.lastname,
+            # Add more mappings as needed
+        }
+
+        # Get the corresponding model attribute from the mapping
+        field = field_mapping.get(filterfield)
+    
+        if field is not None:
+            return field.ilike(f'%{keyword}%')
         else:
-            return text(filterfield).ilike(f'%{keyword}%')
+            return filterfield.ilike(f'%{keyword}%')
     
     @classmethod
     def getgroupfilters(cls, groups):
