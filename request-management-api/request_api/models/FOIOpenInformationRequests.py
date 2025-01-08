@@ -66,6 +66,15 @@ class FOIOpenInformationRequests(db.Model):
                 foiministryrequest_id=foiopeninforequest["foiministryrequest_id"],
                 foiministryrequestversion_id=foiopeninforequest["foiministryrequestversion_id"],
                 oipublicationstatus_id=foiopeninforequest["oipublicationstatus_id"],
+                oiexemption_id=foiopeninforequest.get("oiexemption_id"),
+                iaorationale=foiopeninforequest.get("iaorationale"),
+                pagereference=foiopeninforequest.get("pagereference"),
+                oiassignedto=foiopeninforequest.get("oiassignedto"),
+                oiexemptionapproved=foiopeninforequest.get("oiexemptionapproved"),
+                oifeedback=foiopeninforequest.get("oifeedback"),
+                publicationdate=foiopeninforequest.get("publicationdate"),
+                oiexemptiondate=foiopeninforequest.get("oiexemptiondate"),
+                copyrightsevered=foiopeninforequest.get("copyrightsevered"),
                 isactive=True,
                 created_at=createddate,
                 createdby=userid,
@@ -77,31 +86,36 @@ class FOIOpenInformationRequests(db.Model):
             logging.error(f"Error: {exception}")
             return DefaultMethodResult(False, "FOIOpenInfo request unable to be created")
     
-    def updateopeninfo(cls, foiopeninforequest, userid)->DefaultMethodResult:
+    def saveopeninfo(cls, foiopeninforequest, userid)->DefaultMethodResult:
         try:
-            createddate = datetime2.now().isoformat()
-            updated_foiopeninforequest = FOIOpenInformationRequests(
-                foiopeninforequestid=foiopeninforequest['foiopeninforequestid'],
-                version=foiopeninforequest['version']+1,
-                foiministryrequest_id=foiopeninforequest["foiministryrequest_id"],
-                foiministryrequestversion_id=foiopeninforequest["foiministryrequestversion_id"],
-                oipublicationstatus_id=foiopeninforequest["oipublicationstatus_id"],
-                oiexemption_id=foiopeninforequest["oiexemption_id"],
-                iaorationale=foiopeninforequest["iaorationale"],
-                pagereference=foiopeninforequest["pagereference"],
-                oiassignedto=foiopeninforequest["oiassignedto"],
-                oiexemptionapproved=foiopeninforequest["oiexemptionapproved"],
-                oifeedback=foiopeninforequest["oifeedback"],
-                publicationdate=foiopeninforequest["publicationdate"],
-                oiexemptiondate=foiopeninforequest["oiexemptiondate"],
-                copyrightsevered=foiopeninforequest["copyrightsevered"],
-                isactive=True,
-                created_at=createddate,
-                createdby=userid,
-            )
-            db.session.add(updated_foiopeninforequest)
-            db.session.commit()
-            return DefaultMethodResult(True, "FOIOpenInfo request version updated", updated_foiopeninforequest.foiopeninforequestid)
+            query = db.session.query(FOIOpenInformationRequests)
+            openinfo = cls.getcurrentfoiopeninforequest(foiopeninforequest['foiministryrequest_id'])
+            if openinfo:
+                createddate = datetime2.now().isoformat()
+                updated_foiopeninforequest = FOIOpenInformationRequests(
+                    foiopeninforequestid=openinfo['foiopeninforequestid'],
+                    version=openinfo['version']+1,
+                    foiministryrequest_id=foiopeninforequest["foiministryrequest_id"],
+                    foiministryrequestversion_id=foiopeninforequest["foiministryrequestversion_id"],
+                    oipublicationstatus_id=foiopeninforequest["oipublicationstatus_id"],
+                    oiexemption_id=foiopeninforequest["oiexemption_id"],
+                    iaorationale=foiopeninforequest["iaorationale"],
+                    pagereference=foiopeninforequest["pagereference"],
+                    oiassignedto=foiopeninforequest["oiassignedto"],
+                    oiexemptionapproved=foiopeninforequest["oiexemptionapproved"],
+                    oifeedback=foiopeninforequest["oifeedback"],
+                    publicationdate=foiopeninforequest["publicationdate"],
+                    oiexemptiondate=foiopeninforequest["oiexemptiondate"],
+                    copyrightsevered=foiopeninforequest["copyrightsevered"],
+                    isactive=True,
+                    created_at=createddate,
+                    createdby=userid,
+                )
+                db.session.add(updated_foiopeninforequest)
+                db.session.commit()
+                return DefaultMethodResult(True, "FOIOpenInfo request version updated", updated_foiopeninforequest.foiopeninforequestid)
+            else:
+                return cls.createopeninfo(foiopeninforequest, userid)
         except Exception as exception:
             logging.error(f"Error: {exception}")
             return DefaultMethodResult(False, "FOIOpenInfo request version unable to be updated")
@@ -243,7 +257,8 @@ class FOIOpenInformationRequests(db.Model):
                 or_( 
                     and_(
                         FOIMinistryRequest.oistatus_id.isnot(None),
-                        FOIMinistryRequest.oistatus_id != OIStatusEnum.PUBLISHED.value
+                        FOIMinistryRequest.oistatus_id != OIStatusEnum.PUBLISHED.value,                        
+                        FOIMinistryRequest.oistatus_id != OIStatusEnum.DO_NOT_PUBLISH.value
                     ),
                     and_(
                         FOIMinistryRequest.oistatus_id.is_(None),

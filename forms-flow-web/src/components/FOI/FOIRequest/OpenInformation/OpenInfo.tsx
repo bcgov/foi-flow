@@ -51,7 +51,7 @@ const OpenInfo = ({
   const [isDataEdited, setIsDataEdited] = useState(false);
 
   useEffect(() => {
-    setOiPublicationData(foiOITransactionData);
+    setOiPublicationData({...foiOITransactionData, oipublicationstatus_id: foiOITransactionData.oipublicationstatus_id || OIPublicationStatuses.Publish});
     if (isOITeam) {
       if (foiOITransactionData.oipublicationstatus_id === findOIPublicationState('Do Not Publish')?.oipublicationstatusid) {
         setTabValue(1)
@@ -139,7 +139,7 @@ const OpenInfo = ({
       ...oiPublicationData,
       publicationdate: publicationdate
     };
-    if (formattedData.oiexemptionapproved === false) {
+    if (formattedData.oiexemptionapproved === false && isOITeam) {
       formattedData.oipublicationstatus_id = findOIPublicationState("Publish")?.oipublicationstatusid || OIPublicationStatuses.Publish;
       formattedData.oiexemption_id = null;
     }
@@ -168,11 +168,18 @@ const OpenInfo = ({
             const isValidExemptionRequest = !isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
             const isValidExemptionDenial = isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && formattedData.oiexemptionapproved === false;
             const manualPublicationStatusChange = requestDetails.oistatusid === OIStates.ExemptionRequest && formattedData.oipublicationstatus_id === OIPublicationStatuses.Publish;
+            const isUnpublish = isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest;
             if (isValidExemptionRequest) {
               requestDetails.oistatusid = OIStates.ExemptionRequest;
             }
-            if (isValidExemptionDenial || manualPublicationStatusChange) {
+            if (isValidExemptionDenial) {
+              requestDetails.oistatusid = OIPublicationStatuses.DoNotPublish;
+            }
+            if (manualPublicationStatusChange) {
               requestDetails.oistatusid = null;
+            }
+            if (isUnpublish) {
+              requestDetails.oistatusid = OIStates.Unpublished
             }
             dispatch(fetchFOIOpenInfoRequest(foiministryrequestid));
           } else {

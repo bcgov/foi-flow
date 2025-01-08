@@ -255,7 +255,7 @@ const StateDropDown = ({
   };
   const getDisableMenuItem = (index, status) => {
     if (isOITeam) {
-      return status === requestState;
+      return status === requestState || status === 'Do Not Publish';
     }
     if (index === 0) {
       return false;
