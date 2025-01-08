@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import { fetchFOIOIRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
 import Loading from "../../../../containers/Loading";
-import { debounce, ClickableChip, cellTooltipRender, displayQueueFlagIcons } from "../utils";
+import { debounce, ClickableChip, } from "../utils";
 import Grid from "@mui/material/Grid";
 import Stack from "@mui/material/Stack";
 import SearchIcon from "@material-ui/icons/Search";
@@ -14,8 +14,6 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import IconButton from "@mui/material/IconButton";
 import Paper from "@mui/material/Paper";
-import { formatDate } from "../../../../helper/FOI/helper";
-import { StateEnum } from "../../../../constants/FOI/statusEnum";
 import { setQueueFilter, setQueueParams } from "../../../../actions/FOI/foiRequestActions";
 import { CustomFooter } from "../CustomFooter"
 
@@ -25,8 +23,6 @@ const Queue = ({ userDetail, tableInfo }) => {
   const requestQueue = useSelector(
     (state) => state.foiRequests.foiMinistryRequestsList
   );
-
-  console.log("requestQueue", requestQueue);
 
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
 
@@ -92,30 +88,6 @@ const Queue = ({ userDetail, tableInfo }) => {
   }, [rowsState, sortModel, keyword, requestFilter]);
 
   const columnsRef = React.useRef(tableInfo?.columns || []);
-
-  // function getRecordsDue(params) {
-  //   let receivedDateString = params.row.cfrduedate;
-  //   const currentStatus = params.row.currentState;
-  //   if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
-  //     return "N/A";
-  //   } else if(!receivedDateString) {
-  //     return "";
-  //   } else {
-  //     return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
-  //   }
-  // }
-
-  // function getLDD(params) {
-  //   let receivedDateString = params.row.duedate;
-  //   const currentStatus = params.row.currentState;
-  //   if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
-  //     return "N/A";
-  //   } else if(!receivedDateString) {
-  //     return "";
-  //   } else {
-  //     return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
-  //   }
-  // }
 
   const columns = React.useRef([
     {

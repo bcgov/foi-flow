@@ -178,8 +178,8 @@ export const deleteFOIOpenInfoAdditionalFiles = (
 };
 
 export const saveFOIOpenInfoAdditionalFiles = (
-  foiministryrequestid,
   foirequestId,
+  foiministryrequestid,
   data,
   ...rest
 ) => {

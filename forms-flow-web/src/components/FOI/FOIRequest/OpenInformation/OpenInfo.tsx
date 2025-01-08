@@ -55,6 +55,8 @@ const OpenInfo = ({
     if (isOITeam) {
       if (foiOITransactionData.oipublicationstatus_id === findOIPublicationState('Do Not Publish')?.oipublicationstatusid) {
         setTabValue(1)
+      } else {
+        setTabValue(2)
       }
     }
   }, [foiOITransactionData]);
@@ -244,10 +246,6 @@ const OpenInfo = ({
       confirmButtonTitle: "Publish Now",
     }));
   }
-
-  console.log("req", requestDetails)
-  console.log("oi info", oiPublicationData)
-  console.log("isOIUser", isOITeam)
 
   return (
     <>

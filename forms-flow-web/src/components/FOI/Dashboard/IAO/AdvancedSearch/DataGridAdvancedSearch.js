@@ -10,7 +10,6 @@ import {
   getFullName,
   getDaysLeft,
   getReceivedDate,
-  // onBehalfFullName,
   getRecordsDue,
   LightTooltip,
   displayQueueFlagIcons,
