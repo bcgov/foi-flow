@@ -2,17 +2,15 @@ import React, {useEffect, useState}from "react";
 import { Redirect, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import "semantic-ui-css/semantic.min.css";
-
 import UserService from "../../services/UserService";
 import { setUserAuth } from "../../actions/bpmActions";
 import Loading from "../../containers/Loading";
 import FOIHeader from "./Header";
 import FOIFooter from "./Footer";
-import { Dashboard, MinistryDashboard, OIDashboard } from "./Dashboard";
+import { Dashboard, MinistryDashboard } from "./Dashboard";
 import FOIRequest  from "./FOIRequest";
 import MinistryReview from "./FOIRequest/MinistryReview/MinistryReview";
 import { isMinistryLogin } from '../../helper/FOI/helper';
-//import { isMinistryLogin, isOITeam } from '../../helper/FOI/helper';
 import UnAuthorized from "./UnAuthorized";
 import Admin from "./Admin";
 import Divisions from "./Admin/Divisions";
@@ -44,11 +42,9 @@ const FOIAuthenticateRouting = React.memo((props) => {
   const isAuthorized = useSelector(state=> state.user.isAuthorized);
 
   let isMinistry = false;
-  //let isOITeam = false;
   if (Object.entries(userDetail).length !== 0) {
     const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
     isMinistry = isMinistryLogin(userGroups);
-    //isOITeam = isOITeamLogin(userGroups);
   }
   return (
       <>
@@ -57,13 +53,6 @@ const FOIAuthenticateRouting = React.memo((props) => {
             <>
               <FOIHeader /> 
               <Route exact path="/foi/dashboard">
-                  {/* {isOITeam ? (
-                  <OIDashboard userDetail={userDetail} />
-                  ) : isMinistry ? (
-                  <MinistryDashboard userDetail={userDetail} />
-                  ) : (
-                  <Dashboard userDetail={userDetail} />
-                  )} */}
                   {isMinistry ? (
                   <MinistryDashboard userDetail={userDetail} />
                   ) : (

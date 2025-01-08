@@ -183,3 +183,39 @@ class CacheUrls(Enum):
     extensionreasons= "/api/foiflow/extensionreasons"
     applicantcategories= "/api/foiflow/applicantcategories"
     subjectcodes= "/api/foiflow/subjectcodes"
+
+
+class ExcludedProgramArea(Enum):
+    """Program areas to exclude from OI requests."""
+    CLB = 24
+    IIO = 29
+    TIC = 32
+    OBC = 33
+    MGC = 34
+
+    @staticmethod
+    def list():
+        return [area.value for area in ExcludedProgramArea]
+
+class OICloseReason(Enum):
+    """Open Information eligible close reasons."""
+    FULL_DISCLOSURE = 4
+    PARTIAL_DISCLOSURE = 7
+
+    @staticmethod
+    def list():
+        return [reason.value for reason in OICloseReason]
+
+class OIStatusEnum(Enum):
+    FIRST_REVIEW = 1
+    PEER_REVIEW = 2
+    READY_TO_PUBLISH = 3
+    PUBLISHED = 4
+    HOLD_PUBLICATION = 5
+    UNPUBLISHED = 6
+    DO_NOT_PUBLISH = 7
+    EXEMPTION_REQUEST = 8
+
+    @classmethod
+    def list(cls):
+        return [status.value for status in cls]

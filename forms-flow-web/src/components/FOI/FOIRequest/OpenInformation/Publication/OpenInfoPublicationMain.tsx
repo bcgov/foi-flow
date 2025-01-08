@@ -32,12 +32,8 @@ import { readUploadedFileAsBytes } from "../../../../../helper/FOI/helper";
 import { OSS_S3_CHUNK_SIZE } from "../../../../../constants/constants";
 import { RecordDownloadStatus } from "../../../../../constants/FOI/enum"; 
 import Tooltip from "@mui/material/Tooltip";
-
-type OIPublicationStatus = {
-  oipublicationstatusid: number;
-  name: string;
-  isactive: boolean;
-};
+import { OIPublicationStatus } from "../types";
+import { OIPublicationStatuses } from "../../../../../helper/openinfo-helper";
 
 const OpenInfoPublicationMain = ({
   requestId,
@@ -124,9 +120,6 @@ const OpenInfoPublicationMain = ({
   }
 
   const handleModal = (value: any, fileInfoList: any, files: any) => {
-    console.log(value)
-    console.log(fileInfoList)
-    console.log(files)
     setOpenModal(false)
     if (value) {
       saveDocument(value, fileInfoList, files)
@@ -257,6 +250,19 @@ const OpenInfoPublicationMain = ({
                 closeButton: true,
               });
               setFOILoader(false);
+            } else {              
+              toast.error(
+                err,
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
             }
           }
         );
@@ -271,7 +277,7 @@ const OpenInfoPublicationMain = ({
     window.open(url, "_blank")?.focus();
   }
 
-  const disableUserInput = !oiPublicationData?.oiexemptionapproved && oiPublicationData.oipublicationstatus_id === 1;
+  const disableUserInput = oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish;
   
   var saveAs = (blob: any, filename: any) => {
     const fileURL = URL.createObjectURL(blob);
@@ -364,7 +370,7 @@ const OpenInfoPublicationMain = ({
                 name="oipublicationstatus_id"
                 label="Publication Status"
                 variant="outlined"
-                value={oiPublicationData?.oipublicationstatus_id === 1 ? 2 : oiPublicationData?.oipublicationstatus_id}
+                value={(oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish ? OIPublicationStatuses.Publish : oiPublicationData?.oipublicationstatus_id) || OIPublicationStatuses.Publish}
                 select
                 disabled={disableUserInput}
                 required
@@ -374,7 +380,7 @@ const OpenInfoPublicationMain = ({
                 }
               >
                 {oiPublicationStatuses.map((status) => {
-                  if (status.oipublicationstatusid === 1) {
+                  if (status.oipublicationstatusid === OIPublicationStatuses.DoNotPublish) {
                     return null;
                   }
                   return (
@@ -394,16 +400,13 @@ const OpenInfoPublicationMain = ({
                 name="publicationdate"
                 label="Publication Date"
                 variant="outlined"
-                disabled={disableUserInput || currentOIRequestState === "First Review"}
+                disabled={disableUserInput || currentOIRequestState === "First Review" || currentOIRequestState === "Unopened" }
                 InputLabelProps={{ shrink: true }}
+                InputProps={{inputProps: { min: formatDate(new Date())} }}
                 onChange={(event) =>
                   handleOIDataChange(event.target.value, event.target.name)
                 }
-                value={
-                  oiPublicationData?.publicationdate
-                    ? formatDate(new Date(oiPublicationData?.publicationdate))
-                    : ""
-                }
+                value={(oiPublicationData?.publicationdate ? formatDate(new Date(oiPublicationData?.publicationdate)) : "") || ""}
                 type="date"
               ></TextField>
             </Grid>

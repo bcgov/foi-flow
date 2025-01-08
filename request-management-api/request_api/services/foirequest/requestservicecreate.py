@@ -16,8 +16,6 @@ from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.RequestorType import RequestorType
 from request_api.utils.enums import StateName
 from request_api.services.openinfoservice import openinfoservice
-from request_api.schemas.foiopeninfo import FOIOpenInfoSchema
-from request_api.utils.constants import SKIP_OPENINFO_MINISTRIES
 
 import json
 class requestservicecreate:
@@ -51,16 +49,8 @@ class requestservicecreate:
            openfoirequest.foirequestid = foirequestid
         openfoirequest.wfinstanceid = wfinstanceid if wfinstanceid is not None else None
         openfoirequest.createdby = userid          
-        result = FOIRequest.saverequest(openfoirequest)
-        #Create FOIOpenInfoRequest after FOIMinistryRequest has successfully been created and set to Open state
-        if foirequestschema["requestType"] == 'general' and foirequestschema["selectedMinistries"][0]["code"].upper() not in SKIP_OPENINFO_MINISTRIES:
-            foiministryrequest = result.args[0]
-            default_foiopeninforequest = {
-                "oipublicationstatus_id": 2,
-            }
-            foiopeninforequestschema = FOIOpenInfoSchema().load(default_foiopeninforequest)
-            openinfoservice().createopeninforequest(foiopeninforequestschema, userid, foiministryrequest[0]['id'])        
-        return result
+        return FOIRequest.saverequest(openfoirequest)
+        
     
     
     def saverequestversion(self,foirequestschema, foirequestid , ministryid, userid):
@@ -77,7 +67,6 @@ class requestservicecreate:
             result = self.saverequest(foirequestschema, userid, foirequestid,ministryid,filenumber,activeversion,_foirequest["foirawrequestid"],_foirequest["wfinstanceid"])
             if result.success == True:
                 FOIMinistryRequest.deActivateFileNumberVersion(ministryid, filenumber, userid)
-                self.__updatefoiopeninforequest(ministryid, activeversion, userid)
             return result
     
     def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype = None):        
@@ -97,7 +86,6 @@ class requestservicecreate:
         result = FOIRequest.saverequest(foirequest)
         if result.success == True:
             FOIMinistryRequest.deActivateFileNumberVersion(ministryid, _foiministryrequest['filenumber'], userid)
-            self.__updatefoiopeninforequest(ministryid, _foirequest['version']+1, userid)
         return result       
     
     def __prepareministries(self,foirequestschema, activeversion, filenumber,ministryid, userid):
@@ -219,7 +207,3 @@ class requestservicecreate:
 
     def __getkeyvalue(self, inputschema, property):
         return inputschema[property] if inputschema is not None and inputschema.get(property) is not None  else ''
-    
-    def __updatefoiopeninforequest(self, ministryid, version, userid):
-        result = openinfoservice().updatefoioirequest_onfoirequestchange(ministryid, version, userid)
-        return result

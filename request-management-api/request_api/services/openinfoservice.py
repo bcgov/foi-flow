@@ -5,6 +5,8 @@ from request_api.models.FOIOpenInformationRequests import FOIOpenInformationRequ
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIOpenInfoAdditionalFiles import FOIOpenInfoAdditionalFiles
 from request_api.models.FOIAssignees import FOIAssignee
+from request_api.schemas.foiopeninfo import FOIOpenInfoSchema
+from request_api.utils.constants import SKIP_OPENINFO_MINISTRIES
 from datetime import datetime
 
 class openinfoservice:
@@ -23,12 +25,19 @@ class openinfoservice:
     def getcurrentfoiopeninforequest(self, foiministryrequestid):
        return FOIOpenInformationRequests().getcurrentfoiopeninforequest(foiministryrequestid)
     
-    def createopeninforequest(self, foiopeninforequest, userid, foiministryrequestid):
-        version = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
-        foiopeninforequest['foiministryrequestversion_id'] = version
-        foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
-        result = FOIOpenInformationRequests().createopeninfo(foiopeninforequest, userid)
-        return result
+    def createopeninforequest(self, foirequestschema, userid, foiministryrequest):
+        if foirequestschema["requestType"] == 'general' and foirequestschema["selectedMinistries"][0]["code"].upper() not in SKIP_OPENINFO_MINISTRIES:
+            foiministryrequestid = foiministryrequest[0]['id']
+            default_foiopeninforequest = {
+                "oipublicationstatus_id": 2,
+            }
+            foiopeninforequest = FOIOpenInfoSchema().load(default_foiopeninforequest)
+            version = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
+            foiopeninforequest['foiministryrequestversion_id'] = version
+            foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
+            result = FOIOpenInformationRequests().createopeninfo(foiopeninforequest, userid)
+            print(result)
+            return result
 
     def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid, assigneedetails):
         # Handle assignee update
@@ -40,6 +49,9 @@ class openinfoservice:
         foiopeninforequest['foiministryrequestversion_id'] = foiministryrequestversion
         foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
         foiopeninforequest['version'] = prev_foiopeninforequest["version"]
+        foiopeninforequest['processingstatus'] = prev_foiopeninforequest["processingstatus"]
+        foiopeninforequest["processingmessage"] = prev_foiopeninforequest["processingmessage"]
+        foiopeninforequest["sitemap_pages"] = prev_foiopeninforequest["sitemap_pages"]
         foiopeninforequest['foiopeninforequestid'] = prev_foiopeninforequest["foiopeninforequestid"]
         result = FOIOpenInformationRequests().updateopeninfo(foiopeninforequest, userid)
         deactivateresult = None

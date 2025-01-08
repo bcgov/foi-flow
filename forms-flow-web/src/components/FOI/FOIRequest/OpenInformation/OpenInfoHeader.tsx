@@ -1,4 +1,3 @@
-// import TextField from '@material-ui/core/TextField';
 import { TextField } from "@material-ui/core";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -132,11 +131,7 @@ const handleOIAssigneeUpdate = async (event: any) => {
         }
       })
     );
-  }else{
-    console.log("username is OI Team");
   }
-  
-  
 }
 
 const [menuItems, setMenuItems] = useState<any>([]);

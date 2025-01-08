@@ -30,7 +30,7 @@ const IAOOpenInfoPublishing = ({
       </button>
       <OpenInfoConfirmationModal
         modal={saveModal}
-        confirm={saveData}
+        confirm={() => saveData()}
         setModal={setSaveModal}
       />
     </>

@@ -121,7 +121,7 @@ export default function AttachmentModal({
           : uploadFor === "record" &&
             (modalFor === "replace" || modalFor === "replaceattachment")
           ? replacementfiletypes
-          : recordFormats
+          : uploadFor === "additionalFiles" ? MimeTypeList.openInfo : recordFormats 
         : MimeTypeList.stateTransition
     );
   }, [recordFormats]);
@@ -132,7 +132,7 @@ export default function AttachmentModal({
         : uploadFor === "record" &&
           (modalFor === "replace" || modalFor === "replaceattachment")
         ? replacementfiletypes
-        : recordFormats
+        : uploadFor === "additionalFiles" ? MimeTypeList.openInfo : recordFormats 
       : MimeTypeList.stateTransition
   );
   const maxFileSize =

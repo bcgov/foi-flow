@@ -1,18 +1,16 @@
 from flask import g, request
 from flask_restx import Namespace, Resource
-from flask_expects_json import expects_json
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships,str_to_bool,canrestictdata,canrestictdata_ministry
+from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships
 from request_api.exceptions import BusinessException
 from request_api.schemas.foiopeninfo import FOIOpenInfoSchema, FOIOpenInfoAdditionalFilesSchema, FOIOpenInfoAdditionalFilesDeleteSchema
 from request_api.services.openinfoservice import openinfoservice
 from request_api.utils.enums import IAOTeamWithKeycloackGroup
 from marshmallow import Schema, fields, validate, ValidationError
 import json
-import asyncio
 
 API = Namespace('FOIOPENINFO', description='Endpoints for FOI OpenInformation management')
 TRACER = Tracer.get_instance()
@@ -37,8 +35,8 @@ class FOIOpenInfoRequest(Resource):
     def get(foiministryrequestid, usertype=None):
         try:
             result = openinfoservice().getcurrentfoiopeninforequest(foiministryrequestid)
-            if result in (None, {}):
-                return {"status": False, "message": "Could not find FOIOpenInfoRequest"}, 404
+            # if result in (None, {}):
+            #     return {"status": False, "message": "Could not find FOIOpenInfoRequest"}, 404
             return  json.dumps(result), 200
         except ValidationError as err:
             return {'status': False, 'message': str(err)}, 400

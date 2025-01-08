@@ -120,7 +120,7 @@ const FileUpload = ({
           }
         }
         setTotalFileSize(_totalFileSizeInMB);
-        let errMsg = getErrorMessage(_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes, recordUploadLimitReached, totalRecordUploadLimit);
+        let errMsg = getErrorMessage(_duplicateFiles, _typeErrorFiles, _overSizedFiles, maxFileSize, multipleFiles, mimeTypes, recordUploadLimitReached, totalRecordUploadLimit, uploadFor);
         setErrorMessage(errMsg);
         return [{...files}, _totalFileSizeInMB, removeFileSize, errMsg];
     };

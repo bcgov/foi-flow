@@ -4,11 +4,13 @@ import {
   serviceActionError,
   setFOILoader,
   setFOIOpenInfoRequest,
-  setFOIOpenInfoAdditionalFiles
+  setFOIOpenInfoAdditionalFiles,
+  setFOIRequestDetail
 } from "../../../actions/FOI/foiRequestActions";
 import { fnDone, catchError } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper";
+import { OIStates, OIPublicationStatuses, OIExemptions } from "../../../helper/openinfo-helper";
 
 export const fetchFOIOpenInfoRequest = (foiministryrequestid) => {
   if (!foiministryrequestid) {
@@ -54,13 +56,19 @@ export const saveFOIOpenInfoRequest = (
     foiministryrequestid
   );
   const done = fnDone(rest);
+  const isValidExemptionRequest = !isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && data.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
+  const isValidExemptionDenial = isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && data.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && data.oiexemptionapproved === false;
+  const manualPublicationStatusChange = requetsinfo.oistatusid === OIStates.ExemptionRequest && data.oipublicationstatus_id === OIPublicationStatuses.Publish;  
   return (dispatch) => {
-    updateFOIMinistryRequestOIStatus(foiministryrequestid, foirequestId, data, isOIUser, requetsinfo)
+    updateFOIMinistryRequestOIStatus(foiministryrequestid, foirequestId, isValidExemptionRequest, isValidExemptionDenial, manualPublicationStatusChange)
       .then((res) => {
         // If res.data.sucess (meaning BE call to update FOIMinistryRequest oistatusid for IAO OI Exemption purposes is successfull) =>
         // create and store an exemption date for the related foiopeninfo request
-        if (res.data?.success) {
+        if (res.data?.success && isValidExemptionRequest) {
           data.oiexemptiondate = new Date();
+        }
+        if (res.data?.success && (isValidExemptionDenial || manualPublicationStatusChange)) {
+          data.oiexemptiondate = null;
         }
         httpPOSTRequest(apiUrl, data)
       .then((res) => {
@@ -86,9 +94,9 @@ export const saveFOIOpenInfoRequest = (
 const updateFOIMinistryRequestOIStatus = (
   foiministryrequestid, 
   foirequestId, 
-  foiopeninfodata,
-  isOIUser, 
-  requetsinfo
+  isValidExemptionRequest,
+  isValidExemptionDenial,
+  manualPublicationStatusChange,
 ) => {
   let apiUrl= replaceUrl(replaceUrl(
     API.FOI_REQUEST_SECTION_API,
@@ -96,8 +104,11 @@ const updateFOIMinistryRequestOIStatus = (
     foiministryrequestid),"<requestid>", foirequestId
   );
   // Update FOIMinistryRequest oistatusid to "Do Not Publish" if EXEMPTION is required from IAO
-  if (!isOIUser && foiopeninfodata.oipublicationstatus_id === 1 && foiopeninfodata.oiexemption_id !== 5) {
-    return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: 8 });
+  if (isValidExemptionRequest) {
+    return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: OIStates.ExemptionRequest });
+  // Update FOIMinistryRequest oistatusid to "Null" if Exemption Request denied OR if OpenInfo Publication status is manually changed from "Do not Publish" to Publish  
+  } else if (isValidExemptionDenial || manualPublicationStatusChange) {
+    return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: null });
   } else {
     return Promise.resolve("API call to adjust foiministryrequest not needed");
   }
@@ -167,8 +178,8 @@ export const deleteFOIOpenInfoAdditionalFiles = (
 };
 
 export const saveFOIOpenInfoAdditionalFiles = (
-  foiministryrequestid,
   foirequestId,
+  foiministryrequestid,
   data,
   ...rest
 ) => {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { saveFOIOpenInfoRequest } from "../../../../apiManager/services/FOI/foiOpenInfoRequestServices";
+import { saveFOIOpenInfoRequest, fetchFOIOpenInfoRequest } from "../../../../apiManager/services/FOI/foiOpenInfoRequestServices";
 import { useDispatch, useSelector } from "react-redux";
 import IAOOpenInfoPublishing from "./Exemption/IAOOpenInfoPublishing";
 import OpenInfoPublication from "./Publication/OpenInfoPublication";
@@ -7,18 +7,8 @@ import OpenInfoHeader from "./OpenInfoHeader";
 import OpenInfoTab from "./OpenInfoTab";
 import "./openinfo.scss";
 import { isReadyForPublishing } from "../utils";
-
-type OITransactionObject = {
-  oipublicationstatus_id: number;
-  oiexemption_id: number | null;
-  oiexemptionapproved: boolean | null;
-  pagereference: string;
-  iaorationale: string;
-  oifeedback: string;
-  copyrightsevered: boolean;
-  publicationdate: string;
-  oiexemptiondate: string;
-};
+import { OIPublicationStatus, OITransactionObject } from "./types";
+import { OIStates, OIPublicationStatuses, OIExemptions } from "../../../../helper/openinfo-helper";
 
 const OpenInfo = ({
   requestNumber,
@@ -42,6 +32,9 @@ const OpenInfo = ({
   let foiOITransactionData = useSelector(
     (state: any) => state.foiRequests.foiOpenInfoRequest
   );
+  const oiPublicationStatuses: OIPublicationStatus[] = useSelector(
+    (state: any) => state.foiRequests.oiPublicationStatuses
+  );
 
   //Local State
   const [oiPublicationData, setOiPublicationData] =
@@ -59,9 +52,19 @@ const OpenInfo = ({
 
   useEffect(() => {
     setOiPublicationData(foiOITransactionData);
+    if (isOITeam) {
+      if (foiOITransactionData.oipublicationstatus_id === findOIPublicationState('Do Not Publish')?.oipublicationstatusid) {
+        setTabValue(1)
+      } else {
+        setTabValue(2)
+      }
+    }
   }, [foiOITransactionData]);
 
   //Functions
+  const findOIPublicationState = (name: string) => {
+    return oiPublicationStatuses.find((s: OIPublicationStatus) => s.name === name);
+  }
   const handleOIDataChange = (
     value: number | string | boolean,
     oiDataKey: string
@@ -70,13 +73,14 @@ const OpenInfo = ({
       setIsDataEdited(true);
     }
     //Reset foi oi data if publication status goes back to publication.
-    if (oiDataKey === "oipublicationstatus_id" && value === 2) {
+    if (oiDataKey === "oipublicationstatus_id" && value === findOIPublicationState("Publish")?.oipublicationstatusid) {
       setOiPublicationData((prev: any) => ({
         ...prev,
-        [oiDataKey]: 2,
+        [oiDataKey]: value,
         copyrightsevered: null,
         publicationdate: null,
         oiexemptiondate: null,
+        oiexemption_id: null
       }));
     } else if (oiDataKey === "publicationdate" && requestDetails.closedate 
       && typeof(value) === "string" && calculateDaysBetweenDates(value, requestDetails.closedate) >= 1 && calculateDaysBetweenDates(value, requestDetails.closedate) <= 10) {
@@ -98,8 +102,8 @@ const OpenInfo = ({
   };
   const handleExemptionSave = () => {
     if (
-      oiPublicationData?.oipublicationstatus_id === 1 &&
-      oiPublicationData?.oiexemption_id !== 5
+      oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish &&
+      oiPublicationData?.oiexemption_id !== OIExemptions.OutsideScopeOfPublication
     ) {
       if (isOITeam && oiPublicationData?.oiexemptionapproved != null) {
         setConfirmationModal((prev: any) => ({
@@ -126,14 +130,19 @@ const OpenInfo = ({
       saveData();
     }
   };
-  const saveData = () => {
+  const saveData = (publicationdate?: any) => {
     const toastID = toast.loading("Saving FOI OpenInformation request...");
+    publicationdate = publicationdate || (oiPublicationData.publicationdate ? 
+      new Date(oiPublicationData.publicationdate).toISOString().split('T')[0] : 
+      null)
     const formattedData = {
       ...oiPublicationData,
-      publicationdate: oiPublicationData.publicationdate ? 
-        new Date(oiPublicationData.publicationdate).toISOString().split('T')[0] : 
-        null
+      publicationdate: publicationdate
     };
+    if (formattedData.oiexemptionapproved === false) {
+      formattedData.oipublicationstatus_id = findOIPublicationState("Publish")?.oipublicationstatusid || OIPublicationStatuses.Publish;
+      formattedData.oiexemption_id = null;
+    }
     dispatch(
       saveFOIOpenInfoRequest(
         foiministryrequestid,
@@ -156,9 +165,16 @@ const OpenInfo = ({
               draggable: true,
               progress: undefined,
             });
-            if (!isOITeam && oiPublicationData.oipublicationstatus_id === 1 && oiPublicationData.oiexemption_id !== 5) {
-              requestDetails.oistatusid = 8;
+            const isValidExemptionRequest = !isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
+            const isValidExemptionDenial = isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && formattedData.oiexemptionapproved === false;
+            const manualPublicationStatusChange = requestDetails.oistatusid === OIStates.ExemptionRequest && formattedData.oipublicationstatus_id === OIPublicationStatuses.Publish;
+            if (isValidExemptionRequest) {
+              requestDetails.oistatusid = OIStates.ExemptionRequest;
             }
+            if (isValidExemptionDenial || manualPublicationStatusChange) {
+              requestDetails.oistatusid = null;
+            }
+            dispatch(fetchFOIOpenInfoRequest(foiministryrequestid));
           } else {
             toast.error(
               "Temporarily unable to save FOI OpenInformation request. Please try again in a few minutes.",
@@ -178,11 +194,11 @@ const OpenInfo = ({
     );
   };
   const disableSave = (oiPublicationData: OITransactionObject): boolean => {
-    const isDoNotPublish = oiPublicationData?.oipublicationstatus_id === 1;
-    const hasExemption = oiPublicationData?.oiexemption_id !== null;
+    const isDoNotPublish = oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish;
+    const hasExemption = oiPublicationData?.oiexemption_id;
     const isMissingRequiredFields =
       !oiPublicationData?.iaorationale || !oiPublicationData?.pagereference;
-    const hasOutOfScopeExemption = oiPublicationData?.oiexemption_id === 5;
+    const hasOutOfScopeExemption = oiPublicationData?.oiexemption_id === OIExemptions.OutsideScopeOfPublication;
     if (isDoNotPublish && hasOutOfScopeExemption) {
       return false;
     }
@@ -230,10 +246,6 @@ const OpenInfo = ({
       confirmButtonTitle: "Publish Now",
     }));
   }
-
-  console.log("req", requestDetails)
-  console.log("oi info", oiPublicationData)
-  console.log("isOIUser", isOITeam)
 
   return (
     <>

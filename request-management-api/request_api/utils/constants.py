@@ -24,6 +24,7 @@ MAX_EXCEPTION_MESSAGE = 'Field exceeds the size limit'
 FILE_CONVERSION_FILE_TYPES = ''
 DEDUPE_FILE_TYPES = ''
 NONREDACTABLE_FILE_TYPES = ''
+SKIP_OPENINFO_MINISTRIES = getenv('SKIP_OPENINFO_MINISTRIES', "").replace(" ", "").split(',')
 try:
     response = requests.request(
         method='GET',
@@ -35,9 +36,9 @@ try:
     FILE_CONVERSION_FILE_TYPES = response.json()['conversion']
     DEDUPE_FILE_TYPES = response.json()['dedupe']
     NONREDACTABLE_FILE_TYPES = response.json()['nonredactable']    
-    SKIP_OPENINFO_MINISTRIES = getenv('SKIP_OPENINFO_MINISTRIES').replace(" ", "").split(',')
 except Exception as err:
     logging.error("Unable to retrieve record upload formats from S3")
     logging.error(err)
+
 
 
