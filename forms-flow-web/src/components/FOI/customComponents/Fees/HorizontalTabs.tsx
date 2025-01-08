@@ -42,11 +42,11 @@ export const HorizontalTabs = ({ selectedSubtab, handleSubtabChange, showApplica
               {(showCFRTab && <ClickableChip
                   id="cfr-form"
                   key={`cfr-form`}
-                  label={"CFR FORM"}
+                  label={"PROCESSING FEE"}
                   color="primary"
                   size="small"
-                  onClick={()=>{handleSubtabChange(FeesSubtabValues.CFRFORM)}}
-                  clicked={selectedSubtab == FeesSubtabValues.CFRFORM}
+                  onClick={()=>{handleSubtabChange(FeesSubtabValues.PROCESSINGFEE)}}
+                  clicked={selectedSubtab == FeesSubtabValues.PROCESSINGFEE}
               />)}
             </Stack>
           </Grid>

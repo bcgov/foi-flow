@@ -30,7 +30,7 @@ export const BottomButtonGroup = ({
         }}
         disabled={disableNewCfrFormBtn()}
       >
-        + Create New CFR Form
+        + Create New Processing Fee Form
       </button>}
     </div>
   )

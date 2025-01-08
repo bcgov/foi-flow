@@ -12,7 +12,6 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { formatDate, isMinistryLogin } from "../../../../../helper/FOI/helper";
 import { ApplicationFeeStatuses, paymentMethods } from '../util';
 import _ from 'lodash';
-import CustomizedTooltip from '../../Tooltip/MuiTooltip/Tooltip';
 import FileUpload from '../../FileUpload';
 import { generateReceiptFromOnlinePayment } from '../../../../../apiManager/services/FOI/foiApplicationFeeFormServices';
 import { getFileFromS3, getFOIS3DocumentPreSignedUrl } from '../../../../../apiManager/services/FOI/foiOSSServices';
@@ -25,7 +24,6 @@ export const ApplicationFeeTab = ({
     ministryId,
     requestId,
     userDetail,
-    setCFRUnsaved,
     formData,
     setFormData,
     rerenderFileUpload,
@@ -35,9 +33,6 @@ export const ApplicationFeeTab = ({
     const dispatch = useDispatch();
     const userGroups = userDetail.groups.map((group: any) => group.slice(1));
     const isMinistry = isMinistryLogin(userGroups);
-    const initialApplicationFeeState: any = useSelector((state: any) => state.foiRequests.foiRequestApplicationFeeForm);
-
-    const [initialFormData, setInitialFormData] = useState(initialApplicationFeeState);
 
     const handleTextChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
       const name : string = e.target.name;
@@ -59,24 +54,6 @@ export const ApplicationFeeTab = ({
   
       setFormData((values: any) => ({...values, ['refundAmount']: value}));
     }
-
-    const tooltipTotals = {
-      "title": "Payment Details",
-      "content": [
-        <div className="toolTipContent">
-          <p>The balance remaining for a fee estimate is the Estimated total subtracted by the amount paid.
-            When actuals are entered, the balance remaining is the actual totals subtracted by the amount paid.
-            If the balance is negative, then an applicant may be owed a refund.</p>
-        </div>]
-    };
-
-    React.useEffect(() => {
-      if (!_.isEqual(initialFormData, formData)) {
-        setCFRUnsaved(true);
-      } else {
-        setCFRUnsaved(false);
-      }
-    }, [initialFormData, formData]);
 
     const applicationFeeStatusField = (
       <div className="col-lg-6 foi-details-col">
@@ -398,6 +375,13 @@ export const ApplicationFeeTab = ({
       return isDisabled;
     }
 
+    const refundAmountFieldError = () => {
+      let refundDateBlank = formData?.refundDate == '' || formData?.refundDate == null
+      if (!refundDateBlank && formData?.refundAmount == 0) return true;
+      if (formData?.refundAmount % 10 != 0 || formData?.refundAmount > formData?.amountPaid) return true
+      return false;
+    }
+
     const [refundAmountHelperText, setRefundAmountHelperText] = useState('')
 
     React.useEffect(() => {
@@ -433,12 +417,19 @@ export const ApplicationFeeTab = ({
             e.target.value = parseFloat(e.target.value).toFixed(2);
           }}
           fullWidth
-          error={formData?.refundAmount % 10 != 0 || formData?.refundAmount > formData?.amountPaid}
+          error={refundAmountFieldError()}
           helperText={refundAmountHelperText}
           disabled={disableRefundFields()}
         />
       </div>
     )
+
+    const refundDateFieldError = () => {
+      if (formData?.refundAmount > 0) {
+        if (formData?.refundDate == '' || formData?.refundDate == null) return true
+      }
+      return false;
+    }
 
     const refundDateField = (
       <div className="col-lg-6 foi-details-col">
@@ -453,6 +444,7 @@ export const ApplicationFeeTab = ({
           InputLabelProps={{
           shrink: true,
           }}
+          error={refundDateFieldError()}
           InputProps={{inputProps: { max: formatDate(new Date())} }}
           variant="outlined"
           fullWidth
@@ -480,10 +472,6 @@ export const ApplicationFeeTab = ({
                 {receiptUploadField}
                 {formData?.receipts.length > 0 || formData?.paymentSource == 'creditcardonline' ? uploadedReceiptsField : <></>}
               </div>}
-              <div className="cfrform-floatRight cfrform-totals">
-                <CustomizedTooltip content={tooltipTotals} position={""} />
-                <p className="hideContent" id="popup-6">Information6</p>
-              </div>
             </AccordionDetails>
           </Accordion>
         </div>
