@@ -210,10 +210,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
   const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes);
 
-  //get foiopeninfo request details from the store
-  let foiOITransactionData = useSelector(
-    (state) => state.foiRequests.foiOpenInfoRequest
-  );
   const activePublicationRequest = !SKIP_OPENINFO_MINISTRIES.split(",").includes(requestDetails?.bcgovcode?.toUpperCase()) && requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL;
 
   const handleUnsavedContinue = () => {
@@ -1139,8 +1135,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   }
   const showOpenInformationTab = () => {
     return (
-      foiOITransactionData && 
-      Object.keys(foiOITransactionData).length > 0 &&
       activePublicationRequest &&
       requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name

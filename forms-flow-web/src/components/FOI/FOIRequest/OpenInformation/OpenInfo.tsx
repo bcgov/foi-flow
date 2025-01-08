@@ -51,7 +51,7 @@ const OpenInfo = ({
   const [isDataEdited, setIsDataEdited] = useState(false);
 
   useEffect(() => {
-    setOiPublicationData({...foiOITransactionData, oipublicationstatus_id: foiOITransactionData.oipublicationstatus_id || OIPublicationStatuses.Publish});
+    setOiPublicationData({...foiOITransactionData, oipublicationstatus_id: foiOITransactionData?.oipublicationstatus_id || OIPublicationStatuses.Publish});
     if (isOITeam) {
       if (foiOITransactionData.oipublicationstatus_id === findOIPublicationState('Do Not Publish')?.oipublicationstatusid) {
         setTabValue(1)
