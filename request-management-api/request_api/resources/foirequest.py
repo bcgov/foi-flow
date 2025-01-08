@@ -26,7 +26,6 @@ from request_api.exceptions import BusinessException
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
-from request_api.services.openinfoservice import openinfoservice
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema
 from request_api.schemas.foiassignee import FOIRequestAssigneeSchema
 from request_api.utils.enums import StateName
@@ -108,10 +107,7 @@ class FOIRequests(Resource):
             
             if rawresult.success == True:
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
-                if result.success == True:                    
-                    #Create FOIOpenInfoRequest after FOIMinistryRequest has successfully been created and set to Open state                
-                    foiministryrequest = result.args[0]
-                    openinfoservice().createopeninforequest(foirequestschema, AuthHelper.getuserid(), foiministryrequest)
+                if result.success == True:
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copydocuments(request_json['id'],result.args[0],AuthHelper.getuserid())

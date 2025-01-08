@@ -1,6 +1,7 @@
 import OpenInfoPublicationMain from "./OpenInfoPublicationMain";
 import OpenInfoConfirmationModal from "../OpenInfoConfirmationModal";
 import { formatDateInPst } from "../../../../../helper/FOI/helper";
+import { OIPublicationStatuses } from "../../../../../helper/openinfo-helper";
 
 const OpenInfoPublication = ({
   oiPublicationData,
@@ -25,6 +26,19 @@ const OpenInfoPublication = ({
     saveData(todaysDate);
   }
 
+  const save = () => {
+    if (oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest) {
+      setConfirmationModal({
+        show: true,
+        title: "Unpublish Request",
+        description: "Are you sure you want to unpublish this request?",
+        message: "This request will be removed from Open Information and marked for Review.",
+        confirmButtonTitle: "Unpublish Request"
+      });
+    } else {
+      saveData()
+    }
+  }
   return (
     <>
       <OpenInfoPublicationMain
@@ -40,7 +54,7 @@ const OpenInfoPublication = ({
         type="button"
         className="btn btn-bottom"
         disabled={!isDataEdited}
-        onClick={() => saveData()}
+        onClick={save}
       >
         Save
       </button>
@@ -54,7 +68,10 @@ const OpenInfoPublication = ({
       </button>
       <OpenInfoConfirmationModal
         modal={confirmModal}
-        confirm={(confirmModal.title === "Change Publication Date" && handleDateConfirmation) || (confirmModal.title === "Publish Now" && publishConfirmation)}
+        confirm={(confirmModal.title === "Change Publication Date" && handleDateConfirmation)
+           || (confirmModal.title === "Publish Now" && publishConfirmation)
+           || (confirmModal.title === "Unpublish Request" && saveData)
+          }
         setModal={setConfirmationModal}
       />
     </>

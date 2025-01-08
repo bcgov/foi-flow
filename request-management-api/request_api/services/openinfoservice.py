@@ -26,8 +26,9 @@ class openinfoservice:
        return FOIOpenInformationRequests().getcurrentfoiopeninforequest(foiministryrequestid)
     
     def createopeninforequest(self, foirequestschema, userid, foiministryrequest):
-        if foirequestschema["requestType"] == 'general' and foirequestschema["selectedMinistries"][0]["code"].upper() not in SKIP_OPENINFO_MINISTRIES:
-            foiministryrequestid = foiministryrequest[0]['id']
+        foiministryrequestid = foiministryrequest.foiministryrequestid
+        current_oirequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
+        if foirequestschema["requestType"] == 'general' and foirequestschema["selectedMinistries"][0]["code"].upper() not in SKIP_OPENINFO_MINISTRIES and current_oirequest == {}:
             default_foiopeninforequest = {
                 "oipublicationstatus_id": 2,
             }
@@ -36,7 +37,6 @@ class openinfoservice:
             foiopeninforequest['foiministryrequestversion_id'] = version
             foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
             result = FOIOpenInformationRequests().createopeninfo(foiopeninforequest, userid)
-            print(result)
             return result
 
     def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid, assigneedetails):
@@ -44,22 +44,18 @@ class openinfoservice:
         if 'oiassignedto' in foiopeninforequest:
             self.updateopeninfoassignee(foiopeninforequest['oiassignedto'], assigneedetails)
         
-        prev_foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
         foiministryrequestversion = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
         foiopeninforequest['foiministryrequestversion_id'] = foiministryrequestversion
         foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
-        foiopeninforequest['version'] = prev_foiopeninforequest["version"]
-        foiopeninforequest['processingstatus'] = prev_foiopeninforequest["processingstatus"]
-        foiopeninforequest["processingmessage"] = prev_foiopeninforequest["processingmessage"]
-        foiopeninforequest["sitemap_pages"] = prev_foiopeninforequest["sitemap_pages"]
-        foiopeninforequest['foiopeninforequestid'] = prev_foiopeninforequest["foiopeninforequestid"]
-        result = FOIOpenInformationRequests().updateopeninfo(foiopeninforequest, userid)
-        deactivateresult = None
-        if result.success == True:
+        result = FOIOpenInformationRequests().saveopeninfo(foiopeninforequest, userid)
+        if result.success == True and result.message != 'FOIOpenInfo request created':
             foiopeninfoid = result.identifier
             deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
-        if result and deactivateresult:
-            return result     
+            if deactivateresult.success:
+                return result
+        else:
+            return result
+            
 
     def updateopeninfoassignee(self, assignee, assigneedetails):
         if not assignee or not assigneedetails:
@@ -94,7 +90,7 @@ class openinfoservice:
     def updatefoioirequest_onfoirequestchange(self, foiministryrequestid, new_foirequestversion, userid):
         foiopeninforequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
         foiopeninforequest['foiministryrequestversion_id'] = new_foirequestversion
-        result = FOIOpenInformationRequests().updateopeninfo(foiopeninforequest, userid)
+        result = FOIOpenInformationRequests().saveopeninfo(foiopeninforequest, userid)
         deactivateresult = None
         if result.success == True:
             foiopeninfoid = result.identifier

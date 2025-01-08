@@ -14,7 +14,8 @@ from request_api.models.FOIRequestOIPC import FOIRequestOIPC
 from datetime import datetime as datetime2
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, StateName
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
-from request_api.services.foirequest.requestserviceministrybuilder import requestserviceministrybuilder 
+from request_api.services.foirequest.requestserviceministrybuilder import requestserviceministrybuilder
+from request_api.services.openinfoservice import openinfoservice
 
 
 import json
@@ -79,6 +80,11 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.version = activeversion
         oistatusid = self.getpropertyvaluefromschema(requestschema, 'oistatusid')
         foiministryrequest.oistatus_id = oistatusid
+        
+        #Create new FOIOpenInfoRequest after FOIMinistryRequest has successfully been closed and if no other FOIOpenInfoRequest exists in DB (ie. through OI exemption flow)
+        if 'closereasonid' in requestschema and requestschema['closereasonid'] in (4,7):
+            openinfoservice().createopeninforequest(requestschema, userid, foiministryrequest)
+
         foiministryrequest.closedate = self.getpropertyvaluefromschema(requestschema, 'closedate')
         if requestschema.get('reopen'):
             foiministryrequest.closereasonid = None
