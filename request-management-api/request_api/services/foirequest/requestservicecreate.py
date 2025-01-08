@@ -15,7 +15,6 @@ from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMa
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.RequestorType import RequestorType
 from request_api.utils.enums import StateName
-from request_api.services.openinfoservice import openinfoservice
 
 import json
 class requestservicecreate:

@@ -277,7 +277,7 @@ const OpenInfoPublicationMain = ({
     window.open(url, "_blank")?.focus();
   }
 
-  const disableUserInput = !oiPublicationData?.oiexemptionapproved && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish;
+  const disableUserInput = oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish;
   
   var saveAs = (blob: any, filename: any) => {
     const fileURL = URL.createObjectURL(blob);

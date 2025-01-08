@@ -26,8 +26,9 @@ class openinfoservice:
        return FOIOpenInformationRequests().getcurrentfoiopeninforequest(foiministryrequestid)
     
     def createopeninforequest(self, foirequestschema, userid, foiministryrequest):
-        if foirequestschema["requestType"] == 'general' and foirequestschema["selectedMinistries"][0]["code"].upper() not in SKIP_OPENINFO_MINISTRIES:
-            foiministryrequestid = foiministryrequest[0]['id']
+        foiministryrequestid = foiministryrequest.foiministryrequestid
+        current_oirequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
+        if foirequestschema["requestType"] == 'general' and foirequestschema["selectedMinistries"][0]["code"].upper() not in SKIP_OPENINFO_MINISTRIES and current_oirequest == {}:
             default_foiopeninforequest = {
                 "oipublicationstatus_id": 2,
             }
@@ -36,7 +37,6 @@ class openinfoservice:
             foiopeninforequest['foiministryrequestversion_id'] = version
             foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
             result = FOIOpenInformationRequests().createopeninfo(foiopeninforequest, userid)
-            print(result)
             return result
 
     def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid, assigneedetails):
