@@ -101,18 +101,17 @@ class workflowservice:
         try:
             # Sync and get raw instance details from FOI DB
             raw_metadata = self.__sync_raw_request(requesttype, requestid)
-            print("raw_metadata", "raw_metadata")
+            print("raw_metadata", raw_metadata)
             if requesttype == "ministryrequest":
-                print("requesttype", requesttype)
-                req_metadata = self.__sync_foi_request(requestid, raw_metadata)  
-                print("req_metadata", req_metadata)   
+                print("ministryrequest", "ministryrequest")
+                req_metadata = self.__sync_foi_request(requestid, raw_metadata)     
                 # Check foi request instance creation - Reconcile by transition to Open
-                _all_activity_desc = FOIMinistryRequest.getactivitybyid(requestid)
-                print("_all_activity_desc", _all_activity_desc)               
+                _all_activity_desc = FOIMinistryRequest.getactivitybyid(requestid)             
                 self.__sync_state_transition(requestid, str(req_metadata.wfinstanceid), _all_activity_desc, isallactivity)
                 return req_metadata.wfinstanceid            
             return raw_metadata.wfinstanceid 
         except Exception as ex:
+            print("exLOGS", ex)
             logging.error(ex)
         return None
 
@@ -121,6 +120,7 @@ class workflowservice:
         requestid = int(requestid)
         print("requesttype", requesttype)
         _raw_metadata = FOIRawRequest.getworkflowinstancebyraw(requestid) if requesttype == "rawrequest" else FOIRawRequest.getworkflowinstancebyministry(requestid)
+        print("_raw_metadata", _raw_metadata)
         wf_rawrequest_pid = self.__get_wf_pid("rawrequest", _raw_metadata)    
         print("wf_rawrequest_pid", wf_rawrequest_pid)
         # Check for exists - Reconcile with new instance creation
