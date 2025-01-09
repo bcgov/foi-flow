@@ -40,7 +40,7 @@ class senderservice:
 
     def send(self, subject, content, _messageattachmentlist, emails, from_email = None):
         logging.debug("Begin: Send email for request ")
-        
+
         content = content.replace('src=\\\"', 'src="')
         content = content.replace('\\\">','">')
         msg = MIMEMultipart('related')
@@ -80,7 +80,6 @@ class senderservice:
                 smtpobj.starttls()
                 smtpobj.ehlo()
                 #smtpobj.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
-                print("msgSTR", msg.as_string())
                 smtpobj.sendmail(msg['From'],  msg['To'], msg.as_string())
                 smtpobj.quit()
                 logging.debug("End: Send email for request")
