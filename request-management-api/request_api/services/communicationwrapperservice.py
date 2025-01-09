@@ -31,6 +31,10 @@ class communicationwrapperservice:
             else:
                 if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
                     template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
+                    _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
+                    _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
+                    if _paymentexpirydate not in (None, ""):
+                        paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())
                     return communicationemailservice().send(template, applicantcorrespondencelog)
                 return result
                 
@@ -41,6 +45,7 @@ class communicationwrapperservice:
     def __handle_fee_email(self,requestid, ministryrequestid, applicantcorrespondencelog):
         if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
             requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
+            print('__handle_fee_email')
             _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
             _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
             if _paymentexpirydate not in (None, ""):
