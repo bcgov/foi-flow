@@ -273,15 +273,24 @@ class notificationservice:
             
     def __preparenotification(self, message, requesttype, notificationtype, userid, foirequest, requestjson=None):
         ministryusers = []
+        print("=========__preparenotification requesttype : ",requesttype)
+        print("=========__preparenotification foirequest : ",foirequest)
+        print("=========__preparenotification notificationtype : ",notificationtype)
         if requesttype == "ministryrequest":
             notification = FOIRequestNotification()
             notification.requestid = foirequest["foiministryrequestid"]
             notification.idnumber = foirequest["filenumber"]
             notification.foirequestid = foirequest["foirequest_id"]
-
             #mute notifications for ministry users
             mutenotification = self.__mutenotification(requesttype, notificationtype['name'], foirequest)
-            usergroupfromkeycloak = KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"])
+            
+            #usergroupfromkeycloak = KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"])
+
+            group_name = "OI Team" if notificationtype['name'] == "Exemption Request" else foirequest["assignedministrygroup"]
+            print("========= group_name : ",group_name)
+            usergroupfromkeycloak = KeycloakAdminService().getmembersbygroupname(group_name)
+            print("========= usergroupfromkeycloak : ",usergroupfromkeycloak)
+
             if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
                 for user in usergroupfromkeycloak[0].get("members"):
                     ministryusers.append(user["username"])
