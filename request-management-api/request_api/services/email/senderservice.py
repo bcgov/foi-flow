@@ -80,6 +80,7 @@ class senderservice:
                 smtpobj.starttls()
                 smtpobj.ehlo()
                 #smtpobj.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
+                print('msgSTR', msg.as_string())
                 smtpobj.sendmail(msg['From'],  msg['To'], msg.as_string())
                 smtpobj.quit()
                 logging.debug("End: Send email for request")

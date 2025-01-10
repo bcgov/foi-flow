@@ -16,6 +16,10 @@ __author__      = "sumathi.thirumani@aot-technologies.com"
 class bpmservice(camundaservice):
 
     def createinstance(self, messagequeue, message, token=None):
+        print('message', message)
+        print('token', token)
+        print('messagequeue', messagequeue)
+        print('selfbpmengineresturl', self.bpmengineresturl)
         if self.bpmengineresturl is not None:
             _variables = {"variables":{}}
             for key in message:                
@@ -23,7 +27,6 @@ class bpmservice(camundaservice):
                     _variables["variables"][key] = {"type" : _variabletype, "value": message[key]} 
             variableschema = VariableMessageSchema().dump(_variables)
             createresponce =  requests.post(self._getUrl_(None,self._geProcessDefinitionKey_(messagequeue)), data=json.dumps(variableschema), headers = self._getHeaders_(token))
-            print("createresponce", createresponce)
             if createresponce.ok:
                 _createresponce = json.loads(createresponce.content)
                 return _createresponce["id"]

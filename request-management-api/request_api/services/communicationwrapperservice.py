@@ -27,18 +27,15 @@ class communicationwrapperservice:
         if result.success == True:
             # raw requests should never be fee emails so they would only get handled by else statement
             if self.__is_fee_processing(applicantcorrespondencelog["templateid"]) == True:
-                return self.__handle_fee_email(requestid, ministryrequestid, applicantcorrespondencelog)
+                return self.__handle_fee_email(requestid, ministryrequestid, applicantcorrespondencelog, result)
             else:
                 if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
                     template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
                     return communicationemailservice().send(template, applicantcorrespondencelog)
                 return result
                 
-
-
-
-
-    def __handle_fee_email(self,requestid, ministryrequestid, applicantcorrespondencelog):
+                
+    def __handle_fee_email(self,requestid, ministryrequestid, applicantcorrespondencelog, result):
         if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
             requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
             _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
