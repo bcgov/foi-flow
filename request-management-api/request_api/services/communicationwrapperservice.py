@@ -13,7 +13,6 @@ from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.paymentservice import paymentservice
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.services.communicationemailservice import communicationemailservice
-from request_api.services.fee_service import FeeService
 
 class communicationwrapperservice:
     """ FOI communication wrapper service
@@ -32,11 +31,6 @@ class communicationwrapperservice:
             else:
                 if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
                     template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
-                    request_json={"request_id": requestid,"fee_code": None}
-                    fee_service: FeeService = FeeService(request_id=requestid, code=request_json['fee_code'])
-                    pay_response = fee_service.init_payment(request_json)
-                    print("pay_response", pay_response)
-                    print("applicantcorrespondencelog", applicantcorrespondencelog)
                     return communicationemailservice().send(template, applicantcorrespondencelog)
                 return result
                 
