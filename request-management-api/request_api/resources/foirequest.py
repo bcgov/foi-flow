@@ -28,7 +28,7 @@ from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema
 from request_api.schemas.foiassignee import FOIRequestAssigneeSchema
-from request_api.utils.enums import StateName
+from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup
 from marshmallow import Schema, fields, validate, ValidationError
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 from request_api.utils.enums import OIStatusEnum
@@ -145,6 +145,8 @@ class FOIRequestsById(Resource):
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
+                if IAOTeamWithKeycloackGroup.oi.value in AuthHelper.getusergroups():
+                    eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
@@ -319,6 +321,8 @@ class FOIRequestsById(Resource):
                     if not notification_result.success:
                         print(f"Warning: Failed to create exemption notification: {notification_result.message}")
                 
+                if (section == 'oistatusid'):
+                    eventservice().postopeninfostateevent(foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
                 return {'success': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200

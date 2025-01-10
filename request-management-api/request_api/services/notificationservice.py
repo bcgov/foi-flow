@@ -34,11 +34,11 @@ class notificationservice:
     """ FOI notification management service
     """
     
-    def createnotification(self, message, requestid, requesttype, notificationtype, userid, iscleanup=True):
+    def createnotification(self, message, requestid, requesttype, notificationtype, userid, iscleanup=True, requestjson=None):
         foirequest = self.getrequest(requestid, requesttype)
         if iscleanup == True:
             self.__cleanupnotifications(requesttype, notificationtype['name'], foirequest)
-        return self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest)
+        return self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest, requestjson)
     
     def createusernotification(self, message, requestid, requesttype, notificationtypename, notificationuser, userid):
         foirequest = self.getrequest(requestid, requesttype)

@@ -8,7 +8,9 @@ from request_api.models.FOIRequestComments import FOIRequestComment
 from request_api.services.notifications.notificationconfig import notificationconfig
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.services.commentservice import commentservice
-
+from request_api.services.openinfoservice import openinfoservice
+from request_api.auth import AuthHelper
+from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup
 class notificationuser:
     """ notification user service
 
@@ -33,6 +35,8 @@ class notificationuser:
             _users = self.__getgroupmembers('scanningteam') + self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)
         elif 'Exemption Request' in notificationtype:   
             _users = self.__getgroupmembers('OI Team')
+        elif 'OI State' in notificationtype:
+            _users = self.__getoiassignees(requestjson)
         else:
             _users = self.__getassignees(foirequest, requesttype, notificationtype, requestjson) + self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)
         for user in _users:
@@ -77,10 +81,13 @@ class notificationuser:
                     notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationconfig().getnotificationusertypelabel("Watcher")})
         return notificationusers         
     
-    def __getassignees(self, foirequest, requesttype, notificationtype, requestjson=None):
+    def __getassignees(self, foirequest, requesttype, notificationtype, requestjson=None):        
         notificationusers = []
         notificationusertypelabel = notificationconfig().getnotificationusertypelabel("Assignee")
-        if notificationtype == 'User Assignment Removal':
+        if foirequest['requeststatuslabel'].lower() == StateName.closed.value.lower() and IAOTeamWithKeycloackGroup.oi.value in AuthHelper.getusergroups():
+            _openinfo = openinfoservice().getcurrentfoiopeninforequest(foirequest['foiministryrequestid'])
+            notificationusers.append({"userid":_openinfo["oiassignedto"], "usertype":notificationusertypelabel}) 
+        elif notificationtype == 'User Assignment Removal':
             notificationusers.append({"userid": requestjson['userid'], "usertype":notificationusertypelabel})
         else:
             if self.__isministryassigneeneeded(requesttype, foirequest, notificationtype, requestjson):
@@ -88,6 +95,10 @@ class notificationuser:
             if self.__isfoiassigneeneeded(foirequest, notificationtype, requestjson):
                 notificationusers.append({"userid":foirequest["assignedto"], "usertype":notificationusertypelabel})
         return notificationusers  
+    
+    def __getoiassignees(self, requestjson):
+        notificationusertypelabel = notificationconfig().getnotificationusertypelabel("Assignee")
+        return [{"userid": requestjson['oiassignedto'], "usertype":notificationusertypelabel}]
     
 
     def __isiaointernalcomment(self, notificationtype, requestjson):

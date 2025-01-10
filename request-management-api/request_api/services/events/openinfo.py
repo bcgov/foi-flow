@@ -2,6 +2,7 @@ from os import stat
 from re import VERBOSE
 from request_api.services.commentservice import commentservice
 from request_api.services.notificationservice import notificationservice
+from request_api.services.openinfoservice import openinfoservice
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.NotificationTypes import NotificationType
@@ -15,6 +16,24 @@ class openinfoevent:
     def createopeninfoevent(self, ministryrequestid, requestid, userid, username):
         _commentresponse = self.__createcomment(requestid, userid, username)
         _notificationresponse = self.__createnotification(requestid, userid)
+        if _commentresponse.success == True and _notificationresponse.success == True:
+            return DefaultMethodResult(True,'Comment posted',requestid)
+        else:
+            return DefaultMethodResult(False,'unable to post comment',requestid)
+    
+    def createopeninfostateevent(self, ministryrequestid, requestid, userid, username):
+        _openinfo = openinfoservice().getcurrentfoiopeninforequest(ministryrequestid)
+        oistatuses = openinfoservice().getopeninfostatuses()
+        foirequest = notificationservice().getrequest(ministryrequestid, "ministryrequest")
+        oistatus = None
+        for status in oistatuses:
+            if status['oistatusid'] == foirequest['oistatus_id']:
+                oistatus = status['name']
+        comment = {"comment": username + ' changed the state of the request to ' + oistatus, 'ministryrequestid': ministryrequestid}
+        _commentresponse = commentservice().createministryrequestcomment(comment, userid, 2)
+        _notificationtype = NotificationType.getnotificationtypeid('OI State')
+        _notificationmessage = "Moved to " + oistatus + " State"
+        _notificationresponse = self.__createnotification(requestid, userid, _notificationtype, _notificationmessage, {"oiassignedto": _openinfo.get('oiassignedto')})
         if _commentresponse.success == True and _notificationresponse.success == True:
             return DefaultMethodResult(True,'Comment posted',requestid)
         else:
@@ -111,9 +130,8 @@ class openinfoevent:
             return "Exemption request denied. See Open Information tab for more information."
         return None  
 
-    def __createnotification(self, requestid, userid):
-        notification = self.__preparenotification(requestid)
-        response = notificationservice().createnotification({"message" : notification}, requestid, "ministryrequest", "fill in here", userid)
+    def __createnotification(self, requestid, userid, type, message, requestjson):
+        response = notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", type, userid, True, requestjson)
         if response.success == True:
             return DefaultMethodResult(True,'Notification added',requestid)
         return  DefaultMethodResult(True,'Unable to post notification',requestid)
