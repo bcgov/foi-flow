@@ -1,4 +1,3 @@
-
 from os import stat
 from re import VERBOSE
 from request_api.services.commentservice import commentservice
@@ -21,23 +20,23 @@ class openinfoevent:
         else:
             return DefaultMethodResult(False,'unable to post comment',requestid)
     
-    def createopeninforequestevent(self, ministryrequestid, requestid, userid, username, requesttype):
-        print("createopeninforequestevent called")
-        print("========= : ",ministryrequestid, requestid, userid, username, requesttype)
+    # def createopeninforequestevent(self, ministryrequestid, requestid, userid, username, requesttype):
+    #     print("createopeninforequestevent called")
+    #     print("========= : ",ministryrequestid, requestid, userid, username, requesttype)
 
-        if requesttype == "EXEMPTION_REQUEST":
-            return self.__handle_exemption_request(requestid, userid, username)
-        elif requesttype == "EXEMPTION_APPROVED":
-            return self.__handle_exemption_approved(requestid, userid, username, reason)
-        elif requesttype == "EXEMPTION_DENIED":
-            return self.__handle_exemption_denied(requestid, userid, username, reason)
+    #     if requesttype == "EXEMPTION_REQUEST":
+    #         return self.__handle_exemption_request(requestid, userid, username)
+    #     elif requesttype == "EXEMPTION_APPROVED":
+    #         return self.__handle_exemption_approved(requestid, userid, username, reason)
+    #     elif requesttype == "EXEMPTION_DENIED":
+    #         return self.__handle_exemption_denied(requestid, userid, username, reason)
 
-        # _commentresponse = self.__createcomment(requestid, userid, username)
-        # _notificationresponse = self.__createnotification(requestid, userid)
-        if _commentresponse.success == True and _notificationresponse.success == True:
-            return DefaultMethodResult(True,'Comment posted',requestid)
-        else:
-            return DefaultMethodResult(False,'unable to post comment',requestid)
+    #     # _commentresponse = self.__createcomment(requestid, userid, username)
+    #     # _notificationresponse = self.__createnotification(requestid, userid)
+    #     if _commentresponse.success == True and _notificationresponse.success == True:
+    #         return DefaultMethodResult(True,'Comment posted',requestid)
+    #     else:
+    #         return DefaultMethodResult(False,'unable to post comment',requestid)
     
     def handle_exemption_request(self, ministryrequestid, requestid, userid, username):
         print("handle_exemption_request called")
@@ -82,6 +81,15 @@ class openinfoevent:
         except Exception as e:
             print("========= error : ",e)
             return DefaultMethodResult(False, 'Unable to post notification', requestid)
+    
+    def dismiss_exemption_notifications(self, requestid):
+        try:
+            print("Dismissing exemption notifications for ministry request:", requestid)
+            notificationservice().dismissnotifications_by_requestid_type(requestid, "ministryrequest", "Exemption Request")
+            print("Successfully dismissed exemption notifications")
+        
+        except Exception as e:
+            print("Error dismissing exemption notifications:", str(e))
 
     def __createcomment(self, requestid, userid, username):
         comment = self.__preparecomment(requestid, userid, username)

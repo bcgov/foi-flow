@@ -91,16 +91,16 @@
         "name": "Attachment Upload Event",
         "notificationtypelabel": "attachmentuploadevent"
     },
-    "oiexemptionrequest":{
+    "exemptionrequest":{
         "name": "Exemption Request",
         "notificationtypelabel": "exemptionrequest"
     },
-    "oiexemptionapproved":{
+    "exemptionapproved":{
         "name": "Exemption Approved",
-        "notificationtypelabel": "oiexemptionapproved"
+        "notificationtypelabel": "exemptionapproved"
     },
-    "oiexemptiondenied":{
+    "exemptiondenied":{
         "name": "Exemption Denied",
-        "notificationtypelabel": "oiexemptiondenied"
+        "notificationtypelabel": "exemptiondenied"
     }   
 }

@@ -5,6 +5,7 @@ from request_api.models.FOIOpenInformationRequests import FOIOpenInformationRequ
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIOpenInfoAdditionalFiles import FOIOpenInfoAdditionalFiles
 from request_api.models.FOIAssignees import FOIAssignee
+from request_api.services.events.openinfo import openinfoevent
 from request_api.schemas.foiopeninfo import FOIOpenInfoSchema
 from request_api.utils.constants import SKIP_OPENINFO_MINISTRIES
 from datetime import datetime
@@ -40,15 +41,26 @@ class openinfoservice:
             return result
 
     def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid, assigneedetails):
+        is_new_assignment = False
+        
         # Handle assignee update
         if 'oiassignedto' in foiopeninforequest:
+            current_request = self.getcurrentfoiopeninforequest(foiministryrequestid)
+            is_new_assignment = current_request and current_request.get('oiassignedto') is None
             self.updateopeninfoassignee(foiopeninforequest['oiassignedto'], assigneedetails)
-        
+        print("========= updateopeninforequest called")
+        print("========= foiopeninforequest : ", foiopeninforequest)
+        print("========= is_new_assignment : ", is_new_assignment)
+
         foiministryrequestversion = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
         foiopeninforequest['foiministryrequestversion_id'] = foiministryrequestversion
         foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
         result = FOIOpenInformationRequests().saveopeninfo(foiopeninforequest, userid)
         if result.success == True and result.message != 'FOIOpenInfo request created':
+             # If this was a new assignment to OI Analyst, clear all exemption notifications for OI Team
+            if is_new_assignment:
+                openinfoevent().dismiss_exemption_notifications(foiministryrequestid)
+            
             foiopeninfoid = result.identifier
             deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
             if deactivateresult.success:
