@@ -49,7 +49,6 @@ class FOISendEmail(Resource):
             requestjson = request.get_json()
             emailschema = FOIEmailSchema().load(requestjson)
             result = emailservice().send(servicename.upper(), requestid, ministryrequestid, emailschema)
-            print("result", result)
             return json.dumps(result), 200 if result["success"] == True else 500
         except ValueError as err:
             return {'status': 500, 'message': str(err)}, 500
