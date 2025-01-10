@@ -68,12 +68,11 @@ class unopenedreportservice:
                 alerts.append({"request": request, "rank": 2, "potentialmatches": alert.potentialmatches})        
         UnopenedReport.bulkinsert(alertdbrows)
         alerts.sort(key=lambda a : a.get('potentialmatches', {'highscore': -1})['highscore'])
-        emails = {"email": self.reportemail, "topic": "Unopened Report"}
         senderservice().send(
             subject="Intake Unopened Request Report: " + str(date.today()),
             content=self.generateemailhtml(alerts),
             _messageattachmentlist=[],
-            requestjson=emails.get("email")
+            requestjson={"email": self.reportemail, "topic": "Unopened Report"}
         )
         return alerts
 

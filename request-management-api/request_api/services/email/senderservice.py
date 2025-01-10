@@ -47,12 +47,9 @@ class senderservice:
         msg = MIMEMultipart('related')
         if from_email is None:
             from_email = MAIL_FROM_ADDRESS
-            
+
         msg['From'] = from_email
-        if isinstance(emails, list):
-            msg['To'] = ",".join(emails)
-        else:
-            msg['To'] = emails
+        msg['To'] = ",".join(emails)
         msg['Subject'] = subject
         formattedContent, embeddedImages = embeddedimagehandler().formatembeddedimage(content)
         part = MIMEText(formattedContent, "html")
