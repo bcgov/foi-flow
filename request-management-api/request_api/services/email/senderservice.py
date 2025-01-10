@@ -40,6 +40,7 @@ class senderservice:
 
     def send(self, subject, content, _messageattachmentlist, emails, from_email = None):
         logging.debug("Begin: Send email for request ")
+        print('emails', emails)
 
         content = content.replace('src=\\\"', 'src="')
         content = content.replace('\\\">','">')
