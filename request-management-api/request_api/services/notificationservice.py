@@ -278,10 +278,12 @@ class notificationservice:
             notification.requestid = foirequest["foiministryrequestid"]
             notification.idnumber = foirequest["filenumber"]
             notification.foirequestid = foirequest["foirequest_id"]
-
             #mute notifications for ministry users
             mutenotification = self.__mutenotification(requesttype, notificationtype['name'], foirequest)
-            usergroupfromkeycloak = KeycloakAdminService().getmembersbygroupname(foirequest["assignedministrygroup"])
+            
+            group_name = "OI Team" if notificationtype['name'] == "Exemption Request" else foirequest["assignedministrygroup"]
+            usergroupfromkeycloak = KeycloakAdminService().getmembersbygroupname(group_name)
+
             if usergroupfromkeycloak is not None and len(usergroupfromkeycloak) > 0:
                 for user in usergroupfromkeycloak[0].get("members"):
                     ministryusers.append(user["username"])

@@ -26,12 +26,13 @@ from request_api.exceptions import BusinessException
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
-from request_api.services.openinfoservice import openinfoservice
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema
 from request_api.schemas.foiassignee import FOIRequestAssigneeSchema
 from request_api.utils.enums import StateName
 from marshmallow import Schema, fields, validate, ValidationError
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
+from request_api.utils.enums import OIStatusEnum
+from request_api.services.events.openinfo import openinfoevent
 import json
 import asyncio
 import traceback
@@ -108,10 +109,7 @@ class FOIRequests(Resource):
             
             if rawresult.success == True:
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
-                if result.success == True:                    
-                    #Create FOIOpenInfoRequest after FOIMinistryRequest has successfully been created and set to Open state                
-                    foiministryrequest = result.args[0]
-                    openinfoservice().createopeninforequest(foirequestschema, AuthHelper.getuserid(), foiministryrequest)
+                if result.success == True:
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copydocuments(request_json['id'],result.args[0],AuthHelper.getuserid())
@@ -302,12 +300,25 @@ class FOIRequestsById(Resource):
                 foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
                 foirequest['userrecordslockstatus'] = request_json['userrecordslockstatus']
             if (section == "oistatusid"):
+                print("oistatusid called")
                 foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
                 foirequest['oistatusid'] = request_json['oistatusid']
             foirequestschema = FOIRequestWrapperSchema().load(foirequest)
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
+                # Add exemption request notification if needed
+                if(request_json['oistatusid'] == OIStatusEnum.EXEMPTION_REQUEST.value):
+                    print("========= oistatusid : ",request_json['oistatusid'])
+                    notification_result = openinfoevent().handle_exemption_request(
+                        foiministryrequestid, 
+                        foirequestid, 
+                        AuthHelper.getuserid(), 
+                        AuthHelper.getusername()
+                    )
+                    if not notification_result.success:
+                        print(f"Warning: Failed to create exemption notification: {notification_result.message}")
+                
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
                 return {'success': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200

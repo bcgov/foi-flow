@@ -19,6 +19,9 @@ from .FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from .ProgramAreas import ProgramArea
 from .OpenInformationStatuses import OpenInformationStatuses
 from .FOIRequestStatus import FOIRequestStatus
+from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
+from .SubjectCodes import SubjectCode
+from .FOIRequestOIPC import FOIRequestOIPC
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.models.FOIRequestRecords import FOIRequestRecord
 from sqlalchemy import text
@@ -69,6 +72,15 @@ class FOIOpenInformationRequests(db.Model):
                 foiministryrequest_id=foiopeninforequest["foiministryrequest_id"],
                 foiministryrequestversion_id=foiopeninforequest["foiministryrequestversion_id"],
                 oipublicationstatus_id=foiopeninforequest["oipublicationstatus_id"],
+                oiexemption_id=foiopeninforequest.get("oiexemption_id"),
+                iaorationale=foiopeninforequest.get("iaorationale"),
+                pagereference=foiopeninforequest.get("pagereference"),
+                oiassignedto=foiopeninforequest.get("oiassignedto"),
+                oiexemptionapproved=foiopeninforequest.get("oiexemptionapproved"),
+                oifeedback=foiopeninforequest.get("oifeedback"),
+                publicationdate=foiopeninforequest.get("publicationdate"),
+                oiexemptiondate=foiopeninforequest.get("oiexemptiondate"),
+                copyrightsevered=foiopeninforequest.get("copyrightsevered"),
                 isactive=True,
                 created_at=createddate,
                 createdby=userid,
@@ -80,34 +92,36 @@ class FOIOpenInformationRequests(db.Model):
             logging.error(f"Error: {exception}")
             return DefaultMethodResult(False, "FOIOpenInfo request unable to be created")
     
-    def updateopeninfo(cls, foiopeninforequest, userid)->DefaultMethodResult:
+    def saveopeninfo(cls, foiopeninforequest, userid)->DefaultMethodResult:
         try:
-            createddate = datetime2.now().isoformat()
-            updated_foiopeninforequest = FOIOpenInformationRequests(
-                foiopeninforequestid=foiopeninforequest['foiopeninforequestid'],
-                version=foiopeninforequest['version']+1,
-                foiministryrequest_id=foiopeninforequest["foiministryrequest_id"],
-                foiministryrequestversion_id=foiopeninforequest["foiministryrequestversion_id"],
-                oipublicationstatus_id=foiopeninforequest["oipublicationstatus_id"],
-                oiexemption_id=foiopeninforequest["oiexemption_id"],
-                iaorationale=foiopeninforequest["iaorationale"],
-                pagereference=foiopeninforequest["pagereference"],
-                oiassignedto=foiopeninforequest["oiassignedto"],
-                oiexemptionapproved=foiopeninforequest["oiexemptionapproved"],
-                oifeedback=foiopeninforequest["oifeedback"],
-                publicationdate=foiopeninforequest["publicationdate"],
-                oiexemptiondate=foiopeninforequest["oiexemptiondate"],
-                copyrightsevered=foiopeninforequest["copyrightsevered"],
-                isactive=True,
-                created_at=createddate,
-                createdby=userid,
-                processingstatus=foiopeninforequest["processingstatus"],
-                processingmessage=foiopeninforequest["processingmessage"],
-                sitemap_pages=foiopeninforequest["sitemap_pages"],
-            )
-            db.session.add(updated_foiopeninforequest)
-            db.session.commit()
-            return DefaultMethodResult(True, "FOIOpenInfo request version updated", updated_foiopeninforequest.foiopeninforequestid)
+            query = db.session.query(FOIOpenInformationRequests)
+            openinfo = cls.getcurrentfoiopeninforequest(foiopeninforequest['foiministryrequest_id'])
+            if openinfo:
+                createddate = datetime2.now().isoformat()
+                updated_foiopeninforequest = FOIOpenInformationRequests(
+                    foiopeninforequestid=openinfo['foiopeninforequestid'],
+                    version=openinfo['version']+1,
+                    foiministryrequest_id=foiopeninforequest["foiministryrequest_id"],
+                    foiministryrequestversion_id=foiopeninforequest["foiministryrequestversion_id"],
+                    oipublicationstatus_id=foiopeninforequest["oipublicationstatus_id"],
+                    oiexemption_id=foiopeninforequest["oiexemption_id"],
+                    iaorationale=foiopeninforequest["iaorationale"],
+                    pagereference=foiopeninforequest["pagereference"],
+                    oiassignedto=foiopeninforequest["oiassignedto"],
+                    oiexemptionapproved=foiopeninforequest["oiexemptionapproved"],
+                    oifeedback=foiopeninforequest["oifeedback"],
+                    publicationdate=foiopeninforequest["publicationdate"],
+                    oiexemptiondate=foiopeninforequest["oiexemptiondate"],
+                    copyrightsevered=foiopeninforequest["copyrightsevered"],
+                    isactive=True,
+                    created_at=createddate,
+                    createdby=userid,
+                )
+                db.session.add(updated_foiopeninforequest)
+                db.session.commit()
+                return DefaultMethodResult(True, "FOIOpenInfo request version updated", updated_foiopeninforequest.foiopeninforequestid)
+            else:
+                return cls.createopeninfo(foiopeninforequest, userid)
         except Exception as exception:
             logging.error(f"Error: {exception}")
             return DefaultMethodResult(False, "FOIOpenInfo request version unable to be updated")
@@ -128,7 +142,7 @@ class FOIOpenInformationRequests(db.Model):
             db.session.close()
     
     @classmethod
-    def getoibasequery(cls, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, groups=[]):
+    def getoibasequery(cls, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, groups=[], isadvancedsearch=False):
         _session = db.session
 
         # subquery for getting the latest version of FOIOpenInformationRequests
@@ -224,6 +238,7 @@ class FOIOpenInformationRequests(db.Model):
             cls.foiopeninforequestid,
             FOIRequestStatus.name.label('currentState'),
             FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
+            SubjectCode.name.label('subjectcode'),
         ]   
 
         basequery = (
@@ -232,7 +247,7 @@ class FOIOpenInformationRequests(db.Model):
             .join(FOIMinistryRequest, and_(
                 FOIMinistryRequest.foiministryrequestid == cls.foiministryrequest_id, 
                 FOIMinistryRequest.isactive == True,
-                FOIMinistryRequest.programareaid.notin_(excluded_program_areas),
+                # FOIMinistryRequest.programareaid.notin_(excluded_program_areas),
             ))
             .join(FOIRequest, and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id, FOIRequest.requesttype != 'personal'))
             .join(ApplicantCategory,and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True))
@@ -244,12 +259,27 @@ class FOIOpenInformationRequests(db.Model):
                                     FOIRestrictedMinistryRequest.type == 'iao',
                                     FOIRestrictedMinistryRequest.isactive == True),
                                 isouter=True
-            ).outerjoin(FOIAssignee, FOIAssignee.username == cls.oiassignedto) 
-            .filter(
+            ).outerjoin(FOIAssignee, FOIAssignee.username == cls.oiassignedto)
+            .outerjoin(FOIMinistryRequestSubjectCode, 
+                and_(
+                    FOIMinistryRequestSubjectCode.foiministryrequestid == FOIMinistryRequest.foiministryrequestid, FOIMinistryRequestSubjectCode.foiministryrequestversion == FOIMinistryRequest.version
+                )
+            )
+            .join(
+                  SubjectCode,
+                  SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
+                  isouter=True
+                 )
+        )
+
+        if not isadvancedsearch:
+            basequery = basequery.filter(
+                FOIMinistryRequest.programareaid.notin_(excluded_program_areas),
                 or_( 
                     and_(
                         FOIMinistryRequest.oistatus_id.isnot(None),
-                        FOIMinistryRequest.oistatus_id != OIStatusEnum.PUBLISHED.value
+                        FOIMinistryRequest.oistatus_id != OIStatusEnum.PUBLISHED.value,                        
+                        FOIMinistryRequest.oistatus_id != OIStatusEnum.DO_NOT_PUBLISH.value
                     ),
                     and_(
                         FOIMinistryRequest.oistatus_id.is_(None),
@@ -258,14 +288,36 @@ class FOIOpenInformationRequests(db.Model):
                     )
                 )
             )
-            .order_by(  
-                case(
-                    [(FOIMinistryRequest.oistatus_id == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
-                    else_=1
-                ),
-                receiveddate.desc()
-            )
+
+        basequery = basequery.order_by(
+            case(
+                [(FOIMinistryRequest.oistatus_id == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
+                else_=1
+            ),
+            receiveddate.desc()
         )
+
+            # .filter(
+            #     or_( 
+            #         and_(
+            #             FOIMinistryRequest.oistatus_id.isnot(None),
+            #             FOIMinistryRequest.oistatus_id != OIStatusEnum.PUBLISHED.value
+            #         ),
+            #         and_(
+            #             FOIMinistryRequest.oistatus_id.is_(None),
+            #             FOIMinistryRequest.requeststatuslabel == StateName.closed.name,
+            #             FOIMinistryRequest.closereasonid.in_(eligible_close_reasons)
+            #         )
+            #     )
+            # )
+            # .order_by(  
+            #     case(
+            #         [(FOIMinistryRequest.oistatus_id == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
+            #         else_=1
+            #     ),
+            #     receiveddate.desc()
+            # )
+        #)
             
         if additionalfilter == 'watchingRequests':
             subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
@@ -292,7 +344,7 @@ class FOIOpenInformationRequests(db.Model):
 
     @classmethod
     def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby, isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
-        oibasequery = cls.getoibasequery(additionalfilter, userid, isiaorestrictedfilemanager, groups)
+        oibasequery = cls.getoibasequery(additionalfilter, userid, isiaorestrictedfilemanager, groups, isadvancedsearch=False)
         if len(filterfields) > 0 and keyword is not None:
             filtercondition = cls.getfilterforrequestssubquery(filterfields, keyword)
             return oibasequery.filter(filtercondition)
@@ -398,6 +450,8 @@ class FOIOpenInformationRequests(db.Model):
             return cast(FOIMinistryRequest.axisrequestid, String)
         elif field == 'currentState':   
             return FOIRequestStatus.name
+        elif field == 'subjectcode':
+            return SubjectCode.name
         else:
             return text(field)
 
@@ -504,18 +558,10 @@ class FOIOpenInformationRequests(db.Model):
     
     @classmethod
     def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
-        basequery = FOIOpenInformationRequests.getoibasequery(None, userid, isiaorestrictedfilemanager)
-
+        basequery = FOIOpenInformationRequests.getoibasequery(None, userid, isiaorestrictedfilemanager,isadvancedsearch=True)
         #filter/search
         filtercondition = FOIOpenInformationRequests.getfilterforadvancedsearch(params)
         searchquery = basequery.filter(and_(*filtercondition))
-
-        #ministry requests
-        # iaoassignee = aliased(FOIAssignee)
-        # ministryassignee = aliased(FOIAssignee)
-        # subquery_ministry_queue = FOIMinistryRequest.advancedsearchsubquery(params, iaoassignee, ministryassignee, userid, 'IAO', isiaorestrictedfilemanager)
-
-        #oi requests
 
         #sorting
         sortingcondition = FOIOpenInformationRequests.getsorting(params['sortingitems'], params['sortingorders'])
@@ -607,6 +653,9 @@ class FOIOpenInformationRequests(db.Model):
     @classmethod
     def getfilterforrequestflags(cls, params):
         #request flags: restricted, oipc, phased
+        iaoassignee = aliased(FOIAssignee)
+        ministryassignee = aliased(FOIAssignee)
+
         requestflagscondition = []
         #alias for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
@@ -621,7 +670,7 @@ class FOIOpenInformationRequests(db.Model):
                 requestflagscondition.append(FOIOpenInformationRequests.findfield('isoipcreview') == True)
             if (flag.lower() == 'phased'):
                 continue
-        return or_(*requestflagscondition)
+        return requestflagscondition
 
     @classmethod
     def getfilterforpublicbody(cls, params):
@@ -644,6 +693,16 @@ class FOIOpenInformationRequests(db.Model):
             return FOIOpenInformationRequests.__getfilterforidnumber(params)
         elif(params['search'] == 'axisrequest_number'):
             return FOIOpenInformationRequests.__getfilterforaxisnumber(params)
+        elif(params['search'] == 'subjectcode'):
+            return FOIOpenInformationRequests.__getfilterforsubjectcode(params)
+        elif(params['search'] == 'oipc_number'):
+                searchcondition1 = []
+                searchcondition2 = []
+                for keyword in params['keywords']:
+                    oipccondition = FOIRequestOIPC.getrequestidsbyoipcno(keyword)
+                    searchcondition1.append(oipccondition.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid)
+                    searchcondition2.append(oipccondition.c.foiministryrequestversion_id == FOIMinistryRequest.version) 
+                return and_(and_(*searchcondition1), and_(*searchcondition2))
         else:
             searchcondition = []
             for keyword in params['keywords']:
@@ -656,8 +715,6 @@ class FOIOpenInformationRequests(db.Model):
         searchcondition2 = []
         for keyword in params['keywords']:
             searchcondition1.append(FOIOpenInformationRequests.findfield('description').ilike('%'+keyword+'%'))
-            #searchcondition2.append(FOIOpenInformationRequests.findfield('descriptionDescription').ilike('%'+keyword+'%'))
-        #return or_(and_(*searchcondition1), and_(*searchcondition2))   
         return or_(and_(*searchcondition1))   
 
     @classmethod
@@ -669,9 +726,6 @@ class FOIOpenInformationRequests(db.Model):
         for keyword in params['keywords']:
             searchcondition1.append(FOIOpenInformationRequests.findfield('firstName').ilike('%'+keyword+'%'))
             searchcondition2.append(FOIOpenInformationRequests.findfield('lastName').ilike('%'+keyword+'%'))
-            # searchcondition3.append(FOIOpenInformationRequests.findfield('contactFirstName').ilike('%'+keyword+'%'))
-            # searchcondition4.append(FOIOpenInformationRequests.findfield('contactLastName').ilike('%'+keyword+'%'))
-        #return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3), and_(*searchcondition4))
         return or_(and_(*searchcondition1), and_(*searchcondition2)) 
 
     @classmethod        
@@ -682,17 +736,18 @@ class FOIOpenInformationRequests(db.Model):
         for keyword in params['keywords']:
             searchcondition1.append(FOIOpenInformationRequests.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
             searchcondition2.append(FOIOpenInformationRequests.findfield('assignedToLastName').ilike('%'+keyword+'%'))
-            searchcondition3.append(FOIMinistryRequest.assignedgroup.ilike('%'+keyword+'%'))
-        return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3))
+        return or_(and_(*searchcondition1), and_(*searchcondition2))
 
     @classmethod
     def __getfilterforidnumber(cls,params):
-        searchcondition = []
+        searchcondition1 = []
+        searchcondition2 = []
         for keyword in params['keywords']:
             keyword = keyword.lower()
             keyword = keyword.replace('u-00', '')
-            searchcondition.append(cls.idNumber.ilike('%'+keyword+'%'))
-        return and_(*searchcondition)
+            searchcondition1.append(FOIOpenInformationRequests.findfield('idNumber').ilike('%'+keyword+'%'))
+            searchcondition2.append(FOIOpenInformationRequests.findfield('axisRequestId').ilike('%'+keyword+'%'))
+        return or_(and_(*searchcondition1), and_(*searchcondition2))
     
     @classmethod
     def __getfilterforaxisnumber(cls,params):
@@ -701,16 +756,23 @@ class FOIOpenInformationRequests(db.Model):
         for keyword in params['keywords']:
             keyword = keyword.lower()
             keyword = keyword.replace('u-00', '')
-            searchcondition1.append(cls.idNumber.ilike('%'+keyword+'%'))
-            searchcondition2.append(cls.axisRequestId.ilike('%'+keyword+'%'))
+            searchcondition1.append(FOIOpenInformationRequests.findfield('idNumber').ilike('%'+keyword+'%'))
+            searchcondition2.append(FOIOpenInformationRequests.findfield('axisRequestId').ilike('%'+keyword+'%'))
         return or_(and_(*searchcondition1), and_(*searchcondition2))
+
+    @classmethod
+    def __getfilterforsubjectcode(cls,params):
+        searchcondition1 = []
+        for keyword in params['keywords']:
+            searchcondition1.append(FOIOpenInformationRequests.findfield('subjectcode').ilike('%'+keyword+'%'))
+        return or_(*searchcondition1)
 
     @classmethod
     def getfilterfordate(cls, params):
         filterconditionfordate = []
         if(params['daterangetype'] == 'closedate'):
             #no rawrequest returned for this case
-            filterconditionfordate.append(FOIRawRequest.requestid < 0)
+            filterconditionfordate.append(FOIMinistryRequest.foirequest_id < 0)
         else:
             if(params['fromdate'] is not None):
                 if(params['daterangetype'] == 'receivedDate'):
@@ -722,7 +784,7 @@ class FOIOpenInformationRequests(db.Model):
                         )
                     )
                 else:
-                    filterconditionfordate.append(FOIRawRequest.findfield(params['daterangetype']).cast(Date) >= parser.parse(params['fromdate']))
+                    filterconditionfordate.append(FOIOpenInformationRequests.findfield(params['daterangetype']).cast(Date) >= parser.parse(params['fromdate']))
 
             if(params['todate'] is not None):
                 if(params['daterangetype'] == 'receivedDate'):
