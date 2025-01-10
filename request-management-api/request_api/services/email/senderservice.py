@@ -48,7 +48,7 @@ class senderservice:
             from_email = MAIL_FROM_ADDRESS
 
         msg['From'] = from_email
-        msg['To'] = ",".join(emails) if isinstance(emails, list) else emails.get("email")
+        msg['To'] = ",".join(emails)
         msg['Subject'] = subject
         formattedContent, embeddedImages = embeddedimagehandler().formatembeddedimage(content)
         part = MIMEText(formattedContent, "html")
