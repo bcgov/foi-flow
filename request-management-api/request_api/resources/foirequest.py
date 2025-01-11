@@ -33,6 +33,7 @@ from marshmallow import Schema, fields, validate, ValidationError
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 from request_api.utils.enums import OIStatusEnum
 from request_api.services.events.openinfo import openinfoevent
+from request_api.utils.enums import OpenInfoNotificationType
 import json
 import asyncio
 import traceback
@@ -309,12 +310,13 @@ class FOIRequestsById(Resource):
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
                 # Add exemption request notification if needed
                 if(request_json['oistatusid'] == OIStatusEnum.EXEMPTION_REQUEST.value):
-                    print("========= oistatusid : ",request_json['oistatusid'])
                     notification_result = openinfoevent().handle_exemption_request(
                         foiministryrequestid, 
                         foirequestid, 
                         AuthHelper.getuserid(), 
-                        AuthHelper.getusername()
+                        AuthHelper.getusername(),
+                        OpenInfoNotificationType.EXEMPTION_REQUEST.value,
+                        None
                     )
                     if not notification_result.success:
                         print(f"Warning: Failed to create exemption notification: {notification_result.message}")
