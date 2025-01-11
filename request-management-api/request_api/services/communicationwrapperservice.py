@@ -26,8 +26,11 @@ class communicationwrapperservice:
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
         if result.success == True:
             # raw requests should never be fee emails so they would only get handled by else statement
+            isFee = self.__is_fee_processing(applicantcorrespondencelog["templateid"])
+            print("isFee", isFee)
             if self.__is_fee_processing(applicantcorrespondencelog["templateid"]) == True:
-                return self.__handle_fee_email(requestid, ministryrequestid, applicantcorrespondencelog)
+                print("isFee2", isFee)
+                return self.__handle_fee_email(requestid, ministryrequestid, applicantcorrespondencelog, result)
             else:
                 if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
                     template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
@@ -35,17 +38,32 @@ class communicationwrapperservice:
                 return result
                 
                 
-    def __handle_fee_email(self,requestid, ministryrequestid, applicantcorrespondencelog):
+    def __handle_fee_email(self,requestid, ministryrequestid, applicantcorrespondencelog, result):
         if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
             requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
             _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
             _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
             if _paymentexpirydate not in (None, ""):
                 paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())
+        print("isFee3")
         return requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
 
+    # def __is_fee_processing(self, templateid):
+    #     template = applicantcorrespondenceservice().gettemplatebyid(templateid)
+    #     print("template10", template)
+    #     return template and template.name in ['PAYONLINE', 'PAYOUTSTANDING']
+    
+    # def __is_fee_processing(self, templateid):
+    #     template = applicantcorrespondenceservice().getactivetemplatebyid(templateid)
+    #     template2 = applicantcorrespondenceservice().gettemplatebyid(templateid).name
+    #     print("template10", template)
+    #     print("template12", template2)
+    #     if template and hasattr(template, 'name') and template.name.upper() in ['PAYONLINE', 'PAYOUTSTANDING']:
+    #         return True
+    #     return False
+
     def __is_fee_processing(self, templateid):
-        if applicantcorrespondenceservice().gettemplatebyid(templateid) in ['PAYONLINE','PAYOUTSTANDING']:
+        if applicantcorrespondenceservice().gettemplatebyid(templateid).name in ['PAYONLINE','PAYOUTSTANDING']:
             return True
         return False
 
