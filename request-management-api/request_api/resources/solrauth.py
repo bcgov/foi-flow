@@ -26,7 +26,8 @@ class FOISolr(Resource):
     @auth.isiao
     def get():      
         try:                        
-            usernamepassword ="%s:%s" % (os.getenv("FOI_SOLR_USERNAME"),os.getenv("FOI_SOLR_PASSWORD"))            
+            usernamepassword ="%s:%s" % (os.getenv("FOI_SOLR_USERNAME"),os.getenv("FOI_SOLR_PASSWORD"))     
+            print("usernamepassword:",usernamepassword)       
             unamepassword_bytes = usernamepassword.encode("utf-8")
             # Encode the bytes to Base64
             base64_encoded = base64.b64encode(unamepassword_bytes)
@@ -48,9 +49,9 @@ class FOISolrSearch(Resource):
     @auth.isiao
     def get():      
         try:
-
-            if 'requestnumbers' in request.args:
-                requestnumbers = request.args.getlist('requestnumbers')                       
+            #print("\nArgs:",request.args)
+            if 'requestnumbers[]' in request.args:
+                requestnumbers = request.args.getlist('requestnumbers[]')                       
                 requestdetails = requestservice().getrequestsdetailsforsearch(requestnumbers)
                 return requestdetails, 200
             else:

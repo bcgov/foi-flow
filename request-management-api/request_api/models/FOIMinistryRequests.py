@@ -1594,6 +1594,8 @@ class FOIMinistryRequest(db.Model):
             csvrequestnumbers = tuple(requestnumbers)            
             query=f"""SELECT
                     DISTINCT FMR.foiministryrequestid
+                     ,FMR.foiministryrequestid
+                     ,FMR.foirequest_id
                     ,FMR.axisrequestid
                     ,FMR.requeststatuslabel
                     ,FRA.lastname
@@ -1604,6 +1606,8 @@ class FOIMinistryRequest(db.Model):
                     ,FMR.axislanpagecount
                     ,FMR.estimatedpagecount
                     ,FMR.estimatedtaggedpagecount
+                    ,PA.iaocode AS programareacode
+                    ,FR.requesttype
                     FROM public."FOIMinistryRequests" FMR INNER JOIN (
                         SELECT 
                         DISTINCT FMR.foiministryrequestid as ministryrequestid
@@ -1614,11 +1618,15 @@ class FOIMinistryRequest(db.Model):
                         GROUP BY FMR.foiministryrequestid,FMR.foirequest_id
                     ) MaxRequestVersions ON FMR.foiministryrequestid=MaxRequestVersions.ministryrequestid and FMR.version=MaxRequestVersions.latestversion
                     JOIN public."FOIRequestApplicantMappings" FRAM ON FRAM.foirequest_id=MaxRequestVersions.requestid
-                    JOIN public."FOIRequestApplicants" FRA ON FRA.foirequestapplicantid=FRAM.foirequestapplicantid"""            
+                    JOIN public."FOIRequestApplicants" FRA ON FRA.foirequestapplicantid=FRAM.foirequestapplicantid
+                    LEFT JOIN public."ProgramAreas" PA	ON FMR.programareaid = PA.programareaid
+   	                JOIN public."FOIRequests" FR ON FMR.foiministryrequestid = FR.foirequestid AND FMR.version = FR.version"""            
             result = db.session.execute(text(query),{"csvrequestnumbers":csvrequestnumbers})        
             rows = result.fetchall()            
             for row in rows:
                 requestdetail={}
+                requestdetail["ministryrequestid"]=row["foiministryrequestid"]
+                requestdetail["id"]=row["foirequest_id"]
                 requestdetail["requeststatus"]=row["requeststatuslabel"]
                 requestdetail["requestnumber"]=row["axisrequestid"]
                 requestdetail["lastname"]=row["lastname"]
@@ -1629,6 +1637,8 @@ class FOIMinistryRequest(db.Model):
                 requestdetail["axislanpagecount"]=row["axislanpagecount"]
                 requestdetail["estimatedpagecount"]=row["estimatedpagecount"]
                 requestdetail["estimatedtaggedpagecount"]=row["estimatedtaggedpagecount"]
+                requestdetail["requestType"]=row["requesttype"]
+                requestdetail["bcgovcode"]=row["programareacode"]
                 requestdetails.append(requestdetail)
 
         except Exception as ex:

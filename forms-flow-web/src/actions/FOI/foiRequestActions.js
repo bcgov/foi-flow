@@ -62,6 +62,12 @@ export const setAdvancedSearchParams = (data) => (dispatch) => {
     payload: data,
   });
 };
+export const setKeywordSearchParams = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_KEYWORD_SEARCH_PARAMS,
+    payload: data,
+  });
+};
 export const setFOIAssignedToListLoader = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.IS_ASSIGNEDTOLIST_LOADING,
@@ -531,6 +537,13 @@ export const setHistoricalSearchParams = (data) => (dispatch) => {
 export const setFOICommentTypes = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_COMMENT_TYPES,
+    payload: data,
+  });
+};
+
+export const setShowKeywordSearch = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.SHOW_KEYWORD_SEARCH,
     payload: data,
   });
 };

@@ -67,3 +67,6 @@ export const DISABLE_GATHERINGRECORDS_TAB = (window._env_ && window._env_.REACT_
 
 export const RECORD_DOWNLOAD_LIMIT = (window._env_ && window._env_.REACT_APP_RECORD_DOWNLOAD_LIMIT) || process.env.REACT_APP_RECORD_DOWNLOAD_LIMIT || 500;
 export const RECORD_DOWNLOAD_SIZE_LIMIT = (window._env_ && window._env_.REACT_APP_RECORD_DOWNLOAD_SIZE_LIMIT) || process.env.REACT_APP_RECORD_DOWNLOAD_SIZE_LIMIT || 1073741824;
+
+export const FOI_SOLR_API_BASE =  (window._env_ && window._env_.FOI_SOLR_API_BASE) ||
+process.env.FOI_SOLR_API_BASE || "https://solr-fc7a67-dev.apps.gold.devops.gov.bc.ca";

@@ -18,6 +18,7 @@ const initialState = {
   showAdvancedSearch: false,
   showEventQueue: false,
   foiAdvancedSearchParams: {},
+  foiKeywordSearchParams:{},
   foiHistoricalSearchParams:{},
   isAssignedToListLoading: true,
   isAttachmentListLoading: true,
@@ -178,6 +179,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, eventQueueParams: action.payload };
     case FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH:
       return { ...state, showAdvancedSearch: action.payload };
+    case FOI_ACTION_CONSTANTS.SHOW_KEYWORD_SEARCH:
+      return { ...state, showKeywordSearch: action.payload };
     case FOI_ACTION_CONSTANTS.SHOW_EVENT_QUEUE:
       return { ...state, showEventQueue: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_PARAMS:
@@ -185,6 +188,14 @@ const foiRequests = (state = initialState, action) => {
         ...state,
         foiAdvancedSearchParams: {
           ...state.foiAdvancedSearchParams,
+          ...action.payload,
+        },
+      };
+    case FOI_ACTION_CONSTANTS.FOI_KEYWORD_SEARCH_PARAMS:
+      return {
+        ...state,
+        foiKeywordSearchParams: {
+          ...state.foiKeywordSearchParams,
           ...action.payload,
         },
       };
