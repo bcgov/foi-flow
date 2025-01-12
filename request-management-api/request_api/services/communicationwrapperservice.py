@@ -35,6 +35,7 @@ class communicationwrapperservice:
                 return result
                 
     def __handle_fee_email(self,requestid, ministryrequestid, applicantcorrespondencelog, identifier):
+        print("applicantcorrespondencelog", applicantcorrespondencelog)
         if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
             requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
             _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
