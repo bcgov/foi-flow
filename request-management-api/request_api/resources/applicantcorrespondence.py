@@ -113,14 +113,15 @@ class FOIFlowApplicantCorrespondence(Resource):
                         paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())            
                 requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
                 print("result2", result)
-                
+                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200    
+
             # Send email for non-fee templates with email recipients
             else:
                 if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
                     template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
-                    return communicationemailservice().send(template, applicantcorrespondencelog)
+                    communicationemailservice().send(template, applicantcorrespondencelog)
+                    return {'status': result.success, 'message':result.message,'id':result.identifier} , 200    
 
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
             return "Error happened while saving  applicant correspondence log" , 500 
 
