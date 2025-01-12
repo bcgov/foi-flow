@@ -33,11 +33,8 @@ class paymentservice:
         payment.ministryrequestid = ministryrequestid
         payment.ministryrequestversion = ministryversion
         payment.paymenturl = data['paymenturl'] if 'paymenturl' in data else None
-        print("data", data)
-        paymentexpirydate = data.get('paymentexpirydate') or data.get('paymentExpiryDate')
-        if not paymentexpirydate:
-            paymentexpirydate = self.getpaymentexpirydate(requestid, ministryrequestid)
-        payment.paymentexpirydate = paymentexpirydate
+        print("data_paymentexpirydate3", data)
+        payment.paymentexpirydate = data['paymentExpiryDate'] if 'paymentExpiryDate' in data else self.getpaymentexpirydate(requestid, ministryrequestid)
         print("_paymentexpirydate3", data['paymentExpiryDate'])
         payment.version = 1
         payment.createdby = createdby

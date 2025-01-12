@@ -41,9 +41,10 @@ class communicationwrapperservice:
                 return result
             
     @staticmethod
-    def __is_fee_processing(templateid):
-        template = applicantcorrespondenceservice().gettemplatebyid(templateid)
-        return template.name in ['PAYONLINE', 'PAYOUTSTANDING']
+    def _is_fee_processing(templateid):
+        if applicantcorrespondenceservice().gettemplatebyid(templateid).name in ['PAYONLINE','PAYOUTSTANDING']:
+            return True
+        return False
 
 class CommuniationType(Enum):
     """Communication types."""
