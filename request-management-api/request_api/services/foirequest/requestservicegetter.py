@@ -29,9 +29,10 @@ class requestservicegetter:
         print("requestservicegetter_request", request)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
         print("version", request['version'])
-        requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,request['version'])
-        requestapplicants = FOIRequestApplicantMapping.getrequestapplicantinfos(foirequestid,request['version'])
-        requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
+        version = request.get('version')
+        requestcontactinformation = FOIRequestContactInformation.getrequestcontactinformation(foirequestid,version)
+        requestapplicants = FOIRequestApplicantMapping.getrequestapplicantinfos(foirequestid,version)
+        requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,version)
         iaorestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(ministryrequestid=foiministryrequestid,type='iao')
 
         baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
