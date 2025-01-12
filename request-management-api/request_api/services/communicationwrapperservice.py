@@ -33,7 +33,7 @@ class communicationwrapperservice:
                     template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
                     return communicationemailservice().send(template, applicantcorrespondencelog)
                 return result
-                
+            
 
 
 
@@ -49,6 +49,11 @@ class communicationwrapperservice:
 
     def __is_fee_processing(self, templateid):
         if applicantcorrespondenceservice().gettemplatebyid(templateid) in ['PAYONLINE','PAYOUTSTANDING']:
+            return True
+        return False
+    
+    def _is_fee_processing(templateid):
+        if applicantcorrespondenceservice().gettemplatebyid(templateid).name in ['PAYONLINE','PAYOUTSTANDING']:
             return True
         return False
 
