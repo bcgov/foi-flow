@@ -27,38 +27,23 @@ class communicationwrapperservice:
         if result.success == True:
             # raw requests should never be fee emails so they would only get handled by else statement
             if self.__is_fee_processing(applicantcorrespondencelog["templateid"]) == True:
-                return self.__handle_fee_email(requestid, ministryrequestid, applicantcorrespondencelog, result.identifier)
+                if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
+                    requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
+                    _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
+                    _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
+                    if _paymentexpirydate not in (None, ""):
+                        paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())
+                return requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
             else:
                 if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
                     template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
                     return communicationemailservice().send(template, applicantcorrespondencelog)
                 return result
-                
-    def __handle_fee_email(self,requestid, ministryrequestid, applicantcorrespondencelog, identifier):
-        print("applicantcorrespondencelog", applicantcorrespondencelog)
-        if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
-            requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
-            _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
-            _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
-            print("_paymentexpirydate1", _paymentexpirydate)
-            if _paymentexpirydate not in (None, ""):
-                print("_paymentexpirydate2", _paymentexpirydate)
-                paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())
-                print("isFee3")
-        print("isFee4")
-        workflow_result = requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
-        print("isFee5")
-        print("workflow_result", workflow_result)
-        return type('Result', (object,), {
-            "success": True,
-            "message": "Fee email processed successfully.",
-            "identifier": identifier
-        })()
-
-    def __is_fee_processing(self, templateid):
-        if applicantcorrespondenceservice().gettemplatebyid(templateid).name in ['PAYONLINE','PAYOUTSTANDING']:
-            return True
-        return False
+            
+    @staticmethod
+    def __is_fee_processing(templateid):
+        template = applicantcorrespondenceservice().gettemplatebyid(templateid)
+        return template.name in ['PAYONLINE', 'PAYOUTSTANDING']
 
 class CommuniationType(Enum):
     """Communication types."""
