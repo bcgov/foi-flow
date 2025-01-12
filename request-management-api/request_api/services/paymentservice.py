@@ -33,7 +33,9 @@ class paymentservice:
         payment.ministryrequestid = ministryrequestid
         payment.ministryrequestversion = ministryversion
         payment.paymenturl = data['paymenturl'] if 'paymenturl' in data else None
+        print("data", data)
         payment.paymentexpirydate = data['paymentExpiryDate'] if 'paymentExpiryDate' in data else self.getpaymentexpirydate(requestid, ministryrequestid)
+        print("_paymentexpirydate3", data['paymentExpiryDate'])
         payment.version = 1
         payment.createdby = createdby
         _payment = FOIRequestPayment.getpayment(requestid, ministryrequestid)
@@ -80,6 +82,7 @@ class paymentservice:
 
     def getpaymentexpirydate(self, requestid, ministryrequestid):
         payment = FOIRequestPayment.getpayment(requestid, ministryrequestid)
+        print("payment", payment)
         paymentexpirydate = payment["paymentexpirydate"] if payment not in (None, {}) else None
         if paymentexpirydate is not None:
             return parse(str(paymentexpirydate)).strftime("%Y-%m-%d")
