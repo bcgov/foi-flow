@@ -251,7 +251,6 @@ class requestservice:
         wfinstanceid = workflowservice().syncwfinstance(
             "ministryrequest", ministryrequestid, True
         )
-        print("foirequestschema", foirequestschema)
         workflowservice().postcorrenspodenceevent(
             wfinstanceid,
             ministryrequestid,

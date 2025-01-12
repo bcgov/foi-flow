@@ -46,7 +46,14 @@ class communicationwrapperservice:
                 paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())
                 print("isFee3")
         print("isFee4")
-        return requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
+        workflow_result = requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
+        print("isFee5")
+        print("workflow_result", workflow_result)
+        return type('Result', (object,), {
+            "success": True,
+            "message": "Fee email processed successfully.",
+            "identifier": identifier
+        })()
 
     def __is_fee_processing(self, templateid):
         if applicantcorrespondenceservice().gettemplatebyid(templateid).name in ['PAYONLINE','PAYOUTSTANDING']:
