@@ -92,8 +92,17 @@ class FOIFlowApplicantCorrespondence(Resource):
         try:
             requestjson = request.get_json()
             applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
+            rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
 
-            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
+            # Save correspondence log based on request type
+            if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
+                print("ministryrequestid1")
+                result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
+            else:
+                print("ministryrequestid2")
+                result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
+
+            print("result", result)
             if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
                 requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
             if result.success == True:
