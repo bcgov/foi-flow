@@ -20,9 +20,13 @@ class communicationwrapperservice:
     """
     
     def send_email(self,requestid, ministryrequestid, applicantcorrespondencelog):
+        isMinistry = ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"])
+        print("isMinistry", isMinistry) 
         if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
+            print("isMinistryNone", isMinistry) 
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(requestid, applicantcorrespondencelog, AuthHelper.getuserid())
         else:
+            print("isMinistryYes", isMinistry)
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
         if result.success == True:
             # raw requests should never be fee emails so they would only get handled by else statement
@@ -41,11 +45,12 @@ class communicationwrapperservice:
     def __handle_fee_email(self,requestid, ministryrequestid, applicantcorrespondencelog, result):
         if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
             requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
-            _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
-            _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
-            if _paymentexpirydate not in (None, ""):
-                paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())
-        print("isFee3")
+            if result.success == True:
+                _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
+                _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
+                if _paymentexpirydate not in (None, ""):
+                    paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())
+                    print("isFee3")
         return requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
 
     # def __is_fee_processing(self, templateid):
