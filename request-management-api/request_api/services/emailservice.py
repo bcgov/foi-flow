@@ -79,6 +79,7 @@ class emailservice:
                 "correspondencemessagejson": {"message": content},
                 "attachments": attachmentlist
             }
+            print("saveapplicantcorrespondencelog9", requestid)
             return applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, data, 'system')
         
 
