@@ -105,5 +105,4 @@ class emailservice:
     
     def __getvaluefromschema(self, emailschema, property):
         schema = emailschema.get(property) if property in emailschema  else None
-        print("schema", schema)
         return emailschema.get(property) if property in emailschema  else None
