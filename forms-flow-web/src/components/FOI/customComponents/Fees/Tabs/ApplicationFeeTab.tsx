@@ -92,6 +92,7 @@ export const ApplicationFeeTab = ({
       if (formData?.paymentSource != 'creditcardonline' && formData?.paymentSource != 'init') {
         if (formData?.amountPaid % 10 != 0 || formData?.amountPaid == 0) return true;
       }
+      if (formData?.amountPaid % 10 != 0 && formData?.amountPaid > 0) return true;
     }
     const amountPaidField = (
       <div className="col-lg-6 foi-details-col">
@@ -100,7 +101,7 @@ export const ApplicationFeeTab = ({
           label="Amount Paid"
           inputProps={{
             "aria-labelledby": "amountpaid-label",
-            step: 0.01,
+            step: 10,
             min: 0
           }}
           InputProps={{
