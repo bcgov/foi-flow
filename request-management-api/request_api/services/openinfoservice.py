@@ -53,7 +53,7 @@ class openinfoservice:
         foiopeninforequest['foiministryrequestversion_id'] = foiministryrequestversion
         foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
         result = FOIOpenInformationRequests().saveopeninfo(foiopeninforequest, userid)
-        if result.success == True and result.message != 'FOIOpenInfo request created':
+        if result.success == True:
             # Clear OI Team notifications
             if is_new_assignment:
                 openinfoevent().dismiss_exemption_notifications(foiministryrequestid)
@@ -66,10 +66,11 @@ class openinfoservice:
                 oiexemption_id = foiopeninforequest['oiexemption_id'] if foiopeninforequest['oiexemption_id'] else None
                 openinfoevent().handle_exemption_request(foiministryrequestid, requestid, AuthHelper.getuserid(), AuthHelper.getusername(), notification_type, oiexemption_id)
             
-            foiopeninfoid = result.identifier
-            deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
-            if deactivateresult.success:
-                return result
+            if result.message != 'FOIOpenInfo request created':
+                foiopeninfoid = result.identifier
+                deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
+                if deactivateresult.success:
+                    return result
         else:
             return result
             

@@ -2,10 +2,11 @@ from os import stat
 from re import VERBOSE
 from request_api.services.commentservice import commentservice
 from request_api.services.notificationservice import notificationservice
-from request_api.services.openinfoservice import openinfoservice
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.NotificationTypes import NotificationType
+from request_api.models.OpenInformationStatuses import OpenInformationStatuses
+from request_api.models.FOIOpenInformationRequests import FOIOpenInformationRequests
 import json
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.utils.enums import OpenInfoNotificationType
@@ -24,8 +25,8 @@ class openinfoevent:
             return DefaultMethodResult(False,'unable to post comment',requestid)
     
     def createopeninfostateevent(self, ministryrequestid, requestid, userid, username):
-        _openinfo = openinfoservice().getcurrentfoiopeninforequest(ministryrequestid)
-        oistatuses = openinfoservice().getopeninfostatuses()
+        _openinfo = FOIOpenInformationRequests().getcurrentfoiopeninforequest(ministryrequestid)
+        oistatuses = OpenInformationStatuses.getallstatuses()
         foirequest = notificationservice().getrequest(ministryrequestid, "ministryrequest")
         oistatus = None
         for status in oistatuses:

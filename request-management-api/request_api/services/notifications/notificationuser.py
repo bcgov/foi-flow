@@ -5,10 +5,10 @@ import json
 from request_api.services.watcherservice import watcherservice
 from request_api.models.FOIRawRequestComments import FOIRawRequestComment
 from request_api.models.FOIRequestComments import FOIRequestComment
+from request_api.models.FOIOpenInformationRequests import FOIOpenInformationRequests
 from request_api.services.notifications.notificationconfig import notificationconfig
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.services.commentservice import commentservice
-from request_api.services.openinfoservice import openinfoservice
 from request_api.auth import AuthHelper
 from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup
 class notificationuser:
@@ -89,7 +89,7 @@ class notificationuser:
         notificationusers = []
         notificationusertypelabel = notificationconfig().getnotificationusertypelabel("Assignee")
         if foirequest['requeststatuslabel'].lower() == StateName.closed.value.lower() and IAOTeamWithKeycloackGroup.oi.value in AuthHelper.getusergroups():
-            _openinfo = openinfoservice().getcurrentfoiopeninforequest(foirequest['foiministryrequestid'])
+            _openinfo = FOIOpenInformationRequests().getcurrentfoiopeninforequest(foirequest['foiministryrequestid'])
             notificationusers.append({"userid":_openinfo["oiassignedto"], "usertype":notificationusertypelabel}) 
         elif notificationtype == 'User Assignment Removal':
             notificationusers.append({"userid": requestjson['userid'], "usertype":notificationusertypelabel})
