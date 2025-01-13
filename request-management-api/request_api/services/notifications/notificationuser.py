@@ -18,7 +18,6 @@ class notificationuser:
     
     def getnotificationusers(self, notificationtype, requesttype, userid, foirequest, requestjson=None):
         notificationusers = []
-        print("Inside getnotificationusers - notificationtype:", notificationtype)
         if 'User Assignment Removal' == notificationtype:
             _users = self.__getassignees(foirequest, requesttype, notificationtype, requestjson)
         elif 'Assignment' in notificationtype:
@@ -80,7 +79,6 @@ class notificationuser:
             else:
                 if isministryinternalcommenttype == False:
                     watchers =  watcherservice().getrawrequestwatchers(foirequest['requestid'])
-            print("*****watchers:",watchers)
             for watcher in watchers:
                     notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationconfig().getnotificationusertypelabel("Watcher")})
         return notificationusers         

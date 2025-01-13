@@ -111,13 +111,6 @@ class openinfoevent:
             return DefaultMethodResult(True,'Notification added',requestid)
         return  DefaultMethodResult(True,'Unable to post notification',requestid)
 
-    def __commentmessage(self, username, event_type, exemption_reason):
-        if event_type == OpenInfoNotificationType.EXEMPTION_APPROVED.value:
-            return f"Publication Exemption Approved by {username} for {exemption_reason}"
-        elif event_type == OpenInfoNotificationType.EXEMPTION_DENIED.value:
-            return f"Publication Exemption denied for {exemption_reason} by {username}"
-        return None
-
     def __preparenotification(self, requestid):
         return self.__notificationmessage(requestid)
 
