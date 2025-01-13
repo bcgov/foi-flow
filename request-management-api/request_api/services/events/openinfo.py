@@ -88,13 +88,6 @@ class openinfoevent:
         }
         return commentservice().createministryrequestcomment(data, userid, 2)
 
-    def __createtestnotification(self, requestid, userid):
-        notification = self.__preparenotification(requestid)
-        response = notificationservice().createnotification({"message" : notification}, requestid, "ministryrequest", "fill in here", userid)
-        if response.success == True:
-            return DefaultMethodResult(True,'Notification added',requestid)
-        return  DefaultMethodResult(True,'Unable to post notification',requestid)
-
     def __notificationexemptionmessage(self, requestid, notificationtype):
         if OpenInfoNotificationType.EXEMPTION_REQUEST.value == notificationtype:
             return "New Exemption Request is Received"
@@ -112,8 +105,7 @@ class openinfoevent:
         return None
 
     def __createnotification(self, requestid, userid, type, message, requestjson):
-        notification = self.__preparenotification(requestid)
-        response = notificationservice().createnotification({"message" : notification}, requestid, "ministryrequest", "fill in here", userid)
+        response = notificationservice().createnotification({"message" : message}, requestid, "ministryrequest", type, userid, True, requestjson)
         if response.success == True:
             return DefaultMethodResult(True,'Notification added',requestid)
         return  DefaultMethodResult(True,'Unable to post notification',requestid)
