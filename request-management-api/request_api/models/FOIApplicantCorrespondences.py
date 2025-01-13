@@ -45,31 +45,36 @@ class FOIApplicantCorrespondence(db.Model):
     foiministryrequestversion_id=db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.version'))
 
     
+    # @classmethod
+    # def getapplicantcorrespondences(cls,ministryrequestid):
+    #     correspondences = []
+    #     try:
+    #         sql = """select distinct on (applicantcorrespondenceid) applicantcorrespondenceid, templateid , correspondencemessagejson , version, 
+    #                     created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at,
+    #                      isdraft, isdeleted, isresponse, response_at
+    #                      from "FOIApplicantCorrespondences" fpa 
+    #                     where foiministryrequest_id = :ministryrequestid
+    #                 order by applicantcorrespondenceid desc, version desc""" 
+    #         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
+    #         for row in rs:
+    #             if row["isdeleted"] == False:
+    #                 correspondences.append({"applicantcorrespondenceid": row["applicantcorrespondenceid"], "templateid": row["templateid"],
+    #                                         "correspondencemessagejson": row["correspondencemessagejson"], "version": row["version"], 
+    #                                         "created_at": row["created_at"], "createdby": row["createdby"], 
+    #                                         "sentcorrespondencemessage": row["sentcorrespondencemessage"], "parentapplicantcorrespondenceid": row["parentapplicantcorrespondenceid"],
+    #                                         "sent_at": row["sent_at"], "sentby": row["sentby"],
+    #                                         "isdraft": row["isdraft"], "isresponse": row["isresponse"], "response_at": row["response_at"]})
+    #     except Exception as ex:
+    #         logging.error(ex)
+    #         raise ex
+    #     finally:
+    #         db.session.close()
+    #     return correspondences
     @classmethod
     def getapplicantcorrespondences(cls,ministryrequestid):
-        correspondences = []
-        try:
-            sql = """select distinct on (applicantcorrespondenceid) applicantcorrespondenceid, templateid , correspondencemessagejson , version, 
-                        created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at,
-                         isdraft, isdeleted, isresponse, response_at
-                         from "FOIApplicantCorrespondences" fpa 
-                        where foiministryrequest_id = :ministryrequestid
-                    order by applicantcorrespondenceid desc, version desc""" 
-            rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
-            for row in rs:
-                if row["isdeleted"] == False:
-                    correspondences.append({"applicantcorrespondenceid": row["applicantcorrespondenceid"], "templateid": row["templateid"],
-                                            "correspondencemessagejson": row["correspondencemessagejson"], "version": row["version"], 
-                                            "created_at": row["created_at"], "createdby": row["createdby"], 
-                                            "sentcorrespondencemessage": row["sentcorrespondencemessage"], "parentapplicantcorrespondenceid": row["parentapplicantcorrespondenceid"],
-                                            "sent_at": row["sent_at"], "sentby": row["sentby"],
-                                            "isdraft": row["isdraft"], "isresponse": row["isresponse"], "response_at": row["response_at"]})
-        except Exception as ex:
-            logging.error(ex)
-            raise ex
-        finally:
-            db.session.close()
-        return correspondences
+        comment_schema = FOIApplicantCorrespondenceSchema(many=True)
+        query = db.session.query(FOIApplicantCorrespondence).filter(FOIApplicantCorrespondence.foiministryrequest_id == ministryrequestid).order_by(FOIApplicantCorrespondence.applicantcorrespondenceid.desc()).all()
+        return comment_schema.dump(query)
     
     @classmethod
     def getapplicantcorrespondencebyid(cls,applicantcorrespondenceid):
