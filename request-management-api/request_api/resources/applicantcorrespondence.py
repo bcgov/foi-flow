@@ -34,7 +34,6 @@ from request_api.services.requestservice import requestservice
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.paymentservice import paymentservice
 from request_api.services.communicationwrapperservice import communicationwrapperservice
-from request_api.services.communicationemailservice import communicationemailservice
 
 API = Namespace('FOIApplicantCorrespondenceLog', description='Endpoints for FOI Applicant Correspondence Log')
 TRACER = Tracer.get_instance()

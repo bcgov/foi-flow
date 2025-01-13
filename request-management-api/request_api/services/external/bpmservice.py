@@ -22,9 +22,7 @@ class bpmservice(camundaservice):
                     _variabletype = VariableType.Integer.value if key in ["id"] else  VariableType.String.value
                     _variables["variables"][key] = {"type" : _variabletype, "value": message[key]} 
             variableschema = VariableMessageSchema().dump(_variables)
-            print("createresponce", createresponce)
             createresponce =  requests.post(self._getUrl_(None,self._geProcessDefinitionKey_(messagequeue)), data=json.dumps(variableschema), headers = self._getHeaders_(token))
-            print("createresponce2", createresponce)
             if createresponce.ok:
                 _createresponce = json.loads(createresponce.content)
                 return _createresponce["id"]
@@ -169,12 +167,9 @@ class bpmservice(camundaservice):
         return auth_response.json().get('access_token')
     
     def _getHeaders_(self, token):
-        print("_getHeaders_1", token)
         """Generate headers."""
         if token is None:
-            print("_getHeaders_2", token)
             token = self._getserviceaccounttoken_()
-            print("_getHeaders_3", token)
         return {
             "Authorization": "Bearer " + token,
             "Content-Type": "application/json",
