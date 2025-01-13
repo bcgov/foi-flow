@@ -169,7 +169,7 @@ class bpmservice(camundaservice):
     def _getHeaders_(self, token):
         """Generate headers."""
         if token is None:
-            token = self._getserviceaccounttoken_()
+            token = self._getserviceaccounttoken_();
         return {
             "Authorization": "Bearer " + token,
             "Content-Type": "application/json",
