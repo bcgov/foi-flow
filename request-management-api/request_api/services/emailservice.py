@@ -26,6 +26,9 @@ class emailservice:
     def send(self, servicename, requestid, ministryrequestid, emailschema):
         try:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
+            increment_number = 1  # Initialize the number
+            print("requestjson", increment_number, requestjson)
+            increment_number += 1  # Increment the number
             _templatename = self.__getvaluefromschema(emailschema, "templatename")
             servicename = _templatename  if servicename == ServiceName.correspondence.value.upper() else servicename            
             _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
@@ -99,4 +102,6 @@ class emailservice:
             logging.exception(ex)
     
     def __getvaluefromschema(self, emailschema, property):
+        schema = emailschema.get(property) if property in emailschema  else None
+        print("schema", schema)
         return emailschema.get(property) if property in emailschema  else None
