@@ -82,18 +82,6 @@ class FOIFlowApplicantCorrespondence(Resource):
         except BusinessException:
             return "Error happened while fetching  applicant correspondence logs" , 500 
 
-    # @staticmethod
-    # @TRACER.trace()
-    # @cross_origin(origins=allowedorigins())
-    # @auth.require
-    # @auth.hasusertype('iao')
-    # def get(requestid, ministryrequestid):
-    #     try:
-    #         correspondencelogs = applicantcorrespondenceservice().getapplicantcorrespondencelogs(ministryrequestid)
-    #         return json.dumps(correspondencelogs) , 200
-    #     except BusinessException:
-    #         return "Error happened while fetching  applicant correspondence logs" , 500 
-
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())

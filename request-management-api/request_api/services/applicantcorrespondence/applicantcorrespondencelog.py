@@ -32,8 +32,6 @@ class applicantcorrespondenceservice:
     def getapplicantcorrespondencelogs(self,ministryrequestid, rawrequestid):
         """ Returns the active applicant correspondence logs
         """
-        _correspondencelogs1 = FOIApplicantCorrespondence.getapplicantcorrespondences(ministryrequestid)
-        print("_correspondencelogs1", _correspondencelogs1)
         _correspondencelogs = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencesrawrequests(rawrequestid)
         print("_correspondencelogs", _correspondencelogs)
         _correspondenceattachments = FOIApplicantCorrespondenceAttachmentRawRequest.getcorrespondenceattachmentsbyrawrequestid(rawrequestid)
@@ -59,6 +57,7 @@ class applicantcorrespondenceservice:
                 correspondencelogs.append(correpondencelog)
         # Since we're merging raw and ministry requests, resort by date
         correspondencelogs.sort(key=lambda x: datetime.strptime(x['date'], '%Y %b %d | %I:%M %p'), reverse=True)
+        print("correspondencelogs", correspondencelogs)
         return correspondencelogs
     
     def __getattachmentsbyid(self, attachments, correspondenceid, correspondenceversion):
@@ -93,6 +92,7 @@ class applicantcorrespondenceservice:
         emails = data['emails'] if 'emails' in data else None   
         applicantcorrespondence.response_at = data['responsedate'] if 'responsedate' in data and data['responsedate'] is not None else datetime.now()
 
+        print("saveapplicantcorrespondencelog", applicantcorrespondence)
         return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails)        
 
     def saveapplicantcorrespondencelogforrawrequest(self, requestid, data, userid, isdraft=False):
@@ -122,6 +122,7 @@ class applicantcorrespondenceservice:
                 applicantcorrespondence.sentby = userid
         emails = data['emails'] if 'emails' in data else None   
         applicantcorrespondence.response_at = data['responsedate'] if 'responsedate' in data and data['responsedate'] is not None else datetime.now()
+        print("saveapplicantcorrespondencelog2", applicantcorrespondence)
         return FOIApplicantCorrespondenceRawRequest.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails)
     
     def editapplicantcorrespondencelogforministry(self, ministryrequestid, data, userid):
@@ -141,6 +142,7 @@ class applicantcorrespondenceservice:
             updt_correspondence.isdraft = data['isdraft']
         if 'correspondencemessagejson' in data and data['correspondencemessagejson'] is not None:
             updt_correspondence.correspondencemessagejson = data['correspondencemessagejson']
+        print("saveapplicantcorrespondencelog3", updt_correspondence)
         response = FOIApplicantCorrespondence.saveapplicantcorrespondence(updt_correspondence, None, None)
         if response.success == True:
             attachresponse = self.__updateattachmentversionministry(data, userid)
@@ -165,6 +167,7 @@ class applicantcorrespondenceservice:
             updt_correspondence.isdraft = data['isdraft']
         if 'correspondencemessagejson' in data and data['correspondencemessagejson'] is not None:
             updt_correspondence.correspondencemessagejson = data['correspondencemessagejson']
+        print("saveapplicantcorrespondencelog4", updt_correspondence)
         response = FOIApplicantCorrespondenceRawRequest.saveapplicantcorrespondence(updt_correspondence, None, None)
         if response.success == True:
             attachresponse = self.__updateattachmentversionrawrequest(data, userid)

@@ -38,6 +38,7 @@ class emailservice:
             _messageattachmentlist = self.__get_attachments(ministryrequestid, emailschema, servicename)
             self.__pre_send_correspondence_audit(requestid, ministryrequestid,emailschema, content, templateconfig().isnotreceipt(servicename), _messageattachmentlist)
             subject = templateconfig().getsubject(servicename, requestjson)
+            print("requestjsonEmail", requestjson.get("email"))
             return senderservice().send(subject, _messagepart, _messageattachmentlist, requestjson.get("email"))
         except Exception as ex:
             logging.exception(ex)
