@@ -36,7 +36,7 @@ class applicantcorrespondenceservice:
         correspondencelogs =[]
         for _correpondencelog in _correspondencelogs:
                 attachments = []
-                for _attachment in _correpondencelog['attachments']:
+                for _attachment in _correpondencelog.get('attachments'):
                     attachment = {
                         "applicantcorrespondenceattachmentid" : _attachment.applicantcorrespondenceattachmentid,
                         "documenturipath" : _attachment.attachmentdocumenturipath,
