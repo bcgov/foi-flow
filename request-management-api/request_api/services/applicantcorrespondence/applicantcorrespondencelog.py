@@ -29,52 +29,37 @@ class applicantcorrespondenceservice:
         """
         return ApplicationCorrespondenceTemplate.get_template_by_id(templateid)
     
-    def getapplicantcorrespondencelogs(self,ministryrequestid):
+    def getapplicantcorrespondencelogs(self,ministryrequestid, rawrequestid):
         """ Returns the active applicant correspondence logs
         """
-        _correspondencelogs = FOIApplicantCorrespondence.getapplicantcorrespondences(ministryrequestid)
+        _correspondencelogs1 = FOIApplicantCorrespondence.getapplicantcorrespondences(ministryrequestid)
+        print("_correspondencelogs1", _correspondencelogs1)
+        _correspondencelogs = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencesrawrequests(rawrequestid)
+        print("_correspondencelogs", _correspondencelogs)
+        _correspondenceattachments = FOIApplicantCorrespondenceAttachmentRawRequest.getcorrespondenceattachmentsbyrawrequestid(rawrequestid)
+        _correspondenceemails = FOIApplicantCorrespondenceEmailRawRequest.getapplicantcorrespondenceemails(rawrequestid)
+        if ministryrequestid != 'None':
+            _correspondencelogs.extend(FOIApplicantCorrespondence.getapplicantcorrespondences(ministryrequestid))
+            _correspondenceattachments.extend(FOIApplicantCorrespondenceAttachment.getcorrespondenceattachmentsbyministryid(ministryrequestid))
+            _correspondenceemails.extend(FOIApplicantCorrespondenceEmail.getapplicantcorrespondenceemails(ministryrequestid))
         correspondencelogs =[]
         for _correpondencelog in _correspondencelogs:
                 attachments = []
-                for _attachment in _correpondencelog.get('attachments'):
+                for _attachment in self.__getattachmentsbyid(_correspondenceattachments, _correpondencelog['applicantcorrespondenceid'], _correpondencelog['version']):
                     attachment = {
-                        "applicantcorrespondenceattachmentid" : _attachment.applicantcorrespondenceattachmentid,
-                        "documenturipath" : _attachment.attachmentdocumenturipath,
-                        "filename" : _attachment.attachmentfilename,
+                        "applicantcorrespondenceattachmentid" : _attachment['applicantcorrespondenceattachmentid'],
+                        "documenturipath" : _attachment['attachmentdocumenturipath'],
+                        "filename" : _attachment['attachmentfilename'],
                     }
                     attachments.append(attachment)
                 correpondencelog = self.__createcorrespondencelog(_correpondencelog, attachments)
+                #Email block - Begin
+                correpondencelog['emails'] = self.__getcorrespondenceemailbyid(_correspondenceemails,  _correpondencelog['applicantcorrespondenceid'], _correpondencelog['version'])
+                #Email block - End
                 correspondencelogs.append(correpondencelog)
+        # Since we're merging raw and ministry requests, resort by date
+        correspondencelogs.sort(key=lambda x: datetime.strptime(x['date'], '%Y %b %d | %I:%M %p'), reverse=True)
         return correspondencelogs
-
-    # def getapplicantcorrespondencelogs(self,ministryrequestid, rawrequestid):
-    #     """ Returns the active applicant correspondence logs
-    #     """
-    #     _correspondencelogs = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencesrawrequests(rawrequestid)
-    #     _correspondenceattachments = FOIApplicantCorrespondenceAttachmentRawRequest.getcorrespondenceattachmentsbyrawrequestid(rawrequestid)
-    #     _correspondenceemails = FOIApplicantCorrespondenceEmailRawRequest.getapplicantcorrespondenceemails(rawrequestid)
-    #     if ministryrequestid != 'None':
-    #         _correspondencelogs.extend(FOIApplicantCorrespondence.getapplicantcorrespondences(ministryrequestid))
-    #         _correspondenceattachments.extend(FOIApplicantCorrespondenceAttachment.getcorrespondenceattachmentsbyministryid(ministryrequestid))
-    #         _correspondenceemails.extend(FOIApplicantCorrespondenceEmail.getapplicantcorrespondenceemails(ministryrequestid))
-    #     correspondencelogs =[]
-    #     for _correpondencelog in _correspondencelogs:
-    #             attachments = []
-    #             for _attachment in self.__getattachmentsbyid(_correspondenceattachments, _correpondencelog['applicantcorrespondenceid'], _correpondencelog['version']):
-    #                 attachment = {
-    #                     "applicantcorrespondenceattachmentid" : _attachment['applicantcorrespondenceattachmentid'],
-    #                     "documenturipath" : _attachment['attachmentdocumenturipath'],
-    #                     "filename" : _attachment['attachmentfilename'],
-    #                 }
-    #                 attachments.append(attachment)
-    #             correpondencelog = self.__createcorrespondencelog(_correpondencelog, attachments)
-    #             #Email block - Begin
-    #             correpondencelog['emails'] = self.__getcorrespondenceemailbyid(_correspondenceemails,  _correpondencelog['applicantcorrespondenceid'], _correpondencelog['version'])
-    #             #Email block - End
-    #             correspondencelogs.append(correpondencelog)
-    #     # Since we're merging raw and ministry requests, resort by date
-    #     correspondencelogs.sort(key=lambda x: datetime.strptime(x['date'], '%Y %b %d | %I:%M %p'), reverse=True)
-    #     return correspondencelogs
     
     def __getattachmentsbyid(self, attachments, correspondenceid, correspondenceversion):
         return [x for x in attachments if x['applicantcorrespondenceid'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion]

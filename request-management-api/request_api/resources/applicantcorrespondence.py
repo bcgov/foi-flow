@@ -69,19 +69,6 @@ class FOIFlowApplicantCorrespondenceTemplates(Resource):
 @API.route('/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>')
 class FOIFlowApplicantCorrespondence(Resource):
 
-    # @staticmethod
-    # @TRACER.trace()
-    # @cross_origin(origins=allowedorigins())
-    # @auth.require
-    # @auth.hasusertype('iao')
-    # def get(requestid, ministryrequestid):
-    #     try:
-    #         rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
-    #         correspondencelogs = applicantcorrespondenceservice().getapplicantcorrespondencelogs(ministryrequestid, rawrequestid)
-    #         return json.dumps(correspondencelogs) , 200
-    #     except BusinessException:
-    #         return "Error happened while fetching  applicant correspondence logs" , 500 
-
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
@@ -89,10 +76,23 @@ class FOIFlowApplicantCorrespondence(Resource):
     @auth.hasusertype('iao')
     def get(requestid, ministryrequestid):
         try:
-            correspondencelogs = applicantcorrespondenceservice().getapplicantcorrespondencelogs(ministryrequestid)
+            rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
+            correspondencelogs = applicantcorrespondenceservice().getapplicantcorrespondencelogs(ministryrequestid, rawrequestid)
             return json.dumps(correspondencelogs) , 200
         except BusinessException:
             return "Error happened while fetching  applicant correspondence logs" , 500 
+
+    # @staticmethod
+    # @TRACER.trace()
+    # @cross_origin(origins=allowedorigins())
+    # @auth.require
+    # @auth.hasusertype('iao')
+    # def get(requestid, ministryrequestid):
+    #     try:
+    #         correspondencelogs = applicantcorrespondenceservice().getapplicantcorrespondencelogs(ministryrequestid)
+    #         return json.dumps(correspondencelogs) , 200
+    #     except BusinessException:
+    #         return "Error happened while fetching  applicant correspondence logs" , 500 
 
     @staticmethod
     @TRACER.trace()
