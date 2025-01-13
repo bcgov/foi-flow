@@ -37,6 +37,10 @@ class notificationuser:
             _users = self.__getgroupmembers('OI Team')
         elif 'OI State' in notificationtype:
             _users = self.__getoiassignees(requestjson)
+        elif 'Exemption Approved' in notificationtype:
+            _users = self.__getassignees(foirequest, requesttype, notificationtype)
+        elif 'Exemption Denied' in notificationtype:
+            _users = self.__getassignees(foirequest, requesttype, notificationtype)
         else:
             _users = self.__getassignees(foirequest, requesttype, notificationtype, requestjson) + self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)
         for user in _users:
