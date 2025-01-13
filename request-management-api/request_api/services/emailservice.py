@@ -26,9 +26,6 @@ class emailservice:
     def send(self, servicename, requestid, ministryrequestid, emailschema):
         try:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
-            increment_number = 1  # Initialize the number
-            print("requestjson", increment_number, requestjson)
-            increment_number += 1  # Increment the number
             _templatename = self.__getvaluefromschema(emailschema, "templatename")
             servicename = _templatename  if servicename == ServiceName.correspondence.value.upper() else servicename            
             _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
@@ -38,7 +35,6 @@ class emailservice:
             _messageattachmentlist = self.__get_attachments(ministryrequestid, emailschema, servicename)
             self.__pre_send_correspondence_audit(requestid, ministryrequestid,emailschema, content, templateconfig().isnotreceipt(servicename), _messageattachmentlist)
             subject = templateconfig().getsubject(servicename, requestjson)
-            print("requestjsonEmail", requestjson.get("email"))
             return senderservice().send(subject, _messagepart, _messageattachmentlist, requestjson.get("email"))
         except Exception as ex:
             logging.exception(ex)
@@ -79,7 +75,6 @@ class emailservice:
                 "correspondencemessagejson": {"message": content},
                 "attachments": attachmentlist
             }
-            print("saveapplicantcorrespondencelog9", requestid)
             return applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, data, 'system')
         
 
@@ -104,5 +99,4 @@ class emailservice:
             logging.exception(ex)
     
     def __getvaluefromschema(self, emailschema, property):
-        schema = emailschema.get(property) if property in emailschema  else None
         return emailschema.get(property) if property in emailschema  else None

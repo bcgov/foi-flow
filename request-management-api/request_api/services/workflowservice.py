@@ -95,7 +95,6 @@ class workflowservice:
         filenumber = self.__getvaluefromschema(requestsschema,"idNumber")
         status = self.__getvaluefromschema(requestsschema,"currentState")
         metadata = json.dumps({"id": filenumber, "status": status , "ministryRequestID": ministryid, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "applicantcorrespondenceid": applicantcorrespondenceid, "templatename": templatename.replace(" ", "")})
-        print("metadata", metadata)
         bpmservice().correspondanceevent(wfinstanceid, filenumber, metadata)
 
     def syncwfinstance(self, requesttype, requestid, isallactivity=False):      

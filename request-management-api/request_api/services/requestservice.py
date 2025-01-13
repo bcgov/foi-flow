@@ -247,13 +247,10 @@ class requestservice:
         templateid,
     ):
         foirequestschema = self.getrequestdetails(requestid, ministryrequestid)
-        print("foirequestschema", foirequestschema)
         templatedetails = applicantcorrespondenceservice().gettemplatebyid(templateid)
-        print("templatedetails", templatedetails)
         wfinstanceid = workflowservice().syncwfinstance(
             "ministryrequest", ministryrequestid, True
         )
-        print("wfinstanceid", wfinstanceid)
         workflowservice().postcorrenspodenceevent(
             wfinstanceid,
             ministryrequestid,

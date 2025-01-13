@@ -112,7 +112,6 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
             correspondenceschemaobj = FOIApplicantCorrespondenceSchema().load(data=requestjson)
             rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
             if ministryrequestid != 'None' or "israwrequest" in correspondenceschemaobj and correspondenceschemaobj["israwrequest"] == False:
-                print("saveapplicantcorrespondencelog5", correspondenceschemaobj)
                 result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(rawrequestid, ministryrequestid, correspondenceschemaobj, AuthHelper.getuserid(), True)
             elif ministryrequestid == 'None' or "israwrequest" in correspondenceschemaobj and correspondenceschemaobj["israwrequest"] == True:
                 result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, correspondenceschemaobj, AuthHelper.getuserid(), True)
@@ -137,7 +136,6 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
             if ministryrequestid == 'None' or "israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"] == True:
                 result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelog, AuthHelper.getuserid(), True)
             else:
-                print("saveapplicantcorrespondencelog6", applicantcorrespondencelog)
                 result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(rawrequestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid(), True)
             if result.success == True:
                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
@@ -215,7 +213,6 @@ class FOIFlowApplicantCorrespondenceResponse(Resource):
             if ministryrequestid == 'None' or 'israwrequest' in requestjson and requestjson['israwrequest'] == True:
                 result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestidfromfoirequest, correspondenceemail, AuthHelper.getuserid())
             else:
-                print("saveapplicantcorrespondencelog7", rawrequestidfromfoirequest)
                 result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(rawrequestidfromfoirequest, ministryrequestid, correspondenceemail, AuthHelper.getuserid())
             
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      

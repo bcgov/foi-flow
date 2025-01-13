@@ -66,7 +66,6 @@ class bpmservice(camundaservice):
                                                   "assignedTo": VariableSchema().dump({"type" : VariableType.String.value, "value": userid})
                                                   }
                                               })
-            print("messageschema2", messageschema)
             return self.__post_message(messagetype, messageschema, token)
         else:
             return
@@ -80,7 +79,6 @@ class bpmservice(camundaservice):
                                                   "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})
                                                   }
                                               })
-            print("messageschema3", messageschema)
             return self.__post_message(messagetype, messageschema, token)
         else:
             return
@@ -113,7 +111,6 @@ class bpmservice(camundaservice):
                                               "processVariables":{
                                                   "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})}
                                               })
-            print("messageschema4", messageschema)
             return self.__post_message(messagetype, messageschema, token)
         else:
             return    
@@ -128,7 +125,6 @@ class bpmservice(camundaservice):
                                                 "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data}),
                                                 "paymentstatus": VariableSchema().dump({"type" : VariableType.String.value, "value": paymentstatus})}
                                             })
-            print("messageschema5", messageschema)
             return self.__post_message(MessageType.managepayment.value, messageschema, token)
         else:
             return
@@ -143,7 +139,6 @@ class bpmservice(camundaservice):
                                               "processVariables":{
                                                   "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})}
                                               })
-            print("messageschema6", messageschema)
             return self.__post_message(MessageType.iaocorrenspodence.value, messageschema, token)
         else:
             return 
@@ -152,7 +147,6 @@ class bpmservice(camundaservice):
         return self.unopenedcomplete(processinstanceid, data, messagetype, token)
 
     def __post_message(self, messagetype, messageschema, token=None):
-        print("messageschema1", messageschema)
         return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
 
     def _getUrl_(self, messagetype, definitionkey=None):
