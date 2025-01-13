@@ -83,31 +83,6 @@ class FOIFlowApplicantCorrespondence(Resource):
         except BusinessException:
             return "Error happened while fetching  applicant correspondence logs" , 500 
 
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    @auth.hasusertype('iao')
-    def post(requestid, ministryrequestid):
-        try:
-            requestjson = request.get_json()
-            applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
-
-            result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
-            if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
-                requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
-            if result.success == True:
-                _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
-                _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
-                if _paymentexpirydate not in (None, ""):
-                    paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())            
-            requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
-           
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
-        except BusinessException:
-            return "Error happened while saving  applicant correspondence log" , 500 
-
- 
     # @staticmethod
     # @TRACER.trace()
     # @cross_origin(origins=allowedorigins())
@@ -117,39 +92,64 @@ class FOIFlowApplicantCorrespondence(Resource):
     #     try:
     #         requestjson = request.get_json()
     #         applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
-    #         rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
 
-    #         # Save correspondence log based on request type
-    #         if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
-    #             print("ministryrequestid1")
-    #             result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
-    #         else:
-    #             print("ministryrequestid2")
-    #             result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
-
-    #         print("result", result)
-    #         if communicationwrapperservice._is_fee_processing(applicantcorrespondencelog["templateid"]) == True:
-    #             if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
-    #                 requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
-    #             if result.success == True:
-    #                 _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
-    #                 _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
-    #                 if _paymentexpirydate not in (None, ""):
-    #                     paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())            
-    #             requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
-    #             print("result2", result)
-    #             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200    
-
-    #         # Send email for non-fee templates with email recipients
-    #         else:
-    #             if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
-    #                 template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
-    #                 communicationemailservice().send(template, applicantcorrespondencelog)
-    #                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200    
-
+    #         result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
+    #         if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
+    #             requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
+    #         if result.success == True:
+    #             _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
+    #             _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
+    #             if _paymentexpirydate not in (None, ""):
+    #                 paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())            
+    #         requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
+           
+    #         return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
     #     except BusinessException:
     #         return "Error happened while saving  applicant correspondence log" , 500 
 
+ 
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.hasusertype('iao')
+    def post(requestid, ministryrequestid):
+        try:
+            requestjson = request.get_json()
+            applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
+            rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
+
+            # Save correspondence log based on request type
+            if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
+                print("ministryrequestid1")
+                result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
+            else:
+                print("ministryrequestid2")
+                result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
+
+            print("result", result)
+            if communicationwrapperservice._is_fee_processing(applicantcorrespondencelog["templateid"]) == True:
+                if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
+                    requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
+                if result.success == True:
+                    _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
+                    _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
+                    if _paymentexpirydate not in (None, ""):
+                        paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())            
+                requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
+                print("result2", result)
+                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200    
+
+            # Send email for non-fee templates with email recipients
+            else:
+                if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
+                    template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
+                    communicationemailservice().send(template, applicantcorrespondencelog)
+                    return {'status': result.success, 'message':result.message,'id':result.identifier} , 200    
+
+        except BusinessException:
+            return "Error happened while saving  applicant correspondence log" , 500 
+        
 
     # @staticmethod
     # @TRACER.trace()
