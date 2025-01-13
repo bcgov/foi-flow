@@ -93,31 +93,11 @@ class FOIFlowApplicantCorrespondence(Resource):
             requestjson = request.get_json()
             applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson)
             rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
-
-            # Call the service method
-            result = communicationwrapperservice().send_email(
-                requestid, ministryrequestid, rawrequestid, applicantcorrespondencelog
-            )
-            return result
+            result = communicationwrapperservice().send_email(requestid, ministryrequestid, rawrequestid, applicantcorrespondencelog)
+            return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
         except BusinessException:
             return "Error happened while saving applicant correspondence log", 500
-   
-
-    # @staticmethod
-    # @TRACER.trace()
-    # @cross_origin(origins=allowedorigins())
-    # @auth.require
-    # @auth.hasusertype('iao')
-    # def post(requestid, ministryrequestid):
-    #     try:
-    #         requestjson = request.get_json()
-    #         applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
-    #         rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
-    #         result = communicationwrapperservice().send_email(rawrequestid, ministryrequestid, applicantcorrespondencelog)
-    #         return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
-    #     except BusinessException:
-    #         return "Error happened while saving  applicant correspondence log" , 500 
-        
+               
         
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiflow/applicantcorrespondence/draft/<requestid>/<ministryrequestid>')

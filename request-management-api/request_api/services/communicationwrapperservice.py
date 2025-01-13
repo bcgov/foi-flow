@@ -34,13 +34,12 @@ class communicationwrapperservice:
     #                 return communicationemailservice().send(template, applicantcorrespondencelog)
     #             return result
             
+    
     def send_email(self, requestid, ministryrequestid, rawrequestid, applicantcorrespondencelog):
         # Save correspondence log based on request type
         if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
-            print("ministryrequestid1")
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
         else:
-            print("ministryrequestid2")
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
 
         # Handle fee processing templates
@@ -54,8 +53,6 @@ class communicationwrapperservice:
                 if _paymentexpirydate not in (None, ""):
                     paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())            
             requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
-            print("result2", result)
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
 
         # Handle non-fee templates
         # Send email for non-fee templates with email recipients
@@ -63,9 +60,9 @@ class communicationwrapperservice:
             if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
                 template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
                 communicationemailservice().send(template, applicantcorrespondencelog)
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
 
-        return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
+        return result
+
 
     def __handle_fee_email(self,requestid, ministryrequestid, applicantcorrespondencelog):
         if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
@@ -76,15 +73,11 @@ class communicationwrapperservice:
                 paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())
         return requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
 
+
     def __is_fee_processing(self, templateid):
         if applicantcorrespondenceservice().gettemplatebyid(templateid).name in ['PAYONLINE','PAYOUTSTANDING']:
             return True
         return False
-    
-    # def _is_fee_processing(templateid):
-    #     if applicantcorrespondenceservice().gettemplatebyid(templateid).name in ['PAYONLINE','PAYOUTSTANDING']:
-    #         return True
-    #     return False
 
 class CommuniationType(Enum):
     """Communication types."""
