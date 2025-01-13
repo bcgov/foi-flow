@@ -32,8 +32,8 @@ def upgrade():
 
     op.execute('''INSERT INTO public."OperatingTeamEmails" (teamid, email_address)
                     VALUES
-                        ((SELECT teamid FROM public."OperatingTeams" WHERE name = 'Central and Economy Team'), 'IAOCentralTeam@gov.bc.ca'),
-                        ((SELECT teamid FROM public."OperatingTeams" WHERE name = 'Community and Health Team'), 'FOI.SocialEducationTeam@gov.bc.ca'),
+                        ((SELECT teamid FROM public."OperatingTeams" WHERE name = 'Central and Economy Team'), 'IAO.CentralAndEconomyTeam@gov.bc.ca'),
+                        ((SELECT teamid FROM public."OperatingTeams" WHERE name = 'Community and Health Team'), 'IAO.CommunityandHealthTeam@gov.bc.ca'),
                         ((SELECT teamid FROM public."OperatingTeams" WHERE name = 'Resource and Justice Team'), 'IAOResourceTeam@gov.bc.ca'),
                         ((SELECT teamid FROM public."OperatingTeams" WHERE name = 'Children and Family Team'), 'IAO.ChildrenandEducationTeam@gov.bc.ca'),
                         ((SELECT teamid FROM public."OperatingTeams" WHERE name = 'Children and Education Team'), 'IAO.ChildrenandEducationTeam@gov.bc.ca'),
