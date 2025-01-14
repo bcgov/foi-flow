@@ -74,6 +74,8 @@ class openinfoservice:
                 deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
                 if deactivateresult.success:
                     return result
+                else:
+                    return deactivateresult
             return result
         else:
             return result

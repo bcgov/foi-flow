@@ -125,6 +125,14 @@ class eventservice:
         except BusinessException as exception:
             self.__logbusinessexception(exception)
 
+    def postopeninfoexemptionevent(self, ministryrequestid, requestid, userid, username, event_type, exemption_id):
+        try:
+            openinfoeventresponse = openinfoevent().handle_exemption_request(requestid, ministryrequestid, userid, username, event_type, exemption_id)
+            if openinfoeventresponse.success == False:
+                current_app.logger.error("FOI Notification failed for openinfo event for request= %s ; event response=%s" % (requestid, openinfoeventresponse.message))
+        except BusinessException as exception:
+            self.__logbusinessexception(exception)
+
     def posteventforemailfailure(self, ministryrequestid, requesttype, stage, reason, userid):
         try:
             emaileventresponse = emailevent().createemailevent(ministryrequestid, requesttype, stage, reason, userid)

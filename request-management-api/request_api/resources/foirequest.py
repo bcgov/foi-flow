@@ -309,21 +309,10 @@ class FOIRequestsById(Resource):
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
-                # Add exemption request notification if needed
-                if(request_json['oistatusid'] == OIStatusEnum.EXEMPTION_REQUEST.value):
-                    notification_result = openinfoevent().handle_exemption_request(
-                        foiministryrequestid, 
-                        foirequestid, 
-                        AuthHelper.getuserid(), 
-                        AuthHelper.getusername(),
-                        OpenInfoNotificationType.EXEMPTION_REQUEST.value,
-                        None
-                    )
-                    if not notification_result.success:
-                        print(f"Warning: Failed to create exemption notification: {notification_result.message}")
-                
                 if (section == 'oistatusid'):
                     eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
+                    if(request_json['oistatusid'] == OIStatusEnum.EXEMPTION_REQUEST.value):
+                        eventservice().postopeninfoexemptionevent(foiministryrequestid, foirequestid, AuthHelper.getuserid(),AuthHelper.getusername(), OpenInfoNotificationType.EXEMPTION_REQUEST.value, None)
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
                 return {'success': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
