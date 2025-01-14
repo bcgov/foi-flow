@@ -18,40 +18,42 @@ class communicationwrapperservice:
     """ FOI communication wrapper service
     """
 
-    def send_email(self,requestid, ministryrequestid, applicantcorrespondencelog):
+    def send_email(self, requestid, ministryrequestid, rawrequestid, applicantcorrespondencelog):
+        # Save correspondence log based on request type
         if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
-            result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(requestid, applicantcorrespondencelog, AuthHelper.getuserid())
+            result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
         else:
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
+
         if result.success == True:
             # raw requests should never be fee emails so they would only get handled by else statement
-            if self.__is_fee_processing(applicantcorrespondencelog["templateid"]) == True:
-                return self.__handle_fee_email(requestid, ministryrequestid, applicantcorrespondencelog)
+            # Handle fee processing templates
+            if self.__is_fee_processing(applicantcorrespondencelog["templateid"]):
+                self.__handle_fee_email(requestid, ministryrequestid, result, applicantcorrespondencelog)
+            # Handle non-fee templates - Send email for non-fee templates with email recipients
             else:
                 if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
                     template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
-                    return communicationemailservice().send(template, applicantcorrespondencelog)
-                return result
+                    communicationemailservice().send(template, applicantcorrespondencelog)
+            return result
 
 
-
-
-
-    def __handle_fee_email(self,requestid, ministryrequestid, applicantcorrespondencelog):
-        if cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
+    def __handle_fee_email(self, requestid, ministryrequestid, result, applicantcorrespondencelog):
+        if cfrfeeservice().getactivepayment(requestid, ministryrequestid) is not None:
             requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
-            _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
-            _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
-            if _paymentexpirydate not in (None, ""):
-                paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())
-        return requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
+        _attributes = applicantcorrespondencelog["attributes"][0] if "attributes" in applicantcorrespondencelog else None
+        _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
+        if _paymentexpirydate not in (None, ""):
+            paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())            
+        requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
+
 
     def __is_fee_processing(self, templateid):
-        if applicantcorrespondenceservice().gettemplatebyid(templateid) in ['PAYONLINE','PAYOUTSTANDING']:
+        if applicantcorrespondenceservice().gettemplatebyid(templateid).name in ['PAYONLINE','PAYOUTSTANDING']:
             return True
         return False
 
 class CommuniationType(Enum):
     """Communication types."""
     FEE_PROCESSING = 'FEE_PROCESSING'
-    GENERAL = 'GENERAL'           
+    GENERAL = 'GENERAL'   
