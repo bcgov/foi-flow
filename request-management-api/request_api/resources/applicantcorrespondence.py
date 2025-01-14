@@ -92,6 +92,8 @@ class FOIFlowApplicantCorrespondence(Resource):
             requestjson = request.get_json()
             applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson)
             rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
+            print("requestid", requestid)
+            print("rawrequestid", rawrequestid)
             result = communicationwrapperservice().send_email(rawrequestid, ministryrequestid, applicantcorrespondencelog)
             return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
         except BusinessException:

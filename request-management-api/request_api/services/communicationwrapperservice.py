@@ -29,12 +29,13 @@ class communicationwrapperservice:
             # raw requests should never be fee emails so they would only get handled by else statement
             # Handle fee processing templates
             if self.__is_fee_processing(applicantcorrespondencelog["templateid"]):
-                return self.__handle_fee_email(requestid, ministryrequestid, result, applicantcorrespondencelog)
+                self.__handle_fee_email(requestid, ministryrequestid, result, applicantcorrespondencelog)
             # Handle non-fee templates - Send email for non-fee templates with email recipients
             else:
                 if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
                     template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
                     return communicationemailservice().send(template, applicantcorrespondencelog)
+            return result
 
 
     def __handle_fee_email(self, requestid, ministryrequestid, result, applicantcorrespondencelog):
@@ -45,7 +46,6 @@ class communicationwrapperservice:
         if _paymentexpirydate not in (None, ""):
             paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())            
         requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
-        return result
 
 
     def __is_fee_processing(self, templateid):
