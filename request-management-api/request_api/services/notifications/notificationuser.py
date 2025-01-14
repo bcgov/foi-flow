@@ -102,7 +102,10 @@ class notificationuser:
     
     def __getoiassignees(self, requestjson):
         notificationusertypelabel = notificationconfig().getnotificationusertypelabel("Assignee")
-        return [{"userid": requestjson['oiassignedto'], "usertype":notificationusertypelabel}]
+        notificationusers = []
+        if requestjson.get('oiassignedto'):
+            notificationusers.append({"userid": requestjson['oiassignedto'], "usertype":notificationusertypelabel})
+        return notificationusers
     
 
     def __isiaointernalcomment(self, notificationtype, requestjson):

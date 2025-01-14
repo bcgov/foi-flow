@@ -324,7 +324,7 @@ class FOIRequestsById(Resource):
                         print(f"Warning: Failed to create exemption notification: {notification_result.message}")
                 
                 if (section == 'oistatusid'):
-                    eventservice().postopeninfostateevent(foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
+                    eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
                 return {'success': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200

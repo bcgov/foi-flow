@@ -47,6 +47,7 @@ class openinfoservice:
         if 'oiassignedto' in foiopeninforequest:
             current_request = self.getcurrentfoiopeninforequest(foiministryrequestid)
             is_new_assignment = current_request and current_request.get('oiassignedto') is None and foiopeninforequest['oiassignedto'] is not None
+            is_assignment_changed = current_request and current_request.get('oiassignedto') != foiopeninforequest['oiassignedto']
             self.updateopeninfoassignee(foiopeninforequest['oiassignedto'], assigneedetails)
 
         foiministryrequestversion = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
@@ -54,15 +55,17 @@ class openinfoservice:
         foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
         result = FOIOpenInformationRequests().saveopeninfo(foiopeninforequest, userid)
         if result.success == True:
-            # Clear OI Team notifications
+            foiministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
+            requestid = foiministryrequest['foirequest_id'] if foiministryrequest else None
             if is_new_assignment:
+                # Clear OI Team notifications
                 openinfoevent().dismiss_exemption_notifications(foiministryrequestid)
+            if is_assignment_changed:
+                openinfoevent().createopeninfoassigneeevent(foiministryrequestid, requestid, AuthHelper.getuserid(), AuthHelper.getusername(), assigneedetails)
             
             # Handle exemption decision notifications
             if 'oiexemptionapproved' in foiopeninforequest and foiopeninforequest['oiexemptionapproved'] is not None:
-                notification_type = OpenInfoNotificationType.EXEMPTION_APPROVED.value if foiopeninforequest['oiexemptionapproved'] is True else OpenInfoNotificationType.EXEMPTION_DENIED.value
-                foiministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
-                requestid = foiministryrequest['foirequest_id'] if foiministryrequest else None
+                notification_type = OpenInfoNotificationType.EXEMPTION_APPROVED.value if foiopeninforequest['oiexemptionapproved'] is True else OpenInfoNotificationType.EXEMPTION_DENIED.value                
                 oiexemption_id = foiopeninforequest['oiexemption_id'] if foiopeninforequest['oiexemption_id'] else None
                 openinfoevent().handle_exemption_request(foiministryrequestid, requestid, AuthHelper.getuserid(), AuthHelper.getusername(), notification_type, oiexemption_id)
             

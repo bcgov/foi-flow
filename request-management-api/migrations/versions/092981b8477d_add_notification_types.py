@@ -20,6 +20,8 @@ def upgrade():
     op.execute('Insert into public."NotificationTypes" (name, description, notificationtypelabel, isactive) values (\'Exemption Request\', \'Exemption Request\', \'exemptionrequest\', true);commit;')
     op.execute('Insert into public."NotificationTypes" (name, description, notificationtypelabel, isactive) values (\'Exemption Approved\', \'Exemption Approved\', \'exemptionapproved\', true);commit;')
     op.execute('Insert into public."NotificationTypes" (name, description, notificationtypelabel, isactive) values (\'Exemption Denied\', \'Exemption Denied\', \'exemptiondenied\', true);commit;')
+    op.execute('Insert into public."NotificationTypes" (name, description, notificationtypelabel, isactive) values (\'OI State\', \'OI State\', \'oistate\', true);commit;')
+    op.execute('Insert into public."NotificationTypes" (name, description, notificationtypelabel, isactive) values (\'OI Assignee\', \'OI Assignee\', \'oiassignee\', true);commit;')
     # ### end Alembic commands ###
 
 
@@ -28,4 +30,6 @@ def downgrade():
     op.execute('delete from  public."NotificationTypes" where name in (\'Exemption Request\');commit;')
     op.execute('delete from  public."NotificationTypes" where name in (\'Exemption Approved\');commit;')
     op.execute('delete from  public."NotificationTypes" where name in (\'Exemption Denied\');commit;')
+    op.execute('delete from  public."NotificationTypes" where name in (\'OI State\');commit;')
+    op.execute('delete from  public."NotificationTypes" where name in (\'OI Assignee\');commit;')
     # ### end Alembic commands ###

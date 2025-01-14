@@ -16,9 +16,13 @@ class openinfoevent:
     """ FOI Event management service
 
     """
-    def createopeninfoevent(self, ministryrequestid, requestid, userid, username):
-        _commentresponse = self.__createcomment(requestid, userid, username)
-        _notificationresponse = self.__createnotification(requestid, userid)
+    def createopeninfoassigneeevent(self, ministryrequestid, requestid, userid, username, assigneedetails):
+        comment = {"comment": '{0} assigned this request to {1}'.format(username,assigneedetails['assignedToName']), 'ministryrequestid': ministryrequestid}
+        _commentresponse = commentservice().createministryrequestcomment(comment, userid, 2)
+        notificationservice().dismissnotifications_by_requestid_type(requestid, "ministryrequest", OpenInfoNotificationType.OI_ASSIGNEE.value)
+        _notificationtype = NotificationType.getnotificationtypeid(OpenInfoNotificationType.OI_ASSIGNEE.value)
+        _notificationmessage = 'New Request Assigned to You.'
+        _notificationresponse = self.__createnotification(requestid, userid, _notificationtype, _notificationmessage, {"oiassignedto": assigneedetails['assignedToName']})
         if _commentresponse.success == True and _notificationresponse.success == True:
             return DefaultMethodResult(True,'Comment posted',requestid)
         else:
@@ -32,10 +36,10 @@ class openinfoevent:
         for status in oistatuses:
             if status['oistatusid'] == foirequest['oistatus_id']:
                 oistatus = status['name']
-        comment = {"comment": username + ' changed the state of the request to ' + oistatus, 'ministryrequestid': ministryrequestid}
+        comment = {"comment": username + ' changed the state of the request to ' + (oistatus or "Unopened"), 'ministryrequestid': ministryrequestid}
         _commentresponse = commentservice().createministryrequestcomment(comment, userid, 2)
         _notificationtype = NotificationType.getnotificationtypeid('OI State')
-        _notificationmessage = "Moved to " + oistatus + " State"
+        _notificationmessage = "Moved to " + (oistatus or "Unopened") + " State"
         _notificationresponse = self.__createnotification(requestid, userid, _notificationtype, _notificationmessage, {"oiassignedto": _openinfo.get('oiassignedto')})
         if _commentresponse.success == True and _notificationresponse.success == True:
             return DefaultMethodResult(True,'Comment posted',requestid)
