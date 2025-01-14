@@ -219,3 +219,14 @@ class OIStatusEnum(Enum):
     @classmethod
     def list(cls):
         return [status.value for status in cls]
+
+class OpenInfoNotificationType(Enum):
+    EXEMPTION_REQUEST = "Exemption Request"
+    EXEMPTION_APPROVED = "Exemption Approved"
+    EXEMPTION_DENIED = "Exemption Denied"
+    OI_STATE = "OI State"
+    OI_ASSIGNEE = "OI Assignee"
+
+    @staticmethod
+    def list():
+        return [notification.value for notification in OpenInfoNotificationType]
