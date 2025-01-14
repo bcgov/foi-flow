@@ -29,6 +29,7 @@ class applicantcorrespondenceservice:
         """
         return ApplicationCorrespondenceTemplate.get_template_by_id(templateid)
     
+    
     def getapplicantcorrespondencelogs(self,ministryrequestid, rawrequestid):
         """ Returns the active applicant correspondence logs
         """
@@ -138,7 +139,6 @@ class applicantcorrespondenceservice:
             updt_correspondence.isdraft = data['isdraft']
         if 'correspondencemessagejson' in data and data['correspondencemessagejson'] is not None:
             updt_correspondence.correspondencemessagejson = data['correspondencemessagejson']
-        print("saveapplicantcorrespondencelog3", updt_correspondence)
         response = FOIApplicantCorrespondence.saveapplicantcorrespondence(updt_correspondence, None, None)
         if response.success == True:
             attachresponse = self.__updateattachmentversionministry(data, userid)
