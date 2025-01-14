@@ -70,3 +70,6 @@ export const RECORD_DOWNLOAD_SIZE_LIMIT = (window._env_ && window._env_.REACT_AP
 
 export const FOI_SOLR_API_BASE =  (window._env_ && window._env_.FOI_SOLR_API_BASE) ||
 process.env.FOI_SOLR_API_BASE || "https://solr-fc7a67-dev.apps.gold.devops.gov.bc.ca";
+
+export const SEARCH_KEYWORD_LIMIT =  (window._env_ && window._env_.SEARCH_KEYWORD_LIMIT) ||
+process.env.SEARCH_KEYWORD_LIMIT || 5;

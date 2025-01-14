@@ -36,6 +36,12 @@ const DataGridKeywordSearch = ({ userDetail }) => {
     keywordSearchParams,
   } = useContext(ActionContext);
 
+  console.log("keywordSearchParams-Grid:",keywordSearchParams)
+  const keywordSearchParamsRef = React.useRef(keywordSearchParams);
+
+  useEffect(() => {
+    keywordSearchParamsRef.current = keywordSearchParams;
+  }, [keywordSearchParams]);
 
   const renderReviewRequest = (e, row) => {
     e.preventDefault()
@@ -100,20 +106,40 @@ const DataGridKeywordSearch = ({ userDetail }) => {
   };
 
   const goToRecordsRenderCell = (params) => {
+    const keywordSearchParam = keywordSearchParamsRef.current;
+    console.log("goToRecordsRenderCell-",keywordSearchParam);
+    let keywordList = [];
+
     let link;
-    if (params.row.ministryrequestid) { 
-      link = `${DOC_REVIEWER_WEB_URL}/foi/${params.row.ministryrequestid}`;
+    if (params.row.ministryrequestid) {
+      if (keywordSearchParam?.keywords?.length > 0) {
+        const keywords = keywordSearchParam?.keywords
+          .map(keyword => `${keyword}`) // Properly quote keywords
+          .join(",");
+          keywordList.push(keywords);
+      }
+      console.log("keywordList:", keywordList);
+      let queryString= {"query": keywordList };
+      const queryStringParam = new URLSearchParams(queryString).toString();
+      const formattedQueryString = queryStringParam.replace(/\+/g, '%20');
+      console.log("formattedQueryString:", formattedQueryString);
+      link = `${DOC_REVIEWER_WEB_URL}/foi/${params.row.ministryrequestid}?${formattedQueryString}`;
+      console.log("link:", link);
     }
     return (
-      <Link href={link} target="_blank" rel="noopener noreferrer" onClick={(e) =>{ 
-        e.stopPropagation();}
-      }>
+      <Link
+        href={link}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
         <div className="MuiDataGrid-cellContent">Go to records</div>
       </Link>
-    )
+    );
   };
 
-  
 
   const IAOColumns = [
     {
@@ -174,7 +200,7 @@ const DataGridKeywordSearch = ({ userDetail }) => {
     {
       field: "goToRecords",
       headerName: "",
-      renderCell: goToRecordsRenderCell,
+      renderCell: (params) => goToRecordsRenderCell( params),
       //cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },

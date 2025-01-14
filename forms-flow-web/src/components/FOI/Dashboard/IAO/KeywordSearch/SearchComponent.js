@@ -32,6 +32,8 @@ import {
 } from "../../../../../helper/FOI/helper";
 import { ActionContext } from "./ActionContext";
 import Tooltip from '../../../customComponents/Tooltip/Tooltip';
+import { SEARCH_KEYWORD_LIMIT } from "../../../../../constants/constants";
+
 
 const DEFAULT_PAGE_SIZE = 100;
 const ITEM_HEIGHT = 48;
@@ -107,7 +109,6 @@ const KeywordSearch = ({ userDetail }) => {
   const [maxToDate, setMaxToDate] = useState(formatDate(new Date()));
   const [selectedPublicBodies, setSelectedPublicBodies] = useState(keywordSearchParams?.publicBodies || []);
 
-  console.log("keywordSearchParams:",keywordSearchParams)
   const [keywords, setKeywords] = useState(() => {
     if (keywordSearchParams != null && keywordSearchParams != undefined && Object.keys(keywordSearchParams).length > 0 && keywordSearchParams.keywords.length > 0) {
       return keywordSearchParams.keywords;
@@ -186,14 +187,15 @@ const KeywordSearch = ({ userDetail }) => {
   }
 
   useEffect(() => {
-    if (keywordSearchParams != null && keywordSearchParams != undefined && Object.keys(keywordSearchParams).length > 0) {
-        if (!keywordSearchComponentLoading) {
-          setKeywordSearchComponentLoading(true);
-        }
-        setKeywordSearchLoading(true);
-        handleUpdateSearchFilter(keywordSearchParams)
-    } 
+    if (keywordSearchParams && Object.keys(keywordSearchParams).length > 0) {
+      if (!keywordSearchComponentLoading) {
+        setKeywordSearchComponentLoading(true);
+      }
+      setKeywordSearchLoading(true);
+      handleUpdateSearchFilter(keywordSearchParams);
+    }
   }, []);
+  
 
   // const noSearchCriteria = () => {
   //   return (keywords.length===0  || !searchText)
@@ -214,7 +216,7 @@ const KeywordSearch = ({ userDetail }) => {
     if (!searchText) {
       return;
     }
-    if (keywords.length >= 10) {
+    if (keywords.length >= SEARCH_KEYWORD_LIMIT) {
       setError(true); // Show error message and turn bar red
       return;
     }
@@ -247,7 +249,7 @@ const KeywordSearch = ({ userDetail }) => {
   const handleKeywordDelete = (keywordToDelete) => {
     let updatedKeywordList= keywords.filter((keyword) => keyword !== keywordToDelete)
     setKeywords(updatedKeywordList);
-    if (updatedKeywordList.length >= 10)
+    if (updatedKeywordList.length >= SEARCH_KEYWORD_LIMIT)
       setError(true);
     else
       setError(false);
@@ -270,7 +272,7 @@ const KeywordSearch = ({ userDetail }) => {
             fontSize: "12px",
           }}
         >
-          You can only search up to 10 keywords at a time
+          You can only search up to {SEARCH_KEYWORD_LIMIT} keywords at a time
         </Typography>
       )}
       <Grid item container xs={12} 
