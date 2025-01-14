@@ -303,7 +303,6 @@ class FOIRequestsById(Resource):
                 foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
                 foirequest['userrecordslockstatus'] = request_json['userrecordslockstatus']
             if (section == "oistatusid"):
-                print("oistatusid called")
                 foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
                 foirequest['oistatusid'] = request_json['oistatusid']
             foirequestschema = FOIRequestWrapperSchema().load(foirequest)
