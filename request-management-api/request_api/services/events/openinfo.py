@@ -66,7 +66,7 @@ class openinfoevent:
             )
 
             # Create comment for approval/denial
-            if exemption_id and event_type in [OpenInfoNotificationType.EXEMPTION_APPROVED.value, OpenInfoNotificationType.EXEMPTION_DENIED.value]:
+            if event_type in [OpenInfoNotificationType.EXEMPTION_APPROVED.value, OpenInfoNotificationType.EXEMPTION_DENIED.value]:
                 _commentresponse = self.__createcomment(requestid, userid, username, event_type, exemption_id)
                 if not _commentresponse.success:
                     return DefaultMethodResult(False, 'Unable to post comment', requestid)
@@ -106,7 +106,7 @@ class openinfoevent:
         if event_type == OpenInfoNotificationType.EXEMPTION_APPROVED.value:
             return f"Publication Exemption Approved by {username} for {exemption_reason}"
         elif event_type == OpenInfoNotificationType.EXEMPTION_DENIED.value:
-            return f"Publication Exemption denied for {exemption_reason} by {username}"
+            return f"Publication Exemption denied by {username}"
         return None
 
     def __createnotification(self, requestid, userid, type, message, requestjson):
@@ -120,8 +120,8 @@ class openinfoevent:
 
     def __preparecomment(self, requestid, userid, username, event_type, exemption_id):
         if event_type in [OpenInfoNotificationType.EXEMPTION_APPROVED.value, OpenInfoNotificationType.EXEMPTION_DENIED.value]:
-            exemption_reason = OpenInformationExemptions.getexemptionnamebyid(exemption_id)
-            comment = self.__commentmessage(username, event_type, exemption_reason)
+                exemption_reason = OpenInformationExemptions.getexemptionnamebyid(exemption_id)
+                comment = self.__commentmessage(username, event_type, exemption_reason)
         return comment
 
     def __notificationmessage(self, requestid):
