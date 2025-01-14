@@ -23,9 +23,9 @@
         "name": "Ministry Assignment",
         "notificationtypelabel": "ministryassignment"    
     },
-    "oiassignment": {
-        "name": "OI Assignment",
-        "notificationtypelabel": "oiassignment"   
+    "oiassignee": {
+        "name": "OI Assignee",
+        "notificationtypelabel": "oiassignee"   
     },
     "cfrduereminder": {
         "name": "CFR Due Reminder",
