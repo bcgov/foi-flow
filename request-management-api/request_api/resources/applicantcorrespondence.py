@@ -92,7 +92,7 @@ class FOIFlowApplicantCorrespondence(Resource):
             requestjson = request.get_json()
             applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson)
             rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
-            result = communicationwrapperservice().send_email(rawrequestid, ministryrequestid, applicantcorrespondencelog)
+            result = communicationwrapperservice().send_email(requestid, rawrequestid, ministryrequestid, applicantcorrespondencelog)
             return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
         except BusinessException:
             return "Error happened while saving applicant correspondence log", 500
