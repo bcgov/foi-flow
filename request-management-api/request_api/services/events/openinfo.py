@@ -22,7 +22,7 @@ class openinfoevent:
         notificationservice().dismissnotifications_by_requestid_type(requestid, "ministryrequest", OpenInfoNotificationType.OI_ASSIGNEE.value)
         _notificationtype = NotificationType.getnotificationtypeid(OpenInfoNotificationType.OI_ASSIGNEE.value)
         _notificationmessage = 'New Request Assigned to You.'
-        _notificationresponse = self.__createnotification(requestid, userid, _notificationtype, _notificationmessage, {"oiassignedto": assigneedetails['assignedToName']})
+        _notificationresponse = self.__createnotification(requestid, userid, _notificationtype, _notificationmessage, {"oiassignedto": assigneedetails['assignedTo']})
         if _commentresponse.success == True and _notificationresponse.success == True:
             return DefaultMethodResult(True,'Comment posted',requestid)
         else:
