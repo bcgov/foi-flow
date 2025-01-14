@@ -22,8 +22,16 @@ EXPOSE 8080
 RUN test ! -d /app && mkdir /app || :
 # Add spring boot application
 RUN mkdir -p /app
+COPY sslcom.crt /app/sslcom.crt
 COPY --from=MAVEN_TOOL_CHAIN /tmp/target/forms-flow-bpm.jar ./app
 RUN chmod a+rwx -R /app
+
+RUN keytool -import -trustcacerts \
+    -alias sslcom-cert \
+    -file /app/sslcom.crt \
+    -keystore /opt/java/openjdk/lib/security/cacerts \
+    -storepass changeit \
+    -noprompt
 WORKDIR /app
 VOLUME /tmp
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app/forms-flow-bpm.jar"]
