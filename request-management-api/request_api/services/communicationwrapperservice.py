@@ -18,10 +18,10 @@ class communicationwrapperservice:
     """ FOI communication wrapper service
     """
 
-    def send_email(self, requestid, ministryrequestid, rawrequestid, applicantcorrespondencelog):
+    def send_email(self, requestid, ministryrequestid, applicantcorrespondencelog):
         # Save correspondence log based on request type
         if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
-            result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
+            result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(requestid, applicantcorrespondencelog, AuthHelper.getuserid())
         else:
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
 
@@ -29,13 +29,12 @@ class communicationwrapperservice:
             # raw requests should never be fee emails so they would only get handled by else statement
             # Handle fee processing templates
             if self.__is_fee_processing(applicantcorrespondencelog["templateid"]):
-                self.__handle_fee_email(requestid, ministryrequestid, result, applicantcorrespondencelog)
+                return self.__handle_fee_email(requestid, ministryrequestid, result, applicantcorrespondencelog)
             # Handle non-fee templates - Send email for non-fee templates with email recipients
             else:
                 if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
                     template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
-                    communicationemailservice().send(template, applicantcorrespondencelog)
-            return result
+                    return communicationemailservice().send(template, applicantcorrespondencelog)
 
 
     def __handle_fee_email(self, requestid, ministryrequestid, result, applicantcorrespondencelog):
@@ -46,6 +45,7 @@ class communicationwrapperservice:
         if _paymentexpirydate not in (None, ""):
             paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())            
         requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
+        return result
 
 
     def __is_fee_processing(self, templateid):
