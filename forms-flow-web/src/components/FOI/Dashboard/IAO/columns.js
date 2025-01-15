@@ -159,7 +159,7 @@ const IntakeTeamColumns = [
     headerName: "CFR DUE",
     flex: 1,
     headerAlign: "left",
-    valueGetter: (params) => formatDate(params.row.cfrduedate, "MM/dd/yyyy"),
+    valueGetter: (params) => formatDate(params.row.cfrduedate, "MMM dd yyyy").toUpperCase(),
   },
   {
     field: "DaysLeftValue",
@@ -245,7 +245,7 @@ const FlexTeamColumns = [
     headerName: "CFR DUE",
     flex: 1,
     headerAlign: "left",
-    valueGetter: (params) => formatDate(params.row.cfrduedate, "MM/dd/yyyy"),
+    valueGetter: (params) => formatDate(params.row.cfrduedate, "MMM dd yyyy").toUpperCase(),
   },
   {
     field: "DaysLeftValue",
