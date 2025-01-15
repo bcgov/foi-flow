@@ -61,6 +61,8 @@ class Payment(Resource):
         try:
             request_json = request.get_json()
             fee_service: FeeService = FeeService(request_id=request_id, code=request_json['fee_code'])
+            print("request_id", request_id)
+            print("request_json", request_json)
             pay_response = fee_service.init_payment(request_json)
             return pay_response, 201
         except BusinessException as e:
