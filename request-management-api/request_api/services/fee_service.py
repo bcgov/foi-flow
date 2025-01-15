@@ -77,6 +77,7 @@ class FeeService:
             request_id=self.request_id
         ).flush()
 
+        print("self_payment", self.payment)
         self.payment.paybc_url = self._get_paybc_url(self.fee_code, return_route)
         self.payment.transaction_number = self._get_transaction_number()
         self.payment.commit()
@@ -173,6 +174,7 @@ class FeeService:
                            'revenue': self._get_gl_coding(self.payment.total, revenue_account)
                            }
 
+        print("url_params_dict", url_params_dict)
         url_params = urlencode(url_params_dict)
         # unquote is used below so that unescaped url string can be hashed
         url_params_dict['hashValue'] = HashService.encode(unquote_plus(url_params))
