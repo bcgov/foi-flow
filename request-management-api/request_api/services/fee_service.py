@@ -69,7 +69,6 @@ class FeeService:
             total = self._get_cfr_fee(self.request_id, pay_request)
         else:
             total = quantity * self.fee_code.fee
-        print("total", total)
         self.payment = Payment(
             fee_code_id=self.fee_code.fee_code_id,
             quantity=quantity,

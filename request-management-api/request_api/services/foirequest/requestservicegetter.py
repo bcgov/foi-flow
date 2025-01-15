@@ -117,7 +117,6 @@ class requestservicegetter:
         requestdetails = self.getrequest(foirequestid, foiministryrequestid)
         approvedcfrfee = cfrfeeservice().getapprovedcfrfee(foiministryrequestid)
         cfrfee = cfrfeeservice().getcfrfee(foiministryrequestid)
-        print("cfrfee2", cfrfee)
         payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
         if approvedcfrfee is not None and approvedcfrfee != {}:
             requestdetails['cfrfee'] = approvedcfrfee
