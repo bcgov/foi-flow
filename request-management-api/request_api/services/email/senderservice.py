@@ -85,7 +85,7 @@ class senderservice:
                 return DefaultMethodResult(True,'Sent successfully', -1)
         except Exception as e:
             logging.exception(e)
-        return {"success" : False, "message": "Unable to send", "identifier": -1}    
+        return DefaultMethodResult(False,'Unable to send', -1)
     
 
     def read_outbox_as_bytes(self, servicekey, requestjson):
