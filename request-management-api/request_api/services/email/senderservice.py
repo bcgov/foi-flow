@@ -82,7 +82,7 @@ class senderservice:
                 smtpobj.sendmail(msg['From'],  msg['To'], msg.as_string())
                 smtpobj.quit()
                 logging.debug("End: Send email for request")
-                return {"success" : True, "message": "Sent successfully", "identifier": -1}   
+                return DefaultMethodResult(True,'Sent successfully', -1)
         except Exception as e:
             logging.exception(e)
         return {"success" : False, "message": "Unable to send", "identifier": -1}    
