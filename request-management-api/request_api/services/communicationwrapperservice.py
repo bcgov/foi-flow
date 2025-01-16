@@ -45,7 +45,7 @@ class communicationwrapperservice:
         if _paymentexpirydate not in (None, ""):
             paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())            
         requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
-        return result
+        return {"success" : True, "message": "Sent successfully", "identifier": -1}  
 
 
     def __is_fee_processing(self, templateid):
