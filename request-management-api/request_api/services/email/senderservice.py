@@ -48,7 +48,10 @@ class senderservice:
             from_email = MAIL_FROM_ADDRESS
 
         msg['From'] = from_email
-        msg['To'] = ",".join(emails)
+        if isinstance(emails, list):
+            msg['To'] = ",".join(emails)
+        else:
+            msg['To'] = emails
         msg['Subject'] = subject
         formattedContent, embeddedImages = embeddedimagehandler().formatembeddedimage(content)
         part = MIMEText(formattedContent, "html")
@@ -79,10 +82,10 @@ class senderservice:
                 smtpobj.sendmail(msg['From'],  msg['To'], msg.as_string())
                 smtpobj.quit()
                 logging.debug("End: Send email for request")
-                return DefaultMethodResult(True,'Sent successfully', -1)    
+                return {"success" : True, "message": "Sent successfully", "identifier": -1}   
         except Exception as e:
             logging.exception(e)
-        return DefaultMethodResult(False,'Unable to send', -1)    
+        return {"success" : False, "message": "Unable to send", "identifier": -1}    
     
 
     def read_outbox_as_bytes(self, servicekey, requestjson):
