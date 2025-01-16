@@ -18,7 +18,7 @@ import './confirmationmodal.scss';
 import { StateEnum, StateTransitionCategories } from '../../../../constants/FOI/statusEnum';
 import FileUpload from '../FileUpload'
 import MinistryApprovalModal from './MinistryApprovalModal';
-import { formatDate, calculateDaysRemaining, ConditionalComponent, isMinistryLogin } from "../../../../helper/FOI/helper";
+import { formatDate, formatDateInPst, calculateDaysRemaining, ConditionalComponent, isMinistryLogin } from "../../../../helper/FOI/helper";
 import { MimeTypeList, MaxFileSizeInMB, MaxNumberOfFiles } from "../../../../constants/FOI/enum";
 import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo } from './util';
 
@@ -352,18 +352,21 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
   const _requestDetails = saveRequestObject;
   const _closingReasons = useSelector(state=> state.foiRequests.closingReasons);
 
-  const today = new Date();
-  const [closingDateText, setClosingDate] = React.useState( formatDate(today) );
+  const today = formatDateInPst(new Date());
+  const [closingDateText, setClosingDate] = React.useState(today);
   const [selectedReason, setClosingReason] = React.useState( 0 );
 
   //############### replace this with the last status change date
   const lastStatusChangeDate = _requestDetails.lastStatusUpdateDate;
 
+  React.useEffect(() => {
+    handleClosingDateChange(today);
+  }, []);
+
   const _handleClosingDateChange = (e) => {
     let pickedDate = e.target.value;
     if(new Date(pickedDate) > today)
-      pickedDate = formatDate(today);
-
+      pickedDate = formatDateInPst(today);
     setClosingDate(pickedDate);
     handleClosingDateChange(pickedDate);
   }
@@ -423,7 +426,7 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
             InputLabelProps={{
               shrink: true,
             }}
-            InputProps={{inputProps: { min: _requestDetails.requestProcessStart, max: formatDate(today)} }}
+            InputProps={{inputProps: { min: _requestDetails.requestProcessStart, max: formatDateInPst(today)} }}
             variant="outlined"
             required
             error={closingDateText === undefined || closingDateText === ""}
