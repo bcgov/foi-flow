@@ -385,10 +385,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     if (isOITeam) {
       dispatch(fetchOpenInfoStatuses());
       dispatch(fetchFOIOpenInfoAdditionalFiles(requestId, ministryId));
-      dispatch(fetchPDFStitchedStatus(requestId, ministryId, "openinfo", (err, res) => {
+      dispatch(fetchPDFStitchedStatus(requestId, ministryId, "publicationpackage", (err, res) => {
         dispatch(setFOIPDFStitchStatusForOIPackage(res))
       }));
-      dispatch(fetchPDFStitchedPackage(requestId, ministryId, "openinfo", (err, res) => {
+      dispatch(fetchPDFStitchedPackage(requestId, ministryId, "publicationpackage", (err, res) => {
         dispatch(setFOIPDFStitchedOIPackage(res))
       }));
     }
