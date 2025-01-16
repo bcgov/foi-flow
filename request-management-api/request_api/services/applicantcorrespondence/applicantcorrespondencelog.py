@@ -28,7 +28,8 @@ class applicantcorrespondenceservice:
         """ Returns the active applicant correspondence templates
         """
         return ApplicationCorrespondenceTemplate.get_template_by_id(templateid)
-
+    
+    
     def getapplicantcorrespondencelogs(self,ministryrequestid, rawrequestid):
         """ Returns the active applicant correspondence logs
         """
