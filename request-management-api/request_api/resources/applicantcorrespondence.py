@@ -77,6 +77,8 @@ class FOIFlowApplicantCorrespondence(Resource):
     def get(requestid, ministryrequestid):
         try:
             if ministryrequestid == 'None':
+                if requestid == 'undefined':
+                    return json.dumps([]) , 200
                 rawrequestid = requestid
             else:
                 rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
