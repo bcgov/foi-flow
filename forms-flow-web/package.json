@@ -52,6 +52,7 @@
     "@testing-library/user-event": "^12.1.10",
     "@wojtekmaj/react-daterange-picker": "^3.1.0",
     "axios": "^0.21.1",
+    "body-parser": "1.20.3",
     "bootstrap": "^4.6.0",
     "braces": "3.0.3",
     "browserslist": "^4.16.6",
