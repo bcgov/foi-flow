@@ -1,11 +1,11 @@
 import React, { createContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFOIProgramAreaList } from "../../../../../apiManager/services/FOI/foiMasterDataServices";
-import { fetchAdvancedSearchData } from "../../../../../apiManager/services/FOI/foiAdvancedSearchServices";
 import {getCrossTextSearchAuth, getSolrKeywordSearchData, 
   getKeywordSearchRequestDetails} from "../../../../../apiManager/services/FOI/foiKeywordSearchServices"
 import { errorToast } from "../../../../../helper/FOI/helper";
 import { setKeywordSearchParams } from "../../../../../actions/FOI/foiRequestActions";
+import { SOLR_DOC_SEARCH_LIMIT } from "../../../../../constants/constants";
 
 export const ActionContext = createContext();
 ActionContext.displayName = "KeywordSearchContext";
@@ -14,9 +14,7 @@ export const ActionProvider = ({ children }) => {
 
   const [queryData, setQueryData] = useState(null);
   const [keywordSearchLoading, setKeywordSearchLoading] = useState(false);
-  const [keywordSearchComponentLoading, setKeywordSearchComponentLoading] =
-    useState(true);
-
+  const [keywordSearchComponentLoading, setKeywordSearchComponentLoading] = useState(false);
   const [searchResults, setSearchResults] = useState(null);
   const keywordSearchParams = useSelector((state) => state.foiRequests.foiKeywordSearchParams);
 
@@ -39,11 +37,35 @@ export const ActionProvider = ({ children }) => {
 
 const generateSolrQueryParams = (queryData) => {
   let queryParts = [];
+  let booleanKeywords=[];
   if (queryData.keywords.length > 0) {
-    const keywords = queryData.keywords
-      .map(keyword => `${keyword}`) // Properly quote keywords
-      .join(",");
-    queryParts.push(keywords);
+    let andKeywords= queryData.keywords?.filter(
+      (keyword) =>(keyword.category === "AND"));
+    let orKeywords= queryData.keywords?.filter(
+      (keyword) =>(keyword.category === "OR"));
+    let notKeywords= queryData.keywords?.filter(
+      (keyword) =>(keyword.category === "NOT"));
+
+    if (andKeywords.length > 0) {
+      let andPart = andKeywords.map((keyword) => keyword.text).join(" AND ");
+      booleanKeywords.push(andPart);
+    }
+    if (orKeywords.length > 0) {
+      let orPart = orKeywords.map((keyword) => keyword.text).join(" OR ");
+      booleanKeywords.push(orPart);
+    }
+    if (notKeywords.length > 0) {
+      let notPart = notKeywords.map((keyword) => `NOT ${keyword.text}`).join(" NOT ");
+      // if (booleanKeywords.length > 0) {
+      //   notPart += ` NOT ${booleanKeywords}`;
+      // }
+      booleanKeywords.push(notPart);
+    }
+    if (booleanKeywords.length > 0) {
+      queryParts.push(booleanKeywords.join(" "));
+    }
+    //queryParts.push(keywords);
+    console.log("\nqueryParts::",queryParts);
   }
   // Handle received date range
   if (queryData.fromDate || queryData.toDate) {
@@ -57,13 +79,12 @@ const generateSolrQueryParams = (queryData) => {
   }
   const query = queryParts.join(" AND ");
   console.log("\nquery:",query)
-  return { df: "foidocumentsentence", q: query };
+  return { df: "foidocumentsentence", q: query, rows:SOLR_DOC_SEARCH_LIMIT };
 };
 
 const convertToISO = (dateStr) => {
   if(!!dateStr){
     const date = new Date(`${dateStr}T00:00:00Z`);
-    // Convert to ISO 8601 format
     return date.toISOString();
   }
   else
@@ -106,6 +127,7 @@ const convertToISO = (dateStr) => {
               }
               else{
                 setKeywordSearchComponentLoading(false);
+                setSearchResults([]);
               }
             },
             errorCallback: (message) => {

@@ -36,22 +36,25 @@ class FOISolr(Resource):
             return {'status': exception.status_code, 'message':exception.message}, 500
         
 
-@cors_preflight('GET,OPTIONS')
+@cors_preflight('POST,OPTIONS')
 @API.route('/foicrosstextsearch/requests')
 class FOISolrSearch(Resource):
-    """Get users"""
+    """Get request details for 
+    keyword search dashboard"""
 
-       
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
     @auth.isiao
-    def get():      
+    def post():      
         try:
             #print("\nArgs:",request.args)
-            if 'requestnumbers[]' in request.args:
-                requestnumbers = request.args.getlist('requestnumbers[]')                       
+            payload = request.get_json()
+            print("payload:",payload)
+            if 'requestnumbers' in payload:
+                print("payload:",payload["requestnumbers"])
+                requestnumbers = payload["requestnumbers"]                      
                 requestdetails = requestservice().getrequestsdetailsforsearch(requestnumbers)
                 return requestdetails, 200
             else:
