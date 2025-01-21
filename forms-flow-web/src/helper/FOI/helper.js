@@ -12,11 +12,14 @@ let isBetween = require("dayjs/plugin/isBetween");
 let utc = require("dayjs/plugin/utc");
 let timezone = require("dayjs/plugin/timezone");
 let CryptoJS = require("crypto-js");
+let customParseFormat = require("dayjs/plugin/customParseFormat");
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(isBetween);
 dayjs.extend(dayjsBusinessDays);
+dayjs.extend(customParseFormat); 
+
 const hd = new DateHolidayjs("CA", "BC");
 
 const replaceUrl = (URL, key, value) => {
@@ -40,6 +43,38 @@ const formatDateInPst = (d, formatString = "yyyy-MM-dd") => {
   } else {
     return "";
   }
+};
+
+
+const convertDate = (dateString, outputFormat = 'MMMM D, YYYY') => {
+
+  if (!dateString) {
+    return '';
+  }
+
+  // Check if the input dateString matches 'YYYY-MM-DD' format
+  if (dayjs(dateString, 'YYYY-MM-DD').isValid()) {
+    const date = dayjs(dateString).format('YYYY-MM-DD');
+    const formattedDate = dayjs(date).format(outputFormat);
+    return formattedDate;
+  }
+
+  // Check if the input dateString matches 'YYYY MMM, DD' format
+  if (dayjs(dateString, 'YYYY MMM, DD').isValid()) {
+    const date = dayjs(dateString, 'YYYY MMM, DD').format('YYYY-MM-DD');
+    const formattedDate = dayjs(date).format(outputFormat);
+    return formattedDate;
+  }
+
+  // Check if the input dateString matches 'YYYY-MM-DD HH:mm:ss' format
+  if (dayjs(dateString, 'YYYY-MM-DD HH:mm:ss').isValid()) {
+    const date = dayjs(dateString, 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD');
+    const formattedDate = dayjs(date).format(outputFormat);
+    return formattedDate;
+  }
+
+  console.error('Unsupported date format.');
+  return '';
 };
 
 const businessDay = (date) => {
@@ -504,6 +539,10 @@ const getCommentTypeFromId = (commentTypes, id) => {
   return "";
 };
 
+const convertSTRToDate = (dateString) => {
+  return dayjs(dateString, "YYYY MMM DD | hh:mm A").utc().format("YYYY-MM-DDTHH:mm:ss.SSS[Z]");
+}
+
 const setTeamTagList = (bcgovcode) => {
   //let fullnameList = getFullnameList();
   let iaoFullnameArray = [];
@@ -581,6 +620,7 @@ export {
   isRequestWatcherOrAssignee,
   isRequestWatcherOrMinistryAssignee,
   formatDateInPst,
+  convertDate,
   isProcessingTeam,
   isScanningTeam,
   isFlexTeam,
@@ -597,9 +637,10 @@ export {
   readUploadedFileAsBytes,
   getUserFullName,
   getCommentTypeIdByName,
+  getCommentTypeFromId,
+  convertSTRToDate,
   getCommentLabelFromId,
   getIAOAssignToList,
   setTeamTagList,
-  getIAOTagList,
-  getCommentTypeFromId
+  getIAOTagList
 };

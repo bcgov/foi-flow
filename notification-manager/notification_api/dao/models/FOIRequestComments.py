@@ -34,7 +34,7 @@ class FOIRequestComment(object):
             
             conn = getconnection()
             cursor = conn.cursor()
-           
+            
             cursor.execute('INSERT INTO public."FOIRequestComments" (parentcommentid, ministryrequestid, "version", commenttypeid, \
                                 comment, taggedusers, isactive, createdby, created_at, commentsversion) \
                                 VALUES(%s::integer,%s::integer, %s::integer, %s::integer,%s,%s,%s::boolean,%s,%s,%s::integer) RETURNING commentid', 
