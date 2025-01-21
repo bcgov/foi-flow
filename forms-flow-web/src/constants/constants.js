@@ -72,4 +72,7 @@ export const FOI_SOLR_API_BASE =  (window._env_ && window._env_.REACT_APP_FOI_SO
 process.env.REACT_APP_FOI_SOLR_API_BASE || "https://solr-fc7a67-dev.apps.gold.devops.gov.bc.ca";
 
 export const SEARCH_KEYWORD_LIMIT =  (window._env_ && window._env_.REACT_APP_SEARCH_KEYWORD_LIMIT) ||
-process.env.REACT_APP_SEARCH_KEYWORD_LIMIT || 5;
+process.env.REACT_APP_SEARCH_KEYWORD_LIMIT || 10;
+
+export const SOLR_DOC_SEARCH_LIMIT =  (window._env_ && window._env_.REACT_APP_SOLR_DOC_SEARCH_LIMIT) ||
+process.env.REACT_APP_SOLR_DOC_SEARCH_LIMIT || 1000; 

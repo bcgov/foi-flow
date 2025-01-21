@@ -1,4 +1,4 @@
-import { httpGETRequest } from "../../httpRequestHandler";
+import { httpGETRequest, httpPOSTRequest} from "../../httpRequestHandler";
 import API from "../../endpoints";
 import { catchError } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
@@ -69,10 +69,9 @@ export const getSolrKeywordSearchData = ({
     errorCallback,
     dispatch,
   }) => {
-    httpGETRequest(
-      API.FOI_GET_CROSSTEXTSEARCH_REQUEST_DETAILS, 
-      {"requestnumbers": foirequestNumbers}, 
-      UserService.getToken())
+    let requestjson={"requestnumbers":foirequestNumbers}
+    let apiUrlPost = API.FOI_GET_CROSSTEXTSEARCH_REQUEST_DETAILS;
+    httpPOSTRequest(apiUrlPost, requestjson, UserService.getToken() ?? '', true)
       .then((res) => {
         if (res.data) {           
           callback(res.data);

@@ -56,17 +56,6 @@ const DataGridKeywordSearch = ({ userDetail }) => {
     }
   };
 
-  // const renderDocReviewerForRequest = (e, row) => {
-  //   e.preventDefault()
-  //   if (row.ministryrequestid) {
-  //     dispatch(
-  //       push(
-  //         `${DOC_REVIEWER_WEB_URL}/foi/${row.ministryrequestid}`
-  //       )
-  //     );
-  //   }
-  // };
-  
   const hyperlinkTooltipRenderCell = (params) => {
     let link;
     if (params.row.ministryrequestid) { 
@@ -107,24 +96,17 @@ const DataGridKeywordSearch = ({ userDetail }) => {
 
   const goToRecordsRenderCell = (params) => {
     const keywordSearchParam = keywordSearchParamsRef.current;
-    console.log("goToRecordsRenderCell-",keywordSearchParam);
-    let keywordList = [];
-
     let link;
-    if (params.row.ministryrequestid) {
-      if (keywordSearchParam?.keywords?.length > 0) {
-        const keywords = keywordSearchParam?.keywords
-          .map(keyword => `${keyword}`) // Properly quote keywords
-          .join(",");
-          keywordList.push(keywords);
-      }
-      console.log("keywordList:", keywordList);
-      let queryString= {"query": keywordList };
+    if (params.row.ministryrequestid && keywordSearchParam?.keywords?.length > 0) {
+      const keywords = keywordSearchParam.keywords
+      .filter(keyword => keyword.category.toUpperCase() !== "NOT")
+      .map(keyword => keyword.text)
+      .join(",");
+      //console.log("keywordList:", keywordList);
+      let queryString= {"query": keywords };
       const queryStringParam = new URLSearchParams(queryString).toString();
       const formattedQueryString = queryStringParam.replace(/\+/g, '%20');
-      console.log("formattedQueryString:", formattedQueryString);
       link = `${DOC_REVIEWER_WEB_URL}/foi/${params.row.ministryrequestid}?${formattedQueryString}`;
-      console.log("link:", link);
     }
     return (
       <Link
@@ -221,19 +203,12 @@ const DataGridKeywordSearch = ({ userDetail }) => {
   
   const classes = useStyles();
 
-  const defaultRowsState = { page: 0, pageSize: 100 };
-  const [rowsState, setRowsState] = useState(
-    Object.keys(keywordSearchParams).length > 0 ? 
-      {page: keywordSearchParams.page - 1, pageSize: keywordSearchParams.size} : 
-      defaultRowsState
-  );
-
+  const defaultRowsState = { page: 0, pageSize: 10 };
+  const [rowsState, setRowsState] = useState(defaultRowsState);
   const defaultSortModel = [
     { field: "requeststatus", sort: "desc" },
-    // { field: "receivedDateUF", sort: "desc" },
   ];
-
-  const [sortModel, setSortModel] = useState(keywordSearchParams?.sort || defaultSortModel);
+  const [sortModel, setSortModel] = useState(defaultSortModel);
 
   useEffect(() => {
     if (searchResults) {
@@ -252,6 +227,33 @@ const DataGridKeywordSearch = ({ userDetail }) => {
   }, [rowsState, sortModel]);
 
   const columnsRef = React.useRef(tableInfo?.columns || []);
+
+  // Function to get paginated data
+  const getPaginatedRows = (sortedRows) => {
+    const startIndex = rowsState.page * rowsState.pageSize;
+    const endIndex = startIndex + rowsState.pageSize;
+    return sortedRows.slice(startIndex, endIndex); // Correctly slice rows for pagination
+  };
+  // Function to sort data locally
+  const getSortedRows = () => {
+    if (!Array.isArray(searchResults) || searchResults.length === 0) return [];
+    if (sortModel.length === 0) return searchResults;
+    const { field, sort } = sortModel[0];
+    return [...searchResults].sort((a, b) => {
+      if (a[field] < b[field]) return sort === "asc" ? -1 : 1;
+      if (a[field] > b[field]) return sort === "asc" ? 1 : -1;
+      return 0;
+    });
+  };
+
+  // Compute rows to display (sorted and paginated)
+  const rows = React.useMemo(() => {
+    const sortedRows = getSortedRows();
+    let currentPageRows= getPaginatedRows(sortedRows); // Get rows for the current page
+    console.log("currentPageRows:",currentPageRows)
+    return currentPageRows
+  }, [searchResults, rowsState, sortModel]);
+
 
   if (keywordSearchComponentLoading && queryData) {
     return (
@@ -279,7 +281,8 @@ const DataGridKeywordSearch = ({ userDetail }) => {
             autoHeight
             className="foi-data-grid"
             getRowId={(row) => row.requestnumber}
-            rows={searchResults || []}
+            //rows={searchResults || []}
+            rows={rows} // Display only the current page's rows
             columns={columnsRef?.current}
             rowHeight={30}
             headerHeight={50}
@@ -289,20 +292,19 @@ const DataGridKeywordSearch = ({ userDetail }) => {
             hideFooterSelectedRowCount={true}
             disableColumnMenu={true}
             pagination
-            paginationMode="server"
             initialState={{
               pagination: rowsState
             }}
+            paginationMode="server"
             onPageChange={(newPage) => setRowsState((prev) => ({ ...prev, page: newPage }))}
             onPageSizeChange={(newpageSize) =>
               setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
             }
             components={{
-              Footer: ()=> <CustomFooter rowCount={searchResults?.length || 0} defaultSortModel={tableInfo.sort} footerFor={"advancedsearch"}></CustomFooter>
+              Footer: ()=> <CustomFooter rowCount={searchResults?.length || 0} defaultSortModel={defaultSortModel} footerFor={"advancedsearch"}></CustomFooter>
             }}
             sortingOrder={["desc", "asc"]}
             sortModel={[sortModel[0]]}
-            sortingMode={"server"}
             onSortModelChange={(model) => {
               if (model.length > 0) {
                 setSortModel(model)

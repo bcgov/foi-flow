@@ -126,9 +126,12 @@ const KeywordSearch = ({ userDetail }) => {
     }
   });
 
+  const [andKeywords, setAndKeywords] = useState([]);
+  const [orKeywords, setOrKeywords] = useState([]);
+  const [notKeywords, setNotKeywords] = useState([]);
+
 
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl) && Boolean(searchText);
   const [error, setError] = useState(false);
 
 
@@ -174,15 +177,6 @@ const KeywordSearch = ({ userDetail }) => {
 
  
   const handleSearch = () =>{
-    // getCrossTextSearchAuth({
-    //   callback: (data) => {
-    //   console.log("!!!!",data)
-    // },
-    // errorCallback: (error) => {
-    //   console.log("!!!!",error)
-    // },
-    // dispatch,})
-    //NEEDED
     handleApplySearchFilters();
   }
 
@@ -205,41 +199,56 @@ const KeywordSearch = ({ userDetail }) => {
   // };
 
   const handleResetSearchFilters = () => {
-    setSearchText("");
+    //setSearchText("");
     setKeywords([]);
     setFromDate("");
     setToDate("");
     setSelectedPublicBodies([]);
   };
 
-  const handleKeywordAdd = () => {
-    if (!searchText) {
-      return;
-    }
+  const handleKeywordAdd = (category) => {
+    // if (!searchText) {
+    //   return;
+    // }
     if (keywords.length >= SEARCH_KEYWORD_LIMIT) {
       setError(true); // Show error message and turn bar red
       return;
     }
-    if (searchText.trim() && !keywords.includes(searchText.trim())) {
-      setKeywords([...keywords, searchText.trim()]);
+    // if (searchText.trim() && !keywords.includes(searchText.trim())) {
+    //   setKeywords([...keywords, searchText.trim()]);
+    // }
+    let updatedKeywords = [];
+    if (category === "AND" && andKeywords) {
+      updatedKeywords = [...keywords, { category: "AND", text: andKeywords }];
+      setAndKeywords("");
+    } else if (category === "OR" && orKeywords) {
+      updatedKeywords = [...keywords, { category: "OR", text: orKeywords }];
+      setOrKeywords("");
+    } else if (category === "NOT" && notKeywords) {
+      updatedKeywords = [...keywords, { category: "NOT", text: notKeywords }];
+      setNotKeywords("");
     }
+    setKeywords(updatedKeywords);
     setAnchorEl(null);
-    setKeywords([...keywords, searchText.trim()]);
-    setSearchText("");
-    setError(false); // Reset error if it was active
+    //setKeywords([...keywords, searchText.trim()]);
+    //setSearchText("");
+    setError(false);
   };
 
-  const handleSearchChange = (e) => {
-    setAnchorEl(e.currentTarget);
-    setSearchText(e.target.value);
-  };
+  const handleAndChange = (e) => setAndKeywords(e.target.value);
+  const handleOrChange = (e) => setOrKeywords(e.target.value);
+  const handleNotChange = (e) => setNotKeywords(e.target.value);
+
+  // const handleSearchChange = (e) => {
+  //   setAnchorEl(e.currentTarget);
+  //   setSearchText(e.target.value);
+  // };
 
   const handleSelectedPublicBodiesChange = (event) => {
     const {
       target: { value },
     } = event;
     setSelectedPublicBodies(
-      // On autofill we get a stringified value.
       typeof value === "string" ? value.split(",") : value
     );
   };
@@ -247,7 +256,11 @@ const KeywordSearch = ({ userDetail }) => {
 
   //Remove a keyword bubble
   const handleKeywordDelete = (keywordToDelete) => {
-    let updatedKeywordList= keywords.filter((keyword) => keyword !== keywordToDelete)
+    let updatedKeywordList = keywords.filter(
+      (keyword) =>
+        !(keyword.category === keywordToDelete.category 
+          && keyword.text === keywordToDelete.text)
+    );
     setKeywords(updatedKeywordList);
     if (updatedKeywordList.length >= SEARCH_KEYWORD_LIMIT)
       setError(true);
@@ -301,8 +314,70 @@ const KeywordSearch = ({ userDetail }) => {
               className={classes.search}
             >
               <Grid item xs={12}>
-                <label className="hideContent" for="keywordSearch">
-                  Search keywords...
+                <label className="keywordLabel" for="andKeywordSearch">
+                  With ALL of the following
+                </label>
+                <Box sx={{ position: "relative", width: "100%" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      padding: "4px",
+                      border: "1px solid",
+                      borderColor: error ? "red" : "#ccc", // Turn red if error
+                      borderRadius: "4px",
+                    }}
+                  >
+                  <InputBase
+                    id="andKeywordSearch"
+                    name="andKeywordSearch"
+                    placeholder="Search Keywords..."
+                    onChange={handleAndChange}
+                    value={andKeywords}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") {
+                        handleKeywordAdd("AND");
+                      }
+                    }}
+                    sx={{
+                      flex: 1,
+                      minWidth: "120px",
+                      color: "#38598A",
+                    }}
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <IconButton sx={{ color: "#38598A" }}>
+                          <span className="hideContent">Search keywords...</span>
+                          <SearchIcon />
+                        </IconButton>
+                        {keywords.filter((keyword) => keyword.category === "AND")
+                          .map((keyword, index) => (
+                          <Chip
+                            key={index}
+                            label={`${keyword.text}`}
+                            onDelete={() => handleKeywordDelete(keyword)}
+                            className={classes.chip}
+                            sx={{
+                              backgroundColor: "#95c3ffc7",
+                              margin: "1px",
+                              height: "22px",
+                              fontSize: "13px",
+                              "& .MuiChip-deleteIcon": {
+                                fontSize: "16px",
+                              },
+                            }}
+                          />
+                        ))}
+                      </InputAdornment>
+                    }
+                  />
+                  </Box>
+                </Box>
+              </Grid>
+              <Grid item xs={12}>
+                <label className="keywordLabel" for="orKeywordSearch">
+                  With at LEAST ONE of the following
                 </label>
                 <Box sx={{ position: "relative", width: "100%" }}>
                   <Box
@@ -318,14 +393,14 @@ const KeywordSearch = ({ userDetail }) => {
                   >
                   {/* Search Input */}
                   <InputBase
-                    id="keywordSearch"
-                    name="keywordSearch"
+                    id="orKeywordSearch"
+                    name="orKeywordSearch"
                     placeholder="Search Keywords..."
-                    onChange={handleSearchChange}
-                    value={searchText}
+                    onChange={handleOrChange}
+                    value={orKeywords}
                     onKeyPress={(e) => {
                       if (e.key === "Enter") {
-                        handleKeywordAdd();
+                        handleKeywordAdd("OR");
                       }
                     }}
                     sx={{
@@ -339,10 +414,11 @@ const KeywordSearch = ({ userDetail }) => {
                           <span className="hideContent">Search keywords...</span>
                           <SearchIcon />
                         </IconButton>
-                        {keywords.map((keyword, index) => (
+                        {keywords.filter((keyword) => keyword.category === "OR")
+                          .map((keyword, index) => (
                           <Chip
                             key={index}
-                            label={keyword}
+                            label={`${keyword.text}`}
                             onDelete={() => handleKeywordDelete(keyword)}
                             className={classes.chip}
                             sx={{
@@ -354,7 +430,6 @@ const KeywordSearch = ({ userDetail }) => {
                                 fontSize: "16px", // Adjust icon size
                               },
                             }}
-                            //sx={{ margin: "4px 4px 4px 0" }}
                           />
                         ))}
                       </InputAdornment>
@@ -363,45 +438,70 @@ const KeywordSearch = ({ userDetail }) => {
                   </Box>
                 </Box>
               </Grid>
-              {/* <ConditionalComponent>
-                <Grid item container direction="row-reverse" xs={12}>
-                  {keywords.map((keyword, index) => (
-                    <Chip
-                      key={`keyword-${index}`}
-                      label={keyword}
-                      onDelete={() => {
-                        setKeywords(keywords.filter((_kw, i) => index !== i));
-                      }}
-                      color="primary"
-                      className={classes.chip}
-                      sx={{
-                        backgroundColor: "#95c3ff",
-                        margin: "1px",
-                        height: "20px"
-                      }}
-                      size="small"
-                    />
-                  ))}
-                </Grid>
-              </ConditionalComponent> */}
-            </Grid>
-            <ConditionalComponent>
-              <Grid>
-                <Menu
-                  id="basic-menu"
-                  anchorEl={anchorEl}
-                  open={open}
-                  onClose={handleKeywordAdd}
-                  disableAutoFocus={true}
-                  autoFocus={false}
-                >
-                  <MenuItem
-                    onClick={handleKeywordAdd}
-                  >{`Add "${searchText}"`}</MenuItem>
-                </Menu>
+              <Grid item xs={12}>
+                <label className="keywordLabel" for="notKeywordSearch">
+                    WITHOUT the following
+                </label>
+                <Box sx={{ position: "relative", width: "100%" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      padding: "4px",
+                      border: "1px solid",
+                      borderColor: error ? "red" : "#ccc", // Turn red if error
+                      borderRadius: "4px",
+                    }}
+                  >
+                  {/* Search Input */}
+                  <InputBase
+                    id="notKeywordSearch"
+                    name="notKeywordSearch"
+                    placeholder="Search Keywords..."
+                    onChange={handleNotChange}
+                    value={notKeywords}
+                    onKeyPress={(e) => {
+                      if (e.key === "Enter") {
+                        handleKeywordAdd("NOT");
+                      }
+                    }}
+                    sx={{
+                      flex: 1,
+                      minWidth: "120px",
+                      color: "#38598A",
+                    }}
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <IconButton sx={{ color: "#38598A" }}>
+                          <span className="hideContent">Search keywords...</span>
+                          <SearchIcon />
+                        </IconButton>
+                        {keywords.filter((keyword) => keyword.category === "NOT")
+                          .map((keyword, index) => (
+                          <Chip
+                            key={index}
+                            label={`${keyword.text}`}
+                            onDelete={() => handleKeywordDelete(keyword)}
+                            className={classes.chip}
+                            sx={{
+                              backgroundColor: "#95c3ffc7",
+                              margin: "1px",
+                              height: "22px",
+                              fontSize: "13px",
+                              "& .MuiChip-deleteIcon": {
+                                fontSize: "16px",
+                              },
+                            }}
+                          />
+                        ))}
+                      </InputAdornment>
+                    }
+                  />
+                  </Box>
+                </Box>
               </Grid>
-            </ConditionalComponent>
-
+            </Grid>
             <Grid
               item
               container
