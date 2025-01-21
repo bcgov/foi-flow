@@ -16,6 +16,16 @@ class templateconfig:
             return "fee_estimate_notification_outstanding.html"
         elif key == "PAYOUTSTANDINGFULLPAYMENT":
             return "fee_payment_confirmation_outstanding.html"
+        elif key == "OIPCAPPLICANTCONSENTEXTENSION":
+            return "oipc_applicant_consent_time_extension.html"
+        elif key == "OIPCFIRSTTIMEEXTENSION":
+            return "oipc_first_time_extension.html"
+        elif key == "OIPCSUBSEQUENTTIMEEXTENSION":
+            return "oipc_subsequent_time_extension.html"
+        elif key == "GENERICCOVEREMAILTEMPLATE":
+            return "generic_cover_email_template.html"
+        elif key == "ACKNOWLEDGEMENTLETTER":
+            return "acknowledgement_letter.html"
         else:
             logging.info("Unknown key")
             return None
@@ -25,7 +35,7 @@ class templateconfig:
             return "Your FOI Request ["+requestjson["axisRequestId"]+"]"
         elif key == "FEE-ESTIMATE-PAYMENT-RECEIPT" or key == "OUTSTANDING-PAYMENT-RECEIPT":
             return "Your FOI Request ["+requestjson["axisRequestId"]+"] - Fee Payment Received"
-        return None   
+        return "Your FOI Request ["+requestjson["axisRequestId"]+"]"   
         
     def getstage(self, key):        
         if key == "PAYONLINE" or key == "PAYOUTSTANDING":

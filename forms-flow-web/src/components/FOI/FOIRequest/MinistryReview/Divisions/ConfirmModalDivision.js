@@ -61,7 +61,7 @@ const ConfirmModalDivision= ({
             </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <button className="btn-bottom btn-cancel" onClick={handleClose}>
+                <button className="btn-cancel" onClick={handleClose}>
                 OK
                 </button>
             </DialogActions>

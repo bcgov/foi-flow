@@ -42,7 +42,11 @@ const MINISTRYGROUPS = {
     TIC : "TIC Ministry Team",
     TRAN : "TRAN Ministry Team",
     COR : "COR Ministry Team",
-    HSG : "HSG Ministry Team"
+    HSG : "HSG Ministry Team",
+    LSB : "LSB Ministry Team",
+    INF : "INF Ministry Team",
+    MCM : "MCM Ministry Team",
+    ECS : "ECS Ministry Team",
 
   };
 

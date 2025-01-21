@@ -119,7 +119,7 @@ class requestservice:
         )
 
     def updateduedate(
-        self, requestid, ministryrequestid, offholddate, foirequestschema, nextstatename
+        self, requestid, ministryrequestid,  offholddate, foirequestschema, nextstatename
     ):
         foirequest = self.getrequest(requestid, ministryrequestid)
         currentstatus = (
@@ -131,8 +131,10 @@ class requestservice:
         # Check for Off Hold
         if (
             currentstatus not in (None, "")
-            and currentstatus == StateName.onhold.value
-            and nextstatename != StateName.response.value
+            and ((currentstatus == StateName.onhold.value
+            and nextstatename != StateName.response.value)
+            or (currentstatus == StateName.onholdother.value
+            and nextstatename != StateName.open.value))
         ):
             skipcalculation = self.__skipduedatecalculation(
                 ministryrequestid, offholddate, currentstatus, nextstatename
@@ -153,6 +155,12 @@ class requestservice:
 
     def getrequest(self, foirequestid, foiministryrequestid):
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
+
+    def getrawrequestidbyfoirequestid(self, foirequestid):
+        if foirequestid == 'undefined':
+            return None
+        rawrequestid = requestservicegetter().getrawrequestidbyfoirequestid(foirequestid)
+        return rawrequestid
 
     def getrequestdetailsforministry(
         self, foirequestid, foiministryrequestid, authmembershipgroups
@@ -268,12 +276,12 @@ class requestservice:
     
 
     def __skipduedatecalculation(self, ministryrequestid, offholddate, currentstatus="", nextstatename=""):
-        previousoffholddate = FOIMinistryRequest.getlastoffholddate(ministryrequestid)
+        previousoffholddate = FOIMinistryRequest.getlastoffholddate(ministryrequestid, currentstatus)
         if (
-            currentstatus not in (None, "")
-            and currentstatus == StateName.onhold.value
+            (currentstatus not in (None, "")
+            and (currentstatus == StateName.onhold.value or currentstatus == StateName.onholdother.value)
             and nextstatename not in (None, "")
-            and currentstatus == nextstatename
+            and currentstatus == nextstatename) 
         ):
             return True
         if previousoffholddate not in (None, ""):

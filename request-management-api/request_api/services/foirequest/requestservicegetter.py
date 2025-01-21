@@ -18,6 +18,7 @@ from request_api.services.programareaservice import programareaservice
 from request_api.utils.commons.datetimehandler import datetimehandler
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.utils.enums import StateName
+from request_api.models.OperatingTeamEmails import OperatingTeamEmail
 
 class requestservicegetter:
     """ This class consolidates retrival of FOI request for actors: iao and ministry. 
@@ -128,14 +129,17 @@ class requestservicegetter:
             else:
                 requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["estimatedtotaldue"])
             
-        if payment is not None and payment != {}:
-            paidamount = float(payment['paidamount']) if payment['paidamount'] != None else 0
-            requestdetails['cfrfee']['feedata']['paidamount'] = '{:.2f}'.format(paidamount)
-            # depositpaid field is only accurate and used for outstanding email and receipts
-            requestdetails['cfrfee']['feedata']['depositpaid'] = '{:.2f}'.format(float(cfrfee['feedata']['amountpaid']) - paidamount)
-            requestdetails['cfrfee']['feedata']['paymenturl'] = payment['paymenturl']            
-            requestdetails['cfrfee']['feedata']['paymentdate'] = payment['created_at'][:10]
+            if payment is not None and payment != {}:
+                paidamount = float(payment['paidamount']) if payment['paidamount'] != None else 0
+                requestdetails['cfrfee']['feedata']['paidamount'] = '{:.2f}'.format(paidamount)
+                # depositpaid field is only accurate and used for outstanding email and receipts
+                requestdetails['cfrfee']['feedata']['depositpaid'] = '{:.2f}'.format(float(cfrfee['feedata']['amountpaid']) - paidamount)
+                requestdetails['cfrfee']['feedata']['paymenturl'] = payment['paymenturl']            
+                requestdetails['cfrfee']['feedata']['paymentdate'] = payment['created_at'][:10]
         return requestdetails
+
+    def getrawrequestidbyfoirequestid(self, foirequestid):
+        return FOIRequest.getrawrequestidbyfoirequestid(foirequestid)
 
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
         _receiveddate = parse(request['receiveddate'])
@@ -143,6 +147,9 @@ class requestservicegetter:
         linkedministryrequests= []
         if "linkedrequests" in requestministry and requestministry["linkedrequests"] is not None:
             linkedministryrequests = self.__assignministrynames(requestministry["linkedrequests"])
+        assignedgroupemail = OperatingTeamEmail.getoperatingteamemail(requestministry["assignedgroup"])
+        if assignedgroupemail is None:
+            assignedgroupemail = KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"])
         baserequestinfo = {
             'id': request['foirequestid'],
             'requestType': request['requesttype'],
@@ -153,7 +160,7 @@ class requestservicegetter:
             'receivedmodeid':request['receivedmode.receivedmodeid'],
             'receivedMode':request['receivedmode.name'],
             'assignedGroup': requestministry["assignedgroup"],
-            'assignedGroupEmail': KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"]),
+            'assignedGroupEmail': assignedgroupemail,
             'assignedTo': requestministry["assignedto"],
             'idNumber':requestministry["filenumber"],
             'axisRequestId': requestministry["axisrequestid"],
@@ -269,7 +276,7 @@ class requestservicegetter:
         onholddate = None
         transitions = FOIMinistryRequest.getrequeststatusById(foiministryrequestid)
         for entry in transitions:
-            if entry['requeststatuslabel'] == StateName.onhold.name:
+            if (entry['requeststatuslabel'] == StateName.onhold.name or entry['requeststatuslabel'] == StateName.onholdother.name):
                 onholddate = datetimehandler().convert_to_pst(entry['created_at'],'%Y-%m-%d')
             else:
                 if onholddate is not None:
