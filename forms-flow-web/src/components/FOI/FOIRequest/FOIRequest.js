@@ -64,7 +64,6 @@ import "./TabbedContainer.scss";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { CommentSection } from "../customComponents/Comments";
 import { AttachmentSection } from "../customComponents/Attachments";
-import { CFRForm } from "../customComponents/CFRForm";
 import { ContactApplicant } from "../customComponents/ContactApplicant";
 import Loading from "../../../containers/Loading";
 import clsx from "clsx";
