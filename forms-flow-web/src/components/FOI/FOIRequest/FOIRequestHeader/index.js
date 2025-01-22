@@ -305,6 +305,14 @@ const FOIRequestHeader = React.memo(
                     showFlag={showOipcReviewFlag}
                     isDisabled={isMinistry}
                 />
+                <RequestFlag
+                    type="consult"
+                    requestDetails={requestDetails}
+                    isActive={false}
+                    handleSelect={handleOipcReviewFlagChange}
+                    showFlag={true}
+                    isDisabled={false}
+                />
                 {/* <RequestFlag
                   type="phasedrelease"
                   requestDetails={requestDetails}
