@@ -447,6 +447,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   }, [oipcData])
 
   
+
+  
   useEffect(() => {
     if (requestApplicantProfile) {      
       if (!ministryId) {
@@ -832,6 +834,29 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     }
   }
 
+  const handleConsultFlagChange = (isSelected) => {
+    console.log("handleConsultFlagChange isSelected: ", isSelected);
+
+    // if (!isSelected) {
+    //  removeConsult();
+    // } else {
+    //    setIsConsultReview(isSelected);
+    //    requestDetails.isconsultflag = isSelected;
+
+    // }
+
+    requestDetails.isconsultflag = isSelected;
+    const updatedRequestObject = { ...saveRequestObject };
+    updatedRequestObject.isconsultflag = isSelected;
+    alert(
+      "updatedRequestObject :",updatedRequestObject
+    )
+    setSaveRequestObject(updatedRequestObject);
+    //todo: scenario 4,5 legistilative due date field appear with calendar picker
+    //todo: scenario 7 applicant type mandatory
+
+  }
+
   //handle email validation
   const [validation, setValidation] = React.useState({});
   const handleEmailValidation = (validationObj) => {
@@ -899,10 +924,14 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [stateChanged, setStateChanged] = useState(false);
 
   const handleSaveRequest = (_state, _unSaved, id) => {
+    console.log("handleSaveRequest _state: ", _state);
+    console.log("handleSaveRequest _unSaved: ", _unSaved);
+    console.log("handleSaveRequest id: ", id);
     setHeader(_state);
 
     if (!_unSaved) {
       setUnSavedRequest(_unSaved);
+      alert("wait")
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(id || requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(id || requestId, ministryId));
@@ -1357,6 +1386,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         isAddRequest={isAddRequest}
                         handleOipcReviewFlagChange={handleOipcReviewFlagChange}
                         showOipcReviewFlag={requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()}
+                        showConsultFlag={true}
+                        handleConsultFlagChange={handleConsultFlagChange}
                       />
                       {(isAddRequest ||
                         requestState === StateEnum.unopened.name) && (

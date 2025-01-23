@@ -64,7 +64,6 @@ class FOIRawRequest(Resource):
             requestidisinteger = int(requestid)
             if requestidisinteger :                
                 baserequestinfo = rawrequestservice().getrawrequest(requestid)
-
                 assignee = baserequestinfo['assignedTo']
                 isiaorestricted = baserequestinfo['isiaorestricted']
                 # print('Request # {0} Assigned to {1} and is restricted {2} '.format(requestid,assignee,isiaorestricted))
@@ -88,6 +87,9 @@ class FOIRawRequest(Resource):
     def post(requestid=None, actiontype=None):
         try :                        
             updaterequest = request.get_json()
+            print("===============================================")
+            print("updaterequest: ", updaterequest)
+            print("===============================================")
             requestdata = getparams(updaterequest)
             assigneegroup = requestdata['assigneegroup']
             assignee = requestdata['assignee']

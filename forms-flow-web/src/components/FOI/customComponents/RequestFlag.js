@@ -42,7 +42,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
   let modalMessageInactive = "";
   let modalDescriptionActive = "";
   let modalDescriptionInactive = "";
-  let modalButtonText = "Save Change";
+  let modalSaveButtonText = "Save Change";
 
   // css
   let iconClass;
@@ -153,7 +153,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
       bgClass = "linear-gradient(to right, #fff 80%, #9954bb 0%)";
       borderStyle = "1px solid #9954bb";
 
-      modalButtonText = "Continue";
+      modalSaveButtonText = "Continue";
       //when setting to active
       modalHeadingActive = "Consultation";
       modalMessageActive =
@@ -175,6 +175,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
   }
 
   const handleValueChange = (e) => {
+    console.log("handleValueChange : ", e.target.value);
     setIsSelected(e.target.value);
     if (type == "oipcreview" && !isActive) {
         handleSelect(e.target.value)
@@ -199,6 +200,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
   };
 
   const handleSave = (e) => {
+    console.log("handleSave isSelected:", isSelected);
     setModalOpen(false);
     handleSelect(isSelected);
   };
@@ -285,7 +287,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
               onClick={handleSave}
               disabled={false}
             >
-              {modalButtonText}
+              {modalSaveButtonText}
             </button>
             <button className="btn-bottom btn-cancel" onClick={handleClose}>
               Cancel
