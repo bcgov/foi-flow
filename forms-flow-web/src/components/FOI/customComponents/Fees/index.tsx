@@ -222,7 +222,8 @@ export const Fees = ({
     }
   
     const validateFields = () => {
-      if (!_.isEqual(initialApplicationFeeFormData?.applicationFeeStatus, applicationFeeFormData?.applicationFeeStatus) || applicationFeeFormData?.applicationFeeStatus == 'init') {
+      if (!_.isEqual(initialApplicationFeeFormData?.applicationFeeStatus, applicationFeeFormData?.applicationFeeStatus) 
+        || (applicationFeeFormData?.applicationFeeStatus == 'init' && _.isEqual(initialCFRFormData, CFRFormData))) {
         if (applicationFeeFormData?.applicationFeeStatus == 'na-ige' || applicationFeeFormData?.applicationFeeStatus == 'appfeeowing') return true;
         if (applicationFeeFormData?.applicationFeeStatus == 'paid' || applicationFeeFormData?.applicationFeeStatus == 'init') {
           if (applicationFeeFormData?.paymentSource != 'creditcardonline') {
