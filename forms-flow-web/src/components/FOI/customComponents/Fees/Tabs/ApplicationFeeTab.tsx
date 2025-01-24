@@ -15,6 +15,7 @@ import _ from 'lodash';
 import FileUpload from '../../FileUpload';
 import { generateReceiptFromOnlinePayment } from '../../../../../apiManager/services/FOI/foiApplicationFeeFormServices';
 import { getFileFromS3, getFOIS3DocumentPreSignedUrl } from '../../../../../apiManager/services/FOI/foiOSSServices';
+import { ReceiptField } from './ReceiptField';
 
 
 export const ApplicationFeeTab = ({
@@ -321,7 +322,7 @@ export const ApplicationFeeTab = ({
       })
     }
 
-    const getReceiptFile = (filename?: string, rawfilepath?: string) => {
+    const getReceiptFile = (filename?: string, rawfilepath?: string, download: Boolean = false) => {
       if (filename) {
         const filepath = rawfilepath?.split('/').slice(4).join('/')
         getFOIS3DocumentPreSignedUrl(filepath, undefined, dispatch, (err: any, res: any) => {
@@ -329,7 +330,17 @@ export const ApplicationFeeTab = ({
             getFileFromS3({filepath: res}, (_err: any, response: any) => {
               let blob = new Blob([response.data], {type: "application/pdf"});
               let blobURL = URL.createObjectURL(blob);
-              window.open(blobURL);
+              if (download) {
+                const downloadLink = document.createElement('a');
+                downloadLink.href = blobURL;
+                downloadLink.download = filename;
+                downloadLink.style.display = 'none';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+              } else {
+                window.open(blobURL);
+              }
             });
           }
         }, 'attachments', 'Misc');
@@ -356,6 +367,11 @@ export const ApplicationFeeTab = ({
           </div>
         )}
     })
+
+    const uploadedReceiptsFieldComponent = formData.receipts.map((receipt: any) => {
+      return <ReceiptField receipt={receipt} getReceiptFile={getReceiptFile} formData={formData} setFormData={setFormData} />
+    })
+
     if (uploadedReceiptsField.length == 0) {
       uploadedReceiptsField.push(
         <div className="col-lg-12 foi-details-col">
@@ -471,7 +487,7 @@ export const ApplicationFeeTab = ({
                 {orderIdField}
                 {transactionNumberField}
                 {receiptUploadField}
-                {formData?.receipts.length > 0 || formData?.paymentSource == 'creditcardonline' ? uploadedReceiptsField : <></>}
+                {formData?.receipts.length > 0 || formData?.paymentSource == 'creditcardonline' ? uploadedReceiptsFieldComponent : <></>}
               </div>}
             </AccordionDetails>
           </Accordion>
