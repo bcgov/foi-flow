@@ -312,7 +312,7 @@ const FOIRequestHeader = React.memo(
                     requestDetails={requestDetails}
                     isActive={requestDetails.isconsultflag}
                     handleSelect={handleConsultFlagChange}
-                    showFlag={showConsultFlag}
+                    showFlag={true}
                     isDisabled={false}
                 />
                 {/* <RequestFlag

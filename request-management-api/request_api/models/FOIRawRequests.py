@@ -90,6 +90,8 @@ class FOIRawRequest(db.Model):
             axisrequestid = _requestrawdata["axisRequestId"] if 'axisRequestId' in _requestrawdata  else None
             axissyncdate = _requestrawdata["axisSyncDate"] if 'axisSyncDate' in _requestrawdata  else None   
             linkedrequests = _requestrawdata["linkedRequests"] if 'linkedRequests' in _requestrawdata  else None 
+            isconsultflag = _requestrawdata["isconsultflag"] if 'isconsultflag' in _requestrawdata  else None
+
             _version = request.version+1           
             insertstmt =(
                 insert(FOIRawRequest).
@@ -113,7 +115,7 @@ class FOIRawRequest(db.Model):
                     axissyncdate=axissyncdate,
                     linkedrequests=linkedrequests,
                     isiaorestricted = request.isiaorestricted,
-                    isconsultflag = consultflag
+                    isconsultflag = isconsultflag
                    
                 )
             )

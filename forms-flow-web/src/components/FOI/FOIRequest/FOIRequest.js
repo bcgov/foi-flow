@@ -847,11 +847,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     requestDetails.isconsultflag = isSelected;
     const updatedRequestObject = { ...saveRequestObject };
     updatedRequestObject.isconsultflag = isSelected;
-    alert(
+    console.log(
       "updatedRequestObject :",updatedRequestObject
     )
     setSaveRequestObject(updatedRequestObject);
-    //todo: scenario 4,5 legistilative due date field appear with calendar picker
     //todo: scenario 7 applicant type mandatory
 
   }
@@ -930,7 +929,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
     if (!_unSaved) {
       setUnSavedRequest(_unSaved);
-      alert("wait")
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
       dispatch(fetchFOIRequestDescriptionList(id || requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(id || requestId, ministryId));

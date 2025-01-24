@@ -42,6 +42,7 @@ const RequestDetails = React.memo(
     });
     const classes = useStyles();
     const disableFieldForMinistryRequest = shouldDisableFieldForMinistryRequests(requestStatus)
+    console.log("requestdetails: ",requestDetails)
     const {ministryId} = useParams();
     const validateFields = (request, name, value) => {
       if (request !== undefined) {
@@ -76,7 +77,9 @@ const RequestDetails = React.memo(
           return value || "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.DUE_DATE) {
-          if(request.dueDate) {
+          console.log("request.isconsultflag : ",request.isconsultflag)
+          console.log("request.dueDate : ",request.dueDate)
+          if(request.dueDate || request.isconsultflag) {
             return request.dueDate
           }
 
@@ -132,6 +135,16 @@ const RequestDetails = React.memo(
       handleRequestDetailsInitialValue(requestDetailsObject);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES, requestDetailsObject);
     },[requestDetails, handleRequestDetailsInitialValue])
+
+    React.useEffect(() => {
+      console.log("requestDetails.id : ",requestDetails.id)
+      if (!requestDetails?.isconsultflag) {
+        const calculatedDueDate = startDateText ? dueDateCalculation(startDateText) : "";
+        setDueDate(calculatedDueDate);
+        //handleRequestDetailsValue(calculatedDueDate, FOI_COMPONENT_CONSTANTS.DUE_DATE);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DUE_DATE, calculatedDueDate);
+      }
+    }, [requestDetails?.isconsultflag]);
 
     const getReceivedDateForLocalState = () => {
       let receivedDate = validateFields(
@@ -212,6 +225,14 @@ const RequestDetails = React.memo(
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, e.target.value);
     }
+
+    const handleDueDateChange = (e) => {
+      console.log("handleDueDateChange:",e.target.value)
+      const newDueDate = requestDetails?.isconsultflag ? e.target.value : dueDateCalculation(startDateText);
+      setDueDate(newDueDate);
+      handleRequestDetailsValue(newDueDate, FOI_COMPONENT_CONSTANTS.DUE_DATE);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DUE_DATE, newDueDate);
+    }
     
      return (
 
@@ -267,13 +288,14 @@ const RequestDetails = React.memo(
                   label="Legislated Due Date"
                   type={requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? "text" : "date"}
                   value={requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? 'N/A' : (dueDateText || '')}
+                  onChange={handleDueDateChange}
                   inputProps={{ "aria-labelledby": "dueDate-label"}}
                   InputLabelProps={{
                   shrink: true,
                   }}
                   variant="outlined"
                   required
-                  disabled
+                  disabled={!requestDetails?.isconsultflag}
                   fullWidth
                 />
             </div>

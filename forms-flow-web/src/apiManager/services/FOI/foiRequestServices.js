@@ -167,7 +167,6 @@ export const fetchFOIRequestDetailsWrapper = (requestId, ministryId) => {
 };
 
 export const fetchFOIRawRequestDetails = (requestId) => {
-  console.log("===========fetchFOIRawRequestDetails=================")
   const apiUrlgetRequestDetails = replaceUrl(
     API.FOI_RAW_REQUEST_API,
     "<requestid>",
