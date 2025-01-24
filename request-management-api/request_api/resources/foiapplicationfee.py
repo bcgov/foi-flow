@@ -44,6 +44,8 @@ class FOICFRFee(Resource):
     def get(requestid, ministryrequestid):      
         try:
             ministryrequestid = None if ministryrequestid.lower()not in ['null', 'None', 'undefined'] else ministryrequestid
+            if ministryrequestid is None and requestid.lower() in ['null', 'None', 'undefined']:
+                return [], 200
             result = applicationfeeservice().getapplicationfee(requestid, ministryrequestid)
             return json.dumps(result), 200
         except KeyError as error:
