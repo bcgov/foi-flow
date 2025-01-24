@@ -45,6 +45,8 @@ class requestservicebuilder(requestserviceconfigurator):
         if requestschema.get("isoipcreview") is not None and requestschema.get("isoipcreview")  != "":
             foiministryrequest.isoipcreview = requestschema.get("isoipcreview")
             foiministryrequest.oipcreviews = self.prepareoipc(requestschema, ministryid, activeversion, userid)
+        if requestschema.get("isconsultflag") is not None and requestschema.get("isconsultflag")  != "":
+            foiministryrequest.isconsultflag = requestschema.get("isconsultflag")
             
         if requestschema.get("cfrDueDate") is not None and requestschema.get("cfrDueDate")  != "":
             foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")
