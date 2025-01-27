@@ -261,7 +261,7 @@ const OITeamColumns = [
     headerAlign: "left",
   },
   {
-    field: "oilayerpagecount",
+    field: "recordspagecount",
     headerName: "PAGES",
     flex: 1,
     headerAlign: "left",

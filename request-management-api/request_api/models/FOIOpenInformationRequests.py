@@ -23,7 +23,6 @@ from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .SubjectCodes import SubjectCode
 from .FOIRequestOIPC import FOIRequestOIPC
 from request_api.models.default_method_result import DefaultMethodResult
-from request_api.models.FOIRequestRecords import FOIRequestRecord
 from sqlalchemy import text
 from datetime import datetime as datetime2
 import logging
@@ -534,28 +533,6 @@ class FOIOpenInformationRequests(db.Model):
                             )
             return oifilter
 
-    @classmethod
-    def getdatafromOILayerpagecounts(cls, requestid, ministryRequestid):
-        try:
-            # Import moved inside the method to avoid circular import
-            from request_api.services.records.recordservicebase import recordservicebase
-
-            service = recordservicebase() 
-            uploadedrecords = FOIRequestRecord.fetch(requestid, ministryRequestid) 
-
-            response = None
-            err = None
-            
-            if len(uploadedrecords) > 0:
-                response, err = service.makedocreviewerrequest(
-                    "GET", "/api/ministryrequest/{}/pageflag/count".format(ministryRequestid)
-            )
-
-            return response, err
-        except Exception as e:
-            logging.error(f"Error getting OI Layer page counts: {str(e)}")
-            return None, str(e)
-    
     @classmethod
     def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
         basequery = FOIOpenInformationRequests.getoibasequery(None, userid, isiaorestrictedfilemanager,isadvancedsearch=True)

@@ -121,8 +121,8 @@ const OpenInfo = ({
           ...prev,
           show: true,
           title: "Exemption Request",
-          description: "Are you sure you want to change the state to Exemption Request?",
-          message: "This will assign the request to the Open Information Queue.",
+          description: "Are you sure you want to create an exemption request?",
+          message: "This request will be assigned to the Open Information team queue.",
           confirmButtonTitle: "Save Changes"
         }));
       }
@@ -155,7 +155,7 @@ const OpenInfo = ({
             toast.update(toastID, {
               type: "success",
               render:
-                "FOI OpenInformation request has been saved successfully.",
+                "FOI Open Information request has been saved successfully.",
               position: "top-right",
               isLoading: false,
               autoClose: 3000,
@@ -185,7 +185,7 @@ const OpenInfo = ({
             dispatch(fetchFOIOpenInfoRequest(foiministryrequestid));
           } else {
             toast.error(
-              "Temporarily unable to save FOI OpenInformation request. Please try again in a few minutes.",
+              "Temporarily unable to save FOI Open Information request. Please try again in a few minutes.",
               {
                 position: "top-right",
                 autoClose: 3000,
