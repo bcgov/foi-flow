@@ -59,7 +59,7 @@ export const ReceiptField = ({
               setPopoverOpen(false);
             }}
           >
-            Open in new tab
+            View
           </MenuItem>
 
           <MenuItem
@@ -75,6 +75,7 @@ export const ReceiptField = ({
               }));
               setPopoverOpen(false);
             }}
+            disabled={receipt.isactive && receipt.receiptfilename ? false : true}
           >
             Delete
           </MenuItem>
@@ -83,19 +84,12 @@ export const ReceiptField = ({
     );
   };
 
-  return receipt.isactive ? (
+  return receipt.isactive && receipt.receiptfilename ? (
     <>
       <div className="col-lg-12 foi-details-col application-fee-receipt">
-        <u
-          className="receipt-link"
-          onClick={() => {
-            getReceiptFile(receipt?.receiptfilename, receipt?.receiptfilepath);
-          }}
-        >
           {receipt.receiptfilename
             ? receipt.receiptfilename
             : "view online payment receipt"}
-        </u>
         <i>
           <IconButton
             className={"receipt-popover"}
@@ -116,6 +110,26 @@ export const ReceiptField = ({
       </div>
     </>
   ) : (
-    <></>
+    <>
+      <div className="col-lg-12 foi-details-col application-fee-receipt">Online payment receipt
+        <i>
+          <IconButton
+            className={"receipt-popover"}
+            aria-label="actions"
+            id={`ellipse-icon-onlinereceipt`}
+            key={`ellipse-icon-onlinereceipt`}
+            color="primary"
+            disabled={false}
+            onClick={(e) => {
+              setPopoverOpen(true);
+              setAnchorPosition(e.currentTarget.getBoundingClientRect());
+            }}
+          >
+            <MoreHorizIcon />
+          </IconButton>
+        </i>
+        <ActionsPopover />
+      </div>
+    </>
   );
 };

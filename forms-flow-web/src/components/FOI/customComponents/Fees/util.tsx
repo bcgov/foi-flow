@@ -43,7 +43,7 @@ export const paymentMethods = [
   {
     value: 'creditcardonline',
     label: 'Credit Card - Online',
-    disabled: true,
+    disabled: false,
   },
   {
     value: 'creditcardphone',
