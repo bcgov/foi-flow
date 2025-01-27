@@ -233,6 +233,17 @@ export const Fees = ({
           }
         }
       }
+      // Require amountPaid and paymentDate for online payments
+      if (!applicationFeeFormData?.paymentId) {
+        if (!applicationFeeFormData?.amountPaid || 
+          applicationFeeFormData?.amountPaid == 0 || 
+          !applicationFeeFormData?.paymentDate || 
+          applicationFeeFormData?.paymentDate == '') return false;
+      }
+      if (applicationFeeFormData?.paymentSource != 'init') {
+        if (!applicationFeeFormData?.amountPaid || applicationFeeFormData?.amountPaid == 0) return false;
+        if (applicationFeeFormData?.paymentDate == null || applicationFeeFormData?.paymentDate == '') return false;
+      }
       if (validateBalancePaymentMethod() || validateEstimatePaymentMethod()) {
         return false;
       }

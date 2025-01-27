@@ -70,7 +70,6 @@ export const ApplicationFeeTab = ({
           variant="outlined"
           fullWidth
           required
-          disabled={formData?.paymentSource == 'creditcardonline' ? true : false}
         >
           {ApplicationFeeStatuses.map((option) => (
           <MenuItem
@@ -93,6 +92,8 @@ export const ApplicationFeeTab = ({
       if (formData?.paymentSource != 'creditcardonline' && formData?.paymentSource != 'init') {
         if (formData?.amountPaid % 10 != 0 || formData?.amountPaid == 0) return true;
       }
+      if (!formData?.paymentId && formData?.amountPaid == 0) return true;
+      if ((formData?.paymentSource != 'init') && formData?.amountPaid == 0) return true;
       if (formData?.amountPaid % 10 != 0 && formData?.amountPaid > 0) return true;
     }
     const amountPaidField = (
@@ -128,7 +129,6 @@ export const ApplicationFeeTab = ({
 
     const paymentSourceFieldDisabled = () => {
       if (formData?.applicationFeeStatus == 'na-ige') return true
-      if (formData?.paymentSource == paymentMethods.filter((option) => option.value === 'creditcardonline')[0].value) return true
       return false;
     }
 
@@ -165,6 +165,8 @@ export const ApplicationFeeTab = ({
       if (formData?.paymentSource != 'creditcardonline' && formData?.paymentSource != 'init') {
         if (formData?.paymentDate == '' || formData?.paymentDate == null) return true;
       }
+      if (!formData?.paymentId && (!formData?.paymentDate || formData?.paymentDate == "")) return true;
+      if ((formData?.paymentSource != 'init') && (!formData?.paymentDate || formData?.paymentDate == "")) return true;
     }
     const paymentDateField = (
       <div className="col-lg-6 foi-details-col">
@@ -393,7 +395,7 @@ export const ApplicationFeeTab = ({
           label="Refund Amount"
           inputProps={{
             "aria-labelledby": "refundamount-label",
-            step: 0.01,
+            step: 10,
             min: 0
           }}
           InputProps={{
