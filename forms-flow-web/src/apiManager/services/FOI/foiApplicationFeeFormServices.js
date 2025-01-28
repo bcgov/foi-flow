@@ -1,4 +1,4 @@
-import { httpGETRequest, httpPOSTRequest } from "../../httpRequestHandler";
+import { httpGETRequest, httpPOSTRequest, httpPOSTRequestBlobResponse } from "../../httpRequestHandler";
   import UserService from "../../../services/UserService";
 import API from "../../endpoints";
   import {
@@ -96,7 +96,7 @@ export const generateReceiptFromOnlinePayment = (
   let apiUrl = replaceUrl(baseUrl, "<request_id>", requestId);
   apiUrl = replaceUrl(apiUrl, "<payment_id>", paymentId);
   
-  httpPOSTRequest(apiUrl, data)
+  httpPOSTRequestBlobResponse(apiUrl, data)
     .then((res) => {
       if (res.data) {
         if (callback) {
