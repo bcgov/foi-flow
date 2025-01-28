@@ -92,7 +92,7 @@ export const ApplicationFeeTab = ({
       if (formData?.paymentSource != 'creditcardonline' && formData?.paymentSource != 'init') {
         if (formData?.amountPaid % 10 != 0 || formData?.amountPaid == 0) return true;
       }
-      if (!formData?.paymentId && formData?.amountPaid == 0) return true;
+      if (formData?.paymentId && formData?.amountPaid == 0) return true;
       if ((formData?.paymentSource != 'init') && formData?.amountPaid == 0) return true;
       if (formData?.amountPaid % 10 != 0 && formData?.amountPaid > 0) return true;
     }
@@ -165,7 +165,7 @@ export const ApplicationFeeTab = ({
       if (formData?.paymentSource != 'creditcardonline' && formData?.paymentSource != 'init') {
         if (formData?.paymentDate == '' || formData?.paymentDate == null) return true;
       }
-      if (!formData?.paymentId && (!formData?.paymentDate || formData?.paymentDate == "")) return true;
+      if (formData?.paymentId && (!formData?.paymentDate || formData?.paymentDate == "")) return true;
       if ((formData?.paymentSource != 'init') && (!formData?.paymentDate || formData?.paymentDate == "")) return true;
     }
     const paymentDateField = (
@@ -365,12 +365,13 @@ export const ApplicationFeeTab = ({
     }
 
     const uploadedReceiptsFieldComponent = formData.receipts.map((receipt: any) => {
-      return <ReceiptField receipt={receipt} getReceiptFile={getReceiptFile} formData={formData} setFormData={setFormData} />
+      if (receipt.isactive) return <ReceiptField receipt={receipt} getReceiptFile={getReceiptFile} formData={formData} setFormData={setFormData} />
+      return <></>
     })
 
-    if (uploadedReceiptsFieldComponent.length == 0) {
+    if (formData?.paymentId) {
       uploadedReceiptsFieldComponent.push(
-        <ReceiptField receipt={{}} getReceiptFile={getReceiptFile} formData={formData} setFormData={setFormData} />
+        <ReceiptField receipt={{onlinepayment: true}} getReceiptFile={getReceiptFile} formData={formData} setFormData={setFormData} />
       )
     }
 
@@ -477,7 +478,7 @@ export const ApplicationFeeTab = ({
                 {orderIdField}
                 {transactionNumberField}
                 {receiptUploadField}
-                {formData?.receipts.length > 0 || formData?.paymentSource == 'creditcardonline' ? uploadedReceiptsFieldComponent : <></>}
+                {uploadedReceiptsFieldComponent}
               </div>}
             </AccordionDetails>
           </Accordion>
