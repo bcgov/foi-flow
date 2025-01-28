@@ -92,7 +92,7 @@ export const ApplicationFeeTab = ({
       if (formData?.paymentSource != 'creditcardonline' && formData?.paymentSource != 'init') {
         if (formData?.amountPaid % 10 != 0 || formData?.amountPaid == 0) return true;
       }
-      if (!formData?.paymentId && formData?.amountPaid == 0) return true;
+      if (formData?.paymentId && formData?.amountPaid == 0) return true;
       if ((formData?.paymentSource != 'init') && formData?.amountPaid == 0) return true;
       if (formData?.amountPaid % 10 != 0 && formData?.amountPaid > 0) return true;
     }
@@ -165,7 +165,7 @@ export const ApplicationFeeTab = ({
       if (formData?.paymentSource != 'creditcardonline' && formData?.paymentSource != 'init') {
         if (formData?.paymentDate == '' || formData?.paymentDate == null) return true;
       }
-      if (!formData?.paymentId && (!formData?.paymentDate || formData?.paymentDate == "")) return true;
+      if (formData?.paymentId && (!formData?.paymentDate || formData?.paymentDate == "")) return true;
       if ((formData?.paymentSource != 'init') && (!formData?.paymentDate || formData?.paymentDate == "")) return true;
     }
     const paymentDateField = (
@@ -292,7 +292,7 @@ export const ApplicationFeeTab = ({
       </div>
     )
 
-    const getReceiptFromOnlinePayment = () => {
+    const getReceiptFromOnlinePayment = (download: any) => {
       const selectedBodies = requestDetails?.selectedMinistries.map((ministry: any) => {
         return {
           publicBody: ministry.code,
@@ -314,10 +314,23 @@ export const ApplicationFeeTab = ({
           cardType: formData?.paymentSource == 'creditcardonline' ? 'CC' : ''
         }
       }
-      let callback = (res: any) => {
-          let blob = new Blob([res], {type: "application/pdf"});
-          let blobURL = URL.createObjectURL(blob);
-          window.open(blobURL);
+      let callback;
+      if (download) {
+        callback = (pdfBlob: any) => {
+          let blobURL = URL.createObjectURL(pdfBlob);
+          const downloadLink = document.createElement('a');
+          downloadLink.href = blobURL;
+          downloadLink.download = 'receipt';
+          downloadLink.style.display = 'none';
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+      } 
+      } else {
+        callback = (pdfBlob: any) => {
+            let blobURL = URL.createObjectURL(pdfBlob);
+            window.open(blobURL);
+        }
       }
       generateReceiptFromOnlinePayment(data, requestId, formData?.paymentId, dispatch, callback, (err: any) => {
         console.log('Error: ', err)
@@ -347,17 +360,18 @@ export const ApplicationFeeTab = ({
           }
         }, 'attachments', 'Misc');
       } else {
-        getReceiptFromOnlinePayment();
+        getReceiptFromOnlinePayment(download);
       }
     }
 
     const uploadedReceiptsFieldComponent = formData.receipts.map((receipt: any) => {
-      return <ReceiptField receipt={receipt} getReceiptFile={getReceiptFile} formData={formData} setFormData={setFormData} />
+      if (receipt.isactive) return <ReceiptField receipt={receipt} getReceiptFile={getReceiptFile} formData={formData} setFormData={setFormData} />
+      return <></>
     })
 
-    if (uploadedReceiptsFieldComponent.length == 0) {
+    if (formData?.paymentId) {
       uploadedReceiptsFieldComponent.push(
-        <ReceiptField receipt={{}} getReceiptFile={getReceiptFile} formData={formData} setFormData={setFormData} />
+        <ReceiptField receipt={{onlinepayment: true}} getReceiptFile={getReceiptFile} formData={formData} setFormData={setFormData} />
       )
     }
 
@@ -464,7 +478,7 @@ export const ApplicationFeeTab = ({
                 {orderIdField}
                 {transactionNumberField}
                 {receiptUploadField}
-                {formData?.receipts.length > 0 || formData?.paymentSource == 'creditcardonline' ? uploadedReceiptsFieldComponent : <></>}
+                {uploadedReceiptsFieldComponent}
               </div>}
             </AccordionDetails>
           </Accordion>

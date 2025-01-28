@@ -84,7 +84,7 @@ export const ReceiptField = ({
     );
   };
 
-  return receipt.isactive && receipt.receiptfilename ? (
+  if (receipt?.isactive && receipt?.receiptfilename) return (
     <>
       <div className="col-lg-12 foi-details-col application-fee-receipt">
           {receipt.receiptfilename
@@ -109,7 +109,9 @@ export const ReceiptField = ({
         <ActionsPopover />
       </div>
     </>
-  ) : (
+  );
+
+  if (receipt.onlinepayment == true) return (
     <>
       <div className="col-lg-12 foi-details-col application-fee-receipt">Online payment receipt
         <i>
@@ -132,4 +134,5 @@ export const ReceiptField = ({
       </div>
     </>
   );
+  return <></>
 };
