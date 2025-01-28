@@ -168,6 +168,26 @@
   right: 4% !important;
 }
 
+.application-fee-receipt {
+  background-color: #4e7095;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  margin: 10px 15px;
+  padding: 5px 10px;
+  i {
+    float: right;
+  }
+  .receipt-link {
+    cursor: pointer;
+  }
+  .receipt-popover {
+    padding: 0px;
+    cursor: pointer;
+    color: white;
+  }
+}
+
 @media (max-width: 1444px) {
   .cfrform-floatRightRight {
     display: none;
