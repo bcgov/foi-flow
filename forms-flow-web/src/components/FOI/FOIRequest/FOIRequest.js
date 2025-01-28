@@ -55,6 +55,7 @@ import {
   fetchPDFStitchStatusForResponsePackage,
   fetchPDFStitchedStatusForOIPCRedlineReview,
   fetchPDFStitchedStatusForOIPCRedline,
+  fetchPDFStitchStatusForConsults,
 } from "../../../apiManager/services/FOI/foiRecordServices";
 import { makeStyles } from "@material-ui/core/styles";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
@@ -343,6 +344,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
       dispatch(fetchPDFStitchedStatusForOIPCRedline(requestId, ministryId));
       dispatch(fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId));
+      dispatch(fetchPDFStitchStatusForConsults(requestId, ministryId));
       fetchCFRForm(ministryId, dispatch);
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       dispatch(fetchApplicantCorrespondenceTemplates());
@@ -1216,7 +1218,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     Records
                   </div>
                 )}
-                {showContactApplicantTab() && (
+                {
                   <div
                     className={clsx("tablinks", {
                       active: tabLinksStatuses.ContactApplicant.active,
@@ -1229,7 +1231,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                       ? `(${applicantCorrespondence.length})`
                       : ""}
                   </div>
-                )}
+                }
               </>
             )}
             <div
@@ -1761,7 +1763,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               </>
             )}
           </div>
-          {showContactApplicantTab() && (
+          {
             <div
               id="ContactApplicant"
               className={clsx("tabcontent", {
@@ -1788,7 +1790,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 <Loading />
               )}
             </div>
-          )}
+          }
           <div
             id="RequestHistory"
             className={clsx("tabcontent", {

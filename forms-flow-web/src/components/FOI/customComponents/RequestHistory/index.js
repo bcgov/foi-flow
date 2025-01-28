@@ -114,6 +114,7 @@ export const RequestHistorySection = ({
       isLoading: true,
       autoClose: 3000,
     })
+    
     let selectedCategory;
     if(exportOptions.isApplicantCorrespondenceChecked && exportOptions.isCommentsChecked 
       && exportOptions.isRequestDetailsChecked){
@@ -121,22 +122,29 @@ export const RequestHistorySection = ({
     } else {
         let tempCategory='';
         if (exportOptions.isApplicantCorrespondenceChecked) {
-          tempCategory += 'Application Correspondence, ';
+          tempCategory += 'Correspondence and ';
         } 
         if (exportOptions.isCommentsChecked) {
-          tempCategory += 'Comments, ';
+          tempCategory += 'Comments and ';
         }
         if (exportOptions.isRequestDetailsChecked) {
-          tempCategory += 'Request Details, ';
+          tempCategory += 'Details and ';
         }
-        selectedCategory= tempCategory.substring(0, tempCategory.length - 2);
+        selectedCategory= tempCategory.substring(0, tempCategory.length - 5);
     }
     await exportToPDF(selectedCategory)
     toast.update(toastID, {
-      render: "File Downloaded",
+      type: "success",
+      render: "File Downloaded.",
+      position: "top-right",
       isLoading: false,
       autoClose: 3000,
-    })
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
   }
 
   // Utility function to "await" setState
@@ -147,10 +155,11 @@ export const RequestHistorySection = ({
   const exportToPDF = async (selectedCategory) => {
     await setStateAsync(true)
     const element =  document.getElementById("exportHistory");
+    let filenameSuffix = (requestNumber || `U-00${requestid}`)+ ' - ' + selectedCategory
     // Options for html2pdf
     const options = {
       margin: 5,
-      filename: `Request History ${requestid} - ${selectedCategory}.pdf`,
+      filename: `Request History - ${filenameSuffix}.pdf`,
       image: { type: 'png', quality: 0.97 },
       html2canvas: { scale: 2 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress:true },

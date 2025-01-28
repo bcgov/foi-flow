@@ -13,6 +13,7 @@ import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/servi
 import { renderTemplate, applyVariables, getTemplateVariables, getTemplateVariablesAsync } from './util';
 import { OSS_S3_BUCKET_FULL_PATH, FOI_FFA_URL } from "../../../../constants/constants";
 import { EmailExport } from '../../../FOI/customComponents';
+import logo from "../../../../assets/FOI/images/logo-banner.png";
 
 
 export const PreviewModal = React.memo(({
@@ -23,7 +24,8 @@ export const PreviewModal = React.memo(({
   handleExport,
   attachments,
   templateInfo,
-  enableSend
+  enableSend,
+  selectedEmails
 }: previewParams) => {
 
   const dispatch = useDispatch();
@@ -42,12 +44,16 @@ export const PreviewModal = React.memo(({
     filename: "header_footer_template.html",
     s3sourceuri: rootpath+templatePath
   }]
+  const replaceFFAUrlLogo = (template: string, logo: string) => {
+    return template.replace(/{{ffaurl}}\/logobanner\.jpg/g, logo);
+  };
   React.useEffect(() => {
     getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
       if (!err) {
         res.map(async (header: any, _index: any) => {
           getFileFromS3(header, async (_err: any, response: any) => {
             let html = await new Response(response.data).text();
+            html = replaceFFAUrlLogo(html, logo);
             setTemplate( `${html}` );
           });
         });
@@ -64,6 +70,7 @@ export const PreviewModal = React.memo(({
     };
     getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback)
   };
+  const emailTemplate = renderTemplate(template, innerhtml, templateVariables);
 
   return (
     <div className="state-change-dialog">        
@@ -80,11 +87,15 @@ export const PreviewModal = React.memo(({
           <IconButton aria-label= "close" onClick={handleClose}>
             <CloseIcon />
           </IconButton>
-        </DialogTitle>
+      </DialogTitle>
       <DialogContent>
         <DialogContentText id="state-change-dialog-description" component={'span'}>
+          <div className="state-change-email-note">
+          {enableSend && selectedEmails.length > 0 && (<p>Email to: {selectedEmails.join(', ')}</p>)}
+          {!enableSend && (<p>No email address has been selected to send this correspondence to. Instead, you can export this correspondence as a PDF.</p>)}
+          </div>
           <div className="preview-container">
-            <iframe srcDoc={ renderTemplate(template, innerhtml, templateVariables) } className="preview-frame" sandbox="allow-same-origin" />
+            <iframe srcDoc={ emailTemplate } className="preview-frame" sandbox="allow-same-origin" />
           </div>
           <div className="preview-container">
             {attachments.map((file: any, index: number) => (
@@ -99,7 +110,7 @@ export const PreviewModal = React.memo(({
       { !enableSend && 
         <EmailExport 
           handleExport={handleExport}
-          content={innerhtml}
+          content={emailTemplate}
         />
       }
       { enableSend && 

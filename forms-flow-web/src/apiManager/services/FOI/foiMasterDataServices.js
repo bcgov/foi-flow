@@ -90,7 +90,8 @@ import {
         });
     };
   };
-
+  
+  
   export const fetchFOIAssignedToList = (requestType, status, bcgovcode) => {
     let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API;
     if (requestType && status) {

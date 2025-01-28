@@ -72,7 +72,6 @@ export default function AttachmentModal({
   replacementfiletypes = [],
   totalUploadedRecordSize = 0,
   requestType = FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL,
-  currentResponseDate = "",
   isScanningTeamMember = false,
   curPersonalAttributes = {
     person: "",
@@ -80,7 +79,8 @@ export default function AttachmentModal({
     volume: "",
     trackingid: "",
     personaltag: "TBD"
-  }
+  },
+  currentResponseDate = ""
 }) {
   let tagList = [];
   if (uploadFor === "attachment") {
@@ -865,10 +865,10 @@ export default function AttachmentModal({
               disabled={isSaveDisabled()}
               onClick={handleSave}
             >
-              {uploadFor === "email" ? "Save Changes" :"Continue"}
+              Continue
             </button>
           )}
-          <button className="btn-cancel" onClick={handleClose}>
+          <button className="btn-bottom btn-cancel" onClick={handleClose}>
             Cancel
           </button>
         </DialogActions>

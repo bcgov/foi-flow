@@ -16,6 +16,15 @@
   }
 }
 
+.addCorrespondence-menuitem {
+  li.MuiMenuItem-root {
+    background-color: #FFF !important; 
+    &:hover,
+    &:focus {
+      background-color: #e3f2fd !important;
+    }
+  }
+}
 
 .previewEmail {
   float: right;
@@ -262,4 +271,33 @@
       text-decoration: underline;
     }
   }
+}
+
+.ql-link .ql-stroke,
+.ql-link .ql-fill {
+  display: none !important; 
+}
+
+.ql-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ql-link::before {
+  content: '';
+  display: inline-block;
+  width: 16px; 
+  height: 16px;
+  background-color: currentColor; 
+  mask: url('../../../../assets/styles/attachment-icon.svg') no-repeat center;
+  -webkit-mask: url('../../../../assets/styles/attachment-icon.svg') no-repeat center;
+  background-size: contain;
+}
+
+.state-change-email-note { 
+  margin-left: 25px;
+  margin-bottom: 20px;
+  font-style: italic;
 }
