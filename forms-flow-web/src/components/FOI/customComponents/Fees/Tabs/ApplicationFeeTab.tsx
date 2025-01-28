@@ -292,7 +292,7 @@ export const ApplicationFeeTab = ({
       </div>
     )
 
-    const getReceiptFromOnlinePayment = () => {
+    const getReceiptFromOnlinePayment = (download: any) => {
       const selectedBodies = requestDetails?.selectedMinistries.map((ministry: any) => {
         return {
           publicBody: ministry.code,
@@ -314,10 +314,23 @@ export const ApplicationFeeTab = ({
           cardType: formData?.paymentSource == 'creditcardonline' ? 'CC' : ''
         }
       }
-      let callback = (res: any) => {
-          let blob = new Blob([res], {type: "application/pdf"});
-          let blobURL = URL.createObjectURL(blob);
-          window.open(blobURL);
+      let callback;
+      if (download) {
+        callback = (pdfBlob: any) => {
+          let blobURL = URL.createObjectURL(pdfBlob);
+          const downloadLink = document.createElement('a');
+          downloadLink.href = blobURL;
+          downloadLink.download = 'receipt';
+          downloadLink.style.display = 'none';
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+      } 
+      } else {
+        callback = (pdfBlob: any) => {
+            let blobURL = URL.createObjectURL(pdfBlob);
+            window.open(blobURL);
+        }
       }
       generateReceiptFromOnlinePayment(data, requestId, formData?.paymentId, dispatch, callback, (err: any) => {
         console.log('Error: ', err)
@@ -347,7 +360,7 @@ export const ApplicationFeeTab = ({
           }
         }, 'attachments', 'Misc');
       } else {
-        getReceiptFromOnlinePayment();
+        getReceiptFromOnlinePayment(download);
       }
     }
 
