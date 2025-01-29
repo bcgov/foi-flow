@@ -42,7 +42,6 @@ const RequestDetails = React.memo(
     });
     const classes = useStyles();
     const disableFieldForMinistryRequest = shouldDisableFieldForMinistryRequests(requestStatus)
-    console.log("requestdetails: ",requestDetails)
     const {ministryId} = useParams();
     const validateFields = (request, name, value) => {
       if (request !== undefined) {
@@ -139,7 +138,6 @@ const RequestDetails = React.memo(
     const prevConsultFlag = React.useRef(requestDetails?.isconsultflag);
 
     React.useEffect(() => {
-      console.log("requestDetails.id : ",requestDetails.id)
       if (prevConsultFlag.current === true && !requestDetails?.isconsultflag) {
         const calculatedDueDate = startDateText ? dueDateCalculation(startDateText) : "";
         setDueDate(calculatedDueDate);
