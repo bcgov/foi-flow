@@ -1084,7 +1084,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
       );
     } else {
-      return true;
+      return (requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL);
     }
   };
 
