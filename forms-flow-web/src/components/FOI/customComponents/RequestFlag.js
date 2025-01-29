@@ -178,7 +178,6 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled 
   }
 
   const handleValueChange = (e) => {
-    console.log("handleValueChange : ", e.target.value);
     setIsSelected(e.target.value);
     if (type == "oipcreview" && !isActive) {
         handleSelect(e.target.value)

@@ -907,9 +907,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [stateChanged, setStateChanged] = useState(false);
 
   const handleSaveRequest = (_state, _unSaved, id) => {
-    console.log("handleSaveRequest _state: ", _state);
-    console.log("handleSaveRequest _unSaved: ", _unSaved);
-    console.log("handleSaveRequest id: ", id);
     setHeader(_state);
 
     if (_state?.toLowerCase() === StateEnum.unopened.name.toLowerCase() && 

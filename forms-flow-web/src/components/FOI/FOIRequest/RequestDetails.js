@@ -76,8 +76,6 @@ const RequestDetails = React.memo(
           return value || "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.DUE_DATE) {
-          console.log("request.isconsultflag : ",request.isconsultflag)
-          console.log("request.dueDate : ",request.dueDate)
           if(request.dueDate || request.isconsultflag) {
             return request.dueDate
           }
@@ -229,7 +227,6 @@ const RequestDetails = React.memo(
     }
 
     const handleDueDateChange = (e) => {
-      console.log("handleDueDateChange:",e.target.value)
       const newDueDate = requestDetails?.isconsultflag ? e.target.value : dueDateCalculation(startDateText);
       setDueDate(newDueDate);
       handleRequestDetailsValue(newDueDate, FOI_COMPONENT_CONSTANTS.DUE_DATE);
