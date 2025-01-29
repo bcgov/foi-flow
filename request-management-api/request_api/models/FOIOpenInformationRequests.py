@@ -179,12 +179,6 @@ class FOIOpenInformationRequests(db.Model):
             else_= literal("0").label("recordspagecount")
         )
 
-        recordspagecount = case ([
-            (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
-            ],
-            else_= literal("0").label("recordspagecount")
-        )
-
         oistatusname = case(
             [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
             else_=OpenInformationStatuses.name
@@ -466,6 +460,8 @@ class FOIOpenInformationRequests(db.Model):
             onekeywordfiltercondition = []
             if(_keyword != 'restricted'):
                 for field in filterfields:
+                    if(field == 'idNumber'):
+                        _keyword = _keyword.replace('u-00', '')
                     field_value = cls.findfield(field)
                     condition = field_value.ilike('%'+_keyword+'%')
                     exists_query = db.session.query(field_value).filter(condition).exists()
