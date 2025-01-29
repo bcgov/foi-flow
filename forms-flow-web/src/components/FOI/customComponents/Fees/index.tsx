@@ -221,7 +221,7 @@ export const Fees = ({
       return applicationFeeFormData?.refundAmount % 10 == 0 && applicationFeeFormData?.refundAmount > 0 && applicationFeeFormData?.refundAmount <= applicationFeeFormData?.amountPaid ? true : false;
     }
   
-    const validateFields = () => {
+    const validateApplicationFeeFields = () => {
       if (!_.isEqual(initialApplicationFeeFormData?.applicationFeeStatus, applicationFeeFormData?.applicationFeeStatus) 
         || (applicationFeeFormData?.applicationFeeStatus == 'init' && _.isEqual(initialCFRFormData, CFRFormData))) {
         if (applicationFeeFormData?.applicationFeeStatus == 'na-ige' || applicationFeeFormData?.applicationFeeStatus == 'appfeeowing') return true;
@@ -244,6 +244,20 @@ export const Fees = ({
         if (!applicationFeeFormData?.amountPaid || applicationFeeFormData?.amountPaid == 0) return false;
         if (applicationFeeFormData?.paymentDate == null || applicationFeeFormData?.paymentDate == '') return false;
       }
+      if (!validateApplicationFeeAmountPaid()) {
+        return false;
+      }
+      if (!_.isEqual(initialApplicationFeeFormData?.refundAmount, applicationFeeFormData?.refundAmount) ||
+        !_.isEqual(initialApplicationFeeFormData?.refundDate, applicationFeeFormData?.refundDate)) {
+        if (!validateApplicationFeeRefundAmount() || !applicationFeeFormData?.refundDate) {
+          return false;
+        }
+      }
+      if (receiptFileUpload && receiptFileUpload.length > 0) return true;
+      return !_.isEqual(initialApplicationFeeFormData, applicationFeeFormData)
+    }
+
+    const validateProcessingFeeFields = () => {
       if (validateBalancePaymentMethod() || validateEstimatePaymentMethod()) {
         return false;
       }
@@ -259,19 +273,7 @@ export const Fees = ({
           return false;
         }
       }
-
-      if (!validateApplicationFeeAmountPaid()) {
-        return false;
-      }
-      if (!_.isEqual(initialApplicationFeeFormData?.refundAmount, applicationFeeFormData?.refundAmount) ||
-        !_.isEqual(initialApplicationFeeFormData?.refundDate, applicationFeeFormData?.refundDate)) {
-        if (!validateApplicationFeeRefundAmount() || !applicationFeeFormData?.refundDate) {
-          return false;
-        }
-      }
-      if (receiptFileUpload && receiptFileUpload.length > 0) return true;
-
-      return !_.isEqual(initialCFRFormData, CFRFormData) || !_.isEqual(initialApplicationFeeFormData, applicationFeeFormData);
+      return !_.isEqual(initialCFRFormData, CFRFormData)
     }
 
     //Change handlers
@@ -803,7 +805,7 @@ export const Fees = ({
                 }
                 <BottomButtonGroup 
                   save={save}
-                  validateFields={validateFields}
+                  validateFields={selectedSubtab == FeesSubtabValues.PROCESSINGFEE ? validateProcessingFeeFields : validateApplicationFeeFields}
                   requestState={requestState}
                   StateEnum={StateEnum}
                   formData={CFRFormData}
