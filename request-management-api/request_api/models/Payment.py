@@ -3,8 +3,6 @@ from __future__ import annotations
 from datetime import date, datetime
 
 from sqlalchemy import ForeignKey
-from sqlalchemy.inspection import inspect
-
 
 from .db import db, ma
 
