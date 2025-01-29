@@ -173,7 +173,7 @@ const Dashboard = ({ userDetail }) => {
             marginTop: "2em",
           }}
         >
-          <Queue userDetail={userDetail} tableInfo={tableInfo} />
+          <Queue userDetail={userDetail} tableInfo={tableInfo} isOITeam={isOITeam} />
         </Grid>
         }
         { showEventQueue &&

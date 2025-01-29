@@ -140,6 +140,8 @@ const IAOOpenInfoMain = ({
                   !oiPublicationData?.pagereference
                 }
                 disabled={disableIAOField}
+                multiline
+                maxRows={2}
               ></TextField>
             </Grid>
             <Grid item md={6}>

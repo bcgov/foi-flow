@@ -23,7 +23,6 @@ from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .SubjectCodes import SubjectCode
 from .FOIRequestOIPC import FOIRequestOIPC
 from request_api.models.default_method_result import DefaultMethodResult
-from request_api.models.FOIRequestRecords import FOIRequestRecord
 from sqlalchemy import text
 from datetime import datetime as datetime2
 import logging
@@ -180,12 +179,6 @@ class FOIOpenInformationRequests(db.Model):
             else_= literal("0").label("recordspagecount")
         )
 
-        recordspagecount = case ([
-            (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
-            ],
-            else_= literal("0").label("recordspagecount")
-        )
-
         oistatusname = case(
             [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
             else_=OpenInformationStatuses.name
@@ -296,28 +289,6 @@ class FOIOpenInformationRequests(db.Model):
             ),
             receiveddate.desc()
         )
-
-            # .filter(
-            #     or_( 
-            #         and_(
-            #             FOIMinistryRequest.oistatus_id.isnot(None),
-            #             FOIMinistryRequest.oistatus_id != OIStatusEnum.PUBLISHED.value
-            #         ),
-            #         and_(
-            #             FOIMinistryRequest.oistatus_id.is_(None),
-            #             FOIMinistryRequest.requeststatuslabel == StateName.closed.name,
-            #             FOIMinistryRequest.closereasonid.in_(eligible_close_reasons)
-            #         )
-            #     )
-            # )
-            # .order_by(  
-            #     case(
-            #         [(FOIMinistryRequest.oistatus_id == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
-            #         else_=1
-            #     ),
-            #     receiveddate.desc()
-            # )
-        #)
             
         if additionalfilter == 'watchingRequests':
             subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
@@ -414,7 +385,13 @@ class FOIOpenInformationRequests(db.Model):
         elif field == 'pageCount':
             return FOIMinistryRequest.recordspagecount
         elif field == 'publicationStatus':
-            return OpenInformationStatuses.name
+            return cast(
+                case(
+                    [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
+                    else_=OpenInformationStatuses.name
+                ),
+                String
+            )
         elif field == 'from_closed':
             return func.coalesce(
                 func.greatest(
@@ -467,16 +444,18 @@ class FOIOpenInformationRequests(db.Model):
             onekeywordfiltercondition = []
             if(_keyword != 'restricted'):
                 for field in filterfields:
+                    if(field == 'idNumber'):
+                        _keyword = _keyword.replace('u-00', '')
                     field_value = cls.findfield(field)
                     condition = field_value.ilike('%'+_keyword+'%')
-                    exists_query = db.session.query(field_value).filter(condition).exists()
-                    has_match = db.session.query(exists_query).scalar()
-                    if has_match:
-                        onekeywordfiltercondition.append(condition)                   
+                    onekeywordfiltercondition.append(condition)            
             else:
                 filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
-        
-            filtercondition.append(or_(*onekeywordfiltercondition))
+
+            if onekeywordfiltercondition:
+                filtercondition.append(or_(*onekeywordfiltercondition))
+            elif _keyword != 'restricted':  
+                filtercondition.append(literal(False))
 
         return and_(*filtercondition)
 
@@ -534,28 +513,6 @@ class FOIOpenInformationRequests(db.Model):
                             )
             return oifilter
 
-    @classmethod
-    def getdatafromOILayerpagecounts(cls, requestid, ministryRequestid):
-        try:
-            # Import moved inside the method to avoid circular import
-            from request_api.services.records.recordservicebase import recordservicebase
-
-            service = recordservicebase() 
-            uploadedrecords = FOIRequestRecord.fetch(requestid, ministryRequestid) 
-
-            response = None
-            err = None
-            
-            if len(uploadedrecords) > 0:
-                response, err = service.makedocreviewerrequest(
-                    "GET", "/api/ministryrequest/{}/pageflag/count".format(ministryRequestid)
-            )
-
-            return response, err
-        except Exception as e:
-            logging.error(f"Error getting OI Layer page counts: {str(e)}")
-            return None, str(e)
-    
     @classmethod
     def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
         basequery = FOIOpenInformationRequests.getoibasequery(None, userid, isiaorestrictedfilemanager,isadvancedsearch=True)

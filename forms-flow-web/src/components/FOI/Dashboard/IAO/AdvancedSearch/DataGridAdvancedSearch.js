@@ -453,7 +453,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerAlign: "left",
     },
     {
-      field: "oilayerpagecount",
+      field: "recordspagecount",
       headerName: "PAGES",
       flex: 1,
       renderCell: hyperlinkRenderCell,
