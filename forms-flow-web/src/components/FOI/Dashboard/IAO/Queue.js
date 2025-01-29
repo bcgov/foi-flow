@@ -45,9 +45,9 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
   if (isOITeam) {
     filterFields = [
       "publicationStatus",
-      "idNumber",
+      "axisRequestId",
       "assignedToFirstName",
-      "assignedToLastName",
+      "assignedToLastName"
     ];
   } 
 
