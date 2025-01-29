@@ -147,6 +147,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
   );
+
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   let requestExtensions = useSelector(
     (state) => state.foiRequests.foiRequestExtesions
@@ -834,25 +835,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   }
 
   const handleConsultFlagChange = (isSelected) => {
-    console.log("handleConsultFlagChange isSelected: ", isSelected);
-
-    // if (!isSelected) {
-    //  removeConsult();
-    // } else {
-    //    setIsConsultReview(isSelected);
-    //    requestDetails.isconsultflag = isSelected;
-
-    // }
-
     requestDetails.isconsultflag = isSelected;
-    const updatedRequestObject = { ...saveRequestObject };
-    updatedRequestObject.isconsultflag = isSelected;
-    console.log(
-      "updatedRequestObject :",updatedRequestObject
-    )
-    setSaveRequestObject(updatedRequestObject);
-    //todo: scenario 7 applicant type mandatory
-
+    createSaveRequestObject('isconsultflag', isSelected);
   }
 
   //handle email validation
@@ -887,6 +871,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     _currentrequestStatus,
     oipcData,
     requestDetails.isoipcreview,
+    requestDetails.isconsultflag
   );
 
   const classes = useStyles();
@@ -926,6 +911,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     console.log("handleSaveRequest _unSaved: ", _unSaved);
     console.log("handleSaveRequest id: ", id);
     setHeader(_state);
+
+    if (_state?.toLowerCase() === StateEnum.unopened.name.toLowerCase() && 
+      (saveRequestObject.isconsultflag === null || saveRequestObject.isconsultflag === undefined)) {
+      saveRequestObject.isconsultflag = false;
+    }
 
     if (!_unSaved) {
       setUnSavedRequest(_unSaved);
@@ -1383,7 +1373,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         isAddRequest={isAddRequest}
                         handleOipcReviewFlagChange={handleOipcReviewFlagChange}
                         showOipcReviewFlag={requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()}
-                        showConsultFlag={true}
+                        showConsultFlag={requestState.toLowerCase() == StateEnum.unopened.name.toLowerCase() || (requestDetails.isconsultflag === true)}
                         handleConsultFlagChange={handleConsultFlagChange}
                       />
                       {(isAddRequest ||

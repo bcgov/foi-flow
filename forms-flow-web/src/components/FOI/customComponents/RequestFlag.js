@@ -18,7 +18,7 @@ import TextField from "@mui/material/TextField";
 //oipcreview
 //phasedrelease
 //consultation
-const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled }) => {
+const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled }) => {
   const [isSelected, setIsSelected] = useState(isActive || false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalHeading, setModalHeading] = useState("");
@@ -28,6 +28,9 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
   useEffect(() => {
     if (isActive == null) {
       setIsSelected(false);
+      if(type=="consult") {
+        handleSelect(false);
+      }
     } else {
     setIsSelected(isActive);
     }
@@ -196,11 +199,15 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
 
   const handleClose = () => {
     setModalOpen(false);
-    setIsSelected(isActive);
+
+    if(type == "consult") {
+      setIsSelected(isActive ?? false);
+    }else{
+      setIsSelected(isActive);
+    }
   };
 
   const handleSave = (e) => {
-    console.log("handleSave isSelected:", isSelected);
     setModalOpen(false);
     handleSelect(isSelected);
   };

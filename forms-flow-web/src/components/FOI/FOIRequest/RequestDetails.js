@@ -135,15 +135,19 @@ const RequestDetails = React.memo(
       handleRequestDetailsInitialValue(requestDetailsObject);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES, requestDetailsObject);
     },[requestDetails, handleRequestDetailsInitialValue])
+    
+    const prevConsultFlag = React.useRef(requestDetails?.isconsultflag);
 
     React.useEffect(() => {
       console.log("requestDetails.id : ",requestDetails.id)
-      if (!requestDetails?.isconsultflag) {
+      if (prevConsultFlag.current === true && !requestDetails?.isconsultflag) {
         const calculatedDueDate = startDateText ? dueDateCalculation(startDateText) : "";
         setDueDate(calculatedDueDate);
-        //handleRequestDetailsValue(calculatedDueDate, FOI_COMPONENT_CONSTANTS.DUE_DATE);
+        handleRequestDetailsValue(calculatedDueDate, FOI_COMPONENT_CONSTANTS.DUE_DATE);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DUE_DATE, calculatedDueDate);
       }
+
+      prevConsultFlag.current = requestDetails?.isconsultflag;
     }, [requestDetails?.isconsultflag]);
 
     const getReceivedDateForLocalState = () => {
@@ -295,7 +299,7 @@ const RequestDetails = React.memo(
                   }}
                   variant="outlined"
                   required
-                  disabled={!requestDetails?.isconsultflag}
+                  disabled={!requestDetails?.isconsultflag || requestDetails?.currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase()}
                   fullWidth
                 />
             </div>

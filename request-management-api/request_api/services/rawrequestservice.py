@@ -27,8 +27,6 @@ class rawrequestservice:
     """
 
     def saverawrequest(self, requestdatajson, sourceofsubmission, userid,notes):
-        print("==========saverawrequest===========")
-        print("requestdatajson[isconsultflag] : ",requestdatajson["isconsultflag"] if 'isconsultflag' in requestdatajson  else None)
         assigneegroup = requestdatajson["assignedGroup"] if requestdatajson.get("assignedGroup") != None else None
         assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") not in (None,'') else None
         assigneefirstname = requestdatajson["assignedToFirstName"] if requestdatajson.get("assignedToFirstName") != None else None
@@ -36,7 +34,7 @@ class rawrequestservice:
         assigneelastname = requestdatajson["assignedToLastName"] if requestdatajson.get("assignedToLastName") != None else None
         ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False        
         axisrequestid = requestdatajson["axisRequestId"] if 'axisRequestId' in requestdatajson  else None
-        isconsultflag = requestdatajson["isconsultflag"] if 'isconsultflag' in requestdatajson  else None
+        isconsultflag = requestdatajson["isconsultflag"] if 'isconsultflag' in requestdatajson  else False
         
         if axisrequestid is not None:
             isaxisrequestidpresent = self.isaxisrequestidpresent(axisrequestid)

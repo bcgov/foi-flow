@@ -312,8 +312,8 @@ const FOIRequestHeader = React.memo(
                     requestDetails={requestDetails}
                     isActive={requestDetails.isconsultflag}
                     handleSelect={handleConsultFlagChange}
-                    showFlag={true}
-                    isDisabled={false}
+                    showFlag={showConsultFlag}
+                    isDisabled={!isAddRequest}
                 />
                 {/* <RequestFlag
                   type="phasedrelease"
