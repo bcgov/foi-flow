@@ -70,7 +70,6 @@ export const ApplicationFeeTab = ({
           variant="outlined"
           fullWidth
           required
-          disabled={formData?.paymentSource == 'creditcardonline' ? true : false}
         >
           {ApplicationFeeStatuses.map((option) => (
           <MenuItem
@@ -93,6 +92,8 @@ export const ApplicationFeeTab = ({
       if (formData?.paymentSource != 'creditcardonline' && formData?.paymentSource != 'init') {
         if (formData?.amountPaid % 10 != 0 || formData?.amountPaid == 0) return true;
       }
+      if (formData?.paymentId && formData?.amountPaid == 0) return true;
+      if ((formData?.paymentSource != 'init') && formData?.amountPaid == 0) return true;
       if (formData?.amountPaid % 10 != 0 && formData?.amountPaid > 0) return true;
     }
     const amountPaidField = (
@@ -128,7 +129,6 @@ export const ApplicationFeeTab = ({
 
     const paymentSourceFieldDisabled = () => {
       if (formData?.applicationFeeStatus == 'na-ige') return true
-      if (formData?.paymentSource == paymentMethods.filter((option) => option.value === 'creditcardonline')[0].value) return true
       return false;
     }
 
@@ -165,6 +165,8 @@ export const ApplicationFeeTab = ({
       if (formData?.paymentSource != 'creditcardonline' && formData?.paymentSource != 'init') {
         if (formData?.paymentDate == '' || formData?.paymentDate == null) return true;
       }
+      if (formData?.paymentId && (!formData?.paymentDate || formData?.paymentDate == "")) return true;
+      if ((formData?.paymentSource != 'init') && (!formData?.paymentDate || formData?.paymentDate == "")) return true;
     }
     const paymentDateField = (
       <div className="col-lg-6 foi-details-col">
@@ -290,7 +292,7 @@ export const ApplicationFeeTab = ({
       </div>
     )
 
-    const getReceiptFromOnlinePayment = () => {
+    const getReceiptFromOnlinePayment = (download: any) => {
       const selectedBodies = requestDetails?.selectedMinistries.map((ministry: any) => {
         return {
           publicBody: ministry.code,
@@ -312,10 +314,23 @@ export const ApplicationFeeTab = ({
           cardType: formData?.paymentSource == 'creditcardonline' ? 'CC' : ''
         }
       }
-      let callback = (res: any) => {
-          let blob = new Blob([res], {type: "application/pdf"});
-          let blobURL = URL.createObjectURL(blob);
-          window.open(blobURL);
+      let callback;
+      if (download) {
+        callback = (pdfBlob: any) => {
+          let blobURL = URL.createObjectURL(pdfBlob);
+          const downloadLink = document.createElement('a');
+          downloadLink.href = blobURL;
+          downloadLink.download = 'receipt';
+          downloadLink.style.display = 'none';
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+      } 
+      } else {
+        callback = (pdfBlob: any) => {
+            let blobURL = URL.createObjectURL(pdfBlob);
+            window.open(blobURL);
+        }
       }
       generateReceiptFromOnlinePayment(data, requestId, formData?.paymentId, dispatch, callback, (err: any) => {
         console.log('Error: ', err)
@@ -345,42 +360,18 @@ export const ApplicationFeeTab = ({
           }
         }, 'attachments', 'Misc');
       } else {
-        getReceiptFromOnlinePayment();
+        getReceiptFromOnlinePayment(download);
       }
     }
 
-    const uploadedReceiptsField = formData?.receipts.map((receipt: any) => {
-      if (receipt.isactive) {
-        return (
-          <div className="col-lg-12 foi-details-col application-fee-receipt">
-            <u
-              className="receipt-link"
-              onClick={() => {
-                getReceiptFile(receipt?.receiptfilename, receipt?.receiptfilepath)}
-              }
-            >{receipt.receiptfilename ? receipt.receiptfilename : 'view online payment receipt'}</u>
-            <i
-              className="fa fa-times-circle receipt-delete"
-              onClick={() => setFormData((values: any) => ({...values, ['receipts']: [...formData?.receipts.filter((r: any) => r.receiptfilename != receipt.receiptfilename), {...receipt, isactive: false}]}))}
-            >
-            </i>
-          </div>
-        )}
-    })
-
     const uploadedReceiptsFieldComponent = formData.receipts.map((receipt: any) => {
-      return <ReceiptField receipt={receipt} getReceiptFile={getReceiptFile} formData={formData} setFormData={setFormData} />
+      if (receipt.isactive) return <ReceiptField receipt={receipt} getReceiptFile={getReceiptFile} formData={formData} setFormData={setFormData} />
+      return <></>
     })
 
-    if (uploadedReceiptsField.length == 0) {
-      uploadedReceiptsField.push(
-        <div className="col-lg-12 foi-details-col">
-            <u
-              onClick={() => {
-                getReceiptFile()}
-              }
-            >{'view online payment receipt'}</u>
-          </div>
+    if (formData?.paymentId) {
+      uploadedReceiptsFieldComponent.push(
+        <ReceiptField receipt={{onlinepayment: true}} getReceiptFile={getReceiptFile} formData={formData} setFormData={setFormData} />
       )
     }
 
@@ -418,7 +409,7 @@ export const ApplicationFeeTab = ({
           label="Refund Amount"
           inputProps={{
             "aria-labelledby": "refundamount-label",
-            step: 0.01,
+            step: 10,
             min: 0
           }}
           InputProps={{
@@ -487,7 +478,7 @@ export const ApplicationFeeTab = ({
                 {orderIdField}
                 {transactionNumberField}
                 {receiptUploadField}
-                {formData?.receipts.length > 0 || formData?.paymentSource == 'creditcardonline' ? uploadedReceiptsFieldComponent : <></>}
+                {uploadedReceiptsFieldComponent}
               </div>}
             </AccordionDetails>
           </Accordion>
