@@ -6,6 +6,7 @@ from datetime import datetime
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.Payment import Payment
 from request_api.services.events.applicationfeeform import applicationfeeformevent
+from request_api.services.requestservice import requestservice
 
 class applicationfeeservice:
     """ FOI Application Fee Form management service
@@ -29,15 +30,16 @@ class applicationfeeservice:
         if receipts != []:
             applicationfee['receipts'] = receipts
         if applicationfee == {}:
-            request = FOIRawRequest.get_request(requestid)
+            rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
+            request = FOIRawRequest.get_request(rawrequestid)
             for payment in payments:
                 applicationfee['applicationfeestatus'] = 'paid'
-                applicationfee['amountpaid'] = payment.total
-                applicationfee['paymentdate'] = payment.completed_on
+                applicationfee['amountpaid'] = payment["total"]
+                applicationfee['paymentdate'] = payment["completed_on"]
                 applicationfee['paymentsource'] = 'creditcardonline'
-                applicationfee['orderid'] = payment.order_id
-                applicationfee['transactionnumber'] = payment.transaction_number
-                applicationfee['paymentid'] = payment.payment_id
+                applicationfee['orderid'] = payment["order_id"]
+                applicationfee['transactionnumber'] = payment["transaction_number"]
+                applicationfee['paymentid'] = payment["payment_id"]
             if request != {}:
                 isIGE = request.get('requestrawdata', {}).get('contactInfo', {}).get('IGE', {})
                 if isIGE:
@@ -47,7 +49,7 @@ class applicationfeeservice:
                 self.saveapplicationfee(requestid, ministryrequestid, applicationfee, 'system')
         if 'paymentsource' in applicationfee and applicationfee['paymentsource'] == 'creditcardonline':
             for payment in payments:
-                applicationfee['paymentid'] = payment.payment_id
+                applicationfee['paymentid'] = payment["payment_id"]
         return self.__formatapplicationfee(applicationfee)
     
     def saveapplicationfeereceipt(self, applicationfeereceipt):
