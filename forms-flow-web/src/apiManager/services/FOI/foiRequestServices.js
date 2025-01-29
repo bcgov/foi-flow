@@ -159,6 +159,7 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
   };
 };
 
+//REMOVE THIS + API ENDPOINT
 export const fetchFOIOIRequestListByPage = (page = 1, size = 10, sort = [{field:'defaultSorting', sort:'asc'}], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
   let sortingItems = [];
   let sortingOrders = [];
@@ -166,7 +167,7 @@ export const fetchFOIOIRequestListByPage = (page = 1, size = 10, sort = [{field:
     sortingItems.push(item.field);
     sortingOrders.push(item.sort);
   });
-
+  
   return (dispatch) => {
     httpGETRequest(
           API.FOI_GET_OI_REQUESTS_PAGE_API,
