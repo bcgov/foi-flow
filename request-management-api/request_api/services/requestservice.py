@@ -155,7 +155,7 @@ class requestservice:
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
 
     def getrawrequestidbyfoirequestid(self, foirequestid):
-        if foirequestid == 'undefined':
+        if foirequestid == 'undefined' or foirequestid is None:
             return None
         rawrequestid = requestservicegetter().getrawrequestidbyfoirequestid(foirequestid)
         return rawrequestid

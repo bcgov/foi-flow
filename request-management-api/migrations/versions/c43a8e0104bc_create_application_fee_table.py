@@ -20,7 +20,7 @@ def upgrade():
     op.create_table('FOIRequestApplicationFees',
     sa.Column('applicationfeeid', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('version', sa.Integer(), nullable=False),
-    sa.Column('requestid', sa.Integer(), nullable=False),
+    sa.Column('rawrequestid', sa.Integer(), nullable=False),
     sa.Column('applicationfeestatus', sa.String(length=50), nullable=True),
     sa.Column('amountpaid', sa.Float(), nullable=True),
     sa.Column('paymentsource', sa.String(length=50), nullable=True),
