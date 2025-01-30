@@ -16,9 +16,9 @@ class applicationfeeservice:
         result = FOIRequestApplicationFee.saveapplicationfee(applicationfee, userid)
         if result.success == True and applicationfeeservice().applicationfeestatushaschanged(rawrequestid):
             data['applicationfeestatus'] = applicationfee.applicationfeestatus
-            applicationfeeformevent().createfeestatuschangeevent(requestid, ministryrequestid, data, userid, username)
+            applicationfeeformevent().createfeestatuschangeevent(rawrequestid, requestid, ministryrequestid, data, userid, username)
         if result.success == True and applicationfeeservice().applicationfeerefundupdated(rawrequestid):
-            applicationfeeformevent().createfeerefundevent(requestid, ministryrequestid, data['refundamount'], userid, username)
+            applicationfeeformevent().createfeerefundevent(rawrequestid, requestid, ministryrequestid, data['refundamount'], userid, username)
         return result
     
     def getapplicationfee(self, rawrequestid, requestid = None, ministryrequestid = None):
