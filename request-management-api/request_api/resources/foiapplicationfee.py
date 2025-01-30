@@ -52,9 +52,6 @@ class FOICFRFee(Resource):
                 rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
             if ministryrequestid is None and requestid is None:
                 return [], 200
-            print('rawrequestid: ', rawrequestid)
-            print('requestid: ', requestid)
-            print('ministryrequestid: ', ministryrequestid)
             result = applicationfeeservice().getapplicationfee(rawrequestid, requestid, ministryrequestid)
             return json.dumps(result), 200
         except KeyError as error:
