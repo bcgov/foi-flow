@@ -30,6 +30,12 @@ const StateList = Object.freeze({
     { status: "Peer Review", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
+  openforconsult: [
+    { status: "Open", isSelected: false },
+    { status: "Harms Assessment", isSelected: false },
+    { status: "Peer Review", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
   callforrecords: [
     { status: "Call For Records", isSelected: false },
     { status: "Open", isSelected: false },

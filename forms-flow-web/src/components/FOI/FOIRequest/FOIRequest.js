@@ -1167,6 +1167,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               isMinistryCoordinator={false}
               isValidationError={isValidationError}
               requestType={requestDetails?.requestType}
+              consultflag={requestDetails?.isconsultflag}
             />
           </div>
 
