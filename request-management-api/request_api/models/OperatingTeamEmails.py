@@ -39,6 +39,7 @@ class OperatingTeamEmail(db.Model):
     @classmethod
     def getoperatingteamemail(cls, operatingteamname):
         try:
+            email = None
             sql = """
                 SELECT email_address FROM public."OperatingTeamEmails" em
                     JOIN public."OperatingTeams" op

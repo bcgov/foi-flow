@@ -169,7 +169,6 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         else if (saveRequestObject.requeststatuslabel === StateEnum.signoff.label
           && state.toLowerCase() === StateEnum.review.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.signoffreview.name;
-
         fileInfoList = files.map(file => {
           return {
             ministrycode: requestNumber.split("-")[0],
@@ -186,7 +185,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const attchmentFileNameList = attachmentsArray?.map(_file => _file.filename);
 
     const getDaysRemaining = () => {
-      if (currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.onhold.name.toLowerCase()) {
+      if (currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && state.toLowerCase() !== StateEnum.onholdother.name.toLowerCase()) {
         return (
           <span> <b> {daysRemainingLDD} DAYS REMAINING </b> </span>
         );
@@ -194,7 +193,9 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
 
     const addorUpdateConfirmationModal = () => {
-      if (state.toLowerCase() === StateEnum.closed.name.toLowerCase() && 
+      if(currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) 
+        return null; 
+      else if (state.toLowerCase() === StateEnum.closed.name.toLowerCase() && 
           currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) {
         return (
           <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
@@ -261,7 +262,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
                 </tr>
               </tbody>
           </table> : null }
-        {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() && [StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase()].includes(state.toLowerCase())) ?
+        {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() && [StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase(), StateEnum.onholdother.name.toLowerCase()].includes(state.toLowerCase())) ?
           <table className="table table-bordered table-assignedto">
             <tbody>
               <tr>

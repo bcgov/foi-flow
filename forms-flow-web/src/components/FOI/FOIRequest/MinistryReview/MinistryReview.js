@@ -263,6 +263,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       currentState === StateEnum.peerreview.name ||
       currentState === StateEnum.signoff.name ||
       currentState === StateEnum.response.name ||
+      currentState === StateEnum.onholdother.name ||
       currentState === StateEnum.closed.name
     );
   }
@@ -328,6 +329,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [CFRUnsaved, setCFRUnsaved] = React.useState(false);
   const hideBottomText = [
     StateEnum.onhold.name.toLowerCase(),
+    StateEnum.onholdother.name.toLowerCase(),
     StateEnum.closed.name.toLowerCase(),
   ];
 
@@ -489,6 +491,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
       break;       
     case StateEnum.recordsreadyforreview.name:
       foitabheaderBG = "foitabheadercollection foitabheaderRecordsReadyForReviewBG";
+      break;      
+    case StateEnum.onholdother.name:
+      foitabheaderBG = "foitabheadercollection foitabheaderOnHoldOtherBG";
       break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
