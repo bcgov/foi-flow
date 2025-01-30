@@ -15,6 +15,21 @@ export type CFRFormData = {
     reason: string;
 }
 
+export type ApplicationFeeFormData = {
+  applicationfeeid?: any;
+  applicationFeeStatus: string;
+  amountPaid: number;
+  paymentSource: string;
+  paymentDate: any;
+  orderId: string;
+  transactionNumber: string;
+  receipts: any[];
+  refundAmount: number;
+  refundDate: any;
+  reasonForRefund: string;
+  paymentId: number | null;
+}
+
 export type feeData = {
   locating: number;
   producing: number;
@@ -27,12 +42,14 @@ export type feeData = {
 export type params = {
   requestNumber: string;
   requestState: string;
+  requestDetails: any;
   ministryId: number;
   requestId: number;
   userDetail: {
     groups: string[];
   };
   setCFRUnsaved: Function;
+  handleStateChange: Function;
 }
 
 export type modalParams = {
@@ -41,3 +58,8 @@ export type modalParams = {
   formHistory: Array<any>;
   isMinistry: boolean;
 }
+
+export enum FeesSubtabValues {
+  APPLICATIONFEE = "APPLICATIONFEE",
+  PROCESSINGFEE = "PROCESSINGFEE"
+} 

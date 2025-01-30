@@ -251,7 +251,7 @@ const ExportHistory = ({
           {showCFRTab() &&
             <div style={{ pageBreakInside: 'avoid' }}>
               <div className="export_title">
-                <h1 className="foi-review-request-text foi-ministry-requestheadertext">CFR Forms</h1>
+                <h1 className="foi-review-request-text foi-ministry-requestheadertext">Processing Fee</h1>
               </div>
               <ExportCFRForms foiRequestCFRFormHistory={foiRequestCFRFormHistory} foiRequestCFRForm={foiRequestCFRForm} />
             </div>}
