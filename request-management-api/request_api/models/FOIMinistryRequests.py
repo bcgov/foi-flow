@@ -1606,6 +1606,7 @@ class FOIMinistryRequest(db.Model):
                     ,FMR.axislanpagecount
                     ,FMR.estimatedpagecount
                     ,FMR.estimatedtaggedpagecount
+                    ,FMR.description
                     ,PA.iaocode AS programareacode
                     ,FR.requesttype
                     FROM public."FOIMinistryRequests" FMR INNER JOIN (
@@ -1637,6 +1638,7 @@ class FOIMinistryRequest(db.Model):
                 requestdetail["axislanpagecount"]=row["axislanpagecount"]
                 requestdetail["estimatedpagecount"]=row["estimatedpagecount"]
                 requestdetail["estimatedtaggedpagecount"]=row["estimatedtaggedpagecount"]
+                requestdetail["description"]=row["description"]
                 requestdetail["requestType"]=row["requesttype"]
                 requestdetail["bcgovcode"]=row["programareacode"]
                 requestdetails.append(requestdetail)
