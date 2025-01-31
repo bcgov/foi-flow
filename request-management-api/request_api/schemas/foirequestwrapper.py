@@ -222,3 +222,4 @@ class FOIRequestMinistrySchema(Schema):
     assignedministrypersonLastName = fields.Str(data_key="assignedministrypersonLastName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
     ministrysignoffapproval = fields.Nested(CreateMinistrySignOffApprovalSchema, data_key="ministrysignoffapproval", allow_none=True)
     userrecordslockstatus = fields.Bool(data_key="userrecordslockstatus", allow_none=True)
+    isconsultflag = fields.Bool(data_key="isconsultflag")

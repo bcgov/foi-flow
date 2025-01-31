@@ -85,7 +85,7 @@ class requestservicebuilder(requestserviceconfigurator):
         return foiministryrequest
 
     def __updateministryassignedtoandgroup(self, foiministryrequest, requestschema, ministry, status):
-        if self.__isgrouprequired(status):
+        if self.__isgrouprequired(status, requestschema.get("isconsultflag")):
                 foiministryrequest.assignedministrygroup = MinistryTeamWithKeycloackGroup[ministry["code"]].value
         if self.isNotBlankorNone(requestschema,"assignedministrygroup","main") == True:
             foiministryrequest.assignedministrygroup = requestschema.get("assignedministrygroup")
@@ -103,8 +103,8 @@ class requestservicebuilder(requestserviceconfigurator):
         else:
             foiministryrequest.assignedto = None
 
-    def __isgrouprequired(self,status):
-        if status == StateName.callforrecords.value or status == StateName.recordsreview.value or status == StateName.consult.value or status == StateName.feeestimate.value or status == StateName.ministrysignoff.value or status == StateName.response.value:
+    def __isgrouprequired(self,status,isconsultflag=None):
+        if status == StateName.callforrecords.value or status == StateName.recordsreview.value or status == StateName.consult.value or status == StateName.feeestimate.value or status == StateName.ministrysignoff.value or status == StateName.response.value or ((status == StateName.harmsassessment.value and isconsultflag)):
             return True
         else:
             return False
