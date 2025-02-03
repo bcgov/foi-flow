@@ -33,6 +33,8 @@ import {
 import { ActionContext } from "./ActionContext";
 import Tooltip from '../../../customComponents/Tooltip/Tooltip';
 import { SEARCH_KEYWORD_LIMIT } from "../../../../../constants/constants";
+import { setKeywordSearchParams } from "../../../../../actions/FOI/foiRequestActions";
+
 
 
 const DEFAULT_PAGE_SIZE = 100;
@@ -90,6 +92,8 @@ const KeywordSearch = ({ userDetail }) => {
     setKeywordSearchComponentLoading,
     keywordSearchParams,
   } = useContext(ActionContext);
+
+  const dispatch = useDispatch();
 
   const programAreaList = useSelector(
     (state) => state.foiRequests.foiProgramAreaList
@@ -200,6 +204,7 @@ const KeywordSearch = ({ userDetail }) => {
 
   const handleResetSearchFilters = () => {
     //setSearchText("");
+    dispatch(setKeywordSearchParams({}))
     setKeywords([]);
     setFromDate("");
     setToDate("");
