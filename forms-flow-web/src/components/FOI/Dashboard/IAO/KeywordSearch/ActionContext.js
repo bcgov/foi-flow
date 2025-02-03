@@ -4,7 +4,7 @@ import { fetchFOIProgramAreaList } from "../../../../../apiManager/services/FOI/
 import {getCrossTextSearchAuth, getSolrKeywordSearchData, 
   getKeywordSearchRequestDetails} from "../../../../../apiManager/services/FOI/foiKeywordSearchServices"
 import { errorToast } from "../../../../../helper/FOI/helper";
-import { setKeywordSearchParams } from "../../../../../actions/FOI/foiRequestActions";
+//import { setKeywordSearchParams } from "../../../../../actions/FOI/foiRequestActions";
 import { SOLR_DOC_SEARCH_LIMIT } from "../../../../../constants/constants";
 
 export const ActionContext = createContext();
@@ -16,11 +16,10 @@ export const ActionProvider = ({ children }) => {
   const [keywordSearchLoading, setKeywordSearchLoading] = useState(false);
   const [keywordSearchComponentLoading, setKeywordSearchComponentLoading] = useState(false);
   const [searchResults, setSearchResults] = useState(null);
-  const keywordSearchParams = useSelector((state) => state.foiRequests.foiKeywordSearchParams);
-
+  const [foiKeywordSearchParams, setFoiKeywordSearchParams] = useState({});
 
   const handleUpdateSearchFilter = (filterData) => {
-    dispatch(setKeywordSearchParams(filterData))
+    setFoiKeywordSearchParams(filterData);
     setQueryData({ ...(queryData || {}), ...filterData });
   };
 
@@ -162,7 +161,8 @@ const convertToISO = (dateStr) => {
         defaultSortModel,
         keywordSearchComponentLoading,
         setKeywordSearchComponentLoading,
-        keywordSearchParams,
+        foiKeywordSearchParams,
+        setFoiKeywordSearchParams
       }}
     >
       {children}

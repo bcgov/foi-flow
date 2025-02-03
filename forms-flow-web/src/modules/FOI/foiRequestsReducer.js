@@ -18,7 +18,6 @@ const initialState = {
   showAdvancedSearch: false,
   showEventQueue: false,
   foiAdvancedSearchParams: {},
-  foiKeywordSearchParams:{},
   foiHistoricalSearchParams:{},
   isAssignedToListLoading: true,
   isAttachmentListLoading: true,
@@ -188,14 +187,6 @@ const foiRequests = (state = initialState, action) => {
         ...state,
         foiAdvancedSearchParams: {
           ...state.foiAdvancedSearchParams,
-          ...action.payload,
-        },
-      };
-    case FOI_ACTION_CONSTANTS.FOI_KEYWORD_SEARCH_PARAMS:
-      return {
-        ...state,
-        foiKeywordSearchParams: {
-          ...state.foiKeywordSearchParams,
           ...action.payload,
         },
       };
