@@ -27,13 +27,11 @@ import FormControl from "@mui/material/FormControl";
 import ListItemText from "@mui/material/ListItemText";
 import Select from "@mui/material/Select";
 import {
-  ConditionalComponent,
   formatDate,
 } from "../../../../../helper/FOI/helper";
 import { ActionContext } from "./ActionContext";
 import Tooltip from '../../../customComponents/Tooltip/Tooltip';
 import { SEARCH_KEYWORD_LIMIT } from "../../../../../constants/constants";
-import { setKeywordSearchParams } from "../../../../../actions/FOI/foiRequestActions";
 
 
 
@@ -90,7 +88,8 @@ const KeywordSearch = ({ userDetail }) => {
     defaultSortModel,
     keywordSearchComponentLoading,
     setKeywordSearchComponentLoading,
-    keywordSearchParams,
+    foiKeywordSearchParams,
+    setFoiKeywordSearchParams
   } = useContext(ActionContext);
 
   const dispatch = useDispatch();
@@ -106,27 +105,18 @@ const KeywordSearch = ({ userDetail }) => {
     "content": "Use one or more fields from the following sections on their own or to narrow your search: Received Date Range, or Public Body."
   };
 
-  const [fromDate, setFromDate] = useState(keywordSearchParams?.fromDate || "");
-  const [toDate, setToDate] = useState(keywordSearchParams?.toDate || "");
+  const [fromDate, setFromDate] = useState(foiKeywordSearchParams?.fromDate || "");
+  const [toDate, setToDate] = useState(foiKeywordSearchParams?.toDate || "");
   //default max fromDate - now
   const [maxFromDate, setMaxFromDate] = useState(formatDate(new Date()));
   const [maxToDate, setMaxToDate] = useState(formatDate(new Date()));
-  const [selectedPublicBodies, setSelectedPublicBodies] = useState(keywordSearchParams?.publicBodies || []);
+  const [selectedPublicBodies, setSelectedPublicBodies] = useState(foiKeywordSearchParams?.publicBodies || []);
 
   const [keywords, setKeywords] = useState(() => {
-    if (keywordSearchParams != null && keywordSearchParams != undefined && Object.keys(keywordSearchParams).length > 0 && keywordSearchParams.keywords.length > 0) {
-      return keywordSearchParams.keywords;
+    if (foiKeywordSearchParams != null && foiKeywordSearchParams != undefined && Object.keys(foiKeywordSearchParams).length > 0 && foiKeywordSearchParams.keywords.length > 0) {
+      return foiKeywordSearchParams.keywords;
     } else {
       return [];
-    }
-  });
-
-  const [searchText, setSearchText] = useState(() => {
-    if (keywordSearchParams != null && keywordSearchParams != undefined && Object.keys(keywordSearchParams).length > 0 && 
-      keywordSearchParams.keywords.length > 0 && keywords.length <=0) {
-      return keywordSearchParams.keywords[0]
-    } else {
-      return "";
     }
   });
 
@@ -173,7 +163,7 @@ const KeywordSearch = ({ userDetail }) => {
       toDate: toDate || null,
       publicBodies: selectedPublicBodies,
       page: 1,
-      size: keywordSearchParams?.size || DEFAULT_PAGE_SIZE,
+      size: foiKeywordSearchParams?.size || DEFAULT_PAGE_SIZE,
       sort: defaultSortModel,
       userId: userDetail.preferred_username,
     });    
@@ -185,43 +175,30 @@ const KeywordSearch = ({ userDetail }) => {
   }
 
   useEffect(() => {
-    if (keywordSearchParams && Object.keys(keywordSearchParams).length > 0) {
+    if (foiKeywordSearchParams && Object.keys(foiKeywordSearchParams).length > 0) {
       if (!keywordSearchComponentLoading) {
         setKeywordSearchComponentLoading(true);
       }
       setKeywordSearchLoading(true);
-      handleUpdateSearchFilter(keywordSearchParams);
+      handleUpdateSearchFilter(foiKeywordSearchParams);
     }
-  }, []);
+  }, []); 
   
-
-  // const noSearchCriteria = () => {
-  //   return (keywords.length===0  || !searchText)
-  //             && !fromDate
-  //             && !toDate
-  //             && selectedPublicBodies.length===0
-  // };
 
   const handleResetSearchFilters = () => {
     //setSearchText("");
-    dispatch(setKeywordSearchParams({}))
     setKeywords([]);
     setFromDate("");
     setToDate("");
     setSelectedPublicBodies([]);
+    setFoiKeywordSearchParams({});
   };
 
   const handleKeywordAdd = (category) => {
-    // if (!searchText) {
-    //   return;
-    // }
     if (keywords.length >= SEARCH_KEYWORD_LIMIT) {
-      setError(true); // Show error message and turn bar red
+      setError(true); 
       return;
     }
-    // if (searchText.trim() && !keywords.includes(searchText.trim())) {
-    //   setKeywords([...keywords, searchText.trim()]);
-    // }
     let updatedKeywords = [];
     if (category === "AND" && andKeywords) {
       updatedKeywords = [...keywords, { category: "AND", text: andKeywords }];
@@ -235,8 +212,6 @@ const KeywordSearch = ({ userDetail }) => {
     }
     setKeywords(updatedKeywords);
     setAnchorEl(null);
-    //setKeywords([...keywords, searchText.trim()]);
-    //setSearchText("");
     setError(false);
   };
 
@@ -244,10 +219,6 @@ const KeywordSearch = ({ userDetail }) => {
   const handleOrChange = (e) => setOrKeywords(e.target.value);
   const handleNotChange = (e) => setNotKeywords(e.target.value);
 
-  // const handleSearchChange = (e) => {
-  //   setAnchorEl(e.currentTarget);
-  //   setSearchText(e.target.value);
-  // };
 
   const handleSelectedPublicBodiesChange = (event) => {
     const {

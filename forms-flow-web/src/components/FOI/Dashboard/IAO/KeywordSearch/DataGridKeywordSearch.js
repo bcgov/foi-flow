@@ -33,15 +33,17 @@ const DataGridKeywordSearch = ({ userDetail }) => {
     queryData,
     setKeywordSearchLoading,
     keywordSearchComponentLoading,
-    keywordSearchParams,
+    foiKeywordSearchParams,
   } = useContext(ActionContext);
 
-  console.log("keywordSearchParams-Grid:",keywordSearchParams)
-  const keywordSearchParamsRef = React.useRef(keywordSearchParams);
+  console.log("foiKeywordSearchParams-Grid:",foiKeywordSearchParams)
+  const keywordSearchParamsRef = React.useRef(foiKeywordSearchParams);
+  console.log("keywordSearchParamsRef-Grid:",keywordSearchParamsRef)
+
 
   useEffect(() => {
-    keywordSearchParamsRef.current = keywordSearchParams;
-  }, [keywordSearchParams]);
+    keywordSearchParamsRef.current = foiKeywordSearchParams;
+  }, [foiKeywordSearchParams]);
 
   const renderReviewRequest = (e, row) => {
     e.preventDefault()
