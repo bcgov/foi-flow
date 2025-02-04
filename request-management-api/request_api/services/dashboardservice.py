@@ -10,6 +10,7 @@ from pytz import timezone
 import pytz
 import maya
 from request_api.auth import AuthHelper
+import holidays
 
 from flask import jsonify
 
@@ -319,12 +320,15 @@ class dashboardservice:
             today = dt.datetime.now(tz=pytz.timezone('America/Vancouver')).date()
             closed_date = closedate.date() if isinstance(closedate, dt.datetime) else closedate
             business_days = 0
-        
-            while closed_date < today:
-                if closed_date.weekday() < 5:  # Only count Monday through Friday
+
+            canada_holidays = holidays.Canada(prov='BC', years=range(closed_date.year, today.year + 1))  
+            holidays_set = set(canada_holidays)
+
+            while closed_date <= today:
+                if closed_date != closedate.date() and closed_date.weekday() < 5 and closed_date not in holidays_set:
                     business_days += 1
                 closed_date += dt.timedelta(days=1)
-        
+
             return str(business_days) if business_days > 0 else 'N/A'   
         except Exception as e:
             print("Error in calculate_from_closed: ", e)
