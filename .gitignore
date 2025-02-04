@@ -120,3 +120,26 @@ datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.DocMigration.OCR.Te
 datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.DocMigration.OCR.Tests/bin/*
 /datamigrations/FOIMOD.CFD.ConsoleApp.DocMigration/FOIMOD.CFD.DocMigration.Utils.UnitTests/appsettings.dev.json
 
+integrationapi/MCS.FOI.Integration/.vs/
+integrationapi/MCS.FOI.Integration/.vs/*
+integrationapi/MCS.FOI.Integration/*/bin/*
+integrationapi/MCS.FOI.Integration/*/obj/*
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration/.config/dotnet-tools.json
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.API/bin/
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.API/bin/*
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.API/obj/
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.API/obj/*
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Application/bin/
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Application/bin/*
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Application/obj/
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Application/obj/*
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Core/bin/
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Core/bin/*
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Core/obj/
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Core/obj/*
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Infrastructure/bin/
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Infrastructure/bin/*
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Infrastructure/obj/
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Infrastructure/obj/*
+.gitignore
+
