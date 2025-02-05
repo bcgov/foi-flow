@@ -87,9 +87,6 @@ class FOIRawRequest(Resource):
     def post(requestid=None, actiontype=None):
         try :                        
             updaterequest = request.get_json()
-            print("===============================================")
-            print("updaterequest: ", updaterequest)
-            print("===============================================")
             requestdata = getparams(updaterequest)
             assigneegroup = requestdata['assigneegroup']
             assignee = requestdata['assignee']

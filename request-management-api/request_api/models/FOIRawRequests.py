@@ -59,7 +59,6 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, axisrequestid, axissyncdate, linkedrequests, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None, isconsultflag=None)->DefaultMethodResult:        
-        print("isconsultflag : ",isconsultflag)
         version = 1
         newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = StateName.unopened.value if sourceofsubmission != "intake" else StateName.intakeinprogress.value, requeststatuslabel = StateName.unopened.name if sourceofsubmission != "intake" else StateName.intakeinprogress.name, createdby=userid, version=version, sourceofsubmission=sourceofsubmission, assignedgroup=assigneegroup, assignedto=assignee, ispiiredacted=ispiiredacted, notes=notes, requirespayment=requirespayment, axisrequestid=axisrequestid, axissyncdate=axissyncdate, linkedrequests=linkedrequests, isconsultflag=isconsultflag)
         if assignee is not None:
