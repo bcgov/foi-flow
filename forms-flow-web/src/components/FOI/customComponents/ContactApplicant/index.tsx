@@ -40,6 +40,9 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
+import { DocumentEditorContainerComponent } from "@syncfusion/ej2-react-documenteditor";
+import { DocEditor } from './DocEditor';
+import CustomAutocomplete, {OptionType} from '../Autocomplete'
 
 export const ContactApplicant = ({
   requestNumber,
@@ -50,6 +53,16 @@ export const ContactApplicant = ({
   applicantCorrespondenceTemplates,
   requestId,
 }: any) => {
+  const [curTemplate, setCurTemplate] = useState<string>('');
+
+  const options: OptionType[] = [
+    { label: 'Option 1', value: 'option1' },
+    { label: 'Option 2', value: 'option2' },
+    { label: 'Option 3', value: 'option3' }
+  ];
+  const selectTemplate = (event: React.ChangeEvent<{}>, value: OptionType | null) => {
+    console.log("Selected option:", value?.label);
+  };
 
   const dispatch = useDispatch();
   const currentCFRForm: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
@@ -322,11 +335,13 @@ export const ContactApplicant = ({
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentTemplate(+e.target.value)
     
-    const callback = (templateVariables: any) => {
-      const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
-      setEditorValue(finalTemplate)
-    }
-    getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[+e.target.value], callback);
+    // const callback = (templateVariables: any) => {
+    //   const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
+    //   setEditorValue(finalTemplate)
+    // }
+    // getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[+e.target.value], callback);
+
+    // loadTemplate(+e.target.value);
   }
 
   //When templates are selected from list
@@ -864,7 +879,6 @@ export const ContactApplicant = ({
       </div>]
   };
 
-  
   let correspondenceList;
   correspondenceList = correspondences.map((message: any, index: any) => (
     <div key={index} className="commentsection"
@@ -890,6 +904,67 @@ export const ContactApplicant = ({
       />
     </div>
   ))
+
+
+  // function onImportClick() {
+  //     //Open file picker.
+  //     document.getElementById('file_upload').click();
+  // }
+  function onFileChange(e: any) {
+      if (e.target.files[0]) {
+          //Get selected file.
+          let file = e.target.files[0];
+          if (file.name.substr(file.name.lastIndexOf('.')) !== '.sfdt') {
+              loadFile(file);
+          }
+      }
+  }
+  function loadFile(file: File) {
+      let ajax: XMLHttpRequest = new XMLHttpRequest();
+      ajax.open('POST', 'http://localhost:62870/api/documenteditor/Import', true);
+      ajax.onreadystatechange = () => {
+          if (ajax.readyState === 4) {
+              if (ajax.status === 200 || ajax.status === 304) {
+                  // open SFDT text in document editor
+                  // documenteditor.open(ajax.responseText);
+                  setCurTemplate(ajax.responseText)
+              }
+          }
+      };
+      let formData: FormData = new FormData();
+      formData.append('files', file);
+      ajax.send(formData);
+  }
+
+  function loadTemplate(docName: string): void {
+    fetch(
+      'http://localhost:62870/api/documenteditor/LoadFromS3',
+      {
+        method: 'Post',
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        // body: JSON.stringify({ documentName: 'Getting Started.docx' })
+        body: JSON.stringify({ documentName: docName })
+      }
+    ).then(
+      response => {
+        if (response.status === 200 || response.status === 304) {
+            return response.json(); // Return the Promise
+        } else {
+            throw new Error('Error loading data');
+        }
+      }
+    ).then(
+      json => {
+        setCurTemplate(JSON.stringify(json))
+      }
+    ).catch(
+      error => {
+        console.error(error);
+      }
+    );
+  }
+
+
 
 
   let templatesList;
@@ -1087,7 +1162,15 @@ export const ContactApplicant = ({
           spacing={1}
         >
           <Grid item xs={'auto'}>
-          </Grid>          
+          </Grid>
+          <Grid item xs={3}>
+            <CustomAutocomplete
+              className="email-template-dropdown"
+              list={options}
+              onChange={selectTemplate}
+              label="Select Template"
+            />
+          </Grid>
           <Grid item xs={3}>
             <TextField
               className="email-template-dropdown"
@@ -1126,7 +1209,12 @@ export const ContactApplicant = ({
           </Grid>
         </Grid>
         <div className="correspondence-editor">
-          <div className="closeDraft">
+          <input type="file" id="file_upload" accept=".dotx,.docx,.docm,.dot,.doc,.rtf,.txt,.xml,.sfdt" onChange={onFileChange} />
+          {/* <button onClick={onImportClick}>Import</button> */}
+          <DocEditor
+            curTemplate = {curTemplate}
+          />
+          {/* <div className="closeDraft">
               <IconButton className="title-col3" onClick={()=>setShowEditor(false)}>
                   <i className="dialog-close-button">Close</i>
                   <CloseIcon />
@@ -1148,7 +1236,7 @@ export const ContactApplicant = ({
               >
               </i>
             </div>
-          ))}          
+          ))}           */}
         </div>
         <div id="correspondence-editor-ql-toolbar" className="ql-toolbar ql-snow">
           <span className="ql-formats">
