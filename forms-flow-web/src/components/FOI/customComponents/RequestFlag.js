@@ -17,7 +17,8 @@ import TextField from "@mui/material/TextField";
 //Types are:
 //oipcreview
 //phasedrelease
-const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled }) => {
+//consultation
+const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled }) => {
   const [isSelected, setIsSelected] = useState(isActive || false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalHeading, setModalHeading] = useState("");
@@ -27,6 +28,9 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
   useEffect(() => {
     if (isActive == null) {
       setIsSelected(false);
+      if(type=="consult") {
+        handleSelect(false);
+      }
     } else {
     setIsSelected(isActive);
     }
@@ -41,11 +45,13 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
   let modalMessageInactive = "";
   let modalDescriptionActive = "";
   let modalDescriptionInactive = "";
+  let modalSaveButtonText = "Save Change";
 
   // css
   let iconClass;
   let isSelectedBgClass;
   let bgClass;
+  let borderStyle;
 
   switch (type) {
     //Need to change heading, message, description for modals as well
@@ -68,6 +74,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
       isSelectedBgClass =
         "linear-gradient(to right, rgba(250,124,22,0.32) 80%, #fa7c16 0%)";
       bgClass = "linear-gradient(to right, #fff 80%, #fa7c16 0%)";
+      borderStyle = "1px solid #fa7c16";
 
       //when setting to active
       modalHeadingActive = "OIPC Review";
@@ -109,6 +116,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
       isSelectedBgClass =
         "linear-gradient(to right, rgba(146, 7, 183, 0.32) 80%, #9207b7 0%)";
       bgClass = "linear-gradient(to right, #fff 80%, #9207b7 0%)";
+      borderStyle = "1px solid #9207b7";
 
       //when setting to active
       modalHeadingActive = "Phased Release";
@@ -124,6 +132,47 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
         "Are you sure you want to change this request to Single Release?";
       modalDescriptionInactive = (
         <span>This will tag the request as Single Release.</span>
+      );
+      break;
+
+      case "consult":
+      options = [
+        {
+          value: true,
+          label: "Consultation",
+          disabled: false,
+        },
+        {
+          value: false,
+          label: "No Consultation",
+          disabled: false,
+        },
+      ];
+
+      id = "consultation-flag";
+      iconClass = "consultation-icon";
+      isSelectedBgClass =
+        "linear-gradient(to right, rgba(153, 84, 187, 0.32) 80%, #9954bb 0%)";
+      bgClass = "linear-gradient(to right, #fff 80%, #9954bb 0%)";
+      borderStyle = "1px solid #9954bb";
+
+      modalSaveButtonText = "Continue";
+      //when setting to active
+      modalHeadingActive = "Consultation";
+      modalMessageActive =
+        "Are you sure you want to flag this request as a consultation?";
+      modalDescriptionActive = (
+        <span>This will tag the request as Consultation.</span>
+      );
+
+      //when setting to inactive
+      modalHeadingInactive = "Consultation";
+      modalMessageInactive =
+        "Are you sure you want to remove the Consultation flag from this request?";
+      modalDescriptionInactive = (
+        <span>
+        {/* This will remove the <b>Consultation</b> section from this request. */}
+      </span>
       );
       break;
   }
@@ -149,7 +198,12 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
 
   const handleClose = () => {
     setModalOpen(false);
-    setIsSelected(isActive);
+
+    if(type == "consult") {
+      setIsSelected(isActive ?? false);
+    }else{
+      setIsSelected(isActive);
+    }
   };
 
   const handleSave = (e) => {
@@ -164,7 +218,10 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
         <div className="request-flag-dropdown-all">
           <div
             className="request-flag-select"
-            style={{ background: isSelected ? isSelectedBgClass : bgClass }}
+            style={{ 
+              background: isSelected ? isSelectedBgClass : bgClass,
+              border: borderStyle 
+            }}
           >
             {isSelected ? (
               <FontAwesomeIcon
@@ -236,7 +293,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag = true, isDisabled
               onClick={handleSave}
               disabled={false}
             >
-              Save Change
+              {modalSaveButtonText}
             </button>
             <button className="btn-bottom btn-cancel" onClick={handleClose}>
               Cancel
