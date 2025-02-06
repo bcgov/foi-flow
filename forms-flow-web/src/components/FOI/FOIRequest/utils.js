@@ -329,11 +329,14 @@ export const checkValidationError = (
   isAddRequest,
   currentrequestStatus,
   oipcData,
-  isOipcReview
+  isOipcReview,
+  isconsultflag
 ) => {
   return (
-    requiredApplicantDetails.firstName === "" ||
-    requiredApplicantDetails.lastName === "" ||
+    (!isconsultflag && (
+      requiredApplicantDetails.firstName === "" ||
+      requiredApplicantDetails.lastName === ""
+    )) ||
     requiredApplicantDetails.category.toLowerCase().includes("select") ||
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
