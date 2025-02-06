@@ -1799,7 +1799,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   setLockRecordsTab={setLockRecordsTab}
                   validLockRecordsState={validLockRecordsState}
                   setSaveRequestObject={setSaveRequestObject}
-                  handleSaveRequest={handleSaveRequest}
                 />
               </>
             )}
