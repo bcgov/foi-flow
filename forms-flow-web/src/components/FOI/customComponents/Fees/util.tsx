@@ -43,7 +43,7 @@ export const paymentMethods = [
   {
     value: 'creditcardonline',
     label: 'Credit Card - Online',
-    disabled: true,
+    disabled: false,
   },
   {
     value: 'creditcardphone',
@@ -65,4 +65,27 @@ export const paymentMethods = [
     label: 'Cash',
     disabled: false,
   }
+];
+
+export const ApplicationFeeStatuses = [
+  {
+    value: 'init',
+    label: 'Select Status',
+    disabled: true
+  },
+  {
+    value: 'paid',
+    label: 'Paid',
+    disabled: false,
+  },
+  {
+    value: 'appfeeowing',
+    label: 'Application Fee Owing',
+    disabled: false,
+  },
+  {
+    value: 'na-ige',
+    label: 'N/A - IGE',
+    disabled: false,
+  },
 ];

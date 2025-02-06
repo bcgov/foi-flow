@@ -1,7 +1,6 @@
 import React from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
@@ -46,7 +45,7 @@ export const CFRFormHistoryModal = React.memo(({
           return <div className='request-accordian' key={entry.cfrfeeid}>
             <Accordion defaultExpanded={false} className='history-entry-accordion'>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography className="history-entry-title">CFR Form - Version {formHistory.length - index} - {entry['cfrformreason.description'] ? entry['cfrformreason.description'] : 'Original'} 
+                <Typography className="history-entry-title">Processing Fee Form - Version {formHistory.length - index} - {entry['cfrformreason.description'] ? entry['cfrformreason.description'] : 'Original'} 
                 </Typography>
                 <Typography className="history-entry-username"> {entry.version_createdby} - {entry.version_created_at}</Typography>
               </AccordionSummary>

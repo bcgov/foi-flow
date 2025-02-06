@@ -395,6 +395,13 @@ export const setRequestCFRFormHistory = (data) => (dispatch) => {
   });
 };
 
+export const setRequestApplicationFeeForm = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICATION_FEE_FORM,
+    payload: data,
+  });
+};
+
 export const setApplicantCorrespondence = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_CORRESPONDENCE,
