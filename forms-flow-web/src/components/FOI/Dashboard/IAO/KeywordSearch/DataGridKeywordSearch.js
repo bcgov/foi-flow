@@ -19,7 +19,7 @@ import {
 } from "../../../../../helper/FOI/helper";
 import clsx from "clsx";
 import { push } from "connected-react-router";
-import { CustomFooter } from "../../CustomFooter"
+import { KeywordSearchFooter } from "./KeywordSearchFooter";
 import Link from "@mui/material/Link";
 import { DOC_REVIEWER_WEB_URL } from "../../../../../constants/constants";
 
@@ -36,10 +36,7 @@ const DataGridKeywordSearch = ({ userDetail }) => {
     foiKeywordSearchParams,
   } = useContext(ActionContext);
 
-  console.log("foiKeywordSearchParams-Grid:",foiKeywordSearchParams)
   const keywordSearchParamsRef = React.useRef(foiKeywordSearchParams);
-  console.log("keywordSearchParamsRef-Grid:",keywordSearchParamsRef)
-
 
   useEffect(() => {
     keywordSearchParamsRef.current = foiKeywordSearchParams;
@@ -102,9 +99,8 @@ const DataGridKeywordSearch = ({ userDetail }) => {
     if (params.row.ministryrequestid && keywordSearchParam?.keywords?.length > 0) {
       const keywords = keywordSearchParam.keywords
       .filter(keyword => keyword.category.toUpperCase() !== "NOT")
-      .map(keyword => keyword.text)
-      .join(",");
-      //console.log("keywordList:", keywordList);
+      .map(keyword => `"${keyword.text}"`)
+      .join(" ");
       let queryString= {"query": keywords };
       const queryStringParam = new URLSearchParams(queryString).toString();
       const formattedQueryString = queryStringParam.replace(/\+/g, '%20');
@@ -215,13 +211,16 @@ const DataGridKeywordSearch = ({ userDetail }) => {
   useEffect(() => {
     if (searchResults) {
       setKeywordSearchLoading(true);
-      
       // page+1 here, because initial page value is 0 for mui-data-grid
       handleUpdateSearchFilter({
         page: rowsState.page + 1,
         size: rowsState.pageSize,
         sort: updateSortModel(sortModel),
         userId: userDetail.preferred_username,
+        keywords: keywordSearchParamsRef.current.keywords,
+        fromDate: keywordSearchParamsRef.current.fromDate,
+        toDate: keywordSearchParamsRef.current.toDate,
+        publicBodies: keywordSearchParamsRef.current.publicBodies
       });
 
     }
@@ -251,8 +250,7 @@ const DataGridKeywordSearch = ({ userDetail }) => {
   // Compute rows to display (sorted and paginated)
   const rows = React.useMemo(() => {
     const sortedRows = getSortedRows();
-    let currentPageRows= getPaginatedRows(sortedRows); // Get rows for the current page
-    console.log("currentPageRows:",currentPageRows)
+    let currentPageRows= getPaginatedRows(sortedRows);
     return currentPageRows
   }, [searchResults, rowsState, sortModel]);
 
@@ -303,7 +301,7 @@ const DataGridKeywordSearch = ({ userDetail }) => {
               setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
             }
             components={{
-              Footer: ()=> <CustomFooter rowCount={searchResults?.length || 0} defaultSortModel={defaultSortModel} footerFor={"advancedsearch"}></CustomFooter>
+              Footer: ()=> <KeywordSearchFooter rowCount={searchResults?.length || 0} defaultSortModel={defaultSortModel} footerFor={"advancedsearch"}></KeywordSearchFooter>
             }}
             sortingOrder={["desc", "asc"]}
             sortModel={[sortModel[0]]}
