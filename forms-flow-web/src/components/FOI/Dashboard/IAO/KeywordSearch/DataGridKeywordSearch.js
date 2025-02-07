@@ -212,16 +212,16 @@ const DataGridKeywordSearch = ({ userDetail }) => {
     if (searchResults) {
       setKeywordSearchLoading(true);
       // page+1 here, because initial page value is 0 for mui-data-grid
-      handleUpdateSearchFilter({
-        page: rowsState.page + 1,
-        size: rowsState.pageSize,
-        sort: updateSortModel(sortModel),
-        userId: userDetail.preferred_username,
-        keywords: keywordSearchParamsRef.current.keywords,
-        fromDate: keywordSearchParamsRef.current.fromDate,
-        toDate: keywordSearchParamsRef.current.toDate,
-        publicBodies: keywordSearchParamsRef.current.publicBodies
-      });
+      // handleUpdateSearchFilter({
+      //   page: rowsState.page + 1,
+      //   size: rowsState.pageSize,
+      //   sort: updateSortModel(sortModel),
+      //   userId: userDetail.preferred_username,
+      //   keywords: keywordSearchParamsRef.current.keywords,
+      //   fromDate: keywordSearchParamsRef.current.fromDate,
+      //   toDate: keywordSearchParamsRef.current.toDate,
+      //   publicBodies: keywordSearchParamsRef.current.publicBodies
+      // });
 
     }
     
