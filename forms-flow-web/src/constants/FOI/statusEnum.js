@@ -113,6 +113,7 @@ const StateList = Object.freeze({
     { status: "Peer Review", isSelected: false },
     { status: "Response", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
+    { status: "Deduplication", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
   reviewcfdmsdpersonal: [
@@ -125,6 +126,7 @@ const StateList = Object.freeze({
     { status: "Peer Review", isSelected: false },
     { status: "Response", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
+    { status: "Deduplication", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
   signoff: [
@@ -174,6 +176,7 @@ const StateList = Object.freeze({
     { status: "Consult", isSelected: false },
     { status: "Records Review", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
+    { status: "Deduplication", isSelected: false },
     { status: "Closed", isSelected: false }
   ],
   onholdother: [
