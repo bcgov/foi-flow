@@ -16,6 +16,7 @@ const initialState = {
     keyword: null,
   },
   showAdvancedSearch: false,
+  showKeywordSearch: false,
   showEventQueue: false,
   foiAdvancedSearchParams: {},
   foiHistoricalSearchParams:{},

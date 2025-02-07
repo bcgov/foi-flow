@@ -45,16 +45,18 @@ const generateSolrQueryParams = (queryData) => {
     let notKeywords= queryData.keywords?.filter(
       (keyword) =>(keyword.category === "NOT"));
 
+    const wrapInQuotes = (keyword) => `"${keyword.text}"`;
+
     if (andKeywords.length > 0) {
-      let andPart = andKeywords.map((keyword) => keyword.text).join(" AND ");
+      let andPart = andKeywords.map((keyword) => wrapInQuotes(keyword)).join(" AND ");
       booleanKeywords.push(andPart);
     }
     if (orKeywords.length > 0) {
-      let orPart = orKeywords.map((keyword) => keyword.text).join(" OR ");
+      let orPart = orKeywords.map((keyword) => wrapInQuotes(keyword)).join(" OR ");
       booleanKeywords.push(orPart);
     }
     if (notKeywords.length > 0) {
-      let notPart = notKeywords.map((keyword) => `NOT ${keyword.text}`).join(" NOT ");
+      let notPart = notKeywords.map((keyword) => `NOT ${wrapInQuotes(keyword)}`).join(" NOT ");
       // if (booleanKeywords.length > 0) {
       //   notPart += ` NOT ${booleanKeywords}`;
       // }
@@ -77,7 +79,6 @@ const generateSolrQueryParams = (queryData) => {
     queryParts.push(`foiministrycode:${queryData.publicBodies}`);
   }
   const query = queryParts.join(" AND ");
-  console.log("\nquery:",query)
   return { df: "foidocumentsentence", q: query, rows:SOLR_DOC_SEARCH_LIMIT };
 };
 
