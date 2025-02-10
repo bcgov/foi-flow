@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.AspNetCore.ResponseCompression;
 using Syncfusion.EJ2.SpellChecker;
 using Newtonsoft.Json;
@@ -29,12 +30,13 @@ namespace EJ2APIServices
             string jsonFileName = Configuration["SPELLCHECK_JSON_FILENAME"];
             //check the spell check dictionary path environment variable value and assign default data folder
             //if it is null.
-            path = string.IsNullOrEmpty(path) ? Path.Combine(env.ContentRootPath, "Data") : Path.Combine(env.ContentRootPath, path);
+            path = string.IsNullOrEmpty(path) ? Path.Combine(env.ContentRootPath, "App_Data") : Path.Combine(env.ContentRootPath, path);
             //Set the default spellcheck.json file if the json filename is empty.
             jsonFileName = string.IsNullOrEmpty(jsonFileName) ? Path.Combine(path, "spellcheck.json") : Path.Combine(path, jsonFileName);
             if (File.Exists(jsonFileName))
             {
                 string jsonImport = File.ReadAllText(jsonFileName);
+                Console.WriteLine($"jsonImport: {jsonImport}");
                 List<DictionaryData> spellChecks = JsonConvert.DeserializeObject<List<DictionaryData>>(jsonImport);
                 List<DictionaryData> spellDictCollection = new List<DictionaryData>();
                 string personalDictPath = null;
@@ -45,6 +47,9 @@ namespace EJ2APIServices
                     {
                         spellDictCollection.Add(new DictionaryData(spellCheck.LanguadeID, Path.Combine(path, spellCheck.DictionaryPath), Path.Combine(path, spellCheck.AffixPath)));
                         personalDictPath = Path.Combine(path, spellCheck.PersonalDictPath);
+                        Console.WriteLine($"spellCheck.LanguadeID: {spellCheck.LanguadeID}");
+                        Console.WriteLine($"spellCheck.DictionaryPath: {spellCheck.DictionaryPath}");
+                        Console.WriteLine($"personalDictPath: {personalDictPath}");
                     }
                 }
                 SpellChecker.InitializeDictionaries(spellDictCollection, personalDictPath, 3);

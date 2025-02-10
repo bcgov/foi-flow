@@ -338,3 +338,58 @@ export const fetchApplicantCorrespondenceTemplates = (
       });
     };
 };
+
+export const fetchEmailTemplate = (
+  dispatch,
+  data,
+  callback,
+  errorCallback = null,
+) => {
+  const apiUrl = API.FOI_GET_EMAIL_TEMPLATE;
+  httpPOSTRequest(apiUrl, data, UserService.getToken())
+  .then((res) => {
+    if (res.data) {
+      callback(res.data);
+    } else {
+      console.log("empty response for fetching an email template")
+      dispatch(serviceActionError(res));
+      throw new Error();
+    }
+  })
+  .catch((error) => {
+    console.log("An error occured while trying to load a sfdt template", error);
+    catchError(error, dispatch);
+    if (errorCallback) {
+      errorCallback("An error occured while trying to load a sfdt template");
+    }
+  });
+};
+
+export const exportSFDT = (
+  dispatch,
+  data,
+  callback,
+  errorCallback = null,
+) => {
+  console.log("data: ", data);
+  const apiUrl = API.FOI_EXPORT_SFDT;
+  console.log("apiUrl: ", apiUrl);
+  httpPOSTRequest(apiUrl, data, UserService.getToken())
+  .then((res) => {
+    console.log("res: ", res);
+    if (res.data) {
+      callback(res.data);
+    } else {
+      console.log("empty response for fetching an email template")
+      dispatch(serviceActionError(res));
+      throw new Error();
+    }
+  })
+  .catch((error) => {
+    console.log("An error occured while trying to load a sfdt template", error);
+    catchError(error, dispatch);
+    if (errorCallback) {
+      errorCallback("An error occured while trying to load a sfdt template");
+    }
+  });
+};

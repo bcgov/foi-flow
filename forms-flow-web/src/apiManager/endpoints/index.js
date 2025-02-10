@@ -2,6 +2,8 @@ import {
   FOI_BASE_API_URL,
   AXIS_API_URL,
   DOC_REVIEWER_BASE_API_URL,
+  FOI_TEMPLATE_API_URL,
+  DOC_EDITOR_API_URL,
 } from "./config";
 
 const API = {
@@ -175,5 +177,8 @@ const API = {
   FOI_GET_OIPC_REVIEWTYPES: `${FOI_BASE_API_URL}/api/foiflow/oipc/reviewtypes`,
   FOI_GET_OIPC_INQUIRYOUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/inquiryoutcomes`,
   FOI_GET_COMMENT_TYPES: `${FOI_BASE_API_URL}/api/foiflow/commenttypes`,
+  FOI_GET_EMAIL_TEMPLATES: `${FOI_TEMPLATE_API_URL}/api/Template/GetTemplates`,
+  FOI_GET_EMAIL_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/GetCorrespondenceByName`,
+  FOI_EXPORT_SFDT: `${DOC_EDITOR_API_URL}/api/Template/ExportSFDT`,
 };
 export default API;

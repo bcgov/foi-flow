@@ -5,6 +5,18 @@ using MCS.FOI.Integration.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add CORS services and define a CORS policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAnyOrigin",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
+
 builder.Services
     .AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration)
@@ -13,6 +25,9 @@ builder.Services
 builder.Configuration.AddEnvironmentVariables();
 
 var app = builder.Build();
+
+// Use the defined CORS policy
+app.UseCors("AllowAnyOrigin");
 
 await app.ConfigureMigrationAsync(builder);
 

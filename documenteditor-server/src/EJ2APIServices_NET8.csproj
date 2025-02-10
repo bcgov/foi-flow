@@ -33,7 +33,7 @@
     <PackageReference Include="Syncfusion.Compression.Net.Core" Version="*" />
     <PackageReference Include="Syncfusion.OfficeChart.Net.Core" Version="*" />
     <PackageReference Include="Syncfusion.EJ2.WordEditor.AspNet.Core" Version="*" />
-    <PackageReference Include="Syncfusion.EJ2.SpellChecker.AspNet.Core" Version="*" />
+    <PackageReference Include="Syncfusion.EJ2.SpellChecker.AspNet.Core" Version="28.2.4" />
     <PackageReference Include="System.Drawing.Common" Version="4.*" />
 	<PackageReference Include="Syncfusion.Licensing" Version="*" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.*" />

@@ -1,6 +1,7 @@
 import {
     httpGETRequest,
-    httpPOSTRequest
+    httpPOSTRequest,
+    httpOpenGETRequest
   } from "../../httpRequestHandler";
   import API from "../../endpoints";
   import {
@@ -29,7 +30,8 @@ import {
     setOIPCStatuses,
     setOIPCReviewtypes,
     setOIPCInquiryoutcomes,
-    setFOICommentTypes
+    setFOICommentTypes,
+    setFOIEmailTemplates
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone, catchError } from "./foiServicesUtil";
   import UserService from "../../../services/UserService";
@@ -711,6 +713,31 @@ import {
         })
         .catch((error) => {
           console.log("Error while fetching comment types master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  };
+
+  export const fetchFOIEmailTemplates = () => {
+    return (dispatch) => {
+      // httpGETRequest(API.FOI_GET_EMAIL_TEMPLATES, {}, UserService.getToken())
+      httpOpenGETRequest(API.FOI_GET_EMAIL_TEMPLATES)
+        .then((res) => {
+          if (res.data) {
+            console.log("API.FOI_GET_EMAIL_TEMPLATES: ", API.FOI_GET_EMAIL_TEMPLATES);
+            console.log("TEMPLATES res: ", res);
+            const foiEmailTemplates = res.data;
+            dispatch(setFOIEmailTemplates(foiEmailTemplates));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching email templates master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching email templates master data", error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
         });

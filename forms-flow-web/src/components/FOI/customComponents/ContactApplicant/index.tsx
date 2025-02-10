@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import type { Template } from './types';
 import { fetchApplicantCorrespondence, saveEmailCorrespondence, saveDraftCorrespondence, 
   editDraftCorrespondence, deleteDraftCorrespondence, deleteResponseCorrespondence, saveCorrespondenceResponse, 
-  editCorrespondenceResponse} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+  editCorrespondenceResponse, fetchEmailTemplate} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
@@ -55,16 +55,58 @@ export const ContactApplicant = ({
 }: any) => {
   const [curTemplate, setCurTemplate] = useState<string>('');
 
-  const options: OptionType[] = [
-    { label: 'Option 1', value: 'option1' },
-    { label: 'Option 2', value: 'option2' },
-    { label: 'Option 3', value: 'option3' }
-  ];
-  const selectTemplate = (event: React.ChangeEvent<{}>, value: OptionType | null) => {
-    console.log("Selected option:", value?.label);
+  const dispatch = useDispatch();
+  const templateList: any = useSelector((state: any) => state.foiRequests.foiEmailTemplates);
+  const [options, setOptions] = useState<OptionType[]>([]);
+  const [saveSfdtDraftTrigger, setSaveSfdtDraftTrigger] = useState<boolean>(false);
+  const [previewTrigger, setPreviewTrigger] = useState<boolean>(false);
+
+  useEffect(() => {
+    if(templateList.length > 0) {
+      console.log("templateList: ", templateList);
+      setOptions(
+        templateList.map((template: any) => ({
+          label: template.templateName,
+          value: template.fileName
+        }))
+      );
+    }
+  }, [templateList])
+
+  // const options: OptionType[] = [
+  //   { label: 'Option 1', value: 'option1' },
+  //   { label: 'Option 2', value: 'option2' },
+  //   { label: 'Option 3', value: 'option3' }
+  // ];
+  const selectTemplate = (event: React.ChangeEvent<{}>, item: OptionType | null) => {
+    console.log("Selected option:", item?.label);
+    if(item?.label) {
+      let newData = {
+        "foiRequestId": 1,
+        "foiMinistryRequestId": 1,
+        "filename": item?.value
+      };
+      const loadTemplate = (templateJSON: string) => {
+        setCurTemplate(JSON.stringify(templateJSON));
+      }
+      fetchEmailTemplate(dispatch, newData, loadTemplate);
+    } else {
+      setCurTemplate('');
+    }
+  };
+  const saveSfdtDraft = (sfdtString: string) => {
+    console.log("saveDraft:", sfdtString);
+  };
+  const preview = (sfdtString: string) => {
+    // pass html string to preview modal
+    setEditorValue(sfdtString);
+
+    console.log("preview:", sfdtString);
   };
 
-  const dispatch = useDispatch();
+
+  
+
   const currentCFRForm: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
   const isLoading: boolean = useSelector((state: any) => state.foiRequests.isCorrespondenceLoading);
   const responsePackagePdfStitchStatus = useSelector((state: any) => state.foiRequests.foiPDFStitchStatusForResponsePackage);
@@ -474,56 +516,57 @@ export const ContactApplicant = ({
   
 
   const saveDraft = async () => {
-    setDisablePreview(true);
-    setPreviewModal(false);
-    const attachments = await saveAttachments(files);
-    let callback = (_res: string) => {
-      changeCorrespondenceFilter("drafts");
-      clearcorrespondence();      
-      toast.success("Message has been saved to draft successfully", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
-    }
-    const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
-    let israwrequest = selectedCorrespondence?.israwrequest ||
-      requestDetails.requeststatuslabel == StateEnum.appfeeowing.label ||
-      requestDetails.requeststatuslabel == StateEnum.intakeinprogress.label ||
-      requestDetails.requeststatuslabel == StateEnum.unopened.label
-    let data = {
-      templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
-      correspondencemessagejson: JSON.stringify({
-        "emailhtml": editorValue,
-        "id": approvedForm?.cfrfeeid,
-        "type": type
-      }),
-      foiministryrequest_id: ministryId,
-      attachments: attachments,
-      emails: selectedEmails,
-      israwrequest: israwrequest
-    };
-    saveDraftCorrespondence(
-      data,
-      requestId,
-      ministryId,
-      dispatch,
-      callback,
-      (errorMessage: string) => {
-        clearcorrespondence();
-        changeCorrespondenceFilter("drafts");
-        dispatch(fetchApplicantCorrespondence(requestId, ministryId));
-      },
-    );
-    setFOICorrespondenceLoader(false);
-    setDisablePreview(false);
-    return attachments;
+    setSaveSfdtDraftTrigger(true);
+    // setDisablePreview(true);
+    // setPreviewModal(false);
+    // const attachments = await saveAttachments(files);
+    // let callback = (_res: string) => {
+    //   changeCorrespondenceFilter("drafts");
+    //   clearcorrespondence();      
+    //   toast.success("Message has been saved to draft successfully", {
+    //     position: "top-right",
+    //     autoClose: 3000,
+    //     hideProgressBar: true,
+    //     closeOnClick: true,
+    //     pauseOnHover: true,
+    //     draggable: true,
+    //     progress: undefined,
+    //   });
+    //   dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+    // }
+    // const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
+    // const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    // let israwrequest = selectedCorrespondence?.israwrequest ||
+    //   requestDetails.requeststatuslabel == StateEnum.appfeeowing.label ||
+    //   requestDetails.requeststatuslabel == StateEnum.intakeinprogress.label ||
+    //   requestDetails.requeststatuslabel == StateEnum.unopened.label
+    // let data = {
+    //   templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+    //   correspondencemessagejson: JSON.stringify({
+    //     "emailhtml": editorValue,
+    //     "id": approvedForm?.cfrfeeid,
+    //     "type": type
+    //   }),
+    //   foiministryrequest_id: ministryId,
+    //   attachments: attachments,
+    //   emails: selectedEmails,
+    //   israwrequest: israwrequest
+    // };
+    // saveDraftCorrespondence(
+    //   data,
+    //   requestId,
+    //   ministryId,
+    //   dispatch,
+    //   callback,
+    //   (errorMessage: string) => {
+    //     clearcorrespondence();
+    //     changeCorrespondenceFilter("drafts");
+    //     dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+    //   },
+    // );
+    // setFOICorrespondenceLoader(false);
+    // setDisablePreview(false);
+    // return attachments;
   };
 
   const saveExport = async () => {
@@ -755,55 +798,56 @@ export const ContactApplicant = ({
   }
 
   const editCorrespondence = async (i : any) => {
-    setDisablePreview(true);
-    setPreviewModal(false);
-    const attachments = await saveAttachments(files);
-    let callback = (_res: string) => {
-      clearcorrespondence();
-      changeCorrespondenceFilter("drafts");
-      toast.success("Message has been saved to draft successfully", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      })
-      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
-    }
-    const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
-    let israwrequest = selectedCorrespondence.israwrequest || false;
-    let data = {
-      correspondenceid:correspondenceId,
-      templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
-      correspondencemessagejson: JSON.stringify({
-        "emailhtml": editorValue,
-        "id": approvedForm?.cfrfeeid,
-        "type": type
-      }),
-      foiministryrequest_id: ministryId,
-      attachments: attachments,
-      emails: selectedEmails,
-      israwrequest: israwrequest
-    };
-    editDraftCorrespondence(
-      data,
-      requestId,
-      ministryId,
-      dispatch,
-      callback,
-      (errorMessage: string) => {
-        errorToast(errorMessage);
-        clearcorrespondence();
-        changeCorrespondenceFilter("drafts");
-        dispatch(setFOICorrespondenceLoader(false));
-      },
-    );
-    setFOICorrespondenceLoader(false);
-    setDisablePreview(false);
-    return attachments;
+    setSaveSfdtDraftTrigger(true);
+    // setDisablePreview(true);
+    // setPreviewModal(false);
+    // const attachments = await saveAttachments(files);
+    // let callback = (_res: string) => {
+    //   clearcorrespondence();
+    //   changeCorrespondenceFilter("drafts");
+    //   toast.success("Message has been saved to draft successfully", {
+    //     position: "top-right",
+    //     autoClose: 3000,
+    //     hideProgressBar: true,
+    //     closeOnClick: true,
+    //     pauseOnHover: true,
+    //     draggable: true,
+    //     progress: undefined,
+    //   })
+    //   dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+    // }
+    // const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
+    // const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    // let israwrequest = selectedCorrespondence.israwrequest || false;
+    // let data = {
+    //   correspondenceid:correspondenceId,
+    //   templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+    //   correspondencemessagejson: JSON.stringify({
+    //     "emailhtml": editorValue,
+    //     "id": approvedForm?.cfrfeeid,
+    //     "type": type
+    //   }),
+    //   foiministryrequest_id: ministryId,
+    //   attachments: attachments,
+    //   emails: selectedEmails,
+    //   israwrequest: israwrequest
+    // };
+    // editDraftCorrespondence(
+    //   data,
+    //   requestId,
+    //   ministryId,
+    //   dispatch,
+    //   callback,
+    //   (errorMessage: string) => {
+    //     errorToast(errorMessage);
+    //     clearcorrespondence();
+    //     changeCorrespondenceFilter("drafts");
+    //     dispatch(setFOICorrespondenceLoader(false));
+    //   },
+    // );
+    // setFOICorrespondenceLoader(false);
+    // setDisablePreview(false);
+    // return attachments;
   };
   const [updateAttachment, setUpdateAttachment] = useState<any>({});
 
@@ -906,64 +950,10 @@ export const ContactApplicant = ({
   ))
 
 
-  // function onImportClick() {
-  //     //Open file picker.
-  //     document.getElementById('file_upload').click();
-  // }
-  function onFileChange(e: any) {
-      if (e.target.files[0]) {
-          //Get selected file.
-          let file = e.target.files[0];
-          if (file.name.substr(file.name.lastIndexOf('.')) !== '.sfdt') {
-              loadFile(file);
-          }
-      }
-  }
-  function loadFile(file: File) {
-      let ajax: XMLHttpRequest = new XMLHttpRequest();
-      ajax.open('POST', 'http://localhost:62870/api/documenteditor/Import', true);
-      ajax.onreadystatechange = () => {
-          if (ajax.readyState === 4) {
-              if (ajax.status === 200 || ajax.status === 304) {
-                  // open SFDT text in document editor
-                  // documenteditor.open(ajax.responseText);
-                  setCurTemplate(ajax.responseText)
-              }
-          }
-      };
-      let formData: FormData = new FormData();
-      formData.append('files', file);
-      ajax.send(formData);
-  }
 
-  function loadTemplate(docName: string): void {
-    fetch(
-      'http://localhost:62870/api/documenteditor/LoadFromS3',
-      {
-        method: 'Post',
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        // body: JSON.stringify({ documentName: 'Getting Started.docx' })
-        body: JSON.stringify({ documentName: docName })
-      }
-    ).then(
-      response => {
-        if (response.status === 200 || response.status === 304) {
-            return response.json(); // Return the Promise
-        } else {
-            throw new Error('Error loading data');
-        }
-      }
-    ).then(
-      json => {
-        setCurTemplate(JSON.stringify(json))
-      }
-    ).catch(
-      error => {
-        console.error(error);
-      }
-    );
+  function onExportClick(output: string) {
+      console.log("Output: ", output);
   }
-
 
 
 
@@ -1160,6 +1150,7 @@ export const ContactApplicant = ({
           direction="row"
           justifyContent="flex-end"
           spacing={1}
+          className="select-template-bottom-margin"
         >
           <Grid item xs={'auto'}>
           </Grid>
@@ -1171,7 +1162,7 @@ export const ContactApplicant = ({
               label="Select Template"
             />
           </Grid>
-          <Grid item xs={3}>
+          {/* <Grid item xs={3}>
             <TextField
               className="email-template-dropdown"
               id="emailtemplate"
@@ -1197,7 +1188,7 @@ export const ContactApplicant = ({
                 </MenuItem>
               ))}
             </TextField>
-          </Grid>
+          </Grid> */}
           <Grid item xs={'auto'}>
           <CorrespondenceEmail 
             ministryId={ministryId}
@@ -1209,24 +1200,30 @@ export const ContactApplicant = ({
           </Grid>
         </Grid>
         <div className="correspondence-editor">
-          <input type="file" id="file_upload" accept=".dotx,.docx,.docm,.dot,.doc,.rtf,.txt,.xml,.sfdt" onChange={onFileChange} />
+          {/* <input type="file" id="file_upload" accept=".dotx,.docx,.docm,.dot,.doc,.rtf,.txt,.xml,.sfdt" onChange={onFileChange} /> */}
           {/* <button onClick={onImportClick}>Import</button> */}
           <DocEditor
             curTemplate = {curTemplate}
+            saveSfdtDraft = {saveSfdtDraft}
+            saveSfdtDraftTrigger = {saveSfdtDraftTrigger}
+            setSaveSfdtDraftTrigger = {setSaveSfdtDraftTrigger}
+            preview = {preview}
+            previewTrigger = {previewTrigger}
+            setPreviewTrigger = {setPreviewTrigger}
           />
           {/* <div className="closeDraft">
               <IconButton className="title-col3" onClick={()=>setShowEditor(false)}>
                   <i className="dialog-close-button">Close</i>
                   <CloseIcon />
               </IconButton>
-           </div>
-          <ReactQuill
+           </div> */}
+          {/* <ReactQuill
             theme="snow"
             value={editorValue}
             onChange={setEditorValue}
             modules={quillModules}
             ref={handleRef}
-          />
+          /> */}
           {files.map((file: any, index: number) => (
             <div className="email-attachment-item" key={file.filename}>
               <u>{file.filename}</u>
@@ -1236,10 +1233,10 @@ export const ContactApplicant = ({
               >
               </i>
             </div>
-          ))}           */}
+          ))}
         </div>
         <div id="correspondence-editor-ql-toolbar" className="ql-toolbar ql-snow">
-          <span className="ql-formats">
+          {/* <span className="ql-formats">
             <button className="ql-bold" />
             <button className="ql-italic" />
             <button className="ql-underline" />
@@ -1247,10 +1244,10 @@ export const ContactApplicant = ({
           <span className="ql-formats">
             <button className="ql-list" value="ordered" />
             <button className="ql-list" value="bullet" />
-          </span>
+          </span> */}
           <span className="ql-formats">
             <button className="ql-link" />
-            <button className="ql-image" />
+            {/* <button className="ql-image" /> */}
           </span>
           <div className="previewEmail">
             <PreviewModal
@@ -1279,7 +1276,7 @@ export const ContactApplicant = ({
           data-variant="contained" 
           onClick={ editMode ? editCorrespondence : saveDraft}             
           color="primary"
-          disabled={(currentTemplate <= 0)}
+          // disabled={(currentTemplate <= 0)}
         >
           {draftButtonValue}
         </button>
@@ -1288,7 +1285,7 @@ export const ContactApplicant = ({
               data-variant="contained"
               onClick={() => setPreviewModal(true)}
               color="primary"
-              disabled={(currentTemplate <= 0)}
+              // disabled={(currentTemplate <= 0)}
             >
               {previewButtonValue}
             </button>
