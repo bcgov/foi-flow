@@ -43,20 +43,21 @@
             var requestContactInfo = await _templateDataService.GetRequestContactInformation(foiRequestId, request.Version);
             var requestApplicants = await _templateDataService.GetRequestApplicantInfos(foiRequestId, request.Version, RequestorType.Self);
             var anotherPerson = await _templateDataService.GetRequestApplicantInfos(foiRequestId, request.Version, RequestorType.OnBehalfOf);
-            var oipc = await _templateDataService.GetFOIRequestOIPC(foiRequestId);
+            var oipcDetails = await _templateDataService.GetFOIRequestOIPC(foiRequestId, request.Version);
             var programArea = await _templateDataService.GetProgramArea(requestMinistry.ProgramAreaId);
             var applicantCategory = await _templateDataService.GetApplicantCategory(request.ApplicantCategoryId);
             var operatingTeamEmails = await _templateDataService.GetOperatingTeamEmails(requestMinistry.AssignedGroup);
             var extension = await _templateDataService.GetFOIRequestExtensions(foiMinistryRequestId, requestMinistry.Version);
+            var paymentFees = await _templateDataService.GetPaymentFees(foiRequestId);
 
             var applicant = requestApplicants.FirstOrDefault();
             var onBehalf = anotherPerson.FirstOrDefault();
-            var primaryOipc = oipc.FirstOrDefault();
             var primaryProgramArea = programArea.FirstOrDefault(r => r.ProgramAreaId == requestMinistry.ProgramAreaId);
             var primaryApplicantCategory = applicantCategory.FirstOrDefault(r => r.ApplicantCategoryId == request.ApplicantCategoryId);
             var extensionData = extension?.FirstOrDefault();
+            var applicationFees = paymentFees?.Where(r => r.FeeCodeId.Equals(1));
 
-            string? GetContactInfo(string dataFormat) =>
+            string ? GetContactInfo(string dataFormat) =>
                 requestContactInfo.FirstOrDefault(r => r.DataFormat == dataFormat)?.ContactInformation?.ToString();
 
             string GetFullAddress()
@@ -64,6 +65,7 @@
                 var addressParts = new[]
                 {
                     GetContactInfo("address"),
+                    GetContactInfo("addressSecondary"),
                     GetContactInfo("city"),
                     GetContactInfo("province"),
                     GetContactInfo("country"),
@@ -75,12 +77,12 @@
             var templateData = new Dictionary<string, string?>
             {
                 { "[REQUESTNUMBER]", requestMinistry.AxisRequestId },
-                { "[OIPCNUMBER]", primaryOipc?.OipcNo },
+                { "[OIPCNUMBER]",  ProcessOipcDetails(oipcDetails.ToList()).oipcNumber},
                 { "[TODAYDATE]", DateTime.Now.ToString("MMMM dd, yyyy") },
                 { "[RQREMAIL]", GetContactInfo("email") },
                 { "[RQRFAX]", "(250) 3879843" },
                 { "[STREET1]", GetContactInfo("address") },
-                { "[STREET2]", string.Empty },
+                { "[STREET2]", GetContactInfo("addressSecondary") },
                 { "[CITY]", GetContactInfo("city") },
                 { "[STATE/PROVINCESHORT]", GetContactInfo("province") },
                 { "[COUNTRY]", GetContactInfo("country") },
@@ -91,26 +93,28 @@
                 { "[ONBEHALFOF]", string.Join(" ", new[] { onBehalf?.FirstName, onBehalf?.MiddleName, onBehalf?.LastName }
                                       .Where(namePart => !string.IsNullOrWhiteSpace(namePart))) },
                 { "[MINISTRYOFXX]", primaryProgramArea?.Name },
-                { "[ANALYST]", requestMinistry.AssignedTo },
+                { "[ANALYST]", $"{assignee?.FirstName} {assignee?.LastName}" },
                 { "[REQUESTERCATEGORY]", primaryApplicantCategory?.Description?.ToString() },
                 { "[RECEIVEDDATE]", request.ReceivedDate.ToString("MMMM dd, yyyy") },
                 { "[REQUESTDESCRIPTION]", request.InitialDescription },
-                { "[PAYMENTDUEDATE]", requestMinistry.DueDate.ToString("MMMM dd, yyyy") }, // for inquiries
-                { "[REQUESTEDDATE]", request.ReceivedDate.ToString("MMMM dd, yyyy") }, // for inquiries
+                { "[PAYMENTDUEDATE]", requestMinistry.DueDate.ToString("MMMM dd, yyyy") },
+                { "[REQUESTEDDATE]", request.ReceivedDate.ToString("MMMM dd, yyyy") },
                 { "[PERFECTEDDATE]", request.InitialRecordSearchFromDate?.ToString("MMMM dd, yyyy") },
-                { "[APPLICATION_FEE_AMOUNT]", string.Empty }, // for inquiries
-                { "[OIPCORDERNUMBER]", string.Empty }, // for inquiries
-                { "[DUEDATE]", requestMinistry.DueDate.ToString("MMMM dd, yyyy") }, // for inquiries
+                { "[APPLICATION_FEE_AMOUNT]", applicationFees.Any() ? 
+                        applicationFees?.Select(r => (r.Quantity * r.Total)).Sum().ToString() : string.Empty },
+                { "[OIPCORDERNUMBER]", string.Join(",", ProcessOipcDetails(oipcDetails.ToList()).oipcOrderNumber) }, 
+                { "[DUEDATE]", requestMinistry.DueDate.ToString("MMMM dd, yyyy") }, 
                 { "[ADDITIONALXX]", extensionData?.ApprovedNoOfDays?.ToString() },
                 { "[EXTENDED_DUE_DATE]", extensionData?.ExtendedDueDate?.ToString("MMMM dd, yyyy") },
-                { "[PRIMARYUSERREMAIL]", operatingTeamEmails?.FirstOrDefault()?.EmailAddress?.ToString() },
-                { "[REQUESTOWNER]", $"{assignee?.FirstName} {assignee?.LastName}" }, // for inquiries
-                { "[PRIMARYUSERPHONE]", string.Empty }, // for inquiries
-                { "[PRIMARYUSERNAME]", $"{assignee?.FirstName} {assignee?.LastName}" }, // for inquiries
-                { "[PRIMARYUSERTITLE]", string.Empty }, // for inquiries
-                { "[LINKEDREQUESTS]", primaryProgramArea?.Name }, // for inquiries
-                { "[REQUESTERNAME]", $"{applicant?.FirstName} {applicant?.LastName}" }, // for inquiries
-                { "[COMPANY]", string.Empty } // for inquiries
+                { "[PRIMARYUSERREMAIL]", string.Empty },
+                { "[REQUESTOWNER]", $"{assignee?.FirstName} {assignee?.LastName}" }, 
+                { "[PRIMARYUSERPHONE]", string.Empty }, //No need to Map for now. But will be mapped later
+                { "[PRIMARYUSERNAME]", $"{assignee?.FirstName} {assignee?.LastName}" }, 
+                { "[PRIMARYUSERTITLE]", string.Empty }, //No need to Map for now. But will be mapped later
+                { "[LINKEDREQUESTS]", AssignMinistryNames(requestMinistry.LinkedRequests, programArea)  },
+                { "[REQUESTERNAME]", $"{applicant?.FirstName} {applicant?.LastName}" },
+                { "[COMPANY]", $"{applicant?.BusinessName}" }
+                //{ "[RESPONSEDATE]", string.Empty } //No need to Map for now. But will be mapped later
             };
 
             await PopulateFeeAndPaymentData(templateData, foiMinistryRequestId, foiRequestId);
@@ -139,11 +143,51 @@
             }
 
             var payment = await _templateDataService.GetPayment(foiRequestId, foiMinistryRequestId);
-            if (payment != null)
+            if (payment != null && payment.PaymentId != 0)
             {
                 templateData["[PAIDAMOUNT]"] = payment.PaidAmount?.ToString("F2");
                 templateData["[PAYMENTRECEIVEDDATE]"] = payment.CreatedAt.ToString();
             }
         }
+
+        private (string oipcNumber, string oipcOrderNumber) ProcessOipcDetails(List<FOIRequestOIPCDto> oipcDetails)
+        {
+            var oipcNumber = string.Join(",", oipcDetails.Select(o => o.OipcNo));
+
+            var orderNumbers = oipcDetails
+                .Select(r =>
+                    JsonConvert.DeserializeObject<InquiryAttributes>(r.InquiryAttributes ?? "{}")?.OrderNo)
+                .Where(orderno => !string.IsNullOrEmpty(orderno))
+                .ToList();
+
+            var oipcOrderNumber = string.Join(",", orderNumbers);
+
+            return (oipcNumber, oipcOrderNumber);
+        }
+
+        public string AssignMinistryNames(string linkedRequestsJson, IEnumerable<ProgramAreaDto> programAreas)
+        {
+            if (string.IsNullOrWhiteSpace(linkedRequestsJson))
+            {
+                return string.Empty; 
+            }
+
+            var linkedRequests = JsonConvert.DeserializeObject<List<string>>(linkedRequestsJson) ?? new List<string>();
+
+            var names = linkedRequests
+                .Select(request => int.TryParse(request, out int programAreaId)
+                    ? programAreas.FirstOrDefault(f => f.ProgramAreaId == programAreaId)?.Name
+                    : null)
+                .Where(name => name != null)
+                .ToList();
+
+            return string.Join(",", names);
+        }
+    }
+
+    public class InquiryAttributes
+    {
+        public string OrderNo { get; set; }
+
     }
 }
