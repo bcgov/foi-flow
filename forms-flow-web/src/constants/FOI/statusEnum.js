@@ -86,6 +86,8 @@ const StateList = Object.freeze({
   deduplication: [
     { status: "Deduplication", isSelected: false },
     { status: "Harms Assessment", isSelected: false },
+    { status: "Call For Records", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
     { status: "Records Review", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
     { status: "Closed", isSelected: false },
