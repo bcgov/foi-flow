@@ -80,6 +80,12 @@
             return await _repository.QueryAsync<ProgramAreaDto>(query, new { ProgramAreaId = programAreaId });
         }
 
+        public async Task<IEnumerable<ProgramAreaDto>> GetProgramAreas()
+        {
+            const string query = @"SELECT * FROM public.""ProgramAreas"" WHERE isactive = true";
+            return await _repository.QueryAsync<ProgramAreaDto>(query);
+        }
+
         public async Task<IEnumerable<ApplicantCategoryDto>> GetApplicantCategory(int? applicantCategoryId)
         {
             const string query = @"SELECT * FROM public.""ApplicantCategories"" WHERE isactive = true AND applicantcategoryid = @ApplicantCategoryId";
@@ -100,16 +106,9 @@
                 ?.OrderByDescending(r => r.PaymentId).FirstOrDefault() ?? new FOIRequestPaymentDto();
         }
 
-        public async Task<IEnumerable<FOIRequestOIPCDto>> GetFOIRequestOIPC(int? ministryRequestId)
+        public async Task<IEnumerable<FOIRequestOIPCDto>> GetFOIRequestOIPC(int? ministryRequestId, int versionId)
         {
-            const string query = @"SELECT * FROM public.""FOIRequestOIPC"" WHERE foiministryrequest_id = @MinistryRequestId";
             const string queryWithVersion = @"SELECT * FROM public.""FOIRequestOIPC"" WHERE foiministryrequest_id = @MinistryRequestId AND foiministryrequestversion_id = @MinistryRequestVersionId";
-
-            var latestResult = (await _repository.QueryAsync<FOIRequestOIPCDto>(query, new { MinistryRequestId = ministryRequestId }))
-                .OrderByDescending(r => r.FOIMinistryRequestVersionId)
-            .FirstOrDefault();
-            var versionId = latestResult?.FOIMinistryRequestVersionId;
-
             return (await _repository.QueryAsync<FOIRequestOIPCDto>(queryWithVersion, new { MinistryRequestId = ministryRequestId, MinistryRequestVersionId = versionId }))
                 ?.OrderBy(r => r.OipcId) ?? Enumerable.Empty<FOIRequestOIPCDto>();
         }
@@ -140,6 +139,19 @@
             var parameters = new { MinistryRequestId = ministryRequestId, MinistryRequestVersionId = ministryRequestVersionId };
 
             return await _repository.QueryAsync<FOIRequestExtensionsDto>(query, parameters);
+        }
+
+        public async Task<IEnumerable<PaymentDto>> GetPaymentFees(int foiRequestId)
+        {
+            const string query = @"
+                SELECT * 
+                FROM public.""Payments"" 
+                WHERE request_id = @FOIRequestId"
+            ;
+
+            var parameters = new { FOIRequestId = foiRequestId };
+
+            return await _repository.QueryAsync<PaymentDto>(query, parameters);
         }
     }
 }
