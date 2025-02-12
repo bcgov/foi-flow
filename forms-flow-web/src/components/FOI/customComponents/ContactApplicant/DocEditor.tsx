@@ -48,6 +48,11 @@ export const DocEditor = ({
         // "ContentControl"
     ];
 
+    // Add required font families to list it in font drop down
+    let fontFamilies = {
+        fontFamilies: ['Algerian', 'Arial', 'Calibri', 'Cambria', 'BC Sans'],
+    };
+
     function onCreated(): void  {
         if(container) {
             container.documentEditor.spellChecker.languageID = 1033; // LCID for "en-US"
@@ -72,52 +77,25 @@ export const DocEditor = ({
         }
     }, [curTemplate]);
 
-    const exportToHTMLString = async () => {
-        try {
-            if (container) {
-                // const sfdtBlob = await container.current.documentEditor.saveAsBlob('Sfdt');
-                // const reader = new FileReader();
-                // reader.onload = async (event) => {
-                //     const sfdtString = event.target?.result as string;
-                //     container.current!.documentEditor.open(sfdtString); // Re-open SFDT
-                //     const htmlBlob = await container.current!.documentEditor.saveAsBlob('Html');
-                //     const htmlString = await htmlBlob.text();
-                //     console.log(htmlString); // Output HTML string
-                //     callBack(htmlString)
-                // };
-                // reader.readAsText(sfdtBlob);
-                
-                // const htmlBlob = await container.documentEditor.saveAsBlob('Html');
-                const htmlBlob = await container.documentEditor.saveAsBlob('Docx');
-                const htmlString = await htmlBlob.text();
-                // console.log(htmlString); // Output HTML string
-                preview(htmlString)
-            }
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
     const getSfdtString = () => {
         if (container) {
             // Use the document editor container reference here
-            let sfdt: any = { content: container.documentEditor.serialize() };
-
-            console.log("sfdt: ", sfdt);
-            saveSfdtDraft(sfdt);
+            return { content: container.documentEditor.serialize() };
+        } else {
+            return { content: '' };
         }
     };
 
     React.useEffect(() => {
         if (saveSfdtDraftTrigger) {
-            getSfdtString();
+            saveSfdtDraft( getSfdtString() );
             setSaveSfdtDraftTrigger(false);
         }
     }, [saveSfdtDraftTrigger]);
 
     React.useEffect(() => {
         if (previewTrigger) {
-            getSfdtString();
+            preview( getSfdtString() );
             setPreviewTrigger(false);
         }
     }, [previewTrigger]);
@@ -134,6 +112,7 @@ export const DocEditor = ({
             enableToolbar={true}
             enableSpellCheck={true}
             created={onCreated}
+            documentEditorSettings={fontFamilies}
         />
     );
 }

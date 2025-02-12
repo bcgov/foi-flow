@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import type { Template } from './types';
 import { fetchApplicantCorrespondence, saveEmailCorrespondence, saveDraftCorrespondence, 
   editDraftCorrespondence, deleteDraftCorrespondence, deleteResponseCorrespondence, saveCorrespondenceResponse, 
-  editCorrespondenceResponse, fetchEmailTemplate} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+  editCorrespondenceResponse, fetchEmailTemplate, exportSFDT} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
@@ -60,10 +60,11 @@ export const ContactApplicant = ({
   const [options, setOptions] = useState<OptionType[]>([]);
   const [saveSfdtDraftTrigger, setSaveSfdtDraftTrigger] = useState<boolean>(false);
   const [previewTrigger, setPreviewTrigger] = useState<boolean>(false);
+  // const [sfdtDraft, setSfdtDraft] = useState<string>('');
 
   useEffect(() => {
     if(templateList.length > 0) {
-      console.log("templateList: ", templateList);
+      // console.log("templateList: ", templateList);
       setOptions(
         templateList.map((template: any) => ({
           label: template.templateName,
@@ -79,7 +80,7 @@ export const ContactApplicant = ({
   //   { label: 'Option 3', value: 'option3' }
   // ];
   const selectTemplate = (event: React.ChangeEvent<{}>, item: OptionType | null) => {
-    console.log("Selected option:", item?.label);
+    // console.log("Selected option:", item?.label);
     if(item?.label) {
       let newData = {
         "foiRequestId": 1,
@@ -95,13 +96,21 @@ export const ContactApplicant = ({
     }
   };
   const saveSfdtDraft = (sfdtString: string) => {
-    console.log("saveDraft:", sfdtString);
-  };
-  const preview = (sfdtString: string) => {
-    // pass html string to preview modal
-    setEditorValue(sfdtString);
+    // setSfdtDraft(sfdtString);
 
-    console.log("preview:", sfdtString);
+    console.log("saveDraft:", JSON.stringify(sfdtString));
+  };
+  const preview = async (sfdtString: string) => {
+    // pass html string to preview modal
+    console.log("preview:", JSON.stringify(sfdtString));
+    let newData = {
+      "filename": "email.html",
+      "content": JSON.stringify(sfdtString)
+    };
+    const loadPreview = async (html: string) => {
+      setEditorValue(html.replace("<body bgcolor=\"#FFFFFF\">", "<body bgcolor=\"#FFFFFF\" style=\"width: 6.5in; margin-left: auto; margin-right: auto; padding: 1in;\">"));
+    }
+    await exportSFDT(dispatch, newData, loadPreview);
   };
 
 
@@ -1283,7 +1292,7 @@ export const ContactApplicant = ({
             <button
               className="btn addCorrespondence"
               data-variant="contained"
-              onClick={() => setPreviewModal(true)}
+              onClick={() => {setPreviewModal(true);setPreviewTrigger(true);} }
               color="primary"
               // disabled={(currentTemplate <= 0)}
             >

@@ -1,4 +1,4 @@
-import { httpGETRequest, httpPOSTRequest } from "../../httpRequestHandler";
+import { httpGETRequest, httpPOSTRequest, httpOpenPOSTRequest } from "../../httpRequestHandler";
   import UserService from "../../../services/UserService";
 import API from "../../endpoints";
   import {
@@ -374,22 +374,22 @@ export const exportSFDT = (
   console.log("data: ", data);
   const apiUrl = API.FOI_EXPORT_SFDT;
   console.log("apiUrl: ", apiUrl);
-  httpPOSTRequest(apiUrl, data, UserService.getToken())
+  httpOpenPOSTRequest(apiUrl, data)
   .then((res) => {
     console.log("res: ", res);
     if (res.data) {
       callback(res.data);
     } else {
-      console.log("empty response for fetching an email template")
+      console.log("empty response for fetching a html file")
       dispatch(serviceActionError(res));
       throw new Error();
     }
   })
   .catch((error) => {
-    console.log("An error occured while trying to load a sfdt template", error);
+    console.log("An error occured while trying to load a html file", error);
     catchError(error, dispatch);
     if (errorCallback) {
-      errorCallback("An error occured while trying to load a sfdt template");
+      errorCallback("An error occured while trying to load a html file");
     }
   });
 };

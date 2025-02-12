@@ -501,15 +501,45 @@ namespace SyncfusionDocument.Controllers
         [Route("ExportSFDT")]
         public FileStreamResult ExportSFDT([FromBody] SaveParameter data)
         {
-            string name = data.FileName;
-            string format = RetrieveFileType(name);
-            if (string.IsNullOrEmpty(name))
-            {
-                name = "Document1.doc";
+            try {
+                Console.WriteLine($"SaveParameter: {data}");
+                string name = data.FileName;
+                string format = RetrieveFileType(name);
+                if (string.IsNullOrEmpty(name))
+                {
+                    name = "Document1.html";
+                }
+                WDocument document = WordDocument.Save(data.Content);
+                return SaveDocument(document, format, name);
+            } catch {
+                return new FileStreamResult(new MemoryStream(), "application/html")
+                {
+                    FileDownloadName = "Document1.html"
+                };
             }
-            WDocument document = WordDocument.Save(data.Content);
-            return SaveDocument(document, format, name);
         }
+
+        // [AcceptVerbs("Post")]
+        // [HttpPost]
+        // [EnableCors("AllowAllOrigins")]
+        // [Route("ExportSFDTtoHTML")]
+        // public string ExportSFDTtoHTML([FromBody] SaveParameter data)
+        // {
+        //     string name = data.FileName;
+        //     string format = ".html";
+        //     WFormatType type = GetWFormatType(format);
+        //     Stream stream = new MemoryStream();
+        //     document.Save(stream, type);
+        //     document.Close();
+        //     stream.Position = 0;
+
+
+
+        //     WDocument document = WordDocument.Save(data.Content);
+
+
+        //     return SaveDocument(document, format, name);
+        // }
 
         private string RetrieveFileType(string name)
         {
