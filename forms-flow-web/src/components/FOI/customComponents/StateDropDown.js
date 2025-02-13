@@ -22,6 +22,8 @@ const StateDropDown = ({
   stateTransition,
   updateStateDropDown,
   requestType,
+  isDivisionalCoordinator,
+  isHistoricalRequest,
   disabled,
 }) => {
   const _isMinistryCoordinator = isMinistryCoordinator;
@@ -109,7 +111,15 @@ const StateDropDown = ({
     const appendRecordsReadyForReview = (stateList) => {
       const recordsreadyforreview = { status: "Records Ready for Review", isSelected: false };
       let appendedList = stateList.slice();
-      appendedList.splice(-1, 0, recordsreadyforreview);
+      if(previousState === StateEnum.open.name || previousState === StateEnum.response.name)
+        appendedList.splice(-2, 0, recordsreadyforreview);
+      else appendedList.splice(-1, 0, recordsreadyforreview);
+      return appendedList;
+    }
+    const appendPreviousStateForHoldOthers = (stateList, previousStateName) => {
+      const previousStateObject = { status: previousStateName, isSelected: false };
+      let appendedList = stateList.slice();
+      appendedList.splice(-1, 0, previousStateObject);
       return appendedList;
     }
     const isMCFMinistryTeam = userDetail?.groups?.some(str => str.includes("MCF Ministry Team"))
@@ -223,7 +233,10 @@ const StateDropDown = ({
         break;
       case StateEnum.appfeeowing.name.toLowerCase():
         return _stateList.appfeeowing;
-
+      case StateEnum.onholdother.name.toLowerCase():
+        if (!isMinistryCoordinator) {
+          return appendPreviousStateForHoldOthers(_stateList.onholdother, previousState);
+        } else return _stateList.onholdother;
       default:
         return [];
     }
@@ -260,22 +273,40 @@ const StateDropDown = ({
       );
     });
   return (
-    <TextField
-      id="foi-status-dropdown"
-      label="Status"
-      className="foi-state-dropdown"
-      InputLabelProps={{ shrink: false }}
-      inputProps={{ "aria-labelledby": "foi-status-dropdown-label" }}
-      select
-      value={status}
-      onChange={handleChange}
-      input={<Input />}
-      variant="outlined"
-      fullWidth
-      disabled={disabled}
-    >
-      {menuItems}
-    </TextField>
+    !isHistoricalRequest ?
+      <TextField
+        id="foi-status-dropdown"
+        label="Status"
+        className="foi-state-dropdown"
+        InputLabelProps={{ shrink: false }}
+        inputProps={{ "aria-labelledby": "foi-status-dropdown-label" }}
+        select
+        value={status}
+        onChange={handleChange}
+        input={<Input />}
+        variant="outlined"
+        fullWidth
+        disabled={isDivisionalCoordinator}
+      >
+        {menuItems}
+      </TextField>
+    :
+      <TextField
+        id="foi-status-dropdown"
+        label="Status"
+        className="foi-state-dropdown"
+        InputLabelProps={{ shrink: false }}
+        inputProps={{ "aria-labelledby": "foi-status-dropdown-label" }}
+        value={status}
+        onChange={handleChange}
+        input={<Input />}
+        variant="outlined"
+        fullWidth
+        disabled
+      >
+      </TextField>
+    
+    
   );
 };
 

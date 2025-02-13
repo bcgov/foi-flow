@@ -4,6 +4,7 @@ from re import VERBOSE
 from request_api.utils.constants import FILE_CONVERSION_FILE_TYPES, DEDUPE_FILE_TYPES, NONREDACTABLE_FILE_TYPES
 from request_api.models.FOIRequestRecords import FOIRequestRecord
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.HistoricalRecords import HistoricalRecords
 from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDivision
 from request_api.services.external.eventqueueservice import eventqueueservice
 from request_api.models.default_method_result import DefaultMethodResult
@@ -30,6 +31,8 @@ class recordservice(recordservicebase):
     stitchinglargefilesizelimit= getenv('STITCHING_STREAM_SEPARATION_FILE_SIZE_LIMIT',524288000)
     pdfstitchstreamkey_largefiles = getenv('EVENT_QUEUE_PDFSTITCH_LARGE_FILE_STREAMKEY')
     pagecalculatorstreamkey = getenv('EVENT_QUEUE_PAGECALCULATOR_STREAM_KEY')
+    
+    s3host = getenv('OSS_S3_HOST')
 
     def create(self, requestid, ministryrequestid, recordschema, userid):
         """Creates a record for a user with document details passed in for an opened request.
@@ -78,7 +81,17 @@ class recordservice(recordservicebase):
             records = FOIRequestRecord.getrecordsbyid(recordids)
             for record in records:
                 record['attributes'] = json.loads(record['attributes'])
-                record['attributes']['personalattributes'] = requestdata['newpersonalattributes']
+                for attribute in requestdata['newpersonalattributes']:
+                    if (requestdata['newpersonalattributes'][attribute] is not None and len(requestdata['newpersonalattributes'][attribute]) > 0):
+                        if 'attributes' in record:
+                            if 'personalattributes' in record['attributes']:
+                                record['attributes']['personalattributes'][attribute] = requestdata['newpersonalattributes'][attribute]
+                            else:
+                                record['attributes']['personalattributes'] = {}
+                        else:
+                            record['attributes'] = {}
+                            record['attributes']['personalattributes'] = {}
+                        record['attributes']['personalattributes'][attribute] = requestdata['newpersonalattributes'][attribute]
                 # divisions = divisions + [div for div in record['attributes']['divisions'] if div not in divisions]
                 record.update({'updated_at': datetime.now(), 'updatedby': userid})
                 record['version'] += 1
@@ -224,6 +237,26 @@ class recordservice(recordservicebase):
         if response is None:
                 return {"recordchanged": False}
         return response
+    
+    def gethistoricaldocuments(self, axisrequestid):
+        documents = HistoricalRecords.getdocuments(axisrequestid)
+        if (documents[0]['iscorresponcedocument']):
+            for document in documents:
+                if len(document['attributes']) > 0:
+                    document['category'] = 'response'
+                document['documentpath'] = 'https://' + self.s3host + '/' + document.pop('s3uripath') + '/' + document.pop('recordfilename')
+                document['filename'] = document.pop('displayfilename')
+            return documents
+        else:
+            for document in documents:
+                document['s3uripath'] = 'https://' + self.s3host + '/' + document['s3uripath'] + '/' + document.pop('recordfilename')
+                document['filename'] = document.pop('displayfilename')
+                document['isselected'] = False
+                document['isredactionready'] = True
+                document['documentmasterid'] = document['historicalrecordid']
+            return {'records': documents, 'dedupedfiles': len(documents), 'convertedfiles': 0, 'removedfiles': 0}
+
+            
 
     def __triggerpdfstitchservice(self, requestid, ministryrequestid, message, userid):
         """Call the BE job for stitching the documents.

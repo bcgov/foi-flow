@@ -297,14 +297,14 @@ export const Fees = ({
       if(requestState === StateEnum.peerreview.name){
         return true;
       }
-      if (formHistory.length > 0 && [StateEnum.feeassessed.name, StateEnum.onhold.name, StateEnum.callforrecords.name].includes(requestState)) {
+      if (formHistory.length > 0 && [StateEnum.feeassessed.name, StateEnum.onhold.name, StateEnum.callforrecords.name, StateEnum.onholdother.name].includes(requestState)) {
         if (isMinistry) {
           return ['review', 'approved'].includes(initialCFRFormData.formStatus) || isNewCFRForm;
         } else {
           return initialCFRFormData.formStatus !== 'review';
         }
       }
-      if (CFRFormData.balanceRemaining > 0 &&  [StateEnum.feeassessed.name, StateEnum.onhold.name].includes(requestState)) {
+      if (CFRFormData.balanceRemaining > 0 &&  [StateEnum.feeassessed.name, StateEnum.onhold.name, StateEnum.onholdother.name].includes(requestState)) {
         if (isMinistry) {
           return !['clarification', 'init'].includes(initialCFRFormData.formStatus);
         } else {
@@ -650,7 +650,8 @@ export const Fees = ({
   
     const disableNewCfrFormBtn = () => {
       return(CFRFormData?.formStatus !== 'approved' || requestState === StateEnum.peerreview.name || (requestState !== StateEnum.callforrecords.name &&
-        requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name) || (requestState === StateEnum.onhold.name && CFRFormData?.actualTotalDue > 0));
+        requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name) || (requestState === StateEnum.onhold.name && CFRFormData?.actualTotalDue > 0) || 
+        + (requestState === StateEnum.onholdother.name && CFRFormData?.actualTotalDue > 0));
     }
   
     const [isNewCFRForm, setIsNewCFRForm] = useState(false)
@@ -706,6 +707,8 @@ export const Fees = ({
           component="form"
           sx={{
             '& .MuiTextField-root': { my: 1, mx: 0 },
+            '& .Mui-disabled': { '-webkit-text-fill-color': "black !important" },
+            '& .MuiInputBase-root.Mui-disabled': { 'background-color': "#eee !important" },
           }}
           autoComplete="off"
         >
