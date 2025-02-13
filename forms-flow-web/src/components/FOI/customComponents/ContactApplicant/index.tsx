@@ -105,10 +105,11 @@ export const ContactApplicant = ({
     console.log("preview:", JSON.stringify(sfdtString));
     let newData = {
       "filename": "email.html",
-      "content": JSON.stringify(sfdtString)
+      "content": sfdtString
     };
     const loadPreview = async (html: string) => {
-      setEditorValue(html.replace("<body bgcolor=\"#FFFFFF\">", "<body bgcolor=\"#FFFFFF\" style=\"width: 6.5in; margin-left: auto; margin-right: auto; padding: 1in;\">"));
+      // setEditorValue(html.replace("<body bgcolor=\"#FFFFFF\">", "<body bgcolor=\"#FFFFFF\" style=\"width: 6.5in; margin-left: auto; margin-right: auto; padding: 1in;\">"));
+      setEditorValue(html);
     }
     await exportSFDT(dispatch, newData, loadPreview);
   };

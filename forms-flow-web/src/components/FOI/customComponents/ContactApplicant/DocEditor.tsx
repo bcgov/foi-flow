@@ -39,7 +39,7 @@ export const DocEditor = ({
         // "Separator",
         // "Comments",
         // "TrackChanges",
-        "Separator",
+        // "Separator",
         // "LocalClipboard",
         // "RestrictEditing",
         // "Separator",
@@ -80,9 +80,9 @@ export const DocEditor = ({
     const getSfdtString = () => {
         if (container) {
             // Use the document editor container reference here
-            return { content: container.documentEditor.serialize() };
+            return container.documentEditor.serialize();
         } else {
-            return { content: '' };
+            return '';
         }
     };
 
