@@ -1586,7 +1586,69 @@ class FOIMinistryRequest(db.Model):
         setattr(currequest,'updatedby',userid)
         db.session.commit()  
         return DefaultMethodResult(True,'Request updated',ministryrequestid)
+    
+    @classmethod
+    def getrequestsdetailsforsearch(cls,requestnumbers):
+        requestdetails = []
+        try:
+            csvrequestnumbers = tuple(requestnumbers)            
+            query=f"""SELECT
+                    DISTINCT FMR.foiministryrequestid
+                     ,FMR.foiministryrequestid
+                     ,FMR.foirequest_id
+                    ,FMR.axisrequestid
+                    ,FMR.requeststatuslabel
+                    ,FRA.lastname
+                    ,FRA.firstname
+                    ,FMR.closedate
+                    ,FMR.axispagecount
+                    ,FMR.recordspagecount
+                    ,FMR.axislanpagecount
+                    ,FMR.estimatedpagecount
+                    ,FMR.estimatedtaggedpagecount
+                    ,FMR.description
+                    ,PA.iaocode AS programareacode
+                    ,FR.requesttype
+                    FROM public."FOIMinistryRequests" FMR INNER JOIN (
+                        SELECT 
+                        DISTINCT FMR.foiministryrequestid as ministryrequestid
+                        ,FMR.foirequest_id as requestid
+                        ,max(FMR.version) as latestversion 
+                        FROM public."FOIMinistryRequests" FMR 
+                        WHERE FMR.axisrequestid in :csvrequestnumbers
+                        GROUP BY FMR.foiministryrequestid,FMR.foirequest_id
+                    ) MaxRequestVersions ON FMR.foiministryrequestid=MaxRequestVersions.ministryrequestid and FMR.version=MaxRequestVersions.latestversion
+                    JOIN public."FOIRequestApplicantMappings" FRAM ON FRAM.foirequest_id=MaxRequestVersions.requestid
+                    JOIN public."FOIRequestApplicants" FRA ON FRA.foirequestapplicantid=FRAM.foirequestapplicantid
+                    LEFT JOIN public."ProgramAreas" PA	ON FMR.programareaid = PA.programareaid
+   	                JOIN public."FOIRequests" FR ON FMR.foiministryrequestid = FR.foirequestid AND FMR.version = FR.version"""            
+            result = db.session.execute(text(query),{"csvrequestnumbers":csvrequestnumbers})        
+            rows = result.fetchall()            
+            for row in rows:
+                requestdetail={}
+                requestdetail["ministryrequestid"]=row["foiministryrequestid"]
+                requestdetail["id"]=row["foirequest_id"]
+                requestdetail["requeststatus"]=row["requeststatuslabel"]
+                requestdetail["requestnumber"]=row["axisrequestid"]
+                requestdetail["lastname"]=row["lastname"]
+                requestdetail["firstname"]=row["firstname"]
+                requestdetail["closedate"]=row["closedate"]
+                requestdetail["axispagecount"]=row["axispagecount"]
+                requestdetail["recordspagecount"]=row["recordspagecount"]
+                requestdetail["axislanpagecount"]=row["axislanpagecount"]
+                requestdetail["estimatedpagecount"]=row["estimatedpagecount"]
+                requestdetail["estimatedtaggedpagecount"]=row["estimatedtaggedpagecount"]
+                requestdetail["description"]=row["description"]
+                requestdetail["requestType"]=row["requesttype"]
+                requestdetail["bcgovcode"]=row["programareacode"]
+                requestdetails.append(requestdetail)
 
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return requestdetails
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
         fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate',
