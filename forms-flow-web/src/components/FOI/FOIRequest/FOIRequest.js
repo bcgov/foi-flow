@@ -69,7 +69,6 @@ import "./TabbedContainer.scss";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { CommentSection } from "../customComponents/Comments";
 import { AttachmentSection } from "../customComponents/Attachments";
-import { CFRForm } from "../customComponents/CFRForm";
 import { ContactApplicant } from "../customComponents/ContactApplicant";
 import Loading from "../../../containers/Loading";
 import clsx from "clsx";
@@ -96,7 +95,9 @@ import {
   ConditionalComponent,
   formatDate,
   isRequestRestricted,
-  getCommentTypeIdByName
+  convertSTRToDate,
+  getCommentTypeIdByName,
+  isMinistryLogin
 } from "../../../helper/FOI/helper";
 import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
@@ -114,6 +115,8 @@ import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
+import RequestHistorySection from "../customComponents/RequestHistory";
+import { Fees } from "../customComponents/Fees";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -177,6 +180,12 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let CFRFormHistoryLength = useSelector(
     (state) => state.foiRequests.foiRequestCFRFormHistory.length
   );
+  let foiRequestCFRFormHistory = useSelector(
+    (state) => state.foiRequests.foiRequestCFRFormHistory
+  );
+  let foiRequestCFRForm = useSelector(
+    (state) => state.foiRequests.foiRequestCFRForm
+  );
   // let requestRecords = useSelector(
   //   (state) => state.foiRequests.foiRequestRecords
   // );
@@ -194,6 +203,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
   const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes); 
 
+  let isMinistry = false;
+  if (Object.entries(userDetail).length !== 0) {
+    const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
+    isMinistry = isMinistryLogin(userGroups);
+  }
 
   const handleUnsavedContinue = () => {
     window.removeEventListener("popstate", handleOnHashChange);
@@ -240,7 +254,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       display: false,
       active: false,
     },
-    CFRForm: {
+    Fees: {
       display: false,
       active: false,
     },
@@ -249,6 +263,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       active: false,
     },
     Records: {
+      display: false,
+      active: false,
+    },
+    RequestHistory: {
       display: false,
       active: false,
     },
@@ -1069,14 +1087,18 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     return false;
   };
 
-  const showCFRTab = () => {
-    return (
-      requestState !== StateEnum.intakeinprogress.name &&
-      requestState !== StateEnum.unopened.name &&
-      requestState !== StateEnum.open.name &&
-      requestDetails?.requestType ===
-        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
-    );
+  const showFeesTab = () => {
+    if (isMinistry) {
+      return (
+        requestState !== StateEnum.intakeinprogress.name &&
+        requestState !== StateEnum.unopened.name &&
+        requestState !== StateEnum.open.name &&
+        requestDetails?.requestType ===
+          FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
+      );
+    } else {
+      return (requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL);
+    }
   };
 
   const showContactApplicantTab = () => {
@@ -1088,13 +1110,39 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
 
-  const getCommentsCount = () => {
-    
-      let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
-            c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
-      return '('+commentsCount+')'
+  const getHistoryCount = () => {
+    let historyCount= applicantCorrespondence.length + requestNotes.filter(
+            c => c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
+                c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review")
+        ).length;
+    return '('+historyCount+')'
+  } 
 
-  }
+  const getMergedHistory = (applicantCorrespondence, requestNotes) => {
+    const mergedHistory = [
+      ...(applicantCorrespondence || []).map((message) => ({
+        ...message,
+        type: 'message',
+        created_at: message.created_at ? convertSTRToDate(message.created_at) : message.created_at 
+      })),
+      ...(requestNotes || []).map((comment) => ({
+        ...comment,
+        type: 'comment'
+      }))
+    ];
+
+    return mergedHistory.sort((a, b) => {
+      const dateA = new Date(a.created_at || a.dateUF);
+      const dateB = new Date(b.created_at || b.dateUF);
+      return dateA - dateB || (a.commentId || a.applicantcorrespondenceid || 0) - (b.commentId || b.applicantcorrespondenceid || 0);
+    });
+  };
+  const getCommentsCount = () => {
+    let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
+          c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
+    return '('+commentsCount+')'
+
+}
 
   return (!isLoading &&
     requestDetails &&
@@ -1137,15 +1185,15 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
             </div>
             {!isAddRequest && (
               <>
-                {showCFRTab() && (
+                {showFeesTab() && (
                   <div
                     className={clsx("tablinks", {
-                      active: tabLinksStatuses.CFRForm.active,
+                      active: tabLinksStatuses.Fees.active,
                     })}
-                    name="CFRForm"
-                    onClick={() => tabclick("CFRForm")}
+                    name="Fees"
+                    onClick={() => tabclick("Fees")}
                   >
-                    CFR Form
+                    Fees
                     {CFRFormHistoryLength > 0
                       ? ` (${CFRFormHistoryLength})`
                       : ""}
@@ -1185,7 +1233,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     Records
                   </div>
                 )}
-                {showContactApplicantTab() && (
+                {
                   <div
                     className={clsx("tablinks", {
                       active: tabLinksStatuses.ContactApplicant.active,
@@ -1193,14 +1241,24 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     name="ContactApplicant"
                     onClick={() => tabclick("ContactApplicant")}
                   >
-                    Contact Applicant{" "}
+                    Communications{" "}
                     {applicantCorrespondence?.length > 0
                       ? `(${applicantCorrespondence.length})`
                       : ""}
                   </div>
-                )}
+                }
               </>
             )}
+            <div
+              className={clsx("tablinks", {
+                active: tabLinksStatuses.RequestHistory.active,
+              })}
+              name="RequestHistory"
+              onClick={() => tabclick("RequestHistory")}
+            >
+              Request History{" "}
+              {getHistoryCount()}
+            </div>
           </div>
 
           <div className="foileftpanelstatus">
@@ -1503,22 +1561,24 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               <Loading />
             )}
           </div>
-          {showCFRTab() && (
+          {showFeesTab() && (
             <div
-              id="CFRForm"
+              id="Fees"
               className={clsx("tabcontent", {
-                active: tabLinksStatuses.CFRForm.active,
-                [classes.displayed]: tabLinksStatuses.CFRForm?.display,
-                [classes.hidden]: !tabLinksStatuses.CFRForm?.display,
+                active: tabLinksStatuses.Fees.active,
+                [classes.displayed]: tabLinksStatuses.Fees?.display,
+                [classes.hidden]: !tabLinksStatuses.Fees?.display,
               })}
             >
-              <CFRForm
+              <Fees
                 requestNumber={requestNumber}
                 requestState={requestState}
+                requestDetails={requestDetails}
                 userDetail={userDetail}
                 ministryId={ministryId}
                 requestId={requestId}
                 setCFRUnsaved={setCFRUnsaved}
+                handleStateChange={handleStateChange}
               />
             </div>
           )}
@@ -1726,7 +1786,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               </>
             )}
           </div>
-          {showContactApplicantTab() && (
+          {
             <div
               id="ContactApplicant"
               className={clsx("tabcontent", {
@@ -1740,7 +1800,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   <ContactApplicant
                     requestNumber={requestNumber}
                     requestState={requestState}
-                    userDetail={userDetail}
                     ministryId={ministryId}
                     ministryCode={requestDetails.bcgovcode}
                     applicantCorrespondence={applicantCorrespondence}
@@ -1754,7 +1813,49 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 <Loading />
               )}
             </div>
-          )}
+          }
+          <div
+            id="RequestHistory"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.RequestHistory.active,
+              [classes.displayed]: tabLinksStatuses.RequestHistory?.display,
+              [classes.hidden]: !tabLinksStatuses.RequestHistory?.display,
+            })}
+          >
+            {!isLoading && (requestNotes || applicantCorrespondence) ? (
+              <>
+                <RequestHistorySection
+                  requestHistoryArray={getMergedHistory(applicantCorrespondence, requestNotes)}
+                  currentUser={
+                    userId && {
+                      userId: userId,
+                      avatarUrl: avatarUrl,
+                      name: fullName,
+                    }
+                  }
+                  bcgovcode={bcgovcode}
+                  requestid={requestId}
+                  iaoassignedToList={iaoassignedToList}
+                  ministryAssignedToList={ministryAssignedToList}
+                  requestNumber={requestNumber}
+                  isRestricted={isRequestRestricted(requestDetails, ministryId)}
+                  isMinistry={false}
+                  commentTypes={commentTypes}
+                  ministryId={ministryId}
+                  applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
+                  setComment={setComment}
+                  requestDetails={requestDetails}
+                  requestState={requestState}
+                  foiRequestCFRFormHistory={foiRequestCFRFormHistory}
+                  foiRequestCFRForm={foiRequestCFRForm}
+                  applicantCorrespondence={applicantCorrespondence}
+                  requestNotes={requestNotes}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
+          </div>
           <UnsavedModal
             modalOpen={unsavedPrompt}
             handleClose={() => setUnsavedPrompt(false)}
