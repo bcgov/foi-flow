@@ -531,56 +531,56 @@ export const ContactApplicant = ({
 
   const saveDraft = async () => {
     setSaveSfdtDraftTrigger(true);
-    // setDisablePreview(true);
-    // setPreviewModal(false);
-    // const attachments = await saveAttachments(files);
-    // let callback = (_res: string) => {
-    //   changeCorrespondenceFilter("drafts");
-    //   clearcorrespondence();      
-    //   toast.success("Message has been saved to draft successfully", {
-    //     position: "top-right",
-    //     autoClose: 3000,
-    //     hideProgressBar: true,
-    //     closeOnClick: true,
-    //     pauseOnHover: true,
-    //     draggable: true,
-    //     progress: undefined,
-    //   });
-    //   dispatch(fetchApplicantCorrespondence(requestId, ministryId));
-    // }
-    // const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    // const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
-    // let israwrequest = selectedCorrespondence?.israwrequest ||
-    //   requestDetails.requeststatuslabel == StateEnum.appfeeowing.label ||
-    //   requestDetails.requeststatuslabel == StateEnum.intakeinprogress.label ||
-    //   requestDetails.requeststatuslabel == StateEnum.unopened.label
-    // let data = {
-    //   templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
-    //   correspondencemessagejson: JSON.stringify({
-    //     "emailhtml": editorValue,
-    //     "id": approvedForm?.cfrfeeid,
-    //     "type": type
-    //   }),
-    //   foiministryrequest_id: ministryId,
-    //   attachments: attachments,
-    //   emails: selectedEmails,
-    //   israwrequest: israwrequest
-    // };
-    // saveDraftCorrespondence(
-    //   data,
-    //   requestId,
-    //   ministryId,
-    //   dispatch,
-    //   callback,
-    //   (errorMessage: string) => {
-    //     clearcorrespondence();
-    //     changeCorrespondenceFilter("drafts");
-    //     dispatch(fetchApplicantCorrespondence(requestId, ministryId));
-    //   },
-    // );
-    // setFOICorrespondenceLoader(false);
-    // setDisablePreview(false);
-    // return attachments;
+    setDisablePreview(true);
+    setPreviewModal(false);
+    const attachments = await saveAttachments(files);
+    let callback = (_res: string) => {
+      changeCorrespondenceFilter("drafts");
+      clearcorrespondence();      
+      toast.success("Message has been saved to draft successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+    }
+    const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
+    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    let israwrequest = selectedCorrespondence?.israwrequest ||
+      requestDetails.requeststatuslabel == StateEnum.appfeeowing.label ||
+      requestDetails.requeststatuslabel == StateEnum.intakeinprogress.label ||
+      requestDetails.requeststatuslabel == StateEnum.unopened.label
+    let data = {
+      templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondencemessagejson: JSON.stringify({
+        "emailhtml": editorValue,
+        "id": approvedForm?.cfrfeeid,
+        "type": type
+      }),
+      foiministryrequest_id: ministryId,
+      attachments: attachments,
+      emails: selectedEmails,
+      israwrequest: israwrequest
+    };
+    saveDraftCorrespondence(
+      data,
+      requestId,
+      ministryId,
+      dispatch,
+      callback,
+      (errorMessage: string) => {
+        clearcorrespondence();
+        changeCorrespondenceFilter("drafts");
+        dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+      },
+    );
+    setFOICorrespondenceLoader(false);
+    setDisablePreview(false);
+    return attachments;
   };
 
   const saveExport = async () => {
@@ -1224,20 +1224,9 @@ export const ContactApplicant = ({
             preview = {preview}
             previewTrigger = {previewTrigger}
             setPreviewTrigger = {setPreviewTrigger}
+            addAttachment={openAttachmentModal}
           />
-          {/* <div className="closeDraft">
-              <IconButton className="title-col3" onClick={()=>setShowEditor(false)}>
-                  <i className="dialog-close-button">Close</i>
-                  <CloseIcon />
-              </IconButton>
-           </div> */}
-          {/* <ReactQuill
-            theme="snow"
-            value={editorValue}
-            onChange={setEditorValue}
-            modules={quillModules}
-            ref={handleRef}
-          /> */}
+          <div>
           {files.map((file: any, index: number) => (
             <div className="email-attachment-item" key={file.filename}>
               <u>{file.filename}</u>
@@ -1248,21 +1237,9 @@ export const ContactApplicant = ({
               </i>
             </div>
           ))}
+          </div>
         </div>
         <div id="correspondence-editor-ql-toolbar" className="ql-toolbar ql-snow">
-          {/* <span className="ql-formats">
-            <button className="ql-bold" />
-            <button className="ql-italic" />
-            <button className="ql-underline" />
-          </span>
-          <span className="ql-formats">
-            <button className="ql-list" value="ordered" />
-            <button className="ql-list" value="bullet" />
-          </span> */}
-          <span className="ql-formats">
-            <button className="ql-link" />
-            {/* <button className="ql-image" /> */}
-          </span>
           <div className="previewEmail">
             <PreviewModal
               modalOpen={previewModal}

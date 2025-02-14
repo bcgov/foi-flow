@@ -1,6 +1,7 @@
 import './DocEditor.scss'
 import * as React from 'react';
 import { DocumentEditorContainerComponent, Toolbar, CustomToolbarItemModel, ToolbarItem, SpellChecker } from "@syncfusion/ej2-react-documenteditor";
+import { ClickEventArgs } from '@syncfusion/ej2-navigations';
 import {DOC_EDITOR_API_URL} from "../../../../apiManager/endpoints/config"
 DocumentEditorContainerComponent.Inject(Toolbar, SpellChecker);
 
@@ -12,15 +13,64 @@ export const DocEditor = ({
     preview,
     previewTrigger,
     setPreviewTrigger,
+    addAttachment,
 }: any) => {
     const [container, setContainer] = React.useState<DocumentEditorContainerComponent | null>(null);
     // let container: DocumentEditorContainerComponent;
     // console.log("FormatType: ", FormatType);
 
+    const onToolbarClick = (args: ClickEventArgs): void => {
+        switch (args.item.id) {
+            case "savepdf":
+                // //Disable image toolbar item.
+                // container.toolbar.enableItems(4, false);
+                console.log("save pdf");
+                break;
+            case "attachments":
+                // //Disable image toolbar item.
+                // container.toolbar.enableItems(4, false);
+                // console.log("add attachments");
+                addAttachment();
+                break;
+            default:
+                break;
+        }
+    };
+    const onWrapText = (text: string): string=> {
+      let content: string = '';
+        const index : number = text.lastIndexOf(' ');
+    
+        if (index !== -1) {
+            content = text.slice(0, index) + "<div class='e-de-text-wrap'>" + text.slice(index + 1) + "</div>";
+        } else {
+            content = text;
+        }
+    
+        return content;
+    }
+
+    //Custom toolbar item.
+    let savePdfBtn: CustomToolbarItemModel = {
+        prefixIcon: "e-icons e-large e-custom-export-pdf",
+        tooltipText: "Save as a PDF File",
+        text: onWrapText("Save as PDF"),
+        id: "savepdf"
+    };
+    let attachmentBtn: CustomToolbarItemModel = {
+        prefixIcon: "e-icons e-large e-custom-upload",
+        // prefixIcon: "upload-1 icon",
+        tooltipText: "Add attachments",
+        text: "Attachment",
+        id: "attachments"
+    };
+
     let items: (CustomToolbarItemModel | ToolbarItem)[] = [
+        savePdfBtn,
+        "Separator",
         "Undo",
         "Redo",
         "Separator",
+        attachmentBtn,
         "Image",
         "Table",
         "Hyperlink",
@@ -110,6 +160,7 @@ export const DocEditor = ({
             height={'590px'}
             toolbarItems={items}
             enableToolbar={true}
+            toolbarClick={onToolbarClick.bind(this)}
             enableSpellCheck={true}
             created={onCreated}
             documentEditorSettings={fontFamilies}

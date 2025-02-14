@@ -7,3 +7,12 @@
 @import '../../../../../node_modules/@syncfusion/ej2-splitbuttons/styles/material.css';
 @import '../../../../../node_modules/@syncfusion/ej2-dropdowns/styles/material.css';
 @import "../../../../../node_modules/@syncfusion/ej2-documenteditor/styles/material.css";
+@import "../../../../../node_modules/@syncfusion/ej2-icons/styles/material.css";
+
+.e-custom-export-pdf:before {
+    content: '\e9bf';
+}
+
+.e-custom-upload:before {
+    content: '\e710';
+}
