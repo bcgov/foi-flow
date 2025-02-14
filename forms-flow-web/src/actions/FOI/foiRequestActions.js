@@ -541,3 +541,10 @@ export const setFOICommentTypes = (data) => (dispatch) => {
     payload: data,
   });
 };
+
+export const setShowKeywordSearch = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.SHOW_KEYWORD_SEARCH,
+    payload: data,
+  });
+};
