@@ -28,7 +28,11 @@ class communicationemailservice:
             messagepart = self.__getbody(correspondencelog)
             to = self.__getsenders(correspondencelog)
             attributes =  self.__getattributes(correspondencelog)
-            subject = templateconfig().getsubject(template.name,attributes)
+            subject = ""
+            if(template is None):
+                subject = templateconfig().getsubject("",attributes)
+            else:
+                subject = templateconfig().getsubject(template.name,attributes)
             messageattachmentlist = self.__getattachments(correspondencelog)
             _messagepart = templateservice().decorate_template(template, messagepart, attributes)
             return senderservice().send(subject, _messagepart, messageattachmentlist, to, correspondencelog.get('from_email', None))

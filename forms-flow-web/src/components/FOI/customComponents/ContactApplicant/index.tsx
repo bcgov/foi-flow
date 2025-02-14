@@ -54,6 +54,7 @@ export const ContactApplicant = ({
   requestId,
 }: any) => {
   const [curTemplate, setCurTemplate] = useState<string>('');
+  const [curTemplateName, setCurTemplateName] = useState<string>('');
 
   const dispatch = useDispatch();
   const templateList: any = useSelector((state: any) => state.foiRequests.foiEmailTemplates);
@@ -89,10 +90,12 @@ export const ContactApplicant = ({
       };
       const loadTemplate = (templateJSON: string) => {
         setCurTemplate(JSON.stringify(templateJSON));
+        setCurTemplateName(item.label);
       }
       fetchEmailTemplate(dispatch, newData, loadTemplate);
     } else {
       setCurTemplate('');
+      setCurTemplateName('');
     }
   };
   const saveSfdtDraft = (sfdtString: string) => {
@@ -505,7 +508,8 @@ export const ContactApplicant = ({
         "axisRequestId": requestNumber
       }],
       assignedGroupEmail: requestDetails.assignedGroupEmail,
-      israwrequest: israwrequest
+      israwrequest: israwrequest,
+      templatename: curTemplateName
     };
     saveEmailCorrespondence(
       data,

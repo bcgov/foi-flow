@@ -44,7 +44,8 @@ class templateservice:
         dynamictemplatevalues= {}
         dynamictemplatevalues["ffaurl"] = current_app.config['FOI_FFA_URL']
         dynamictemplatevalues["content"] = emailtemplatehtml
-        dynamictemplatevalues['title'] = template.description
+        if template is not None:
+            dynamictemplatevalues['title'] = template.description
         dynamictemplatevalues.update(attributes)
         headerfooterhtml = storageservice().downloadtemplate(self.__getheaderfootertemplate(template))
         finaltemplate = Template(headerfooterhtml)
@@ -53,7 +54,7 @@ class templateservice:
     
     def __getheaderfootertemplate(self, template):
         #Get template with request info
-        if template.name in ['EXTENSIONS-PB']:
+        if template is not None and template.name in ['EXTENSIONS-PB']:
             return '/TEMPLATES/EMAILS/header_footer_template_without_requestinfo.html'
         #Get template without request info
         return '/TEMPLATES/EMAILS/header_footer_template.html'

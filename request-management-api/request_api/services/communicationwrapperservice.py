@@ -28,12 +28,17 @@ class communicationwrapperservice:
         if result.success == True:
             # raw requests should never be fee emails so they would only get handled by else statement
             # Handle fee processing templates
-            if self.__is_fee_processing(applicantcorrespondencelog["templateid"]):
+            if applicantcorrespondencelog["templateid"] is not None and self.__is_fee_processing(applicantcorrespondencelog["templateid"]):
                 return self.__handle_fee_email(requestid, ministryrequestid, result, applicantcorrespondencelog)
             # Handle non-fee templates - Send email for non-fee templates with email recipients
             else:
                 if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
-                    template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
+                    if applicantcorrespondencelog["templatename"] is None:
+                        template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
+                    else:
+                        template = None
+                        # template["name"] = applicantcorrespondencelog["templatename"]
+                        # template["description"] = applicantcorrespondencelog["templatename"]
                     return communicationemailservice().send(template, applicantcorrespondencelog)
 
 
