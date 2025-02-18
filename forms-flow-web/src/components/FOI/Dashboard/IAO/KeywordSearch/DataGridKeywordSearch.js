@@ -164,6 +164,7 @@ const DataGridKeywordSearch = ({ userDetail }) => {
       field: "requestpagecount",
       headerName: "PAGES",
       headerAlign: "left",
+      valueGetter: (params) => parseInt(params.row.requestpagecount),
       renderCell: pagecountcellTooltipRender,
       cellClassName: 'foi-advanced-search-result-cell',
       flex: 0.5,
