@@ -67,17 +67,16 @@ const AxisDetails = React.memo(({
     
       if (inputValue) {
         if (!requestDetails.isconsultflag) {
-          // Scenario 1: When consult flag is NOT active
-          if (!axisIDPattern.test(inputValue)) {
-            helperText = "Invalid Axis ID Number";
-            updateValidation(helperText);
-          }
+          // When consult flag is NOT active
+          const isValid = axisIDPattern.test(inputValue);
+          helperText = isValid ? "" : "Invalid Axis ID Number";
+          updateValidation(helperText);
         } else {
-          // Scenario 2 & 3: When consult flag is active
-          if (!consultAxisIDPattern.test(inputValue)) {
-            helperText = "Invalid Axis ID Number";
-            updateValidation(helperText);
-          } else {
+          // When consult flag is active
+          const isValid = consultAxisIDPattern.test(inputValue);
+          helperText = isValid ? "" : "Invalid Axis ID Number";
+          updateValidation(helperText);
+          if (isValid) {
             checkDuplicatedAxisID(inputValue);
           }
         }
