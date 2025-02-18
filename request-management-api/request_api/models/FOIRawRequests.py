@@ -662,10 +662,11 @@ class FOIRawRequest(db.Model):
                         and_(
                             FOIRawRequest.status.notin_(['Archived']),
                             or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup.in_(ProcessingTeamWithKeycloackGroup.list()), FOIRawRequest.assignedgroup.in_(tuple(groups))), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
-                basequery = basequery.filter(
-                    and_(
-                        FOIRawRequest.status.notin_(['Archived']),
-                        or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup == "Intake Team"), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
+                else:
+                    basequery = basequery.filter(
+                        and_(
+                            FOIRawRequest.status.notin_(['Archived']),
+                            or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup == "Intake Team"), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
             return basequery.filter(FOIRawRequest.assignedto != None)
         else:
             if(isiaorestrictedfilemanager == True):
