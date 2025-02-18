@@ -1635,6 +1635,14 @@ class FOIMinistryRequest(db.Model):
                 requestdetail["closedate"]=row["closedate"]
                 requestdetail["axispagecount"]=row["axispagecount"]
                 requestdetail["recordspagecount"]=row["recordspagecount"]
+                if row["axispagecount"] is not None and row["recordspagecount"] is not None and int(row["axispagecount"]) > int(row["recordspagecount"]):
+                    requestdetail["requestpagecount"] = row["axispagecount"]
+                elif row["recordspagecount"] is not None:
+                    requestdetail["requestpagecount"] = row["recordspagecount"]
+                elif row["axispagecount"] is not None:
+                    requestdetail["requestpagecount"] = row["axispagecount"]
+                else:
+                    requestdetail["requestpagecount"] = "0"
                 requestdetail["axislanpagecount"]=row["axislanpagecount"]
                 requestdetail["estimatedpagecount"]=row["estimatedpagecount"]
                 requestdetail["estimatedtaggedpagecount"]=row["estimatedtaggedpagecount"]
