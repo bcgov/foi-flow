@@ -211,6 +211,13 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled 
     handleSelect(isSelected);
   };
 
+  const getDropdownClassName = (type, isSelected) => {
+    const baseClass = 'request-flag-dropdown';
+    const inactiveConsultClass = type === 'consult' && !isSelected ? 'consultation-inactive-dropdown' : '';
+    
+    return `${baseClass} ${inactiveConsultClass}`.trim();
+  };
+
   if (!showFlag) return <></>;
   return (
     <>
@@ -237,7 +244,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled 
                     </InputLabel> */}
             <TextField
               id="request-flag-dropdown"
-              className="request-flag-dropdown"
+              className={getDropdownClassName(type, isSelected)}
               select
               value={isSelected}
               onChange={handleValueChange}
