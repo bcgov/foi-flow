@@ -9,6 +9,7 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { debounce } from "lodash";
 
 
 const AxisDetails = React.memo(({  
@@ -50,22 +51,60 @@ const AxisDetails = React.memo(({
 
 
     const handleAxisIdChange = (e) => {
-        if(e.target.value) {
-            let helperText = "";
-            if(!(/^[A-Za-z]+(?:[-]){0,2}\d+\-\d+$/.test(e.target.value)))
-                helperText = "Invalid Axis ID Number";
-            axisIdValidation = {field: "AxisId", helperTextValue: helperText};
-            setValidation(axisIdValidation);
+      const inputValue = e.target.value.toUpperCase();
+      
+      setAxisRequestId(inputValue);
+      handleAxisDetailsValue(inputValue, FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID, inputValue);
+    
+      validateAxisId(inputValue);
+    };
+    
+    const validateAxisId = (inputValue) => {
+      let helperText = "";
+      const axisIDPattern = /^[A-Za-z]+-\d{4}-\d{5}$/;
+      const consultAxisIDPattern = /^[A-Za-z]+-\d{4}-\d{5}-CON$/;
+    
+      if (inputValue) {
+        if (!requestDetails.isconsultflag) {
+          // When consult flag is NOT active
+          const isValid = axisIDPattern.test(inputValue);
+          helperText = isValid ? "" : "Invalid Axis ID Number";
+          updateValidation(helperText);
+        } else {
+          // When consult flag is active
+          const isValid = consultAxisIDPattern.test(inputValue);
+          helperText = isValid ? "" : "Invalid Axis ID Number";
+          updateValidation(helperText);
+          if (isValid) {
+            checkDuplicatedAxisID(inputValue);
+          }
         }
-        else{
-            axisIdValidation = {field: "AxisId", helperTextValue: ""}
-            setValidation(axisIdValidation);  
+      } else {
+        updateValidation("");
+      }
+    };
+    
+    const updateValidation = (helperText) => {
+      const axisIdValidation = { field: "AxisId", helperTextValue: helperText };
+      setValidation(axisIdValidation);
+      handleAxisIdValidation(axisIdValidation);
+    };
+    
+    const checkDuplicatedAxisID = debounce((inputValue) => {
+      dispatch(checkDuplicateAndFetchRequestDataFromAxis(inputValue, false, null, (err, data) => {
+        if (!err) {
+          if (data && data.indexOf("Axis Id exists") >= 0) {
+            updateValidation("Request already exists");
+          } else {
+            updateValidation("");
+          }
+        } else {
+          console.error("Error checking for duplicate request ID:", err);
+          updateValidation("Error checking request ID");
         }
-        handleAxisIdValidation(axisIdValidation);
-        setAxisRequestId(e.target.value.toUpperCase());
-        handleAxisDetailsValue(e.target.value.toUpperCase(), FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID);
-        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID, e.target.value.toUpperCase());
-    }
+      }));
+    }, 500);
 
     const syncWithAxis = () => {
         dispatch(checkDuplicateAndFetchRequestDataFromAxis(axisRequestId, false, saveRequestObject,(err, data) => {
