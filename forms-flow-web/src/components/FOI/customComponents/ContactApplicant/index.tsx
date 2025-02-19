@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import type { Template } from './types';
 import { fetchApplicantCorrespondence, saveEmailCorrespondence, saveDraftCorrespondence, 
   editDraftCorrespondence, deleteDraftCorrespondence, deleteResponseCorrespondence, saveCorrespondenceResponse, 
-  editCorrespondenceResponse, fetchEmailTemplate, exportSFDT} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+  editCorrespondenceResponse, fetchEmailTemplate, exportSFDT, exportPDF} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
@@ -43,6 +43,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import { DocumentEditorContainerComponent } from "@syncfusion/ej2-react-documenteditor";
 import { DocEditor } from './DocEditor';
 import CustomAutocomplete, {OptionType} from '../Autocomplete'
+import { saveAs } from "file-saver";
 
 export const ContactApplicant = ({
   requestNumber,
@@ -107,8 +108,8 @@ export const ContactApplicant = ({
     // pass html string to preview modal
     console.log("preview:", JSON.stringify(sfdtString));
     let newData = {
-      "filename": "email.html",
-      "content": sfdtString
+      "FileName": "email.html",
+      "Content": sfdtString
     };
     const loadPreview = async (html: string) => {
       // setEditorValue(html.replace("<body bgcolor=\"#FFFFFF\">", "<body bgcolor=\"#FFFFFF\" style=\"width: 6.5in; margin-left: auto; margin-right: auto; padding: 1in;\">"));
@@ -116,7 +117,17 @@ export const ContactApplicant = ({
     }
     await exportSFDT(dispatch, newData, loadPreview);
   };
-
+  const savePdf = async (sfdtString: string) => {
+    let newData = {
+      "FileName": "email.pdf",
+      "Content": sfdtString
+    };
+    const saveBlobToPdf = async (pdf: any) => {
+      const blob = new Blob([pdf], { type: 'application/pdf' });
+      saveAs(blob, 'email.pdf');
+    }
+    await exportPDF(dispatch, newData, saveBlobToPdf);
+  }
 
   
 
@@ -1225,6 +1236,7 @@ export const ContactApplicant = ({
             previewTrigger = {previewTrigger}
             setPreviewTrigger = {setPreviewTrigger}
             addAttachment={openAttachmentModal}
+            savepdf = {savePdf}
           />
           <div>
           {files.map((file: any, index: number) => (

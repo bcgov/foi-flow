@@ -1,4 +1,4 @@
-import { httpGETRequest, httpPOSTRequest, httpOpenPOSTRequest } from "../../httpRequestHandler";
+import { httpGETRequest, httpPOSTRequest, httpOpenPOSTRequest, httpOpenPOSTRequest1 } from "../../httpRequestHandler";
   import UserService from "../../../services/UserService";
 import API from "../../endpoints";
   import {
@@ -380,16 +380,45 @@ export const exportSFDT = (
     if (res.data) {
       callback(res.data);
     } else {
-      console.log("empty response for fetching a html file")
+      console.log("empty response for fetching a file")
       dispatch(serviceActionError(res));
       throw new Error();
     }
   })
   .catch((error) => {
-    console.log("An error occured while trying to load a html file", error);
+    console.log("An error occured while trying to load a file", error);
     catchError(error, dispatch);
     if (errorCallback) {
-      errorCallback("An error occured while trying to load a html file");
+      errorCallback("An error occured while trying to load a file");
+    }
+  });
+};
+
+export const exportPDF = (
+  dispatch,
+  data,
+  callback,
+  errorCallback = null,
+) => {
+  console.log("data: ", data);
+  const apiUrl = API.FOI_EXPORT_PDF;
+  console.log("apiUrl: ", apiUrl);
+  httpOpenPOSTRequest1(apiUrl, data)
+  .then((res) => {
+    console.log("res: ", res);
+    if (res.data) {
+      callback(res.data);
+    } else {
+      console.log("empty response for fetching a pdf file")
+      dispatch(serviceActionError(res));
+      throw new Error();
+    }
+  })
+  .catch((error) => {
+    console.log("An error occured while trying to load a pdf file", error);
+    catchError(error, dispatch);
+    if (errorCallback) {
+      errorCallback("An error occured while trying to load a pdf file");
     }
   });
 };

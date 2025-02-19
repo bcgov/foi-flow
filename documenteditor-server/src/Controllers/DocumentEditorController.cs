@@ -14,6 +14,9 @@ using Syncfusion.EJ2.SpellChecker;
 using EJ2APIServices;
 using SkiaSharp;
 using BitMiracle.LibTiff.Classic;
+using Syncfusion.DocIORenderer;
+using Syncfusion.Pdf;
+
 
 namespace SyncfusionDocument.Controllers
 {
@@ -502,7 +505,6 @@ namespace SyncfusionDocument.Controllers
         public FileStreamResult ExportSFDT([FromBody] SaveParameter data)
         {
             try {
-                Console.WriteLine($"SaveParameter: {data}");
                 string name = data.FileName;
                 string format = RetrieveFileType(name);
                 if (string.IsNullOrEmpty(name))
@@ -519,27 +521,32 @@ namespace SyncfusionDocument.Controllers
             }
         }
 
-        // [AcceptVerbs("Post")]
-        // [HttpPost]
-        // [EnableCors("AllowAllOrigins")]
-        // [Route("ExportSFDTtoHTML")]
-        // public string ExportSFDTtoHTML([FromBody] SaveParameter data)
-        // {
-        //     string name = data.FileName;
-        //     string format = ".html";
-        //     WFormatType type = GetWFormatType(format);
-        //     Stream stream = new MemoryStream();
-        //     document.Save(stream, type);
-        //     document.Close();
-        //     stream.Position = 0;
-
-
-
-        //     WDocument document = WordDocument.Save(data.Content);
-
-
-        //     return SaveDocument(document, format, name);
-        // }
+        [AcceptVerbs("Post")]
+        [HttpPost]
+        [EnableCors("AllowAllOrigins")]
+        [Route("ExportPdf")]
+        public FileStreamResult ExportPdf([FromBody]SaveParameter data)
+        {
+            // Converts the sfdt to stream
+            Stream document = WordDocument.Save(data.Content, FormatType.Docx);
+            document.Position = 0;
+            Syncfusion.DocIO.DLS.WordDocument doc = new Syncfusion.DocIO.DLS.WordDocument(document, Syncfusion.DocIO.FormatType.Automatic);
+            //Instantiation of DocIORenderer for Word to PDF conversion 
+            DocIORenderer render = new DocIORenderer();
+            //Converts Word document into PDF document 
+            PdfDocument pdfDocument = render.ConvertToPDF(doc);
+            Stream stream = new MemoryStream();
+            
+            //Saves the PDF file
+            pdfDocument.Save(stream);
+            stream.Position = 0;
+            pdfDocument.Close();         
+            document.Close();
+            return new FileStreamResult(stream, "application/pdf")
+            {
+                FileDownloadName = data.FileName
+            };
+        }
 
         private string RetrieveFileType(string name)
         {

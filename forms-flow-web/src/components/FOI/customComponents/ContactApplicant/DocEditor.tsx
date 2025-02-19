@@ -14,6 +14,7 @@ export const DocEditor = ({
     previewTrigger,
     setPreviewTrigger,
     addAttachment,
+    savepdf,
 }: any) => {
     const [container, setContainer] = React.useState<DocumentEditorContainerComponent | null>(null);
     // let container: DocumentEditorContainerComponent;
@@ -22,14 +23,10 @@ export const DocEditor = ({
     const onToolbarClick = (args: ClickEventArgs): void => {
         switch (args.item.id) {
             case "savepdf":
-                // //Disable image toolbar item.
-                // container.toolbar.enableItems(4, false);
-                console.log("save pdf");
+
+                savepdf(getSfdtString());
                 break;
             case "attachments":
-                // //Disable image toolbar item.
-                // container.toolbar.enableItems(4, false);
-                // console.log("add attachments");
                 addAttachment();
                 break;
             default:
@@ -57,8 +54,7 @@ export const DocEditor = ({
         id: "savepdf"
     };
     let attachmentBtn: CustomToolbarItemModel = {
-        prefixIcon: "e-icons e-large e-custom-upload",
-        // prefixIcon: "upload-1 icon",
+        prefixIcon: "e-icons e-large e-custom-attachment",
         tooltipText: "Add attachments",
         text: "Attachment",
         id: "attachments"

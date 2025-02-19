@@ -32,6 +32,16 @@ export const httpOpenPOSTRequest = (url, data) => {
   return axios.post(url, data, axiosConfig);
 };
 
+export const httpOpenPOSTRequest1 = (url, data) => {
+  const axiosConfig = {
+    responseType: 'blob',
+    headers: {
+        'Content-Type': 'application/json',
+    }
+  };
+  return axios.post(url, data, axiosConfig);
+};
+
 export const httpOSSGETRequest = (url, requestOptions) => {
   return axios.get(url, requestOptions);
 };

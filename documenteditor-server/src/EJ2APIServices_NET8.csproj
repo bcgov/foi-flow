@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <PackageReference Include="BitMiracle.LibTiff.NET" Version="2.4.649" />
+    <PackageReference Include="Syncfusion.DocIORenderer.Net.Core" Version="28.2.6" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,9 +30,10 @@
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="7.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.0" />
-    <PackageReference Include="SkiaSharp" Version="2.88.6" />
+    <PackageReference Include="SkiaSharp" Version="*" />
     <PackageReference Include="Syncfusion.Compression.Net.Core" Version="*" />
     <PackageReference Include="Syncfusion.OfficeChart.Net.Core" Version="*" />
+    <PackageReference Include="Syncfusion.EJ2.AspNet.Core" Version="19.3.0.54" />
     <PackageReference Include="Syncfusion.EJ2.WordEditor.AspNet.Core" Version="*" />
     <PackageReference Include="Syncfusion.EJ2.SpellChecker.AspNet.Core" Version="28.2.4" />
     <PackageReference Include="System.Drawing.Common" Version="4.*" />
