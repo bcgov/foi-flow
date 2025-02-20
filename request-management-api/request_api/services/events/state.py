@@ -70,7 +70,7 @@ class stateevent:
             else:
                 _notificationtype = "State"
 
-        notification = self.__preparenotification(state)
+        notification = self.__preparenotification(state, requestid)
         if state == StateName.response.value and requesttype == "ministryrequest":
             signgoffapproval = FOIMinistryRequest().getrequest(requestid)['ministrysignoffapproval']
             if signgoffapproval:
