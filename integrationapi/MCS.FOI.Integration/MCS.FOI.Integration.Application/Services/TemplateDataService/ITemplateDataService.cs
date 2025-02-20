@@ -16,5 +16,9 @@
         Task<IEnumerable<OperatingTeamEmailsDto>> GetOperatingTeamEmails(string? operatingTeamName);
         Task<IEnumerable<FOIRequestExtensionsDto>> GetFOIRequestExtensions(int? ministryRequestId, int? ministryRequestVersionId);
         Task<IEnumerable<PaymentDto>> GetPaymentFees(int foiRequestId);
+        Task<FOIRequestCFRFeesDto> GetCRFFee(int? ministryRequestId);
+        Task<IEnumerable<FOIRequestExtensionsDto>> GetExtensions(int? ministryRequestId, int? ministryRequestVersionId);
+        Task<FOIMinistryRequestDto> GetRequestOriginalDueDate(int foiMinistryRequestId);
+        Task<IEnumerable<ReceivedModesDto>> GetReceivedModes(int receivedModeId);
     }
 }

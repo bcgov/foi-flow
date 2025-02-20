@@ -1,6 +1,4 @@
-﻿using MCS.FOI.Integration.Application.Queries.GetListOptions;
-
-namespace MCS.FOI.Integration.Application
+﻿namespace MCS.FOI.Integration.Application
 {
     public static class DependencyInjection
     {
@@ -25,7 +23,6 @@ namespace MCS.FOI.Integration.Application
 
             #region Query Handler Injection
             services.AddScoped<IQueryHandler<GetTemplatesQuery, IEnumerable<TemplateResult>>, GetTemplatesQueryHandler>();
-            services.AddScoped<IQueryHandler<GetListOptionsQuery, IEnumerable<ListOptionsResult>>, GetListOptionsQueryHandler>();
             #endregion
 
             #region Service Injection

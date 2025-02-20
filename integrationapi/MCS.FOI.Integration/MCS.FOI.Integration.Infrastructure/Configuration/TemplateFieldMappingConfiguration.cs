@@ -17,6 +17,10 @@
                 .HasColumnType("varchar(20)")
                 .IsRequired();
 
+            builder.Property(b => b.FieldMapping)
+               .HasColumnType("varchar(20)")
+               .IsRequired();
+
             builder.Property(a => a.CreatedAt)
                 .HasColumnType("timestamp")
                 .HasDefaultValueSql("NOW()");

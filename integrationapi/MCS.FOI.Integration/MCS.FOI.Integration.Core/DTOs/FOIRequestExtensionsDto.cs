@@ -31,5 +31,8 @@
         public int ExtensionStatusId { get; set; }
 
         public int ExtensionReasonId { get; set; }
+        public string ExtensionReason { get; set; } = string.Empty;
+        public string ExtensionType { get; set; } = string.Empty;
+        public string ExtensionStatus { get; set; } = string.Empty;
     }
 }

@@ -27,13 +27,5 @@
             var result = await _sender.Send(request, cancellationToken);
             return Ok(result);
         }
-
-        [HttpGet("GetTemplateListOptions")]
-        public async Task<ActionResult<IEnumerable<ListOptionsResult>>> GetTemplateListOptions(
-           [FromQuery] GetListOptionsQuery request, CancellationToken cancellationToken)
-        {
-            var result = await _sender.Send(request, cancellationToken);
-            return Ok(result);
-        }
     }
 }

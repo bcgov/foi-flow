@@ -70,7 +70,6 @@ namespace MCS.FOI.Integration.Infrastructure
 
             #region Repository Injection
             services.AddTransient<ITemplateRepository, TemplateRepository>();
-            services.AddTransient<ITemplateListOptionRepository, TemplateListOptionRepository>();
             services.AddTransient<ITemplateFieldMappingRepository, TemplateFieldMappingRepository>();
             #endregion
 
