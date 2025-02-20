@@ -20,6 +20,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.applicationfeeservice import applicationfeeservice
+from request_api.services.requestservice import requestservice
 from request_api.schemas.foiapplicationfee import FOIApplicationFeeDataSchema, FOIApplicationFeeReceiptDataSchema
 import json
 from flask_cors import cross_origin
@@ -43,10 +44,15 @@ class FOICFRFee(Resource):
     @auth.require
     def get(requestid, ministryrequestid):      
         try:
-            ministryrequestid = None if ministryrequestid.lower()not in ['null', 'None', 'undefined'] else ministryrequestid
-            if ministryrequestid is None and requestid.lower() in ['null', 'None', 'undefined']:
+            ministryrequestid = None if ministryrequestid.lower() in ['null', 'none', 'undefined'] else ministryrequestid
+            requestid = None if requestid.lower() in ['null', 'none', 'undefined'] else requestid
+            if ministryrequestid is None:
+                rawrequestid = requestid
+            else:
+                rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
+            if ministryrequestid is None and requestid is None:
                 return [], 200
-            result = applicationfeeservice().getapplicationfee(requestid, ministryrequestid)
+            result = applicationfeeservice().getapplicationfee(rawrequestid, requestid, ministryrequestid)
             return json.dumps(result), 200
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
@@ -68,8 +74,13 @@ class SanctionFOICFRFee(Resource):
                 return {'status': False, 'message':'UnAuthorized'}, 403
             requestjson = request.get_json() 
             ministryrequestid = None if ministryrequestid.lower() in ['null', 'none', 'undefined'] else ministryrequestid
+            requestid = None if requestid.lower() in ['null', 'none', 'undefined'] else requestid
+            if ministryrequestid is None:
+                rawrequestid = requestid
+            else:
+                rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
             foiapplicationfeeschema = FOIApplicationFeeDataSchema().load(requestjson)
-            result = applicationfeeservice().saveapplicationfee(requestid, ministryrequestid, foiapplicationfeeschema,AuthHelper.getuserid(), AuthHelper.getusername())
+            result = applicationfeeservice().saveapplicationfee(rawrequestid, requestid, ministryrequestid, foiapplicationfeeschema,AuthHelper.getuserid(), AuthHelper.getusername())
             receipts = []
             for receipt in foiapplicationfeeschema['receipts']:
                 if 'receiptid' not in receipt:

@@ -123,7 +123,7 @@ class FOIApplicantCorrespondence(db.Model):
         correspondence = FOIApplicantCorrespondence.getapplicantcorrespondencebyid(correspondenceid)
         try:
             db.session.query(FOIApplicantCorrespondence).filter(FOIApplicantCorrespondence.foiministryrequest_id == ministryid, 
-                            FOIApplicantCorrespondence.applicantcorrespondenceid == correspondenceid, FOIApplicantCorrespondence.version == correspondence['version']
+                            FOIApplicantCorrespondence.applicantcorrespondenceid == correspondenceid, FOIApplicantCorrespondence.version == correspondence.get('version')
                             ).update({FOIApplicantCorrespondence.isdeleted: True, FOIApplicantCorrespondence.updatedby: userid,
                             FOIApplicantCorrespondence.updated_at: datetime.now()}, synchronize_session=False)
             db.session.commit()  

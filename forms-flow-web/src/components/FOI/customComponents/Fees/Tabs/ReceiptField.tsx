@@ -110,7 +110,7 @@ export const ReceiptField = ({
       </div>
     </>
   );
-
+  
   if (receipt.onlinepayment == true) return (
     <>
       <div className="col-lg-12 foi-details-col application-fee-receipt">Online payment receipt

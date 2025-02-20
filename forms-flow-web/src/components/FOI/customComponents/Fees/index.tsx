@@ -221,7 +221,7 @@ export const Fees = ({
       return applicationFeeFormData?.refundAmount % 10 == 0 && applicationFeeFormData?.refundAmount > 0 && applicationFeeFormData?.refundAmount <= applicationFeeFormData?.amountPaid ? true : false;
     }
   
-    const validateFields = () => {
+    const validateApplicationFeeFields = () => {
       if (!_.isEqual(initialApplicationFeeFormData?.applicationFeeStatus, applicationFeeFormData?.applicationFeeStatus) 
         || (applicationFeeFormData?.applicationFeeStatus == 'init' && _.isEqual(initialCFRFormData, CFRFormData))) {
         if (applicationFeeFormData?.applicationFeeStatus == 'na-ige' || applicationFeeFormData?.applicationFeeStatus == 'appfeeowing') return true;
@@ -244,6 +244,20 @@ export const Fees = ({
         if (!applicationFeeFormData?.amountPaid || applicationFeeFormData?.amountPaid == 0) return false;
         if (applicationFeeFormData?.paymentDate == null || applicationFeeFormData?.paymentDate == '') return false;
       }
+      if (!validateApplicationFeeAmountPaid()) {
+        return false;
+      }
+      if (!_.isEqual(initialApplicationFeeFormData?.refundAmount, applicationFeeFormData?.refundAmount) ||
+        !_.isEqual(initialApplicationFeeFormData?.refundDate, applicationFeeFormData?.refundDate)) {
+        if (!validateApplicationFeeRefundAmount() || !applicationFeeFormData?.refundDate) {
+          return false;
+        }
+      }
+      if (receiptFileUpload && receiptFileUpload.length > 0) return true;
+      return !_.isEqual(initialApplicationFeeFormData, applicationFeeFormData)
+    }
+
+    const validateProcessingFeeFields = () => {
       if (validateBalancePaymentMethod() || validateEstimatePaymentMethod()) {
         return false;
       }
@@ -259,19 +273,7 @@ export const Fees = ({
           return false;
         }
       }
-
-      if (!validateApplicationFeeAmountPaid()) {
-        return false;
-      }
-      if (!_.isEqual(initialApplicationFeeFormData?.refundAmount, applicationFeeFormData?.refundAmount) ||
-        !_.isEqual(initialApplicationFeeFormData?.refundDate, applicationFeeFormData?.refundDate)) {
-        if (!validateApplicationFeeRefundAmount() || !applicationFeeFormData?.refundDate) {
-          return false;
-        }
-      }
-      if (receiptFileUpload && receiptFileUpload.length > 0) return true;
-
-      return !_.isEqual(initialCFRFormData, CFRFormData) || !_.isEqual(initialApplicationFeeFormData, applicationFeeFormData);
+      return !_.isEqual(initialCFRFormData, CFRFormData)
     }
 
     //Change handlers
@@ -295,14 +297,14 @@ export const Fees = ({
       if(requestState === StateEnum.peerreview.name){
         return true;
       }
-      if (formHistory.length > 0 && [StateEnum.feeassessed.name, StateEnum.onhold.name, StateEnum.callforrecords.name].includes(requestState)) {
+      if (formHistory.length > 0 && [StateEnum.feeassessed.name, StateEnum.onhold.name, StateEnum.callforrecords.name, StateEnum.onholdother.name].includes(requestState)) {
         if (isMinistry) {
           return ['review', 'approved'].includes(initialCFRFormData.formStatus) || isNewCFRForm;
         } else {
           return initialCFRFormData.formStatus !== 'review';
         }
       }
-      if (CFRFormData.balanceRemaining > 0 &&  [StateEnum.feeassessed.name, StateEnum.onhold.name].includes(requestState)) {
+      if (CFRFormData.balanceRemaining > 0 &&  [StateEnum.feeassessed.name, StateEnum.onhold.name, StateEnum.onholdother.name].includes(requestState)) {
         if (isMinistry) {
           return !['clarification', 'init'].includes(initialCFRFormData.formStatus);
         } else {
@@ -648,7 +650,8 @@ export const Fees = ({
   
     const disableNewCfrFormBtn = () => {
       return(CFRFormData?.formStatus !== 'approved' || requestState === StateEnum.peerreview.name || (requestState !== StateEnum.callforrecords.name &&
-        requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name) || (requestState === StateEnum.onhold.name && CFRFormData?.actualTotalDue > 0));
+        requestState !== StateEnum.feeassessed.name && requestState !== StateEnum.onhold.name) || (requestState === StateEnum.onhold.name && CFRFormData?.actualTotalDue > 0) || 
+        + (requestState === StateEnum.onholdother.name && CFRFormData?.actualTotalDue > 0));
     }
   
     const [isNewCFRForm, setIsNewCFRForm] = useState(false)
@@ -704,6 +707,8 @@ export const Fees = ({
           component="form"
           sx={{
             '& .MuiTextField-root': { my: 1, mx: 0 },
+            '& .Mui-disabled': { '-webkit-text-fill-color': "black !important" },
+            '& .MuiInputBase-root.Mui-disabled': { 'background-color': "#eee !important" },
           }}
           autoComplete="off"
         >
@@ -803,7 +808,7 @@ export const Fees = ({
                 }
                 <BottomButtonGroup 
                   save={save}
-                  validateFields={validateFields}
+                  validateFields={selectedSubtab == FeesSubtabValues.PROCESSINGFEE ? validateProcessingFeeFields : validateApplicationFeeFields}
                   requestState={requestState}
                   StateEnum={StateEnum}
                   formData={CFRFormData}

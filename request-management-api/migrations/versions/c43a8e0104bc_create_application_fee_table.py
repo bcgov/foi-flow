@@ -1,7 +1,7 @@
 """Create Application Fee Table
 
 Revision ID: c43a8e0104bc
-Revises: 516fbf1b13d9
+Revises: 1bda7f7bae57
 Create Date: 2024-11-05 10:58:11.256163
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = 'c43a8e0104bc'
-down_revision = '516fbf1b13d9'
+down_revision = '1bda7f7bae57'
 branch_labels = None
 depends_on = None
 
@@ -20,7 +20,7 @@ def upgrade():
     op.create_table('FOIRequestApplicationFees',
     sa.Column('applicationfeeid', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('version', sa.Integer(), nullable=False),
-    sa.Column('requestid', sa.Integer(), nullable=False),
+    sa.Column('rawrequestid', sa.Integer(), nullable=False),
     sa.Column('applicationfeestatus', sa.String(length=50), nullable=True),
     sa.Column('amountpaid', sa.Float(), nullable=True),
     sa.Column('paymentsource', sa.String(length=50), nullable=True),

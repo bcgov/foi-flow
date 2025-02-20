@@ -29,9 +29,7 @@ export const fetchApplicationFeeForm = async (
   httpGETRequest(apiUrl, {}, UserService.getToken())
     .then((res) => {
       if (res.data) {
-        if (!_.isEmpty(res.data)) {
-          dispatch(setRequestApplicationFeeForm(res.data));
-        }
+        dispatch(setRequestApplicationFeeForm(res.data));
       } else {
         console.log("Error in fetching fees data", res);
         dispatch(serviceActionError(res));

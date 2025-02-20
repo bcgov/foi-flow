@@ -119,7 +119,7 @@ class requestservice:
         )
 
     def updateduedate(
-        self, requestid, ministryrequestid, offholddate, foirequestschema, nextstatename
+        self, requestid, ministryrequestid,  offholddate, foirequestschema, nextstatename
     ):
         foirequest = self.getrequest(requestid, ministryrequestid)
         currentstatus = (
@@ -131,8 +131,10 @@ class requestservice:
         # Check for Off Hold
         if (
             currentstatus not in (None, "")
-            and currentstatus == StateName.onhold.value
-            and nextstatename != StateName.response.value
+            and ((currentstatus == StateName.onhold.value
+            and nextstatename != StateName.response.value)
+            or (currentstatus == StateName.onholdother.value
+            and nextstatename != StateName.open.value))
         ):
             skipcalculation = self.__skipduedatecalculation(
                 ministryrequestid, offholddate, currentstatus, nextstatename
@@ -155,11 +157,9 @@ class requestservice:
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
 
     def getrawrequestidbyfoirequestid(self, foirequestid):
-        if foirequestid == 'undefined':
+        if foirequestid == 'undefined' or foirequestid is None:
             return None
         rawrequestid = requestservicegetter().getrawrequestidbyfoirequestid(foirequestid)
-        if rawrequestid is None:
-            rawrequestid = foirequestid
         return rawrequestid
 
     def getrequestdetailsforministry(
@@ -276,12 +276,12 @@ class requestservice:
     
 
     def __skipduedatecalculation(self, ministryrequestid, offholddate, currentstatus="", nextstatename=""):
-        previousoffholddate = FOIMinistryRequest.getlastoffholddate(ministryrequestid)
+        previousoffholddate = FOIMinistryRequest.getlastoffholddate(ministryrequestid, currentstatus)
         if (
-            currentstatus not in (None, "")
-            and currentstatus == StateName.onhold.value
+            (currentstatus not in (None, "")
+            and (currentstatus == StateName.onhold.value or currentstatus == StateName.onholdother.value)
             and nextstatename not in (None, "")
-            and currentstatus == nextstatename
+            and currentstatus == nextstatename) 
         ):
             return True
         if previousoffholddate not in (None, ""):
@@ -339,3 +339,7 @@ class requestservice:
             if current_state != "Closed" and any(state['status'] == "Closed" for state in states):
                 return True
         return False 
+    
+    def getrequestsdetailsforsearch(self,requestnumbers):
+        requestdetails = FOIMinistryRequest().getrequestsdetailsforsearch(requestnumbers)
+        return requestdetails

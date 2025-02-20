@@ -165,6 +165,12 @@ export const setFOIPDFStitchedRecordForOipcRedline = (data) => (dispatch) => {
     payload: data,
   });
 }
+export const setFOIPDFStitchedRecordForConsults = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_CONSULTS,
+    payload: data,
+  });
+}
 export const setFOIPDFStitchStatusForHarms = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS,
@@ -193,6 +199,12 @@ export const setFOIPDFStitchStatusForOipcRedlineReview = (data) => (dispatch) =>
 export const setFOIPDFStitchStatusForOipcRedline = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OIPCREDLINE,
+    payload: data,
+  });
+};
+export const setFOIPDFStitchStatusForConsults = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_CONSULTS,
     payload: data,
   });
 };
@@ -509,9 +521,30 @@ export const setOIPCInquiryoutcomes = (data) => (dispatch) => {
   });
 };
 
+export const setAdvancedSearchFilter = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_FILTER,
+    payload: data,
+  });
+};
+
+export const setHistoricalSearchParams = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_HISTORIC_SEARCH_PARAMS,
+    payload: data,
+  });
+};
+
 export const setFOICommentTypes = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_COMMENT_TYPES,
+    payload: data,
+  });
+};
+
+export const setShowKeywordSearch = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.SHOW_KEYWORD_SEARCH,
     payload: data,
   });
 };

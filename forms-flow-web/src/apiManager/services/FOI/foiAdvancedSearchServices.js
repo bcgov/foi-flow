@@ -37,7 +37,7 @@ export const fetchAdvancedSearchData = ({
       sortingitems: sortingItems,
       sortingorders: sortingOrders,
       userid: userID,
-      search: search,
+      search: (keywords.length === 1 && keywords[0] === "") ? null : search,
       keywords: keywords,
       requestState: requestState,
       requestStatus: requestStatus,

@@ -111,7 +111,7 @@ export const ContactApplicant = ({
     setFiles([]);
     setEditorValue("");
     setSelectedCorrespondence({});
-    setSelectedEmails([]);
+    setSelectedEmails(requestDetails.email ? [requestDetails.email] : []);
     setCurrentTemplate(0);
     
   }
@@ -213,9 +213,17 @@ export const ContactApplicant = ({
         listOfDraftTemplates.push(draftCorrespondence.templateid);
       }
     })
+
+    setTemplates(oldArray =>
+      oldArray.filter(
+        template => updatedTemplates.includes(template.value) || template.value === ""
+      )
+    );
+    
+    const updatedTemplates: string[] = [];
     applicantCorrespondenceTemplates.forEach((item: any) => {
-      setTemplates([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
       if (isEnabledTemplate(item) || listOfDraftTemplates.includes(item.templateid)) {
+      updatedTemplates.push(item.name)
       const rootpath = OSS_S3_BUCKET_FULL_PATH
       const fileInfoList = [{
         filename: item.name,
@@ -293,7 +301,7 @@ export const ContactApplicant = ({
 
   const [editorValue, setEditorValue] = useState("")
   const [currentTemplate, setCurrentTemplate] = useState(0)
-  const [selectedEmails, setSelectedEmails] = useState([]);
+  const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   // Create a ref to store the Quill instance
   const quillRef = useRef(null);
 
@@ -397,6 +405,7 @@ export const ContactApplicant = ({
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
       clearcorrespondence();
+      changeCorrespondenceFilter("log");
       if (!skiptoast) {
         toast.success("Message has been sent to applicant successfully", {
         position: "top-right",
@@ -635,7 +644,7 @@ export const ContactApplicant = ({
     setOpenConfirmationModal(true);
     setConfirmationFor("delete-draft")
     setConfirmationTitle("Delete Draft")
-    setConfirmationMessage("Are you sure you want to delete these draft(s)? This can not be undone");
+    setConfirmationMessage("Are you sure you want to delete this draft? This action cannot be undone.");
   }
 
 
@@ -681,7 +690,7 @@ export const ContactApplicant = ({
     setOpenConfirmationModal(true);
     setConfirmationFor("delete-response")
     setConfirmationTitle("Delete Response")
-    setConfirmationMessage("Are you sure you want to delete this response? This can not be undone");
+    setConfirmationMessage("Are you sure you want to delete this response? This can not be undone.");
   }
 
   const deleteResponseAction = () => {
@@ -958,6 +967,7 @@ export const ContactApplicant = ({
             size="small"
             fullWidth
           >
+            <div className="addCorrespondence-menuitem">
             <MenuItem
               onClick={() => addCorrespondence()}
               key='messagetoapplicant'
@@ -974,6 +984,7 @@ export const ContactApplicant = ({
             >
               Attach Response
             </MenuItem>
+            </div>
           </TextField>
         </Grid>
       </Grid>
@@ -1163,6 +1174,7 @@ export const ContactApplicant = ({
               attachments={files}
               templateInfo={templates[currentTemplate]}
               enableSend={selectedEmails.length > 0}
+              selectedEmails={selectedEmails}
             />  
             {/*
             <button
