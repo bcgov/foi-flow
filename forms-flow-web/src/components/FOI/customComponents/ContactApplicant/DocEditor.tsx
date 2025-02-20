@@ -15,8 +15,6 @@ export const DocEditor = ({
     setPreviewTrigger,
     addAttachment,
     savepdf,
-    loadDraftTrigger,
-    setLoadDraftTrigger,
     editDraftTrigger,
     setEditDraftTrigger,
     editSfdtDraft
@@ -77,10 +75,10 @@ export const DocEditor = ({
         // "Bookmark",
         // "TableOfContents",
         "Separator",
-        "Header",
-        "Footer",
-        "PageSetup",
-        "PageNumber",
+        // "Header",
+        // "Footer",
+        // "PageSetup",
+        // "PageNumber",
         "Break",
         // "InsertFootnote",
         // "InsertEndnote",
@@ -104,26 +102,18 @@ export const DocEditor = ({
     };
 
     function onCreated(): void  {
-        if(container) {
-            container.documentEditor.spellChecker.languageID = 1033; // LCID for "en-US"
-        }
-    };
-
-    React.useEffect(() => {
-        componentDidMount()
-    }, []);
-    function componentDidMount(): void {
         //initialze enable spell checker
         if(container) {
-            container.documentEditor.spellChecker.languageID = 1033 //LCID of "en-us";
+            container.documentEditor.spellChecker.languageID = 1033; // LCID for "en-US"
             container.documentEditor.spellChecker.removeUnderline = false;
             container.documentEditor.spellChecker.allowSpellCheckAndSuggestion = true;
             container.documentEditor.spellChecker.enableOptimizedSpellCheck = true;
+            //load template/draft
             if (curTemplate) {
                 container.documentEditor.open(curTemplate);
             }
         }
-    }
+    };
 
     React.useEffect(() => {
         // load template
@@ -161,15 +151,6 @@ export const DocEditor = ({
             setPreviewTrigger(false);
         }
     }, [previewTrigger]);
-
-    React.useEffect(() => {
-        if (loadDraftTrigger) {
-            if (container && curTemplate) {
-                container.documentEditor.open(curTemplate);
-            }
-            setLoadDraftTrigger(false);
-        }
-    }, [loadDraftTrigger]);
 
     return (
         <DocumentEditorContainerComponent

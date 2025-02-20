@@ -63,7 +63,6 @@ export const ContactApplicant = ({
   const [saveSfdtDraftTrigger, setSaveSfdtDraftTrigger] = useState<boolean>(false);
   const [previewTrigger, setPreviewTrigger] = useState<boolean>(false);
   const [editDraftTrigger, setEditDraftTrigger] = useState<boolean>(false);
-  const [loadDraftTrigger, setLoadDraftTrigger] = useState<boolean>(false);
   // const [sfdtDraft, setSfdtDraft] = useState<string>('');
 
   useEffect(() => {
@@ -733,10 +732,6 @@ export const ContactApplicant = ({
     setCorrespondenceId(i.applicantcorrespondenceid);
     if(i.draft) {
       setCurTemplate(i.draft);
-      const timer = setTimeout(() => {
-        setLoadDraftTrigger(true);
-      }, 500); // 500 milliseconds (0.5 seconds)
-      setLoadDraftTrigger(true);
     } else {
       setEditorValue(i.text);
       for(let j = 0; j < templates.length; j++) {
@@ -1281,8 +1276,6 @@ export const ContactApplicant = ({
             setPreviewTrigger = {setPreviewTrigger}
             addAttachment={openAttachmentModal}
             savepdf = {savePdf}
-            loadDraftTrigger = {loadDraftTrigger}
-            setLoadDraftTrigger = {setLoadDraftTrigger}
             editDraftTrigger = {editDraftTrigger}
             setEditDraftTrigger = {setEditDraftTrigger}
             editSfdtDraft = {editSfdtDraft}
