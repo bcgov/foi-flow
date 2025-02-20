@@ -12,6 +12,7 @@ import _ from 'lodash';
 import TextField from "@material-ui/core/TextField";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import * as EmailValidator from "email-validator";
 
 
 
@@ -55,6 +56,7 @@ export default function CorrespondenceEmail({
     const [requestemailList, setRequestemailList] = React.useState([]);    
     const [noOfSelectedEmails, setNoOfSelectedEmails] = React.useState(0);
     const [showAddEmail, setShowAddEmail] = React.useState(false);
+    const [validation, setValidation] = React.useState({});
 
     React.useEffect(() => {  
       dispatch(
@@ -114,6 +116,17 @@ export default function CorrespondenceEmail({
     
     
     const handleNewCorrespondenceEmailChange = (e) => {
+      let emailValidation = {};
+      if (e.target.value) {
+        const helperText = EmailValidator.validate(e.target.value)
+          ? ""
+          : "Email is not valid.";
+        emailValidation = { field: "Email", helperTextValue: helperText };
+        setValidation(emailValidation);
+      } else {
+        emailValidation = { field: "Email", helperTextValue: "" };
+        setValidation(emailValidation);
+      }
       setNewCorrespondenceEmail(e.target.value);       
     };
     //creates the grouped menu items for assignedTo combobox
@@ -139,9 +152,14 @@ export default function CorrespondenceEmail({
         <TextField id="new-email" label="Add New Email Address" variant="outlined" fullWidth
         value={newCorrespondenceEmail} onChange={handleNewCorrespondenceEmailChange}
         onKeyDown={(e) => {e.stopPropagation();}} onKeyUp={(e) => {e.stopPropagation();}}
+        error={(validation.helperTextValue !== undefined &&validation.helperTextValue !== "")}
+        helperText={validation.helperTextValue}
         />
         <div>
-        <button className="btn-bottom btn-save" onClick={handleEmailSave} disabled={!newCorrespondenceEmail || isEmailPresent(newCorrespondenceEmail)}>
+        <button className="btn-bottom btn-save" 
+          onClick={handleEmailSave} 
+          disabled={!newCorrespondenceEmail || isEmailPresent(newCorrespondenceEmail) || 
+            (validation.helperTextValue !== undefined && validation.helperTextValue !== "")}>
                 Save
         </button>
         <button className="btn-cancel" onClick={() => setShowAddEmail(false)} >

@@ -1,7 +1,7 @@
 """Create raw request correspondence tables
 
 Revision ID: 0982b9dca5f2
-Revises: 3e8203b24730
+Revises: 5b9b19213803
 Create Date: 2024-07-18 16:40:06.002653
 
 """

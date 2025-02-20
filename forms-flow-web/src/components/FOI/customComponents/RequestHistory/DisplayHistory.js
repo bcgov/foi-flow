@@ -228,9 +228,7 @@ const DisplayHistory = ({
   
   const rendertemplateinfo = (item, fullName, emailText, dateText) => (
     <>
-      <div className="templateUser">
-        {item.category === "response" ? "Applicant Response" : getTemplateName(item.templateid)} - {fullName}
-      </div>
+      <div className="templateUser"> {item.category === "response" ? "Applicant Response" : getTemplateName(item.templateid)} - {fullName}</div> |
       {item.emails.length > 0 && <div className="templateUser"> {emailText} |</div>}
       <div className="templateTime">{dateText.toUpperCase()}</div>
       <div className="templateTime">{item.edited ? "Edited" : ""}</div>

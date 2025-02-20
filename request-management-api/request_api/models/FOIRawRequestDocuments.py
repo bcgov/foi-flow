@@ -19,7 +19,7 @@ class FOIRawRequestDocument(db.Model):
     # Defining the columns
     foidocumentid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     documentpath = db.Column(db.String(1000), unique=False, nullable=False)
-    filename = db.Column(db.String(120), unique=False, nullable=True)
+    filename = db.Column(db.String(500), unique=False, nullable=True)
     category = db.Column(db.String(120), unique=False, nullable=True)
     version =db.Column(db.Integer, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False,default=True)
@@ -37,7 +37,21 @@ class FOIRawRequestDocument(db.Model):
     def getdocuments(cls,requestid, requestversion):
         documents = []
         try:
-            sql = 'SELECT * FROM (SELECT DISTINCT ON (foidocumentid) raw2.created_at, raw.created_at as current_version_created_at, raw.foidocumentid, raw.filename, raw.documentpath, raw.category, raw.isactive, raw.createdby  FROM "FOIRawRequestDocuments" raw  join "FOIRawRequestDocuments" raw2  on (raw.foirequest_id = raw2.foirequest_id and raw2.version = 1) where raw.foirequest_id = :requestid and raw.foirequestversion_id = :requestversion and raw.isactive = true ORDER BY raw.foidocumentid DESC) AS list ORDER BY created_at DESC'
+            sql = '''
+                SELECT * FROM (
+                    SELECT 
+                    DISTINCT ON (foidocumentid) 
+                    raw2.created_at, raw.created_at as current_version_created_at, raw.foidocumentid, raw.filename, raw.documentpath, raw.category, raw.isactive, raw.createdby  
+                    FROM "FOIRawRequestDocuments" raw  
+                    join "FOIRawRequestDocuments" raw2  
+                    on (raw.documentpath = raw2.documentpath) 
+                    where raw.foirequest_id = :requestid
+                    and raw.foirequestversion_id = :requestversion
+                    and raw.isactive = true ORDER
+                    BY raw.foidocumentid DESC, raw2.foidocumentid asc
+                ) AS list ORDER BY created_at DESC
+            '''
+            
             rs = db.session.execute(text(sql), {'requestid': requestid, 'requestversion': requestversion})
         
             for row in rs:

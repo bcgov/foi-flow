@@ -49,11 +49,7 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
                         created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at,
                          isdraft, isdeleted, isresponse, response_at, israwrequest
                          from "FOIApplicantCorrespondencesRawRequests" rawcorr 
-                        where foirawrequest_id = (
-							SELECT foirawrequestid FROM public."FOIRequests"
-							WHERE foirequestid = :requestid
-							ORDER BY foirequestid ASC, version DESC limit 1)
-                            OR
+                        where 
                             foirawrequest_id = :requestid
                     order by applicantcorrespondenceid desc, version desc""" 
             rs = db.session.execute(text(sql), {'requestid': requestid})
@@ -120,7 +116,7 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
         correspondence = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencebyid(correspondenceid)
         try:
             db.session.query(FOIApplicantCorrespondenceRawRequest).filter(FOIApplicantCorrespondenceRawRequest.foirawrequest_id == rawrequestid, 
-                            FOIApplicantCorrespondenceRawRequest.applicantcorrespondenceid == correspondenceid, FOIApplicantCorrespondenceRawRequest.version == correspondence['version']
+                            FOIApplicantCorrespondenceRawRequest.applicantcorrespondenceid == correspondenceid, FOIApplicantCorrespondenceRawRequest.version == correspondence.get('version')
                             ).update({FOIApplicantCorrespondenceRawRequest.isdeleted: True, FOIApplicantCorrespondenceRawRequest.updatedby: userid,
                             FOIApplicantCorrespondenceRawRequest.updated_at: datetime.now()}, synchronize_session=False)
             db.session.commit()  

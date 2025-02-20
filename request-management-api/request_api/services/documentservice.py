@@ -110,15 +110,15 @@ class documentservice:
             return FOIMinistryRequestDocument.createdocument(ministryrequestid, version, documentschema, userid)
         
         
-    def createrawdocumentversion(self, requestid, documentid, documentschema, userid):
+    def createrawdocumentversion(self, requestid, documentid, documentschema, userid): # updates existing raw request document with new attributes (i.e. name, category)
         version = self.__getversionforrequest(requestid, "rawrequest")
         document = FOIRawRequestDocument.getdocument(documentid)
         FOIRawRequestDocument.deActivaterawdocumentsversion(documentid, document['version'], userid)
         return FOIRawRequestDocument.createdocumentversion(requestid, version, self.__copydocumentproperties(document,documentschema,document['version']), userid)
 
-    def createrawrequestdocumentversion(self, requestid):
+    def createrawrequestdocumentversion(self, requestid): # creates new raw request document with new document id when request state changes
         newversion = self.__getversionforrequest(requestid,"rawrequest")
-        documents = self.getrequestdocuments(requestid, "rawrequest", newversion-1)
+        documents = FOIRawRequestDocument.getdocuments(requestid, newversion-1)
         documentarr = []
         for document in documents:
             documentarr.append({"documentpath": document["documentpath"], "filename": document["filename"], "category": document['category'], "version": 1, "foirequest_id": requestid, "foirequestversion_id": newversion - 1, "createdby": document['createdby'], "created_at": document['created_at']     })
