@@ -15,6 +15,11 @@ export const DocEditor = ({
     setPreviewTrigger,
     addAttachment,
     savepdf,
+    loadDraftTrigger,
+    setLoadDraftTrigger,
+    editDraftTrigger,
+    setEditDraftTrigger,
+    editSfdtDraft
 }: any) => {
     const [container, setContainer] = React.useState<DocumentEditorContainerComponent | null>(null);
     // let container: DocumentEditorContainerComponent;
@@ -23,7 +28,6 @@ export const DocEditor = ({
     const onToolbarClick = (args: ClickEventArgs): void => {
         switch (args.item.id) {
             case "savepdf":
-
                 savepdf(getSfdtString());
                 break;
             case "attachments":
@@ -109,15 +113,20 @@ export const DocEditor = ({
         componentDidMount()
     }, []);
     function componentDidMount(): void {
+        //initialze enable spell checker
         if(container) {
             container.documentEditor.spellChecker.languageID = 1033 //LCID of "en-us";
             container.documentEditor.spellChecker.removeUnderline = false;
             container.documentEditor.spellChecker.allowSpellCheckAndSuggestion = true;
             container.documentEditor.spellChecker.enableOptimizedSpellCheck = true;
+            if (curTemplate) {
+                container.documentEditor.open(curTemplate);
+            }
         }
     }
 
     React.useEffect(() => {
+        // load template
         if (container && curTemplate) {
             container.documentEditor.open(curTemplate);
         }
@@ -140,11 +149,27 @@ export const DocEditor = ({
     }, [saveSfdtDraftTrigger]);
 
     React.useEffect(() => {
+        if (editDraftTrigger) {
+            editSfdtDraft( getSfdtString() );
+            setEditDraftTrigger(false);
+        }
+    }, [editDraftTrigger]);
+
+    React.useEffect(() => {
         if (previewTrigger) {
             preview( getSfdtString() );
             setPreviewTrigger(false);
         }
     }, [previewTrigger]);
+
+    React.useEffect(() => {
+        if (loadDraftTrigger) {
+            if (container && curTemplate) {
+                container.documentEditor.open(curTemplate);
+            }
+            setLoadDraftTrigger(false);
+        }
+    }, [loadDraftTrigger]);
 
     return (
         <DocumentEditorContainerComponent

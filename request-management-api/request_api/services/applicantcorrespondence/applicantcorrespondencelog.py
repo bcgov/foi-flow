@@ -251,6 +251,7 @@ class applicantcorrespondenceservice:
             "attachments" : attachments,
             "category" : self.__getcorrespondencecategory(_correpondencelog),
             "israwrequest": _correpondencelog.get('israwrequest', False) is True,
+            "draft": self.__getvaluefromjson(_correspondencemessagejson, 'emaildraft') if _isjson else None,
         }        
         return correpondencelog
     

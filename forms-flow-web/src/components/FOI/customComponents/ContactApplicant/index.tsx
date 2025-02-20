@@ -62,6 +62,8 @@ export const ContactApplicant = ({
   const [options, setOptions] = useState<OptionType[]>([]);
   const [saveSfdtDraftTrigger, setSaveSfdtDraftTrigger] = useState<boolean>(false);
   const [previewTrigger, setPreviewTrigger] = useState<boolean>(false);
+  const [editDraftTrigger, setEditDraftTrigger] = useState<boolean>(false);
+  const [loadDraftTrigger, setLoadDraftTrigger] = useState<boolean>(false);
   // const [sfdtDraft, setSfdtDraft] = useState<string>('');
 
   useEffect(() => {
@@ -99,14 +101,22 @@ export const ContactApplicant = ({
       setCurTemplateName('');
     }
   };
-  const saveSfdtDraft = (sfdtString: string) => {
-    // setSfdtDraft(sfdtString);
-
-    console.log("saveDraft:", JSON.stringify(sfdtString));
+  // export html and save html & sfdt
+  const saveSfdtDraft = async (sfdtString: string) => {
+    let newData = {
+      "FileName": "email.html",
+      "Content": sfdtString
+    };
+    // save html & sfdt to db
+    const saveDraftCallback = async (html: string) => {
+      // setEditorValue(html.replace("<body bgcolor=\"#FFFFFF\">", "<body bgcolor=\"#FFFFFF\" style=\"width: 6.5in; margin-left: auto; margin-right: auto; padding: 1in;\">"));
+      saveDraftToDB(sfdtString, html);
+    }
+    await exportSFDT(dispatch, newData, saveDraftCallback);
   };
   const preview = async (sfdtString: string) => {
     // pass html string to preview modal
-    console.log("preview:", JSON.stringify(sfdtString));
+    // console.log("preview:", JSON.stringify(sfdtString));
     let newData = {
       "FileName": "email.html",
       "Content": sfdtString
@@ -480,6 +490,7 @@ export const ContactApplicant = ({
     return attachments
   }
 
+  // send email
   const save = async (emailContent: string, skiptoast=false) => {
     setDisablePreview(true);
     setPreviewModal(false);
@@ -520,7 +531,8 @@ export const ContactApplicant = ({
       }],
       assignedGroupEmail: requestDetails.assignedGroupEmail,
       israwrequest: israwrequest,
-      templatename: curTemplateName
+      templatename: curTemplateName,
+      templatetype: "sfdt"
     };
     saveEmailCorrespondence(
       data,
@@ -539,9 +551,12 @@ export const ContactApplicant = ({
   };
 
   
-
+  // trigger saving draft - get sfdt, export html, and save to db
   const saveDraft = async () => {
     setSaveSfdtDraftTrigger(true);
+  }
+
+  const saveDraftToDB = async (sfdtString: string, html: string) => {
     setDisablePreview(true);
     setPreviewModal(false);
     const attachments = await saveAttachments(files);
@@ -568,14 +583,16 @@ export const ContactApplicant = ({
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: JSON.stringify({
-        "emailhtml": editorValue,
+        "emailhtml": html?html:editorValue,
         "id": approvedForm?.cfrfeeid,
-        "type": type
+        "type": type,
+        "emaildraft": sfdtString?sfdtString:""
       }),
       foiministryrequest_id: ministryId,
       attachments: attachments,
       emails: selectedEmails,
-      israwrequest: israwrequest
+      israwrequest: israwrequest,
+      templatetype: "sfdt"
     };
     saveDraftCorrespondence(
       data,
@@ -710,15 +727,23 @@ export const ContactApplicant = ({
     setSelectedCorrespondence(i);
     setEditMode(true);
     setShowEditor(true);
-    setEditorValue(i.text);
     setSelectedEmails(i.emails);
     if (i.attachments)
       setFiles(i.attachments);
     setCorrespondenceId(i.applicantcorrespondenceid);
-    for(let j = 0; j < templates.length; j++) {
-      if (templates[j].templateid === i.templateid) {
-        setCurrentTemplate(+j);
-      } 
+    if(i.draft) {
+      setCurTemplate(i.draft);
+      const timer = setTimeout(() => {
+        setLoadDraftTrigger(true);
+      }, 500); // 500 milliseconds (0.5 seconds)
+      setLoadDraftTrigger(true);
+    } else {
+      setEditorValue(i.text);
+      for(let j = 0; j < templates.length; j++) {
+        if (templates[j].templateid === i.templateid) {
+          setCurrentTemplate(+j);
+        } 
+      }
     }
   };
 
@@ -822,57 +847,76 @@ export const ContactApplicant = ({
     }
   }
 
-  const editCorrespondence = async (i : any) => {
-    setSaveSfdtDraftTrigger(true);
-    // setDisablePreview(true);
-    // setPreviewModal(false);
-    // const attachments = await saveAttachments(files);
-    // let callback = (_res: string) => {
-    //   clearcorrespondence();
-    //   changeCorrespondenceFilter("drafts");
-    //   toast.success("Message has been saved to draft successfully", {
-    //     position: "top-right",
-    //     autoClose: 3000,
-    //     hideProgressBar: true,
-    //     closeOnClick: true,
-    //     pauseOnHover: true,
-    //     draggable: true,
-    //     progress: undefined,
-    //   })
-    //   dispatch(fetchApplicantCorrespondence(requestId, ministryId));
-    // }
-    // const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    // const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
-    // let israwrequest = selectedCorrespondence.israwrequest || false;
-    // let data = {
-    //   correspondenceid:correspondenceId,
-    //   templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
-    //   correspondencemessagejson: JSON.stringify({
-    //     "emailhtml": editorValue,
-    //     "id": approvedForm?.cfrfeeid,
-    //     "type": type
-    //   }),
-    //   foiministryrequest_id: ministryId,
-    //   attachments: attachments,
-    //   emails: selectedEmails,
-    //   israwrequest: israwrequest
-    // };
-    // editDraftCorrespondence(
-    //   data,
-    //   requestId,
-    //   ministryId,
-    //   dispatch,
-    //   callback,
-    //   (errorMessage: string) => {
-    //     errorToast(errorMessage);
-    //     clearcorrespondence();
-    //     changeCorrespondenceFilter("drafts");
-    //     dispatch(setFOICorrespondenceLoader(false));
-    //   },
-    // );
-    // setFOICorrespondenceLoader(false);
-    // setDisablePreview(false);
-    // return attachments;
+  // trigger saving draft - get sfdt, export html, and save to db
+  const editDraftNew = async () => {
+    setEditDraftTrigger(true);
+  }
+  // export html and save html & sfdt
+  const editSfdtDraft = async (sfdtString: string) => {
+    let newData = {
+      "FileName": "email.html",
+      "Content": sfdtString
+    };
+    // save html & sfdt to db
+    const editDraftCallback = async (html: string) => {
+      // setEditorValue(html.replace("<body bgcolor=\"#FFFFFF\">", "<body bgcolor=\"#FFFFFF\" style=\"width: 6.5in; margin-left: auto; margin-right: auto; padding: 1in;\">"));
+      editCorrespondence(sfdtString, html);
+    }
+    await exportSFDT(dispatch, newData, editDraftCallback);
+  };
+  // save updated draft to db
+  const editCorrespondence = async (sfdtString: string, html: string) => {
+    setDisablePreview(true);
+    setPreviewModal(false);
+    const attachments = await saveAttachments(files);
+    let callback = (_res: string) => {
+      clearcorrespondence();
+      changeCorrespondenceFilter("drafts");
+      toast.success("Message has been saved to draft successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
+      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+    }
+    const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
+    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    let israwrequest = selectedCorrespondence.israwrequest || false;
+    let data = {
+      correspondenceid:correspondenceId,
+      templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondencemessagejson: JSON.stringify({
+        "emailhtml": html,
+        "id": approvedForm?.cfrfeeid,
+        "type": type,
+        "emaildraft": sfdtString
+      }),
+      foiministryrequest_id: ministryId,
+      attachments: attachments,
+      emails: selectedEmails,
+      israwrequest: israwrequest,
+      templatetype: "sfdt"
+    };
+    editDraftCorrespondence(
+      data,
+      requestId,
+      ministryId,
+      dispatch,
+      callback,
+      (errorMessage: string) => {
+        errorToast(errorMessage);
+        clearcorrespondence();
+        changeCorrespondenceFilter("drafts");
+        dispatch(setFOICorrespondenceLoader(false));
+      },
+    );
+    setFOICorrespondenceLoader(false);
+    setDisablePreview(false);
+    return attachments;
   };
   const [updateAttachment, setUpdateAttachment] = useState<any>({});
 
@@ -1237,6 +1281,11 @@ export const ContactApplicant = ({
             setPreviewTrigger = {setPreviewTrigger}
             addAttachment={openAttachmentModal}
             savepdf = {savePdf}
+            loadDraftTrigger = {loadDraftTrigger}
+            setLoadDraftTrigger = {setLoadDraftTrigger}
+            editDraftTrigger = {editDraftTrigger}
+            setEditDraftTrigger = {setEditDraftTrigger}
+            editSfdtDraft = {editSfdtDraft}
           />
           <div>
           {files.map((file: any, index: number) => (
@@ -1277,7 +1326,7 @@ export const ContactApplicant = ({
         <button
           className="btn addCorrespondence"
           data-variant="contained" 
-          onClick={ editMode ? editCorrespondence : saveDraft}             
+          onClick={ editMode ? editDraftNew : saveDraft}             
           color="primary"
           // disabled={(currentTemplate <= 0)}
         >
