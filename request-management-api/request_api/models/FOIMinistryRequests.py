@@ -1621,7 +1621,7 @@ class FOIMinistryRequest(db.Model):
                     JOIN public."FOIRequestApplicantMappings" FRAM ON FRAM.foirequest_id=MaxRequestVersions.requestid
                     JOIN public."FOIRequestApplicants" FRA ON FRA.foirequestapplicantid=FRAM.foirequestapplicantid
                     LEFT JOIN public."ProgramAreas" PA	ON FMR.programareaid = PA.programareaid
-   	                JOIN public."FOIRequests" FR ON FMR.foiministryrequestid = FR.foirequestid AND FMR.version = FR.version"""            
+   	                JOIN public."FOIRequests" FR ON FMR.foirequest_id = FR.foirequestid AND FMR.version = FR.version"""            
             result = db.session.execute(text(query),{"csvrequestnumbers":csvrequestnumbers})        
             rows = result.fetchall()            
             for row in rows:
