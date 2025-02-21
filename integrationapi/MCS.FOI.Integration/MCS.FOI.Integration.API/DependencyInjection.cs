@@ -1,18 +1,21 @@
-﻿using FluentValidation;
-using HealthChecks.UI.Client;
-using MCS.FOI.Integration.Application.Behaviour;
+﻿using HealthChecks.UI.Client;
 using MCS.FOI.Integration.Application.Exceptions.Handler;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Syncfusion.EJ2.SpellChecker;
 using System.Reflection;
 
 namespace MCS.FOI.Integration.API
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddApiServices(this IServiceCollection services, WebApplicationBuilder builder)
         {
+            var configuration = builder.Configuration;
+
             services.AddControllers();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -45,14 +48,54 @@ namespace MCS.FOI.Integration.API
                 .AddRedis(configuration.GetConnectionString("Redis")!, name: "Redis");
 
             services.AddExceptionHandler<GlobalExceptionHandler>();
-            // Register JWT Authentication
+
+            #region Register JWT Authentication
             // here
+            #endregion
+
+            #region DocumentEditor
+            var env = builder.Environment;
+            var path = configuration["SPELLCHECK_DICTIONARY_PATH"];
+            var jsonFileName = configuration["SPELLCHECK_JSON_FILENAME"];
+
+            // Check and set default paths
+            path = string.IsNullOrEmpty(path) ? Path.Combine(env.ContentRootPath, "App_Data") : Path.Combine(env.ContentRootPath, path);
+            jsonFileName = string.IsNullOrEmpty(jsonFileName) ? Path.Combine(path, "spellcheck.json") : Path.Combine(path, jsonFileName);
+
+            if (File.Exists(jsonFileName))
+            {
+                var jsonImport = File.ReadAllText(jsonFileName);
+                Console.WriteLine($"jsonImport: {jsonImport}");
+                var spellChecks = JsonConvert.DeserializeObject<List<DictionaryData>>(jsonImport);
+                var spellDictCollection = new List<DictionaryData>();
+                string personalDictPath = null;
+
+                if (spellChecks != null)
+                {
+                    foreach (var spellCheck in spellChecks)
+                    {
+                        spellDictCollection.Add(new DictionaryData(spellCheck.LanguadeID, Path.Combine(path, spellCheck.DictionaryPath), Path.Combine(path, spellCheck.AffixPath)));
+                        personalDictPath = Path.Combine(path, spellCheck.PersonalDictPath);
+                        Console.WriteLine($"spellCheck.LanguadeID: {spellCheck.LanguadeID}");
+                        Console.WriteLine($"spellCheck.DictionaryPath: {spellCheck.DictionaryPath}");
+                        Console.WriteLine($"personalDictPath: {personalDictPath}");
+                    }
+                }
+                SpellChecker.InitializeDictionaries(spellDictCollection, personalDictPath, 3);
+            }
+
+            services.Configure<GzipCompressionProviderOptions>(options => options.Level = System.IO.Compression.CompressionLevel.Optimal);
+            services.AddResponseCompression();
+            #endregion
 
             return services;
         }
 
         public static WebApplication Configure(this WebApplication app)
         {
+            // Register Syncfusion license
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(app.Configuration["SyncfusionLicense"]);
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -86,6 +129,7 @@ namespace MCS.FOI.Integration.API
 
             //app.UseAuthentication();
             app.UseAuthorization();
+            app.UseResponseCompression();
 
             app.MapControllers();
             app.MapHealthChecks("/health", new HealthCheckOptions
