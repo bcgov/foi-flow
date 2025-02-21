@@ -1621,7 +1621,7 @@ class FOIMinistryRequest(db.Model):
                     JOIN public."FOIRequestApplicantMappings" FRAM ON FRAM.foirequest_id=MaxRequestVersions.requestid
                     JOIN public."FOIRequestApplicants" FRA ON FRA.foirequestapplicantid=FRAM.foirequestapplicantid
                     LEFT JOIN public."ProgramAreas" PA	ON FMR.programareaid = PA.programareaid
-   	                JOIN public."FOIRequests" FR ON FMR.foiministryrequestid = FR.foirequestid AND FMR.version = FR.version"""            
+   	                JOIN public."FOIRequests" FR ON FMR.foirequest_id = FR.foirequestid AND FMR.version = FR.version"""            
             result = db.session.execute(text(query),{"csvrequestnumbers":csvrequestnumbers})        
             rows = result.fetchall()            
             for row in rows:
@@ -1635,6 +1635,14 @@ class FOIMinistryRequest(db.Model):
                 requestdetail["closedate"]=row["closedate"]
                 requestdetail["axispagecount"]=row["axispagecount"]
                 requestdetail["recordspagecount"]=row["recordspagecount"]
+                if row["axispagecount"] is not None and row["recordspagecount"] is not None and int(row["axispagecount"]) > int(row["recordspagecount"]):
+                    requestdetail["requestpagecount"] = row["axispagecount"]
+                elif row["recordspagecount"] is not None:
+                    requestdetail["requestpagecount"] = row["recordspagecount"]
+                elif row["axispagecount"] is not None:
+                    requestdetail["requestpagecount"] = row["axispagecount"]
+                else:
+                    requestdetail["requestpagecount"] = "0"
                 requestdetail["axislanpagecount"]=row["axislanpagecount"]
                 requestdetail["estimatedpagecount"]=row["estimatedpagecount"]
                 requestdetail["estimatedtaggedpagecount"]=row["estimatedtaggedpagecount"]
