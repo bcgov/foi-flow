@@ -49,6 +49,11 @@ const AxisDetails = React.memo(({
        }
       }, [requestDetails, handleAxisDetailsInitialValue]);
 
+    useEffect(() => {
+        if (axisRequestId) {
+            validateAxisId(axisRequestId);
+        }
+    }, [requestDetails.isconsultflag]);
 
     const handleAxisIdChange = (e) => {
       const inputValue = e.target.value.toUpperCase();
@@ -64,22 +69,15 @@ const AxisDetails = React.memo(({
       let helperText = "";
       const axisIDPattern = /^[A-Za-z]+-\d{4}-\d{5}$/;
       const consultAxisIDPattern = /^[A-Za-z]+-\d{4}-\d{5}-CON$/;
-    
+      const pattern = requestDetails.isconsultflag ? consultAxisIDPattern : axisIDPattern;
+
       if (inputValue) {
-        if (!requestDetails.isconsultflag) {
-          // When consult flag is NOT active
-          const isValid = axisIDPattern.test(inputValue);
-          helperText = isValid ? "" : "Invalid Axis ID Number";
-          updateValidation(helperText);
-        } else {
-          // When consult flag is active
-          const isValid = consultAxisIDPattern.test(inputValue);
+          const isValid = pattern.test(inputValue);
           helperText = isValid ? "" : "Invalid Axis ID Number";
           updateValidation(helperText);
           if (isValid) {
             checkDuplicatedAxisID(inputValue);
           }
-        }
       } else {
         updateValidation("");
       }
