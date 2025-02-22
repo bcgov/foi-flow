@@ -1,5 +1,7 @@
 ﻿using MCS.FOI.Integration.API;
 using MCS.FOI.Integration.Application.Model;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Syncfusion.EJ2.DocumentEditor;
 using Syncfusion.EJ2.SpellChecker;
 using WDocument = Syncfusion.DocIO.DLS.WordDocument;
@@ -7,6 +9,8 @@ using WDocument = Syncfusion.DocIO.DLS.WordDocument;
 namespace SyncfusionDocument.Controllers
 {
     [Route("api/[controller]")]
+    [EnableCors(PolicyName = "FOIOrigins")]
+    [Authorize(Policy = "IAOTeam")]
     public class DocumentEditorController : Controller
     {
         private readonly IWebHostEnvironment _hostingEnvironment;
@@ -17,7 +21,7 @@ namespace SyncfusionDocument.Controllers
         {
             _hostingEnvironment = hostingEnvironment;
             _configuration = configuration;
-            path = _configuration["SPELLCHECK_DICTIONARY_PATH"] ?? string.Empty;
+            path = configuration.GetValue<string>("SPELLCHECK_DICTIONARY_PATH") ?? string.Empty;
         }
 
         [AcceptVerbs("Post")]

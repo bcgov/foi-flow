@@ -1,6 +1,11 @@
-﻿namespace MCS.FOI.Integration.API.Controllers
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
+
+namespace MCS.FOI.Integration.API.Controllers
 {
     [Route("api/[controller]")]
+    [EnableCors(PolicyName = "FOIOrigins")]
+    [Authorize(Policy = "IAOTeam")]
     public class TemplateController : BaseController
     {
         public TemplateController(ISender sender) : base(sender) { }
@@ -18,7 +23,6 @@
             var result = await _sender.Send(request, cancellationToken);
             return Ok(result);
         }
-
 
         [HttpGet("GetTemplates")]
         public async Task<ActionResult<IEnumerable<TemplateResult>>> GetTemplates(
