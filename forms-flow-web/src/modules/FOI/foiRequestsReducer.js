@@ -62,12 +62,14 @@ const initialState = {
   foiPDFStitchedRecordForOipcRedline: {},
   foiPDFStitchedRecordForResponsePackage: {},
   foiPDFStitchedRecordForConsultPackage: {},
+  foiPDFStitchedRecordsForPhasedRedlines: [],
   foiPDFStitchStatusForHarms: "not started",
   foiPDFStitchStatusForRedlines: "not started",
   foiPDFStitchStatusForResponsePackage: "not started",
   foiPDFStitchStatusForOipcRedlineReview: "not started",
   foiPDFStitchStatusForOipcRedline: "not started",
   foiPDFStitchStatusForConsults: "not started",
+  foiPDFStitchStatusesForPhasedRedlines: [],
   foiRequestCFRForm: {
     overallsuggestions: "",
     status: "init",
@@ -305,6 +307,8 @@ const foiRequests = (state = initialState, action) => {
       };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_CONSULTS:
       return { ...state, foiPDFStitchedRecordForConsultPackage: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORDS_FOR_PHASEDREDLINES:
+      return {...state, foiPDFStitchedRecordsForPhasedRedlines: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS:
       return { ...state, foiPDFStitchStatusForHarms: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_REDLINES:
@@ -317,6 +321,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiPDFStitchStatusForOipcRedline: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_CONSULTS:
       return { ...state, foiPDFStitchStatusForConsults: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUSES_FOR_PHASEDREDLINES:
+      return {...state, foiPDFStitchStatusesForPhasedRedlines: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
       return {
         ...state,

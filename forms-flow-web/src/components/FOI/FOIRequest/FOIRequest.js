@@ -60,6 +60,7 @@ import {
   fetchPDFStitchedStatusForOIPCRedline,
   fetchHistoricalRecords,
   fetchPDFStitchStatusForConsults,
+  fetchPDFStitchStatusesForPhasedRedlines,
 } from "../../../apiManager/services/FOI/foiRecordServices";
 import { makeStyles } from "@material-ui/core/styles";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
@@ -110,7 +111,6 @@ import { UnsavedModal } from "../customComponents";
 import { DISABLE_GATHERINGRECORDS_TAB } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
-import ApplicantProfileModal from "./ApplicantProfileModal";
 import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
@@ -374,6 +374,12 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
+
+  useEffect(() => {
+    if (requestDetails?.isphasedrelease) {
+      dispatch(fetchPDFStitchStatusesForPhasedRedlines(requestId, ministryId));
+    }
+  }, [requestId, ministryId, requestDetails])
 
   const validLockRecordsState = (currentState=requestDetails.currentState) => {
     return (
@@ -1760,7 +1766,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   setLockRecordsTab={setLockRecordsTab}
                   validLockRecordsState={validLockRecordsState}
                   setSaveRequestObject={setSaveRequestObject}
-                  handleSaveRequest={handleSaveRequest}
+                  isPhasedRelease={requestDetails.isphasedrelease}
                 />
               </>
             )}

@@ -534,3 +534,17 @@ export const setFOICommentTypes = (data) => (dispatch) => {
     payload: data,
   });
 };
+
+export const setFOIPDFStitchStatusesForPhasedRedlines = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUSES_FOR_PHASEDREDLINES,
+    payload: data
+  });
+}
+
+export const setFOIPDFStitchedRecordsForPhasedRedlines = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORDS_FOR_PHASEDREDLINES,
+    payload: data
+  });
+}

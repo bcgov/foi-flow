@@ -25,6 +25,8 @@ import {
   setFOIAttachmentListLoader,
   setFOIPDFStitchStatusForConsults,
   setFOIPDFStitchedRecordForConsults,
+  setFOIPDFStitchStatusesForPhasedRedlines,
+  setFOIPDFStitchedRecordsForPhasedRedlines
 } from "../../../actions/FOI/foiRequestActions";
 import { fnDone } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
@@ -488,6 +490,40 @@ export const fetchPDFStitchedRecordForRedlines = (
   };
 };
 
+export const fetchPDFStitchStatusesForPhasedRedlines = (
+  requestId,
+  ministryId,
+  ...rest
+) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    replaceUrl(
+      API.FOI_PDF_STITCH_STATUSES_FOR_PHASEDREDLINES,
+      "<ministryrequestid>",
+      ministryId
+    ),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIPDFStitchStatusesForPhasedRedlines(res.data));
+          done(null, res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching pdfstitch job status", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+}
+
 export const fetchPDFStitchStatusForResponsePackage = (
   requestId,
   ministryId,
@@ -786,6 +822,40 @@ export const fetchPDFStitchedRecordForConsults = (
       .then((res) => {
         if (res.data) {
           dispatch(setFOIPDFStitchedRecordForConsults(res.data));
+          done(null, res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching pdfstitch job status", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+}
+
+export const fetchPDFStitchedRecordsForPhasedRedlines = (
+  requestId,
+  ministryId,
+  ...rest
+) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    replaceUrl(
+      API.FOI_DOWNLOAD_RECORDS_FOR_PHASEDREDLINES,
+      "<ministryrequestid>",
+      ministryId
+    ),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIPDFStitchedRecordsForPhasedRedlines(res.data));
           done(null, res.data);
         }
       })
