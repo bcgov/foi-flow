@@ -9,7 +9,6 @@
             _repository = repository;
         }
 
-
         public async Task<FOIRequestDto> GetRequest(int foiRequestId)
         {
             const string query = @"SELECT * FROM public.""FOIRequests"" WHERE foirequestid = @FOIRequestId";
@@ -76,14 +75,8 @@
 
         public async Task<IEnumerable<ProgramAreaDto>> GetProgramArea(int? programAreaId)
         {
-            const string query = @"SELECT * FROM public.""ProgramAreas"" WHERE isactive = true AND programareaid = @ProgramAreaId";
+            const string query = @"SELECT *, REGEXP_REPLACE(name, '^Ministry of ', '', 'i') AS OfficeName FROM public.""ProgramAreas"" WHERE isactive = true AND programareaid = @ProgramAreaId";
             return await _repository.QueryAsync<ProgramAreaDto>(query, new { ProgramAreaId = programAreaId });
-        }
-
-        public async Task<IEnumerable<ProgramAreaDto>> GetProgramAreas()
-        {
-            const string query = @"SELECT * FROM public.""ProgramAreas"" WHERE isactive = true";
-            return await _repository.QueryAsync<ProgramAreaDto>(query);
         }
 
         public async Task<IEnumerable<ApplicantCategoryDto>> GetApplicantCategory(int? applicantCategoryId)
@@ -210,6 +203,20 @@
         {
             const string query = @"SELECT * FROM public.""ReceivedModes""";
             return await _repository.QueryAsync<ReceivedModesDto>(query) ?? new List<ReceivedModesDto>();
+        }
+
+        public async Task<IEnumerable<SubjectCodeDto>> GetMinistryRequestSubjectCodes(int ministryRequestId, int versionId)
+        {
+            const string query = @"
+                SELECT sc.subjectcodeid, sc.name, sc.description
+                FROM public.""FOIMinistryRequestSubjectCodes"" fmrsc
+                INNER JOIN public.""SubjectCodes"" sc ON fmrsc.subjectcodeid = sc.subjectcodeid
+                WHERE fmrsc.foiministryrequestid = @MinistryRequestId 
+                  AND fmrsc.foiministryrequestversion = @MinistryRequestVersionId";
+
+            var parameters = new { MinistryRequestId = ministryRequestId, MinistryRequestVersionId = versionId };
+
+            return await _repository.QueryAsync<SubjectCodeDto>(query, parameters);
         }
     }
 }

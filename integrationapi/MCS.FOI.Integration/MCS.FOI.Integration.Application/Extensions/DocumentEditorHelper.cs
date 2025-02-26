@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
-using System.IO;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+﻿using BitMiracle.LibTiff.Classic;
+using SkiaSharp;
 using Syncfusion.EJ2.DocumentEditor;
+using FormatType = Syncfusion.EJ2.DocumentEditor.FormatType;
 using WDocument = Syncfusion.DocIO.DLS.WordDocument;
 using WFormatType = Syncfusion.DocIO.FormatType;
-using Syncfusion.EJ2.SpellChecker;
-using SkiaSharp;
-using BitMiracle.LibTiff.Classic;
-using FormatType = Syncfusion.EJ2.DocumentEditor.FormatType;
 
 namespace MCS.FOI.Integration.API
 {

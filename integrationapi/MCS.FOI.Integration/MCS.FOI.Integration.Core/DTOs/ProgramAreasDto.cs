@@ -13,5 +13,6 @@
         public string? Type { get; set; }
 
         public bool IsActive { get; set; }
+        public string OfficeName { get; set; }
     }
 }

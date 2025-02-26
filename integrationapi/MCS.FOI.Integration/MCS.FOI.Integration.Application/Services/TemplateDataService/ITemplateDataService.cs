@@ -8,7 +8,6 @@
         Task<IEnumerable<FOIRequestContactInformationDto>> GetRequestContactInformation(int foiRequestId, int versionId);
         Task<IEnumerable<FOIRequestApplicantInfoDto>> GetRequestApplicantInfos(int foiRequestId, int version, RequestorType requestorTypeId);
         Task<IEnumerable<ProgramAreaDto>> GetProgramArea(int? programAreaId);
-        Task<IEnumerable<ProgramAreaDto>> GetProgramAreas();
         Task<IEnumerable<ApplicantCategoryDto>> GetApplicantCategory(int? applicantCategoryId);
         Task<FOIRequestCFRFeesDto> GetApprovedCRFFee(int? ministryRequestId);
         Task<FOIRequestPaymentDto> GetPayment(int? foiRequestId, int? ministryRequestId);
@@ -20,5 +19,6 @@
         Task<IEnumerable<FOIRequestExtensionsDto>> GetExtensions(int? ministryRequestId, int? ministryRequestVersionId);
         Task<FOIMinistryRequestDto> GetRequestOriginalDueDate(int foiMinistryRequestId);
         Task<IEnumerable<ReceivedModesDto>> GetReceivedModes(int receivedModeId);
+        Task<IEnumerable<SubjectCodeDto>> GetMinistryRequestSubjectCodes(int ministryRequestId, int versionId);
     }
 }

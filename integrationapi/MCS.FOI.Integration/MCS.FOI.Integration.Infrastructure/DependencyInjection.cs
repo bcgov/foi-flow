@@ -1,13 +1,4 @@
-﻿using MCS.FOI.Integration.Core.Repositories;
-using MCS.FOI.Integration.Core.Repositories.Base;
-using MCS.FOI.Integration.Infrastructure.Data;
-using MCS.FOI.Integration.Infrastructure.Repositories.Base;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using StackExchange.Redis;
-
-namespace MCS.FOI.Integration.Infrastructure
+﻿namespace MCS.FOI.Integration.Infrastructure
 {
     public static class DependencyInjection
     {

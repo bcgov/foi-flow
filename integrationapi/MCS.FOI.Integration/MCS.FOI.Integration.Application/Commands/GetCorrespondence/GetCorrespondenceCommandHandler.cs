@@ -42,7 +42,9 @@
             document.Save(outputStream, FormatType.Docx);
             outputStream.Position = 0;
 
-            return ProcessGeneratedDocument(outputStream, command);
+            var sfdt = ConvertToSfdt(outputStream);
+            SaveToFile(outputStream, "GeneratedDocuments", $"{template.Id}-{template.TemplateName}.docx"); //to be removed 
+            return sfdt;
         }
 
         #region Template Retrieval
@@ -172,13 +174,6 @@
         #endregion
 
         #region Conversion
-        private string ProcessGeneratedDocument(MemoryStream stream, GetCorrespondenceCommand command)
-        {
-            var sfdt = ConvertToSfdt(stream);
-            SaveToFile(stream, "GeneratedDocuments", $"{DateTime.Now:MMMM dd, yyyy}-{command.FileName}.docx");
-            return sfdt;
-        }
-
         private string ConvertToSfdt(MemoryStream stream)
         {
             stream.Position = 0;
