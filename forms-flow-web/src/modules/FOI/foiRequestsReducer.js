@@ -16,6 +16,7 @@ const initialState = {
     keyword: null,
   },
   showAdvancedSearch: false,
+  showKeywordSearch: false,
   showEventQueue: false,
   foiAdvancedSearchParams: {},
   foiHistoricalSearchParams:{},
@@ -92,6 +93,19 @@ const initialState = {
       actualministrypreparinghrs: 0,
       actualiaopreparinghrs: 0,
     },
+  },
+  foiRequestApplicationFeeForm: {
+    applicationfeestatus: "init",
+    amountpaid: 0,
+    paymentsource: "init",
+    paymentdate: null,
+    orderid: null,
+    transactionnumber: null,
+    receipts: [],
+    refundamount: 0,
+    refunddate: null,
+    reasonForRefund: "",
+    paymentid: null
   },
   foiRequestCFRFormHistory: [],
   foiRequestApplicantCorrespondence: [],
@@ -180,6 +194,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, eventQueueParams: action.payload };
     case FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH:
       return { ...state, showAdvancedSearch: action.payload };
+    case FOI_ACTION_CONSTANTS.SHOW_KEYWORD_SEARCH:
+      return { ...state, showKeywordSearch: action.payload };
     case FOI_ACTION_CONSTANTS.SHOW_EVENT_QUEUE:
       return { ...state, showEventQueue: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_PARAMS:
@@ -330,6 +346,16 @@ const foiRequests = (state = initialState, action) => {
           ? initialState.foiRequestCFRForm
           : {
               ...state.foiRequestCFRForm,
+              ...action.payload,
+            },
+      };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICATION_FEE_FORM:
+      return {
+        ...state,
+        foiRequestApplicationFeeForm: (_.isEmpty(action.payload))
+          ? initialState.foiRequestApplicationFeeForm
+          : {
+              ...state.foiRequestApplicationFeeForm,
               ...action.payload,
             },
       };
