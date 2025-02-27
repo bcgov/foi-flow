@@ -3,7 +3,6 @@ import {
   AXIS_API_URL,
   DOC_REVIEWER_BASE_API_URL,
   FOI_TEMPLATE_API_URL,
-  DOC_EDITOR_API_URL,
 } from "./config";
 
 const API = {
@@ -179,7 +178,7 @@ const API = {
   FOI_GET_COMMENT_TYPES: `${FOI_BASE_API_URL}/api/foiflow/commenttypes`,
   FOI_GET_EMAIL_TEMPLATES: `${FOI_TEMPLATE_API_URL}/api/Template/GetTemplates`,
   FOI_GET_EMAIL_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/GetCorrespondenceByName`,
-  FOI_EXPORT_SFDT: `${DOC_EDITOR_API_URL}/api/documenteditor/ExportSFDT`,
-  FOI_EXPORT_PDF: `${DOC_EDITOR_API_URL}/api/documenteditor/ExportPdf`,
+  FOI_EXPORT_SFDT: `${FOI_TEMPLATE_API_URL}/api/documenteditor/ExportSFDT`,
+  FOI_EXPORT_PDF: `${FOI_TEMPLATE_API_URL}/api/documenteditor/ExportPdf`,
 };
 export default API;
