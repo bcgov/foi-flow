@@ -247,6 +247,13 @@ const ApplicantDetails = React.memo(
       );
     });
 
+    const [isConsultFlagFieldRequired, setIsConsultFlagFieldRequired] = React.useState(!requestDetails?.isconsultflag);
+
+    React.useEffect(() => {
+
+      setIsConsultFlagFieldRequired(!requestDetails?.isconsultflag);
+    }, [requestDetails?.isconsultflag]);
+
     return (
       <div className='request-accordian'>
         <Accordion defaultExpanded={defaultExpanded}>
@@ -267,13 +274,13 @@ const ApplicantDetails = React.memo(
                 inputProps={{ "aria-labelledby": "firstName-label"}}
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
-                className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) && classes.warning}
+                className={isConsultFlagFieldRequired && warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) && classes.warning}
                 value={applicantFirstNameText}
                 fullWidth
                 onChange={handleFirtNameChange}
-                required={true}
+                required={isConsultFlagFieldRequired}
                 disabled={disableInput}
-                error={applicantFirstNameText === ""}
+                error={isConsultFlagFieldRequired && applicantFirstNameText === ""}
               />
               <TextField
                 id="middleName"
@@ -282,7 +289,7 @@ const ApplicantDetails = React.memo(
                 InputLabelProps={{ shrink: true }}
                 value={applicantMiddleNameText}
                 variant="outlined"
-                className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) && classes.warning}
+                className={isConsultFlagFieldRequired &&warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) && classes.warning}
                 fullWidth
                 disabled={disableInput}
                 onChange={handleMiddleNameChange}
@@ -297,9 +304,9 @@ const ApplicantDetails = React.memo(
                 className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) && classes.warning}
                 fullWidth
                 onChange={handleLastNameChange}
-                required={true}
+                required={isConsultFlagFieldRequired}
                 disabled={disableInput}
-                error={applicantLastNameText === ""}
+                error={isConsultFlagFieldRequired && applicantLastNameText === ""}
               />
             </div>
             <div className="col-lg-6 foi-details-col">

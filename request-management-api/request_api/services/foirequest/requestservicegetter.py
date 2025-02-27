@@ -201,6 +201,7 @@ class requestservicegetter:
             'estimatedpagecount':requestministry['estimatedpagecount'],
             'estimatedtaggedpagecount':requestministry['estimatedtaggedpagecount'],
             'userrecordslockstatus': requestministry['userrecordslockstatus'],
+            'isconsultflag': requestministry['isconsultflag']
             
         }
         if requestministry['cfrduedate'] is not None:
