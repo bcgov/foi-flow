@@ -32,16 +32,6 @@ export const httpOpenPOSTRequest = (url, data) => {
   return axios.post(url, data, axiosConfig);
 };
 
-export const httpOpenPOSTRequest1 = (url, data) => {
-  const axiosConfig = {
-    responseType: 'blob',
-    headers: {
-        'Content-Type': 'application/json',
-    }
-  };
-  return axios.post(url, data, axiosConfig);
-};
-
 export const httpOSSGETRequest = (url, requestOptions) => {
   return axios.get(url, requestOptions);
 };
@@ -50,9 +40,19 @@ export const httpOSSPUTRequest = (url, data, requestOptions) => {
   return axios.put(url, data, requestOptions);
 };
 
-
 export const httpPOSTRequest = (url, data, token, isBearer = true) => {
   return axios.post(url, data, {
+    headers: {
+      Authorization: isBearer
+        ? `Bearer ${token || UserService.getToken()}`
+        : token,
+    },
+  });
+};
+
+export const httpPOSTRequest1 = (url, data, token, isBearer = true) => {
+  return axios.post(url, data, {
+    responseType: 'blob',
     headers: {
       Authorization: isBearer
         ? `Bearer ${token || UserService.getToken()}`

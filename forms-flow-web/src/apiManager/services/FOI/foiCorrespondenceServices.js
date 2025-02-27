@@ -1,4 +1,4 @@
-import { httpGETRequest, httpPOSTRequest, httpOpenPOSTRequest, httpOpenPOSTRequest1 } from "../../httpRequestHandler";
+import { httpGETRequest, httpPOSTRequest, httpPOSTRequest1 } from "../../httpRequestHandler";
   import UserService from "../../../services/UserService";
 import API from "../../endpoints";
   import {
@@ -374,7 +374,7 @@ export const exportSFDT = (
   console.log("data: ", data);
   const apiUrl = API.FOI_EXPORT_SFDT;
   console.log("apiUrl: ", apiUrl);
-  httpOpenPOSTRequest(apiUrl, data)
+  httpPOSTRequest(apiUrl, data, UserService.getToken())
   .then((res) => {
     console.log("res: ", res);
     if (res.data) {
@@ -403,7 +403,7 @@ export const exportPDF = (
   console.log("data: ", data);
   const apiUrl = API.FOI_EXPORT_PDF;
   console.log("apiUrl: ", apiUrl);
-  httpOpenPOSTRequest1(apiUrl, data)
+  httpPOSTRequest1(apiUrl, data, UserService.getToken())
   .then((res) => {
     console.log("res: ", res);
     if (res.data) {

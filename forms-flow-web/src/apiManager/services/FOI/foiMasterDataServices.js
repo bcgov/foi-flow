@@ -721,8 +721,7 @@ import {
 
   export const fetchFOIEmailTemplates = () => {
     return (dispatch) => {
-      // httpGETRequest(API.FOI_GET_EMAIL_TEMPLATES, {}, UserService.getToken())
-      httpOpenGETRequest(API.FOI_GET_EMAIL_TEMPLATES)
+      httpGETRequest(API.FOI_GET_EMAIL_TEMPLATES, {}, UserService.getToken())
         .then((res) => {
           if (res.data) {
             console.log("API.FOI_GET_EMAIL_TEMPLATES: ", API.FOI_GET_EMAIL_TEMPLATES);
