@@ -8,6 +8,7 @@ from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.NotificationTypes import NotificationType
+from request_api.models.FOIRequestWatchers import FOIRequestWatcher
 import json
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.utils.enums import StateName
@@ -61,9 +62,19 @@ class stateevent:
 
     def __createnotification(self, requestid, state, requesttype, userid):
         _notificationtype = "State"
-        if state == StateName.callforrecords.value and requesttype == "ministryrequest":
+        if state in [StateName.callforrecords.value, StateName.harmsassessment.value] and requesttype == "ministryrequest":
             foirequest = notificationservice().getrequest(requestid, requesttype)
-            _notificationtype = "Group Members" if foirequest['assignedministryperson'] is None else "State"
+            _isawatcher = FOIRequestWatcher.getNonMinistrywatchers(requestid) if state == StateName.harmsassessment.value else None
+            if foirequest['assignedministryperson'] is None:
+                if state == StateName.harmsassessment.value and foirequest['isconsultflag'] is True and not _isawatcher:
+                    _notificationtype = "Group Members"
+                elif state == StateName.callforrecords.value: 
+                    _notificationtype = "Group Members"
+                else:
+                    _notificationtype = "State"
+            else:
+                _notificationtype = "State"
+
         notification = self.__preparenotification(state, requestid)
         if state == StateName.response.value and requesttype == "ministryrequest":
             signgoffapproval = FOIMinistryRequest().getrequest(requestid)['ministrysignoffapproval']
@@ -97,6 +108,8 @@ class stateevent:
     def __preparegroupmembernotification(self, state, requestid):
         if state == StateName.callforrecords.value:
             return self.__notificationcfrmessage(requestid)
+        if state == StateName.harmsassessment.value:
+            return self.__notificationharmsassessmentmessage(state)
         return self.__groupmembernotificationmessage(state)
 
     def __preparecomment(self, requestid, state,requesttype, username):
@@ -141,6 +154,9 @@ class stateevent:
     def __notificationcfrmessage(self, requestid):
         metadata = FOIMinistryRequest.getmetadata(requestid)
         return "New "+metadata['requesttype'].capitalize()+" request is in Call For Records"
+    
+    def __notificationharmsassessmentmessage(self, state):
+        return "New consultation is in Harms Assessment"
 
     def __createcfrentry(self, state, ministryrequestid, userid):
         cfrfee = cfrfeeservice().getcfrfee(ministryrequestid)
