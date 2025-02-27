@@ -16,13 +16,12 @@ builder.Services.AddCors(options =>
                    .AllowAnyMethod();
         });
 });
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Services
     .AddApplicationServices()
     .AddInfrastructureServices(builder.Configuration)
-    .AddApiServices(builder.Configuration);
-
-builder.Configuration.AddEnvironmentVariables();
+    .AddApiServices(builder);
 
 var app = builder.Build();
 
@@ -32,6 +31,5 @@ app.UseCors("AllowAnyOrigin");
 await app.ConfigureMigrationAsync(builder);
 
 app.Configure();
-
 
 await app.RunAsync();

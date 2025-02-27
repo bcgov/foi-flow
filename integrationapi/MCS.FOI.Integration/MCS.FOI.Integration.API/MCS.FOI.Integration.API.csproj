@@ -12,11 +12,19 @@
     <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="8.0.1" />
     <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.3.0" />
+    <PackageReference Include="BitMiracle.LibTiff.NET" Version="2.4.660" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="SkiaSharp" Version="3.116.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="Syncfusion.EJ2.SpellChecker.AspNet.Core" Version="28.2.6" />
+    <PackageReference Include="Syncfusion.EJ2.WordEditor.AspNet.Core" Version="28.2.6" />
+    <PackageReference Include="Syncfusion.Licensing" Version="28.2.6" />
+    <PackageReference Include="Syncfusion.Pdf.Net.Core" Version="28.2.6" />
   </ItemGroup>
 
   <ItemGroup>

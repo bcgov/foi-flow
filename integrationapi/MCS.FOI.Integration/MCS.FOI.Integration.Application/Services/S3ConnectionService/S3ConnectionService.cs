@@ -19,7 +19,7 @@
             _correspondenceUrl = _configuration.GetValue<string>("ApiSettings:CorrespondenceUrl") ?? string.Empty;
         }
 
-        public async Task<List<TemplateModel>> FetchTemplatesAsync(GetCorrespondenceCommand message, string documentPath, CancellationToken cancellationToken)
+        public async Task<List<TemplateInfo>> FetchTemplatesAsync(GetCorrespondenceCommand message, string documentPath, CancellationToken cancellationToken)
         {
             var s3host = _configuration.GetValue<string>("AWSS3:OSS_S3_HOST") ?? string.Empty;
             var bucket = _configuration.GetValue<string>("AWSS3:OSS_S3_FORMS_BUCKET") ?? string.Empty;
@@ -39,10 +39,10 @@
 
             var fileBytes = await GetOSSHeaderDetailsAsync(message, s3fileResponse);
 
-            var templates = new List<TemplateModel>();
+            var templates = new List<TemplateInfo>();
             if (fileBytes.Length > 0)
             {
-                var templateItem = new TemplateModel
+                var templateItem = new TemplateInfo
                 {
                     Value = message.FileName,
                     TemplateId = Guid.NewGuid().ToString(),
@@ -102,24 +102,31 @@
 
         public async Task<HttpResponseMessage> HttpPostRequest(string url, object data, string token, CancellationToken cancellationToken)
         {
-            var client = _httpClientFactory.CreateClient();
-            var json = JsonConvert.SerializeObject(data);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var request = new HttpRequestMessage(HttpMethod.Post, url)
+            try
             {
-                Content = content
-            };
+                var client = _httpClientFactory.CreateClient();
+                var json = JsonConvert.SerializeObject(data);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var request = new HttpRequestMessage(HttpMethod.Post, url)
+                {
+                    Content = content
+                };
 
-            var response = await client.SendAsync(request, cancellationToken);
-            if (!response.IsSuccessStatusCode)
-            {
-                _logger.LogError($"Error in HTTP POST request to {url}: {response.StatusCode}");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var response = await client.SendAsync(request, cancellationToken);
+                if (!response.IsSuccessStatusCode)
+                {
+                    _logger.LogError($"Error in HTTP POST request to {url}: {response.StatusCode}");
+                }
+
+                return response;
             }
-
-            return response;
+            catch (Exception ex)
+            {
+                throw new UnauthorizedAccessException("An error occurred processing your authentication.");
+            }
         }
     }
 }

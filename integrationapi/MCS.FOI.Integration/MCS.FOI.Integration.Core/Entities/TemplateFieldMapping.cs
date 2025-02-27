@@ -6,6 +6,7 @@ namespace MCS.FOI.Integration.Core.Entities
     {
         public string FieldName { get; set; } = default!;
         public string FieldType { get; set; } = default!;
+        public string FieldMapping { get; set; } = default!;
         public bool IsActive { get; set; }
         public string? CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }

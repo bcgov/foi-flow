@@ -6,6 +6,5 @@
 
         public DbSet<Template> Template { get; set; }
         public DbSet<TemplateFieldMapping> TemplateFieldMapping { get; set; }
-        public DbSet<TemplateListOptions> TemplateListOptions { get; set; }
     }
 }

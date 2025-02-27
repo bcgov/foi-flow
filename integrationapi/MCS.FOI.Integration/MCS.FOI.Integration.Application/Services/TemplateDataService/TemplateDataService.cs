@@ -9,7 +9,6 @@
             _repository = repository;
         }
 
-
         public async Task<FOIRequestDto> GetRequest(int foiRequestId)
         {
             const string query = @"SELECT * FROM public.""FOIRequests"" WHERE foirequestid = @FOIRequestId";
@@ -76,14 +75,8 @@
 
         public async Task<IEnumerable<ProgramAreaDto>> GetProgramArea(int? programAreaId)
         {
-            const string query = @"SELECT * FROM public.""ProgramAreas"" WHERE isactive = true AND programareaid = @ProgramAreaId";
+            const string query = @"SELECT *, REGEXP_REPLACE(name, '^Ministry of ', '', 'i') AS OfficeName FROM public.""ProgramAreas"" WHERE isactive = true AND programareaid = @ProgramAreaId";
             return await _repository.QueryAsync<ProgramAreaDto>(query, new { ProgramAreaId = programAreaId });
-        }
-
-        public async Task<IEnumerable<ProgramAreaDto>> GetProgramAreas()
-        {
-            const string query = @"SELECT * FROM public.""ProgramAreas"" WHERE isactive = true";
-            return await _repository.QueryAsync<ProgramAreaDto>(query);
         }
 
         public async Task<IEnumerable<ApplicantCategoryDto>> GetApplicantCategory(int? applicantCategoryId)
@@ -96,7 +89,14 @@
         {
             const string query = @"SELECT * FROM public.""FOIRequestCFRFees"" WHERE cfrfeestatusid = 2 AND ministryrequestid = @MinistryRequestId";
             return (await _repository.QueryAsync<FOIRequestCFRFeesDto>(query, new { MinistryRequestId = ministryRequestId }))
-                ?.OrderByDescending(r => r.CFRFeeId).FirstOrDefault() ?? new FOIRequestCFRFeesDto();
+                ?.OrderByDescending(r => r.CFRFeeId).ThenByDescending(r => r.Version).FirstOrDefault() ?? new FOIRequestCFRFeesDto();
+        }
+
+        public async Task<FOIRequestCFRFeesDto> GetCRFFee(int? ministryRequestId)
+        {
+            const string query = @"SELECT * FROM public.""FOIRequestCFRFees"" WHERE ministryrequestid = @MinistryRequestId";
+            return (await _repository.QueryAsync<FOIRequestCFRFeesDto>(query, new { MinistryRequestId = ministryRequestId }))
+                ?.OrderByDescending(r => r.CFRFeeId).ThenByDescending(r => r.Version).FirstOrDefault() ?? new FOIRequestCFRFeesDto();
         }
 
         public async Task<FOIRequestPaymentDto> GetPayment(int? foiRequestId, int? ministryRequestId)
@@ -116,7 +116,7 @@
         public async Task<IEnumerable<OperatingTeamEmailsDto>> GetOperatingTeamEmails(string? operatingTeamName)
         {
             const string query = @"
-                SELECT email_address FROM public.""OperatingTeamEmails"" em
+                SELECT email_address as EmailAddress FROM public.""OperatingTeamEmails"" em
                 JOIN public.""OperatingTeams"" op
                 ON em.teamid = op.teamid
                 WHERE em.isactive = true AND op.name = @OperatingTeamName
@@ -152,6 +152,71 @@
             var parameters = new { FOIRequestId = foiRequestId };
 
             return await _repository.QueryAsync<PaymentDto>(query, parameters);
+        }
+
+        public async Task<IEnumerable<FOIRequestExtensionsDto>> GetExtensions(int? ministryRequestId, int? ministryRequestVersionId)
+        {
+            const string query = @"
+                    SELECT * FROM (
+	                      SELECT DISTINCT ON (foirequestextensionid) 
+		                    foirequestextensionid, 
+		                    fre.extensionreasonid, 
+		                    er.reason as ExtensionReason,
+		                    er.extensiontype,
+		                    fre.extensionstatusid, 
+		                    es.name as ExtensionStatus,
+		                    extendedduedays, 
+		                    extendedduedate, 
+		                    decisiondate, 
+		                    approvednoofdays, 
+		                    fre.isactive, 
+		                    created_at as CreatedAt, 
+		                    createdby, 
+		                    fre.version 
+	                     FROM ""public"".""FOIRequestExtensions"" fre 
+		                 INNER JOIN ""public"".""ExtensionReasons"" er ON fre.extensionreasonid = er.extensionreasonid 
+		                 INNER JOIN ""public"".""ExtensionStatuses"" es ON fre.extensionstatusid = es.extensionstatusid 
+	                     WHERE foiministryrequest_id = @MinistryRequestId and foiministryrequestversion_id = @MinistryRequestVersionId 
+	                     ORDER BY foirequestextensionid, version DESC) 
+                    AS list 
+                    ORDER BY extensionstatusid ASC, CreatedAt DESC
+               "
+            ;
+
+            var parameters = new { MinistryRequestId = ministryRequestId, MinistryRequestVersionId = ministryRequestVersionId };
+
+            return await _repository.QueryAsync<FOIRequestExtensionsDto>(query, parameters);
+        }
+
+        public async Task<FOIMinistryRequestDto> GetRequestOriginalDueDate(int ministryRequestId)
+        {
+            const string query = @"SELECT * FROM public.""FOIMinistryRequests"" 
+                WHERE foiministryrequestid = @MinistryRequestId AND requeststatuslabel = 'open'";
+
+            var parameters = new { MinistryRequestId = ministryRequestId };
+
+            return (await _repository.QueryAsync<FOIMinistryRequestDto>(query, parameters))
+                ?.OrderBy(r => r.Version)?.First() ?? new FOIMinistryRequestDto();
+        }
+
+        public async Task<IEnumerable<ReceivedModesDto>> GetReceivedModes(int receivedModeId)
+        {
+            const string query = @"SELECT * FROM public.""ReceivedModes""";
+            return await _repository.QueryAsync<ReceivedModesDto>(query) ?? new List<ReceivedModesDto>();
+        }
+
+        public async Task<IEnumerable<SubjectCodeDto>> GetMinistryRequestSubjectCodes(int ministryRequestId, int versionId)
+        {
+            const string query = @"
+                SELECT sc.subjectcodeid, sc.name, sc.description
+                FROM public.""FOIMinistryRequestSubjectCodes"" fmrsc
+                INNER JOIN public.""SubjectCodes"" sc ON fmrsc.subjectcodeid = sc.subjectcodeid
+                WHERE fmrsc.foiministryrequestid = @MinistryRequestId 
+                  AND fmrsc.foiministryrequestversion = @MinistryRequestVersionId";
+
+            var parameters = new { MinistryRequestId = ministryRequestId, MinistryRequestVersionId = versionId };
+
+            return await _repository.QueryAsync<SubjectCodeDto>(query, parameters);
         }
     }
 }

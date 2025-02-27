@@ -21,18 +21,20 @@
 
         public async Task<string> Handle(GetCorrespondenceCommand command, CancellationToken cancellationToken = default)
         {
-            var templatePath = await GetTemplatePathAsync(command.FileName);
-            if (string.IsNullOrEmpty(templatePath))
+            var template = await GetTemplateAsync(command.FileName);
+            if (template == null || string.IsNullOrWhiteSpace(template.DocumentPath))
                 throw new NotFoundException($"Template not found for filename: {command.FileName}");
 
-            var documentFiles = await _s3StorageService.FetchTemplatesAsync(command, templatePath, cancellationToken);
+            var documentFiles = await _s3StorageService.FetchTemplatesAsync(command, template.DocumentPath, cancellationToken);
             var templateData = await _templateMapping.GenerateFieldsMapping(command.FOIRequestId, command.FOIMinistryRequestId);
 
             var base64Document = documentFiles?.FirstOrDefault()?.Text;
             var fileBytes = DecodeBase64File(base64Document);
-            ValidateDocumentStructure(fileBytes);
 
-            using var document = LoadWordDocument(fileBytes);
+            if (template.Extension.Equals($".{FormatType.Docx}", StringComparison.OrdinalIgnoreCase))
+                ValidateDocumentStructure(fileBytes);
+
+            using var document = LoadWordDocument(fileBytes, template.Extension);
 
             ReplacePlaceholders(document, templateData);
 
@@ -40,16 +42,20 @@
             document.Save(outputStream, FormatType.Docx);
             outputStream.Position = 0;
 
-            return ProcessGeneratedDocument(outputStream, command);
+            var sfdt = ConvertToSfdt(outputStream);
+            SaveToFile(outputStream, "GeneratedDocuments", $"{template.Id}-{template.TemplateName}.docx"); //to be removed 
+            return sfdt;
         }
 
-        #region Validation 
-        private async Task<string> GetTemplatePathAsync(string fileName)
+        #region Template Retrieval
+        private async Task<TemplateDto> GetTemplateAsync(string fileName)
         {
             var template = await _templateRepository.GetAsync(r => r.IsActive && r.FileName.Equals(fileName));
-            return template?.FirstOrDefault()?.DocumentPath ?? string.Empty;
+            return IMap.Mapper.Map<TemplateDto>(template?.FirstOrDefault());
         }
+        #endregion
 
+        #region Validation 
         private static byte[] DecodeBase64File(string base64Text)
         {
             try
@@ -101,10 +107,10 @@
             }
         }
 
-        private static WordDocument LoadWordDocument(byte[] fileBytes)
+        private static WordDocument LoadWordDocument(byte[] fileBytes, string extension)
         {
             var fileStream = new MemoryStream(fileBytes);
-            return new WordDocument(fileStream, FormatType.Docx);
+            return new WordDocument(fileStream, GetDocIOFormatType(extension));
         }
 
         #endregion
@@ -114,7 +120,18 @@
         {
             foreach (var field in templateData)
             {
-                ReplacePlaceholder(document, field.FieldName, field.FieldValue);
+                if (!string.IsNullOrEmpty(field.FieldValue))
+                {
+                    // Check if the value contains HTML content (a simple check for "<p>" or "<div>")
+                    if (field.FieldValue.Contains("<p>") || field.FieldValue.Contains("<div>") || field.FieldValue.Contains("<table>"))
+                    {
+                        ReplacePlaceholderWithHtml(document, field.FieldName, field.FieldValue);
+                    }
+                    else
+                    {
+                        ReplacePlaceholder(document, field.FieldName, field.FieldValue);
+                    }
+                }
             }
         }
 
@@ -125,20 +142,38 @@
             while ((selection = document.Find(placeholder, false, true)) != null)
             {
                 var textRange = selection.GetAsOneRange();
-                textRange.Text = replacement;
+                textRange.Text = replacement ?? string.Empty;
             }
         }
 
+        private void ReplacePlaceholderWithHtml(WordDocument document, string placeholder, string htmlContent)
+        {
+            TextSelection selection;
+            while ((selection = document.Find(placeholder, false, true)) != null)
+            {
+                var textRange = selection.GetAsOneRange();
+
+                // Create a temporary document for HTML content
+                WordDocument tempDoc = new WordDocument();
+                IWSection section = tempDoc.AddSection();
+                IWParagraph paragraph = section.AddParagraph();
+
+                // Append HTML content to the paragraph
+                paragraph.AppendHTML(htmlContent);
+
+                // Import the section into the main document
+                foreach (IWSection sec in tempDoc.Sections)
+                {
+                    document.Sections.Add(sec.Clone());
+                }
+
+                // Remove the placeholder
+                textRange.Text = string.Empty;
+            }
+        }
         #endregion
 
         #region Conversion
-        private string ProcessGeneratedDocument(MemoryStream stream, GetCorrespondenceCommand command)
-        {
-            var sfdt = ConvertToSfdt(stream);
-            SaveToFile(stream, "GeneratedDocuments", $"{DateTime.Now:MMMM dd, yyyy}-{command.FileName}.docx");
-            return sfdt;
-        }
-
         private string ConvertToSfdt(MemoryStream stream)
         {
             stream.Position = 0;
@@ -167,6 +202,20 @@
                 ".txt" => Syncfusion.EJ2.DocumentEditor.FormatType.Txt,
                 ".xml" => Syncfusion.EJ2.DocumentEditor.FormatType.WordML,
                 _ => throw new NotSupportedException("EJ2 DocumentEditor does not support this file format.")
+            };
+        }
+
+        private static Syncfusion.DocIO.FormatType GetDocIOFormatType(string format)
+        {
+            return format.ToLower() switch
+            {
+                ".dotx" or ".docx" or ".docm" or ".dotm" => Syncfusion.DocIO.FormatType.Docx,
+                ".dot" or ".doc" => FormatType.Doc,
+                ".rtf" => Syncfusion.DocIO.FormatType.Rtf,
+                ".txt" => Syncfusion.DocIO.FormatType.Txt,
+                ".xml" => Syncfusion.DocIO.FormatType.WordML,
+                ".html" => Syncfusion.DocIO.FormatType.Html,
+                _ => throw new NotSupportedException("Syncfusion.DocIO does not support this file format.")
             };
         }
         #endregion

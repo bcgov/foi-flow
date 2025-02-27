@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MCS.FOI.Integration.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class initialdata : Migration
+    public partial class InitialData : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -44,6 +44,7 @@ namespace MCS.FOI.Integration.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FieldName = table.Column<string>(type: "text", nullable: false),
                     FieldType = table.Column<string>(type: "text", nullable: false),
+                    FieldMapping = table.Column<string>(type: "text", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedBy = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -55,27 +56,8 @@ namespace MCS.FOI.Integration.Infrastructure.Migrations
                     table.PrimaryKey("PK_TemplateFieldMapping", x => x.Id);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "TemplateListOptions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Code = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    CreatedBy = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedBy = table.Column<string>(type: "text", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TemplateListOptions", x => x.Id);
-                });
-
             DataMigration.SeedOrUpdateDatabaseScripts(migrationBuilder, "InitialTemplateData");
             DataMigration.SeedOrUpdateDatabaseScripts(migrationBuilder, "InitialTemplateFieldMappingData");
-            DataMigration.SeedOrUpdateDatabaseScripts(migrationBuilder, "InitialTemplateListOptionsData");
         }
 
         /// <inheritdoc />
@@ -86,9 +68,6 @@ namespace MCS.FOI.Integration.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "TemplateFieldMapping");
-
-            migrationBuilder.DropTable(
-                name: "TemplateListOptions");
         }
     }
 }

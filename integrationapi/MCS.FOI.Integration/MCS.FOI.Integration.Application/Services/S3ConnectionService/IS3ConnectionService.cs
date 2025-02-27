@@ -2,6 +2,6 @@
 {
     public interface IS3ConnectionService
     {
-        Task<List<TemplateModel>> FetchTemplatesAsync(GetCorrespondenceCommand message, string documentPath, CancellationToken cancellationToken);
+        Task<List<TemplateInfo>> FetchTemplatesAsync(GetCorrespondenceCommand message, string documentPath, CancellationToken cancellationToken);
     }
 }

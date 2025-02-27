@@ -2,6 +2,7 @@
 {
     public class TemplateDto
     {
+        public int Id { get; set; }
         public string FileName { get; set; } = default!;
         public string TemplateName { get; set; } = default!;
         public string Extension { get; set; } = default!;
