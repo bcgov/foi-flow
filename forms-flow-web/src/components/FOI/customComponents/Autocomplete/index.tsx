@@ -1,16 +1,6 @@
 import React, { useState } from 'react';
 import { Autocomplete, TextField } from '@mui/material';
-
-export interface OptionType {
-  label: string;
-  value: string;
-}
-
-// const options: OptionType[] = [
-//   { label: 'Option 1', value: 'option1' },
-//   { label: 'Option 2', value: 'option2' },
-//   { label: 'Option 3', value: 'option3' }
-// ];
+import type { Template } from '../ContactApplicant/types';
 
 const CustomAutocomplete = ({
     list,
@@ -18,13 +8,13 @@ const CustomAutocomplete = ({
     label
 }: any) => {
   const [inputValue, setInputValue] = useState<string>('');
-  const [selectedOption, setSelectedOption] = useState<OptionType | null>(null);
+  const [selectedOption, setSelectedOption] = useState<Template | null>(null);
 
   const handleInputChange = (event: React.ChangeEvent<{}>, value: string) => {
     setInputValue(value);
   };
 
-  const handleChange = (event: React.ChangeEvent<{}>, value: OptionType | null) => {
+  const handleChange = (event: React.ChangeEvent<{}>, value: Template | null) => {
     setSelectedOption(value);
     onChange(event, value);
   };

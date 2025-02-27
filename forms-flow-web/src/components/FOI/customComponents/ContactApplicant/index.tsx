@@ -42,7 +42,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
 import { DocumentEditorContainerComponent } from "@syncfusion/ej2-react-documenteditor";
 import { DocEditor } from './DocEditor';
-import CustomAutocomplete, {OptionType} from '../Autocomplete'
+import CustomAutocomplete from '../Autocomplete'
 import { saveAs } from "file-saver";
 
 export const ContactApplicant = ({
@@ -59,47 +59,39 @@ export const ContactApplicant = ({
 
   const dispatch = useDispatch();
   const templateList: any = useSelector((state: any) => state.foiRequests.foiEmailTemplates);
-  const [options, setOptions] = useState<OptionType[]>([]);
+  const [options, setOptions] = useState<Template[]>([]);
   const [saveSfdtDraftTrigger, setSaveSfdtDraftTrigger] = useState<boolean>(false);
   const [previewTrigger, setPreviewTrigger] = useState<boolean>(false);
   const [editDraftTrigger, setEditDraftTrigger] = useState<boolean>(false);
-  // const [sfdtDraft, setSfdtDraft] = useState<string>('');
+  const [showLagacyEditor, setShowLagacyEditor] = useState<boolean>(false);
 
-  useEffect(() => {
-    if(templateList.length > 0) {
-      // console.log("templateList: ", templateList);
-      setOptions(
-        templateList.map((template: any) => ({
-          label: template.templateName,
-          value: template.fileName
-        }))
-      );
-    }
-  }, [templateList])
+  const selectTemplate = (event: React.ChangeEvent<{}>, item: Template | null) => {
+    console.log("Selected option:", item?.label);
 
-  // const options: OptionType[] = [
-  //   { label: 'Option 1', value: 'option1' },
-  //   { label: 'Option 2', value: 'option2' },
-  //   { label: 'Option 3', value: 'option3' }
-  // ];
-  const selectTemplate = (event: React.ChangeEvent<{}>, item: OptionType | null) => {
-    // console.log("Selected option:", item?.label);
-    if(item?.label) {
-      let newData = {
-        "foiRequestId": 1,
-        "foiMinistryRequestId": 1,
-        "filename": item?.value
-      };
-      const loadTemplate = (templateJSON: string) => {
-        setCurTemplate(JSON.stringify(templateJSON));
-        setCurTemplateName(item.label);
-      }
-      fetchEmailTemplate(dispatch, newData, loadTemplate);
-    } else {
+    if(item?.templateid) {
+      setShowLagacyEditor(true);
       setCurTemplate('');
       setCurTemplateName('');
+    } else {
+      setShowLagacyEditor(false);
+      if(item?.label) {
+        let newData = {
+          "foiRequestId": 1,
+          "foiMinistryRequestId": 1,
+          "filename": item?.value
+        };
+        const loadTemplate = (templateJSON: string) => {
+          setCurTemplate(JSON.stringify(templateJSON));
+          setCurTemplateName(item.label);
+        }
+        fetchEmailTemplate(dispatch, newData, loadTemplate);
+      } else {
+        setCurTemplate('');
+        setCurTemplateName('');
+      }
     }
   };
+
   // export html and save html & sfdt
   const saveSfdtDraft = async (sfdtString: string) => {
     let newData = {
@@ -293,8 +285,23 @@ export const ContactApplicant = ({
       return false;
   }
 
-  useEffect(() => { 
+  useEffect(() => {
+
+    // push sfdt templates to list
+    let _templates: any[] = [];
+    // console.log("templateList: ", templateList);
+    if(templateList.length > 0) {
+      // console.log("templateList: ", templateList);
+      _templates = templateList.map((template: any) => ({
+          label: template.templateName,
+          value: template.fileName,
+          disabled: !template.isActive,
+          created_at: template.createdAt
+      }));
+    }
+
     // Add templates being used in drafts to the list
+    // console.log("applicantCorrespondence: ", applicantCorrespondence);
     const listOfDraftTemplates: number[] = [];
     applicantCorrespondence.forEach((draftCorrespondence: any) => {
       if (draftCorrespondence.templateid && !listOfDraftTemplates.includes(draftCorrespondence.templateid)) {
@@ -302,52 +309,59 @@ export const ContactApplicant = ({
       }
     })
 
-    setTemplates(oldArray =>
-      oldArray.filter(
-        template => updatedTemplates.includes(template.value) || template.value === ""
-      )
-    );
+    // setTemplates(oldArray =>
+    //   oldArray.filter(
+    //     template => updatedTemplates.includes(template.value) || template.value === ""
+    //   )
+    // );
     
-    const updatedTemplates: string[] = [];
-    applicantCorrespondenceTemplates.forEach((item: any) => {
-      if (isEnabledTemplate(item) || listOfDraftTemplates.includes(item.templateid)) {
-      updatedTemplates.push(item.name)
-      const rootpath = OSS_S3_BUCKET_FULL_PATH
-      const fileInfoList = [{
-        filename: item.name,
-        s3sourceuri: rootpath + item.documenturipath
-      }]
+    // // push s3 html templates to the list
+    // console.log("applicantCorrespondenceTemplates: ", applicantCorrespondenceTemplates);
+    // const updatedTemplates: string[] = [];
+    // applicantCorrespondenceTemplates.forEach((item: any) => {
+    //   if (isEnabledTemplate(item) || listOfDraftTemplates.includes(item.templateid)) {
+    //   updatedTemplates.push(item.name)
+    //   const rootpath = OSS_S3_BUCKET_FULL_PATH
+    //   const fileInfoList = [{
+    //     filename: item.name,
+    //     s3sourceuri: rootpath + item.documenturipath
+    //   }]
 
-      getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
-        if (!err) {
-          res.map(async (header: any, _index: any) => {
-            getFileFromS3(header, async (_err: any, response: any) => {
-              let templateItem: Template = {
-                value: item.name,
-                label: item.description,
-                templateid: item.templateid,
-                text: await new Response(response.data).text(),
-                disabled: false,
-                created_at: item.created_at
-              }
-              if (!isduplicate(item.name)) {
-              //setTemplates((oldArray) => [...oldArray, templateItem]); 
-              setTemplates((oldArray) => {
-                // Check if the templateItem already exists in the array
-                const exists = oldArray.some(item => item.templateid === templateItem.templateid);
-                if (!exists) {
-                  return [...oldArray, templateItem];
-                }
-                return oldArray;
-              }); 
-              }
-            });            
-          });
-        }
-      });
-    }
-    });
-  }, [applicantCorrespondence, applicantCorrespondenceTemplates, requestExtensions, dispatch]);
+    //   getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
+    //     if (!err) {
+    //       res.map(async (header: any, _index: any) => {
+    //         getFileFromS3(header, async (_err: any, response: any) => {
+    //           let templateItem: Template = {
+    //             value: item.name,
+    //             label: item.description,
+    //             templateid: item.templateid,
+    //             text: await new Response(response.data).text(),
+    //             disabled: false,
+    //             created_at: item.created_at
+    //           }
+    //           if (!isduplicate(item.name)) {
+    //           //setTemplates((oldArray) => [...oldArray, templateItem]); 
+    //           // setTemplates((oldArray) => {
+    //           //   // Check if the templateItem already exists in the array
+    //           //   const exists = oldArray.some(item => item.templateid === templateItem.templateid);
+    //           //   if (!exists) {
+    //           //     return [...oldArray, templateItem];
+    //           //   }
+    //           //   return oldArray;
+    //           // }); 
+
+    //              _templates = [..._templates, templateItem];
+    //           }
+    //         });            
+    //       });
+    //     }
+    //   });
+    // }
+    // });
+
+    setOptions(_templates)
+    setTemplates(_templates);
+  }, [applicantCorrespondence, requestExtensions, dispatch, templateList]);
 
 
   const [correspondences, setCorrespondences] = useState(applicantCorrespondence);
@@ -1266,20 +1280,41 @@ export const ContactApplicant = ({
         <div className="correspondence-editor">
           {/* <input type="file" id="file_upload" accept=".dotx,.docx,.docm,.dot,.doc,.rtf,.txt,.xml,.sfdt" onChange={onFileChange} /> */}
           {/* <button onClick={onImportClick}>Import</button> */}
-          <DocEditor
-            curTemplate = {curTemplate}
-            saveSfdtDraft = {saveSfdtDraft}
-            saveSfdtDraftTrigger = {saveSfdtDraftTrigger}
-            setSaveSfdtDraftTrigger = {setSaveSfdtDraftTrigger}
-            preview = {preview}
-            previewTrigger = {previewTrigger}
-            setPreviewTrigger = {setPreviewTrigger}
-            addAttachment={openAttachmentModal}
-            savepdf = {savePdf}
-            editDraftTrigger = {editDraftTrigger}
-            setEditDraftTrigger = {setEditDraftTrigger}
-            editSfdtDraft = {editSfdtDraft}
-          />
+
+          {showLagacyEditor ? 
+            <>
+              <div className="closeDraft">
+                  <IconButton className="title-col3" onClick={()=>setShowEditor(false)}>
+                      <i className="dialog-close-button">Close</i>
+                      <CloseIcon />
+                  </IconButton>
+              </div>
+              <ReactQuill
+                theme="snow"
+                value={editorValue}
+                onChange={setEditorValue}
+                modules={quillModules}
+                ref={handleRef}
+              />
+            </>
+            :
+            <>
+              <DocEditor
+                curTemplate = {curTemplate}
+                saveSfdtDraft = {saveSfdtDraft}
+                saveSfdtDraftTrigger = {saveSfdtDraftTrigger}
+                setSaveSfdtDraftTrigger = {setSaveSfdtDraftTrigger}
+                preview = {preview}
+                previewTrigger = {previewTrigger}
+                setPreviewTrigger = {setPreviewTrigger}
+                addAttachment={openAttachmentModal}
+                savepdf = {savePdf}
+                editDraftTrigger = {editDraftTrigger}
+                setEditDraftTrigger = {setEditDraftTrigger}
+                editSfdtDraft = {editSfdtDraft}
+              />
+            </>
+          }
           <div>
           {files.map((file: any, index: number) => (
             <div className="email-attachment-item" key={file.filename}>

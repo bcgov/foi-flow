@@ -67,3 +67,5 @@ export const DISABLE_GATHERINGRECORDS_TAB = (window._env_ && window._env_.REACT_
 
 export const RECORD_DOWNLOAD_LIMIT = (window._env_ && window._env_.REACT_APP_RECORD_DOWNLOAD_LIMIT) || process.env.REACT_APP_RECORD_DOWNLOAD_LIMIT || 500;
 export const RECORD_DOWNLOAD_SIZE_LIMIT = (window._env_ && window._env_.REACT_APP_RECORD_DOWNLOAD_SIZE_LIMIT) || process.env.REACT_APP_RECORD_DOWNLOAD_SIZE_LIMIT || 1073741824;
+
+export const SF_KEY = (window._env_ && window._env_.REACT_APP_SF_KEY) || process.env.REACT_APP_SF_KEY || '';

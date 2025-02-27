@@ -2,7 +2,11 @@ import './DocEditor.scss'
 import * as React from 'react';
 import { DocumentEditorContainerComponent, Toolbar, CustomToolbarItemModel, ToolbarItem, SpellChecker } from "@syncfusion/ej2-react-documenteditor";
 import { ClickEventArgs } from '@syncfusion/ej2-navigations';
-import {DOC_EDITOR_API_URL} from "../../../../apiManager/endpoints/config"
+import { DOC_EDITOR_API_URL } from "../../../../apiManager/endpoints/config"
+import { SF_KEY } from "../../../../constants/constants";
+import { registerLicense } from '@syncfusion/ej2-base';
+
+registerLicense(SF_KEY);
 DocumentEditorContainerComponent.Inject(Toolbar, SpellChecker);
 
 export const DocEditor = ({
@@ -157,8 +161,8 @@ export const DocEditor = ({
             id="container"
             // ref={(scope) => { container = scope; }}
             ref={setContainer}
-            // serviceUrl={DOC_EDITOR_API_URL+"/api/documenteditor/"}
-            serviceUrl={"http://localhost:62870/api/documenteditor/"}
+            serviceUrl={DOC_EDITOR_API_URL+"/api/documenteditor/"}
+            // serviceUrl={"http://localhost:62870/api/documenteditor/"}
             height={'590px'}
             toolbarItems={items}
             enableToolbar={true}
