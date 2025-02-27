@@ -52,6 +52,24 @@ export const getReceivedDate = (params) => {
   return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
 };
 
+export const getClosedDate = (params) => {
+  let closedDateString = params.row.closedate;
+  const dateString = closedDateString
+    ? closedDateString.substring(0, 10)
+    : "";
+    closedDateString = closedDateString ? new Date(closedDateString) : "";
+  if (
+    closedDateString !== "" &&
+    (closedDateString.getHours() > 16 ||
+      (closedDateString.getHours() === 16 &&
+        closedDateString.getMinutes() > 30) ||
+      !businessDay(dateString))
+  ) {
+    closedDateString = addBusinessDays(closedDateString, 1);
+  }
+  return formatDate(closedDateString, "MMM dd yyyy").toUpperCase();
+};
+
 // update sortModel for applicantName & assignedTo
 export const updateSortModel = (sortModel) => {
   let smodel = JSON.parse(JSON.stringify(sortModel));
@@ -129,6 +147,15 @@ export const onBehalfFullName = (params) => {
     params.row.onBehalfLastName || ""
   }`;
 };
+
+export const formatRequestType = (requeststatus) => {
+  if (!requeststatus) {
+    return "";
+  }
+  let formattedRequestState= Object.values(StateEnum).find(state => state.label === requeststatus).name
+  return formattedRequestState;
+};
+
 
 export const getRecordsDue = (params) => {
   let receivedDateString = params.row.cfrduedate;

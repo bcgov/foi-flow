@@ -29,6 +29,11 @@ export const getErrorMessage = (_duplicateFiles, _typeErrorFiles, _overSizedFile
     singleFileUploadAllowedFileExtensions = "pdf, xlsx, docx, msg, eml";
   }
 
+  // This is for application fee receipt uploads
+  if (mimeTypes.includes('.doc') && mimeTypes.includes('.jpeg') && mimeTypes.includes('.png') && mimeTypes.includes('.tif') && mimeTypes.includes('.xls') && mimeTypes.includes('.csv')) {
+    singleFileUploadAllowedFileExtensions = ".pdf, .doc, .docx, .jpeg, .jpg, .png, .tiff, .tif, .xls, .xlsx, .csv";
+  }
+
   if (_duplicateFiles.length > 0 && _duplicateFiles[0]) {
     _errorMessage.push(<>A attachment with this file name(s) <b>{_duplicateFiles.join(", ")}</b> already exists. A duplicate records cannot be added. Please rename attachment or replace existing attachment with updated version.</>);
   }
