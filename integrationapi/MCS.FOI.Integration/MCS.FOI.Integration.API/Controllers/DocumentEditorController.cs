@@ -5,6 +5,11 @@ using Microsoft.AspNetCore.Cors;
 using Syncfusion.EJ2.DocumentEditor;
 using Syncfusion.EJ2.SpellChecker;
 using WDocument = Syncfusion.DocIO.DLS.WordDocument;
+// using EJ2APIServices;
+using SkiaSharp;
+using Syncfusion.DocIORenderer;
+using Syncfusion.Pdf;
+
 
 namespace SyncfusionDocument.Controllers
 {
@@ -50,8 +55,10 @@ namespace SyncfusionDocument.Controllers
             return json;
         }
 
+        [AcceptVerbs("Post")]
         [HttpPost]
         [Route("SpellCheck")]
+        [AllowAnonymous]
         public string SpellCheck([FromBody] SpellCheckJsonData spellChecker)
         {
             try
@@ -76,6 +83,7 @@ namespace SyncfusionDocument.Controllers
         [AcceptVerbs("Post")]
         [HttpPost]
         [Route("SpellCheckByPage")]
+        [AllowAnonymous]
         public string SpellCheckByPage([FromBody] SpellCheckJsonData spellChecker)
         {
             try
@@ -118,7 +126,7 @@ namespace SyncfusionDocument.Controllers
             document1.Dispose();
             return sfdtText;
         }
-        
+
         [AcceptVerbs("Post")]
         [HttpPost]
         [Route("SystemClipboard")]
@@ -235,14 +243,47 @@ namespace SyncfusionDocument.Controllers
         [Route("ExportSFDT")]
         public FileStreamResult ExportSFDT([FromBody] SaveParameter data)
         {
-            string name = data.FileName;
-            string format = DocumentEditorHelper.RetrieveFileType(name);
-            if (string.IsNullOrEmpty(name))
-            {
-                name = "Document1.doc";
+            try {
+                string name = data.FileName;
+                string format = DocumentEditorHelper.RetrieveFileType(name);
+                if (string.IsNullOrEmpty(name))
+                {
+                    name = "Document1.html";
+                }
+                WDocument document = WordDocument.Save(data.Content);
+                return DocumentEditorHelper.SaveDocument(document, format, name);
+            } catch {
+                return new FileStreamResult(new MemoryStream(), "application/html")
+                {
+                    FileDownloadName = "Document1.html"
+                };
             }
-            WDocument document = WordDocument.Save(data.Content);
-            return DocumentEditorHelper.SaveDocument(document, format, name);
+        }
+
+        [AcceptVerbs("Post")]
+        [HttpPost]
+        [Route("ExportPdf")]
+        public FileStreamResult ExportPdf([FromBody]SaveParameter data)
+        {
+            // Converts the sfdt to stream
+            Stream document = WordDocument.Save(data.Content, FormatType.Docx);
+            document.Position = 0;
+            Syncfusion.DocIO.DLS.WordDocument doc = new Syncfusion.DocIO.DLS.WordDocument(document, Syncfusion.DocIO.FormatType.Automatic);
+            //Instantiation of DocIORenderer for Word to PDF conversion 
+            DocIORenderer render = new DocIORenderer();
+            //Converts Word document into PDF document 
+            PdfDocument pdfDocument = render.ConvertToPDF(doc);
+            Stream stream = new MemoryStream();
+            
+            //Saves the PDF file
+            pdfDocument.Save(stream);
+            stream.Position = 0;
+            pdfDocument.Close();         
+            document.Close();
+            return new FileStreamResult(stream, "application/pdf")
+            {
+                FileDownloadName = data.FileName
+            };
         }
 
         [AcceptVerbs("Post")]

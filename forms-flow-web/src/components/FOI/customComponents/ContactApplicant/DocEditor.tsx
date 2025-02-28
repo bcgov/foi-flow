@@ -162,7 +162,6 @@ export const DocEditor = ({
             // ref={(scope) => { container = scope; }}
             ref={setContainer}
             serviceUrl={FOI_TEMPLATE_API_URL+"/api/documenteditor/"}
-            // serviceUrl={"http://localhost:62870/api/documenteditor/"}
             height={'590px'}
             toolbarItems={items}
             enableToolbar={true}
