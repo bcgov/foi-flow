@@ -28,7 +28,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled 
   useEffect(() => {
     if (isActive == null) {
       setIsSelected(false);
-      if(type=="consult") {
+      if(type=="consult" && !isDisabled && handleSelect) {
         handleSelect(false);
       }
     } else {
