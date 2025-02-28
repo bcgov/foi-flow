@@ -74,9 +74,9 @@ const PhaseMenu = ({
           return (
             <MenuItem
               className="download-menu-item"
-              key={phasedPackage.category}
-              onClick={() => {handlePhasePackageDownload(phasedPackage.category, item.id)}}
-              value={phasedPackage.category}
+              key={phasedPackage.phase}
+              onClick={() => {handlePhasePackageDownload(phasedPackage, item.id)}}
+              value={phasedPackage.phase}
               sx={{ display: "flex" }}
             >
               {phasedPackage.downloadReady ? (
@@ -101,8 +101,8 @@ const PhaseMenu = ({
                   className={classes.statusIcons}
                 />
               ) : null}
-              <Tooltip enterDelay={500} title={`Created On: ${getPhasePackageDatetime(phasedPackage.category, item.id) ? getPhasePackageDatetime(phasedPackage.category) : "N/A"}`}>
-              <span>Phase {phasedPackage.category.slice(-1)}</span>
+              <Tooltip enterDelay={500} title={`Created On: ${getPhasePackageDatetime(phasedPackage, item.id) ? getPhasePackageDatetime(phasedPackage, item.id) : "N/A"}`}>
+              <span>Phase {phasedPackage.phase}</span>
               </Tooltip>
             </MenuItem>
           );
