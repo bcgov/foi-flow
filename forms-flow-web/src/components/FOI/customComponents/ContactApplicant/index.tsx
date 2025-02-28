@@ -76,8 +76,8 @@ export const ContactApplicant = ({
       setShowLagacyEditor(false);
       if(item?.label) {
         let newData = {
-          "foiRequestId": 1,
-          "foiMinistryRequestId": 1,
+          "foiRequestId": requestId,
+          "foiMinistryRequestId": ministryId,
           "filename": item?.value
         };
         const loadTemplate = (templateJSON: string) => {
@@ -434,16 +434,39 @@ export const ContactApplicant = ({
   }
 
   //When templates are selected from list
-  const handleTemplateSelection = (index: number) => {
-    setCurrentTemplate(index);
+  const handleTemplateSelection = (template: any, index: number) => {
+    if(template.templateid) {
+      setShowLagacyEditor(true);
+      setCurTemplate('');
+      setCurTemplateName('');
+
+      setCurrentTemplate(index);
     
-    const callback = (templateVariables: any) => {
-      const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
-      setEditorValue(finalTemplate);
-      changeCorrespondenceFilter("log");
-      setShowEditor(true);
+      const callback = (templateVariables: any) => {
+        const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
+        setEditorValue(finalTemplate);
+        changeCorrespondenceFilter("log");
+        setShowEditor(true);
+      }
+      getTemplateVariablesAsync(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index], callback);
+    } else {
+      setShowLagacyEditor(false);
+      if(template?.label) {
+        let newData = {
+          "foiRequestId": requestId,
+          "foiMinistryRequestId": ministryId,
+          "filename": template?.value
+        };
+        const loadTemplate = (templateJSON: string) => {
+          setCurTemplate(JSON.stringify(templateJSON));
+          setCurTemplateName(template.label);
+        }
+        fetchEmailTemplate(dispatch, newData, loadTemplate);
+      } else {
+        setCurTemplate('');
+        setCurTemplateName('');
+      }
     }
-    getTemplateVariablesAsync(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index], callback);
   }
 
   const removeFile = (index: number) => {
@@ -745,8 +768,10 @@ export const ContactApplicant = ({
       setFiles(i.attachments);
     setCorrespondenceId(i.applicantcorrespondenceid);
     if(i.draft) {
+      setShowLagacyEditor(false);
       setCurTemplate(i.draft);
     } else {
+      setShowLagacyEditor(true);
       setEditorValue(i.text);
       for(let j = 0; j < templates.length; j++) {
         if (templates[j].templateid === i.templateid) {
@@ -1049,7 +1074,7 @@ export const ContactApplicant = ({
       <ListItem  
         onClick={() => {
           if (!showEditor) setShowEditor(true)
-          handleTemplateSelection(index)
+          handleTemplateSelection(template, index)
         }} 
         className={`template-list-item ${lastItemInList ? 'template-list-item-last' : ''}`}
         key={template.value}
