@@ -35,7 +35,8 @@ import {
   checkForRecordsChange,
   fetchPDFStitchedRecordForConsults,
   editPersonalAttributes,
-  fetchPDFStitchedRecordsForPhasedRedlines
+  fetchPDFStitchedRecordsForPhasedRedlines,
+  fetchPDFStitchedRecordsForPhasedResponsePackages
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
   saveRequestDetails,
@@ -263,7 +264,11 @@ export const RecordsLog = ({
   let phasedRedlinesStitchedStatuses = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusesForPhasedRedlines
   );
-  console.log("BANG", phasedRedlinesStitchedStatuses)
+  console.log("phasedRedlinesStitchedStatuses", phasedRedlinesStitchedStatuses)
+  let phasedResponsePackageStitchedStatuses = useSelector(
+    (state) => state.foiRequests.foiPDFStitchStatusesForPhasedResponsePackages
+  );
+  console.log("phasedResponsePackageStitchedStatuses", phasedResponsePackageStitchedStatuses)
 
   let pdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForHarms
@@ -287,6 +292,10 @@ export const RecordsLog = ({
     (state) => state.foiRequests.foiPDFStitchedRecordsForPhasedRedlines
   );
   console.log("phasedRedlinesStitchedRecords", phasedRedlinesStitchedRecords)
+  let phasedResponsePackageStitchedRecords = useSelector(
+    (state) => state.foiRequests.foiPDFStitchedRecordsForPhasedResponsePackages
+  );
+  console.log("phasedResponsePackageStitchedRecords", phasedResponsePackageStitchedRecords)
 
   let isRecordsfetching = useSelector(
     (state) => state.foiRequests.isRecordsLoading
@@ -517,6 +526,7 @@ export const RecordsLog = ({
   const [isConsultDownloadFailed, setIsConsultDownloadFailed] = useState(false);
 
   const [phasedRedlineDownloadStatuses, setPhasedRedlineDownloadStatuses] = useState([]);
+  const [phasedResponsePackageDownloadStatuses, setPhasedResponsePackageDownloadStatuses] = useState([]);
 
   const [isAllSelected, setIsAllSelected] = useState(false);
 
@@ -559,38 +569,40 @@ export const RecordsLog = ({
     };
 
     const updatePhasePackageStatus = (statuses, setStatuses, dispatchAction) => {
-      let newArr = [...statuses];
-      for (let phaseObj of newArr) {
-        switch (phaseObj.status) {
-          case RecordDownloadStatus.started:
-          case RecordDownloadStatus.pushedtostream:
-          case RecordDownloadStatus.redactionsummarystarted:
-          case RecordDownloadStatus.redactionsummaryuploaded:
-          case RecordDownloadStatus.zippingstarted:
-          case RecordDownloadStatus.zippingcompleted:
-            phaseObj.downloadReady = false;
-            phaseObj.downloadWIP = true;
-            phaseObj.downloadFailed = false;
-            break;
-          case RecordDownloadStatus.completed:
-            dispatch(dispatchAction(requestId, ministryId));
-            phaseObj.downloadReady = true;
-            phaseObj.downloadWIP = false;
-            phaseObj.downloadFailed = false;
-            break;
-          case RecordDownloadStatus.error:
-            phaseObj.downloadReady = false;
-            phaseObj.downloadWIP = false;
-            phaseObj.downloadFailed = true;
-            break;
-          default:
-            phaseObj.downloadReady = false;
-            phaseObj.downloadWIP = false;
-            phaseObj.downloadFailed = false;
-            break;
+      // if (statuses?.length > 0) {
+        let newArr = [...statuses];
+        for (let phaseObj of newArr) {
+          switch (phaseObj.status) {
+            case RecordDownloadStatus.started:
+            case RecordDownloadStatus.pushedtostream:
+            case RecordDownloadStatus.redactionsummarystarted:
+            case RecordDownloadStatus.redactionsummaryuploaded:
+            case RecordDownloadStatus.zippingstarted:
+            case RecordDownloadStatus.zippingcompleted:
+              phaseObj.downloadReady = false;
+              phaseObj.downloadWIP = true;
+              phaseObj.downloadFailed = false;
+              break;
+            case RecordDownloadStatus.completed:
+              dispatch(dispatchAction(requestId, ministryId));
+              phaseObj.downloadReady = true;
+              phaseObj.downloadWIP = false;
+              phaseObj.downloadFailed = false;
+              break;
+            case RecordDownloadStatus.error:
+              phaseObj.downloadReady = false;
+              phaseObj.downloadWIP = false;
+              phaseObj.downloadFailed = true;
+              break;
+            default:
+              phaseObj.downloadReady = false;
+              phaseObj.downloadWIP = false;
+              phaseObj.downloadFailed = false;
+              break;
+          }
         }
-      }
-      setStatuses(newArr)
+        setStatuses(newArr)
+      // }
     }
 
     // Update PDF Stitch Status
@@ -648,6 +660,11 @@ export const RecordsLog = ({
       setPhasedRedlineDownloadStatuses,
       fetchPDFStitchedRecordsForPhasedRedlines,
     )
+    updatePhasePackageStatus(
+      phasedResponsePackageStitchedStatuses,
+      setPhasedResponsePackageDownloadStatuses,
+      fetchPDFStitchedRecordsForPhasedResponsePackages
+    )
   }, [
     pdfStitchStatus,
     redlinePdfStitchStatus,
@@ -657,7 +674,8 @@ export const RecordsLog = ({
     consultPDFStitchedStatus,
     requestId,
     ministryId,
-    phasedRedlinesStitchedStatuses
+    phasedRedlinesStitchedStatuses,
+    phasedResponsePackageStitchedStatuses,
   ]);
 
   useEffect(() => {
@@ -1024,17 +1042,21 @@ export const RecordsLog = ({
     );
   };
 
-    const handlePhasePackageDownload = (phasedPackageName) => {
+    const handlePhasePackageDownload = (phasedPackageName, itemid) => {
+      const phasedDownloadStatuses = itemid === 2 ? phasedRedlineDownloadStatuses : phasedResponsePackageDownloadStatuses;
+      const phasedStichedRecords = itemid === 2 ? phasedRedlinesStitchedRecords : phasedResponsePackageStitchedRecords;
       console.log("phasedPackageName", phasedPackageName)
-      const isDownloadReady = phasedRedlineDownloadStatuses.find(phasedPackage => phasedPackage.category === phasedPackageName).downloadReady;
-      console.log("isDownloadReady", isDownloadReady)
+      console.log("phasedDownloadStatuses", phasedDownloadStatuses)
+      console.log("phasedStichedRecords", phasedStichedRecords)
+      const isDownloadReady = phasedDownloadStatuses?.find(phasedPackage => phasedPackage.category === phasedPackageName).downloadReady;
       if (isDownloadReady) {
-        const s3filepath = phasedRedlinesStitchedRecords?.find(phasedPackage => phasedPackageName === phasedPackage.category).finalpackagepath;
+        const s3filepath = phasedStichedRecords?.find(phasedPackage => phasedPackageName === phasedPackage.category).finalpackagepath;
         console.log("s3filepath", s3filepath)
         handleDownloadZipFile(s3filepath, phasedPackageName);
       }
     }
-    console.log("STATUS STATE", phasedRedlineDownloadStatuses)
+    console.log("STATUS STATE REDLINE", phasedRedlineDownloadStatuses)
+    console.log("STATUS STATE RESPONSE", phasedResponsePackageDownloadStatuses)
 
     const handleDownloadChange = (e) => {
     //if clicked on harms
@@ -1268,6 +1290,10 @@ export const RecordsLog = ({
       setPhasedRedlineDownloadStatuses((prev) => {
         prev.map(item => item.category === itemid ? {...item, downloadReady: false, downloadWIP: false, downloadFailed: true} : item)
       });
+    } else if (itemid.includes("responsepackagephase")) {
+      setPhasedResponsePackageDownloadStatuses((prev) => {
+        prev.map(item => item.category === itemid ? {...item, downloadReady: false, downloadWIP: false, downloadFailed: true} : item)
+      })
     }
   };
 
@@ -1315,8 +1341,10 @@ export const RecordsLog = ({
     );
   }
   
-  const getPhasePackageDatetime = (phasePackage) => {
-    return phasedRedlinesStitchedRecords.find(phaseRecord => phaseRecord.category === phasePackage)?.createdat_datetime;
+  const getPhasePackageDatetime = (phasePackage, itemid) => {
+    if (itemid === 2) return phasedRedlinesStitchedRecords.find(phaseRecord => phaseRecord.category === phasePackage)?.createdat_datetime;
+    if (itemid === 3) return phasedResponsePackageStitchedRecords.find(phaseRecord => phaseRecord.category === phasePackage)?.createdat_datetime;
+   
   }
 
   const downloadSelectedDocuments = async () => {
@@ -2319,10 +2347,9 @@ export const RecordsLog = ({
                       if ((item.id === 2 || item.id === 3) && isPhasedRelease) {
                         return <PhaseMenu 
                         handlePhasePackageDownload={handlePhasePackageDownload} 
-                        RecordDownloadStatus={RecordDownloadStatus} 
                         item={item} 
                         index={index} 
-                        phasedRedlineDownloadStatuses={phasedRedlineDownloadStatuses}
+                        phasedPackageDownloadStatuses={item.id === 2 ? phasedRedlineDownloadStatuses : phasedResponsePackageDownloadStatuses}
                         getPhasePackageDatetime={getPhasePackageDatetime} 
                         />
                       } else {

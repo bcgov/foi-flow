@@ -26,7 +26,9 @@ import {
   setFOIPDFStitchStatusForConsults,
   setFOIPDFStitchedRecordForConsults,
   setFOIPDFStitchStatusesForPhasedRedlines,
-  setFOIPDFStitchedRecordsForPhasedRedlines
+  setFOIPDFStitchedRecordsForPhasedRedlines,
+  setFOIPDFStitchStatusesForPhasedResponsePackages,
+  setFOIPDFStitchedRecordsForPhasedResponsePackages,
 } from "../../../actions/FOI/foiRequestActions";
 import { fnDone } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
@@ -558,6 +560,40 @@ export const fetchPDFStitchStatusForResponsePackage = (
   };
 };
 
+export const fetchPDFStitchStatusesForPhasedResponsePackages = (
+  requestId,
+  ministryId,
+  ...rest
+) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    replaceUrl(
+      API.FOI_PDF_STITCH_STATUSES_FOR_PHASEDRESPONSEPACKAGES,
+      "<ministryrequestid>",
+      ministryId
+    ),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIPDFStitchStatusesForPhasedResponsePackages(res.data));
+          done(null, res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching pdfstitch job status", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+}
+
 export const fetchPDFStitchedRecordForResponsePackage = (
   requestId,
   ministryId,
@@ -594,6 +630,40 @@ export const fetchPDFStitchedRecordForResponsePackage = (
       });
   };
 };
+
+export const fetchPDFStitchedRecordsForPhasedResponsePackages = (
+  requestId,
+  ministryId,
+  ...rest
+) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    replaceUrl(
+      API.FOI_DOWNLOAD_RECORDS_FOR_PHASEDRESPONSEPACKAGES,
+      "<ministryrequestid>",
+      ministryId
+    ),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIPDFStitchedRecordsForPhasedResponsePackages(res.data));
+          done(null, res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching pdfstitch job status", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+}
 
 export const fetchPDFStitchedStatusForOIPCRedline = (
   requestId,

@@ -561,3 +561,17 @@ export const setShowKeywordSearch = (data) => (dispatch) => {
     payload: data,
   });
 };
+
+export const setFOIPDFStitchStatusesForPhasedResponsePackages = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUSES_FOR_PHASEDRESPONSEPACKAGES,
+    payload: data
+  });
+}
+
+export const setFOIPDFStitchedRecordsForPhasedResponsePackages = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORDS_FOR_PHASEDRESPONSEPACKAGES,
+    payload: data
+  });
+}

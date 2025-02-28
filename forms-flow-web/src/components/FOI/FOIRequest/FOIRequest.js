@@ -61,6 +61,7 @@ import {
   fetchHistoricalRecords,
   fetchPDFStitchStatusForConsults,
   fetchPDFStitchStatusesForPhasedRedlines,
+  fetchPDFStitchStatusesForPhasedResponsePackages,
 } from "../../../apiManager/services/FOI/foiRecordServices";
 import { makeStyles } from "@material-ui/core/styles";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
@@ -384,6 +385,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   useEffect(() => {
     if (requestDetails?.isphasedrelease) {
       dispatch(fetchPDFStitchStatusesForPhasedRedlines(requestId, ministryId));
+      dispatch(fetchPDFStitchStatusesForPhasedResponsePackages(requestId, ministryId));
     }
   }, [requestId, ministryId, requestDetails])
 

@@ -14,7 +14,7 @@ import { makeStyles } from "@material-ui/core/styles";
 const PhaseMenu = ({
   item,
   index,
-  phasedRedlineDownloadStatuses,
+  phasedPackageDownloadStatuses,
   handlePhasePackageDownload,
   getPhasePackageDatetime
 }) => {
@@ -39,7 +39,7 @@ const PhaseMenu = ({
     <>
       <MenuItem
         onClick={handleClick}
-        // disabled={phasedRedlineDownloadStatuses.length <= 0}
+        disabled={phasedPackageDownloadStatuses.length <= 0}
         className="download-menu-item"
         key={item.id}
         value={index}
@@ -70,30 +70,30 @@ const PhaseMenu = ({
           horizontal: "left",
         }}
       >
-        {phasedRedlineDownloadStatuses?.map((phasedRedline, index) => {
+        {phasedPackageDownloadStatuses?.map((phasedPackage) => {
           return (
             <MenuItem
               className="download-menu-item"
-              key={phasedRedline.category}
-              onClick={() => {handlePhasePackageDownload(phasedRedline.category)}}
-              value={phasedRedline.category}
+              key={phasedPackage.category}
+              onClick={() => {handlePhasePackageDownload(phasedPackage.category, item.id)}}
+              value={phasedPackage.category}
               sx={{ display: "flex" }}
             >
-              {phasedRedline.downloadReady ? (
+              {phasedPackage.downloadReady ? (
                 <FontAwesomeIcon
                   icon={faCheckCircle}
                   size="2x"
                   color="#1B8103"
                   className={classes.statusIcons}
                 />
-              ) : phasedRedline.downloadFailed? (
+              ) : phasedPackage.downloadFailed? (
                 <FontAwesomeIcon
                   icon={faExclamationCircle}
                   size="2x"
                   color="#A0192F"
                   className={classes.statusIcons}
                 />
-              ) : phasedRedline.downloadWIP ? (
+              ) : phasedPackage.downloadWIP ? (
                 <FontAwesomeIcon
                   icon={faSpinner}
                   size="2x"
@@ -101,8 +101,8 @@ const PhaseMenu = ({
                   className={classes.statusIcons}
                 />
               ) : null}
-              <Tooltip enterDelay={500} title={`Created On: ${getPhasePackageDatetime(phasedRedline.category) ? getPhasePackageDatetime(phasedRedline.category) : "N/A"}`}>
-              <span>Phase {phasedRedline.category.slice(-1)}</span>
+              <Tooltip enterDelay={500} title={`Created On: ${getPhasePackageDatetime(phasedPackage.category, item.id) ? getPhasePackageDatetime(phasedPackage.category) : "N/A"}`}>
+              <span>Phase {phasedPackage.category.slice(-1)}</span>
               </Tooltip>
             </MenuItem>
           );

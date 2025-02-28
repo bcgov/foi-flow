@@ -186,6 +186,9 @@ const API = {
   FOI_DOWNLOAD_RECORDS_FOR_PHASEDREDLINES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/redlinephase`,
   FOI_PDF_STITCH_STATUSES_FOR_PHASEDREDLINES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/redlinephase/pdfstitchjobstatus`,
 
+  FOI_DOWNLOAD_RECORDS_FOR_PHASEDRESPONSEPACKAGES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/responsepackagephase`,
+  FOI_PDF_STITCH_STATUSES_FOR_PHASEDRESPONSEPACKAGES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/responsepackagephase/pdfstitchjobstatus`,
+
   FOI_GET_OIPC_OUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/outcomes`,
   FOI_GET_OIPC_STATUSES: `${FOI_BASE_API_URL}/api/foiflow/oipc/statuses`,
   FOI_GET_OIPC_REVIEWTYPES: `${FOI_BASE_API_URL}/api/foiflow/oipc/reviewtypes`,
