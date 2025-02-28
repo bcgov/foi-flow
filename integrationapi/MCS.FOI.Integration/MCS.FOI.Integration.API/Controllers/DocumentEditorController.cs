@@ -1,7 +1,5 @@
 ﻿using MCS.FOI.Integration.API;
 using MCS.FOI.Integration.Application.Model;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Syncfusion.EJ2.DocumentEditor;
 using Syncfusion.EJ2.SpellChecker;
 using WDocument = Syncfusion.DocIO.DLS.WordDocument;

@@ -19,7 +19,7 @@
             _correspondenceUrl = _configuration.GetValue<string>("ApiSettings:CorrespondenceUrl") ?? string.Empty;
         }
 
-        public async Task<List<TemplateInfo>> FetchTemplatesAsync(GetCorrespondenceCommand message, string documentPath, CancellationToken cancellationToken)
+        public async Task<List<TemplateInfo>> FetchTemplatesAsync(string fileName, string token, string documentPath, CancellationToken cancellationToken)
         {
             var s3host = _configuration.GetValue<string>("AWSS3:OSS_S3_HOST") ?? string.Empty;
             var bucket = _configuration.GetValue<string>("AWSS3:OSS_S3_FORMS_BUCKET") ?? string.Empty;
@@ -28,23 +28,23 @@
             {
                 new
                 {
-                    filename = message.FileName,
+                    filename = fileName,
                     s3sourceuri = $"{s3host}/{bucket}{documentPath}"
                 }
             };
 
-            var response = await HttpPostRequest(_correspondenceUrl, fileInfoList, message.Token, cancellationToken);
+            var response = await HttpPostRequest(_correspondenceUrl, fileInfoList, token, cancellationToken);
             var resultJson = await response.Content.ReadAsStringAsync(cancellationToken);
             var s3fileResponse = JsonConvert.DeserializeObject<List<FileDetails>>(resultJson) ?? new List<FileDetails>();
 
-            var fileBytes = await GetOSSHeaderDetailsAsync(message, s3fileResponse);
+            var fileBytes = await GetOSSHeaderDetailsAsync(s3fileResponse);
 
             var templates = new List<TemplateInfo>();
             if (fileBytes.Length > 0)
             {
                 var templateItem = new TemplateInfo
                 {
-                    Value = message.FileName,
+                    Value = fileName,
                     TemplateId = Guid.NewGuid().ToString(),
                     Text = Convert.ToBase64String(fileBytes),
                     Disabled = false,
@@ -57,7 +57,7 @@
             return templates;
         }
 
-        public async Task<byte[]> GetOSSHeaderDetailsAsync(GetCorrespondenceCommand message, List<FileDetails> s3fileResponse)
+        public async Task<byte[]> GetOSSHeaderDetailsAsync(List<FileDetails> s3fileResponse)
         {
             if (!s3fileResponse.Any())
             {

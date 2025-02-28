@@ -1,4 +1,6 @@
-﻿namespace MCS.FOI.Integration.Infrastructure
+﻿using MCS.FOI.Integration.Infrastructure.Repositories;
+
+namespace MCS.FOI.Integration.Infrastructure
 {
     public static class DependencyInjection
     {

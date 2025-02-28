@@ -1,11 +1,16 @@
-﻿namespace MCS.FOI.Integration.Core.Repositories
+﻿namespace MCS.FOI.Integration.Infrastructure.Repositories
 {
     public class TemplateRepository : EFRepository<Template>, ITemplateRepository
     {
         private readonly IntegrationDbContext _context;
-        public TemplateRepository(IntegrationDbContext context) : base(context) 
-        { 
+        private readonly IRedisDbContext _redisDbContext;
+
+        public TemplateRepository(
+            IntegrationDbContext context, 
+            IRedisDbContext redisDbContext) : base(context)
+        {
             _context = context;
+            _redisDbContext = redisDbContext;
         }
     }
 }

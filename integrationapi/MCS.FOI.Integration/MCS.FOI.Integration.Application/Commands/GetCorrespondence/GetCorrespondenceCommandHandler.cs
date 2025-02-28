@@ -1,4 +1,6 @@
-﻿namespace MCS.FOI.Integration.Application.Commands.GetCorrespondence
+﻿using MCS.FOI.Integration.Core.Repositories.RedisRepository;
+
+namespace MCS.FOI.Integration.Application.Commands.GetCorrespondence
 {
     public class GetCorrespondenceCommandHandler : ICommandHandler<GetCorrespondenceCommand, string>
     {
@@ -6,17 +8,20 @@
         private readonly ITemplateMappingService _templateMapping;
         private readonly IS3ConnectionService _s3StorageService;
         private readonly ITemplateRepository _templateRepository;
+        private readonly ITemplateRedisCacheRepository _templateCacheService;
 
         public GetCorrespondenceCommandHandler(
             IWebHostEnvironment hostingEnvironment,
             ITemplateMappingService templateMapping,
             IS3ConnectionService s3StorageService,
-            ITemplateRepository templateRepository)
+            ITemplateRepository templateRepository,
+            ITemplateRedisCacheRepository templateCacheService)
         {
             _hostingEnvironment = hostingEnvironment;
             _templateMapping = templateMapping;
             _s3StorageService = s3StorageService;
             _templateRepository = templateRepository;
+            _templateCacheService = templateCacheService;
         }
 
         public async Task<string> Handle(GetCorrespondenceCommand command, CancellationToken cancellationToken = default)
@@ -25,17 +30,25 @@
             if (template == null || string.IsNullOrWhiteSpace(template.DocumentPath))
                 throw new NotFoundException($"Template not found for filename: {command.FileName}");
 
-            var documentFiles = await _s3StorageService.FetchTemplatesAsync(command, template.DocumentPath, cancellationToken);
-            var templateData = await _templateMapping.GenerateFieldsMapping(command.FOIRequestId, command.FOIMinistryRequestId);
+            var templateCache = await _templateCacheService.GetTemplateCacheAsync(command.FileName);
+            string base64DocumentString = templateCache?.EncodedContent ?? string.Empty;
 
-            var base64Document = documentFiles?.FirstOrDefault()?.Text;
-            var fileBytes = DecodeBase64File(base64Document);
+            if (templateCache == null || string.IsNullOrEmpty(templateCache?.EncodedContent))
+            {
+                var documentFiles = await _s3StorageService.FetchTemplatesAsync(command.FileName, command.Token, template.DocumentPath, cancellationToken);
+                base64DocumentString = documentFiles?.FirstOrDefault()?.Text ?? string.Empty;
+                template.EncodedContent = base64DocumentString;
+                await _templateCacheService.SetTemplateCacheAsync(template);
+            }
+
+            var fileBytes = DecodeBase64File(base64DocumentString);
 
             if (template.Extension.Equals($".{FormatType.Docx}", StringComparison.OrdinalIgnoreCase))
                 ValidateDocumentStructure(fileBytes);
 
             using var document = LoadWordDocument(fileBytes, template.Extension);
 
+            var templateData = await _templateMapping.GenerateFieldsMapping(command.FOIRequestId, command.FOIMinistryRequestId);
             ReplacePlaceholders(document, templateData);
 
             using var outputStream = new MemoryStream();
