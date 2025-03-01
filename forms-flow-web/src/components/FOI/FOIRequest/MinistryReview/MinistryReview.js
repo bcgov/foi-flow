@@ -1125,6 +1125,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   lockRecords={lockRecordsTab}
                   validLockRecordsState={validLockRecordsState}
                   handleSaveRequest={handleSaveRequest}
+                  isPhasedRelease={requestDetails.isphasedrelease}
                 />
               </>
             ) : (
