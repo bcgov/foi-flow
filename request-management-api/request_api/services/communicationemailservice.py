@@ -29,12 +29,15 @@ class communicationemailservice:
             to = self.__getsenders(correspondencelog)
             attributes =  self.__getattributes(correspondencelog)
             subject = ""
-            if(template is None):
-                subject = templateconfig().getsubject("",attributes)
+            if template is None:
+                if correspondencelog.templatename is None:
+                    subject = templateconfig().getsubject("", attributes)
+                else:
+                    subject = templateconfig().getsubject(correspondencelog.templatename, attributes)
             else:
-                subject = templateconfig().getsubject(template.name,attributes)
+                subject = templateconfig().getsubject(template.name, attributes)
             messageattachmentlist = self.__getattachments(correspondencelog)
-            _messagepart = templateservice().decorate_template(template, messagepart, attributes)
+            _messagepart = templateservice().decorate_template(template, messagepart, attributes, correspondencelog)
             return senderservice().send(subject, _messagepart, messageattachmentlist, to, correspondencelog.get('from_email', None))
         except Exception as ex:
             logging.exception(ex)

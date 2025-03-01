@@ -28,7 +28,13 @@ class communicationwrapperservice:
         if result.success == True:
             # raw requests should never be fee emails so they would only get handled by else statement
             # Handle fee processing templates
-            if applicantcorrespondencelog["templateid"] is not None and self.__is_fee_processing(applicantcorrespondencelog["templateid"]):
+            templatename = ""
+            if applicantcorrespondencelog["templateid"] is not None:
+                templatename = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"]).name
+            else:
+                templatename = applicantcorrespondencelog["templatename"]
+
+            if self.__is_fee_processing(templatename):
                 return self.__handle_fee_email(requestid, ministryrequestid, result, applicantcorrespondencelog)
             # Handle non-fee templates - Send email for non-fee templates with email recipients
             else:
@@ -53,8 +59,8 @@ class communicationwrapperservice:
         return {"success" : True, "message": "Sent successfully", "identifier": -1}  
 
 
-    def __is_fee_processing(self, templateid):
-        if applicantcorrespondenceservice().gettemplatebyid(templateid).name in ['PAYONLINE','PAYOUTSTANDING']:
+    def __is_fee_processing(self, templatename):
+        if templatename in ['PAYONLINE','PAYOUTSTANDING']:
             return True
         return False
 
