@@ -195,6 +195,31 @@ services:
     networks:
       - forms-flow-bpm-network
       
+  foi-template-api:
+    container_name: foi-template
+    build:
+      context: ./integrationapi/MCS.FOI.Integration/
+      dockerfile: Dockerfile
+    ports:
+      - "3002:8080"
+    environment:
+      - ConnectionStrings__DBConnection=${FOI_TEMPLATE_DB_CONNECTIONSTRING}
+      - ConnectionStrings__Redis=${FOI_TEMPLATE_REDIS_CONNECTIONSTRING}
+      - AWSS3__OSS_S3_HOST=${OSS_S3_HOST}
+      - AWSS3__OSS_S3_FORMS_BUCKET=${OSS_S3_FORMS_BUCKET}
+      - ApiSettings__CorrespondenceUrl=${FOI_TEMPLATE_CORRESPONDENCE_URL}
+
+      - JWT_OIDC_AUDIENCE=${JWT_OIDC_AUDIENCE}
+      - CORS_ORIGIN=${FOI_TEMPLATE_CORS_ORIGIN}
+      - JWT_OIDC_WELL_KNOWN_CONFIG=${KEYCLOAK_URL}/auth/realms/${KEYCLOAK_URL_REALM}/.well-known/openid-configuration
+      - JWT_OIDC_JWKS_URI=${KEYCLOAK_URL}/auth/realms/${KEYCLOAK_URL_REALM}/protocol/openid-connect/certs
+      - JWT_OIDC_ISSUER=${KEYCLOAK_URL}/auth/realms/${KEYCLOAK_URL_REALM}
+      - JWT_OIDC_ALGORITHMS=${KEYCLOAK_URL}/auth/realms/${KEYCLOAK_URL_REALM}/.well-known/openid-configuration
+      - IAOGroups=${FOI_TEMPLATE_IAOGROUPS}
+      - SPELLCHECK_DICTIONARY_PATH=${SPELLCHECK_DICTIONARY_PATH}
+      - SPELLCHECK_JSON_FILENAME=${FOI_TEMPLATE_SPELLCHECK_DICTIONARY_PATH}
+      - SyncfusionLicense=${FOI_TEMPLATE_SPELLCHECK_JSON_FILENAME}
+      
   foi-web:
     container_name: foi-web
     build:

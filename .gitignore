@@ -129,6 +129,10 @@ integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.API/bin/
 integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.API/bin/*
 integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.API/obj/
 integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.API/obj/*
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.API/out/
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.API/out/*
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.API/GeneratedDocuments/
+integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.API/GeneratedDocuments/*
 integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Application/bin/
 integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Application/bin/*
 integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Application/obj/
