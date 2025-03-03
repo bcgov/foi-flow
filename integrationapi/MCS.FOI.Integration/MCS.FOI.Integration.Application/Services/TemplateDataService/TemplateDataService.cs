@@ -16,13 +16,19 @@
                 ?.OrderByDescending(r => r.Version).FirstOrDefault() ?? new FOIRequestDto();
         }
 
+        public async Task<IEnumerable<FOIRawRequestDTO>> GetRawRequest(int foiRequestId)
+        {
+            const string query = @"SELECT * FROM public.""FOIRawRequests"" WHERE requestid = @FOIRequestId";
+            return (await _repository.QueryAsync<FOIRawRequestDTO>(query, new { FOIRequestId = foiRequestId }));
+        }
+
         public async Task<FOIRequestAssigneeDto> GetAssignee(int foiMinistryRequestId)
         {
             const string query = @"SELECT fmr.version, assignedto, fa.firstname, fa.lastname, pa.bcgovcode, fmr.programareaid, f.requesttype, fmr.isoipcreview
                 FROM public.""FOIMinistryRequests"" fmr 
 	                JOIN public.""FOIRequests"" f on fmr.foirequest_id = f.foirequestid and fmr.foirequestversion_id = f.""version"" 
                 FULL OUTER JOIN public.""FOIAssignees"" fa ON fa.username = fmr.assignedto
-                INNER JOIN ""ProgramAreas"" pa ON pa.programareaid = fmr.programareaid
+                INNER JOIN public.""ProgramAreas"" pa ON pa.programareaid = fmr.programareaid
                 WHERE foiministryrequestid = @FOIMinistryRequestid
                 ";
             return (await _repository.QueryAsync<FOIRequestAssigneeDto>(query, new { FOIMinistryRequestid = foiMinistryRequestId }))
@@ -108,13 +114,26 @@
 
         public async Task<IEnumerable<FOIRequestOIPCDto>> GetFOIRequestOIPC(int? ministryRequestId, int versionId)
         {
-            const string queryWithVersion = @"SELECT * FROM public.""FOIRequestOIPC"" WHERE foiministryrequest_id = @MinistryRequestId AND foiministryrequestversion_id = @MinistryRequestVersionId";
-            return (await _repository.QueryAsync<FOIRequestOIPCDto>(queryWithVersion, new { MinistryRequestId = ministryRequestId, MinistryRequestVersionId = versionId }))
-                ?.OrderBy(r => r.OipcId) ?? Enumerable.Empty<FOIRequestOIPCDto>();
+            const string queryWithVersion = @"
+                            SELECT oipc.*, r.name as Reason 
+                            FROM public.""FOIRequestOIPC"" oipc
+                            JOIN public.""OIPCReasons"" r
+	                            ON oipc.reasonid = r.reasonid
+                            WHERE foiministryrequest_id = @MinistryRequestId AND foiministryrequestversion_id = @MinistryRequestVersionId";
+            return ((await _repository.QueryAsync<FOIRequestOIPCDto>(queryWithVersion, new { MinistryRequestId = ministryRequestId, MinistryRequestVersionId = versionId }))
+                 ?? new List<FOIRequestOIPCDto>())?.OrderByDescending(r => r.OipcId);
         }
 
         public async Task<IEnumerable<OperatingTeamEmailsDto>> GetOperatingTeamEmails(string? operatingTeamName)
         {
+            bool emailsTableExists = await TableExistsAsync("OperatingTeamEmails");
+            bool teamsTableExists = await TableExistsAsync("OperatingTeams");
+
+            if (!emailsTableExists || !teamsTableExists)
+            {
+                return new List<OperatingTeamEmailsDto>();
+            }
+
             const string query = @"
                 SELECT email_address as EmailAddress FROM public.""OperatingTeamEmails"" em
                 JOIN public.""OperatingTeams"" op
@@ -196,7 +215,7 @@
             var parameters = new { MinistryRequestId = ministryRequestId };
 
             return (await _repository.QueryAsync<FOIMinistryRequestDto>(query, parameters))
-                ?.OrderBy(r => r.Version)?.First() ?? new FOIMinistryRequestDto();
+                ?.OrderBy(r => r.Version)?.FirstOrDefault() ?? new FOIMinistryRequestDto();
         }
 
         public async Task<IEnumerable<ReceivedModesDto>> GetReceivedModes(int receivedModeId)
@@ -216,7 +235,80 @@
 
             var parameters = new { MinistryRequestId = ministryRequestId, MinistryRequestVersionId = versionId };
 
-            return await _repository.QueryAsync<SubjectCodeDto>(query, parameters);
+            return await _repository.QueryAsync<SubjectCodeDto>(query, parameters) ?? new List<SubjectCodeDto>();
+        }
+
+        public async Task<IEnumerable<FOIRequestPersonalAttributeDto>> GetRequestPersonalAttributes(int foiRequestId, int version)
+        {
+            const string query = @"
+                SELECT foipa.*, pa.name as AttributeName
+                FROM public.""FOIRequestPersonalAttributes"" foipa
+                JOIN public.""PersonalInformationAttributes"" pa
+                ON foipa.personalattributeid = pa.attributeid
+                WHERE foirequest_id = @FOIRequestId and foirequestversion_id = @MinistryRequestVersionId;";
+
+            var parameters = new { FOIRequestId = foiRequestId, MinistryRequestVersionId = version };
+
+            return await _repository.QueryAsync<FOIRequestPersonalAttributeDto>(query, parameters);
+        }
+
+        public async Task<IEnumerable<FOIOpenInformationRequestsDto>> GetOpenInformationRequests(int ministryRequestId, int versionId)
+        {
+            bool openInformationTableExists = await TableExistsAsync("FOIOpenInformationRequests");
+            bool openInfoPublicationTableExists = await TableExistsAsync("OpenInfoPublicationStatuses");
+
+            if (!openInformationTableExists || !openInfoPublicationTableExists)
+            {
+                return new List<FOIOpenInformationRequestsDto>();
+            }
+
+            const string query = @"
+                SELECT oir.*, ps.name as PublicationStatus
+                FROM public.""FOIOpenInformationRequests"" oir
+                JOIN public.""OpenInfoPublicationStatuses"" ps 
+                ON ps.oipublicationstatusid = oir.oipublicationstatus_id
+                WHERE foiministryrequest_id = @MinistryRequestId and foiministryrequestversion_id = @MinistryRequestVersionId;";
+
+            var parameters = new { MinistryRequestId = ministryRequestId, MinistryRequestVersionId = versionId };
+
+            return (await _repository.QueryAsync<FOIOpenInformationRequestsDto>(query, parameters))
+                ?.OrderByDescending(r => r.FoiOpenInfoRequestId).ToList() ?? new List<FOIOpenInformationRequestsDto>();
+        }
+
+        public async Task<IEnumerable<FOIOpenInformationRequestsDto>> GetOpenInformationExemptions(int ministryRequestId, int versionId)
+        {
+            bool openInfoTableExists = await TableExistsAsync("FOIOpenInformationRequests");
+            bool openInfoExemptionsTableExists = await TableExistsAsync("OpenInformationExemptions");
+
+            if (!openInfoTableExists || !openInfoExemptionsTableExists)
+            {
+                return new List<FOIOpenInformationRequestsDto>();
+            }
+
+            const string query = @"
+                SELECT oir.*, ps.name as ExemptionName
+                FROM public.""FOIOpenInformationRequests"" oir
+                JOIN public.""OpenInformationExemptions"" ps
+                ON ps.oiexemptionid = oir.oiexemption_id
+                WHERE foiministryrequest_id = @MinistryRequestId and foiministryrequestversion_id = @MinistryRequestVersionId;";
+
+            var parameters = new { MinistryRequestId = ministryRequestId, MinistryRequestVersionId = versionId };
+
+            return (await _repository.QueryAsync<FOIOpenInformationRequestsDto>(query, parameters))
+                ?.OrderByDescending(r => r.FoiOpenInfoRequestId).ToList() ?? new List<FOIOpenInformationRequestsDto>();
+        }
+
+        public async Task<bool> TableExistsAsync(string tableName)
+        {
+            const string query = @"
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables 
+                    WHERE table_schema = 'public' 
+                    AND table_name = @TableName
+                )";
+
+            var parameters = new { TableName = tableName };
+            return await _repository.QuerySingleAsync<bool>(query, parameters);
         }
     }
 }

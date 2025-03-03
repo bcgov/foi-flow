@@ -20,5 +20,8 @@
         Task<FOIMinistryRequestDto> GetRequestOriginalDueDate(int foiMinistryRequestId);
         Task<IEnumerable<ReceivedModesDto>> GetReceivedModes(int receivedModeId);
         Task<IEnumerable<SubjectCodeDto>> GetMinistryRequestSubjectCodes(int ministryRequestId, int versionId);
+        Task<IEnumerable<FOIRequestPersonalAttributeDto>> GetRequestPersonalAttributes(int foiRequestId, int version);
+        Task<IEnumerable<FOIOpenInformationRequestsDto>> GetOpenInformationRequests(int ministryRequestId, int versionId);
+        Task<IEnumerable<FOIRawRequestDTO>> GetRawRequest(int foiRequestId);
     }
 }

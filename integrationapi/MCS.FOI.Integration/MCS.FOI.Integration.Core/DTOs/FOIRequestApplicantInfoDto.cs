@@ -12,7 +12,7 @@
         public string? MiddleName { get; set; }
         public string? LastName { get; set; }
         public string? AlsoKnownAs { get; set; }
-        public DateTime? DOB { get; set; }
+        public DateTime DOB { get; set; }
         public string? BusinessName { get; set; }
         public int? AxisApplicantId { get; set; }
     }
