@@ -139,7 +139,7 @@ class FOIRequestWrapperSchema(Schema):
     correctionalServiceNumber = fields.Str(data_key="correctionalServiceNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
     publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
     isiaorestricted =   fields.Bool(data_key="isiaorestricted")
-    isconsultflag = fields.Bool(data_key="isconsultflag")
+    isconsultflag = fields.Bool(data_key="isconsultflag", allow_none=True)
 
     foiRequestApplicantID = fields.Int(data_key="foiRequestApplicantID",required=False,allow_none=True)
     axisapplicantid = fields.Int(data_key="axisApplicantID",required=False,allow_none=True)
@@ -220,4 +220,4 @@ class FOIRequestMinistrySchema(Schema):
     assignedministrypersonLastName = fields.Str(data_key="assignedministrypersonLastName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
     ministrysignoffapproval = fields.Nested(CreateMinistrySignOffApprovalSchema, data_key="ministrysignoffapproval", allow_none=True)
     userrecordslockstatus = fields.Bool(data_key="userrecordslockstatus", allow_none=True)
-    isconsultflag = fields.Bool(data_key="isconsultflag")
+    isconsultflag = fields.Bool(data_key="isconsultflag", allow_none=True)
