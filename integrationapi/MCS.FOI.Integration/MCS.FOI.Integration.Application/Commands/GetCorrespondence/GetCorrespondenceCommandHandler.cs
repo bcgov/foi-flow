@@ -56,7 +56,7 @@ namespace MCS.FOI.Integration.Application.Commands.GetCorrespondence
             outputStream.Position = 0;
 
             var sfdt = ConvertToSfdt(outputStream);
-            SaveToFile(outputStream, "GeneratedDocuments", $"{template.Id}-{template.TemplateName}.docx"); //to be removed 
+           
             return sfdt;
         }
 
@@ -192,17 +192,6 @@ namespace MCS.FOI.Integration.Application.Commands.GetCorrespondence
             stream.Position = 0;
             var documentEditor = Syncfusion.EJ2.DocumentEditor.WordDocument.Load(stream, GetFormatType(".docx"));
             return JsonConvert.SerializeObject(documentEditor);
-        }
-
-        //to be removed - for debugging purpose only
-        private void SaveToFile(Stream stream, string folder, string fileName)
-        {
-            var outputPath = Path.Combine(_hostingEnvironment.ContentRootPath, folder, fileName);
-            Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
-
-            stream.Position = 0;
-            using var outputFileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
-            stream.CopyTo(outputFileStream);
         }
 
         private static Syncfusion.EJ2.DocumentEditor.FormatType GetFormatType(string format)
