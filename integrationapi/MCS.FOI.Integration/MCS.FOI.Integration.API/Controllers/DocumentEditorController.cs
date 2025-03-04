@@ -13,17 +13,6 @@ namespace SyncfusionDocument.Controllers
     [Authorize(Policy = "IAOTeam")]
     public class DocumentEditorController : Controller
     {
-        private readonly IWebHostEnvironment _hostingEnvironment;
-        private readonly IConfiguration _configuration;
-        string path;
-
-        public DocumentEditorController(IWebHostEnvironment hostingEnvironment, IConfiguration configuration)
-        {
-            _hostingEnvironment = hostingEnvironment;
-            _configuration = configuration;
-            path = configuration.GetValue<string>("SPELLCHECK_DICTIONARY_PATH") ?? string.Empty;
-        }
-
         [HttpPost]
         [Route("SpellCheck")]
         public string SpellCheck([FromBody] SpellCheckJsonData spellChecker)
@@ -106,6 +95,16 @@ namespace SyncfusionDocument.Controllers
         }
 
         #region Document Editor Functionality that might be usable
+        //private readonly IWebHostEnvironment _hostingEnvironment;
+        //private readonly IConfiguration _configuration;
+        //string path;
+
+        //public DocumentEditorController(IWebHostEnvironment hostingEnvironment, IConfiguration configuration)
+        //{
+        //    _hostingEnvironment = hostingEnvironment;
+        //    _configuration = configuration;
+        //    path = configuration.GetValue<string>("SPELLCHECK_DICTIONARY_PATH") ?? string.Empty;
+        //}
 
         //[AcceptVerbs("Post")]
         //[HttpPost]
