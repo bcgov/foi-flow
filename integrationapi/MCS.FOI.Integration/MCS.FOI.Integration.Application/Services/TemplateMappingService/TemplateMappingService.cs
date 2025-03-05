@@ -6,13 +6,16 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
     {
         private readonly ITemplateDataService _templateDataService;
         private readonly ITemplateFieldMappingRepository _templateFieldMapping;
+        private readonly IConfiguration _configuration;
 
         public TemplateMappingService(
             ITemplateFieldMappingRepository templateFieldMapping,
-            ITemplateDataService templateDataService)
+            ITemplateDataService templateDataService,
+            IConfiguration configuration)
         {
             _templateFieldMapping = templateFieldMapping;
             _templateDataService = templateDataService;
+            _configuration = configuration;
         }
 
         public async Task<IEnumerable<TemplateFieldMappingDto>> GenerateFieldsMapping(int foiRequestId, int foiMinistryRequestId)
@@ -56,6 +59,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
 
         private async Task<Dictionary<string, string?>> PopulateRawRequestData(RequestDto rawRequest)
         {
+            var applicationFees = await _templateDataService.GetApplicationFees(rawRequest.RequestId);
             var additionalInfo = rawRequest?.AdditionalPersonalInfo ?? new PersonalInfoDto();
             var applicantFullName = FormatFullName(rawRequest?.FirstName, rawRequest?.LastName);
             var onBehalfFullName = FormatFullName(additionalInfo?.AnotherFirstName, additionalInfo?.AnotherLastName);
@@ -64,6 +68,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
             var dateOfBirth = !string.IsNullOrEmpty(additionalInfo?.BirthDate) ? DateTime.Parse(additionalInfo?.BirthDate).ToString("MMMM dd, yyyy") : string.Empty;
             var dueDate = !string.IsNullOrEmpty(rawRequest?.DueDate) ? DateTime.Parse(rawRequest?.DueDate).ToString("MMMM dd, yyyy") : string.Empty;
             var officeName = Regex.Replace(rawRequest?.SelectedMinistries?.FirstOrDefault()?.Name ?? string.Empty, "^Ministry of ", "", RegexOptions.IgnoreCase);
+            var faxNumber = _configuration.GetValue<string>("FaxNumber") ?? "(250) 3879843";
 
             string GetAddress()
             {
@@ -79,7 +84,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
                 ["[REQUESTNUMBER]"] = rawRequest?.AxisRequestId,
                 ["[TODAYDATE]"] = DateTime.Now.ToString("MMMM dd, yyyy"),
                 ["[RQREMAIL]"] = rawRequest?.Email,
-                ["[RQRFAX]"] = "(250) 3879843",
+                ["[RQRFAX]"] = faxNumber,
                 ["[ADDRESS]"] = GetAddress()?.ToString(),
                 ["[RFNAME]"] = rawRequest?.FirstName,
                 ["[RLNAME]"] = rawRequest?.LastName,
@@ -106,12 +111,14 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
                 ["[PHONEPRIMARY]"] = rawRequest?.PhonePrimary,
                 ["[WORKPHONEPRIMARY]"] = rawRequest?.WorkPhonePrimary,
                 ["[SUBJECTCODE]"] = rawRequest?.SubjectCode,
-                ["[CORRECTIONNUMBER]"] = rawRequest?.CorrectionalServiceNumber
+                ["[CORRECTIONNUMBER]"] = rawRequest?.CorrectionalServiceNumber,
+                ["[APPLICATION_FEE_AMOUNT]"] = applicationFees?.FirstOrDefault()?.AmountPaid?.ToString("F2") ?? string.Empty
             };
         }
 
         private async Task<Dictionary<string, string?>> PopulateProcessedRequestData(int foiRequestId, int foiMinistryRequestId, FOIRequestDto request, FOIMinistryRequestDto requestMinistry)
         {
+            var applicationFees = await _templateDataService.GetApplicationFees(request.FOIRawRequestId);
             var requestContactInfo = await _templateDataService.GetRequestContactInformation(foiRequestId, request.Version);
             var requestApplicants = await _templateDataService.GetRequestApplicantInfos(foiRequestId, request.Version, RequestorType.Self);
             var anotherPerson = await _templateDataService.GetRequestApplicantInfos(foiRequestId, request.Version, RequestorType.OnBehalfOf);
@@ -120,7 +127,6 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
             var assignee = await _templateDataService.GetAssignee(foiMinistryRequestId);
             var programArea = await _templateDataService.GetProgramArea(requestMinistry.ProgramAreaId);
             var operatingTeamEmails = await _templateDataService.GetOperatingTeamEmails(requestMinistry.AssignedGroup);
-            var paymentFees = await _templateDataService.GetPaymentFees(foiRequestId);
             var originalLdd = await _templateDataService.GetRequestOriginalDueDate(foiMinistryRequestId);
             var receivedModes = await _templateDataService.GetReceivedModes(request.ReceivedModeId ?? 0);
             var foiRequestExtension = await _templateDataService.GetExtensions(foiMinistryRequestId, requestMinistry.Version);
@@ -136,11 +142,12 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
             var primaryApplicantCategory = applicantCategory.FirstOrDefault(r => r.ApplicantCategoryId == request.ApplicantCategoryId);
             var extensionData = foiRequestExtension?.FirstOrDefault() ?? new FOIRequestExtensionsDto();
             var subjectCodes = foiSubjectCodes?.FirstOrDefault() ?? new SubjectCodeDto();
-            var applicationFees = paymentFees?.Where(r => r.FeeCodeId.Equals(1)) ?? new List<PaymentDto>();
+            var fee = applicationFees?.FirstOrDefault();
             var oipcDetails = foiOIPCDetails?.FirstOrDefault() ?? new FOIRequestOIPCDto();
             var openInformation = openInformationRequest?.FirstOrDefault();
             var extensionApprovedDate = extensionData.ExtensionType.Equals(ExtensionType.PublicBody.ToString()) ?
                pbExtension?.ExtendedDueDate : oipcExtension?.ExtendedDueDate;
+            var faxNumber = _configuration.GetValue<string>("FaxNumber") ?? "(250) 3879843";
 
 
             string? GetPersonalAttribute(string dataFormat) =>
@@ -169,7 +176,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
                     ["[OIPCNUMBER]"] =  ProcessOipcDetails(oipcDetails).oipcNumber,
                     ["[TODAYDATE]"] = DateTime.Now.ToString("MMMM dd, yyyy") ,
                     ["[RQREMAIL]"] = GetContactInfo("email") ,
-                    ["[RQRFAX]"] = "(250) 3879843" ,
+                    ["[RQRFAX]"] = faxNumber,
                     ["[ADDRESS]"] = GetFullAddress().ToString() ,
                     ["[RFNAME]"] = applicant?.FirstName ,
                     ["[RLNAME]"] = applicant?.LastName ,
@@ -181,7 +188,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
                     ["[RECEIVEDDATE]"] = request?.ReceivedDate.ToString("MMMM dd, yyyy") ,
                     ["[REQUESTDESCRIPTION]"] = request?.InitialDescription ,
                     ["[PERFECTEDDATE]"] = request?.InitialRecordSearchFromDate?.ToString("MMMM dd, yyyy") ,
-                    ["[APPLICATION_FEE_AMOUNT]"] = applicationFees.Any() ? applicationFees?.Select(r => (r.Quantity * r.Total)).Sum().ToString() : string.Empty,
+                    ["[APPLICATION_FEE_AMOUNT]"] = fee?.AmountPaid?.ToString("F2") ?? string.Empty,
                     ["[OIPCORDERNUMBER]"] = string.Join(",", ProcessOipcDetails(oipcDetails).oipcOrderNumber) ,
                     ["[DUEDATE]"] = requestMinistry?.DueDate.ToString("MMMM dd, yyyy") ,
                     ["[ADDITIONALXX]"] = extensionData?.ApprovedNoOfDays?.ToString() ,
@@ -212,11 +219,11 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
                     ["[PBEXTENSIONDUEDAYS]"] = pbExtension?.ExtendedDueDays ,
                     ["[PBEXTENSIONDUEDATE]"] = pbExtension?.ExtendedDueDate ,
                     ["[EXTENSION_APPROVED_DATE]"] = extensionApprovedDate ,
-                    ["[DOB]"] = applicant?.DOB.ToString("MMMM dd, yyyy") ,
+                    ["[DOB]"] = applicant?.DOB?.ToString("MMMM dd, yyyy") ,
                     ["[PHONEPRIMARY]"] = GetContactInfo("phonePrimary") ,
                     ["[WORKPHONEPRIMARY]"] = GetContactInfo("workPhonePrimary") ,
                     ["[SUBJECTCODE]"] = subjectCodes?.Name?.ToString() ,
-                    ["[OIPCREASON]"] = oipcDetails?.Reason?.ToString() ,
+                    ["[OIPCREASON]"] = oipcDetails.Reason?.ToString() ,
                     ["[PUBLICATIONSTATUS]"] = openInformation?.PublicationStatus?.ToString() ,
                     ["[OPENINFORELEASE]"] = openInformation?.ExemptionName?.ToString() ,
                     ["[CORRECTIONNUMBER]"] = GetPersonalAttribute("BC Correctional Service Number")
@@ -267,6 +274,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
             {
                 string jsonString = rData.RequestRawData;
                 RequestDto details = JsonConvert.DeserializeObject<RequestDto>(jsonString);
+                details.Version = rData.Version;
 
                 return details;
             }

@@ -25,7 +25,6 @@ namespace MCS.FOI.Integration.Application
             services.AddScoped<ICommandHandler<UpdateTemplateCacheCommand, bool>, UpdateTemplateCacheCommandHandler>();
             #endregion
 
-
             #region Query Handler Injection
             services.AddScoped<IQueryHandler<GetTemplatesQuery, IEnumerable<TemplateResult>>, GetTemplatesQueryHandler>();
             #endregion

@@ -4,20 +4,17 @@ namespace MCS.FOI.Integration.Application.Commands.GetCorrespondence
 {
     public class GetCorrespondenceCommandHandler : ICommandHandler<GetCorrespondenceCommand, string>
     {
-        private readonly IWebHostEnvironment _hostingEnvironment; // to be removedd
         private readonly ITemplateMappingService _templateMapping;
         private readonly IS3ConnectionService _s3StorageService;
         private readonly ITemplateRepository _templateRepository;
         private readonly ITemplateRedisCacheRepository _templateCacheService;
 
         public GetCorrespondenceCommandHandler(
-            IWebHostEnvironment hostingEnvironment,
             ITemplateMappingService templateMapping,
             IS3ConnectionService s3StorageService,
             ITemplateRepository templateRepository,
             ITemplateRedisCacheRepository templateCacheService)
         {
-            _hostingEnvironment = hostingEnvironment;
             _templateMapping = templateMapping;
             _s3StorageService = s3StorageService;
             _templateRepository = templateRepository;

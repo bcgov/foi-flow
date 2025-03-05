@@ -2,6 +2,7 @@
 {
     public class RequestDto
     {
+        public int Version { get; set; }
         public int RequestId { get; set; }
         public string? DueDate { get; set; }
         public string? ReceivedMode { get; set; }

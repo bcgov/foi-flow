@@ -15,12 +15,7 @@
         public string? Investigator { get; set; }
         public DateTime? ReceivedDate { get; set; }
         public DateTime? ClosedDate { get; set; }
-
-        // Audit Fields
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public string CreatedBy { get; set; } = string.Empty;
-        public DateTime? UpdatedAt { get; set; }
-        public string? UpdatedBy { get; set; }
         public string? Reason { get; set; }
+
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace MCS.FOI.Integration.Application.Services.TemplateDataService
+﻿using System;
+
+namespace MCS.FOI.Integration.Application.Services.TemplateDataService
 {
     public class TemplateDataService : ITemplateDataService
     {
@@ -160,17 +162,17 @@
             return await _repository.QueryAsync<FOIRequestExtensionsDto>(query, parameters);
         }
 
-        public async Task<IEnumerable<PaymentDto>> GetPaymentFees(int foiRequestId)
+        public async Task<IEnumerable<FOIRequestApplicationFeeDto>> GetApplicationFees(int? rawRequestId)
         {
             const string query = @"
-                SELECT * 
-                FROM public.""Payments"" 
-                WHERE request_id = @FOIRequestId"
+                SELECT * FROM public.""FOIRequestApplicationFees""
+                WHERE rawrequestid = @RawRequestId
+                ORDER BY version DESC"
             ;
 
-            var parameters = new { FOIRequestId = foiRequestId };
+            var parameters = new { RawRequestId = rawRequestId };
 
-            return await _repository.QueryAsync<PaymentDto>(query, parameters);
+            return await _repository.QueryAsync<FOIRequestApplicationFeeDto>(query, parameters);
         }
 
         public async Task<IEnumerable<FOIRequestExtensionsDto>> GetExtensions(int? ministryRequestId, int? ministryRequestVersionId)
