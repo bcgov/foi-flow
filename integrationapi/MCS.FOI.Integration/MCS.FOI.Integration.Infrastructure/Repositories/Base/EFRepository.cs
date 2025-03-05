@@ -23,7 +23,7 @@
         /// <summary>
         /// Adds a collection of entities asynchronously.
         /// </summary>
-        public async Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        public virtual async Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
         {
             if (entities == null) throw new ArgumentNullException(nameof(entities));
             await _dbSet.AddRangeAsync(entities, cancellationToken);
@@ -32,7 +32,7 @@
         /// <summary>
         /// Retrieves entities based on a filter, sorting, and includes.
         /// </summary>
-        public async Task<IEnumerable<TEntity>> GetAsync(
+        public virtual async Task<IEnumerable<TEntity>> GetAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             CancellationToken cancellationToken = default,
@@ -57,7 +57,7 @@
         /// <summary>
         /// Performs bulk insert or update of entities.
         /// </summary>
-        public async Task BulkInsertOrUpdateAsync(IEnumerable<TEntity> entities)
+        public virtual async Task BulkInsertOrUpdateAsync(IEnumerable<TEntity> entities)
         {
             if (entities == null) throw new ArgumentNullException(nameof(entities));
 
@@ -73,7 +73,7 @@
         /// <summary>
         /// Deletes a single entity.
         /// </summary>
-        public async Task DeleteAsync(TEntity entity)
+        public virtual async Task DeleteAsync(TEntity entity)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
             _dbSet.Remove(entity);
@@ -82,7 +82,7 @@
         /// <summary>
         /// Deletes a collection of entities.
         /// </summary>
-        public async Task DeleteRangeAsync(IEnumerable<TEntity> entities)
+        public virtual async Task DeleteRangeAsync(IEnumerable<TEntity> entities)
         {
             if (entities == null) throw new ArgumentNullException(nameof(entities));
             _dbSet.RemoveRange(entities);
@@ -101,7 +101,7 @@
         /// <summary>
         /// Updates a collection of entities.
         /// </summary>
-        public async Task UpdateRangeAsync(IEnumerable<TEntity> entitiesToUpdate)
+        public virtual async Task UpdateRangeAsync(IEnumerable<TEntity> entitiesToUpdate)
         {
             if (entitiesToUpdate == null) throw new ArgumentNullException(nameof(entitiesToUpdate));
 
@@ -109,6 +109,22 @@
             {
                 _dbContext.Entry(entity).State = EntityState.Modified;
             }
+        }
+
+        /// <summary>
+        /// Get collection of entities.
+        /// </summary>
+        public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
+        {
+            return await _dbSet.AsNoTracking().ToListAsync();
+        }
+
+        /// <summary>
+        /// Save entities.
+        /// </summary>
+        public virtual async Task SaveChangesAsync()
+        {
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

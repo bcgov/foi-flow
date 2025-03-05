@@ -14,10 +14,10 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Hosting;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.EntityFrameworkCore.Migrations;
-global using MCS.FOI.Integration.Core.Repositories;
 
 
 global using MCS.FOI.Integration.Core.Repositories.Base;
 global using MCS.FOI.Integration.Core.Entities;
 global using MCS.FOI.Integration.Infrastructure.Data;
 global using MCS.FOI.Integration.Infrastructure.Repositories.Base;
+global using MCS.FOI.Integration.Core.Repositories;

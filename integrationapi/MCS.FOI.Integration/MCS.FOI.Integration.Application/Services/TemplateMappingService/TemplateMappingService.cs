@@ -1,16 +1,25 @@
-﻿namespace MCS.FOI.Integration.Application.Services.TemplateService
+﻿using System.Security.Claims;
+using System.Text.RegularExpressions;
+
+namespace MCS.FOI.Integration.Application.Services.TemplateService
 {
     public class TemplateMappingService : ITemplateMappingService
     {
         private readonly ITemplateDataService _templateDataService;
         private readonly ITemplateFieldMappingRepository _templateFieldMapping;
+        private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public TemplateMappingService(
             ITemplateFieldMappingRepository templateFieldMapping,
-            ITemplateDataService templateDataService)
+            ITemplateDataService templateDataService,
+            IConfiguration configuration,
+            IHttpContextAccessor httpContextAccessor)
         {
             _templateFieldMapping = templateFieldMapping;
             _templateDataService = templateDataService;
+            _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IEnumerable<TemplateFieldMappingDto>> GenerateFieldsMapping(int foiRequestId, int foiMinistryRequestId)
@@ -33,31 +42,123 @@
 
         private async Task<Dictionary<string, string?>> GenerateStringMapping(int foiRequestId, int foiMinistryRequestId)
         {
+            var rawRequest = await GetRawRequestDetails(foiRequestId);
             var request = await _templateDataService.GetRequest(foiRequestId);
             var requestMinistry = await _templateDataService.GetRequestByMinistryRequestId(foiMinistryRequestId);
-            var assignee = await _templateDataService.GetAssignee(foiMinistryRequestId);
-            var requestContactInfo = await _templateDataService.GetRequestContactInformation(foiRequestId, request.Version);
-            var requestApplicants = await _templateDataService.GetRequestApplicantInfos(foiRequestId, request.Version, RequestorType.Self);
-            var anotherPerson = await _templateDataService.GetRequestApplicantInfos(foiRequestId, request.Version, RequestorType.OnBehalfOf);
-            var oipcDetails = await _templateDataService.GetFOIRequestOIPC(foiRequestId, request.Version);
-            var programArea = await _templateDataService.GetProgramArea(requestMinistry.ProgramAreaId);
+            bool isRawRequest = request.FOIRequestId.Equals(0) && requestMinistry.FOIMinistryRequestId.Equals(0);
+
+            var templateData = new Dictionary<string, string?>();
+
+            if (isRawRequest) 
+            {
+                templateData = await PopulateRawRequestData(rawRequest);
+            }
+            else
+            {
+                templateData = await PopulateProcessedRequestData(request, requestMinistry);
+            }
+
+            return templateData;
+        }
+
+        private async Task<Dictionary<string, string?>> PopulateRawRequestData(RequestDto rawRequest)
+        {
+            var applicationFees = await _templateDataService.GetApplicationFees(rawRequest.RequestId);
+            var additionalInfo = rawRequest?.AdditionalPersonalInfo ?? new PersonalInfoDto();
+            var applicantFullName = FormatFullName(rawRequest?.FirstName, rawRequest?.LastName);
+            var onBehalfFullName = FormatFullName(additionalInfo?.AnotherFirstName, additionalInfo?.AnotherLastName);
+            var assigneeFullName = FormatFullName(rawRequest?.AssignedToFirstName, rawRequest?.AssignedToLastName);
+            var receivedDate = !string.IsNullOrEmpty(rawRequest?.ReceivedDate) ? DateTime.Parse(rawRequest?.ReceivedDate).ToString("MMMM dd, yyyy") : string.Empty;
+            var dateOfBirth = !string.IsNullOrEmpty(additionalInfo?.BirthDate) ? DateTime.Parse(additionalInfo?.BirthDate).ToString("MMMM dd, yyyy") : string.Empty;
+            var dueDate = !string.IsNullOrEmpty(rawRequest?.DueDate) ? DateTime.Parse(rawRequest?.DueDate).ToString("MMMM dd, yyyy") : string.Empty;
+            var officeName = Regex.Replace(rawRequest?.SelectedMinistries?.FirstOrDefault()?.Name ?? string.Empty, "^Ministry of ", "", RegexOptions.IgnoreCase);
+            var faxNumber = _configuration.GetValue<string>("FaxNumber") ?? "(250) 3879843";
+
+            string GetAddress()
+            {
+                var addressParts = new[] { rawRequest?.Address, rawRequest?.City, rawRequest?.Province, rawRequest?.Country, rawRequest?.Postal };
+                return string.Join(" ", addressParts.Where(adrs => !string.IsNullOrWhiteSpace(adrs)));
+            }
+
+            string FormatFullName(string? firstName, string? lastName) =>
+                string.Join(" ", new[] { firstName, lastName }.Where(name => !string.IsNullOrWhiteSpace(name)));
+
+            return new Dictionary<string, string?>
+            {
+                ["[REQUESTNUMBER]"] = rawRequest?.AxisRequestId,
+                ["[TODAYDATE]"] = DateTime.Now.ToString("MMMM dd, yyyy"),
+                ["[RQREMAIL]"] = rawRequest?.Email,
+                ["[RQRFAX]"] = faxNumber,
+                ["[ADDRESS]"] = GetAddress()?.ToString(),
+                ["[RFNAME]"] = rawRequest?.FirstName,
+                ["[RLNAME]"] = rawRequest?.LastName,
+                ["[RMNAME]"] = string.Empty,
+                ["[ONBEHALFOF]"] = onBehalfFullName,
+                ["[ACTIONOFFICENAME]"] = officeName,
+                ["[ASSIGNEE]"] = assigneeFullName,
+                ["[REQUESTERCATEGORY]"] = rawRequest?.Category,
+                ["[RECEIVEDDATE]"] = receivedDate,
+                ["[REQUESTDESCRIPTION]"] = rawRequest?.Description,
+                ["[PERFECTEDDATE]"] = rawRequest?.FromDate,
+                ["[DUEDATE]"] = DateTime.Parse(rawRequest?.DueDate).ToString("MMMM dd, yyyy"),
+                ["[STREET1]"] = rawRequest?.Address,
+                ["[CITY]"] = rawRequest?.City,
+                ["[STATE/PROVINCESHORT]"] = rawRequest?.Province,
+                ["[COUNTRY]"] = rawRequest?.Country,
+                ["[ZIP/POSTALCODE]"] = rawRequest?.Postal,
+                ["[REQUESTERNAME]"] = applicantFullName,
+                ["[COMPANY]"] = rawRequest?.BusinessName,
+                ["[ASSIGNEEFIRSTNAME]"] = rawRequest?.AssignedToFirstName,
+                ["[ASSIGNEELASTNAME]"] = rawRequest?.AssignedToLastName,
+                ["[ASSIGNEDGROUP]"] = rawRequest?.AssignedGroup,
+                ["[DOB]"] = dateOfBirth,
+                ["[PHONEPRIMARY]"] = rawRequest?.PhonePrimary,
+                ["[WORKPHONEPRIMARY]"] = rawRequest?.WorkPhonePrimary,
+                ["[SUBJECTCODE]"] = rawRequest?.SubjectCode,
+                ["[CORRECTIONNUMBER]"] = rawRequest?.CorrectionalServiceNumber,
+                ["[APPLICATION_FEE_AMOUNT]"] = applicationFees?.FirstOrDefault()?.AmountPaid?.ToString("F2") ?? string.Empty
+            };
+        }
+
+        private async Task<Dictionary<string, string?>> PopulateProcessedRequestData(FOIRequestDto request, FOIMinistryRequestDto requestMinistry)
+        {
+            var applicationFees = await _templateDataService.GetApplicationFees(request.FOIRawRequestId);
+            var requestContactInfo = await _templateDataService.GetRequestContactInformation(request.FOIRequestId, request.Version);
+            var requestApplicants = await _templateDataService.GetRequestApplicantInfos(request.FOIRequestId, request.Version, RequestorType.Self);
+            var anotherPerson = await _templateDataService.GetRequestApplicantInfos(request.FOIRequestId, request.Version, RequestorType.OnBehalfOf);
+            var foiOIPCDetails = await _templateDataService.GetFOIRequestOIPC(request.FOIRequestId, request.Version);
             var applicantCategory = await _templateDataService.GetApplicantCategory(request.ApplicantCategoryId);
-            var operatingTeamEmails = await _templateDataService.GetOperatingTeamEmails(requestMinistry.AssignedGroup);
-            var paymentFees = await _templateDataService.GetPaymentFees(foiRequestId);
-            var originalLdd = await _templateDataService.GetRequestOriginalDueDate(foiMinistryRequestId);
             var receivedModes = await _templateDataService.GetReceivedModes(request.ReceivedModeId ?? 0);
-            var foiRequestExtension = await _templateDataService.GetExtensions(foiMinistryRequestId, requestMinistry.Version);
-            var foiSubjectCodes = await _templateDataService.GetMinistryRequestSubjectCodes(foiMinistryRequestId, requestMinistry.Version);
-            var oipcExtension = GetExtensionDetails(foiRequestExtension, ExtensionType.OIPC);
-            var pbExtension = GetExtensionDetails(foiRequestExtension, ExtensionType.PublicBody);
+            var foiPersonalAttribute = await _templateDataService.GetRequestPersonalAttributes(request.FOIRequestId, requestMinistry.Version);
+
+            var assignee = await _templateDataService.GetAssignee(requestMinistry.FOIMinistryRequestId);
+            var originalLdd = await _templateDataService.GetRequestOriginalDueDate(requestMinistry.FOIMinistryRequestId);
+            var foiRequestExtension = await _templateDataService.GetExtensions(requestMinistry.FOIMinistryRequestId, requestMinistry.Version);
+            var openInformationRequest = await _templateDataService.GetOpenInformationRequests(requestMinistry.FOIMinistryRequestId, requestMinistry.Version);
+            var foiSubjectCodes = await _templateDataService.GetMinistryRequestSubjectCodes(requestMinistry.FOIMinistryRequestId, requestMinistry.Version);
+            var programArea = await _templateDataService.GetProgramArea(requestMinistry.ProgramAreaId);
+            var operatingTeamEmails = await _templateDataService.GetOperatingTeamEmails(requestMinistry.AssignedGroup);
+
+            var oipcExtension = GetOIPCExtensionDetails(foiRequestExtension);
+            var pbExtension = GetPublicBodyExtensionDetails(foiRequestExtension);
 
             var applicant = requestApplicants.FirstOrDefault();
             var onBehalf = anotherPerson.FirstOrDefault();
             var primaryProgramArea = programArea.FirstOrDefault(r => r.ProgramAreaId == requestMinistry.ProgramAreaId);
             var primaryApplicantCategory = applicantCategory.FirstOrDefault(r => r.ApplicantCategoryId == request.ApplicantCategoryId);
-            var extensionData = foiRequestExtension?.FirstOrDefault();
-            var subjectCodes = foiSubjectCodes?.FirstOrDefault();
-            var applicationFees = paymentFees?.Where(r => r.FeeCodeId.Equals(1));
+            var extensionData = foiRequestExtension?.FirstOrDefault() ?? new FOIRequestExtensionsDto();
+            var subjectCodes = foiSubjectCodes?.FirstOrDefault() ?? new SubjectCodeDto();
+            var fee = applicationFees?.FirstOrDefault();
+            var oipcDetails = foiOIPCDetails?.FirstOrDefault() ?? new FOIRequestOIPCDto();
+            var openInformation = openInformationRequest?.FirstOrDefault();
+            var extensionApprovedDate = extensionData.ExtensionType.Equals(ExtensionType.PublicBody.ToString()) ?
+               pbExtension?.ExtendedDueDate : oipcExtension?.ExtendedDueDate;
+            var faxNumber = _configuration.GetValue<string>("FaxNumber") ?? "(250) 3879843";
+            var assigneeEmail = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty;
+
+
+            string? GetPersonalAttribute(string dataFormat) =>
+                foiPersonalAttribute.FirstOrDefault(r => r.AttributeName == dataFormat)?.AttributeValue?.ToString();
 
             string? GetContactInfo(string dataFormat) =>
                 requestContactInfo.FirstOrDefault(r => r.DataFormat == dataFormat)?.ContactInformation?.ToString();
@@ -78,63 +179,64 @@
 
             var templateData = new Dictionary<string, string?>
             {
-                { "[REQUESTNUMBER]", requestMinistry.AxisRequestId },
-                { "[OIPCNUMBER]",  ProcessOipcDetails(oipcDetails.ToList()).oipcNumber},
-                { "[TODAYDATE]", DateTime.Now.ToString("MMMM dd, yyyy") },
-                { "[RQREMAIL]", GetContactInfo("email") },
-                { "[RQRFAX]", "(250) 3879843" },
-                { "[ADDRESS]", GetFullAddress().ToString() },
-                { "[RFNAME]", applicant?.FirstName },
-                { "[RLNAME]", applicant?.LastName },
-                { "[RMNAME]", applicant?.MiddleName },
-                { "[ONBEHALFOF]", string.Join(" ", new[] { onBehalf?.FirstName, onBehalf?.MiddleName, onBehalf?.LastName }
-                                      .Where(namePart => !string.IsNullOrWhiteSpace(namePart))) },
-                { "[ACTIONOFFICENAME]", primaryProgramArea?.OfficeName },
-                { "[ASSIGNEE]", $"{assignee?.FirstName} {assignee?.LastName}" },
-                { "[REQUESTERCATEGORY]", primaryApplicantCategory?.Description?.ToString() },
-                { "[RECEIVEDDATE]", request.ReceivedDate.ToString("MMMM dd, yyyy") },
-                { "[REQUESTDESCRIPTION]", request.InitialDescription },
-                { "[PERFECTEDDATE]", request.InitialRecordSearchFromDate?.ToString("MMMM dd, yyyy") },
-                { "[APPLICATION_FEE_AMOUNT]", applicationFees.Any() ?
-                        applicationFees?.Select(r => (r.Quantity * r.Total)).Sum().ToString() : string.Empty },
-                { "[OIPCORDERNUMBER]", string.Join(",", ProcessOipcDetails(oipcDetails.ToList()).oipcOrderNumber) },
-                { "[DUEDATE]", requestMinistry.DueDate.ToString("MMMM dd, yyyy") },
-                { "[ADDITIONALXX]", extensionData?.ApprovedNoOfDays?.ToString() },
-                { "[EXTENDED_DUE_DATE]", extensionData?.ExtendedDueDate?.ToString("MMMM dd, yyyy") },
-                { "[PRIMARYUSERREMAIL]", string.Empty },
-                { "[PRIMARYUSERPHONE]", string.Empty }, //No need to Map for now. But will be mapped later
-                { "[PRIMARYUSERTITLE]", string.Empty }, //No need to Map for now. But will be mapped later
-                { "[LINKEDREQUESTS]", AssignMinistryNames(requestMinistry.LinkedRequests, programArea)  },
-                { "[STREET1]", GetContactInfo("address") },
-                { "[STREET2]", GetContactInfo("addressSecondary") },
-                { "[CITY]", GetContactInfo("city") },
-                { "[STATE/PROVINCESHORT]", GetContactInfo("province") },
-                { "[COUNTRY]", GetContactInfo("country") },
-                { "[ZIP/POSTALCODE]", GetContactInfo("postal") },
-                { "[REQUESTERNAME]", $"{applicant?.FirstName} {applicant?.LastName}" },
-                { "[COMPANY]", $"{applicant?.BusinessName}" },
-                { "[RESPONSEDATE]", string.Empty }, //No need to Map for now. But will be mapped later
-                { "[ASSIGNEEFIRSTNAME]", $"{assignee?.FirstName}" },
-                { "[ASSIGNEELASTNAME]", $"{assignee?.LastName}" },
-                { "[ASSIGNEDGROUP]", requestMinistry?.AssignedGroup },
-                { "[ASSIGNEDGROUPEMAILS]", operatingTeamEmails?.First()?.EmailAddress},
-                { "[ARCSNUMBER]", request.RequestType.Equals("general") ? "30": "40" },
-
-                { "[OIPCEXTENSIONDUEDAYS]", oipcExtension?.ExtendedDueDays },
-                { "[OIPCORIGINALRECEIVEDDATE]", request?.ReceivedDate.ToString("MMMM dd, yyyy") },
-                { "[OIPCORIGINALDUEDATE]", requestMinistry?.OriginalLDD?.ToString("MMMM dd, yyyy") ?? originalLdd?.DueDate.ToString("MMMM dd, yyyy") },
-                { "[OIPCCURRENTDUEDATE]", requestMinistry?.DueDate.ToString("MMMM dd, yyyy") },
-                { "[OIPCEXTENSIONDUEDATES]", oipcExtension?.ExtendedDueDate.ToString()},
-                { "[PBEXTENSIONDUEDAYS]", pbExtension?.ExtendedDueDays },
-                { "[PBEXTENSIONDUEDATE]", pbExtension?.ExtendedDueDate.ToString() },
-                { "[EXTENSION_APPROVED_DATE]", extensionData?.DecisionDate.ToString() },
-                { "[DOB]", applicant?.DOB.ToString() },
-                { "[PHONEPRIMARY]", GetContactInfo("phonePrimary") },
-                { "[WORKPHONEPRIMARY]", GetContactInfo("workPhonePrimary") },
-                { "[SUBJECTCODE]", subjectCodes?.Name.ToString() }
+                    ["[REQUESTNUMBER]"] = requestMinistry.AxisRequestId ,
+                    ["[OIPCNUMBER]"] =  ProcessOipcDetails(oipcDetails).oipcNumber,
+                    ["[TODAYDATE]"] = DateTime.Now.ToString("MMMM dd, yyyy") ,
+                    ["[RQREMAIL]"] = GetContactInfo("email") ,
+                    ["[RQRFAX]"] = faxNumber,
+                    ["[ADDRESS]"] = GetFullAddress().ToString() ,
+                    ["[RFNAME]"] = applicant?.FirstName ,
+                    ["[RLNAME]"] = applicant?.LastName ,
+                    ["[RMNAME]"] = applicant?.MiddleName ,
+                    ["[ONBEHALFOF]"] = string.Join(" ", new[] { onBehalf?.FirstName, onBehalf?.MiddleName, onBehalf?.LastName }.Where(namePart => !string.IsNullOrWhiteSpace(namePart))),
+                    ["[ACTIONOFFICENAME]"] = primaryProgramArea?.OfficeName ,
+                    ["[ASSIGNEE]"] = $"{assignee?.FirstName} {assignee?.LastName}" ,
+                    ["[REQUESTERCATEGORY]"] = primaryApplicantCategory?.Description?.ToString() ,
+                    ["[RECEIVEDDATE]"] = request?.ReceivedDate.ToString("MMMM dd, yyyy") ,
+                    ["[REQUESTDESCRIPTION]"] = request?.InitialDescription ,
+                    ["[PERFECTEDDATE]"] = request?.InitialRecordSearchFromDate?.ToString("MMMM dd, yyyy") ,
+                    ["[APPLICATION_FEE_AMOUNT]"] = fee?.AmountPaid?.ToString("F2") ?? string.Empty,
+                    ["[OIPCORDERNUMBER]"] = string.Join(",", ProcessOipcDetails(oipcDetails).oipcOrderNumber) ,
+                    ["[DUEDATE]"] = requestMinistry?.DueDate.ToString("MMMM dd, yyyy") ,
+                    ["[ADDITIONALXX]"] = extensionData?.ApprovedNoOfDays?.ToString() ,
+                    ["[EXTENDED_DUE_DATE]"] = extensionData?.ExtendedDueDate?.ToString("MMMM dd, yyyy") ,
+                    ["[PRIMARYUSERREMAIL]"] = assigneeEmail,
+                    ["[PRIMARYUSERPHONE]"] = string.Empty , //No need to Map for now.
+                    ["[PRIMARYUSERTITLE]"] = string.Empty , //No need to Map for now.
+                    ["[LINKEDREQUESTS]"] = AssignMinistryNames(requestMinistry.LinkedRequests, programArea)  ,
+                    ["[STREET1]"] = GetContactInfo("address") ,
+                    ["[STREET2]"] = GetContactInfo("addressSecondary") ,
+                    ["[CITY]"] = GetContactInfo("city") ,
+                    ["[STATE/PROVINCESHORT]"] = GetContactInfo("province") ,
+                    ["[COUNTRY]"] = GetContactInfo("country") ,
+                    ["[ZIP/POSTALCODE]"] = GetContactInfo("postal") ,
+                    ["[REQUESTERNAME]"] = $"{applicant?.FirstName} {applicant?.LastName}" ,
+                    ["[COMPANY]"] = $"{applicant?.BusinessName}" ,
+                    ["[RESPONSEDATE]"] = string.Empty , //No need to Map for now.
+                    ["[ASSIGNEEFIRSTNAME]"] = $"{assignee?.FirstName}" ,
+                    ["[ASSIGNEELASTNAME]"] = $"{assignee?.LastName}" ,
+                    ["[ASSIGNEDGROUP]"] = requestMinistry?.AssignedGroup ,
+                    ["[ASSIGNEDGROUPEMAILS]"] = operatingTeamEmails?.FirstOrDefault()?.EmailAddress,
+                    ["[ARCSNUMBER]"] = (request?.RequestType ?? "").Equals("general") ? "40": "30" ,
+                    ["[OIPCEXTENSIONDUEDAYS]"] = oipcExtension?.ExtendedDueDays ,
+                    ["[OIPCORIGINALRECEIVEDDATE]"] = request?.ReceivedDate.ToString("MMMM dd, yyyy") ,
+                    ["[OIPCORIGINALDUEDATE]"] = requestMinistry?.OriginalLDD?.ToString("MMMM dd, yyyy") ?? originalLdd?.DueDate.ToString("MMMM dd, yyyy") ,
+                    ["[OIPCCURRENTDUEDATE]"] = requestMinistry?.DueDate.ToString("MMMM dd, yyyy") ,
+                    ["[OIPCEXTENSIONDUEDATES]"] = oipcExtension?.ExtendedDueDate ,
+                    ["[PBEXTENSIONDUEDAYS]"] = pbExtension?.ExtendedDueDays ,
+                    ["[PBEXTENSIONDUEDATE]"] = pbExtension?.ExtendedDueDate ,
+                    ["[EXTENSION_APPROVED_DATE]"] = extensionApprovedDate ,
+                    ["[DOB]"] = applicant?.DOB?.ToString("MMMM dd, yyyy") ,
+                    ["[PHONEPRIMARY]"] = GetContactInfo("phonePrimary") ,
+                    ["[WORKPHONEPRIMARY]"] = GetContactInfo("workPhonePrimary") ,
+                    ["[SUBJECTCODE]"] = subjectCodes?.Name?.ToString() ,
+                    ["[OIPCREASON]"] = oipcDetails.Reason?.ToString() ,
+                    ["[PUBLICATIONSTATUS]"] = openInformation?.PublicationStatus?.ToString() ,
+                    ["[OPENINFORELEASE]"] = openInformation?.ExemptionName?.ToString() ,
+                    ["[CORRECTIONNUMBER]"] = GetPersonalAttribute("BC Correctional Service Number")
             };
 
-            await PopulateFeeAndPaymentData(templateData, foiMinistryRequestId, foiRequestId);
+            await PopulateFeeAndPaymentData(templateData, requestMinistry.FOIMinistryRequestId, request.FOIRequestId);
 
             return templateData;
         }
@@ -171,17 +273,27 @@
             }
         }
 
-        private (string oipcNumber, string oipcOrderNumber) ProcessOipcDetails(List<FOIRequestOIPCDto> oipcDetails)
+        private async Task<RequestDto> GetRawRequestDetails(int rawRequestId)
         {
-            var oipcNumber = string.Join(",", oipcDetails.Select(o => o.OipcNo));
+            var rawRequest = await _templateDataService.GetRawRequest(rawRequestId);
+            var rData = rawRequest?.OrderByDescending(r=> r.Version).FirstOrDefault();
+            if (rData.RequestRawData != null)
+            {
+                string jsonString = rData.RequestRawData;
+                RequestDto details = JsonConvert.DeserializeObject<RequestDto>(jsonString);
+                details.Version = rData.Version;
 
-            var orderNumbers = oipcDetails
-                .Select(r =>
-                    JsonConvert.DeserializeObject<InquiryAttributes>(r.InquiryAttributes ?? "{}")?.OrderNo)
-                .Where(orderno => !string.IsNullOrEmpty(orderno))
-                .ToList();
+                return details;
+            }
 
-            var oipcOrderNumber = string.Join(",", orderNumbers);
+            return null;
+        }
+
+        private (string oipcNumber, string oipcOrderNumber) ProcessOipcDetails(FOIRequestOIPCDto oipcDetail)
+        {
+            var oipcNumber = oipcDetail.OipcNo;
+
+            var oipcOrderNumber = JsonConvert.DeserializeObject<InquiryAttributes>(oipcDetail.InquiryAttributes ?? "{}")?.OrderNo ?? string.Empty;
 
             return (oipcNumber, oipcOrderNumber);
         }
@@ -212,7 +324,7 @@
             }
         }
 
-        private static ExtensionDetails GetExtensionDetails(IEnumerable<FOIRequestExtensionsDto> requestExtensions, string extensionType)
+        private static ExtensionDetails GetPublicBodyExtensionDetails(IEnumerable<FOIRequestExtensionsDto> requestExtensions)
         {
             if (requestExtensions == null || requestExtensions.ToList().Count == 0)
                 return new ExtensionDetails();
@@ -223,22 +335,38 @@
 
             var extension = new ExtensionDetails();
 
-            if (recentExtension.ExtensionType == ExtensionType.PublicBody &&
-                recentExtension.ExtensionStatus?.ToString() == "Approved")
+            if (recentExtension.ExtensionType == ExtensionType.PublicBody)
             {
                 extension.ExtendedDueDays = recentExtension.ExtendedDueDays?.ToString() ?? string.Empty;
-                extension.ExtendedDueDate = recentExtension.ExtendedDueDate?.ToString() ?? string.Empty;
+                extension.ExtendedDueDate = recentExtension.ExtendedDueDate?.ToString("MMMM dd, yyyy") ?? string.Empty;
                 extension.ExtensionReason = recentExtension.ExtensionReason?.ToString() ?? string.Empty;
+                return extension;
             }
-            else if (recentExtension.ExtensionType == ExtensionType.OIPC)
+
+            return extension;
+        }
+
+        private static ExtensionDetails GetOIPCExtensionDetails(IEnumerable<FOIRequestExtensionsDto> requestExtensions)
+        {
+            if (requestExtensions == null || requestExtensions.ToList().Count == 0)
+                return new ExtensionDetails();
+
+            var recentExtension = requestExtensions.FirstOrDefault();
+            if (recentExtension == null || string.IsNullOrEmpty(recentExtension.ExtensionType))
+                return new ExtensionDetails();
+
+            var extension = new ExtensionDetails();
+
+            if (recentExtension.ExtensionType == ExtensionType.OIPC)
             {
                 extension.ApprovedNoOfDays = recentExtension.ApprovedNoOfDays?.ToString() ?? string.Empty;
-                extension.ExtendedDueDate = recentExtension.ExtendedDueDate?.ToString() ?? string.Empty;
+                extension.ExtendedDueDate = recentExtension.ExtendedDueDate?.ToString("MMMM dd, yyyy") ?? string.Empty;
                 extension.ExtensionReason = recentExtension.ExtensionReason?.ToString() ?? string.Empty;
-                extension.CreatedAt = recentExtension.CreatedAt.ToString() ?? string.Empty;
+                extension.CreatedAt = recentExtension.CreatedAt.ToString("MMMM dd, yyyy") ?? string.Empty;
                 extension.ExtensionReasonId = recentExtension.ExtensionReasonId.ToString() ?? string.Empty;
-                extension.DecisionDate = recentExtension.DecisionDate?.ToString() ?? string.Empty;
+                extension.DecisionDate = recentExtension.DecisionDate?.ToString("MMMM dd, yyyy") ?? string.Empty;
                 extension.ExtendedDueDays = recentExtension.ExtendedDueDays?.ToString() ?? string.Empty;
+                return extension;
             }
 
             return extension;

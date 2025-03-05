@@ -8,6 +8,13 @@
         public string FileName { get; init; } = string.Empty;
     }
 
+    public class GetCorrespondenceRequest
+    {
+        public int FOIRequestId { get; init; }
+        public int FOIMinistryRequestId { get; init; }
+        public string FileName { get; init; } = string.Empty;
+    }
+
     public class GetCorrespondenceResponse
     {
         public string Code { get; set; } = default!;

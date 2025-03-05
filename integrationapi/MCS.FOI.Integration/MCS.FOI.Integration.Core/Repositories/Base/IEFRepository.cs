@@ -16,6 +16,7 @@ namespace MCS.FOI.Integration.Core.Repositories.Base
         Task DeleteRangeAsync(IEnumerable<TEntity> entities);
         Task UpdateAsync(TEntity entityToUpdate);
         Task UpdateRangeAsync(IEnumerable<TEntity> entitiesToUpdate);
-
+        Task<IEnumerable<TEntity>> GetAllAsync();
+        Task SaveChangesAsync();
     }
 }

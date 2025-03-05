@@ -1,4 +1,4 @@
-﻿namespace MCS.FOI.Integration.Core.Repositories
+﻿namespace MCS.FOI.Integration.Infrastructure.Repositories
 {
     public class TemplateFieldMappingRepository : EFRepository<TemplateFieldMapping>, ITemplateFieldMappingRepository
     {

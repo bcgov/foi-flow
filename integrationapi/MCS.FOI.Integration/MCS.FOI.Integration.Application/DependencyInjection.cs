@@ -1,4 +1,7 @@
-﻿namespace MCS.FOI.Integration.Application
+﻿using MCS.FOI.Integration.Core.Repositories.RedisRepository;
+using MCS.FOI.Integration.Infrastructure.Repositories.RedisRepository;
+
+namespace MCS.FOI.Integration.Application
 {
     public static class DependencyInjection
     {
@@ -19,6 +22,7 @@
 
             #region Command Handler Injection
             services.AddScoped<ICommandHandler<GetCorrespondenceCommand, string>, GetCorrespondenceCommandHandler>();
+            services.AddScoped<ICommandHandler<UpdateTemplateCacheCommand, bool>, UpdateTemplateCacheCommandHandler>();
             #endregion
 
             #region Query Handler Injection
@@ -29,6 +33,7 @@
             services.AddScoped<ITemplateMappingService, TemplateMappingService>();
             services.AddScoped<ITemplateDataService, TemplateDataService>();
             services.AddScoped<IS3ConnectionService, S3ConnectionService>();
+            services.AddScoped<ITemplateRedisCacheRepository, TemplateRedisCacheRepository>();
             #endregion
 
             return services;

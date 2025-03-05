@@ -1,7 +1,11 @@
-﻿namespace MCS.FOI.Integration.Infrastructure.Extensions
+﻿using MCS.FOI.Integration.Core.Repositories.RedisRepository;
+
+namespace MCS.FOI.Integration.Infrastructure.Extensions
 {
     public class RedisDataContextSeed
     {
+        private const string CachePrefix = "Template_";
+
         public static async Task SeedRedisAsync(
             IIntegrationDbContext dbContext,
             IRedisDbContext redisContext,
@@ -16,7 +20,7 @@
             try
             {
                 logger.LogInformation("Starting Redis seeding...");
-                await SeedListValuesAsync(dbContext, redisContext, logger);
+                await SeedTemplatesBase64FormatAsync(dbContext, redisContext, logger);
                 logger.LogInformation("Redis seeding completed successfully.");
             }
             catch (Exception ex)
@@ -37,29 +41,33 @@
             }
         }
 
-        private static async Task SeedListValuesAsync(
+        private static async Task SeedTemplatesBase64FormatAsync(
             IIntegrationDbContext dbContext,
             IRedisDbContext redisContext,
             ILogger logger)
         {
-            var batch = redisContext.Redis.CreateBatch();
-            var tasks = new List<Task>();
+            if (!redisContext.IsConnected) return;
 
+            var batch = redisContext.Redis.CreateBatch();
             var table = await dbContext.Template
                 .AsNoTracking()
                 .ToListAsync();
 
             if (table.Any())
             {
-                
+                var tasks = table.Select(template =>
+                {
+                    var key = $"{CachePrefix}{template.FileName.Trim()}";
+                    return batch.StringSetAsync(key, JsonConvert.SerializeObject(template));
+                }).ToList();
 
                 batch.Execute();
                 await Task.WhenAll(tasks);
-                logger.LogInformation("Redis caching completed for all list values.");
+                logger.LogInformation("Redis caching completed for all templates.");
             }
             else
             {
-                logger.LogWarning("No list values found for caching.");
+                logger.LogWarning("No templates found for caching.");
             }
         }
     }

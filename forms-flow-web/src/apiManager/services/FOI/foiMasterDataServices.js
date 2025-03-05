@@ -606,6 +606,25 @@ import {
     };
   };
 
+  export const refreshRedisCacheForTemplate = (...rest) => {
+    const done = fnDone(rest);
+    return (dispatch) => {
+      httpPOSTRequest(API.FOI_REFRESH_REDIS_CACHE_TEMPLATE,{}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            throw new Error("Error Refreshing Cache");
+          }
+        })
+        .catch((error) => {
+          done(error);
+          catchError(error, dispatch);
+        });
+    };
+  };
+
   export const fetchOIPCOutcomes = () => {    
     return (dispatch) => {
       httpGETRequest(API.FOI_GET_OIPC_OUTCOMES, {}, UserService.getToken())
