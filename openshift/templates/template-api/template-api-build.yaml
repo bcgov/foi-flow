@@ -48,7 +48,7 @@ parameters:
   displayName: Git Reference
   description: The git reference or branch.
   required: true
-  value: main
+  value: dev-marshal
 - name: SOURCE_CONTEXT_DIR
   displayName: Source Context Directory
   description: The source context directory.
