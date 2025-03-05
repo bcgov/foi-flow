@@ -40,7 +40,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
-import { DocumentEditorContainerComponent } from "@syncfusion/ej2-react-documenteditor";
 import { DocEditor } from './DocEditor';
 import CustomAutocomplete from '../Autocomplete'
 import { saveAs } from "file-saver";
@@ -254,6 +253,7 @@ export const ContactApplicant = ({
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
   const isEnabledTemplate = (item: any) => {
+    var name:string = item?.name ? item.name : item?.templatename ? item.templatename : "";
    if (['PAYONLINE', 'PAYOUTSTANDING'].includes(item.name)) { 
       return !isFeeTemplateDisabled(currentCFRForm, item); 
    } else if (['EXTENSIONS-PB'].includes(item.name)) {
@@ -295,7 +295,7 @@ export const ContactApplicant = ({
       _templates = templateList.map((template: any) => ({
           label: template.templateName,
           value: template.fileName,
-          disabled: !template.isActive,
+          disabled: !template.isActive && !isEnabledTemplate(template),
           created_at: template.createdAt
       }));
     }
