@@ -28,7 +28,8 @@ class FOIApplicantCorrespondenceSchema(Schema):
         required=False,
     )
     israwrequest = fields.Bool(data_key="israwrequest",required=False,allow_none=True)
-
+    templatename = fields.Str(data_key="templatename",allow_none=True)
+    templatetype = fields.Str(data_key="templatetype",allow_none=True)
 
 class FOIApplicantCorrespondenceEmailSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
