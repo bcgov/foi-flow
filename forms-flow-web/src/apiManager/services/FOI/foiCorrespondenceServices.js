@@ -1,4 +1,4 @@
-import { httpGETRequest, httpPOSTRequest, httpPOSTRequest1 } from "../../httpRequestHandler";
+import { httpGETRequest, httpPOSTRequest, httpPOSTRequestBlobResponse } from "../../httpRequestHandler";
   import UserService from "../../../services/UserService";
 import API from "../../endpoints";
   import {
@@ -403,7 +403,7 @@ export const exportPDF = (
   console.log("data: ", data);
   const apiUrl = API.FOI_EXPORT_PDF;
   console.log("apiUrl: ", apiUrl);
-  httpPOSTRequest1(apiUrl, data, UserService.getToken())
+  httpPOSTRequestBlobResponse(apiUrl, data, UserService.getToken())
   .then((res) => {
     console.log("res: ", res);
     if (res.data) {
