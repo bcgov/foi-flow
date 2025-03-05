@@ -164,6 +164,13 @@ namespace MCS.FOI.Integration.Application.Services.TemplateDataService
 
         public async Task<IEnumerable<FOIRequestApplicationFeeDto>> GetApplicationFees(int? rawRequestId)
         {
+            bool tableExists = await TableExistsAsync("FOIRequestApplicationFees");
+
+            if (!tableExists)
+            {
+                return new List<FOIRequestApplicationFeeDto>();
+            }
+
             const string query = @"
                 SELECT * FROM public.""FOIRequestApplicationFees""
                 WHERE rawrequestid = @RawRequestId
