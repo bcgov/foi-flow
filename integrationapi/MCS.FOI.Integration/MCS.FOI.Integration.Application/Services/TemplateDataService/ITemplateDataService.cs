@@ -11,7 +11,7 @@
         Task<IEnumerable<ApplicantCategoryDto>> GetApplicantCategory(int? applicantCategoryId);
         Task<FOIRequestCFRFeesDto> GetApprovedCRFFee(int? ministryRequestId);
         Task<FOIRequestPaymentDto> GetPayment(int? foiRequestId, int? ministryRequestId);
-        Task<IEnumerable<FOIRequestOIPCDto>> GetFOIRequestOIPC(int? ministryRequestId, int versionId);
+        Task<IEnumerable<FOIRequestOIPCDto?>> GetFOIRequestOIPC(int? ministryRequestId, int versionId);
         Task<IEnumerable<OperatingTeamEmailsDto>> GetOperatingTeamEmails(string? operatingTeamName);
         Task<IEnumerable<FOIRequestExtensionsDto>> GetFOIRequestExtensions(int? ministryRequestId, int? ministryRequestVersionId);
         Task<IEnumerable<FOIRequestApplicationFeeDto>> GetApplicationFees(int? rawRequestId);

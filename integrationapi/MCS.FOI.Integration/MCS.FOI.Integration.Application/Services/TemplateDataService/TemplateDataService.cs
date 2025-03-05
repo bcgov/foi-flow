@@ -114,7 +114,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateDataService
                 ?.OrderByDescending(r => r.PaymentId).FirstOrDefault() ?? new FOIRequestPaymentDto();
         }
 
-        public async Task<IEnumerable<FOIRequestOIPCDto>> GetFOIRequestOIPC(int? ministryRequestId, int versionId)
+        public async Task<IEnumerable<FOIRequestOIPCDto>?> GetFOIRequestOIPC(int? ministryRequestId, int versionId)
         {
             const string queryWithVersion = @"
                             SELECT oipc.*, r.name as Reason 
