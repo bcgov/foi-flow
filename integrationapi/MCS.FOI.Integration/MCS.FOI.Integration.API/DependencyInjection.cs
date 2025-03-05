@@ -23,6 +23,8 @@ namespace MCS.FOI.Integration.API
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
+            services.AddHttpContextAccessor();
+
 
             #region Register JWT Authentication
             var corsOrigin = configuration.GetValue<string>("JWTAuth:CORSORIGINS");
@@ -67,7 +69,18 @@ namespace MCS.FOI.Integration.API
                                     claimsIdentity.AddClaim(new Claim("groups", group));
                                 }
                             }
+
+                            var emailClaim = claimsIdentity.FindFirst(ClaimTypes.Email);
+                            if (emailClaim == null)
+                            {
+                                var email = context.Principal?.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")?.Value;
+                                if (!string.IsNullOrEmpty(email))
+                                {
+                                    claimsIdentity.AddClaim(new Claim(ClaimTypes.Email, email));
+                                }
+                            }
                         }
+
                         await Task.CompletedTask;
                     },
                     OnAuthenticationFailed = c =>

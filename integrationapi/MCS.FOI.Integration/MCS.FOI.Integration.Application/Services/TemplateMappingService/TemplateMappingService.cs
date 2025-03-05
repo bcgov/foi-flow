@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace MCS.FOI.Integration.Application.Services.TemplateService
 {
@@ -7,15 +8,18 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
         private readonly ITemplateDataService _templateDataService;
         private readonly ITemplateFieldMappingRepository _templateFieldMapping;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public TemplateMappingService(
             ITemplateFieldMappingRepository templateFieldMapping,
             ITemplateDataService templateDataService,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IHttpContextAccessor httpContextAccessor)
         {
             _templateFieldMapping = templateFieldMapping;
             _templateDataService = templateDataService;
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IEnumerable<TemplateFieldMappingDto>> GenerateFieldsMapping(int foiRequestId, int foiMinistryRequestId)
@@ -51,7 +55,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
             }
             else
             {
-                templateData = await PopulateProcessedRequestData(foiRequestId, foiMinistryRequestId, request, requestMinistry);
+                templateData = await PopulateProcessedRequestData(request, requestMinistry);
             }
 
             return templateData;
@@ -116,23 +120,25 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
             };
         }
 
-        private async Task<Dictionary<string, string?>> PopulateProcessedRequestData(int foiRequestId, int foiMinistryRequestId, FOIRequestDto request, FOIMinistryRequestDto requestMinistry)
+        private async Task<Dictionary<string, string?>> PopulateProcessedRequestData(FOIRequestDto request, FOIMinistryRequestDto requestMinistry)
         {
             var applicationFees = await _templateDataService.GetApplicationFees(request.FOIRawRequestId);
-            var requestContactInfo = await _templateDataService.GetRequestContactInformation(foiRequestId, request.Version);
-            var requestApplicants = await _templateDataService.GetRequestApplicantInfos(foiRequestId, request.Version, RequestorType.Self);
-            var anotherPerson = await _templateDataService.GetRequestApplicantInfos(foiRequestId, request.Version, RequestorType.OnBehalfOf);
-            var foiOIPCDetails = await _templateDataService.GetFOIRequestOIPC(foiRequestId, request.Version);
+            var requestContactInfo = await _templateDataService.GetRequestContactInformation(request.FOIRequestId, request.Version);
+            var requestApplicants = await _templateDataService.GetRequestApplicantInfos(request.FOIRequestId, request.Version, RequestorType.Self);
+            var anotherPerson = await _templateDataService.GetRequestApplicantInfos(request.FOIRequestId, request.Version, RequestorType.OnBehalfOf);
+            var foiOIPCDetails = await _templateDataService.GetFOIRequestOIPC(request.FOIRequestId, request.Version);
             var applicantCategory = await _templateDataService.GetApplicantCategory(request.ApplicantCategoryId);
-            var assignee = await _templateDataService.GetAssignee(foiMinistryRequestId);
+            var receivedModes = await _templateDataService.GetReceivedModes(request.ReceivedModeId ?? 0);
+            var foiPersonalAttribute = await _templateDataService.GetRequestPersonalAttributes(request.FOIRequestId, requestMinistry.Version);
+
+            var assignee = await _templateDataService.GetAssignee(requestMinistry.FOIMinistryRequestId);
+            var originalLdd = await _templateDataService.GetRequestOriginalDueDate(requestMinistry.FOIMinistryRequestId);
+            var foiRequestExtension = await _templateDataService.GetExtensions(requestMinistry.FOIMinistryRequestId, requestMinistry.Version);
+            var openInformationRequest = await _templateDataService.GetOpenInformationRequests(requestMinistry.FOIMinistryRequestId, requestMinistry.Version);
+            var foiSubjectCodes = await _templateDataService.GetMinistryRequestSubjectCodes(requestMinistry.FOIMinistryRequestId, requestMinistry.Version);
             var programArea = await _templateDataService.GetProgramArea(requestMinistry.ProgramAreaId);
             var operatingTeamEmails = await _templateDataService.GetOperatingTeamEmails(requestMinistry.AssignedGroup);
-            var originalLdd = await _templateDataService.GetRequestOriginalDueDate(foiMinistryRequestId);
-            var receivedModes = await _templateDataService.GetReceivedModes(request.ReceivedModeId ?? 0);
-            var foiRequestExtension = await _templateDataService.GetExtensions(foiMinistryRequestId, requestMinistry.Version);
-            var openInformationRequest = await _templateDataService.GetOpenInformationRequests(foiMinistryRequestId, requestMinistry.Version);
-            var foiSubjectCodes = await _templateDataService.GetMinistryRequestSubjectCodes(foiMinistryRequestId, requestMinistry.Version);
-            var foiPersonalAttribute = await _templateDataService.GetRequestPersonalAttributes(foiRequestId, requestMinistry.Version);
+
             var oipcExtension = GetOIPCExtensionDetails(foiRequestExtension);
             var pbExtension = GetPublicBodyExtensionDetails(foiRequestExtension);
 
@@ -148,6 +154,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
             var extensionApprovedDate = extensionData.ExtensionType.Equals(ExtensionType.PublicBody.ToString()) ?
                pbExtension?.ExtendedDueDate : oipcExtension?.ExtendedDueDate;
             var faxNumber = _configuration.GetValue<string>("FaxNumber") ?? "(250) 3879843";
+            var assigneeEmail = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty;
 
 
             string? GetPersonalAttribute(string dataFormat) =>
@@ -193,9 +200,9 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
                     ["[DUEDATE]"] = requestMinistry?.DueDate.ToString("MMMM dd, yyyy") ,
                     ["[ADDITIONALXX]"] = extensionData?.ApprovedNoOfDays?.ToString() ,
                     ["[EXTENDED_DUE_DATE]"] = extensionData?.ExtendedDueDate?.ToString("MMMM dd, yyyy") ,
-                    ["[PRIMARYUSERREMAIL]"] = string.Empty ,
-                    ["[PRIMARYUSERPHONE]"] = string.Empty , //No need to Map for now. But will be mapped later
-                    ["[PRIMARYUSERTITLE]"] = string.Empty , //No need to Map for now. But will be mapped later
+                    ["[PRIMARYUSERREMAIL]"] = assigneeEmail,
+                    ["[PRIMARYUSERPHONE]"] = string.Empty , //No need to Map for now.
+                    ["[PRIMARYUSERTITLE]"] = string.Empty , //No need to Map for now.
                     ["[LINKEDREQUESTS]"] = AssignMinistryNames(requestMinistry.LinkedRequests, programArea)  ,
                     ["[STREET1]"] = GetContactInfo("address") ,
                     ["[STREET2]"] = GetContactInfo("addressSecondary") ,
@@ -205,7 +212,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
                     ["[ZIP/POSTALCODE]"] = GetContactInfo("postal") ,
                     ["[REQUESTERNAME]"] = $"{applicant?.FirstName} {applicant?.LastName}" ,
                     ["[COMPANY]"] = $"{applicant?.BusinessName}" ,
-                    ["[RESPONSEDATE]"] = string.Empty , //No need to Map for now. But will be mapped later
+                    ["[RESPONSEDATE]"] = string.Empty , //No need to Map for now.
                     ["[ASSIGNEEFIRSTNAME]"] = $"{assignee?.FirstName}" ,
                     ["[ASSIGNEELASTNAME]"] = $"{assignee?.LastName}" ,
                     ["[ASSIGNEDGROUP]"] = requestMinistry?.AssignedGroup ,
@@ -229,7 +236,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
                     ["[CORRECTIONNUMBER]"] = GetPersonalAttribute("BC Correctional Service Number")
             };
 
-            await PopulateFeeAndPaymentData(templateData, foiMinistryRequestId, foiRequestId);
+            await PopulateFeeAndPaymentData(templateData, requestMinistry.FOIMinistryRequestId, request.FOIRequestId);
 
             return templateData;
         }
