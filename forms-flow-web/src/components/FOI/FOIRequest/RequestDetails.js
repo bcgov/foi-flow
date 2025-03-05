@@ -25,6 +25,7 @@ const RequestDetails = React.memo(
     handleRequestDetailsInitialValue,
     createSaveRequestObject,
     disableInput,
+    isHistoricalRequest
   }) => {    /**
      *  Request details box in the UI
      *  All fields are mandatory here
@@ -76,7 +77,7 @@ const RequestDetails = React.memo(
           return value || "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.DUE_DATE) {
-          if(request.dueDate) {
+          if(request.dueDate || request.isconsultflag) {
             return request.dueDate
           }
 
@@ -132,6 +133,19 @@ const RequestDetails = React.memo(
       handleRequestDetailsInitialValue(requestDetailsObject);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES, requestDetailsObject);
     },[requestDetails, handleRequestDetailsInitialValue])
+    
+    const prevConsultFlag = React.useRef(requestDetails?.isconsultflag);
+
+    React.useEffect(() => {
+      if (prevConsultFlag.current === true && !requestDetails?.isconsultflag) {
+        const calculatedDueDate = startDateText ? dueDateCalculation(startDateText) : "";
+        setDueDate(calculatedDueDate);
+        handleRequestDetailsValue(calculatedDueDate, FOI_COMPONENT_CONSTANTS.DUE_DATE);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DUE_DATE, calculatedDueDate);
+      }
+
+      prevConsultFlag.current = requestDetails?.isconsultflag;
+    }, [requestDetails?.isconsultflag]);
 
     const getReceivedDateForLocalState = () => {
       let receivedDate = validateFields(
@@ -212,6 +226,13 @@ const RequestDetails = React.memo(
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, e.target.value);
     }
+
+    const handleDueDateChange = (e) => {
+      const newDueDate = requestDetails?.isconsultflag ? e.target.value : dueDateCalculation(startDateText);
+      setDueDate(newDueDate);
+      handleRequestDetailsValue(newDueDate, FOI_COMPONENT_CONSTANTS.DUE_DATE);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DUE_DATE, newDueDate);
+    }
     
      return (
 
@@ -265,15 +286,16 @@ const RequestDetails = React.memo(
                 <TextField
                   id="dueDate"
                   label="Legislated Due Date"
-                  type={requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? "text" : "date"}
-                  value={requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() ? 'N/A' : (dueDateText || '')}
+                  type={(requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || requestDetails?.currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) ? "text" : "date"}
+                  value={(requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || requestDetails?.currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) ? 'N/A' : (dueDateText || '')}
+                  onChange={handleDueDateChange}
                   inputProps={{ "aria-labelledby": "dueDate-label"}}
                   InputLabelProps={{
                   shrink: true,
                   }}
                   variant="outlined"
                   required
-                  disabled
+                  disabled={!requestDetails?.isconsultflag || requestDetails?.currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase()}
                   fullWidth
                 />
             </div>
@@ -331,64 +353,113 @@ const RequestDetails = React.memo(
 
           <div className="row foi-details-row">
               <div className="col-lg-6 foi-details-col">
-                <TextField
-                      id="requestType"
-                      label="Request Type"
-                      inputProps={{ "aria-labelledby": "requestType-label"}}
-                      InputLabelProps={{ shrink: true, }}
-                      select
-                      value={selectedRequestType}
-                      onChange={handleRequestTypeChange}
-                      // input={<Input />}
-                      variant="outlined"
-                      fullWidth
-                      required
-                      disabled={disableInput || disableFieldForMinistryRequest}
-                      error={selectedRequestType.toLowerCase().includes("select")}
-                  >
-                  {requestTypes}
-                </TextField>
+                {!isHistoricalRequest ?
+                  <TextField
+                        id="requestType"
+                        label="Request Type"
+                        inputProps={{ "aria-labelledby": "requestType-label"}}
+                        InputLabelProps={{ shrink: true, }}
+                        select
+                        value={selectedRequestType}
+                        onChange={handleRequestTypeChange}
+                        // input={<Input />}
+                        variant="outlined"
+                        fullWidth
+                        required
+                        disabled={disableInput || disableFieldForMinistryRequest}
+                        error={selectedRequestType.toLowerCase().includes("select")}
+                    >
+                    {requestTypes}
+                  </TextField>
+                :
+                  <TextField
+                        id="requestType"
+                        label="Request Type"
+                        inputProps={{ "aria-labelledby": "requestType-label"}}
+                        InputLabelProps={{ shrink: true, }}
+                        value={selectedRequestType}
+                        onChange={handleRequestTypeChange}
+                        // input={<Input />}
+                        variant="outlined"
+                        fullWidth
+                        required
+                        disabled
+                    >
+                  </TextField>
+                }
 
-                <TextField
-                      id="deliveryMode"
-                      label="Delivery Mode"
-                      inputProps={{ "aria-labelledby": "deliveryMode-label"}}
-                      InputLabelProps={{ shrink: true, }}
-                      select
-                      value={selectedDeliveryMode}
-                      onChange={handleDeliveryModeChange}
-                      input={<Input />}
-                      variant="outlined"
-                      fullWidth
-                      required
-                      disabled={disableInput || disableFieldForMinistryRequest}
-                      error={selectedDeliveryMode.toLowerCase().includes("select")}
-                  >
-                  {deliveryModes}
-                </TextField>
+                {!isHistoricalRequest ?
+                  <TextField
+                        id="deliveryMode"
+                        label="Delivery Mode"
+                        inputProps={{ "aria-labelledby": "deliveryMode-label"}}
+                        InputLabelProps={{ shrink: true, }}
+                        select
+                        value={selectedDeliveryMode}
+                        onChange={handleDeliveryModeChange}
+                        input={<Input />}
+                        variant="outlined"
+                        fullWidth
+                        required
+                        disabled={disableInput || disableFieldForMinistryRequest}
+                        error={selectedDeliveryMode.toLowerCase().includes("select")}
+                    >
+                    {deliveryModes}
+                  </TextField>
+                  :
+                  <TextField
+                        id="deliveryMode"
+                        label="Delivery Mode"
+                        inputProps={{ "aria-labelledby": "deliveryMode-label"}}
+                        InputLabelProps={{ shrink: true, }}
+                        value={selectedDeliveryMode}
+                        onChange={handleDeliveryModeChange}
+                        input={<Input />}
+                        variant="outlined"
+                        fullWidth
+                        disabled
+                    >
+                  </TextField>
+                }
               </div>
               <div className="col-lg-6 foi-details-col">
-                <TextField
-                      id="receivedMode"
-                      label="Received Mode"
-                      inputProps={{ "aria-labelledby": "receivedMode-label"}}
-                      InputLabelProps={{ shrink: true, }}
-                      select
-                      value={selectedReceivedMode}
-                      onChange={handleReceivedModeChange}
-                      input={<Input />}
-                      variant="outlined"
-                      fullWidth
-                      required
-                      error={selectedReceivedMode.toLowerCase().includes("select")}
-                      disabled={disableInput ||
-                        requestDetails.receivedMode?.toLowerCase() === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase() ||
-                        requestDetails.currentState?.toLowerCase() === StateEnum.unopened.name.toLowerCase() ||
-                        disableFieldForMinistryRequest
-                      }
-                  >
-                  {receivedModes}
-                </TextField>
+                {!isHistoricalRequest ?
+                  <TextField
+                        id="receivedMode"
+                        label="Received Mode"
+                        inputProps={{ "aria-labelledby": "receivedMode-label"}}
+                        InputLabelProps={{ shrink: true, }}
+                        select
+                        value={selectedReceivedMode}
+                        onChange={handleReceivedModeChange}
+                        input={<Input />}
+                        variant="outlined"
+                        fullWidth
+                        required
+                        error={selectedReceivedMode.toLowerCase().includes("select")}
+                        disabled={disableInput ||
+                          requestDetails.receivedMode?.toLowerCase() === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase() ||
+                          requestDetails.currentState?.toLowerCase() === StateEnum.unopened.name.toLowerCase() ||
+                          disableFieldForMinistryRequest
+                        }
+                    >
+                    {receivedModes}
+                  </TextField>
+                  :
+                  <TextField
+                        id="receivedMode"
+                        label="Received Mode"
+                        inputProps={{ "aria-labelledby": "receivedMode-label"}}
+                        InputLabelProps={{ shrink: true, }}
+                        value={selectedReceivedMode}
+                        onChange={handleReceivedModeChange}
+                        input={<Input />}
+                        variant="outlined"
+                        fullWidth
+                        disabled
+                    >
+                  </TextField>
+                }
               </div>
           </div>
           </AccordionDetails>

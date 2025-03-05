@@ -395,6 +395,13 @@ export const setRequestCFRFormHistory = (data) => (dispatch) => {
   });
 };
 
+export const setRequestApplicationFeeForm = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICATION_FEE_FORM,
+    payload: data,
+  });
+};
+
 export const setApplicantCorrespondence = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_CORRESPONDENCE,
@@ -514,6 +521,20 @@ export const setOIPCInquiryoutcomes = (data) => (dispatch) => {
   });
 };
 
+export const setAdvancedSearchFilter = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_FILTER,
+    payload: data,
+  });
+};
+
+export const setHistoricalSearchParams = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_HISTORIC_SEARCH_PARAMS,
+    payload: data,
+  });
+};
+
 export const setFOICommentTypes = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_COMMENT_TYPES,
@@ -524,6 +545,13 @@ export const setFOICommentTypes = (data) => (dispatch) => {
 export const setFOIEmailTemplates = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_EMAIL_TEMPLATES,
+    payload: data,
+  });
+};
+
+export const setShowKeywordSearch = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.SHOW_KEYWORD_SEARCH,
     payload: data,
   });
 };

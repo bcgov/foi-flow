@@ -16,8 +16,10 @@ const initialState = {
     keyword: null,
   },
   showAdvancedSearch: false,
+  showKeywordSearch: false,
   showEventQueue: false,
   foiAdvancedSearchParams: {},
+  foiHistoricalSearchParams:{},
   isAssignedToListLoading: true,
   isAttachmentListLoading: true,
   isCommentTagListLoading: true,
@@ -90,6 +92,19 @@ const initialState = {
       actualiaopreparinghrs: 0,
     },
   },
+  foiRequestApplicationFeeForm: {
+    applicationfeestatus: "init",
+    amountpaid: 0,
+    paymentsource: "init",
+    paymentdate: null,
+    orderid: null,
+    transactionnumber: null,
+    receipts: [],
+    refundamount: 0,
+    refunddate: null,
+    reasonForRefund: "",
+    paymentid: null
+  },
   foiRequestCFRFormHistory: [],
   foiRequestApplicantCorrespondence: [],
   foiRequestApplicantCorrespondenceTemplates: [],
@@ -156,7 +171,9 @@ const initialState = {
   oipcReviewtypes: [],
   oipcInquiryoutcomes: [],
   foiCommentTypes:[],
-  foiEmailTemplates: []
+  foiEmailTemplates: [],
+  foiadvancedsearchfilter:"foimod",
+  foiCommentTypes:[]
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -177,6 +194,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, eventQueueParams: action.payload };
     case FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH:
       return { ...state, showAdvancedSearch: action.payload };
+    case FOI_ACTION_CONSTANTS.SHOW_KEYWORD_SEARCH:
+      return { ...state, showKeywordSearch: action.payload };
     case FOI_ACTION_CONSTANTS.SHOW_EVENT_QUEUE:
       return { ...state, showEventQueue: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_PARAMS:
@@ -187,6 +206,14 @@ const foiRequests = (state = initialState, action) => {
           ...action.payload,
         },
       };
+    case FOI_ACTION_CONSTANTS.FOI_HISTORIC_SEARCH_PARAMS:
+        return {
+          ...state,
+          foiHistoricalSearchParams: {
+            ...state.foiHistoricalSearchParams,
+            ...action.payload,
+          },
+        };  
     case FOI_ACTION_CONSTANTS.IS_ASSIGNEDTOLIST_LOADING:
       return { ...state, isAssignedToListLoading: action.payload };
     case FOI_ACTION_CONSTANTS.IS_ATTACHMENTLIST_LOADING:
@@ -318,6 +345,16 @@ const foiRequests = (state = initialState, action) => {
               ...action.payload,
             },
       };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICATION_FEE_FORM:
+      return {
+        ...state,
+        foiRequestApplicationFeeForm: (_.isEmpty(action.payload))
+          ? initialState.foiRequestApplicationFeeForm
+          : {
+              ...state.foiRequestApplicationFeeForm,
+              ...action.payload,
+            },
+      };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM_HISTORY:
       return { ...state, foiRequestCFRFormHistory: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_CORRESPONDENCE:
@@ -353,6 +390,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, oipcReviewtypes: action.payload };
     case FOI_ACTION_CONSTANTS.OIPC_INQUIRYOUTCOMES:
         return { ...state, oipcInquiryoutcomes: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_FILTER:
+      return { ...state, foiadvancedsearchfilter: action.payload };    
     case FOI_ACTION_CONSTANTS.FOI_COMMENT_TYPES:
       return { ...state, foiCommentTypes: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_EMAIL_TEMPLATES:

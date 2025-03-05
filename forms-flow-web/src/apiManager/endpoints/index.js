@@ -2,6 +2,7 @@ import {
   FOI_BASE_API_URL,
   AXIS_API_URL,
   DOC_REVIEWER_BASE_API_URL,
+  FOI_HISTORICAL_API_URL,
   FOI_TEMPLATE_API_URL,
 } from "./config";
 
@@ -51,6 +52,12 @@ const API = {
   FOI_GET_APPLICANT_REQUEST_HISTORY: `${FOI_BASE_API_URL}/api/foiapplicants/requests/<applicantid>`,
   FOI_GET_APPLICANT_INFO: `${FOI_BASE_API_URL}/api/foiapplicants/applicantid/<applicantid>`,
 
+  FOI_HISTORICAL_REQUEST_API: `${FOI_HISTORICAL_API_URL}/api/foihistoricalrequest`,
+  FOI_HISTORICAL_REQUEST_DESCRIPTION_API: `${FOI_HISTORICAL_API_URL}/api/foihistoricalrequest/descriptionhistory`,
+  FOI_HISTORICAL_REQUEST_EXTENSIONS_API: `${FOI_HISTORICAL_API_URL}/api/foihistoricalrequest/extensions`,
+  FOI_HISTORICAL_RECORDS_API: `${FOI_BASE_API_URL}/api/foirecord/historical/<axisrequestid>`,
+  FOI_HISTORICAL_SEARCH_API: `${FOI_HISTORICAL_API_URL}/api/advancedsearch`,
+
   FOI_GET_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/divisions`,
   FOI_POST_PROGRAMAREADIVISION: `${FOI_BASE_API_URL}/api/foiadmin/division`,
   FOI_PUT_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/division/<divisionid>`,
@@ -96,6 +103,12 @@ const API = {
   FOI_GET_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>`,
   FOI_POST_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
   FOI_POST_CFR_FORM_IAO: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>/sanction`,
+
+  FOI_GET_APPLICATION_FEES_FORM: `${FOI_BASE_API_URL}/api/foiapplicationfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
+  FOI_POST_APPLICATION_FEES_FORM: `${FOI_BASE_API_URL}/api/foiapplicationfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
+
+  FOI_GET_RAWREQUEST_PAYMENT_DETAILS: `${FOI_BASE_API_URL}/api/foirawrequests/<request_id>/payments`,
+  FOI_POST_RAWREQUEST_PAYMENT_RECEIPT: `${FOI_BASE_API_URL}/api/foirawrequests/<request_id>/payments/<payment_id>/receipt`,
 
   FOI_POST_REQUEST_CORRESPONDENCE_EMAIL: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/email/<ministryid>/<rawrequestid>`,
   FOI_GET_REQUEST_CORRESPONDENCE_EMAILS: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/email/<ministryid>/<rawrequestid>`,
@@ -176,6 +189,9 @@ const API = {
   FOI_GET_OIPC_REVIEWTYPES: `${FOI_BASE_API_URL}/api/foiflow/oipc/reviewtypes`,
   FOI_GET_OIPC_INQUIRYOUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/inquiryoutcomes`,
   FOI_GET_COMMENT_TYPES: `${FOI_BASE_API_URL}/api/foiflow/commenttypes`,
+
+  FOI_GET_CROSSTEXTSEARCH_AUTH: `${FOI_BASE_API_URL}/api/foicrosstextsearch/authstring`,
+  FOI_GET_CROSSTEXTSEARCH_REQUEST_DETAILS: `${FOI_BASE_API_URL}/api/foicrosstextsearch/requests`,
   FOI_GET_EMAIL_TEMPLATES: `${FOI_TEMPLATE_API_URL}/api/Template/GetTemplates`,
   FOI_GET_EMAIL_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/GetCorrespondenceByName`,
   FOI_EXPORT_SFDT: `${FOI_TEMPLATE_API_URL}/api/documenteditor/ExportSFDT`,

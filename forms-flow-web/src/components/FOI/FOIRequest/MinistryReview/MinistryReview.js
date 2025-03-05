@@ -56,7 +56,6 @@ import RequestTracking from "./RequestTracking";
 import BottomButtonGroup from "./BottomButtonGroup";
 import { CommentSection } from "../../customComponents/Comments";
 import { AttachmentSection } from "../../customComponents/Attachments";
-import { CFRForm } from "../../customComponents/CFRForm";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import Loading from "../../../../containers/Loading";
 import ExtensionDetails from "./ExtensionDetails";
@@ -71,6 +70,7 @@ import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 import {isMinistryLogin} from "../../../../helper/FOI/helper";
 import OIPCDetails from "../OIPCDetails/Index";
+import { Fees } from "../../customComponents/Fees";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -169,7 +169,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       display: false,
       active: false,
     },
-    CFRForm: {
+    Fees: {
       display: false,
       active: false,
     },
@@ -263,6 +263,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       currentState === StateEnum.peerreview.name ||
       currentState === StateEnum.signoff.name ||
       currentState === StateEnum.response.name ||
+      currentState === StateEnum.onholdother.name ||
       currentState === StateEnum.closed.name
     );
   }
@@ -328,6 +329,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [CFRUnsaved, setCFRUnsaved] = React.useState(false);
   const hideBottomText = [
     StateEnum.onhold.name.toLowerCase(),
+    StateEnum.onholdother.name.toLowerCase(),
     StateEnum.closed.name.toLowerCase(),
   ];
 
@@ -489,6 +491,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
       break;       
     case StateEnum.recordsreadyforreview.name:
       foitabheaderBG = "foitabheadercollection foitabheaderRecordsReadyForReviewBG";
+      break;      
+    case StateEnum.onholdother.name:
+      foitabheaderBG = "foitabheadercollection foitabheaderOnHoldOtherBG";
       break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
@@ -672,12 +677,12 @@ const MinistryReview = React.memo(({ userDetail }) => {
               FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && (
               <div
                 className={clsx("tablinks", {
-                  active: tabLinksStatuses.CFRForm.active,
+                  active: tabLinksStatuses.Fees.active,
                 })}
-                name="CFRForm"
-                onClick={() => tabclick("CFRForm")}
+                name="Fees"
+                onClick={() => tabclick("Fees")}
               >
-                CFR Form
+                Fees
                 {CFRFormHistoryLength > 0 ? ` (${CFRFormHistoryLength})` : ""}
               </div>
             )}
@@ -864,20 +869,22 @@ const MinistryReview = React.memo(({ userDetail }) => {
           {requestDetails?.requestType ===
             FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && (
             <div
-              id="CFRForm"
+              id="Fees"
               className={clsx("tabcontent", {
-                active: tabLinksStatuses.CFRForm.active,
-                [classes.displayed]: tabLinksStatuses.CFRForm?.display,
-                [classes.hidden]: !tabLinksStatuses.CFRForm?.display,
+                active: tabLinksStatuses.Fees.active,
+                [classes.displayed]: tabLinksStatuses.Fees?.display,
+                [classes.hidden]: !tabLinksStatuses.Fees?.display,
               })}
             >
-              <CFRForm
+              <Fees
                 requestNumber={requestNumber}
                 requestState={requestState}
+                requestDetails={requestDetails}
                 userDetail={userDetail}
                 ministryId={ministryId}
                 requestId={requestId}
                 setCFRUnsaved={setCFRUnsaved}
+                handleStateChange={handleStateChange}
               />
             </div>
           )}

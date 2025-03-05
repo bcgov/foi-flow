@@ -23,6 +23,7 @@ export const getTabBottomText = ({
     StateEnum.closed.name,
     StateEnum.intakeinprogress.name,
     StateEnum.redirect.name,
+    StateEnum.onholdother.name,
   ];
 
   if (!statusesToNotAppearIn.includes(_status)) {
@@ -143,7 +144,8 @@ export const getTabBG = (_tabStatus, _requestState) => {
         return "foitabheadercollection foitabheaderAppFeeOwingBG";
     case StateEnum.recordsreadyforreview.name:
         return "foitabheadercollection foitabheaderRecordsReadyForReviewBG";
-
+    case StateEnum.onholdother.name:
+        return "foitabheadercollection foitabheaderOnholdOtherBG";
     default:
       return "foitabheadercollection foitabheaderdefaultBG";
   }
@@ -329,11 +331,14 @@ export const checkValidationError = (
   isAddRequest,
   currentrequestStatus,
   oipcData,
-  isOipcReview
+  isOipcReview,
+  isconsultflag
 ) => {
   return (
-    requiredApplicantDetails.firstName === "" ||
-    requiredApplicantDetails.lastName === "" ||
+    (!isconsultflag && (
+      requiredApplicantDetails.firstName === "" ||
+      requiredApplicantDetails.lastName === ""
+    )) ||
     requiredApplicantDetails.category.toLowerCase().includes("select") ||
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||

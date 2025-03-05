@@ -52,6 +52,24 @@ export const getReceivedDate = (params) => {
   return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
 };
 
+export const getClosedDate = (params) => {
+  let closedDateString = params.row.closedate;
+  const dateString = closedDateString
+    ? closedDateString.substring(0, 10)
+    : "";
+    closedDateString = closedDateString ? new Date(closedDateString) : "";
+  if (
+    closedDateString !== "" &&
+    (closedDateString.getHours() > 16 ||
+      (closedDateString.getHours() === 16 &&
+        closedDateString.getMinutes() > 30) ||
+      !businessDay(dateString))
+  ) {
+    closedDateString = addBusinessDays(closedDateString, 1);
+  }
+  return formatDate(closedDateString, "MMM dd yyyy").toUpperCase();
+};
+
 // update sortModel for applicantName & assignedTo
 export const updateSortModel = (sortModel) => {
   let smodel = JSON.parse(JSON.stringify(sortModel));
@@ -130,10 +148,19 @@ export const onBehalfFullName = (params) => {
   }`;
 };
 
+export const formatRequestType = (requeststatus) => {
+  if (!requeststatus) {
+    return "";
+  }
+  let formattedRequestState= Object.values(StateEnum).find(state => state.label === requeststatus).name
+  return formattedRequestState;
+};
+
+
 export const getRecordsDue = (params) => {
   let receivedDateString = params.row.cfrduedate;
   const currentStatus = params.row.currentState;
-  if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
+  if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || currentStatus.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) {
     return "N/A";
   } else if(!receivedDateString) {
     return "";
@@ -145,7 +172,7 @@ export const getRecordsDue = (params) => {
 export const getLDD = (params) => {
   let receivedDateString = params.row.duedate;
   const currentStatus = params.row.currentState;
-  if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()) {
+  if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()||currentStatus.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) {
     return "N/A";
   } else if(!receivedDateString) {
     return "";
@@ -158,7 +185,7 @@ export const getDaysLeft = (params) => {
   const receivedDateString = params.row.duedate;
 
   if (
-    [StateEnum.onhold.name.toLowerCase(), StateEnum.closed.name.toLowerCase()].includes(params.row.currentState.toLowerCase())
+    [StateEnum.onhold.name.toLowerCase(), StateEnum.closed.name.toLowerCase(), StateEnum.onholdother.name.toLowerCase()].includes(params.row.currentState.toLowerCase())
   ) {
     return "N/A";
   } else if(!receivedDateString) {

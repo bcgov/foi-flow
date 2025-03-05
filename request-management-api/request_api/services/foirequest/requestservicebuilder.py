@@ -23,6 +23,7 @@ class requestservicebuilder(requestserviceconfigurator):
     """
 
     def createministry(self, requestschema, ministry, activeversion, userid, filenumber=None, ministryid=None):
+        current_foiministryrequest = FOIMinistryRequest.getrequest(ministryid)
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.__dict__.update(ministry)
         foiministryrequest.requeststatusid = self.__getrequeststatusid(requestschema.get("requeststatuslabel"))
@@ -32,7 +33,7 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.axissyncdate = requestschema.get("axisSyncDate")
         foiministryrequest.axispagecount = requestschema.get("axispagecount")
         foiministryrequest.axislanpagecount = requestschema.get("axislanpagecount")
-        foiministryrequest.recordspagecount = requestschema.get("recordspagecount")
+        foiministryrequest.recordspagecount = current_foiministryrequest["recordspagecount"] if current_foiministryrequest not in (None, {}) else 0
         foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else filenumber
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
         foiministryrequest.description = requestschema.get("description")
@@ -45,6 +46,8 @@ class requestservicebuilder(requestserviceconfigurator):
         if requestschema.get("isoipcreview") is not None and requestschema.get("isoipcreview")  != "":
             foiministryrequest.isoipcreview = requestschema.get("isoipcreview")
             foiministryrequest.oipcreviews = self.prepareoipc(requestschema, ministryid, activeversion, userid)
+        if requestschema.get("isconsultflag") is not None and requestschema.get("isconsultflag")  != "":
+            foiministryrequest.isconsultflag = requestschema.get("isconsultflag")
             
         if requestschema.get("cfrDueDate") is not None and requestschema.get("cfrDueDate")  != "":
             foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")
@@ -83,7 +86,7 @@ class requestservicebuilder(requestserviceconfigurator):
         return foiministryrequest
 
     def __updateministryassignedtoandgroup(self, foiministryrequest, requestschema, ministry, status):
-        if self.__isgrouprequired(status):
+        if self.__isgrouprequired(status, requestschema.get("isconsultflag")):
                 foiministryrequest.assignedministrygroup = MinistryTeamWithKeycloackGroup[ministry["code"]].value
         if self.isNotBlankorNone(requestschema,"assignedministrygroup","main") == True:
             foiministryrequest.assignedministrygroup = requestschema.get("assignedministrygroup")
@@ -101,8 +104,8 @@ class requestservicebuilder(requestserviceconfigurator):
         else:
             foiministryrequest.assignedto = None
 
-    def __isgrouprequired(self,status):
-        if status == StateName.callforrecords.value or status == StateName.recordsreview.value or status == StateName.consult.value or status == StateName.feeestimate.value or status == StateName.ministrysignoff.value or status == StateName.response.value:
+    def __isgrouprequired(self,status,isconsultflag=None):
+        if status == StateName.callforrecords.value or status == StateName.recordsreview.value or status == StateName.consult.value or status == StateName.feeestimate.value or status == StateName.ministrysignoff.value or status == StateName.response.value or ((status == StateName.harmsassessment.value and isconsultflag)):
             return True
         else:
             return False

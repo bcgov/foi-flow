@@ -18,7 +18,7 @@ import './confirmationmodal.scss';
 import { StateEnum, StateTransitionCategories } from '../../../../constants/FOI/statusEnum';
 import FileUpload from '../FileUpload'
 import MinistryApprovalModal from './MinistryApprovalModal';
-import { formatDate, calculateDaysRemaining, ConditionalComponent, isMinistryLogin } from "../../../../helper/FOI/helper";
+import { formatDate, formatDateInPst, calculateDaysRemaining, ConditionalComponent, isMinistryLogin } from "../../../../helper/FOI/helper";
 import { MimeTypeList, MaxFileSizeInMB, MaxNumberOfFiles } from "../../../../constants/FOI/enum";
 import { getMessage, getAssignedTo, getMinistryGroup, getSelectedMinistry, getSelectedMinistryAssignedTo, getProcessingTeams, getUpdatedAssignedTo } from './util';
 
@@ -169,7 +169,6 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
         else if (saveRequestObject.requeststatuslabel === StateEnum.signoff.label
           && state.toLowerCase() === StateEnum.review.name.toLowerCase())
           fileStatusTransition = StateTransitionCategories.signoffreview.name;
-
         fileInfoList = files.map(file => {
           return {
             ministrycode: requestNumber.split("-")[0],
@@ -186,7 +185,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const attchmentFileNameList = attachmentsArray?.map(_file => _file.filename);
 
     const getDaysRemaining = () => {
-      if (currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.onhold.name.toLowerCase()) {
+      if (currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.closed.name.toLowerCase() && state.toLowerCase() !== StateEnum.onhold.name.toLowerCase() && state.toLowerCase() !== StateEnum.onholdother.name.toLowerCase()) {
         return (
           <span> <b> {daysRemainingLDD} DAYS REMAINING </b> </span>
         );
@@ -194,7 +193,9 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
 
     const addorUpdateConfirmationModal = () => {
-      if (state.toLowerCase() === StateEnum.closed.name.toLowerCase() && 
+      if(currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) 
+        return null; 
+      else if (state.toLowerCase() === StateEnum.closed.name.toLowerCase() && 
           currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) {
         return (
           <CloseForm saveRequestObject={saveRequestObject} handleClosingDateChange={handleClosingDateChange} handleClosingReasonChange={handleClosingReasonChange} enableSaveBtn={enableSaveBtn} />
@@ -261,7 +262,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
                 </tr>
               </tbody>
           </table> : null }
-        {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() && [StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase()].includes(state.toLowerCase())) ?
+        {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase() && [StateEnum.callforrecords.name.toLowerCase(), StateEnum.consult.name.toLowerCase(), StateEnum.onhold.name.toLowerCase(), StateEnum.onholdother.name.toLowerCase()].includes(state.toLowerCase())) ?
           <table className="table table-bordered table-assignedto">
             <tbody>
               <tr>
@@ -305,8 +306,10 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
           </DialogContent>
           <DialogActions>
             <button className={`btn-bottom btn-save ${isBtnDisabled() ? classes.btndisabled : classes.btnenabled }`} disabled={disableSaveBtn || isBtnDisabled()} onClick={handleSave}>
-              {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) ?
-              "Save Change" : "Re-Open Request"}
+            {(currentState?.toLowerCase() !== StateEnum.closed.name.toLowerCase()) 
+              ? (saveRequestObject?.isconsultflag && currentState?.toLowerCase() === StateEnum.open.name.toLowerCase()? "Continue" : "Save Change")
+              : "Re-Open Request"
+            }
             </button>
             <button className="btn-bottom btn-cancel" onClick={handleClose}>
               Cancel
@@ -352,18 +355,21 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
   const _requestDetails = saveRequestObject;
   const _closingReasons = useSelector(state=> state.foiRequests.closingReasons);
 
-  const today = new Date();
-  const [closingDateText, setClosingDate] = React.useState( formatDate(today) );
+  const today = formatDateInPst(new Date());
+  const [closingDateText, setClosingDate] = React.useState(today);
   const [selectedReason, setClosingReason] = React.useState( 0 );
 
   //############### replace this with the last status change date
   const lastStatusChangeDate = _requestDetails.lastStatusUpdateDate;
 
+  React.useEffect(() => {
+    handleClosingDateChange(today);
+  }, []);
+
   const _handleClosingDateChange = (e) => {
     let pickedDate = e.target.value;
     if(new Date(pickedDate) > today)
-      pickedDate = formatDate(today);
-
+      pickedDate = formatDateInPst(today);
     setClosingDate(pickedDate);
     handleClosingDateChange(pickedDate);
   }
@@ -423,7 +429,7 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
             InputLabelProps={{
               shrink: true,
             }}
-            InputProps={{inputProps: { min: _requestDetails.requestProcessStart, max: formatDate(today)} }}
+            InputProps={{inputProps: { min: _requestDetails.requestProcessStart, max: formatDateInPst(today)} }}
             variant="outlined"
             required
             error={closingDateText === undefined || closingDateText === ""}

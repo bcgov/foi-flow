@@ -50,14 +50,14 @@ export const httpPOSTRequest = (url, data, token, isBearer = true) => {
   });
 };
 
-export const httpPOSTRequest1 = (url, data, token, isBearer = true) => {
+export const httpPOSTRequestBlobResponse = (url, data, token, isBearer = true) => {
   return axios.post(url, data, {
-    responseType: 'blob',
     headers: {
       Authorization: isBearer
         ? `Bearer ${token || UserService.getToken()}`
         : token,
     },
+    responseType: 'blob'
   });
 };
 

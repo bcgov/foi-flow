@@ -64,7 +64,6 @@ class FOIRawRequest(Resource):
             requestidisinteger = int(requestid)
             if requestidisinteger :                
                 baserequestinfo = rawrequestservice().getrawrequest(requestid)
-
                 assignee = baserequestinfo['assignedTo']
                 isiaorestricted = baserequestinfo['isiaorestricted']
                 # print('Request # {0} Assigned to {1} and is restricted {2} '.format(requestid,assignee,isiaorestricted))
@@ -97,7 +96,7 @@ class FOIRawRequest(Resource):
             statuslabel = requestdata['requeststatuslabel']
             if int(requestid) and str(requestid) != "-1" :
                 status, statuslabel = rawrequestservice().getstatus(updaterequest)
-                if status not in [StateName.intakeinprogress.value, StateName.closed.value, StateName.redirect.value, StateName.peerreview.value, StateName.section5pending.value, StateName.appfeeowing.value]:
+                if status not in [StateName.intakeinprogress.value, StateName.closed.value, StateName.redirect.value, StateName.peerreview.value, StateName.section5pending.value, StateName.appfeeowing.value, StateName.onholdother.value]:
                     raise ValueError('Invalid request state.')
                 result = rawrequestservice().saverawrequestversion(updaterequest,requestid,assigneegroup,assignee,status,AuthHelper.getuserid(),assigneefirstname,assigneemiddlename,assigneelastname, statuslabel, actiontype)                
                 assignee = ''
