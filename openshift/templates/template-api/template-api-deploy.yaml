@@ -8,7 +8,7 @@ metadata:
   name: "${API_NAME}-deploy"
 objects:
 - kind: DeploymentConfig
-  apiVersion: template.openshift.io/v1
+  apiVersion: v1
   metadata:
     name: "${API_NAME}"
     labels:
@@ -206,7 +206,7 @@ parameters:
   displayName: correspondence Secrets
   description: Name of secret for all template-api values
   required: true
-  value: correspondence-secret
+  value: correspondence-secret-marshal
 - name: IMAGE_STREAM_NAME_FULL
   displayName: Full image stream name (eg "template-api:dev")
   description: Includes ImageStream name and tag
