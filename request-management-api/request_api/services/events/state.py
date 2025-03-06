@@ -66,7 +66,12 @@ class stateevent:
             foirequest = notificationservice().getrequest(requestid, requesttype)
             _isawatcher = FOIRequestWatcher.getNonMinistrywatchers(requestid) if state == StateName.harmsassessment.value else None
             if foirequest['assignedministryperson'] is None:
-                _notificationtype = "Group Members" if state == StateName.harmsassessment.value and foirequest['isconsultflag'] is True and not _isawatcher else "State"
+                if state == StateName.harmsassessment.value and foirequest['isconsultflag'] is True and not _isawatcher:
+                    _notificationtype = "Group Members"
+                elif state == StateName.callforrecords.value: 
+                    _notificationtype = "Group Members"
+                else:
+                    _notificationtype = "State"
             else:
                 _notificationtype = "State"
 

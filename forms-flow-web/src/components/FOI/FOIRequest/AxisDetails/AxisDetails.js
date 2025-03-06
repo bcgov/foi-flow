@@ -57,11 +57,7 @@ const AxisDetails = React.memo(({
 
     const handleAxisIdChange = (e) => {
       const inputValue = e.target.value.toUpperCase();
-      
       setAxisRequestId(inputValue);
-      handleAxisDetailsValue(inputValue, FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID);
-      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID, inputValue);
-    
       validateAxisId(inputValue);
     };
     
@@ -96,6 +92,8 @@ const AxisDetails = React.memo(({
             updateValidation("Request already exists");
           } else {
             updateValidation("");
+            handleAxisDetailsValue(inputValue, FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID);
+            createSaveRequestObject(FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID, inputValue);
           }
         } else {
           console.error("Error checking for duplicate request ID:", err);
