@@ -1,7 +1,4 @@
-﻿using System.Security.Claims;
-using System.Text.RegularExpressions;
-
-namespace MCS.FOI.Integration.Application.Services.TemplateService
+﻿namespace MCS.FOI.Integration.Application.Services.TemplateService
 {
     public class TemplateMappingService : ITemplateMappingService
     {
@@ -71,7 +68,8 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
             var receivedDate = !string.IsNullOrEmpty(rawRequest?.ReceivedDate) ? DateTime.Parse(rawRequest?.ReceivedDate).ToString("MMMM dd, yyyy") : string.Empty;
             var dateOfBirth = !string.IsNullOrEmpty(additionalInfo?.BirthDate) ? DateTime.Parse(additionalInfo?.BirthDate).ToString("MMMM dd, yyyy") : string.Empty;
             var dueDate = !string.IsNullOrEmpty(rawRequest?.DueDate) ? DateTime.Parse(rawRequest?.DueDate).ToString("MMMM dd, yyyy") : string.Empty;
-            var officeName = Regex.Replace(rawRequest?.SelectedMinistries?.FirstOrDefault()?.Name ?? string.Empty, "^Ministry of ", "", RegexOptions.IgnoreCase);
+            var ministryName = rawRequest?.SelectedMinistries?.FirstOrDefault()?.Name ?? string.Empty;
+            var officeName = ministryName.StartsWith("Ministry of ", StringComparison.OrdinalIgnoreCase) ? ministryName.Substring(12) : ministryName;
             var faxNumber = _configuration.GetValue<string>("FaxNumber") ?? "(250) 3879843";
 
             string GetAddress()
@@ -230,7 +228,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
                     ["[PHONEPRIMARY]"] = GetContactInfo("phonePrimary"),
                     ["[WORKPHONEPRIMARY]"] = GetContactInfo("workPhonePrimary"),
                     ["[SUBJECTCODE]"] = subjectCodes?.Name?.ToString(),
-                    ["[OIPCREASON]"] = oipcDetails.Reason?.ToString(),
+                    ["[OIPCREASON]"] = oipcDetails?.Reason?.ToString(),
                     ["[PUBLICATIONSTATUS]"] = openInformation?.PublicationStatus?.ToString(),
                     ["[OPENINFORELEASE]"] = openInformation?.ExemptionName?.ToString(),
                     ["[CORRECTIONNUMBER]"] = GetPersonalAttribute("BC Correctional Service Number"),

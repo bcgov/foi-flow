@@ -16,6 +16,7 @@ global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.Extensions.Configuration;
 global using System.Net.Http.Headers;
 global using System.Text;
+global using System.Security.Claims;
 
 
 global using MCS.FOI.Integration.Application.Interface;
@@ -34,5 +35,6 @@ global using MCS.FOI.Integration.Application.Queries.GetTemplates;
 global using MCS.FOI.Integration.Application.Exceptions;
 global using MCS.FOI.Integration.Application.Model;
 global using MCS.FOI.Integration.Application.Commands.UpdateRedisTemplate;
+global using MCS.FOI.Integration.Core.Repositories.RedisRepository;
 
 

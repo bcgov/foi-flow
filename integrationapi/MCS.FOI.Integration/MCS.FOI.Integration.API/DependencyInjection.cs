@@ -4,10 +4,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.Extensions.Configuration;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using Syncfusion.EJ2.SpellChecker;
 using System.Reflection;
 using System.Security.Claims;
 
@@ -27,16 +25,21 @@ namespace MCS.FOI.Integration.API
 
 
             #region Register JWT Authentication
-            var corsOrigin = configuration.GetValue<string>("JWTAuth:CORSORIGINS");
-            if (!String.IsNullOrEmpty(corsOrigin))
+            var corsOrigin = configuration.GetValue<string>("JWTAuth:CORS_ORIGIN");
+            if (!string.IsNullOrEmpty(corsOrigin))
             {
-                string[] _origins = corsOrigin.Split(",");
+                string[] _origins = corsOrigin.Split(",", StringSplitOptions.RemoveEmptyEntries);
                 services.AddCors(options =>
-                                    options.AddPolicy("FOIOrigins", p => p.WithOrigins(_origins)
-                                                   .WithMethods("GET", "POST")
-                                                   .AllowAnyHeader()
-                                                   .AllowAnyMethod()
-                                       ));
+                {
+                    options.AddPolicy("FOIOrigins", builder =>
+                    {
+                        builder.WithOrigins(_origins)
+                               .WithMethods("GET", "POST")
+                               .AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials();
+                    });
+                });
             }
 
             services.AddAuthentication(options =>
