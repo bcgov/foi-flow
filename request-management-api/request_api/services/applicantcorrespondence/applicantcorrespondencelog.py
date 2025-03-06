@@ -90,8 +90,6 @@ class applicantcorrespondenceservice:
                 applicantcorrespondence.sentby = userid
         emails = data['emails'] if 'emails' in data else None   
         applicantcorrespondence.response_at = data['responsedate'] if 'responsedate' in data and data['responsedate'] is not None else datetime.now()
-        applicantcorrespondence.templatename = data['templatename'] if 'templatename' in data and data['templatename'] is not None else None
-        applicantcorrespondence.templatetype = data['templatetype'] if 'templatetype' in data and data['templatetype'] is not None else None
 
         return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails)        
 
@@ -122,8 +120,6 @@ class applicantcorrespondenceservice:
                 applicantcorrespondence.sentby = userid
         emails = data['emails'] if 'emails' in data else None   
         applicantcorrespondence.response_at = data['responsedate'] if 'responsedate' in data and data['responsedate'] is not None else datetime.now()
-        applicantcorrespondence.templatename = data['templatename'] if 'templatename' in data and data['templatename'] is not None else None
-        applicantcorrespondence.templatetype = data['templatetype'] if 'templatetype' in data and data['templatetype'] is not None else None
         return FOIApplicantCorrespondenceRawRequest.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails)
     
     def editapplicantcorrespondencelogforministry(self, ministryrequestid, data, userid):
@@ -255,9 +251,6 @@ class applicantcorrespondenceservice:
             "attachments" : attachments,
             "category" : self.__getcorrespondencecategory(_correpondencelog),
             "israwrequest": _correpondencelog.get('israwrequest', False) is True,
-            "draft": self.__getvaluefromjson(_correspondencemessagejson, 'emaildraft') if _isjson else None,
-            "templatename": _correpondencelog['templatename'],
-            "templatetype": _correpondencelog['templatetype'],
         }        
         return correpondencelog
     

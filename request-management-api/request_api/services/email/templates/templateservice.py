@@ -40,26 +40,20 @@ class templateservice:
             logging.exception(ex)
         return None
 
-    def decorate_template(self, template, emailtemplatehtml, attributes, correspondencelog):
+    def decorate_template(self, template, emailtemplatehtml, attributes):
         dynamictemplatevalues= {}
         dynamictemplatevalues["ffaurl"] = current_app.config['FOI_FFA_URL']
         dynamictemplatevalues["content"] = emailtemplatehtml
-        templatename = ''
-        if template is not None:
-            dynamictemplatevalues['title'] = template.description
-            templatename = template.name
-        else:
-            dynamictemplatevalues['title'] = correspondencelog.templatename
-            templatename = correspondencelog.templatename
+        dynamictemplatevalues['title'] = template.description
         dynamictemplatevalues.update(attributes)
-        headerfooterhtml = storageservice().downloadtemplate(self.__getheaderfootertemplate(templatename))
+        headerfooterhtml = storageservice().downloadtemplate(self.__getheaderfootertemplate(template))
         finaltemplate = Template(headerfooterhtml)
         finaltemplatedhtml = finaltemplate.render(dynamictemplatevalues)
         return finaltemplatedhtml
     
-    def __getheaderfootertemplate(self, templatename):
+    def __getheaderfootertemplate(self, template):
         #Get template with request info
-        if templatename is not None and templatename in ['EXTENSIONS-PB']:
+        if template.name in ['EXTENSIONS-PB']:
             return '/TEMPLATES/EMAILS/header_footer_template_without_requestinfo.html'
         #Get template without request info
         return '/TEMPLATES/EMAILS/header_footer_template.html'

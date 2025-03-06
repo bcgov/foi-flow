@@ -3,7 +3,6 @@ import {
   AXIS_API_URL,
   DOC_REVIEWER_BASE_API_URL,
   FOI_HISTORICAL_API_URL,
-  FOI_TEMPLATE_API_URL,
 } from "./config";
 
 const API = {
@@ -192,10 +191,5 @@ const API = {
 
   FOI_GET_CROSSTEXTSEARCH_AUTH: `${FOI_BASE_API_URL}/api/foicrosstextsearch/authstring`,
   FOI_GET_CROSSTEXTSEARCH_REQUEST_DETAILS: `${FOI_BASE_API_URL}/api/foicrosstextsearch/requests`,
-  FOI_GET_EMAIL_TEMPLATES: `${FOI_TEMPLATE_API_URL}/api/Template/GetTemplates`,
-  FOI_GET_EMAIL_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/GetCorrespondenceByName`,
-  FOI_EXPORT_SFDT: `${FOI_TEMPLATE_API_URL}/api/documenteditor/ExportSFDT`,
-  FOI_EXPORT_PDF: `${FOI_TEMPLATE_API_URL}/api/documenteditor/ExportPdf`,
-  FOI_REFRESH_REDIS_CACHE_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/UpdateTemplateCache`
 };
 export default API;
