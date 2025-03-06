@@ -3,11 +3,6 @@ import { formatDateInPst, convertDate } from "../../../../helper/FOI/helper";
 import { any, instanceOf, number } from "prop-types";
 import { fetchDocumentPage, fetchDocumentPageFlags } from "../../../../apiManager/services/FOI/foiRecordServices";
 
-export const renderTemplateNoParams = (template: string, content: string) => {
-  let newTemplate = template.replace("{{content}}", content);
-  return newTemplate;
-}
-
 export const renderTemplate = (template: string, content: string, params: Array<any>) => {
   let newTemplate = template.replace("{{content}}", content);
   return applyVariables(newTemplate, params);

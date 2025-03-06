@@ -170,8 +170,6 @@ const initialState = {
   oipcStatuses: [],
   oipcReviewtypes: [],
   oipcInquiryoutcomes: [],
-  foiCommentTypes:[],
-  foiEmailTemplates: [],
   foiadvancedsearchfilter:"foimod",
   foiCommentTypes:[]
 };
@@ -394,8 +392,6 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiadvancedsearchfilter: action.payload };    
     case FOI_ACTION_CONSTANTS.FOI_COMMENT_TYPES:
       return { ...state, foiCommentTypes: action.payload };
-    case FOI_ACTION_CONSTANTS.FOI_EMAIL_TEMPLATES:
-      return { ...state, foiEmailTemplates: action.payload };
     default:
       return state;
   }

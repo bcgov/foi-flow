@@ -31,8 +31,7 @@ import {
   fetchOIPCStatuses,
   fetchOIPCReviewtypes,
   fetchOIPCInquiryoutcomes,
-  fetchFOICommentTypes,
-  fetchFOIEmailTemplates
+  fetchFOICommentTypes
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
@@ -367,7 +366,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           }
         })
       );
-      dispatch(fetchFOIEmailTemplates());
     }
 
     dispatch(fetchFOICategoryList());

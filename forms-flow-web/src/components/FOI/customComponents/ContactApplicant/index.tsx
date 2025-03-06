@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import type { Template } from './types';
 import { fetchApplicantCorrespondence, saveEmailCorrespondence, saveDraftCorrespondence, 
   editDraftCorrespondence, deleteDraftCorrespondence, deleteResponseCorrespondence, saveCorrespondenceResponse, 
-  editCorrespondenceResponse, fetchEmailTemplate, exportSFDT, exportPDF} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+  editCorrespondenceResponse} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
@@ -40,9 +40,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
-import { DocEditor } from './DocEditor';
-import CustomAutocomplete from '../Autocomplete'
-import { saveAs } from "file-saver";
 
 export const ContactApplicant = ({
   requestNumber,
@@ -53,84 +50,8 @@ export const ContactApplicant = ({
   applicantCorrespondenceTemplates,
   requestId,
 }: any) => {
-  const [curTemplate, setCurTemplate] = useState<string>('');
-  const [curTemplateName, setCurTemplateName] = useState<string>('');
 
   const dispatch = useDispatch();
-  const templateList: any = useSelector((state: any) => state.foiRequests.foiEmailTemplates);
-  const [options, setOptions] = useState<Template[]>([]);
-  const [saveSfdtDraftTrigger, setSaveSfdtDraftTrigger] = useState<boolean>(false);
-  const [previewTrigger, setPreviewTrigger] = useState<boolean>(false);
-  const [editDraftTrigger, setEditDraftTrigger] = useState<boolean>(false);
-  const [showLagacyEditor, setShowLagacyEditor] = useState<boolean>(false);
-
-  const selectTemplate = (event: React.ChangeEvent<{}>, item: Template | null) => {
-    console.log("Selected option:", item?.label);
-
-    if(item?.templateid) {
-      setShowLagacyEditor(true);
-      setCurTemplate('');
-      setCurTemplateName('');
-    } else {
-      setShowLagacyEditor(false);
-      if(item?.label) {
-        let newData = {
-          "foiRequestId": requestId,
-          "foiMinistryRequestId": ministryId,
-          "filename": item?.value
-        };
-        const loadTemplate = (templateJSON: string) => {
-          setCurTemplate(JSON.stringify(templateJSON));
-          setCurTemplateName(item.label);
-        }
-        fetchEmailTemplate(dispatch, newData, loadTemplate);
-      } else {
-        setCurTemplate('');
-        setCurTemplateName('');
-      }
-    }
-  };
-
-  // export html and save html & sfdt
-  const saveSfdtDraft = async (sfdtString: string) => {
-    let newData = {
-      "FileName": "email.html",
-      "Content": sfdtString
-    };
-    // save html & sfdt to db
-    const saveDraftCallback = async (html: string) => {
-      // setEditorValue(html.replace("<body bgcolor=\"#FFFFFF\">", "<body bgcolor=\"#FFFFFF\" style=\"width: 6.5in; margin-left: auto; margin-right: auto; padding: 1in;\">"));
-      saveDraftToDB(sfdtString, html);
-    }
-    await exportSFDT(dispatch, newData, saveDraftCallback);
-  };
-  const preview = async (sfdtString: string) => {
-    // pass html string to preview modal
-    // console.log("preview:", JSON.stringify(sfdtString));
-    let newData = {
-      "FileName": "email.html",
-      "Content": sfdtString
-    };
-    const loadPreview = async (html: string) => {
-      // setEditorValue(html.replace("<body bgcolor=\"#FFFFFF\">", "<body bgcolor=\"#FFFFFF\" style=\"width: 6.5in; margin-left: auto; margin-right: auto; padding: 1in;\">"));
-      setEditorValue(html);
-    }
-    await exportSFDT(dispatch, newData, loadPreview);
-  };
-  const savePdf = async (sfdtString: string) => {
-    let newData = {
-      "FileName": "email.pdf",
-      "Content": sfdtString
-    };
-    const saveBlobToPdf = async (pdf: any) => {
-      const blob = new Blob([pdf], { type: 'application/pdf' });
-      saveAs(blob, 'email.pdf');
-    }
-    await exportPDF(dispatch, newData, saveBlobToPdf);
-  }
-
-  
-
   const currentCFRForm: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
   const isLoading: boolean = useSelector((state: any) => state.foiRequests.isCorrespondenceLoading);
   const responsePackagePdfStitchStatus = useSelector((state: any) => state.foiRequests.foiPDFStitchStatusForResponsePackage);
@@ -253,7 +174,6 @@ export const ContactApplicant = ({
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
   const isEnabledTemplate = (item: any) => {
-    var name:string = item?.name ? item.name : item?.templatename ? item.templatename : "";
    if (['PAYONLINE', 'PAYOUTSTANDING'].includes(item.name)) { 
       return !isFeeTemplateDisabled(currentCFRForm, item); 
    } else if (['EXTENSIONS-PB'].includes(item.name)) {
@@ -285,23 +205,8 @@ export const ContactApplicant = ({
       return false;
   }
 
-  useEffect(() => {
-
-    // push sfdt templates to list
-    let _templates: any[] = [];
-    // console.log("templateList: ", templateList);
-    if(templateList.length > 0) {
-      // console.log("templateList: ", templateList);
-      _templates = templateList.map((template: any) => ({
-          label: template.templateName,
-          value: template.fileName,
-          disabled: !template.isActive && !isEnabledTemplate(template),
-          created_at: template.createdAt
-      }));
-    }
-
+  useEffect(() => { 
     // Add templates being used in drafts to the list
-    // console.log("applicantCorrespondence: ", applicantCorrespondence);
     const listOfDraftTemplates: number[] = [];
     applicantCorrespondence.forEach((draftCorrespondence: any) => {
       if (draftCorrespondence.templateid && !listOfDraftTemplates.includes(draftCorrespondence.templateid)) {
@@ -309,59 +214,52 @@ export const ContactApplicant = ({
       }
     })
 
-    // setTemplates(oldArray =>
-    //   oldArray.filter(
-    //     template => updatedTemplates.includes(template.value) || template.value === ""
-    //   )
-    // );
+    setTemplates(oldArray =>
+      oldArray.filter(
+        template => updatedTemplates.includes(template.value) || template.value === ""
+      )
+    );
     
-    // // push s3 html templates to the list
-    // console.log("applicantCorrespondenceTemplates: ", applicantCorrespondenceTemplates);
-    // const updatedTemplates: string[] = [];
-    // applicantCorrespondenceTemplates.forEach((item: any) => {
-    //   if (isEnabledTemplate(item) || listOfDraftTemplates.includes(item.templateid)) {
-    //   updatedTemplates.push(item.name)
-    //   const rootpath = OSS_S3_BUCKET_FULL_PATH
-    //   const fileInfoList = [{
-    //     filename: item.name,
-    //     s3sourceuri: rootpath + item.documenturipath
-    //   }]
+    const updatedTemplates: string[] = [];
+    applicantCorrespondenceTemplates.forEach((item: any) => {
+      if (isEnabledTemplate(item) || listOfDraftTemplates.includes(item.templateid)) {
+      updatedTemplates.push(item.name)
+      const rootpath = OSS_S3_BUCKET_FULL_PATH
+      const fileInfoList = [{
+        filename: item.name,
+        s3sourceuri: rootpath + item.documenturipath
+      }]
 
-    //   getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
-    //     if (!err) {
-    //       res.map(async (header: any, _index: any) => {
-    //         getFileFromS3(header, async (_err: any, response: any) => {
-    //           let templateItem: Template = {
-    //             value: item.name,
-    //             label: item.description,
-    //             templateid: item.templateid,
-    //             text: await new Response(response.data).text(),
-    //             disabled: false,
-    //             created_at: item.created_at
-    //           }
-    //           if (!isduplicate(item.name)) {
-    //           //setTemplates((oldArray) => [...oldArray, templateItem]); 
-    //           // setTemplates((oldArray) => {
-    //           //   // Check if the templateItem already exists in the array
-    //           //   const exists = oldArray.some(item => item.templateid === templateItem.templateid);
-    //           //   if (!exists) {
-    //           //     return [...oldArray, templateItem];
-    //           //   }
-    //           //   return oldArray;
-    //           // }); 
-
-    //              _templates = [..._templates, templateItem];
-    //           }
-    //         });            
-    //       });
-    //     }
-    //   });
-    // }
-    // });
-
-    setOptions(_templates)
-    setTemplates(_templates);
-  }, [applicantCorrespondence, requestExtensions, dispatch, templateList]);
+      getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
+        if (!err) {
+          res.map(async (header: any, _index: any) => {
+            getFileFromS3(header, async (_err: any, response: any) => {
+              let templateItem: Template = {
+                value: item.name,
+                label: item.description,
+                templateid: item.templateid,
+                text: await new Response(response.data).text(),
+                disabled: false,
+                created_at: item.created_at
+              }
+              if (!isduplicate(item.name)) {
+              //setTemplates((oldArray) => [...oldArray, templateItem]); 
+              setTemplates((oldArray) => {
+                // Check if the templateItem already exists in the array
+                const exists = oldArray.some(item => item.templateid === templateItem.templateid);
+                if (!exists) {
+                  return [...oldArray, templateItem];
+                }
+                return oldArray;
+              }); 
+              }
+            });            
+          });
+        }
+      });
+    }
+    });
+  }, [applicantCorrespondence, applicantCorrespondenceTemplates, requestExtensions, dispatch]);
 
 
   const [correspondences, setCorrespondences] = useState(applicantCorrespondence);
@@ -424,49 +322,24 @@ export const ContactApplicant = ({
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentTemplate(+e.target.value)
     
-    // const callback = (templateVariables: any) => {
-    //   const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
-    //   setEditorValue(finalTemplate)
-    // }
-    // getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[+e.target.value], callback);
-
-    // loadTemplate(+e.target.value);
+    const callback = (templateVariables: any) => {
+      const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
+      setEditorValue(finalTemplate)
+    }
+    getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[+e.target.value], callback);
   }
 
   //When templates are selected from list
-  const handleTemplateSelection = (template: any, index: number) => {
-    if(template.templateid) {
-      setShowLagacyEditor(true);
-      setCurTemplate('');
-      setCurTemplateName('');
-
-      setCurrentTemplate(index);
+  const handleTemplateSelection = (index: number) => {
+    setCurrentTemplate(index);
     
-      const callback = (templateVariables: any) => {
-        const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
-        setEditorValue(finalTemplate);
-        changeCorrespondenceFilter("log");
-        setShowEditor(true);
-      }
-      getTemplateVariablesAsync(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index], callback);
-    } else {
-      setShowLagacyEditor(false);
-      if(template?.label) {
-        let newData = {
-          "foiRequestId": requestId,
-          "foiMinistryRequestId": ministryId,
-          "filename": template?.value
-        };
-        const loadTemplate = (templateJSON: string) => {
-          setCurTemplate(JSON.stringify(templateJSON));
-          setCurTemplateName(template.label);
-        }
-        fetchEmailTemplate(dispatch, newData, loadTemplate);
-      } else {
-        setCurTemplate('');
-        setCurTemplateName('');
-      }
+    const callback = (templateVariables: any) => {
+      const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
+      setEditorValue(finalTemplate);
+      changeCorrespondenceFilter("log");
+      setShowEditor(true);
     }
+    getTemplateVariablesAsync(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index], callback);
   }
 
   const removeFile = (index: number) => {
@@ -526,7 +399,6 @@ export const ContactApplicant = ({
     return attachments
   }
 
-  // send email
   const save = async (emailContent: string, skiptoast=false) => {
     setDisablePreview(true);
     setPreviewModal(false);
@@ -566,9 +438,7 @@ export const ContactApplicant = ({
         "axisRequestId": requestNumber
       }],
       assignedGroupEmail: requestDetails.assignedGroupEmail,
-      israwrequest: israwrequest,
-      templatename: curTemplateName,
-      templatetype: "sfdt"
+      israwrequest: israwrequest
     };
     saveEmailCorrespondence(
       data,
@@ -587,12 +457,8 @@ export const ContactApplicant = ({
   };
 
   
-  // trigger saving draft - get sfdt, export html, and save to db
-  const saveDraft = async () => {
-    setSaveSfdtDraftTrigger(true);
-  }
 
-  const saveDraftToDB = async (sfdtString: string, html: string) => {
+  const saveDraft = async () => {
     setDisablePreview(true);
     setPreviewModal(false);
     const attachments = await saveAttachments(files);
@@ -619,16 +485,14 @@ export const ContactApplicant = ({
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: JSON.stringify({
-        "emailhtml": html?html:editorValue,
+        "emailhtml": editorValue,
         "id": approvedForm?.cfrfeeid,
-        "type": type,
-        "emaildraft": sfdtString?sfdtString:""
+        "type": type
       }),
       foiministryrequest_id: ministryId,
       attachments: attachments,
       emails: selectedEmails,
-      israwrequest: israwrequest,
-      templatetype: "sfdt"
+      israwrequest: israwrequest
     };
     saveDraftCorrespondence(
       data,
@@ -763,21 +627,15 @@ export const ContactApplicant = ({
     setSelectedCorrespondence(i);
     setEditMode(true);
     setShowEditor(true);
+    setEditorValue(i.text);
     setSelectedEmails(i.emails);
     if (i.attachments)
       setFiles(i.attachments);
     setCorrespondenceId(i.applicantcorrespondenceid);
-    if(i.draft) {
-      setShowLagacyEditor(false);
-      setCurTemplate(i.draft);
-    } else {
-      setShowLagacyEditor(true);
-      setEditorValue(i.text);
-      for(let j = 0; j < templates.length; j++) {
-        if (templates[j].templateid === i.templateid) {
-          setCurrentTemplate(+j);
-        } 
-      }
+    for(let j = 0; j < templates.length; j++) {
+      if (templates[j].templateid === i.templateid) {
+        setCurrentTemplate(+j);
+      } 
     }
   };
 
@@ -881,25 +739,7 @@ export const ContactApplicant = ({
     }
   }
 
-  // trigger saving draft - get sfdt, export html, and save to db
-  const editDraftNew = async () => {
-    setEditDraftTrigger(true);
-  }
-  // export html and save html & sfdt
-  const editSfdtDraft = async (sfdtString: string) => {
-    let newData = {
-      "FileName": "email.html",
-      "Content": sfdtString
-    };
-    // save html & sfdt to db
-    const editDraftCallback = async (html: string) => {
-      // setEditorValue(html.replace("<body bgcolor=\"#FFFFFF\">", "<body bgcolor=\"#FFFFFF\" style=\"width: 6.5in; margin-left: auto; margin-right: auto; padding: 1in;\">"));
-      editCorrespondence(sfdtString, html);
-    }
-    await exportSFDT(dispatch, newData, editDraftCallback);
-  };
-  // save updated draft to db
-  const editCorrespondence = async (sfdtString: string, html: string) => {
+  const editCorrespondence = async (i : any) => {
     setDisablePreview(true);
     setPreviewModal(false);
     const attachments = await saveAttachments(files);
@@ -924,16 +764,14 @@ export const ContactApplicant = ({
       correspondenceid:correspondenceId,
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: JSON.stringify({
-        "emailhtml": html,
+        "emailhtml": editorValue,
         "id": approvedForm?.cfrfeeid,
-        "type": type,
-        "emaildraft": sfdtString
+        "type": type
       }),
       foiministryrequest_id: ministryId,
       attachments: attachments,
       emails: selectedEmails,
-      israwrequest: israwrequest,
-      templatetype: "sfdt"
+      israwrequest: israwrequest
     };
     editDraftCorrespondence(
       data,
@@ -1026,6 +864,7 @@ export const ContactApplicant = ({
       </div>]
   };
 
+  
   let correspondenceList;
   correspondenceList = correspondences.map((message: any, index: any) => (
     <div key={index} className="commentsection"
@@ -1053,13 +892,6 @@ export const ContactApplicant = ({
   ))
 
 
-
-  function onExportClick(output: string) {
-      console.log("Output: ", output);
-  }
-
-
-
   let templatesList;
   const parser = new DOMParser();
   let templateListItems = templates.map((template: any, index: any) => {
@@ -1074,7 +906,7 @@ export const ContactApplicant = ({
       <ListItem  
         onClick={() => {
           if (!showEditor) setShowEditor(true)
-          handleTemplateSelection(template, index)
+          handleTemplateSelection(index)
         }} 
         className={`template-list-item ${lastItemInList ? 'template-list-item-last' : ''}`}
         key={template.value}
@@ -1253,19 +1085,10 @@ export const ContactApplicant = ({
           direction="row"
           justifyContent="flex-end"
           spacing={1}
-          className="select-template-bottom-margin"
         >
           <Grid item xs={'auto'}>
-          </Grid>
+          </Grid>          
           <Grid item xs={3}>
-            <CustomAutocomplete
-              className="email-template-dropdown"
-              list={options}
-              onChange={selectTemplate}
-              label="Select Template"
-            />
-          </Grid>
-          {/* <Grid item xs={3}>
             <TextField
               className="email-template-dropdown"
               id="emailtemplate"
@@ -1291,7 +1114,7 @@ export const ContactApplicant = ({
                 </MenuItem>
               ))}
             </TextField>
-          </Grid> */}
+          </Grid>
           <Grid item xs={'auto'}>
           <CorrespondenceEmail 
             ministryId={ministryId}
@@ -1303,44 +1126,19 @@ export const ContactApplicant = ({
           </Grid>
         </Grid>
         <div className="correspondence-editor">
-          {/* <input type="file" id="file_upload" accept=".dotx,.docx,.docm,.dot,.doc,.rtf,.txt,.xml,.sfdt" onChange={onFileChange} /> */}
-          {/* <button onClick={onImportClick}>Import</button> */}
-
-          {showLagacyEditor ? 
-            <>
-              <div className="closeDraft">
-                  <IconButton className="title-col3" onClick={()=>setShowEditor(false)}>
-                      <i className="dialog-close-button">Close</i>
-                      <CloseIcon />
-                  </IconButton>
-              </div>
-              <ReactQuill
-                theme="snow"
-                value={editorValue}
-                onChange={setEditorValue}
-                modules={quillModules}
-                ref={handleRef}
-              />
-            </>
-            :
-            <>
-              <DocEditor
-                curTemplate = {curTemplate}
-                saveSfdtDraft = {saveSfdtDraft}
-                saveSfdtDraftTrigger = {saveSfdtDraftTrigger}
-                setSaveSfdtDraftTrigger = {setSaveSfdtDraftTrigger}
-                preview = {preview}
-                previewTrigger = {previewTrigger}
-                setPreviewTrigger = {setPreviewTrigger}
-                addAttachment={openAttachmentModal}
-                savepdf = {savePdf}
-                editDraftTrigger = {editDraftTrigger}
-                setEditDraftTrigger = {setEditDraftTrigger}
-                editSfdtDraft = {editSfdtDraft}
-              />
-            </>
-          }
-          <div>
+          <div className="closeDraft">
+              <IconButton className="title-col3" onClick={()=>setShowEditor(false)}>
+                  <i className="dialog-close-button">Close</i>
+                  <CloseIcon />
+              </IconButton>
+           </div>
+          <ReactQuill
+            theme="snow"
+            value={editorValue}
+            onChange={setEditorValue}
+            modules={quillModules}
+            ref={handleRef}
+          />
           {files.map((file: any, index: number) => (
             <div className="email-attachment-item" key={file.filename}>
               <u>{file.filename}</u>
@@ -1350,10 +1148,22 @@ export const ContactApplicant = ({
               >
               </i>
             </div>
-          ))}
-          </div>
+          ))}          
         </div>
         <div id="correspondence-editor-ql-toolbar" className="ql-toolbar ql-snow">
+          <span className="ql-formats">
+            <button className="ql-bold" />
+            <button className="ql-italic" />
+            <button className="ql-underline" />
+          </span>
+          <span className="ql-formats">
+            <button className="ql-list" value="ordered" />
+            <button className="ql-list" value="bullet" />
+          </span>
+          <span className="ql-formats">
+            <button className="ql-link" />
+            <button className="ql-image" />
+          </span>
           <div className="previewEmail">
             <PreviewModal
               modalOpen={previewModal}
@@ -1379,18 +1189,18 @@ export const ContactApplicant = ({
         <button
           className="btn addCorrespondence"
           data-variant="contained" 
-          onClick={ editMode ? editDraftNew : saveDraft}             
+          onClick={ editMode ? editCorrespondence : saveDraft}             
           color="primary"
-          // disabled={(currentTemplate <= 0)}
+          disabled={(currentTemplate <= 0)}
         >
           {draftButtonValue}
         </button>
             <button
               className="btn addCorrespondence"
               data-variant="contained"
-              onClick={() => {setPreviewModal(true);setPreviewTrigger(true);} }
+              onClick={() => setPreviewModal(true)}
               color="primary"
-              // disabled={(currentTemplate <= 0)}
+              disabled={(currentTemplate <= 0)}
             >
               {previewButtonValue}
             </button>
