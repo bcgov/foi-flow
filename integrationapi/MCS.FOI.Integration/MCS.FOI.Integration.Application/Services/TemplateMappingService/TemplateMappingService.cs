@@ -39,7 +39,6 @@
 
         private async Task<Dictionary<string, string?>> GenerateStringMapping(int foiRequestId, int foiMinistryRequestId)
         {
-            var rawRequest = await GetRawRequestDetails(foiRequestId);
             var request = await _templateDataService.GetRequest(foiRequestId);
             var requestMinistry = await _templateDataService.GetRequestByMinistryRequestId(foiMinistryRequestId);
             bool isRawRequest = request.FOIRequestId.Equals(0) && requestMinistry.FOIMinistryRequestId.Equals(0);
@@ -48,6 +47,7 @@
 
             if (isRawRequest) 
             {
+                var rawRequest = await GetRawRequestDetails(foiRequestId);
                 templateData = await PopulateRawRequestData(rawRequest);
             }
             else
