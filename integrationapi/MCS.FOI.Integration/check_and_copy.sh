@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Check if /app-data is empty
-if [ -z "$(ls -A /App-Data)" ]; then
+if [ -z "$(ls -A /app-data)" ]; then
   echo "App_Data directory is empty, copying files..."
-  cp -r /app/App_Data/* /App-Data/
+  cp -r /app/App_Data/* /app-data/
   echo "App_Data files copied."
-  chmod -R 777 /App-Data/ # Change permissions after copy
+  chmod -R 777 /app-data/ # Change permissions after copy
 else
   echo "App_Data directory is not empty, skipping copy."
-  chmod -R 777 /App-Data/ # Change permissions even if no copy
+  chmod -R 777 /app-data/ # Change permissions even if no copy
 fi
