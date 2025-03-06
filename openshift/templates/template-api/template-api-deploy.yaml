@@ -115,7 +115,7 @@ objects:
                   name: "${TEMPLATE_API_SECRETS}"
                   key: SyncfusionLicense
           ports:
-          - containerPort: 5000
+          - containerPort: 8080
             protocol: TCP
           resources:
             requests:
@@ -153,7 +153,7 @@ objects:
     - name: 5000-tcp
       protocol: TCP
       port: 5000
-      targetPort: 5000
+      targetPort: 8080
     selector:
       deploymentconfig: "${API_NAME}"
     type: ClusterIP

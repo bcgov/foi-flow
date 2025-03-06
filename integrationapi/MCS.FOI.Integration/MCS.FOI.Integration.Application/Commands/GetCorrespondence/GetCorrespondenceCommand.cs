@@ -4,14 +4,14 @@
     {
         public string Token { get; set; } = string.Empty;
         public int FOIRequestId { get; init; }
-        public int FOIMinistryRequestId { get; init; }
+        public int? FOIMinistryRequestId { get; init; }
         public string FileName { get; init; } = string.Empty;
     }
 
     public class GetCorrespondenceRequest
     {
         public int FOIRequestId { get; init; }
-        public int FOIMinistryRequestId { get; init; }
+        public int? FOIMinistryRequestId { get; init; }
         public string FileName { get; init; } = string.Empty;
     }
 
@@ -28,7 +28,6 @@
         public GetCorrespondenceCommandValidator()
         {
             RuleFor(a => a.FOIRequestId).NotNull().NotEmpty().WithMessage($"{nameof(GetCorrespondenceCommand.FOIRequestId)} is required.");
-            RuleFor(a => a.FOIMinistryRequestId).NotNull().NotEmpty().WithMessage($"{nameof(GetCorrespondenceCommand.FOIMinistryRequestId)} is required.");
             RuleFor(a => a.FileName).NotNull().NotEmpty().WithMessage($"{nameof(GetCorrespondenceCommand.FileName)} is required.");
             RuleFor(a => a.Token).NotNull().NotEmpty().WithMessage($"{nameof(GetCorrespondenceCommand.Token)} is required.");
         }
