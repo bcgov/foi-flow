@@ -264,11 +264,9 @@ export const RecordsLog = ({
   let phasedRedlinesStitchedStatuses = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusesForPhasedRedlines
   );
-  console.log("phasedRedlinesStitchedStatuses", phasedRedlinesStitchedStatuses)
   let phasedResponsePackageStitchedStatuses = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusesForPhasedResponsePackages
   );
-  console.log("phasedResponsePackageStitchedStatuses", phasedResponsePackageStitchedStatuses)
 
   let pdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForHarms
@@ -291,11 +289,9 @@ export const RecordsLog = ({
   let phasedRedlinesStitchedRecords = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordsForPhasedRedlines
   );
-  console.log("phasedRedlinesStitchedRecords", phasedRedlinesStitchedRecords)
   let phasedResponsePackageStitchedRecords = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordsForPhasedResponsePackages
   );
-  console.log("phasedResponsePackageStitchedRecords", phasedResponsePackageStitchedRecords)
 
   let isRecordsfetching = useSelector(
     (state) => state.foiRequests.isRecordsLoading
@@ -1049,13 +1045,9 @@ export const RecordsLog = ({
       const isDownloadReady = phasedDownloadStatuses?.find(phasedPackage => phasedPackage.phase === packageObj.phase).downloadReady;
       if (isDownloadReady) {
         const s3filepath = phasedStichedRecords?.find(phasedPackage => packageName === phasedPackage.category).finalpackagepath;
-        console.log("s3filepath", s3filepath)
         handleDownloadZipFile(s3filepath, packageObj);
       }
     }
-    console.log("STATUS STATE REDLINE", phasedRedlineDownloadStatuses)
-    console.log("STATUS STATE RESPONSE", phasedResponsePackageDownloadStatuses)
-
     const handleDownloadChange = (e) => {
     //if clicked on harms
     if (
