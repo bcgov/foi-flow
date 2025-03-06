@@ -28,12 +28,10 @@ WORKDIR /app
 COPY --from=build /src/MCS.FOI.Integration.API/out ./
 
 # copy app data to the image.
-COPY MCS.FOI.Integration.API/App_Data /app/App_Data/
-COPY entrypoint.sh /app/
-RUN chmod +x /app/entrypoint.sh
+COPY MCS.FOI.Integration.API/App_Data/. /app/app-data/
 
 # Expose the port that the application listens on.
 EXPOSE 8080
 
 # Specify the entry point for the application.
-ENTRYPOINT ["/app/entrypoint.sh"]
+ENTRYPOINT ["dotnet", "MCS.FOI.Integration.API.dll"]
