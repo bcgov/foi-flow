@@ -27,6 +27,9 @@ WORKDIR /app
 # Copy the published output from the build stage.
 COPY --from=build /src/MCS.FOI.Integration.API/out ./
 
+# copy app data to the image.
+COPY MCS.FOI.Integration.API/App_Data/. /app/app-data/
+
 # Expose the port that the application listens on.
 EXPOSE 8080
 
