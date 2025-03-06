@@ -27,6 +27,11 @@ WORKDIR /app
 # Copy the published output from the build stage.
 COPY --from=build /src/MCS.FOI.Integration.API/out ./
 
+# Copy App_Data only if it doesn't exist in the PVC
+COPY check_and_copy.sh ./
+RUN chmod +x check_and_copy.sh
+RUN check_and_copy.sh
+
 # Expose the port that the application listens on.
 EXPOSE 8080
 
