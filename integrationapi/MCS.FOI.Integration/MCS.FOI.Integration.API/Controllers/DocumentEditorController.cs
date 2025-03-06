@@ -1,14 +1,4 @@
-﻿using MCS.FOI.Integration.API;
-using MCS.FOI.Integration.Application.Model;
-using Syncfusion.DocIORenderer;
-using Syncfusion.EJ2.DocumentEditor;
-using Syncfusion.EJ2.SpellChecker;
-using Syncfusion.Pdf;
-using WDocument = Syncfusion.DocIO.DLS.WordDocument;
-// using EJ2APIServices;
-
-
-namespace SyncfusionDocument.Controllers
+﻿namespace SyncfusionDocument.Controllers
 {
     [Route("api/[controller]")]
     [EnableCors(PolicyName = "FOIOrigins")]

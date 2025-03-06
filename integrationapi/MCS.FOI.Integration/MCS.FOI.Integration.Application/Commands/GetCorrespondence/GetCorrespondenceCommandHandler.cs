@@ -1,6 +1,4 @@
-﻿using MCS.FOI.Integration.Core.Repositories.RedisRepository;
-
-namespace MCS.FOI.Integration.Application.Commands.GetCorrespondence
+﻿namespace MCS.FOI.Integration.Application.Commands.GetCorrespondence
 {
     public class GetCorrespondenceCommandHandler : ICommandHandler<GetCorrespondenceCommand, string>
     {
