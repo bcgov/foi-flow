@@ -112,6 +112,13 @@ const RequestHeader = React.memo(({
               isDisabled={isMinistry}
             />
             <RequestFlag
+              type="consult"
+              requestDetails={requestDetails}
+              isActive={requestDetails.isconsultflag}
+              showFlag={requestDetails.isconsultflag === true}
+              isDisabled={true}
+            />
+            <RequestFlag
               type="phasedrelease"
               requestDetails={requestDetails}
               isActive={requestDetails.isphasedrelease}

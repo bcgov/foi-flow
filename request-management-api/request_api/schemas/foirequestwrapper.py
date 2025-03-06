@@ -94,9 +94,9 @@ class FOIRequestWrapperSchema(Schema):
     description = fields.Str(data_key="description", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
     category = fields.Str(data_key="category", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
     requestType = fields.Str(data_key="requestType", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)]) 
-    firstName = fields.Str(data_key="firstName", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE, max=50)])    
+    firstName = fields.Str(data_key="firstName", allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])    
     middleName = fields.Str(data_key="middleName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])    
-    lastName = fields.Str(data_key="lastName", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE, max=50)])         
+    lastName = fields.Str(data_key="lastName", allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])         
     email = fields.Str(data_key="email",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])      
     businessName = fields.Str(data_key="businessName",allow_none=True, validate=[validate.Length(max=255, error=MAX_EXCEPTION_MESSAGE)]) 
     assignedGroup = fields.Str(data_key="assignedGroup",allow_none=True, validate=[validate.Length(max=250, error=MAX_EXCEPTION_MESSAGE)])
@@ -139,6 +139,7 @@ class FOIRequestWrapperSchema(Schema):
     correctionalServiceNumber = fields.Str(data_key="correctionalServiceNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
     publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)]) 
     isiaorestricted =   fields.Bool(data_key="isiaorestricted")
+    isconsultflag = fields.Bool(data_key="isconsultflag", missing=False)#missing is deprecated, use load_default for marshmallow >3.12
 
     foiRequestApplicantID = fields.Int(data_key="foiRequestApplicantID",required=False,allow_none=True)
     axisapplicantid = fields.Int(data_key="axisApplicantID",required=False,allow_none=True)
@@ -220,3 +221,4 @@ class FOIRequestMinistrySchema(Schema):
     assignedministrypersonLastName = fields.Str(data_key="assignedministrypersonLastName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
     ministrysignoffapproval = fields.Nested(CreateMinistrySignOffApprovalSchema, data_key="ministrysignoffapproval", allow_none=True)
     userrecordslockstatus = fields.Bool(data_key="userrecordslockstatus", allow_none=True)
+    isconsultflag = fields.Bool(data_key="isconsultflag", missing=False)#missing is deprecated, use load_default for marshmallow >3.12

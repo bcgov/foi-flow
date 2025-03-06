@@ -25,6 +25,7 @@ const StateDropDown = ({
   isDivisionalCoordinator,
   isHistoricalRequest,
   disabled,
+  consultflag
 }) => {
   const _isMinistryCoordinator = isMinistryCoordinator;
 
@@ -153,7 +154,7 @@ const StateDropDown = ({
           return _stateList.peerreview;
         }
       case StateEnum.open.name.toLowerCase():
-        return _stateList.open;
+        return consultflag ? _stateList.openforconsult : _stateList.open;
       case StateEnum.closed.name.toLowerCase():
         return getClosedList();
       case StateEnum.redirect.name.toLowerCase():
