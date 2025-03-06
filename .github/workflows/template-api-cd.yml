@@ -29,6 +29,16 @@ jobs:
     if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install OpenShift CLI
+        run: |
+          curl -LO https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux-amd64.tar.gz
+          tar -xzf openshift-client-linux-amd64.tar.gz
+          sudo mv oc /usr/local/bin/
+
+      - name: Verify oc installation
+        run: oc version
+
       - name: Set ENV variables for dev branch
         if: ${{ github.ref_name == 'dev' }}
         shell: bash
