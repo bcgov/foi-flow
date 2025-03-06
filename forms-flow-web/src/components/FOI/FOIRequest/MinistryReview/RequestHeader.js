@@ -115,7 +115,7 @@ const RequestHeader = React.memo(({
               type="consult"
               requestDetails={requestDetails}
               isActive={requestDetails.isconsultflag}
-              showFlag={requestDetails.isconsultflag}
+              showFlag={requestDetails.isconsultflag === true}
               isDisabled={true}
             />
             {/* <RequestFlag
