@@ -1,5 +1,4 @@
-﻿using MCS.FOI.Integration.Core.Repositories.RedisRepository;
-using Template = MCS.FOI.Integration.Core.Entities.Template;
+﻿using Template = MCS.FOI.Integration.Core.Entities.Template;
 
 namespace MCS.FOI.Integration.Application.Commands.UpdateRedisTemplate
 {

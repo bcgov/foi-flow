@@ -2,8 +2,19 @@
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Cors;
 global using Microsoft.AspNetCore.Authorization;
+global using Syncfusion.DocIORenderer;
+global using Syncfusion.EJ2.DocumentEditor;
+global using Syncfusion.EJ2.SpellChecker;
+global using Syncfusion.Pdf;
+global using WDocument = Syncfusion.DocIO.DLS.WordDocument;
+global using MCS.FOI.Integration.Application.Mapper;
 
 global using MCS.FOI.Integration.Application.Extensions;
 global using MCS.FOI.Integration.Application.Queries.GetTemplates;
 global using MCS.FOI.Integration.Application.Commands.GetCorrespondence;
 global using MCS.FOI.Integration.Application.Commands.UpdateRedisTemplate;
+global using MCS.FOI.Integration.API;
+global using MCS.FOI.Integration.Application.Model;
+global using MCS.FOI.Integration.Application;
+global using MCS.FOI.Integration.Infrastructure;
+global using MCS.FOI.Integration.Infrastructure.Extensions;

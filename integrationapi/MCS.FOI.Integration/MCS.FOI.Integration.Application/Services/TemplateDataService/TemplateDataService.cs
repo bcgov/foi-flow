@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MCS.FOI.Integration.Application.Services.TemplateDataService
+﻿namespace MCS.FOI.Integration.Application.Services.TemplateDataService
 {
     public class TemplateDataService : ITemplateDataService
     {

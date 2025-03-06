@@ -1,6 +1,4 @@
-﻿using MCS.FOI.Integration.Application.Mapper;
-
-namespace MCS.FOI.Integration.API.Controllers
+﻿namespace MCS.FOI.Integration.API.Controllers
 {
     [Route("api/[controller]")]
     [EnableCors(PolicyName = "FOIOrigins")]
