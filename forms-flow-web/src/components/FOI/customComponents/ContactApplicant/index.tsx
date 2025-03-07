@@ -646,6 +646,7 @@ export const ContactApplicant = ({
       attachments: attachments,
       emails: selectedEmails,
       israwrequest: israwrequest,
+      templatename: curTemplateName,
       templatetype: "sfdt"
     };
     saveDraftCorrespondence(
@@ -951,6 +952,7 @@ export const ContactApplicant = ({
       attachments: attachments,
       emails: selectedEmails,
       israwrequest: israwrequest,
+      templatename: curTemplateName,
       templatetype: "sfdt"
     };
     editDraftCorrespondence(
