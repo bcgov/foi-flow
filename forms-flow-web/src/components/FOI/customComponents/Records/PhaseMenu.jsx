@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import {
   faSpinner,
   faExclamationCircle,
-  faCheckCircle,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheckCircle,
+} from "@fortawesome/free-regular-svg-icons";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import Tooltip from "@mui/material/Tooltip";
