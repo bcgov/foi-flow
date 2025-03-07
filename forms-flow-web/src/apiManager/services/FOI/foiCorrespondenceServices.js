@@ -371,12 +371,12 @@ export const exportSFDT = (
   callback,
   errorCallback = null,
 ) => {
-  console.log("data: ", data);
+  // console.log("data: ", data);
   const apiUrl = API.FOI_EXPORT_SFDT;
-  console.log("apiUrl: ", apiUrl);
+  // console.log("apiUrl: ", apiUrl);
   httpPOSTRequest(apiUrl, data, UserService.getToken())
   .then((res) => {
-    console.log("res: ", res);
+    // console.log("res: ", res);
     if (res.data) {
       callback(res.data);
     } else {
@@ -400,12 +400,11 @@ export const exportPDF = (
   callback,
   errorCallback = null,
 ) => {
-  console.log("data: ", data);
+  // console.log("data: ", data);
   const apiUrl = API.FOI_EXPORT_PDF;
-  console.log("apiUrl: ", apiUrl);
+  // console.log("apiUrl: ", apiUrl);
   httpPOSTRequestBlobResponse(apiUrl, data, UserService.getToken())
   .then((res) => {
-    console.log("res: ", res);
     if (res.data) {
       callback(res.data);
     } else {

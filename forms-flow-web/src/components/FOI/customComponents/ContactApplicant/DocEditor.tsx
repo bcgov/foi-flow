@@ -1,5 +1,6 @@
 import './DocEditor.scss'
 import * as React from 'react';
+import { useSelector } from "react-redux";
 import { DocumentEditorContainerComponent, Toolbar, CustomToolbarItemModel, ToolbarItem, SpellChecker } from "@syncfusion/ej2-react-documenteditor";
 import { ClickEventArgs } from '@syncfusion/ej2-navigations';
 import { FOI_TEMPLATE_API_URL } from "../../../../apiManager/endpoints/config"
@@ -24,6 +25,8 @@ export const DocEditor = ({
     editSfdtDraft
 }: any) => {
     const [container, setContainer] = React.useState<DocumentEditorContainerComponent | null>(null);
+    const userDetail: any|null = useSelector((state: any)=> state.user.userDetail);
+
     // let container: DocumentEditorContainerComponent;
     // console.log("FormatType: ", FormatType);
 
@@ -112,6 +115,8 @@ export const DocEditor = ({
             container.documentEditor.spellChecker.removeUnderline = false;
             container.documentEditor.spellChecker.allowSpellCheckAndSuggestion = true;
             container.documentEditor.spellChecker.enableOptimizedSpellCheck = true;
+            container.documentEditor.currentUser = userDetail.preferred_username;
+            container.documentEditor.enableTrackChanges = false;
             //load template/draft
             if (curTemplate) {
                 container.documentEditor.open(curTemplate);
@@ -168,6 +173,7 @@ export const DocEditor = ({
             toolbarClick={onToolbarClick.bind(this)}
             enableSpellCheck={true}
             created={onCreated}
+            enableAutoFocus={false}
             documentEditorSettings={fontFamilies}
         />
     );

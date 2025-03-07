@@ -65,7 +65,7 @@ export const ContactApplicant = ({
   const [showLagacyEditor, setShowLagacyEditor] = useState<boolean>(false);
 
   const selectTemplate = (event: React.ChangeEvent<{}>, item: Template | null) => {
-    console.log("Selected option:", item?.label);
+    // console.log("Selected option:", item?.label);
 
     if(item?.templateid) {
       setShowLagacyEditor(true);
