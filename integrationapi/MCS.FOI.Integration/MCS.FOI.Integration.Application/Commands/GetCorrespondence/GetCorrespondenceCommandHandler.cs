@@ -43,7 +43,7 @@
 
             using var document = LoadWordDocument(fileBytes, template.Extension);
 
-            var templateData = await _templateMapping.GenerateFieldsMapping(command.FOIRequestId, command.FOIMinistryRequestId);
+            var templateData = await _templateMapping.GenerateFieldsMapping(command.FOIRequestId, command.FOIMinistryRequestId ?? 0);
             ReplacePlaceholders(document, templateData);
 
             using var outputStream = new MemoryStream();
