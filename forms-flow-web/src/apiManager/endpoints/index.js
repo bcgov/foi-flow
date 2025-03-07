@@ -2,7 +2,7 @@ import {
   FOI_BASE_API_URL,
   AXIS_API_URL,
   DOC_REVIEWER_BASE_API_URL,
-  FOI_HISTORICAL_API_URL
+  FOI_HISTORICAL_API_URL,
 } from "./config";
 
 const API = {
@@ -183,10 +183,19 @@ const API = {
   FOI_DOWNLOAD_RECORDS_FOR_CONSULTPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/consultpackage`,
   FOI_PDF_STITCH_STATUS_FOR_CONSULTPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/consultpackage/pdfstitchjobstatus`,
 
+  FOI_DOWNLOAD_RECORDS_FOR_PHASEDREDLINES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/redlinephase`,
+  FOI_PDF_STITCH_STATUSES_FOR_PHASEDREDLINES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/redlinephase/pdfstitchjobstatus`,
+
+  FOI_DOWNLOAD_RECORDS_FOR_PHASEDRESPONSEPACKAGES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/responsepackagephase`,
+  FOI_PDF_STITCH_STATUSES_FOR_PHASEDRESPONSEPACKAGES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/responsepackagephase/pdfstitchjobstatus`,
+
   FOI_GET_OIPC_OUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/outcomes`,
   FOI_GET_OIPC_STATUSES: `${FOI_BASE_API_URL}/api/foiflow/oipc/statuses`,
   FOI_GET_OIPC_REVIEWTYPES: `${FOI_BASE_API_URL}/api/foiflow/oipc/reviewtypes`,
   FOI_GET_OIPC_INQUIRYOUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/inquiryoutcomes`,
   FOI_GET_COMMENT_TYPES: `${FOI_BASE_API_URL}/api/foiflow/commenttypes`,
+
+  FOI_GET_CROSSTEXTSEARCH_AUTH: `${FOI_BASE_API_URL}/api/foicrosstextsearch/authstring`,
+  FOI_GET_CROSSTEXTSEARCH_REQUEST_DETAILS: `${FOI_BASE_API_URL}/api/foicrosstextsearch/requests`,
 };
 export default API;

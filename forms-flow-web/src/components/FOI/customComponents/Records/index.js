@@ -35,11 +35,13 @@ import {
   checkForRecordsChange,
   fetchPDFStitchedRecordForConsults,
   editPersonalAttributes,
-  updateUserLockedRecords,
+  fetchPDFStitchedRecordsForPhasedRedlines,
+  fetchPDFStitchedRecordsForPhasedResponsePackages
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
   saveRequestDetails,
-  openRequestDetails
+  openRequestDetails,
+  updateSpecificRequestSection,
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import {
   StateTransitionCategories,
@@ -126,6 +128,7 @@ import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import MCFPersonal from "./MCFPersonal";
 import MSDPersonal from "./MSDPersonal";
+import PhaseMenu from "./PhaseMenu";
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -233,6 +236,7 @@ export const RecordsLog = ({
   setLockRecordsTab,
   validLockRecordsState,
   setSaveRequestObject,
+  isPhasedRelease
 }) => {
   const user = useSelector((state) => state.user.userDetail);
   const userGroups = user?.groups?.map((group) => group.slice(1));
@@ -257,6 +261,12 @@ export const RecordsLog = ({
   let consultPDFStitchedStatus = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusForConsults
   );
+  let phasedRedlinesStitchedStatuses = useSelector(
+    (state) => state.foiRequests.foiPDFStitchStatusesForPhasedRedlines
+  );
+  let phasedResponsePackageStitchedStatuses = useSelector(
+    (state) => state.foiRequests.foiPDFStitchStatusesForPhasedResponsePackages
+  );
 
   let pdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForHarms
@@ -275,6 +285,12 @@ export const RecordsLog = ({
   );
   let consultPDFStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForConsultPackage
+  );
+  let phasedRedlinesStitchedRecords = useSelector(
+    (state) => state.foiRequests.foiPDFStitchedRecordsForPhasedRedlines
+  );
+  let phasedResponsePackageStitchedRecords = useSelector(
+    (state) => state.foiRequests.foiPDFStitchedRecordsForPhasedResponsePackages
   );
 
   let isRecordsfetching = useSelector(
@@ -505,6 +521,9 @@ export const RecordsLog = ({
   const [isConsultDownloadReady, setIsConsultDownloadReady] = useState(false);
   const [isConsultDownloadFailed, setIsConsultDownloadFailed] = useState(false);
 
+  const [phasedRedlineDownloadStatuses, setPhasedRedlineDownloadStatuses] = useState([]);
+  const [phasedResponsePackageDownloadStatuses, setPhasedResponsePackageDownloadStatuses] = useState([]);
+
   const [isAllSelected, setIsAllSelected] = useState(false);
 
   useEffect(() => {
@@ -544,6 +563,43 @@ export const RecordsLog = ({
           break;
       }
     };
+
+    const updatePhasePackageStatus = (statuses, setStatuses, dispatchAction) => {
+      if (statuses?.length > 0) {
+        let newArr = [...statuses];
+        for (let phaseObj of newArr) {
+          switch (phaseObj.status) {
+            case RecordDownloadStatus.started:
+            case RecordDownloadStatus.pushedtostream:
+            case RecordDownloadStatus.redactionsummarystarted:
+            case RecordDownloadStatus.redactionsummaryuploaded:
+            case RecordDownloadStatus.zippingstarted:
+            case RecordDownloadStatus.zippingcompleted:
+              phaseObj.downloadReady = false;
+              phaseObj.downloadWIP = true;
+              phaseObj.downloadFailed = false;
+              break;
+            case RecordDownloadStatus.completed:
+              dispatch(dispatchAction(requestId, ministryId));
+              phaseObj.downloadReady = true;
+              phaseObj.downloadWIP = false;
+              phaseObj.downloadFailed = false;
+              break;
+            case RecordDownloadStatus.error:
+              phaseObj.downloadReady = false;
+              phaseObj.downloadWIP = false;
+              phaseObj.downloadFailed = true;
+              break;
+            default:
+              phaseObj.downloadReady = false;
+              phaseObj.downloadWIP = false;
+              phaseObj.downloadFailed = false;
+              break;
+          }
+        }
+        setStatuses(newArr)
+      }
+    }
 
     // Update PDF Stitch Status
     updateStatus(
@@ -595,6 +651,16 @@ export const RecordsLog = ({
       setIsConsultDownloadFailed,
       fetchPDFStitchedRecordForConsults
     );
+    updatePhasePackageStatus(
+      phasedRedlinesStitchedStatuses,
+      setPhasedRedlineDownloadStatuses,
+      fetchPDFStitchedRecordsForPhasedRedlines,
+    )
+    updatePhasePackageStatus(
+      phasedResponsePackageStitchedStatuses,
+      setPhasedResponsePackageDownloadStatuses,
+      fetchPDFStitchedRecordsForPhasedResponsePackages
+    )
   }, [
     pdfStitchStatus,
     redlinePdfStitchStatus,
@@ -604,6 +670,8 @@ export const RecordsLog = ({
     consultPDFStitchedStatus,
     requestId,
     ministryId,
+    phasedRedlinesStitchedStatuses,
+    phasedResponsePackageStitchedStatuses,
   ]);
 
   useEffect(() => {
@@ -970,7 +1038,17 @@ export const RecordsLog = ({
     );
   };
 
-  const handleDownloadChange = (e) => {
+    const handlePhasePackageDownload = (packageObj, itemid) => {
+      const phasedDownloadStatuses = itemid === 2 ? phasedRedlineDownloadStatuses : phasedResponsePackageDownloadStatuses;
+      const phasedStichedRecords = itemid === 2 ? phasedRedlinesStitchedRecords : phasedResponsePackageStitchedRecords;
+      const packageName = `${packageObj.category}phase${packageObj.phase}`;
+      const isDownloadReady = phasedDownloadStatuses?.find(phasedPackage => phasedPackage.phase === packageObj.phase).downloadReady;
+      if (isDownloadReady) {
+        const s3filepath = phasedStichedRecords?.find(phasedPackage => packageName === phasedPackage.category).finalpackagepath;
+        handleDownloadZipFile(s3filepath, packageObj);
+      }
+    }
+    const handleDownloadChange = (e) => {
     //if clicked on harms
     if (
       e.target.value === 1 &&
@@ -1017,13 +1095,18 @@ export const RecordsLog = ({
     setCurrentDownload(e.target.value);
   };
 
-  const handleDownloadZipFile = (s3filepath, itemid) => {
+  const handleDownloadZipFile = (s3filepath, packageid) => {
     const filename = requestNumber + ".zip";
     try {
       downloadZipFile(s3filepath, filename);
     } catch (error) {
       console.log(error);
-      toastError(itemid);
+      if (isPhasedRelease) {
+        phasedReleaseToastError(packageid)
+      }
+      else {
+        toastError(packageid);
+      }
     }
   };
 
@@ -1200,6 +1283,29 @@ export const RecordsLog = ({
       setIsConsultDownloadFailed(true);
     }
   };
+  const phasedReleaseToastError = (packageObj) => {
+    toast.error(
+      "Temporarily unable to process your request. Please try again in a few minutes.",
+      {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      }
+    );
+    if (packageObj.category === "redline") {
+      setPhasedRedlineDownloadStatuses((prev) => {
+        prev.map(item => item.phase === packageObj.phase ? {...item, downloadReady: false, downloadWIP: false, downloadFailed: true} : item)
+      });
+    } else if (packageObj.category === "responsepackage") {
+      setPhasedResponsePackageDownloadStatuses((prev) => {
+        prev.map(item => item.phase === packageObj.phase ? {...item, downloadReady: false, downloadWIP: false, downloadFailed: true} : item)
+      })
+    }
+  }
 
   const isReady = (itemid) => {
     return (
@@ -1243,6 +1349,13 @@ export const RecordsLog = ({
       (itemid === 5 && oipcRedlineReviewPdfStitchedRecord?.createdat_datetime) ||
       (itemid === 6 && consultPDFStitchedRecord?.createdat_datetime)
     );
+  }
+  
+  const getPhasePackageDatetime = (phasePackage, itemid) => {
+    const packageName = `${phasePackage.category}phase${phasePackage.phase}`;
+    if (itemid === 2) return phasedRedlinesStitchedRecords.find(phaseRecord => phaseRecord.category === packageName)?.createdat_datetime;
+    if (itemid === 3) return phasedResponsePackageStitchedRecords.find(phaseRecord => phaseRecord.category === packageName)?.createdat_datetime;
+   
   }
 
   const downloadSelectedDocuments = async () => {
@@ -2069,8 +2182,9 @@ export const RecordsLog = ({
     const toastID = toast.loading("Updating records lock status for request...");
     const data = {userrecordslockstatus: !lockRecords};
     dispatch(
-      updateUserLockedRecords(
+      updateSpecificRequestSection(
         data,
+        'userrecordslockstatus',
         requestId,
         ministryId, 
         (err, _res) => {
@@ -2240,7 +2354,16 @@ export const RecordsLog = ({
                   fullWidth
                 >
                   {recordsDownloadList.map((item, index) => {
-                    if (item.id != 0) {
+                    if (item.id !== 0) {
+                      if ((item.id === 2 || item.id === 3) && isPhasedRelease) {
+                        return <PhaseMenu 
+                        handlePhasePackageDownload={handlePhasePackageDownload} 
+                        item={item} 
+                        index={index} 
+                        phasedPackageDownloadStatuses={item.id === 2 ? phasedRedlineDownloadStatuses : phasedResponsePackageDownloadStatuses}
+                        getPhasePackageDatetime={getPhasePackageDatetime} 
+                        />
+                      } else {
                       return (
                         <MenuItem
                           className="download-menu-item"
@@ -2275,7 +2398,7 @@ export const RecordsLog = ({
                             <span>{item.label}</span>
                           </Tooltip>
                         </MenuItem>
-                      );
+                      )};
                     }
                   })}
                 </TextField>

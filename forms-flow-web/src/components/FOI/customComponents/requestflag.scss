@@ -19,6 +19,12 @@
         margin-top: 3px;
     }
 
+    .consultation-icon{
+        color: #9954bb;
+        padding-left: 14px;
+        margin-top: 3px;
+    }
+
     .restrict-label {
         border: 1px solid #a0192f;
         width: 100px;
@@ -26,7 +32,7 @@
     }
 
     .request-flag-select{
-        border: 1px solid #fa7c16;
+        //border: 1px solid #fa7c16;
         //padding-top: 8px;
         //width:40px;
         height: 40px;
@@ -40,6 +46,10 @@
         color: black !important;
         width: 155px;
         padding-left: 10px;
+    }
+
+    .consultation-inactive-dropdown {
+        width: 160px;
     }
     
     .request-flag-dropdown .MuiSelect-icon {

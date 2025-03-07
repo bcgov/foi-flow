@@ -75,6 +75,7 @@ class FOIMinistryRequest(db.Model):
     ministrysignoffapproval = db.Column(JSON, unique=False, nullable=True)
     requeststatuslabel = db.Column(db.String(50), nullable=False)
     userrecordslockstatus = db.Column(db.Boolean, nullable=True)
+    isconsultflag = db.Column(db.Boolean, nullable=True)
 
     #ForeignKey References
     
@@ -110,6 +111,7 @@ class FOIMinistryRequest(db.Model):
     isofflinepayment = db.Column(db.Boolean, unique=False, nullable=True,default=False)
 
     isoipcreview = db.Column(db.Boolean, unique=False, nullable=True,default=False)
+    isphasedrelease = db.Column(db.Boolean, unique=False, nullable=True,default=False)
 
     @classmethod
     def getrequest(cls,ministryrequestid):
@@ -449,6 +451,8 @@ class FOIMinistryRequest(db.Model):
                         onekeywordfiltercondition.append(ministry_restricted_requests.isrestricted == True)
                 if (_keyword == "oipc"):
                     onekeywordfiltercondition.append(FOIMinistryRequest.isoipcreview == True)
+                if (_keyword == "phased"):
+                    onekeywordfiltercondition.append(FOIMinistryRequest.isphasedrelease == True)
             
                 filtercondition.append(or_(*onekeywordfiltercondition))
 
@@ -592,6 +596,7 @@ class FOIMinistryRequest(db.Model):
             ministry_restricted_requests.isrestricted.label('isministryrestricted'),
             SubjectCode.name.label('subjectcode'),
             FOIMinistryRequest.isoipcreview.label('isoipcreview'),
+            FOIMinistryRequest.isphasedrelease.label('isphasedrelease'),
             literal(None).label('oipc_number'),
         ]
 
@@ -818,7 +823,8 @@ class FOIMinistryRequest(db.Model):
             'recordspagecount': recordspagecount,
             'closedate': FOIMinistryRequest.closedate,
             'subjectcode': SubjectCode.name,
-            'isoipcreview': FOIMinistryRequest.isoipcreview
+            'isoipcreview': FOIMinistryRequest.isoipcreview,
+            'isphasedrelease': FOIMinistryRequest.isphasedrelease
         }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
@@ -1212,6 +1218,7 @@ class FOIMinistryRequest(db.Model):
             ministry_restricted_requests.isrestricted.label('isministryrestricted'),
             SubjectCode.name.label('subjectcode'),
             FOIMinistryRequest.isoipcreview.label('isoipcreview'),
+            FOIMinistryRequest.isphasedrelease.label('isphasedrelease'),
             literal(None).label('oipc_number')
         ]
 
@@ -1442,7 +1449,7 @@ class FOIMinistryRequest(db.Model):
             if (flag.lower() == 'oipc'):
                 requestflagscondition.append(FOIMinistryRequest.findfield('isoipcreview', iaoassignee, ministryassignee) == True)
             if (flag.lower() == 'phased'):
-                # requestflagscondition.append(FOIMinistryRequest.findfield('isphasedrelease', iaoassignee, ministryassignee) == True)
+                requestflagscondition.append(FOIMinistryRequest.findfield('isphasedrelease', iaoassignee, ministryassignee) == True)
                 continue
         return or_(*requestflagscondition)
 
@@ -1586,7 +1593,77 @@ class FOIMinistryRequest(db.Model):
         setattr(currequest,'updatedby',userid)
         db.session.commit()  
         return DefaultMethodResult(True,'Request updated',ministryrequestid)
+    
+    @classmethod
+    def getrequestsdetailsforsearch(cls,requestnumbers):
+        requestdetails = []
+        try:
+            csvrequestnumbers = tuple(requestnumbers)            
+            query=f"""SELECT
+                    DISTINCT FMR.foiministryrequestid
+                     ,FMR.foiministryrequestid
+                     ,FMR.foirequest_id
+                    ,FMR.axisrequestid
+                    ,FMR.requeststatuslabel
+                    ,FRA.lastname
+                    ,FRA.firstname
+                    ,FMR.closedate
+                    ,FMR.axispagecount
+                    ,FMR.recordspagecount
+                    ,FMR.axislanpagecount
+                    ,FMR.estimatedpagecount
+                    ,FMR.estimatedtaggedpagecount
+                    ,FMR.description
+                    ,PA.iaocode AS programareacode
+                    ,FR.requesttype
+                    FROM public."FOIMinistryRequests" FMR INNER JOIN (
+                        SELECT 
+                        DISTINCT FMR.foiministryrequestid as ministryrequestid
+                        ,FMR.foirequest_id as requestid
+                        ,max(FMR.version) as latestversion 
+                        FROM public."FOIMinistryRequests" FMR 
+                        WHERE FMR.axisrequestid in :csvrequestnumbers
+                        GROUP BY FMR.foiministryrequestid,FMR.foirequest_id
+                    ) MaxRequestVersions ON FMR.foiministryrequestid=MaxRequestVersions.ministryrequestid and FMR.version=MaxRequestVersions.latestversion
+                    JOIN public."FOIRequestApplicantMappings" FRAM ON FRAM.foirequest_id=MaxRequestVersions.requestid
+                    JOIN public."FOIRequestApplicants" FRA ON FRA.foirequestapplicantid=FRAM.foirequestapplicantid
+                    LEFT JOIN public."ProgramAreas" PA	ON FMR.programareaid = PA.programareaid
+   	                JOIN public."FOIRequests" FR ON FMR.foirequest_id = FR.foirequestid AND FMR.version = FR.version"""            
+            result = db.session.execute(text(query),{"csvrequestnumbers":csvrequestnumbers})        
+            rows = result.fetchall()            
+            for row in rows:
+                requestdetail={}
+                requestdetail["ministryrequestid"]=row["foiministryrequestid"]
+                requestdetail["id"]=row["foirequest_id"]
+                requestdetail["requeststatus"]=row["requeststatuslabel"]
+                requestdetail["requestnumber"]=row["axisrequestid"]
+                requestdetail["lastname"]=row["lastname"]
+                requestdetail["firstname"]=row["firstname"]
+                requestdetail["closedate"]=row["closedate"]
+                requestdetail["axispagecount"]=row["axispagecount"]
+                requestdetail["recordspagecount"]=row["recordspagecount"]
+                if row["axispagecount"] is not None and row["recordspagecount"] is not None and int(row["axispagecount"]) > int(row["recordspagecount"]):
+                    requestdetail["requestpagecount"] = row["axispagecount"]
+                elif row["recordspagecount"] is not None:
+                    requestdetail["requestpagecount"] = row["recordspagecount"]
+                elif row["axispagecount"] is not None:
+                    requestdetail["requestpagecount"] = row["axispagecount"]
+                else:
+                    requestdetail["requestpagecount"] = "0"
+                requestdetail["axislanpagecount"]=row["axislanpagecount"]
+                requestdetail["estimatedpagecount"]=row["estimatedpagecount"]
+                requestdetail["estimatedtaggedpagecount"]=row["estimatedtaggedpagecount"]
+                requestdetail["description"]=row["description"]
+                requestdetail["requestType"]=row["requesttype"]
+                requestdetail["bcgovcode"]=row["programareacode"]
+                requestdetails.append(requestdetail)
 
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return requestdetails
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
         fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate',
@@ -1597,5 +1674,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
                 'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 
                 'axissyncdate', 'axispagecount', 'axislanpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd',
-                'isoipcreview', 'recordspagecount', 'estimatedpagecount', 'estimatedtaggedpagecount', 'userrecordslockstatus')
+                'isoipcreview', 'isphasedrelease', 'recordspagecount', 'estimatedpagecount', 'estimatedtaggedpagecount', 'userrecordslockstatus', 'isconsultflag')
     

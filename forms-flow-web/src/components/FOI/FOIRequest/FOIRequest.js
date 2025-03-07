@@ -60,6 +60,8 @@ import {
   fetchPDFStitchedStatusForOIPCRedline,
   fetchHistoricalRecords,
   fetchPDFStitchStatusForConsults,
+  fetchPDFStitchStatusesForPhasedRedlines,
+  fetchPDFStitchStatusesForPhasedResponsePackages,
 } from "../../../apiManager/services/FOI/foiRecordServices";
 import { makeStyles } from "@material-ui/core/styles";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
@@ -110,7 +112,6 @@ import { UnsavedModal } from "../customComponents";
 import { DISABLE_GATHERINGRECORDS_TAB } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
-import ApplicantProfileModal from "./ApplicantProfileModal";
 import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
@@ -153,6 +154,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
   );
+
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   let requestExtensions = useSelector(
     (state) => state.foiRequests.foiRequestExtesions
@@ -381,6 +383,13 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
 
+  useEffect(() => {
+    if (requestDetails?.isphasedrelease) {
+      dispatch(fetchPDFStitchStatusesForPhasedRedlines(requestId, ministryId));
+      dispatch(fetchPDFStitchStatusesForPhasedResponsePackages(requestId, ministryId));
+    }
+  }, [requestId, ministryId, requestDetails])
+
   const validLockRecordsState = (currentState=requestDetails.currentState) => {
     return (
       currentState === StateEnum.harms.name ||
@@ -457,6 +466,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       setIsOIPCReview(false);
     }
   }, [oipcData])
+
+  
 
   
   useEffect(() => {
@@ -844,6 +855,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     }
   }
 
+  const handleConsultFlagChange = (isSelected) => {
+    requestDetails.isconsultflag = isSelected;
+    createSaveRequestObject('isconsultflag', isSelected);
+  }
+
   //handle email validation
   const [validation, setValidation] = React.useState({});
   const handleEmailValidation = (validationObj) => {
@@ -876,6 +892,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     _currentrequestStatus,
     oipcData,
     requestDetails.isoipcreview,
+    requestDetails.isconsultflag
   );
 
   const classes = useStyles();
@@ -893,7 +910,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const createSaveRequestObject = (name, value, value2) => {
     let requestObject = { ...saveRequestObject };
-    if (name !== "assignedTo") {
+    if (name !== "assignedTo" && name !== "isphasedrelease") {
       setUnSavedRequest(
         name !== FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES
       );
@@ -912,6 +929,12 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
+
+    if (_state?.toLowerCase() === StateEnum.unopened.name.toLowerCase() && 
+      (saveRequestObject.isconsultflag === null || saveRequestObject.isconsultflag === undefined)) {
+      saveRequestObject.isconsultflag = false;
+    }
+
     if (!_unSaved) {
       setUnSavedRequest(_unSaved);
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
@@ -1170,6 +1193,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               requestType={requestDetails?.requestType}
               isDivisionalCoordinator={false}
               isHistoricalRequest={isHistoricalRequest}
+              consultflag={requestDetails?.isconsultflag}
             />
           </div>
 
@@ -1373,7 +1397,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         isMinistry={false}
                         isAddRequest={isAddRequest}
                         handleOipcReviewFlagChange={handleOipcReviewFlagChange}
-                        showOipcReviewFlag={requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()}
+                        showFlags={requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()}
+                        showConsultFlag={requestState.toLowerCase() == StateEnum.unopened.name.toLowerCase() || (requestDetails.isconsultflag === true)}
+                        handleConsultFlagChange={handleConsultFlagChange}
                       />
                       {(isAddRequest ||
                         requestState === StateEnum.unopened.name) && (
@@ -1781,7 +1807,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   setLockRecordsTab={setLockRecordsTab}
                   validLockRecordsState={validLockRecordsState}
                   setSaveRequestObject={setSaveRequestObject}
-                  handleSaveRequest={handleSaveRequest}
+                  isPhasedRelease={requestDetails.isphasedrelease}
                 />
               </>
             )}

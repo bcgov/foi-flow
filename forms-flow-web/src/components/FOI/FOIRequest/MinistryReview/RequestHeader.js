@@ -111,12 +111,19 @@ const RequestHeader = React.memo(({
               isActive={requestDetails.isoipcreview}
               isDisabled={isMinistry}
             />
-            {/* <RequestFlag
+            <RequestFlag
+              type="consult"
+              requestDetails={requestDetails}
+              isActive={requestDetails.isconsultflag}
+              showFlag={requestDetails.isconsultflag === true}
+              isDisabled={true}
+            />
+            <RequestFlag
               type="phasedrelease"
               requestDetails={requestDetails}
               isActive={requestDetails.isphasedrelease}
-              handleSelect={() => console.log('selected')}
-            /> */}
+              isDisabled={true}
+            />
         </div>
       );
     return (

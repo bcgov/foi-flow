@@ -52,6 +52,7 @@ from .dashboardeventpagination import API as FOIEVENT_API
 from .foiuser import API as FOIUSER_API
 from .foiapplicant import API as APPLICANT_API
 from .foiaxissync import API as FOIAXISSYNC_API
+from .solrauth import API as FOISolr
 
 __all__ = ('API_BLUEPRINT')
 
@@ -98,3 +99,4 @@ API.add_namespace(FOIEVENT_API, '/api')
 API.add_namespace(FOIUSER_API, '/api')
 API.add_namespace(APPLICANT_API, '/api')
 API.add_namespace(FOIAXISSYNC_API, '/api')
+API.add_namespace(FOISolr, '/api')
