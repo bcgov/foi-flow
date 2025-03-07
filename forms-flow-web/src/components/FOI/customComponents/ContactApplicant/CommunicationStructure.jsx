@@ -37,7 +37,7 @@ const CommunicationStructure = ({correspondence, currentIndex,
   fullName, ministryId=null, editDraft, deleteDraft, deleteResponse, modalFor, setModalFor,setModal,setUpdateAttachment, 
   setSelectedCorrespondence, setCurrentResponseDate, applicantCorrespondenceTemplates, templateVariableInfo}) => {
 
-
+  // console.log("correspondence: ", correspondence);
   const dispatch = useDispatch();
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [communicationUploadModalOpen, setCommunicationUploadModalOpen] = useState(false);
@@ -269,8 +269,12 @@ const CommunicationStructure = ({correspondence, currentIndex,
   }
 
 
-  const getTemplateName = (templateId) => {
-    return applicantCorrespondenceTemplates.find((obj)=> obj.templateid == templateId)?.description
+  const getTemplateName = (correspondence) => {
+    if(correspondence.templatename) {
+      return correspondence.templatename;
+    } else {
+      return applicantCorrespondenceTemplates.find((obj)=> obj.templateid == correspondence.templateId)?.description
+    }
   }
   
 
@@ -322,7 +326,7 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
                   <div className="templateInfo">
                     {correspondence && (
                       <>
-                      <div className="templateUser">{correspondence.category === "response" ? "Applicant Response": getTemplateName(correspondence.templateid)} - {fullName} </div> |  
+                      <div className="templateUser">{correspondence.category === "response" ? "Applicant Response": getTemplateName(correspondence)} - {fullName} </div> |  
                         {correspondence?.emails.length > 0 ? <div className="templateUser"> {emailText} |</div> : ''} 
                         <div className="templateTime">{dateText.toUpperCase()} </div>  
                         <div className="templateTime">{correspondence.edited ? "Edited": ""} </div>
