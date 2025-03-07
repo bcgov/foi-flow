@@ -52,6 +52,11 @@ const StateList = Object.freeze({
     { status: "On Hold - Other", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
+  callforrecordsForConsult: [
+    { status: "Call For Records", isSelected: false },
+    { status: "Open", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
   tagging: [
     { status: "Tagging", isSelected: true },
     { status: "Call For Records", isSelected: false },
@@ -61,6 +66,14 @@ const StateList = Object.freeze({
     { status: "On Hold - Other", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
+  taggingforConsult: [
+    { status: "Tagging", isSelected: true },
+    { status: "Call For Records", isSelected: false },
+    { status: "Ready to Scan", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
+    { status: "Records Review", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
   readytoscan: [
     { status: "Ready to Scan", isSelected: true },
     { status: "Call For Records", isSelected: false },
@@ -68,6 +81,14 @@ const StateList = Object.freeze({
     { status: "Records Ready for Review", isSelected: false },
     { status: "Records Review", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
+  readytoscanforConsult: [
+    { status: "Ready to Scan", isSelected: true },
+    { status: "Call For Records", isSelected: false },
+    { status: "Tagging", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
+    { status: "Records Review", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
   feeassessed: [
@@ -83,6 +104,11 @@ const StateList = Object.freeze({
     { status: "On Hold - Other", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
+  feeassessedforConsult: [
+    { status: "Fee Estimate", isSelected: false },
+    { status: "Call For Records", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
   onhold: [
     { status: "On Hold", isSelected: false },
     { status: "Call For Records", isSelected: false },
@@ -94,6 +120,12 @@ const StateList = Object.freeze({
     { status: "Harms Assessment", isSelected: false },
     { status: "Records Review", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
+  deduplicationforConsult: [
+    { status: "Deduplication", isSelected: false },
+    { status: "Harms Assessment", isSelected: false },
+    { status: "Records Review", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
   harms: [
@@ -112,6 +144,14 @@ const StateList = Object.freeze({
     { status: "Ministry Sign Off", isSelected: false },
     { status: "Peer Review", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
+  consultforConsult : [
+    { status: "Consult", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
+    { status: "Records Review", isSelected: false },
+    { status: "Ministry Sign Off", isSelected: false },
+    { status: "Peer Review", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
   review: [
@@ -137,9 +177,23 @@ const StateList = Object.freeze({
     { status: "On Hold - Other", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
+  reviewforConsult: [
+    { status: "Records Review", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
+    { status: "Call For Records", isSelected: false },
+    { status: "Consult", isSelected: false },
+    { status: "Ministry Sign Off", isSelected: false },
+    { status: "Peer Review", isSelected: false },
+    { status: "Response", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
   signoff: [
     { status: "Ministry Sign Off", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
+  signoffforConsult: [
+    { status: "Ministry Sign Off", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
   response: [
@@ -157,11 +211,21 @@ const StateList = Object.freeze({
     { status: "On Hold - Other", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
+  responseforConsult: [
+    { status: "Response", isSelected: false },
+    { status: "Records Review", isSelected: false },
+    { status: "Peer Review", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
   //peerreview: [{status:"Peer Review", isSelected: false},{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false},{status: "Records Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Response", isSelected: false}],
   peerreview: [
     { status: "Peer Review", isSelected: false },
     { status: "Records Ready for Review", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
+  ],
+  peerreviewforConsult: [
+    { status: "Peer Review", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
   ],
   section5pending: [
     { status: "Section 5 Pending", isSelected: false },
@@ -184,6 +248,14 @@ const StateList = Object.freeze({
     { status: "Consult", isSelected: false },
     { status: "Records Review", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
+    { status: "Closed", isSelected: false }
+  ],
+  recordsreadyforreviewforConsult: [
+    { status: "Records Ready for Review", isSelected: false },
+    { status: "Call For Records", isSelected: false },
+    { status: "Tagging", isSelected: false },
+    { status: "Consult", isSelected: false },
+    { status: "Records Review", isSelected: false },
     { status: "Closed", isSelected: false }
   ],
   onholdother: [
