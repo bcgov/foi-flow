@@ -483,7 +483,7 @@ export const ContactApplicant = ({
     } else{
       let _filteredMessages = applicantCorrespondence.filter((corr: any) => {
         // Filter through template names, and for responses include "applicant response"
-        const templateName = getTemplateName(corr.templateid)
+        const templateName = corr.templatename ? corr.templatename : getTemplateName(corr.templateid)
         if(templateName && templateName.toLowerCase().indexOf(filterValue.toLowerCase()) >= 0) {
           return corr;
         } 
