@@ -59,10 +59,12 @@ export const ContactApplicant = ({
   const dispatch = useDispatch();
   const templateList: any = useSelector((state: any) => state.foiRequests.foiEmailTemplates);
   const [options, setOptions] = useState<Template[]>([]);
+  const [disabledOptions, setDisabledOptions] = useState<Template[]>([]);
   const [saveSfdtDraftTrigger, setSaveSfdtDraftTrigger] = useState<boolean>(false);
   const [previewTrigger, setPreviewTrigger] = useState<boolean>(false);
   const [editDraftTrigger, setEditDraftTrigger] = useState<boolean>(false);
   const [showLagacyEditor, setShowLagacyEditor] = useState<boolean>(false);
+  const [enableAutoFocus, setEnableAutoFocus] = useState<boolean>(false);
 
   const selectTemplate = (event: React.ChangeEvent<{}>, item: Template | null) => {
     // console.log("Selected option:", item?.label);
@@ -73,6 +75,7 @@ export const ContactApplicant = ({
       setCurTemplateName('');
     } else {
       setShowLagacyEditor(false);
+      setEnableAutoFocus(false);
       if(item?.label) {
         let newData = {
           "foiRequestId": requestId,
@@ -113,10 +116,26 @@ export const ContactApplicant = ({
     };
     const loadPreview = async (html: string) => {
       // setEditorValue(html.replace("<body bgcolor=\"#FFFFFF\">", "<body bgcolor=\"#FFFFFF\" style=\"width: 6.5in; margin-left: auto; margin-right: auto; padding: 1in;\">"));
-      setEditorValue(html);
+      setEditorValue( removeHeaderParagraph(html) );
     }
     await exportSFDT(dispatch, newData, loadPreview);
   };
+  const removeHeaderParagraph = (htmlString: string) => {
+    // Create a temporary DOM element to parse the HTML string.
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlString;
+  
+    // Find the <p class="Header"> element.
+    const headerParagraph = tempDiv.querySelector('p.Header');
+  
+    // Remove the element if it exists.
+    if (headerParagraph) {
+      headerParagraph.remove();
+    }
+  
+    // Return the modified HTML string.
+    return tempDiv.innerHTML;
+  }
   const savePdf = async (sfdtString: string) => {
     let newData = {
       "FileName": "email.pdf",
@@ -253,27 +272,28 @@ export const ContactApplicant = ({
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
   const isEnabledTemplate = (item: any) => {
-    var name:string = item?.name ? item.name : item?.templatename ? item.templatename : "";
-   if (['PAYONLINE', 'PAYOUTSTANDING'].includes(item.name)) { 
-      return !isFeeTemplateDisabled(currentCFRForm, item); 
-   } else if (['EXTENSIONS-PB'].includes(item.name)) {
+    var name:string = item?.name ? item.name : item?.fileName ? item.fileName : "";
+   if (['PAYONLINE', 'PAYOUTSTANDING'].includes(name)) { 
+      return !isFeeTemplateDisabled(currentCFRForm, name); 
+   } else if (['EXTENSIONS-PB'].includes(name)) {
       return getExtensionType(requestDetails, requestExtensions) === "PB";
-   } else if (['OIPCAPPLICANTCONSENTEXTENSION'].includes(item.name)) {
+   } else if (['OIPCAPPLICANTCONSENTEXTENSION'].includes(name)) {
     const isApplicantConsent = getExtensionType(requestDetails, requestExtensions) === "OIPCAPPLICANTCONSENTEXTENSION"
       return isApplicantConsent;
-   } else if(['OIPCFIRSTTIMEEXTENSION'].includes(item.name)){
+   } else if(['OIPCFIRSTTIMEEXTENSION'].includes(name)){
     const isFirstTimeExtension = getExtensionType(requestDetails, requestExtensions) === "OIPCFIRSTTIMEEXTENSION"
       return isFirstTimeExtension;
-   } else if(['OIPCSUBSEQUENTTIMEEXTENSION'].includes(item.name)){
+   } else if(['OIPCSUBSEQUENTTIMEEXTENSION'].includes(name)){
     const isSubsequentTimeExtension = getExtensionType(requestDetails, requestExtensions) === "OIPCSUBSEQUENTTIMEEXTENSION"
       return isSubsequentTimeExtension;
-   } else if(['GENERICCOVEREMAILTEMPLATE'].includes(item.name)){
+   } else if(['GENERICCOVEREMAILTEMPLATE'].includes(name)){
       return requestDetails.currentState !== "Intake in Progress";
-   } else if(['ACKNOWLEDGEMENTLETTER'].includes(item.name)){
+   } else if(['ACKNOWLEDGEMENTLETTER'].includes(name)){
     if (requestDetails.currentState === "Intake in Progress" || requestDetails.currentState === "Open") {
       return true;
     }
    }
+   return true;
   }
 
   const isduplicate = (item: string) => {
@@ -291,11 +311,10 @@ export const ContactApplicant = ({
     let _templates: any[] = [];
     // console.log("templateList: ", templateList);
     if(templateList.length > 0) {
-      // console.log("templateList: ", templateList);
       _templates = templateList.map((template: any) => ({
           label: template.templateName,
           value: template.fileName,
-          disabled: !template.isActive && !isEnabledTemplate(template),
+          disabled: !template.isActive || !isEnabledTemplate(template),
           created_at: template.createdAt
       }));
     }
@@ -359,7 +378,8 @@ export const ContactApplicant = ({
     // }
     // });
 
-    setOptions(_templates)
+    setOptions(_templates);
+    setDisabledOptions(_templates.filter((item)=>item.disabled === true).map((item)=>item.value));
     setTemplates(_templates);
   }, [applicantCorrespondence, requestExtensions, dispatch, templateList]);
 
@@ -450,6 +470,7 @@ export const ContactApplicant = ({
       }
       getTemplateVariablesAsync(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index], callback);
     } else {
+      setEnableAutoFocus(true);
       setShowLagacyEditor(false);
       if(template?.label) {
         let newData = {
@@ -483,7 +504,7 @@ export const ContactApplicant = ({
     } else{
       let _filteredMessages = applicantCorrespondence.filter((corr: any) => {
         // Filter through template names, and for responses include "applicant response"
-        const templateName = getTemplateName(corr.templateid)
+        const templateName = corr.templatename ? corr.templatename : getTemplateName(corr.templateid)
         if(templateName && templateName.toLowerCase().indexOf(filterValue.toLowerCase()) >= 0) {
           return corr;
         } 
@@ -628,6 +649,7 @@ export const ContactApplicant = ({
       attachments: attachments,
       emails: selectedEmails,
       israwrequest: israwrequest,
+      templatename: curTemplateName,
       templatetype: "sfdt"
     };
     saveDraftCorrespondence(
@@ -768,6 +790,7 @@ export const ContactApplicant = ({
       setFiles(i.attachments);
     setCorrespondenceId(i.applicantcorrespondenceid);
     if(i.draft) {
+      setEnableAutoFocus(true);
       setShowLagacyEditor(false);
       setCurTemplate(i.draft);
     } else {
@@ -933,6 +956,7 @@ export const ContactApplicant = ({
       attachments: attachments,
       emails: selectedEmails,
       israwrequest: israwrequest,
+      templatename: curTemplateName,
       templatetype: "sfdt"
     };
     editDraftCorrespondence(
@@ -1063,7 +1087,7 @@ export const ContactApplicant = ({
   let templatesList;
   const parser = new DOMParser();
   let templateListItems = templates.map((template: any, index: any) => {
-    if (template.label !== "") {
+    if (template.label !== "" && !template.disabled) {
     let lastItemInList = false
     if (templates.length === index + 1) lastItemInList = true;
     const htmlEmail = parser.parseFromString(template.text, 'text/html');
@@ -1261,6 +1285,7 @@ export const ContactApplicant = ({
             <CustomAutocomplete
               className="email-template-dropdown"
               list={options}
+              disabledValues={disabledOptions}
               onChange={selectTemplate}
               label="Select Template"
             />
@@ -1337,6 +1362,7 @@ export const ContactApplicant = ({
                 editDraftTrigger = {editDraftTrigger}
                 setEditDraftTrigger = {setEditDraftTrigger}
                 editSfdtDraft = {editSfdtDraft}
+                enableAutoFocus = {enableAutoFocus}
               />
             </>
           }

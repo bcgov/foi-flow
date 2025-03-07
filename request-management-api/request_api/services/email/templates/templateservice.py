@@ -49,8 +49,8 @@ class templateservice:
             dynamictemplatevalues['title'] = template.description
             templatename = template.name
         else:
-            dynamictemplatevalues['title'] = correspondencelog.templatename
-            templatename = correspondencelog.templatename
+            dynamictemplatevalues['title'] = correspondencelog['templatename']
+            templatename = correspondencelog['templatename']
         dynamictemplatevalues.update(attributes)
         headerfooterhtml = storageservice().downloadtemplate(self.__getheaderfootertemplate(templatename))
         finaltemplate = Template(headerfooterhtml)

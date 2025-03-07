@@ -743,8 +743,6 @@ import {
       httpGETRequest(API.FOI_GET_EMAIL_TEMPLATES, {}, UserService.getToken())
         .then((res) => {
           if (res.data) {
-            // console.log("API.FOI_GET_EMAIL_TEMPLATES: ", API.FOI_GET_EMAIL_TEMPLATES);
-            // console.log("TEMPLATES res: ", res);
             const foiEmailTemplates = res.data;
             dispatch(setFOIEmailTemplates(foiEmailTemplates));
             dispatch(setFOILoader(false));

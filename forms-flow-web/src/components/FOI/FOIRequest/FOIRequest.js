@@ -176,6 +176,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let applicantCorrespondence = useSelector(
     (state) => state.foiRequests.foiRequestApplicantCorrespondence
   );
+  // console.log("applicantCorrespondence: ", applicantCorrespondence);
   let applicantCorrespondenceTemplates = useSelector(
     (state) => state.foiRequests.foiRequestApplicantCorrespondenceTemplates
   );
