@@ -24,7 +24,8 @@
 
         public async Task<FOIRequestAssigneeDto> GetAssignee(int foiMinistryRequestId)
         {
-            const string query = @"SELECT fmr.version, assignedto, fa.firstname, fa.lastname, pa.bcgovcode, fmr.programareaid, f.requesttype, fmr.isoipcreview
+            const string query = @"
+                SELECT fmr.version, assignedto, fa.firstname, fa.lastname, pa.bcgovcode, fmr.programareaid, f.requesttype, fmr.isoipcreview
                 FROM public.""FOIMinistryRequests"" fmr 
 	                JOIN public.""FOIRequests"" f on fmr.foirequest_id = f.foirequestid and fmr.foirequestversion_id = f.""version"" 
                 FULL OUTER JOIN public.""FOIAssignees"" fa ON fa.username = fmr.assignedto

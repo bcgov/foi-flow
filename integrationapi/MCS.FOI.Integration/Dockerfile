@@ -22,20 +22,21 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 
 # Install required native dependencies for SkiaSharp
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libfontconfig1 \
     libfreetype6 \
-    libpng-dev \
-    libjpeg-dev \
-    libwebp-dev \
-    libtiff-dev \
-    libgif-dev \
-    libglib2.0-dev \
-    libcairo2-dev \
-    libpango1.0-dev \
-    libharfbuzz-dev \
-    libfribidi-dev \
-    && rm -rf /var/lib/apt/lists/*
+    libpng16-16 \
+    libjpeg62-turbo \
+    libwebpdemux2 \
+    libtiff6 \
+    libgif7 \
+    libglib2.0-0 \
+    libcairo2 \
+    libpango-1.0-0 \
+    libharfbuzz0b \
+    libfribidi0 \
+    libicu-dev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container.
 WORKDIR /app
