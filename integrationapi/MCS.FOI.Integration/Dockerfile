@@ -21,6 +21,22 @@ RUN dotnet publish -c Release -o out
 # Use the official .NET runtime image as a base image for the final stage.
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 
+# Install required native dependencies for SkiaSharp
+RUN apt-get update && apt-get install -y \
+    libfontconfig1 \
+    libfreetype6 \
+    libpng-dev \
+    libjpeg-dev \
+    libwebp-dev \
+    libtiff-dev \
+    libgif-dev \
+    libglib2.0-dev \
+    libcairo2-dev \
+    libpango1.0-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 # Set the working directory in the container.
 WORKDIR /app
 

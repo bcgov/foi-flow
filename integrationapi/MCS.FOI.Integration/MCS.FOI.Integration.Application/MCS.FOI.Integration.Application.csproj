@@ -16,6 +16,8 @@
     <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="SkiaSharp" Version="3.116.1" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.116.1" />
     <PackageReference Include="Syncfusion.Compression.Net.Core" Version="28.1.41" />
     <PackageReference Include="Syncfusion.DocIO.Net.Core" Version="28.1.41" />
     <PackageReference Include="Syncfusion.DocIORenderer.Net.Core" Version="28.1.41" />
