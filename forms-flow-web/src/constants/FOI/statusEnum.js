@@ -101,6 +101,10 @@ const StateList = Object.freeze({
     { status: "On Hold - Other", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
+  harmsforConsult: [
+    { status: "Harms Assessment", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
   consult: [
     { status: "Consult", isSelected: false },
     { status: "Records Ready for Review", isSelected: false },
