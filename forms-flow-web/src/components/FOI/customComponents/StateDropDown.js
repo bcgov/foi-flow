@@ -124,6 +124,7 @@ const StateDropDown = ({
       return appendedList;
     }
     const isMCFMinistryTeam = userDetail?.groups?.some(str => str.includes("MCF Ministry Team"))
+
     switch (_state.toLowerCase()) {
       case StateEnum.unopened.name.toLowerCase():
         return _stateList.unopened;
@@ -216,7 +217,7 @@ const StateDropDown = ({
         }
         return _stateList.deduplication;
       case StateEnum.harms.name.toLowerCase():
-        return _stateList.harms;
+        return consultflag ? _stateList.harmsforConsult : _stateList.harms;
       case StateEnum.response.name.toLowerCase():
         if (personalIAO) return _stateList.responseforpersonal;
         else if (cfrFeeData?.balanceremaining > 0 && cfrStatus === "approved") {
