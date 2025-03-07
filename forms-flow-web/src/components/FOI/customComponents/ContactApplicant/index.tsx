@@ -64,6 +64,7 @@ export const ContactApplicant = ({
   const [previewTrigger, setPreviewTrigger] = useState<boolean>(false);
   const [editDraftTrigger, setEditDraftTrigger] = useState<boolean>(false);
   const [showLagacyEditor, setShowLagacyEditor] = useState<boolean>(false);
+  const [enableAutoFocus, setEnableAutoFocus] = useState<boolean>(false);
 
   const selectTemplate = (event: React.ChangeEvent<{}>, item: Template | null) => {
     // console.log("Selected option:", item?.label);
@@ -74,6 +75,7 @@ export const ContactApplicant = ({
       setCurTemplateName('');
     } else {
       setShowLagacyEditor(false);
+      setEnableAutoFocus(false);
       if(item?.label) {
         let newData = {
           "foiRequestId": requestId,
@@ -114,10 +116,26 @@ export const ContactApplicant = ({
     };
     const loadPreview = async (html: string) => {
       // setEditorValue(html.replace("<body bgcolor=\"#FFFFFF\">", "<body bgcolor=\"#FFFFFF\" style=\"width: 6.5in; margin-left: auto; margin-right: auto; padding: 1in;\">"));
-      setEditorValue(html);
+      setEditorValue( removeHeaderParagraph(html) );
     }
     await exportSFDT(dispatch, newData, loadPreview);
   };
+  const removeHeaderParagraph = (htmlString: string) => {
+    // Create a temporary DOM element to parse the HTML string.
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlString;
+  
+    // Find the <p class="Header"> element.
+    const headerParagraph = tempDiv.querySelector('p.Header');
+  
+    // Remove the element if it exists.
+    if (headerParagraph) {
+      headerParagraph.remove();
+    }
+  
+    // Return the modified HTML string.
+    return tempDiv.innerHTML;
+  }
   const savePdf = async (sfdtString: string) => {
     let newData = {
       "FileName": "email.pdf",
@@ -452,6 +470,7 @@ export const ContactApplicant = ({
       }
       getTemplateVariablesAsync(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index], callback);
     } else {
+      setEnableAutoFocus(true);
       setShowLagacyEditor(false);
       if(template?.label) {
         let newData = {
@@ -630,6 +649,7 @@ export const ContactApplicant = ({
       attachments: attachments,
       emails: selectedEmails,
       israwrequest: israwrequest,
+      templatename: curTemplateName,
       templatetype: "sfdt"
     };
     saveDraftCorrespondence(
@@ -770,6 +790,7 @@ export const ContactApplicant = ({
       setFiles(i.attachments);
     setCorrespondenceId(i.applicantcorrespondenceid);
     if(i.draft) {
+      setEnableAutoFocus(true);
       setShowLagacyEditor(false);
       setCurTemplate(i.draft);
     } else {
@@ -935,6 +956,7 @@ export const ContactApplicant = ({
       attachments: attachments,
       emails: selectedEmails,
       israwrequest: israwrequest,
+      templatename: curTemplateName,
       templatetype: "sfdt"
     };
     editDraftCorrespondence(
@@ -1340,6 +1362,7 @@ export const ContactApplicant = ({
                 editDraftTrigger = {editDraftTrigger}
                 setEditDraftTrigger = {setEditDraftTrigger}
                 editSfdtDraft = {editSfdtDraft}
+                enableAutoFocus = {enableAutoFocus}
               />
             </>
           }

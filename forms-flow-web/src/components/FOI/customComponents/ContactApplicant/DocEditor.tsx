@@ -22,7 +22,8 @@ export const DocEditor = ({
     savepdf,
     editDraftTrigger,
     setEditDraftTrigger,
-    editSfdtDraft
+    editSfdtDraft,
+    enableAutoFocus,
 }: any) => {
     const [container, setContainer] = React.useState<DocumentEditorContainerComponent | null>(null);
     const userDetail: any|null = useSelector((state: any)=> state.user.userDetail);
@@ -173,7 +174,7 @@ export const DocEditor = ({
             toolbarClick={onToolbarClick.bind(this)}
             enableSpellCheck={true}
             created={onCreated}
-            enableAutoFocus={false}
+            enableAutoFocus={enableAutoFocus}
             documentEditorSettings={fontFamilies}
         />
     );
