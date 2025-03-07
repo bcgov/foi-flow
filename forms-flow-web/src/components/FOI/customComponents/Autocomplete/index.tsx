@@ -4,6 +4,7 @@ import type { Template } from '../ContactApplicant/types';
 
 const CustomAutocomplete = ({
     list,
+    disabledValues,
     onChange,
     label
 }: any) => {
@@ -24,12 +25,13 @@ const CustomAutocomplete = ({
         size = "small"
         sx = {{ marginTop: '8px !important' }}
         options={list}
-        getOptionLabel={(option) => option.label}
+        getOptionDisabled={(option:any) => disabledValues.includes(option.value)}
+        getOptionLabel={(option:any) => option.label}
         value={selectedOption}
         inputValue={inputValue}
         onInputChange={handleInputChange}
         onChange={handleChange}
-        renderInput={(params) => <TextField {...params} label={label} variant="outlined" />}
+        renderInput={(params:any) => <TextField {...params} label={label} variant="outlined" />}
     />
   );
 };
