@@ -64,6 +64,7 @@ export const ContactApplicant = ({
   const [previewTrigger, setPreviewTrigger] = useState<boolean>(false);
   const [editDraftTrigger, setEditDraftTrigger] = useState<boolean>(false);
   const [showLagacyEditor, setShowLagacyEditor] = useState<boolean>(false);
+  const [enableAutoFocus, setEnableAutoFocus] = useState<boolean>(false);
 
   const selectTemplate = (event: React.ChangeEvent<{}>, item: Template | null) => {
     // console.log("Selected option:", item?.label);
@@ -74,6 +75,7 @@ export const ContactApplicant = ({
       setCurTemplateName('');
     } else {
       setShowLagacyEditor(false);
+      setEnableAutoFocus(false);
       if(item?.label) {
         let newData = {
           "foiRequestId": requestId,
@@ -468,6 +470,7 @@ export const ContactApplicant = ({
       }
       getTemplateVariablesAsync(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index], callback);
     } else {
+      setEnableAutoFocus(true);
       setShowLagacyEditor(false);
       if(template?.label) {
         let newData = {
@@ -787,6 +790,7 @@ export const ContactApplicant = ({
       setFiles(i.attachments);
     setCorrespondenceId(i.applicantcorrespondenceid);
     if(i.draft) {
+      setEnableAutoFocus(true);
       setShowLagacyEditor(false);
       setCurTemplate(i.draft);
     } else {
@@ -1358,6 +1362,7 @@ export const ContactApplicant = ({
                 editDraftTrigger = {editDraftTrigger}
                 setEditDraftTrigger = {setEditDraftTrigger}
                 editSfdtDraft = {editSfdtDraft}
+                enableAutoFocus = {enableAutoFocus}
               />
             </>
           }
