@@ -30,8 +30,8 @@ class communicationemailservice:
             attributes =  self.__getattributes(correspondencelog)
             subject = ""
             if template is None:
-                if 'templatename' in correspondencelog and correspondencelog.templatename is not None:
-                    subject = templateconfig().getsubject(correspondencelog.templatename, attributes)
+                if 'templatename' in correspondencelog and correspondencelog['templatename'] is not None:
+                    subject = templateconfig().getsubject(correspondencelog['templatename'], attributes)
                 else:
                     subject = templateconfig().getsubject("", attributes)
             else:
