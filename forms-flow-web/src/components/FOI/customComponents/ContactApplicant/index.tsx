@@ -59,6 +59,7 @@ export const ContactApplicant = ({
   const dispatch = useDispatch();
   const templateList: any = useSelector((state: any) => state.foiRequests.foiEmailTemplates);
   const [options, setOptions] = useState<Template[]>([]);
+  const [disabledOptions, setDisabledOptions] = useState<Template[]>([]);
   const [saveSfdtDraftTrigger, setSaveSfdtDraftTrigger] = useState<boolean>(false);
   const [previewTrigger, setPreviewTrigger] = useState<boolean>(false);
   const [editDraftTrigger, setEditDraftTrigger] = useState<boolean>(false);
@@ -253,27 +254,28 @@ export const ContactApplicant = ({
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
   const isEnabledTemplate = (item: any) => {
-    var name:string = item?.name ? item.name : item?.templatename ? item.templatename : "";
-   if (['PAYONLINE', 'PAYOUTSTANDING'].includes(item.name)) { 
-      return !isFeeTemplateDisabled(currentCFRForm, item); 
-   } else if (['EXTENSIONS-PB'].includes(item.name)) {
+    var name:string = item?.name ? item.name : item?.fileName ? item.fileName : "";
+   if (['PAYONLINE', 'PAYOUTSTANDING'].includes(name)) { 
+      return !isFeeTemplateDisabled(currentCFRForm, name); 
+   } else if (['EXTENSIONS-PB'].includes(name)) {
       return getExtensionType(requestDetails, requestExtensions) === "PB";
-   } else if (['OIPCAPPLICANTCONSENTEXTENSION'].includes(item.name)) {
+   } else if (['OIPCAPPLICANTCONSENTEXTENSION'].includes(name)) {
     const isApplicantConsent = getExtensionType(requestDetails, requestExtensions) === "OIPCAPPLICANTCONSENTEXTENSION"
       return isApplicantConsent;
-   } else if(['OIPCFIRSTTIMEEXTENSION'].includes(item.name)){
+   } else if(['OIPCFIRSTTIMEEXTENSION'].includes(name)){
     const isFirstTimeExtension = getExtensionType(requestDetails, requestExtensions) === "OIPCFIRSTTIMEEXTENSION"
       return isFirstTimeExtension;
-   } else if(['OIPCSUBSEQUENTTIMEEXTENSION'].includes(item.name)){
+   } else if(['OIPCSUBSEQUENTTIMEEXTENSION'].includes(name)){
     const isSubsequentTimeExtension = getExtensionType(requestDetails, requestExtensions) === "OIPCSUBSEQUENTTIMEEXTENSION"
       return isSubsequentTimeExtension;
-   } else if(['GENERICCOVEREMAILTEMPLATE'].includes(item.name)){
+   } else if(['GENERICCOVEREMAILTEMPLATE'].includes(name)){
       return requestDetails.currentState !== "Intake in Progress";
-   } else if(['ACKNOWLEDGEMENTLETTER'].includes(item.name)){
+   } else if(['ACKNOWLEDGEMENTLETTER'].includes(name)){
     if (requestDetails.currentState === "Intake in Progress" || requestDetails.currentState === "Open") {
       return true;
     }
    }
+   return true;
   }
 
   const isduplicate = (item: string) => {
@@ -291,11 +293,10 @@ export const ContactApplicant = ({
     let _templates: any[] = [];
     // console.log("templateList: ", templateList);
     if(templateList.length > 0) {
-      // console.log("templateList: ", templateList);
       _templates = templateList.map((template: any) => ({
           label: template.templateName,
           value: template.fileName,
-          disabled: !template.isActive && !isEnabledTemplate(template),
+          disabled: !template.isActive || !isEnabledTemplate(template),
           created_at: template.createdAt
       }));
     }
@@ -359,7 +360,8 @@ export const ContactApplicant = ({
     // }
     // });
 
-    setOptions(_templates)
+    setOptions(_templates);
+    setDisabledOptions(_templates.filter((item)=>item.disabled === true).map((item)=>item.value));
     setTemplates(_templates);
   }, [applicantCorrespondence, requestExtensions, dispatch, templateList]);
 
@@ -1063,7 +1065,7 @@ export const ContactApplicant = ({
   let templatesList;
   const parser = new DOMParser();
   let templateListItems = templates.map((template: any, index: any) => {
-    if (template.label !== "") {
+    if (template.label !== "" && !template.disabled) {
     let lastItemInList = false
     if (templates.length === index + 1) lastItemInList = true;
     const htmlEmail = parser.parseFromString(template.text, 'text/html');
@@ -1261,6 +1263,7 @@ export const ContactApplicant = ({
             <CustomAutocomplete
               className="email-template-dropdown"
               list={options}
+              disabledValues={disabledOptions}
               onChange={selectTemplate}
               label="Select Template"
             />

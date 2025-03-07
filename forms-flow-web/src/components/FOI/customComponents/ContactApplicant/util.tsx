@@ -139,10 +139,10 @@ export const isRequestInfoVisible = (templateInfo: any) => {
   return "block";
 }
 
-export const isFeeTemplateDisabled = (currentCFRForm: any, template: any) => {
-  if (template.name === 'PAYONLINE') {
+export const isFeeTemplateDisabled = (currentCFRForm: any, templateName: string) => {
+  if (templateName === 'PAYONLINE') {
     return currentCFRForm.status !== 'approved' || ("estimatepaymentmethod" in currentCFRForm.feedata && currentCFRForm.feedata.actualtotaldue > 0)
-  } else if (template.name === 'PAYOUTSTANDING') {
+  } else if (templateName === 'PAYOUTSTANDING') {
     return currentCFRForm.status !== 'approved' || !("estimatepaymentmethod" in currentCFRForm.feedata) || currentCFRForm.feedata.balanceremaining <= 0 || currentCFRForm.feedata.actualtotaldue <= 0
   }
   return false
