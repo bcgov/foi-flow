@@ -71,6 +71,7 @@
             var ministryName = rawRequest?.SelectedMinistries?.FirstOrDefault()?.Name ?? string.Empty;
             var officeName = ministryName.StartsWith("Ministry of ", StringComparison.OrdinalIgnoreCase) ? ministryName.Substring(12) : ministryName;
             var faxNumber = _configuration.GetValue<string>("FaxNumber") ?? "(250) 3879843";
+            var assigneeEmail = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty;
 
             string GetAddress()
             {
@@ -97,7 +98,7 @@
                 ["[REQUESTERCATEGORY]"] = rawRequest?.Category,
                 ["[RECEIVEDDATE]"] = receivedDate,
                 ["[REQUESTDESCRIPTION]"] = rawRequest?.Description,
-                ["[PERFECTEDDATE]"] = rawRequest?.FromDate,
+                ["[PERFECTEDDATE]"] = DateTime.Parse(rawRequest?.FromDate).ToString("MMMM dd, yyyy"),
                 ["[DUEDATE]"] = DateTime.Parse(rawRequest?.DueDate).ToString("MMMM dd, yyyy"),
                 ["[STREET1]"] = rawRequest?.Address,
                 ["[CITY]"] = rawRequest?.City,
@@ -114,7 +115,8 @@
                 ["[WORKPHONEPRIMARY]"] = rawRequest?.WorkPhonePrimary,
                 ["[SUBJECTCODE]"] = rawRequest?.SubjectCode,
                 ["[CORRECTIONNUMBER]"] = rawRequest?.CorrectionalServiceNumber,
-                ["[APPLICATION_FEE_AMOUNT]"] = applicationFees?.FirstOrDefault()?.AmountPaid?.ToString("F2") ?? string.Empty
+                ["[APPLICATION_FEE_AMOUNT]"] = applicationFees?.FirstOrDefault()?.AmountPaid?.ToString("F2") ?? string.Empty,
+                ["[PRIMARYUSERREMAIL]"] = assigneeEmail
             };
         }
 
@@ -282,6 +284,7 @@
                 string jsonString = rData.RequestRawData;
                 RequestDto details = JsonConvert.DeserializeObject<RequestDto>(jsonString);
                 details.Version = rData.Version;
+                details.RequestId = rawRequestId;
 
                 return details;
             }
