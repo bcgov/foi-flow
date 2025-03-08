@@ -9,7 +9,6 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
         private readonly ITemplateFieldMappingRepository _templateFieldMapping;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        //private const string DateFormat = "MMMM dd, yyyy";
 
         public TemplateMappingService(
             ITemplateFieldMappingRepository templateFieldMapping,
