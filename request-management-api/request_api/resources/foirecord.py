@@ -274,7 +274,8 @@ class UpdateRequestsPageCount(Resource):
             requestjson = request.get_json()
             ministryrequestid = requestjson['ministryrequestid']  if requestjson.get("ministryrequestid") != None else None
             if ministryrequestid:
-                asyncio.ensure_future(recordservice().updatepagecount(ministryrequestid, AuthHelper.getuserid()))
+                event_loop = asyncio.get_running_loop()
+                asyncio.run_coroutine_threadsafe(recordservice().updatepagecount(ministryrequestid, AuthHelper.getuserid()), event_loop)
                 return {'status': True, 'message': 'async updatepagecount function called'} , 200
             else:
                 return {'status': True, 'message':'ministryrequestid is none'} , 200
@@ -300,7 +301,8 @@ class UpdateRequestsPageCountOption2(Resource):
             requestid = requestjson['requestid']  if requestjson.get("requestid") != None else None
             print(f'option 2 >>> requestid = {requestid}, ministryrequestid = {ministryrequestid}')
             if ministryrequestid:
-                asyncio.ensure_future(recordservice().calculatepagecount(requestid, ministryrequestid, AuthHelper.getuserid()))
+                event_loop = asyncio.get_running_loop()
+                asyncio.run_coroutine_threadsafe(recordservice().calculatepagecount(requestid, ministryrequestid, AuthHelper.getuserid()), event_loop)
                 return {'status': True, 'message': 'async calculatepagecount function called'} , 200
             else:
                 return {'status': True, 'message':'ministryrequestid is none'} , 200
