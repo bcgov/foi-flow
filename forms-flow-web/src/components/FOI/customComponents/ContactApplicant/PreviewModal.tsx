@@ -31,10 +31,11 @@ export const PreviewModal = React.memo(({
   const dispatch = useDispatch();
 
   // //gets the request detail from the store
-  // const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
-  // const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
-  // const responsePackagePdfStitchStatus = useSelector((state: any) => state.foiRequests.foiPDFStitchStatusForResponsePackage);
-  // const cfrFeeData = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
+  const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
+  const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
+  const responsePackagePdfStitchStatus = useSelector((state: any) => state.foiRequests.foiPDFStitchStatusForResponsePackage);
+  const cfrFeeData = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
+  console.log("cfrFeeData: ", cfrFeeData);
   
   //get template
   const rootpath = OSS_S3_BUCKET_FULL_PATH
@@ -61,18 +62,20 @@ export const PreviewModal = React.memo(({
     });
   }, []);
   
-  // requestDetails["ffaurl"] = FOI_FFA_URL;
+  requestDetails["ffaurl"] = FOI_FFA_URL;
 
-  // const templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo);
+  const templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo);
+  console.log("templateVariables: ", templateVariables);
   const handleSend = () => {
-    // const callback = (templateVariables: any) => {
-    //   handleSave( applyVariables(innerhtml, templateVariables ) );
-    // };
-    // getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback)
-    handleSave(innerhtml);
+    const callback = (templateVariables: any) => {
+      console.log("templateVariables - async: ", templateVariables);
+      handleSave( applyVariables(innerhtml, templateVariables ) );
+    };
+    getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback);
+    // handleSave(innerhtml);
   };
-  // const emailTemplate = renderTemplate(template, innerhtml, templateVariables);
-  const emailTemplate = renderTemplateNoParams(template, innerhtml);
+  const emailTemplate = renderTemplate(template, innerhtml, templateVariables);
+  // const emailTemplate = renderTemplateNoParams(template, innerhtml);
 
   return (
     <div className="state-change-dialog">        
