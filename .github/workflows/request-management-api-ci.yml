@@ -22,7 +22,7 @@ defaults:
 
 jobs:
   docker-build-check:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     name: Build dockerfile to ensure it works
 
     steps:
@@ -33,7 +33,7 @@ jobs:
           docker build -f dockerfile.local .
 
   python-build-check:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     name: Build python to ensure it works
 
     strategy:
