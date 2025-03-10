@@ -55,7 +55,7 @@ class communicationwrapperservice:
         _paymentexpirydate =  _attributes["paymentExpiryDate"] if _attributes is not None and "paymentExpiryDate" in _attributes else None
         if _paymentexpirydate not in (None, ""):
             paymentservice().createpayment(requestid, ministryrequestid, _attributes, AuthHelper.getuserid())            
-        requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog['attributes'], applicantcorrespondencelog['templateid'])
+        requestservice().postcorrespondenceeventtoworkflow(requestid, ministryrequestid, result.identifier, applicantcorrespondencelog)
         return {"success" : True, "message": "Sent successfully", "identifier": -1}  
 
 

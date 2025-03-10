@@ -84,7 +84,7 @@ export const ContactApplicant = ({
         };
         const loadTemplate = (templateJSON: string) => {
           setCurTemplate(JSON.stringify(templateJSON));
-          setCurTemplateName(item.label);
+          setCurTemplateName(item.value);
         }
         fetchEmailTemplate(dispatch, newData, loadTemplate);
       } else {
@@ -480,7 +480,7 @@ export const ContactApplicant = ({
         };
         const loadTemplate = (templateJSON: string) => {
           setCurTemplate(JSON.stringify(templateJSON));
-          setCurTemplateName(template.label);
+          setCurTemplateName(template.value);
         }
         fetchEmailTemplate(dispatch, newData, loadTemplate);
       } else {
@@ -569,7 +569,7 @@ export const ContactApplicant = ({
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName)) ) ? "CFRFee" : "";
     let israwrequest = selectedCorrespondence.israwrequest || false;
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
