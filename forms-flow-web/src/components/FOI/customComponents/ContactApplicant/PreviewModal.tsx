@@ -35,7 +35,6 @@ export const PreviewModal = React.memo(({
   const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
   const responsePackagePdfStitchStatus = useSelector((state: any) => state.foiRequests.foiPDFStitchStatusForResponsePackage);
   const cfrFeeData = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
-  console.log("cfrFeeData: ", cfrFeeData);
   
   //get template
   const rootpath = OSS_S3_BUCKET_FULL_PATH
@@ -65,10 +64,8 @@ export const PreviewModal = React.memo(({
   requestDetails["ffaurl"] = FOI_FFA_URL;
 
   const templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo);
-  console.log("templateVariables: ", templateVariables);
   const handleSend = () => {
     const callback = (templateVariables: any) => {
-      console.log("templateVariables - async: ", templateVariables);
       handleSave( applyVariables(innerhtml, templateVariables ) );
     };
     getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback);
