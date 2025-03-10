@@ -1,4 +1,7 @@
-﻿namespace MCS.FOI.Integration.Application.Services.TemplateService
+﻿using MCS.FOI.Integration.Application.Extensions;
+using MCS.FOI.Integration.Application.Helpers;
+
+namespace MCS.FOI.Integration.Application.Services.TemplateService
 {
     public class TemplateMappingService : ITemplateMappingService
     {
@@ -65,12 +68,13 @@
             var applicantFullName = FormatFullName(rawRequest?.FirstName, rawRequest?.LastName);
             var onBehalfFullName = FormatFullName(additionalInfo?.AnotherFirstName, additionalInfo?.AnotherLastName);
             var assigneeFullName = FormatFullName(rawRequest?.AssignedToFirstName, rawRequest?.AssignedToLastName);
-            var receivedDate = !string.IsNullOrEmpty(rawRequest?.ReceivedDate) ? DateTime.Parse(rawRequest?.ReceivedDate).ToString("MMMM dd, yyyy") : string.Empty;
-            var dateOfBirth = !string.IsNullOrEmpty(additionalInfo?.BirthDate) ? DateTime.Parse(additionalInfo?.BirthDate).ToString("MMMM dd, yyyy") : string.Empty;
-            var dueDate = !string.IsNullOrEmpty(rawRequest?.DueDate) ? DateTime.Parse(rawRequest?.DueDate).ToString("MMMM dd, yyyy") : string.Empty;
+            var receivedDate = !string.IsNullOrEmpty(rawRequest?.ReceivedDate) ? DateHelper.FormatDate(rawRequest?.ReceivedDate) : string.Empty;
+            var dateOfBirth = !string.IsNullOrEmpty(additionalInfo?.BirthDate) ? DateHelper.FormatDate(additionalInfo?.BirthDate) : string.Empty;
+            var dueDate = !string.IsNullOrEmpty(rawRequest?.DueDate) ? DateHelper.FormatDate(rawRequest?.DueDate) : string.Empty;
             var ministryName = rawRequest?.SelectedMinistries?.FirstOrDefault()?.Name ?? string.Empty;
             var officeName = ministryName.StartsWith("Ministry of ", StringComparison.OrdinalIgnoreCase) ? ministryName.Substring(12) : ministryName;
             var faxNumber = _configuration.GetValue<string>("FaxNumber") ?? "(250) 3879843";
+            var assigneeEmail = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty;
 
             string GetAddress()
             {
@@ -84,7 +88,7 @@
             return new Dictionary<string, string?>
             {
                 ["[REQUESTNUMBER]"] = rawRequest?.AxisRequestId,
-                ["[TODAYDATE]"] = DateTime.Now.ToString("MMMM dd, yyyy"),
+                ["[TODAYDATE]"] = DateHelper.GetTodayDate(),
                 ["[RQREMAIL]"] = rawRequest?.Email,
                 ["[RQRFAX]"] = faxNumber,
                 ["[ADDRESS]"] = GetAddress()?.ToString(),
@@ -97,8 +101,8 @@
                 ["[REQUESTERCATEGORY]"] = rawRequest?.Category,
                 ["[RECEIVEDDATE]"] = receivedDate,
                 ["[REQUESTDESCRIPTION]"] = rawRequest?.Description,
-                ["[PERFECTEDDATE]"] = rawRequest?.FromDate,
-                ["[DUEDATE]"] = DateTime.Parse(rawRequest?.DueDate).ToString("MMMM dd, yyyy"),
+                ["[PERFECTEDDATE]"] = DateHelper.FormatDate(rawRequest?.FromDate),
+                ["[DUEDATE]"] = DateHelper.FormatDate(rawRequest?.DueDate),
                 ["[STREET1]"] = rawRequest?.Address,
                 ["[CITY]"] = rawRequest?.City,
                 ["[STATE/PROVINCESHORT]"] = rawRequest?.Province,
@@ -114,7 +118,8 @@
                 ["[WORKPHONEPRIMARY]"] = rawRequest?.WorkPhonePrimary,
                 ["[SUBJECTCODE]"] = rawRequest?.SubjectCode,
                 ["[CORRECTIONNUMBER]"] = rawRequest?.CorrectionalServiceNumber,
-                ["[APPLICATION_FEE_AMOUNT]"] = applicationFees?.FirstOrDefault()?.AmountPaid?.ToString("F2") ?? string.Empty
+                ["[APPLICATION_FEE_AMOUNT]"] = applicationFees?.FirstOrDefault()?.AmountPaid?.ToString("F2") ?? string.Empty,
+                ["[PRIMARYUSERREMAIL]"] = assigneeEmail
             };
         }
 
@@ -179,7 +184,7 @@
             {
                     ["[REQUESTNUMBER]"] = requestMinistry.AxisRequestId,
                     ["[OIPCNUMBER]"] =  ProcessOipcDetails(oipcDetails).oipcNumber,
-                    ["[TODAYDATE]"] = DateTime.Now.ToString("MMMM dd, yyyy"),
+                    ["[TODAYDATE]"] = DateHelper.GetTodayDate(),
                     ["[RQREMAIL]"] = GetContactInfo("email"),
                     ["[RQRFAX]"] = faxNumber,
                     ["[ADDRESS]"] = GetFullAddress().ToString(),
@@ -190,14 +195,14 @@
                     ["[ACTIONOFFICENAME]"] = primaryProgramArea?.OfficeName,
                     ["[ASSIGNEE]"] = $"{assignee?.FirstName} {assignee?.LastName}",
                     ["[REQUESTERCATEGORY]"] = primaryApplicantCategory?.Description?.ToString(),
-                    ["[RECEIVEDDATE]"] = request?.ReceivedDate.ToString("MMMM dd, yyyy"),
+                    ["[RECEIVEDDATE]"] = DateHelper.FormatDate(request.ReceivedDate),
                     ["[REQUESTDESCRIPTION]"] = request?.InitialDescription,
-                    ["[PERFECTEDDATE]"] = request?.InitialRecordSearchFromDate?.ToString("MMMM dd, yyyy"),
+                    ["[PERFECTEDDATE]"] = DateHelper.FormatDate(request?.InitialRecordSearchFromDate),
                     ["[APPLICATION_FEE_AMOUNT]"] = fee?.AmountPaid?.ToString("F2") ?? string.Empty,
                     ["[OIPCORDERNUMBER]"] = string.Join(",", ProcessOipcDetails(oipcDetails).oipcOrderNumber),
-                    ["[DUEDATE]"] = requestMinistry?.DueDate.ToString("MMMM dd, yyyy"),
+                    ["[DUEDATE]"] = DateHelper.FormatDate(requestMinistry?.DueDate),
                     ["[ADDITIONALXX]"] = extensionData?.ApprovedNoOfDays?.ToString(),
-                    ["[EXTENDED_DUE_DATE]"] = extensionData?.ExtendedDueDate?.ToString("MMMM dd, yyyy"),
+                    ["[EXTENDED_DUE_DATE]"] = DateHelper.FormatDate(extensionData?.ExtendedDueDate),
                     ["[PRIMARYUSERREMAIL]"] = assigneeEmail,
                     ["[PRIMARYUSERPHONE]"] = string.Empty, //No need to Map for now.
                     ["[PRIMARYUSERTITLE]"] = string.Empty, //No need to Map for now.
@@ -217,14 +222,14 @@
                     ["[ASSIGNEDGROUPEMAILS]"] = operatingTeamEmails?.FirstOrDefault()?.EmailAddress,
                     ["[ARCSNUMBER]"] = (request?.RequestType ?? "").Equals("general") ? "40": "30",
                     ["[OIPCEXTENSIONDUEDAYS]"] = oipcExtension?.ExtendedDueDays,
-                    ["[OIPCORIGINALRECEIVEDDATE]"] = request?.ReceivedDate.ToString("MMMM dd, yyyy"),
-                    ["[OIPCORIGINALDUEDATE]"] = requestMinistry?.OriginalLDD?.ToString("MMMM dd, yyyy") ?? originalLdd?.DueDate.ToString("MMMM dd, yyyy"),
-                    ["[OIPCCURRENTDUEDATE]"] = requestMinistry?.DueDate.ToString("MMMM dd, yyyy"),
+                    ["[OIPCORIGINALRECEIVEDDATE]"] = DateHelper.FormatDate(request?.ReceivedDate),
+                    ["[OIPCORIGINALDUEDATE]"] = DateHelper.FormatDate(requestMinistry?.OriginalLDD) ?? DateHelper.FormatDate(originalLdd?.DueDate),
+                    ["[OIPCCURRENTDUEDATE]"] = DateHelper.FormatDate(requestMinistry?.DueDate),
                     ["[OIPCEXTENSIONDUEDATES]"] = oipcExtension?.ExtendedDueDate,
                     ["[PBEXTENSIONDUEDAYS]"] = pbExtension?.ExtendedDueDays,
                     ["[PBEXTENSIONDUEDATE]"] = pbExtension?.ExtendedDueDate,
                     ["[EXTENSION_APPROVED_DATE]"] = extensionApprovedDate,
-                    ["[DOB]"] = applicant?.DOB?.ToString("MMMM dd, yyyy"),
+                    ["[DOB]"] = DateHelper.FormatDate(applicant?.DOB),
                     ["[PHONEPRIMARY]"] = GetContactInfo("phonePrimary"),
                     ["[WORKPHONEPRIMARY]"] = GetContactInfo("workPhonePrimary"),
                     ["[SUBJECTCODE]"] = subjectCodes?.Name?.ToString(),
@@ -232,7 +237,7 @@
                     ["[PUBLICATIONSTATUS]"] = openInformation?.PublicationStatus?.ToString(),
                     ["[OPENINFORELEASE]"] = openInformation?.ExemptionName?.ToString(),
                     ["[CORRECTIONNUMBER]"] = GetPersonalAttribute("BC Correctional Service Number"),
-                    ["[REQFORDOCSDUEDATE]"] = requestMinistry?.CFRDueDate?.ToString("MMMM dd, yyyy")
+                    ["[REQFORDOCSDUEDATE]"] = DateHelper.FormatDate(requestMinistry?.CFRDueDate)
 
             };
 
@@ -269,7 +274,7 @@
                 templateData["[PAIDAMOUNT]"] = paidAmount.ToString("F2");
 
                 if (payment != null && payment.PaymentId != 0)
-                    templateData["[PAYMENTRECEIVEDDATE]"] = payment.CreatedAt.ToString("MMMM dd, yyyy");
+                    templateData["[PAYMENTRECEIVEDDATE]"] = DateHelper.FormatDate(payment.CreatedAt);
             }
         }
 
@@ -282,6 +287,7 @@
                 string jsonString = rData.RequestRawData;
                 RequestDto details = JsonConvert.DeserializeObject<RequestDto>(jsonString);
                 details.Version = rData.Version;
+                details.RequestId = rawRequestId;
 
                 return details;
             }
@@ -338,7 +344,7 @@
             if (recentExtension.ExtensionType == ExtensionType.PublicBody)
             {
                 extension.ExtendedDueDays = recentExtension.ExtendedDueDays?.ToString() ?? string.Empty;
-                extension.ExtendedDueDate = recentExtension.ExtendedDueDate?.ToString("MMMM dd, yyyy") ?? string.Empty;
+                extension.ExtendedDueDate = DateHelper.FormatDate(recentExtension.ExtendedDueDate) ?? string.Empty;
                 extension.ExtensionReason = recentExtension.ExtensionReason?.ToString() ?? string.Empty;
                 return extension;
             }
@@ -360,11 +366,11 @@
             if (recentExtension.ExtensionType == ExtensionType.OIPC)
             {
                 extension.ApprovedNoOfDays = recentExtension.ApprovedNoOfDays?.ToString() ?? string.Empty;
-                extension.ExtendedDueDate = recentExtension.ExtendedDueDate?.ToString("MMMM dd, yyyy") ?? string.Empty;
+                extension.ExtendedDueDate = DateHelper.FormatDate(recentExtension.ExtendedDueDate) ?? string.Empty;
                 extension.ExtensionReason = recentExtension.ExtensionReason?.ToString() ?? string.Empty;
-                extension.CreatedAt = recentExtension.CreatedAt.ToString("MMMM dd, yyyy") ?? string.Empty;
+                extension.CreatedAt = DateHelper.FormatDate(recentExtension.CreatedAt) ?? string.Empty;
                 extension.ExtensionReasonId = recentExtension.ExtensionReasonId.ToString() ?? string.Empty;
-                extension.DecisionDate = recentExtension.DecisionDate?.ToString("MMMM dd, yyyy") ?? string.Empty;
+                extension.DecisionDate = DateHelper.FormatDate(recentExtension.DecisionDate) ?? string.Empty;
                 extension.ExtendedDueDays = recentExtension.ExtendedDueDays?.ToString() ?? string.Empty;
                 return extension;
             }

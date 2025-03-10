@@ -22,18 +22,6 @@
             return await _dbConnection.QuerySingleOrDefaultAsync<T>(query, parameters);
         }
 
-        public async Task<int> ExecuteAsync(string query, object? parameters = null)
-        {
-            ValidateQuery(query);
-            return await _dbConnection.ExecuteAsync(query, parameters);
-        }
-
-        public async Task<T> ExecuteScalarAsync<T>(string query, object? parameters = null)
-        {
-            ValidateQuery(query);
-            return await _dbConnection.ExecuteScalarAsync<T>(query, parameters);
-        }
-
         public async Task<IEnumerable<dynamic>> QueryDynamicAsync(string query, object? parameters = null)
         {
             ValidateQuery(query);
