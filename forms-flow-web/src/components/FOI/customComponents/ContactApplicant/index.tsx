@@ -139,7 +139,7 @@ export const ContactApplicant = ({
       if (!textContent || textContent === " " || textContent === "&nbsp;") return;
     
       const nextNode = p.nextSibling;
-      if (nextNode?.nodeType === Node.TEXT_NODE && /^[ \t\r]*\n[ \t\r]*$/.test(nextNode.nodeValue || "")) {
+      if (nextNode?.nodeType === Node.TEXT_NODE && /^[ \t\r]*\n[ \t\r]*$/.test(nextNode.nodeValue ?? "")) {
         p.insertAdjacentHTML("afterend", "<br>");
       }
     });
