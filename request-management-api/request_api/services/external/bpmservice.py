@@ -116,6 +116,10 @@ class bpmservice(camundaservice):
             return    
         
     def feeevent(self,axisrequestid, data, paymentstatus, token=None):
+        print("=========feeevent=================")
+        print("axisrequestid:  ",axisrequestid)
+        print("data : ",data)
+        print("=================================")
         if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"messageName": MessageType.managepayment.value,
                                             "correlationKeys":{
@@ -130,6 +134,9 @@ class bpmservice(camundaservice):
             return
 
     def correspondanceevent(self,wfinstanceid, filenumber, data, token=None):
+        print("=========correspondanceevent=================")
+        print("data : ",data)
+        print("==============================================")
         if self.bpmengineresturl is not None:
             messageschema = MessageSchema().dump({"messageName": MessageType.iaocorrenspodence.value,
                                               "processInstanceId": wfinstanceid,
@@ -147,6 +154,11 @@ class bpmservice(camundaservice):
         return self.unopenedcomplete(processinstanceid, data, messagetype, token)
 
     def __post_message(self, messagetype, messageschema, token=None):
+        print("===__post_message==========")
+        print("url: ", self._getUrl_(messagetype))
+        print("data: ", json.dumps(messageschema))
+        print("headers: ", self._getHeaders_(token))
+        print("=============================")
         return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
 
     def _getUrl_(self, messagetype, definitionkey=None):
