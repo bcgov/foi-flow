@@ -119,7 +119,7 @@ class eventservice:
 
     def postopeninfostateevent(self, requestid, ministryrequestid, userid, username):
         try:
-            openinfoeventresponse = openinfoevent().createopeninfostateevent(requestid, ministryrequestid, userid, username)
+            openinfoeventresponse = openinfoevent().createopeninfostateevent(ministryrequestid, requestid, userid, username)
             if openinfoeventresponse.success == False:
                 current_app.logger.error("FOI Notification failed for openinfo event for request= %s ; event response=%s" % (requestid, openinfoeventresponse.message))
         except BusinessException as exception:
