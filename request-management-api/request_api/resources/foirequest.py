@@ -141,11 +141,15 @@ class FOIRequestsById(Resource):
     def post(foirequestid,foiministryrequestid):
         """ POST Method for capturing FOI requests before processing"""
         try:
+            #HERE
             request_json = request.get_json()
             foirequestschema = FOIRequestWrapperSchema().load(request_json)  
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
                 asyncio.ensure_future(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()))
+                #BANG
+                print(IAOTeamWithKeycloackGroup.oi.value, "BANG")
+                print(AuthHelper.getusergroups(), "BOOM")
                 if IAOTeamWithKeycloackGroup.oi.value in AuthHelper.getusergroups():
                     eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
@@ -173,6 +177,7 @@ class FOIRequestsByIdAndType(Resource):
     def post(foirequestid,foiministryrequestid,actiontype = None,usertype = None):
         """ POST Method for capturing FOI requests before processing"""
         try:
+            #HERE
             if usertype != "ministry" and actiontype != "assignee":
                 return {'status': False, 'message':'Bad Request'}, 400
             request_json = request.get_json()
@@ -294,6 +299,7 @@ class FOIRequestsById(Resource):
     @auth.require
     def post(foirequestid,foiministryrequestid,section):
         try:
+            #HERE
             request_json = request.get_json()
             if (section == "oipc"):
                 foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
