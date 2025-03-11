@@ -135,10 +135,11 @@ export const ContactApplicant = ({
 
     // Replace \n (newlines) that are NOT inside <p> with <br>
     tempDiv.querySelectorAll("p").forEach((p) => {
-      if (!p.textContent?.trim() || p.innerHTML.trim() === "&nbsp;") return;
+      const textContent = p.textContent?.trim();
+      if (!textContent || textContent === " " || textContent === "&nbsp;") return;
     
       const nextNode = p.nextSibling;
-      if (nextNode?.nodeType === Node.TEXT_NODE && nextNode.nodeValue?.trim() === "\n") {
+      if (nextNode?.nodeType === Node.TEXT_NODE && /^[ \t\r]*\n[ \t\r]*$/.test(nextNode.nodeValue || "")) {
         p.insertAdjacentHTML("afterend", "<br>");
       }
     });
