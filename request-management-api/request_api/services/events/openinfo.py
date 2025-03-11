@@ -33,19 +33,22 @@ class openinfoevent:
         oistatuses = OpenInformationStatuses.getallstatuses()
         foirequest = notificationservice().getrequest(ministryrequestid, "ministryrequest")
         oistatus = None
-        print(_openinfo)
+        print(foirequest)
         print(oistatuses)
         print("BANG")
         for status in oistatuses:
             if status['oistatusid'] == foirequest['oistatus_id']:
                 oistatus = status['name']
+        print("GOTCHA", oistatus)
         comment = {"comment": username + ' changed the state of the request to ' + (oistatus or "Unopened"), 'ministryrequestid': ministryrequestid}
         print("Comment", comment)
         _commentresponse = commentservice().createministryrequestcomment(comment, userid, 2)
         _notificationtype = NotificationType.getnotificationtypeid('OI State')
         print("_notificationtype", _notificationtype)
         _notificationmessage = "Moved to " + (oistatus or "Unopened") + " State"
+        print("_notificationmessage", _notificationmessage)
         _notificationresponse = self.__createnotification(requestid, userid, _notificationtype, _notificationmessage, {"oiassignedto": _openinfo.get('oiassignedto')})
+        print("RES", _notificationresponse, _commentresponse.success)
         if _commentresponse.success == True and _notificationresponse.success == True:
             return DefaultMethodResult(True,'Comment posted',requestid)
         else:
