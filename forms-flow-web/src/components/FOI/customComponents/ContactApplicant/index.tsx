@@ -132,6 +132,9 @@ export const ContactApplicant = ({
     if (headerParagraph) {
       headerParagraph.remove();
     }
+
+    // Replace \n (newlines) that are NOT inside <p> with <br>
+    tempDiv.innerHTML = tempDiv.innerHTML.replace(/(?<!<\/p>)\n/g, "<br>");
   
     // Return the modified HTML string.
     return tempDiv.innerHTML;
