@@ -12,7 +12,8 @@ import Divider from "@mui/material/Divider";
 import { ButtonBase } from "@mui/material";
 import { getTableInfo } from "./columns";
 import { getIAOEventQueueTableInfo } from "../EventQueueColumns"
-import { setShowAdvancedSearch, setResumeDefaultSorting, setShowEventQueue } from "../../../../actions/FOI/foiRequestActions";
+import { setShowAdvancedSearch, setResumeDefaultSorting, setShowEventQueue, setShowKeywordSearch } from "../../../../actions/FOI/foiRequestActions";
+import KeywordSearch from "./KeywordSearch";
 
 const useStyles = makeStyles(() => ({
   displayed: {
@@ -36,6 +37,7 @@ const Dashboard = ({ userDetail }) => {
 
   const showAdvancedSearch = useSelector((state) => state.foiRequests.showAdvancedSearch);
   const showEventQueue = useSelector((state) => state.foiRequests.showEventQueue);
+  const showKeywordSearch = useSelector((state) => state.foiRequests.showKeywordSearch);
 
   const addRequest = (_e) => {
     dispatch(push(`/foi/addrequest`));
@@ -46,10 +48,12 @@ const Dashboard = ({ userDetail }) => {
       document.title = 'FOI Advanced Search'
     } else if (showEventQueue) {
       document.title = 'Event Queue'
+    } else if (showKeywordSearch) {
+      document.title = 'Keyword Search'
     } else {
       document.title = 'FOI Request Queue'
     }
-  }, [showAdvancedSearch, showEventQueue]);
+  }, [showAdvancedSearch, showEventQueue, showKeywordSearch]);
 
   return (
     <div className="container foi-container">
@@ -78,6 +82,7 @@ const Dashboard = ({ userDetail }) => {
           >
             <ButtonBase
               onClick={() => {
+                dispatch(setShowKeywordSearch(false));
                 dispatch(setShowAdvancedSearch(false));
                 dispatch(setShowEventQueue(false));
                 dispatch(setResumeDefaultSorting(true));
@@ -86,7 +91,7 @@ const Dashboard = ({ userDetail }) => {
             >
               <h3
                 className={clsx("foi-request-queue-text", {
-                  [classes.disabledTitle]: showAdvancedSearch || showEventQueue,
+                  [classes.disabledTitle]: showAdvancedSearch || showEventQueue || showKeywordSearch,
                 })}
               >
                 Your FOI Request Queue
@@ -105,6 +110,7 @@ const Dashboard = ({ userDetail }) => {
             />
             <ButtonBase
               onClick={() => {
+                dispatch(setShowKeywordSearch(false));
                 dispatch(setShowEventQueue(true));
                 dispatch(setShowAdvancedSearch(false));
                 dispatch(setResumeDefaultSorting(true));
@@ -113,7 +119,7 @@ const Dashboard = ({ userDetail }) => {
             >
               <h3
                 className={clsx("foi-request-queue-text", {
-                  [classes.disabledTitle]: !showEventQueue || showAdvancedSearch,
+                  [classes.disabledTitle]: !showEventQueue || showAdvancedSearch || showKeywordSearch,
                 })}
               >
                 Event Queue
@@ -132,6 +138,7 @@ const Dashboard = ({ userDetail }) => {
             />
             <ButtonBase
               onClick={() => {
+                dispatch(setShowKeywordSearch(false));
                 dispatch(setShowAdvancedSearch(true));
                 dispatch(setShowEventQueue(false));
                 dispatch(setResumeDefaultSorting(true));
@@ -140,10 +147,38 @@ const Dashboard = ({ userDetail }) => {
             >
               <h3
                 className={clsx("foi-request-queue-text", {
-                  [classes.disabledTitle]: !showAdvancedSearch || showEventQueue,
+                  [classes.disabledTitle]: !showAdvancedSearch || showEventQueue || showKeywordSearch,
                 })}
               >
                 Advanced Search
+              </h3>
+            </ButtonBase>
+            <Divider
+              sx={{
+                mr: 2,
+                ml: 2,
+                borderRightWidth: 3,
+                height: 28,
+                borderColor: "black",
+              }}
+              flexItem
+              orientation="vertical"
+            />
+            <ButtonBase
+              onClick={() => {
+                dispatch(setShowKeywordSearch(true));
+                dispatch(setShowAdvancedSearch(false));
+                dispatch(setShowEventQueue(false));
+                dispatch(setResumeDefaultSorting(true));
+              }}
+              disableRipple
+            >
+              <h3
+                className={clsx("foi-request-queue-text", {
+                  [classes.disabledTitle]: !showKeywordSearch || showEventQueue || showAdvancedSearch,
+                })}
+              >
+                Keyword Search
               </h3>
             </ButtonBase>
           </Grid>
@@ -157,7 +192,7 @@ const Dashboard = ({ userDetail }) => {
             </button>
           </Grid>
         </Grid>
-        { (!showAdvancedSearch && !showEventQueue) &&
+        { (!showAdvancedSearch && !showEventQueue && !showKeywordSearch) &&
         <Grid
           container
           direction="row"
@@ -200,6 +235,21 @@ const Dashboard = ({ userDetail }) => {
           // })}
         >
           <AdvancedSearch userDetail={userDetail} />
+        </Grid>
+        }
+        {showKeywordSearch &&
+        <Grid
+          container
+          direction="row"
+          spacing={2}
+          sx={{
+            marginTop: "2em",
+          }}
+          // className={clsx({
+          //   [classes.hidden]: !showAdvancedSearch,
+          // })}
+        >
+          <KeywordSearch userDetail={userDetail} />
         </Grid>
         }
       </Grid>
