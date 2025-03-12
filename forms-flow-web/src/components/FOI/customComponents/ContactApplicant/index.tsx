@@ -592,7 +592,7 @@ export const ContactApplicant = ({
       assignedGroupEmail: requestDetails.assignedGroupEmail,
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: "sfdt"
+      templatetype: templateId?"":"sfdt"
     };
     saveEmailCorrespondence(
       data,
@@ -635,7 +635,7 @@ export const ContactApplicant = ({
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName)) ) ? "CFRFee" : "";
     let israwrequest = selectedCorrespondence?.israwrequest ||
       requestDetails.requeststatuslabel == StateEnum.appfeeowing.label ||
       requestDetails.requeststatuslabel == StateEnum.intakeinprogress.label ||
@@ -653,7 +653,7 @@ export const ContactApplicant = ({
       emails: selectedEmails,
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: "sfdt"
+      templatetype: templateId?"":"sfdt"
     };
     saveDraftCorrespondence(
       data,
@@ -682,7 +682,7 @@ export const ContactApplicant = ({
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName)) ) ? "CFRFee" : "";
     let israwrequest = selectedCorrespondence.israwrequest || false;
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
@@ -699,7 +699,9 @@ export const ContactApplicant = ({
         "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS),
         "axisRequestId": requestNumber
       }],
-      israwrequest: israwrequest
+      israwrequest: israwrequest,
+      templatename: curTemplateName,
+      templatetype: templateId?"":"sfdt"
     };
     saveEmailCorrespondence(
       data,
@@ -944,7 +946,7 @@ export const ContactApplicant = ({
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName)) ) ? "CFRFee" : "";
     let israwrequest = selectedCorrespondence.israwrequest || false;
     let data = {
       correspondenceid:correspondenceId,
@@ -960,7 +962,7 @@ export const ContactApplicant = ({
       emails: selectedEmails,
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: "sfdt"
+      templatetype: templateId?"":"sfdt"
     };
     editDraftCorrespondence(
       data,
