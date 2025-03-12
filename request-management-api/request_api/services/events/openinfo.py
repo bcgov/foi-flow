@@ -33,22 +33,14 @@ class openinfoevent:
         oistatuses = OpenInformationStatuses.getallstatuses()
         foirequest = notificationservice().getrequest(ministryrequestid, "ministryrequest")
         oistatus = None
-        print(foirequest)
-        print(oistatuses)
-        print("BANG")
         for status in oistatuses:
             if status['oistatusid'] == foirequest['oistatus_id']:
                 oistatus = status['name']
-        print("GOTCHA", oistatus)
         comment = {"comment": username + ' changed the state of the request to ' + (oistatus or "Unopened"), 'ministryrequestid': ministryrequestid}
-        print("Comment", comment)
         _commentresponse = commentservice().createministryrequestcomment(comment, userid, 2)
         _notificationtype = NotificationType.getnotificationtypeid('OI State')
-        print("_notificationtype", _notificationtype)
         _notificationmessage = "Moved to " + (oistatus or "Unopened") + " State"
-        print("_notificationmessage", _notificationmessage)
         _notificationresponse = self.__createnotification(requestid, userid, _notificationtype, _notificationmessage, {"oiassignedto": _openinfo.get('oiassignedto')})
-        print("RES", _notificationresponse, _commentresponse.success)
         if _commentresponse.success == True and _notificationresponse.success == True:
             return DefaultMethodResult(True,'Comment posted',requestid)
         else:
@@ -75,7 +67,7 @@ class openinfoevent:
 
             # Create comment for approval/denial
             if event_type in [OpenInfoNotificationType.EXEMPTION_APPROVED.value, OpenInfoNotificationType.EXEMPTION_DENIED.value]:
-                _commentresponse = self.__createcomment(requestid, userid, username, event_type, exemption_id)
+                _commentresponse = self.__createcomment(ministryrequestid, userid, username, event_type, exemption_id)
                 if not _commentresponse.success:
                     return DefaultMethodResult(False, 'Unable to post comment', requestid)
 
@@ -93,10 +85,10 @@ class openinfoevent:
         except Exception as e:
             print("Error dismissing exemption notifications:", str(e))
 
-    def __createcomment(self, requestid, userid, username, event_type, exemption_id):
-        comment = self.__preparecomment(requestid, userid, username, event_type, exemption_id)
+    def __createcomment(self, ministryrequestid, userid, username, event_type, exemption_id):
+        comment = self.__preparecomment(ministryrequestid, userid, username, event_type, exemption_id)
         data = {
-            "ministryrequestid": requestid,
+            "ministryrequestid": ministryrequestid,
             "comment": comment
         }
         return commentservice().createministryrequestcomment(data, userid, 2)
@@ -114,7 +106,7 @@ class openinfoevent:
         if event_type == OpenInfoNotificationType.EXEMPTION_APPROVED.value:
             return f"Publication Exemption Approved by {username} for {exemption_reason}"
         elif event_type == OpenInfoNotificationType.EXEMPTION_DENIED.value:
-            return f"Publication Exemption denied by {username}"
+            return f"Publication Exemption Denied by {username}"
         return None
 
     def __createnotification(self, requestid, userid, type, message, requestjson):
@@ -123,14 +115,9 @@ class openinfoevent:
             return DefaultMethodResult(True,'Notification added',requestid)
         return  DefaultMethodResult(True,'Unable to post notification',requestid)
 
-    def __preparenotification(self, requestid):
-        return self.__notificationmessage(requestid)
-
-    def __preparecomment(self, requestid, userid, username, event_type, exemption_id):
+    def __preparecomment(self, ministryrequestid, userid, username, event_type, exemption_id):
         if event_type in [OpenInfoNotificationType.EXEMPTION_APPROVED.value, OpenInfoNotificationType.EXEMPTION_DENIED.value]:
                 exemption_reason = OpenInformationExemptions.getexemptionnamebyid(exemption_id)
                 comment = self.__commentmessage(username, event_type, exemption_reason)
         return comment
-
-    def __notificationmessage(self, requestid):
-        return "fill in here"
+    
