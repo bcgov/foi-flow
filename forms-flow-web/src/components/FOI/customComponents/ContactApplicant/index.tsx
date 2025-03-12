@@ -134,8 +134,16 @@ export const ContactApplicant = ({
     }
 
     // Replace \n (newlines) that are NOT inside <p> with <br>
-    tempDiv.innerHTML = tempDiv.innerHTML.replace(/(?<!<\/p>)\n/g, "<br>");
-  
+    tempDiv.querySelectorAll("p").forEach((p) => {
+      const textContent = p.textContent?.trim();
+      if (!textContent || textContent === " " || textContent === "&nbsp;") return;
+    
+      const nextNode = p.nextSibling;
+      if (nextNode?.nodeType === Node.TEXT_NODE && /^[ \t\r]*\n[ \t\r]*$/.test(nextNode.nodeValue ?? "")) {
+        p.insertAdjacentHTML("afterend", "<br>");
+      }
+    });
+
     // Return the modified HTML string.
     return tempDiv.innerHTML;
   }
