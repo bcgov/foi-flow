@@ -292,7 +292,7 @@ const OpenInfo = ({
             bcgovcode={bcgovcode}
             requestNumber={requestNumber}
             handlePublishNow={handlePublishNow}
-            earliestPublicationDate={requestDetails ? addBusinessDaysToDate(requestDetails.closedate, 10) : null}
+            earliestPublicationDate={addBusinessDaysToDate(requestDetails.closedate, 10)}
           />
         )}
       </div>
