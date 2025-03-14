@@ -169,6 +169,9 @@ const calculateBusinessDaysBetween = (date1, date2) => {
   return daysBetween;
 };
 const addBusinessDaysToDate = (date, days) => {
+  if (!date) {
+    return null;
+  }
   let holidays = 0;
   let date2 = new Date(dayjs(date).businessDaysAdd(days));
   date = new Date(date);
