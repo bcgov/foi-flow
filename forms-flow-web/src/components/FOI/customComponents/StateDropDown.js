@@ -221,9 +221,6 @@ const StateDropDown = ({
         if (personalIAO) return _stateList.feeassessedforpersonal;
         return _stateList.feeassessed;
       case StateEnum.deduplication.name.toLowerCase():
-        if (!isMCFMinistryTeam) {
-          return consultflag ? _stateList.deduplicationforConsult : _stateList.deduplication.filter(_state => _state.status.toLowerCase() !== StateEnum.recordsreadyforreview.name.toLowerCase());
-        }
         return consultflag ? _stateList.deduplicationforConsult : _stateList.deduplication;
       case StateEnum.harms.name.toLowerCase():
         return consultflag ? _stateList.harmsforConsult : _stateList.harms;
