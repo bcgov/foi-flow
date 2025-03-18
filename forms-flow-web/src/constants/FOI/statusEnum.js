@@ -118,6 +118,8 @@ const StateList = Object.freeze({
   deduplication: [
     { status: "Deduplication", isSelected: false },
     { status: "Harms Assessment", isSelected: false },
+    { status: "Call For Records", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
     { status: "Records Review", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
     { status: "Closed", isSelected: false },
@@ -163,6 +165,7 @@ const StateList = Object.freeze({
     { status: "Peer Review", isSelected: false },
     { status: "Response", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
+    { status: "Deduplication", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
   reviewcfdmsdpersonal: [
@@ -175,6 +178,7 @@ const StateList = Object.freeze({
     { status: "Peer Review", isSelected: false },
     { status: "Response", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
+    { status: "Deduplication", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
   reviewforConsult: [
@@ -248,6 +252,7 @@ const StateList = Object.freeze({
     { status: "Consult", isSelected: false },
     { status: "Records Review", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
+    { status: "Deduplication", isSelected: false },
     { status: "Closed", isSelected: false }
   ],
   recordsreadyforreviewforConsult: [
