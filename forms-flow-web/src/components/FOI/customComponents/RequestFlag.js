@@ -114,9 +114,9 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled 
       id = "phased-release-flag";
       iconClass = "phased-release-icon";
       isSelectedBgClass =
-        "linear-gradient(to right, rgba(2, 126, 111, 0.32) 80%, #EFFFFD 0%)";
-      bgClass = "linear-gradient(to right, #fff 80%, #EFFFFD 0%)";
-      borderStyle = "1px solid #EFFFFD";
+        "linear-gradient(to right, #EFFFFD 80%, #027E6F 0%)";
+      bgClass = "linear-gradient(to right, #fff 80%, #027E6F 0%)";
+      borderStyle = "1px solid #027E6F";
 
       //when setting to active
       modalHeadingActive = "Phased Release";
