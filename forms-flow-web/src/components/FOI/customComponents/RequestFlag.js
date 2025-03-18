@@ -114,24 +114,24 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled 
       id = "phased-release-flag";
       iconClass = "phased-release-icon";
       isSelectedBgClass =
-        "linear-gradient(to right, rgba(146, 7, 183, 0.32) 80%, #9207b7 0%)";
-      bgClass = "linear-gradient(to right, #fff 80%, #9207b7 0%)";
-      borderStyle = "1px solid #9207b7";
+        "linear-gradient(to right, #EFFFFD 80%, #027E6F 0%)";
+      bgClass = "linear-gradient(to right, #fff 80%, #027E6F 0%)";
+      borderStyle = "1px solid #027E6F";
 
       //when setting to active
       modalHeadingActive = "Phased Release";
       modalMessageActive =
-        "By setting the status of Phased Release to this request, the records timelines will be extended. Are you sure you want to continue?";
-      // modalDescriptionActive = (
-      //   <span>This will tag the request as Phased Release.</span>
-      // );
+        "Are you sure you want to change this request to Phased Release?";
+      modalDescriptionActive = (
+        <span>This will flag the request as a Phased Release.</span>
+      );
 
       //when setting to inactive
       modalHeadingInactive = "Single Release";
       modalMessageInactive =
         "Are you sure you want to change this request to Single Release?";
       modalDescriptionInactive = (
-        <span>This will tag the request as Single Release.</span>
+        <span>This will flag the request as a Single Release.</span>
       );
       break;
 
