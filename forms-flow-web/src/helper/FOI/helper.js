@@ -150,6 +150,43 @@ const calculateDaysRemaining = (endDate, startDate) => {
     );
   }
 };
+const calculateBusinessDaysBetween = (date1, date2) => {
+  date1 = new Date((dayjs(date1).tz('America/Los_Angeles')));
+  date2 = new Date((dayjs(date2).tz('America/Los_Angeles')));
+  let currentDate = date1 <= date2 ? date1 : date2;
+  let days = (date1.getTime() - date2.getTime()) / (1000 * 3600 *24);
+  let daysBetween = 0;
+  while(days > 0) {
+    currentDate.setDate(currentDate.getDate() + 1);
+    const isHoliday = hd.isHoliday(currentDate);
+    // isHoliday = false;
+    const isWeekend = currentDate.getDay() === 6 || currentDate.getDay() === 0;
+    if (!isHoliday && !isWeekend) {
+      daysBetween++;
+    }
+    days--;
+  }
+  return daysBetween;
+};
+const addBusinessDaysToDate = (date, days) => {
+  if (!date) {
+    return null;
+  }
+  let holidays = 0;
+  let date2 = new Date(dayjs(date).businessDaysAdd(days));
+  date = new Date(date);
+  let currentDate = date;
+  while(days > 0) {
+    const isHoliday = hd.isHoliday(currentDate);
+    const isWeekend = currentDate.getDay() === 6 || currentDate.getDay() === 0;
+    if (isHoliday && !isWeekend) {
+      holidays++;
+    }
+    currentDate.setDate(currentDate.getDate() + 1);
+    days--;
+  }
+  return dayjs(date2).add(holidays, 'day').format('YYYY/MM/DD')
+}
 
 const isMinistryCoordinator = (userdetail, ministryteam) => {
   if (
@@ -608,5 +645,7 @@ export {
   getIAOAssignToList,
   setTeamTagList,
   getIAOTagList,
-  getCommentTypeFromId
+  getCommentTypeFromId,
+  calculateBusinessDaysBetween,
+  addBusinessDaysToDate
 };
