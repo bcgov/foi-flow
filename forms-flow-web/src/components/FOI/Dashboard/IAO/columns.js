@@ -301,7 +301,6 @@ const OITeamColumns = [
 const defaultTableInfo = {
   sort: [
     { field: "defaultSorting", sort: "asc" },
-    // { field: "duedate", sort: "asc" }
   ],
   noAssignedClassName: "not-assigned"
 };
@@ -311,7 +310,6 @@ const getTableInfo = (userGroups) => {
     defaultTableInfo.columns = IntakeTeamColumns;
     defaultTableInfo.sort = [
       { field: "intakeSorting", sort: "asc" },
-      // { field: "duedate", sort: "asc" }
     ];
   }
 
@@ -325,9 +323,6 @@ const getTableInfo = (userGroups) => {
 
   if (isOITeam(userGroups)) {
     defaultTableInfo.columns = OITeamColumns;
-    defaultTableInfo.sort = [
-      { field: "receivedDate", sort: "desc" },  // Default sorting for OI team
-    ];
   }
 
   return defaultTableInfo;

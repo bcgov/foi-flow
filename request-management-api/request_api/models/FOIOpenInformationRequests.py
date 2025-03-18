@@ -5,7 +5,7 @@ from datetime import datetime
 from sqlalchemy.orm import relationship, backref, aliased
 from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc
 from sqlalchemy.sql.sqltypes import String
-from sqlalchemy.sql.sqltypes import Date
+from sqlalchemy.sql.sqltypes import Date, Integer
 from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup, OICloseReason, ExcludedProgramArea, OIStatusEnum
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIAssignees import FOIAssignee
@@ -167,12 +167,6 @@ class FOIOpenInformationRequests(db.Model):
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
 
-        defaultsorting = case([
-                            (FOIMinistryRequest.assignedto == None, # Unassigned requests first
-                             literal(None)),
-                           ],
-        else_ = FOIMinistryRequest.duedate).label('defaultSorting')
-        
         recordspagecount = case ([
             (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
             ],
@@ -240,7 +234,6 @@ class FOIOpenInformationRequests(db.Model):
             .join(FOIMinistryRequest, and_(
                 FOIMinistryRequest.foiministryrequestid == cls.foiministryrequest_id, 
                 FOIMinistryRequest.isactive == True,
-                # FOIMinistryRequest.programareaid.notin_(excluded_program_areas),
             ))
             .join(FOIRequest, and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id, FOIRequest.requesttype != 'personal'))
             .join(ApplicantCategory,and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True))
@@ -281,14 +274,6 @@ class FOIOpenInformationRequests(db.Model):
                     )
                 )
             )
-
-        basequery = basequery.order_by(
-            case(
-                [(FOIMinistryRequest.oistatus_id == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
-                else_=1
-            ),
-            receiveddate.desc()
-        )
             
         if additionalfilter == 'watchingRequests':
             subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
@@ -336,29 +321,28 @@ class FOIOpenInformationRequests(db.Model):
     def getsorting(cls, sortingitems, sortingorders):
         sortingcondition = []
         if len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders):
-            for field, order in zip(sortingitems, sortingorders):
+            for field in sortingitems:
                 if cls.validatefield(field):
+                    order = sortingorders.pop(0)
                     sortfield = cls.findfield(field)
                     if order == 'desc':
                         sortingcondition.append(nullslast(desc(sortfield)))
                     else:
                         sortingcondition.append(nullsfirst(asc(sortfield)))
         
-        if len(sortingcondition) == 0:
-            default_sort = case(
-                [(cls.oiexemptiondate.is_(None), FOIMinistryRequest.closedate)],
-                else_=cls.oiexemptiondate
-            )
-            sortingcondition.append(asc(default_sort))
+        #default sorting
+        if(len(sortingcondition) == 0):
+            default_sort = cls.findfield('defaultSorting')
 
-        sortingcondition.append(asc('id'))
+            sortingcondition.append(default_sort)
+            sortingcondition.append(cls.findfield('receivedDate').desc())
         
         return sortingcondition
 
     @classmethod
     def validatefield(cls, field):
-        valid_fields = ['receivedDateUF', 'requestType', 'pageCount', 
-                        'publicationStatus', 'from_closed', 'publicationdate', 'assignee']
+        valid_fields = ['receivedDate', 'axisRequestId', 'requestType', 'recordspagecount', 
+                        'publicationStatus', 'fromClosed', 'publicationDate', 'assignedTo', 'applicantType']
         return field in valid_fields
 
     @classmethod
@@ -378,12 +362,35 @@ class FOIOpenInformationRequests(db.Model):
 
     @classmethod
     def findfield(cls, field):
+
+        receiveddate = case(
+            [
+                (FOIMinistryRequest.oistatus_id.is_(None), FOIMinistryRequest.closedate),
+                (and_(
+                    FOIMinistryRequest.oistatus_id.isnot(None),
+                    FOIOpenInformationRequests.oiexemptiondate.is_(None)
+                ), FOIMinistryRequest.closedate),
+            ],
+            else_=FOIOpenInformationRequests.oiexemptiondate
+            )
+
+        defaultsorting = case(
+                [(FOIMinistryRequest.oistatus_id == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
+                else_=1
+            )
+
         if field == 'receivedDateUF':
             return FOIRequest.receiveddate
+        elif field == 'receivedDate':
+            return receiveddate
+        elif field == 'defaultSorting':      
+            return defaultsorting
         elif field == 'requestType':
             return FOIRequest.requesttype
         elif field == 'pageCount':
             return FOIMinistryRequest.recordspagecount
+        elif field == 'recordspagecount':
+            return cast(FOIMinistryRequest.recordspagecount, Integer)   
         elif field == 'publicationStatus':
             return cast(
                 case(
@@ -401,8 +408,29 @@ class FOIOpenInformationRequests(db.Model):
                 ),
                 0
             )
+        elif field == 'fromClosed':
+            return case(
+            [
+            (FOIMinistryRequest.closedate.isnot(None), 
+             func.coalesce(
+                 func.greatest(
+                     func.ceil((func.date_part('day', func.current_date() - FOIMinistryRequest.closedate) + 1) * 5 / 7) - 
+                     func.ceil((func.date_part('dow', FOIMinistryRequest.closedate) + func.date_part('dow', func.current_date())) / 5),
+                     0
+                 ),
+                 0
+             ))
+            ],
+            else_=0
+        ).label('fromClosed')
+        elif field == 'applicantType':
+            return ApplicantCategory.name
         elif field == 'publicationdate':
             return cls.publicationdate
+        elif field == 'publicationDate':
+            return cls.publicationdate
+        elif field == 'publicationStatus':
+            return cls.oiStatusName
         elif field == 'assignee':
             return cls.oiassignedto
         elif field == 'duedate':
@@ -420,6 +448,8 @@ class FOIOpenInformationRequests(db.Model):
         elif field == 'assignedToFirstName':
             return FOIAssignee.firstname
         elif field == 'assignedToLastName':
+            return FOIAssignee.lastname
+        elif field == 'assignedTo':
             return FOIAssignee.lastname
         elif field == 'idNumber':
             return cast(FOIMinistryRequest.filenumber, String)

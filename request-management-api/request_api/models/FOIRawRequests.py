@@ -720,20 +720,24 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, usertype, isministryrestrictedfilemanager=False):
+        # Check if user is in OI Team
+        is_oi_team = usertype == "iao" and 'OI Team' in groups if groups else False
+
         #ministry requests
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
         subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
 
         #sorting
-        sortingcondition = FOIRawRequest.getsorting(sortingitems, sortingorders)
+        if is_oi_team:
+            sortingcondition = FOIOpenInformationRequests.getsorting(sortingitems, sortingorders)
+        else:
+            sortingcondition = FOIRawRequest.getsorting(sortingitems, sortingorders)
+
         #rawrequests
         if usertype == "iao" or groups is None:
-            # Check if user is in OI Team
-            is_oi_team = usertype == "iao" and 'OI Team' in groups if groups else False
             if is_oi_team:
                 subquery_oirequest_queue = FOIOpenInformationRequests.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, "OI", isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-                sortingcondition = FOIOpenInformationRequests.getsorting(sortingitems, sortingorders)
                 return subquery_oirequest_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
             else:
                 subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups)
