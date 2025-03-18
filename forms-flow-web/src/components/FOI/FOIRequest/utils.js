@@ -491,6 +491,6 @@ export const getUniqueIdentifier = (obj) => {
 }
 
 export const isReadyForPublishing = (openinfo, additionalfiles, requestnumber) => {
-  return !(openinfo?.copyrightsevered === null || openinfo?.publicationdate === null || additionalfiles?.findIndex(f => f.filename.includes("Response_Letter_" + requestnumber + ".pdf")) < 0)
+  return !(openinfo?.copyrightsevered === null || additionalfiles?.findIndex(f => f.filename.includes("Response_Letter_" + requestnumber + ".pdf")) < 0)
 }
 

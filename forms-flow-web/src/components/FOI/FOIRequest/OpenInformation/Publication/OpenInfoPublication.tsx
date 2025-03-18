@@ -18,6 +18,7 @@ const OpenInfoPublication = ({
   bcgovcode, 
   requestNumber,
   handlePublishNow,
+  earliestPublicationDate
 }: any) => {
 
   //Functions
@@ -49,6 +50,7 @@ const OpenInfoPublication = ({
         requestId={requestId}
         bcgovcode={bcgovcode}
         requestNumber={requestNumber}
+        earliestPublicationDate={earliestPublicationDate}
       />
       <button
         type="button"

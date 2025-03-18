@@ -6,9 +6,9 @@ import OpenInfoPublication from "./Publication/OpenInfoPublication";
 import OpenInfoHeader from "./OpenInfoHeader";
 import OpenInfoTab from "./OpenInfoTab";
 import "./openinfo.scss";
-import { isReadyForPublishing } from "../utils";
 import { OIPublicationStatus, OITransactionObject } from "./types";
 import { OIStates, OIPublicationStatuses, OIExemptions } from "../../../../helper/openinfo-helper";
+import { calculateDaysRemaining, addBusinessDays, addBusinessDaysToDate, calculateBusinessDaysBetween } from "../../../../helper/FOI/helper";
 
 const OpenInfo = ({
   requestNumber,
@@ -83,7 +83,7 @@ const OpenInfo = ({
         oiexemption_id: null
       }));
     } else if (oiDataKey === "publicationdate" && requestDetails.closedate 
-      && typeof(value) === "string" && calculateDaysBetweenDates(value, requestDetails.closedate) >= 1 && calculateDaysBetweenDates(value, requestDetails.closedate) <= 10) {
+      && typeof(value) === "string" && calculateBusinessDaysBetween(value, requestDetails.closedate) >=0 && calculateBusinessDaysBetween(value, requestDetails.closedate) <= 10) {
       setConfirmationModal((prev : any) => ({
         ...prev, 
         show: true,
@@ -222,7 +222,7 @@ const OpenInfo = ({
     return true;
   };
   const disablePublish = (oiPublicationData: OITransactionObject) : boolean => {    
-    const isMissingRequiredInput = !isReadyForPublishing(oiPublicationData, foiOpenInfoAdditionalFiles, requestNumber);
+    const isMissingRequiredInput = oiPublicationData?.copyrightsevered === null || oiPublicationData?.publicationdate === null || foiOpenInfoAdditionalFiles?.findIndex((f: any) => f.filename.includes("Response_Letter_" + requestNumber + ".pdf")) < 0;
     const isOIReadyToPublish = currentOIRequestState === "Ready to Publish";
     if (!isOIReadyToPublish) {
       return true;
@@ -240,9 +240,6 @@ const OpenInfo = ({
       ...prev,
       publicationdate: value,
     }));
-  }
-  const calculateDaysBetweenDates = (date1: string, date2: string) => {
-    return Math.round((new Date(date1).getTime() - new Date(date2).getTime()) / (1000 * 3600 *24));
   }
   const handlePublishNow = () => {
     setConfirmationModal((prev : any) => ({
@@ -295,6 +292,7 @@ const OpenInfo = ({
             bcgovcode={bcgovcode}
             requestNumber={requestNumber}
             handlePublishNow={handlePublishNow}
+            earliestPublicationDate={addBusinessDaysToDate(requestDetails.closedate, 10)}
           />
         )}
       </div>
