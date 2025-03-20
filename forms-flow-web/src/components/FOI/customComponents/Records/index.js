@@ -387,7 +387,7 @@ export const RecordsLog = ({
           }
         }
         if(record.attributes?.personalattributes?.personaltag && MCFSections?.sections) {
-          if(_personalTagFilters.filter((pt)=>{return pt.divisionname === record.attributes.personalattributes.personaltag}).length === 0) {
+          if(_personalTagFilters.filter((pt)=>{return pt.name === record.attributes.personalattributes.personaltag}).length === 0) {
             _personalTagFilters = _personalTagFilters.concat(MCFSections.sections.filter((d)=>{return d.name === record.attributes.personalattributes.personaltag}));
           }
         }
