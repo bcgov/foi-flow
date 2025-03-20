@@ -43,7 +43,7 @@ class FOIOpenInformationRequests(db.Model):
     iaorationale = db.Column(db.String, nullable=True)
     oifeedback = db.Column(db.String, nullable=True)
     publicationdate = db.Column(db.DateTime, nullable=True)
-    oiexemptiondate = db.Column(db.DateTime, nullable=True)
+    receiveddate = db.Column(db.DateTime, nullable=True)
     isactive = db.Column(db.Boolean, nullable=False)
     copyrightsevered = db.Column(db.Boolean, nullable=True)
 
@@ -78,7 +78,7 @@ class FOIOpenInformationRequests(db.Model):
                 oiexemptionapproved=foiopeninforequest.get("oiexemptionapproved"),
                 oifeedback=foiopeninforequest.get("oifeedback"),
                 publicationdate=foiopeninforequest.get("publicationdate"),
-                oiexemptiondate=foiopeninforequest.get("oiexemptiondate"),
+                receiveddate=foiopeninforequest.get("receiveddate"),
                 copyrightsevered=foiopeninforequest.get("copyrightsevered"),
                 isactive=True,
                 created_at=createddate,
@@ -110,7 +110,7 @@ class FOIOpenInformationRequests(db.Model):
                     oiexemptionapproved=foiopeninforequest["oiexemptionapproved"],
                     oifeedback=foiopeninforequest["oifeedback"],
                     publicationdate=foiopeninforequest["publicationdate"],
-                    oiexemptiondate=foiopeninforequest["oiexemptiondate"],
+                    receiveddate=foiopeninforequest["receiveddate"],
                     copyrightsevered=foiopeninforequest["copyrightsevered"],
                     isactive=True,
                     created_at=createddate,
@@ -183,10 +183,10 @@ class FOIOpenInformationRequests(db.Model):
                 (FOIMinistryRequest.oistatus_id.is_(None), FOIMinistryRequest.closedate),
                 (and_(
                     FOIMinistryRequest.oistatus_id.isnot(None),
-                    cls.oiexemptiondate.is_(None)
+                    cls.receiveddate.is_(None)
                 ), FOIMinistryRequest.closedate),
             ],
-            else_=cls.oiexemptiondate
+            else_=cls.receiveddate
         ).label('receivedDate')
 
         assignedToFormatted = case([
@@ -368,10 +368,10 @@ class FOIOpenInformationRequests(db.Model):
                 (FOIMinistryRequest.oistatus_id.is_(None), FOIMinistryRequest.closedate),
                 (and_(
                     FOIMinistryRequest.oistatus_id.isnot(None),
-                    FOIOpenInformationRequests.oiexemptiondate.is_(None)
+                    FOIOpenInformationRequests.receiveddate.is_(None)
                 ), FOIMinistryRequest.closedate),
             ],
-            else_=FOIOpenInformationRequests.oiexemptiondate
+            else_=FOIOpenInformationRequests.receiveddate
             )
 
         defaultsorting = case(
@@ -794,5 +794,5 @@ class FOIOpenInfoRequestSchema(ma.Schema):
         fields = (
             'foiopeninforequestid', 'version', 'foiministryrequest_id', 'foiministryrequestversion_id', 'oipublicationstatus_id', 'oiexemption_id', 'oiassignedto',
             'oiexemptionapproved', 'copyrightsevered', 'pagereference', 'iaorationale', 'oifeedback', 'publicationdate', 'created_at', 'updated_at', 'createdby', 'updatedby',
-            "oiexemptiondate", 'processingstatus', 'processingmessage', 'sitemap_pages'
+            "receiveddate", 'processingstatus', 'processingmessage', 'sitemap_pages'
         )
