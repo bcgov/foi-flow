@@ -178,17 +178,6 @@ class FOIOpenInformationRequests(db.Model):
             else_=OpenInformationStatuses.name
         ).label('oiStatusName')
 
-        receiveddate = case(
-            [
-                (FOIMinistryRequest.oistatus_id.is_(None), FOIMinistryRequest.closedate),
-                (and_(
-                    FOIMinistryRequest.oistatus_id.isnot(None),
-                    cls.receiveddate.is_(None)
-                ), FOIMinistryRequest.closedate),
-            ],
-            else_=cls.receiveddate
-        ).label('receivedDate')
-
         assignedToFormatted = case([
                 (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
                 func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
@@ -217,7 +206,7 @@ class FOIOpenInformationRequests(db.Model):
             ApplicantCategory.name.label('applicantcategory'),
             recordspagecount.label('recordspagecount'),  
             oistatusname.label('oiStatusName'),
-            receiveddate.label('receivedDate'),
+            cls.receiveddate.label('receivedDate'),
             cls.publicationdate,
             cls.created_at, 
             assignedToFormatted, 
@@ -363,17 +352,6 @@ class FOIOpenInformationRequests(db.Model):
     @classmethod
     def findfield(cls, field):
 
-        receiveddate = case(
-            [
-                (FOIMinistryRequest.oistatus_id.is_(None), FOIMinistryRequest.closedate),
-                (and_(
-                    FOIMinistryRequest.oistatus_id.isnot(None),
-                    FOIOpenInformationRequests.receiveddate.is_(None)
-                ), FOIMinistryRequest.closedate),
-            ],
-            else_=FOIOpenInformationRequests.receiveddate
-            )
-
         defaultsorting = case(
                 [(FOIMinistryRequest.oistatus_id == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
                 else_=1
@@ -382,7 +360,7 @@ class FOIOpenInformationRequests(db.Model):
         if field == 'receivedDateUF':
             return FOIRequest.receiveddate
         elif field == 'receivedDate':
-            return receiveddate
+            return cls.receiveddate
         elif field == 'defaultSorting':      
             return defaultsorting
         elif field == 'requestType':
@@ -399,16 +377,7 @@ class FOIOpenInformationRequests(db.Model):
                 ),
                 String
             )
-        elif field == 'from_closed':
-            return func.coalesce(
-                func.greatest(
-                    func.ceil((func.date_part('day', func.current_date() - FOIMinistryRequest.closedate) + 1) * 5 / 7) - 
-                    func.ceil((func.date_part('dow', FOIMinistryRequest.closedate) + func.date_part('dow', func.current_date())) / 5),
-                    0
-                ),
-                0
-            )
-        elif field == 'fromClosed':
+        elif (field == 'fromClosed' or field == 'from_closed'):
             return case(
             [
             (FOIMinistryRequest.closedate.isnot(None), 
