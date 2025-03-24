@@ -17,9 +17,9 @@ from .FOIRawRequestNotificationUsers import FOIRawRequestNotificationUser
 class FOIRequestNotificationDashboard:   
    
     @classmethod
-    def getiaoeventpagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager=False):
+    def getiaoeventpagination(cls, daterangetype, fromdate, todate, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, isministryrestrictedfilemanager=False):        
         #ministry requests
-        subquery_ministry_queue = FOIRequestNotificationUser.geteventsubquery(groups, filterfields, keyword, additionalfilter, userid, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
+        subquery_ministry_queue = FOIRequestNotificationUser.geteventsubquery(daterangetype, fromdate, todate, groups, filterfields, keyword, additionalfilter, userid, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
 
         #sorting
         sortingcondition = FOIRawRequestNotificationUser.getsorting(sortingitems, sortingorders)
@@ -31,10 +31,10 @@ class FOIRequestNotificationDashboard:
         #    return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
 
     @classmethod
-    def getministryeventpagination(cls, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid,isiaorestrictedfilemanager, isministryrestrictedfilemanager):
+    def getministryeventpagination(cls, daterangetype, fromdate, todate, group, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid,isiaorestrictedfilemanager, isministryrestrictedfilemanager):
         requestby = 'Ministry'
 
-        subquery = FOIRequestNotificationUser.geteventsubquery(group, filterfields, keyword, additionalfilter, userid, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
+        subquery = FOIRequestNotificationUser.geteventsubquery(daterangetype, fromdate, todate, group, filterfields, keyword, additionalfilter, userid, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
         sortingcondition = FOIRequestNotificationUser.getsorting(sortingitems, sortingorders)
 
         return subquery.order_by(*sortingcondition).paginate(page=page, per_page=size)

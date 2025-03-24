@@ -5,13 +5,13 @@ import "../dashboard.scss";
 import Grid from "@mui/material/Grid";
 import { makeStyles } from "@material-ui/core/styles";
 import Queue from "./Queue";
-import EventQueue from "../EventQueue"
-import { getMinistryEventQueueTableInfo } from "../EventQueueColumns"
+import { getMinistryEventQueueTableInfo } from "../EventQueueSearch/EventQueueColumns"
 import AdvancedSearch from "./AdvancedSearch";
 import clsx from "clsx";
 import Divider from "@mui/material/Divider";
 import { ButtonBase } from "@mui/material";
 import { setShowAdvancedSearch, setResumeDefaultSorting, setShowEventQueue } from "../../../../actions/FOI/foiRequestActions";
+import EventQueueSearch from "../EventQueueSearch/index";
 
 const useStyles = makeStyles(() => ({
   displayed: {
@@ -173,7 +173,7 @@ const MinistryDashboard = ({ userDetail }) => {
             [classes.hidden]: !showEventQueue,
           })}
         >
-          <EventQueue userDetail={userDetail} eventQueueTableInfo={eventQueueTableInfo} />
+          <EventQueueSearch userDetail={userDetail} eventQueueTableInfo={eventQueueTableInfo}></EventQueueSearch>
         </Grid>
         }
         { showAdvancedSearch &&
