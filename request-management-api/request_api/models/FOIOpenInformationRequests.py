@@ -358,25 +358,6 @@ class FOIOpenInformationRequests(db.Model):
                 else_=1
             )
 
-        # fromClosedSort = case(
-        #     [
-        #         (FOIMinistryRequest.closedate.isnot(None), 
-        #         cast(
-        #             func.coalesce(
-        #                 func.greatest(
-        #                     func.ceil((func.date_part('day', func.current_date() - FOIMinistryRequest.closedate) + 1) * 5 / 7) - 
-        #                     func.ceil((func.date_part('dow', FOIMinistryRequest.closedate) + func.date_part('dow', func.current_date())) / 5),
-        #                     0
-        #                 ),
-        #                 0
-        #             ),
-        #             String
-        #         )
-        #         )
-        #     ],
-        #     else_=-1
-        # )
-
         if field == 'receivedDateUF':
             return FOIRequest.receiveddate
         elif field == 'receivedDate':
@@ -398,7 +379,7 @@ class FOIOpenInformationRequests(db.Model):
                 String
             )
         elif (field == 'closedDate' or field == 'from_closed'):
-            return FOIMinistryRequest.closedate
+            return FOIMinistryRequest.closedate if FOIMinistryRequest.closedate is not None else text('N/A')
         elif field == 'applicantType':
             return ApplicantCategory.name
         elif (field == 'publicationdate' or field == 'publicationDate'):
