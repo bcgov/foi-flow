@@ -168,22 +168,6 @@ const calculateBusinessDaysBetween = (date1, date2) => {
   }
   return daysBetween;
 };
-const calculateWeekdaysBetween = (startDate, endDate) => {
-  if (!startDate || !endDate) {
-    return "-1"
-  }
-  startDate = typeof startDate === "string" ? dayjs.utc(startDate).toDate() : startDate;
-
-  endDate =new Date(endDate)
-  const publicHoliDays = getPublicHoliDays(startDate, endDate);
-  const weekendDays = countWeekendDays(startDate, endDate);
-  const noOfDays = Math.floor(daysBetween(startDate, endDate)) + 1;
-  
-  // Calculate weekdays by subtracting weekends and public holidays
-  const weekdays = noOfDays - weekendDays - publicHoliDays;
-
-  return weekdays > 0 ? weekdays: 0; 
-};
 const addBusinessDaysToDate = (date, days) => {
   if (!date) {
     return null;
@@ -663,6 +647,5 @@ export {
   getIAOTagList,
   getCommentTypeFromId,
   calculateBusinessDaysBetween,
-  addBusinessDaysToDate,
-  calculateWeekdaysBetween
+  addBusinessDaysToDate
 };

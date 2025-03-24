@@ -278,7 +278,6 @@ const OITeamColumns = [
     headerName: "FROM CLOSED",
     flex: 1,
     headerAlign: "left",
-    valueGetter: calculateFromClosed
   },
   {
     field: "publicationDate",
