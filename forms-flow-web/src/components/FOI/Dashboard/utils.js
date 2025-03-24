@@ -157,7 +157,6 @@ export const getLDD = (params) => {
 
 export const getDaysLeft = (params) => {
   const receivedDateString = params.row.duedate;
-  console.log("getDaysLeft receivedDateString: ",receivedDateString)
 
   if (
     [StateEnum.onhold.name.toLowerCase(), StateEnum.closed.name.toLowerCase(), StateEnum.onholdother.name.toLowerCase()].includes(params.row.currentState.toLowerCase())
