@@ -79,7 +79,7 @@ const OpenInfo = ({
         [oiDataKey]: value,
         copyrightsevered: null,
         publicationdate: null,
-        oiexemptiondate: null,
+        receiveddate: null,
         oiexemption_id: null
       }));
     } else if (oiDataKey === "publicationdate" && requestDetails.closedate 

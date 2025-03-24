@@ -292,7 +292,7 @@ class dashboardservice:
 
         return jsonify({'data': requestqueue, 'meta': meta})
 
-    def __preparefoioirequestinfo(self, request, receivedDate, publicationDate, fromClosed):
+    def __preparefoioirequestinfo(self, request, receivedDate, publicationDate):
         return {
             'id': request.id,
             'idNumber': request.idNumber,
@@ -302,37 +302,38 @@ class dashboardservice:
             'requestType': REQUEST_TYPE_MAPPING.get(request.requestType, ''),
             'recordspagecount': request.recordspagecount,
             'publicationStatus': request.oiStatusName,
-            'fromClosed': fromClosed,
+            #'fromClosed': fromClosed,
             'publicationDate': publicationDate,
             'assignedTo': request.assignedToFormatted,
             'applicantType': request.applicantcategory,
             'version': request.version,
             'foiopeninforequestid': request.foiopeninforequestid,
             'currentState': request.currentState,
+            'closedDate': request.closedate
         }
 
-    def __calculate_from_closed(self, closedate):
-        """Calculate business days from close date to today"""
+    # def __calculate_from_closed(self, closedate):
+    #     """Calculate business days from close date to today"""
 
-        if not closedate:
-            return 'N/A'
-        try:
-            today = dt.datetime.now(tz=pytz.timezone('America/Vancouver')).date()
-            closed_date = closedate.date() if isinstance(closedate, dt.datetime) else closedate
-            business_days = 0
+    #     if not closedate:
+    #         return -1
+    #     try:
+    #         today = dt.datetime.now(tz=pytz.timezone('America/Vancouver')).date()
+    #         closed_date = closedate.date() if isinstance(closedate, dt.datetime) else closedate
+    #         business_days = 0
 
-            canada_holidays = holidays.Canada(prov='BC', years=range(closed_date.year, today.year + 1))  
-            holidays_set = set(canada_holidays)
+    #         canada_holidays = holidays.Canada(prov='BC', years=range(closed_date.year, today.year + 1))  
+    #         holidays_set = set(canada_holidays)
 
-            while closed_date <= today:
-                if closed_date != closedate.date() and closed_date.weekday() < 5 and closed_date not in holidays_set:
-                    business_days += 1
-                closed_date += dt.timedelta(days=1)
+    #         while closed_date <= today:
+    #             if closed_date != closedate.date() and closed_date.weekday() < 5 and closed_date not in holidays_set:
+    #                 business_days += 1
+    #             closed_date += dt.timedelta(days=1)
 
-            return str(business_days) if business_days > 0 else 'N/A'   
-        except Exception as e:
-            print("Error in calculate_from_closed: ", e)
-            return 'N/A'
+    #         return int(business_days) if business_days > 0 else 0
+    #     except Exception as e:
+    #         print("Error in calculate_from_closed: ", e)
+    #         return -1
 
     def __handle_oi_request(self, request):
         """Formats request data for OI team view with received date, publication date, and days since closure"""
@@ -349,6 +350,6 @@ class dashboardservice:
             _publicationdate = request.publicationdate.strftime("%b %d %Y") if request.publicationdate else None
         
         # Calculate business days
-        _from_closed = self.__calculate_from_closed(request.closedate)
+        #_from_closed = self.__calculate_from_closed(request.closedate)
             
-        return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed)
+        return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate)

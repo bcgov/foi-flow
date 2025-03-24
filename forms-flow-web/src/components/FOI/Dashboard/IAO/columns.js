@@ -7,7 +7,8 @@ import {
   displayHeaderIcon,
   displayQueueFlagIcons,
   cellTooltipRender,
-  pagecountcellTooltipRender
+  pagecountcellTooltipRender,
+  calculateFromClosed
 } from "../utils";
 import {
   isProcessingTeam,
@@ -273,10 +274,11 @@ const OITeamColumns = [
     headerAlign: "left",
   },
   {
-    field: "fromClosed",
+    field: "closedDate",
     headerName: "FROM CLOSED",
     flex: 1,
     headerAlign: "left",
+    valueGetter: calculateFromClosed
   },
   {
     field: "publicationDate",
@@ -301,7 +303,6 @@ const OITeamColumns = [
 const defaultTableInfo = {
   sort: [
     { field: "defaultSorting", sort: "asc" },
-    // { field: "duedate", sort: "asc" }
   ],
   noAssignedClassName: "not-assigned"
 };
@@ -311,7 +312,6 @@ const getTableInfo = (userGroups) => {
     defaultTableInfo.columns = IntakeTeamColumns;
     defaultTableInfo.sort = [
       { field: "intakeSorting", sort: "asc" },
-      // { field: "duedate", sort: "asc" }
     ];
   }
 
@@ -325,9 +325,6 @@ const getTableInfo = (userGroups) => {
 
   if (isOITeam(userGroups)) {
     defaultTableInfo.columns = OITeamColumns;
-    defaultTableInfo.sort = [
-      { field: "receivedDate", sort: "desc" },  // Default sorting for OI team
-    ];
   }
 
   return defaultTableInfo;

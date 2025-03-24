@@ -67,10 +67,10 @@ export const saveFOIOpenInfoRequest = (
         // If res.data.sucess (meaning BE call to update FOIMinistryRequest oistatusid for IAO OI Exemption purposes is successfull) =>
         // create and store an exemption date for the related foiopeninfo request
         if (res.data?.success && isValidExemptionRequest) {
-          data.oiexemptiondate = new Date();
+          data.receiveddate = new Date();
         }
         if (res.data?.success && (isValidExemptionDenial || manualPublicationStatusChange)) {
-          data.oiexemptiondate = null;
+          data.receiveddate = null;
         }
         httpPOSTRequest(apiUrl, data)
       .then((res) => {

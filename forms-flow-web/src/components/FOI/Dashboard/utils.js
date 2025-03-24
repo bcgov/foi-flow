@@ -3,6 +3,7 @@ import {
   addBusinessDays,
   businessDay,
   calculateDaysRemaining,
+  calculateWeekdaysBetween,
 } from "../../../helper/FOI/helper";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { MinistryNeedsLANPages, RequestTypes } from "../../../constants/FOI/enum";
@@ -167,6 +168,22 @@ export const getDaysLeft = (params) => {
     return `${calculateDaysRemaining(receivedDateString)}`;
   }
 };
+
+export const calculateFromClosed = (params) => {
+  // Calculate business days from close date to today
+  if (!params.row.closedDate) {
+    return "N/A";
+  }
+
+  const today = new Date();
+  const closedDate = params.row.closedDate;
+
+  // Assuming you have a function to get holidays in BC
+  const businessDays = calculateWeekdaysBetween(closedDate, today);
+
+  return businessDays > 0 ? `${businessDays}` : "N/A";
+};
+
 
 export const ClickableChip = ({ clicked, sx={}, color, ...rest }) => {
   return (

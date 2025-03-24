@@ -7,7 +7,7 @@ export type OITransactionObject = {
   oifeedback: string;
   copyrightsevered: boolean;
   publicationdate: string;
-  oiexemptiondate: string;
+  receiveddate: string;
 };
 
 export type OIPublicationStatus = {

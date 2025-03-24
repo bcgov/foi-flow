@@ -11,6 +11,7 @@ from request_api.utils.constants import SKIP_OPENINFO_MINISTRIES
 from request_api.utils.enums import OpenInfoNotificationType        
 from request_api.auth import AuthHelper
 from datetime import datetime
+import pytz
 
 class openinfoservice:
     """ OpenInformation service
@@ -34,6 +35,7 @@ class openinfoservice:
         if foirequestschema["requestType"] == 'general' and foirequestschema["selectedMinistries"][0]["code"].upper() not in SKIP_OPENINFO_MINISTRIES and current_oirequest == {}:
             default_foiopeninforequest = {
                 "oipublicationstatus_id": 2,
+                "receiveddate": datetime.now(pytz.timezone('America/Vancouver')).strftime('%Y-%m-%d %H:%M:%S'),
             }
             foiopeninforequest = FOIOpenInfoSchema().load(default_foiopeninforequest)
             version = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
