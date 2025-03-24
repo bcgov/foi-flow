@@ -31,7 +31,7 @@ const IAOOpenInfoMain = ({
   const disableIAOField =
     oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish || isOIUser;
   const disableOIField =
-    oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish || !isOIUser || oiPublicationData?.oiexemptionapproved !== null;
+    oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish || !isOIUser;
 
   //Styling
   const useStyles = makeStyles({
