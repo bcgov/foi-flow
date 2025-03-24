@@ -215,6 +215,7 @@ class FOIOpenInformationRequests(db.Model):
             FOIRequestStatus.name.label('currentState'),
             FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
             SubjectCode.name.label('subjectcode'),
+            FOIMinistryRequest.closedate
         ]   
 
         basequery = (
@@ -331,7 +332,7 @@ class FOIOpenInformationRequests(db.Model):
     @classmethod
     def validatefield(cls, field):
         valid_fields = ['receivedDate', 'axisRequestId', 'requestType', 'recordspagecount', 
-                        'publicationStatus', 'fromClosed', 'publicationDate', 'assignedTo', 'applicantType']
+                        'publicationStatus', 'closedDate', 'publicationDate', 'assignedTo', 'applicantType']
         return field in valid_fields
 
     @classmethod
@@ -357,6 +358,25 @@ class FOIOpenInformationRequests(db.Model):
                 else_=1
             )
 
+        # fromClosedSort = case(
+        #     [
+        #         (FOIMinistryRequest.closedate.isnot(None), 
+        #         cast(
+        #             func.coalesce(
+        #                 func.greatest(
+        #                     func.ceil((func.date_part('day', func.current_date() - FOIMinistryRequest.closedate) + 1) * 5 / 7) - 
+        #                     func.ceil((func.date_part('dow', FOIMinistryRequest.closedate) + func.date_part('dow', func.current_date())) / 5),
+        #                     0
+        #                 ),
+        #                 0
+        #             ),
+        #             String
+        #         )
+        #         )
+        #     ],
+        #     else_=-1
+        # )
+
         if field == 'receivedDateUF':
             return FOIRequest.receiveddate
         elif field == 'receivedDate':
@@ -377,29 +397,12 @@ class FOIOpenInformationRequests(db.Model):
                 ),
                 String
             )
-        elif (field == 'fromClosed' or field == 'from_closed'):
-            return case(
-            [
-            (FOIMinistryRequest.closedate.isnot(None), 
-             func.coalesce(
-                 func.greatest(
-                     func.ceil((func.date_part('day', func.current_date() - FOIMinistryRequest.closedate) + 1) * 5 / 7) - 
-                     func.ceil((func.date_part('dow', FOIMinistryRequest.closedate) + func.date_part('dow', func.current_date())) / 5),
-                     0
-                 ),
-                 0
-             ))
-            ],
-            else_=0
-        ).label('fromClosed')
+        elif (field == 'closedDate' or field == 'from_closed'):
+            return FOIMinistryRequest.closedate
         elif field == 'applicantType':
             return ApplicantCategory.name
-        elif field == 'publicationdate':
+        elif (field == 'publicationdate' or field == 'publicationDate'):
             return cls.publicationdate
-        elif field == 'publicationDate':
-            return cls.publicationdate
-        elif field == 'publicationStatus':
-            return cls.oiStatusName
         elif field == 'assignee':
             return cls.oiassignedto
         elif field == 'duedate':

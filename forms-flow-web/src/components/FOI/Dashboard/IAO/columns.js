@@ -7,7 +7,8 @@ import {
   displayHeaderIcon,
   displayQueueFlagIcons,
   cellTooltipRender,
-  pagecountcellTooltipRender
+  pagecountcellTooltipRender,
+  calculateFromClosed
 } from "../utils";
 import {
   isProcessingTeam,
@@ -273,10 +274,11 @@ const OITeamColumns = [
     headerAlign: "left",
   },
   {
-    field: "fromClosed",
+    field: "closedDate",
     headerName: "FROM CLOSED",
     flex: 1,
     headerAlign: "left",
+    valueGetter: calculateFromClosed
   },
   {
     field: "publicationDate",
