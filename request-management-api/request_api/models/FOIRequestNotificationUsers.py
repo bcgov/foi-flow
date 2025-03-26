@@ -1,7 +1,7 @@
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey
 from .db import  db, ma
-from datetime import datetime as datetime2
+from datetime import datetime as datetime2, time
 from sqlalchemy.orm import relationship,backref, aliased
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
@@ -153,13 +153,12 @@ class FOIRequestNotificationUser(db.Model):
 
     # Begin of Dashboard functions
     @classmethod
-    def geteventsubquery(cls, groups, filterfields, keyword, additionalfilter, userid, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
+    def geteventsubquery(cls, daterangetype, fromdate, todate, groups, filterfields, keyword, additionalfilter, userid, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
         #for queue/dashboard
         _session = db.session
 
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
-        ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
-        
+        ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)      
         #ministry filter for group/team
         ministryfilter = FOIRequestNotificationUser.getgroupfilters(groups)
 
@@ -215,7 +214,7 @@ class FOIRequestNotificationUser(db.Model):
                                 FOINotifications,    
                                 and_(FOINotifications.axisnumber == FOIRequests.axisrequestid),
                             ).filter(FOIRequests.requeststatuslabel != StateName.closed.name)
-                            
+            
         if(additionalfilter == 'watchingRequests'):
             #watchby
             #activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
@@ -237,6 +236,24 @@ class FOIRequestNotificationUser(db.Model):
                 else:
                     dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIRequests.assignedministryperson == userid))).filter(ministryfilter)
                 
+        # Apply date filter if daterangetype is 'eventDate'
+        if daterangetype == 'eventDate' and fromdate and todate:
+            if isinstance(fromdate, str):
+                fromdate = datetime2.strptime(fromdate, "%Y-%m-%d").date()
+            if isinstance(todate, str):
+                todate = datetime2.strptime(todate, "%Y-%m-%d").date()
+                
+            # Set min and max time for the day
+            fromdate = datetime2.combine(fromdate, time.min)  # 00:00:00
+            todate = datetime2.combine(todate, time.max)  # 23:59:59
+
+            dbquery = dbquery.filter(
+                and_(
+                    FOINotifications.created_at >= fromdate,
+                    FOINotifications.created_at <= todate
+                )
+            )
+        
         if(keyword is None):
             return dbquery
         else:
