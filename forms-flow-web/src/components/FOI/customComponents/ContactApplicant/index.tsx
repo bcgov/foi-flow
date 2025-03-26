@@ -220,7 +220,6 @@ export const ContactApplicant = ({
     setFiles([]);
     setEditorValue("");
     setSelectedCorrespondence({});
-    setSelectedEmails(requestDetails.email ? [requestDetails.email] : []);
     setCurrentTemplate(0);
     
   }
