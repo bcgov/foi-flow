@@ -162,6 +162,20 @@ class FOIRequestNotificationUser(db.Model):
         #ministry filter for group/team
         ministryfilter = FOIRequestNotificationUser.getgroupfilters(groups)
 
+        if daterangetype == 'eventDate' and (not fromdate or not todate):
+            return _session.query().filter(False)
+
+        if daterangetype == 'eventDate':
+            if isinstance(fromdate, str):
+                fromdate = datetime2.strptime(fromdate, "%Y-%m-%d").date()
+            if isinstance(todate, str):
+                todate = datetime2.strptime(todate, "%Y-%m-%d").date()
+            fromdate = datetime2.combine(fromdate, time.min)
+            todate = datetime2.combine(todate, time.max)
+        else:
+            fromdate = None
+            todate = None
+
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = []
@@ -194,6 +208,12 @@ class FOIRequestNotificationUser(db.Model):
             FOINotifications.id.label('id')        
         ]
 
+        notification_join_conditions = [FOINotifications.axisnumber == FOIRequests.axisrequestid]
+        if fromdate:
+            notification_join_conditions.append(FOINotifications.created_at >= fromdate)
+        if todate:
+            notification_join_conditions.append(FOINotifications.created_at <= todate)
+
         basequery = _session.query(
                                 *selectedcolumns
                             ).join(
@@ -212,7 +232,7 @@ class FOIRequestNotificationUser(db.Model):
                                 isouter=True
                             ).join(
                                 FOINotifications,    
-                                and_(FOINotifications.axisnumber == FOIRequests.axisrequestid),
+                                and_(*notification_join_conditions),
                             ).filter(FOIRequests.requeststatuslabel != StateName.closed.name)
             
         if(additionalfilter == 'watchingRequests'):
@@ -236,24 +256,7 @@ class FOIRequestNotificationUser(db.Model):
                 else:
                     dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIRequests.assignedministryperson == userid))).filter(ministryfilter)
                 
-        # Apply date filter if daterangetype is 'eventDate'
-        if daterangetype == 'eventDate' and fromdate and todate:
-            if isinstance(fromdate, str):
-                fromdate = datetime2.strptime(fromdate, "%Y-%m-%d").date()
-            if isinstance(todate, str):
-                todate = datetime2.strptime(todate, "%Y-%m-%d").date()
                 
-            # Set min and max time for the day
-            fromdate = datetime2.combine(fromdate, time.min)  # 00:00:00
-            todate = datetime2.combine(todate, time.max)  # 23:59:59
-
-            dbquery = dbquery.filter(
-                and_(
-                    FOINotifications.created_at >= fromdate,
-                    FOINotifications.created_at <= todate
-                )
-            )
-        
         if(keyword is None):
             return dbquery
         else:
