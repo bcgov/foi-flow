@@ -25,7 +25,7 @@ import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import ListItemText from "@mui/material/ListItemText";
 import Select from "@mui/material/Select";
-import { SearchFilter, DateRangeTypes } from "./enum";
+import { SearchFilter, DateRangeTypes, MappedMinistries } from "./enum";
 import {
   ConditionalComponent,
   formatDate,
@@ -370,9 +370,13 @@ const AdvancedSearch = ({ userDetail }) => {
     } = event;
     setSelectedPublicBodies(
       // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
+      typeof value === "string" ? value.split(",") : getMappedMinistriesValue(value)
     );
   };
+
+  const getMappedMinistriesValue = (ministries) => {
+    return ministries.flatMap(ministry => MappedMinistries[ministry] || [ministry])    
+  }
 
   const ClickableChip = ({ clicked, ...rest }) => {
     if (!clicked) {
