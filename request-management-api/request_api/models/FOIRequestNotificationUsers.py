@@ -10,6 +10,8 @@ from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nu
 from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text
+from flask import current_app
+import pytz
 import logging
 import json
 f = open('common/notificationtypes.json', encoding="utf8")
@@ -166,12 +168,15 @@ class FOIRequestNotificationUser(db.Model):
             return _session.query().filter(False)
 
         if daterangetype == 'eventDate':
+            pacific = pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])
+
             if isinstance(fromdate, str):
                 fromdate = datetime2.strptime(fromdate, "%Y-%m-%d").date()
             if isinstance(todate, str):
                 todate = datetime2.strptime(todate, "%Y-%m-%d").date()
-            fromdate = datetime2.combine(fromdate, time.min)
-            todate = datetime2.combine(todate, time.max)
+
+            fromdate = pacific.localize(datetime2.combine(fromdate, time.min)).astimezone(pytz.utc)
+            todate = pacific.localize(datetime2.combine(todate, time.max)).astimezone(pytz.utc)
         else:
             fromdate = None
             todate = None
@@ -253,13 +258,22 @@ class FOIRequestNotificationUser(db.Model):
             else:
                 if(requestby == 'IAO'):
                     dbquery = basequery.filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIRequests.assignedto == userid))).filter(ministryfilter)
+                    print("IAO-daterangetype", daterangetype)
+                    print("IAO-fromdate", fromdate)
+                    print("IAO-fromdate", todate)
+                    print("IAO-dbquery", dbquery)
                 else:
                     dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIRequests.assignedministryperson == userid))).filter(ministryfilter)
-                
+                    print("MI-daterangetype", daterangetype)
+                    print("MI-fromdate", fromdate)
+                    print("MI-fromdate", todate)
+                    print("MI-dbquery", dbquery)
                 
         if(keyword is None):
+            print("keyword-dbquery", dbquery)
             return dbquery
         else:
+            print("keyword-dbquery", dbquery.filter(or_(*filtercondition)))
             return dbquery.filter(or_(*filtercondition))
 
     
