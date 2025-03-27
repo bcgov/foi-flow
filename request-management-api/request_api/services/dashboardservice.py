@@ -191,6 +191,7 @@ class dashboardservice:
                 unopenrequest.update({'description':request.description})
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 unopenrequest.update({'isiaorestricted': request.isiaorestricted})
+                unopenrequest.update({'closereason': request.closereason})
 
                 requestqueue.append(unopenrequest)
             else:
@@ -203,6 +204,7 @@ class dashboardservice:
 
                 isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
                 _openrequest.update({'isiaorestricted': isiaorestricted})
+                _openrequest.update({'closereason': request.closereason})
 
                 requestqueue.append(_openrequest)
 
