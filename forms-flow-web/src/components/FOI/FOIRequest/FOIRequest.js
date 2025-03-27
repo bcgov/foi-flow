@@ -205,8 +205,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes); 
 
   let isMinistry = false;
+  const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
   if (Object.entries(userDetail).length !== 0) {
-    const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
     isMinistry = isMinistryLogin(userGroups);
   }
 
@@ -334,7 +334,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   useEffect(async () => {
     if (isAddRequest) {
-      dispatch(fetchFOIAssignedToList("", "", ""));
+      let isbcpsteam = false;
+      if (userGroups.includes('BCPS Team')) isbcpsteam = true;
+      dispatch(fetchFOIAssignedToList("", "", "", isbcpsteam));
       dispatch(fetchFOIProgramAreaList());
     } else if (isHistoricalRequest) {
       dispatch(fetchHistoricalRequestDetails(requestId));
@@ -344,7 +346,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     } else {
       await Promise.all([
         dispatch(fetchFOIProgramAreaList()),
-        dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId)),
+        dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId, userGroups)),
         dispatch(fetchFOIRequestDescriptionList(requestId, ministryId)),
       ]);
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
