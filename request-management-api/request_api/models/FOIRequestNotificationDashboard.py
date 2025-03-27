@@ -24,8 +24,9 @@ class FOIRequestNotificationDashboard:
         #sorting
         sortingcondition = FOIRawRequestNotificationUser.getsorting(sortingitems, sortingorders)
         #if "Intake Team" in groups or groups is None:                
-        subquery_rawrequest_queue = FOIRawRequestNotificationUser.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager)
+        subquery_rawrequest_queue = FOIRawRequestNotificationUser.getrequestssubquery(daterangetype, fromdate, todate, groups, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager)
         query_full_queue = subquery_rawrequest_queue.union_all(subquery_ministry_queue)
+        print("query_full_queue", query_full_queue)
         return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
         #else:
         #    return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
