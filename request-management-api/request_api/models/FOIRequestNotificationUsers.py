@@ -258,22 +258,12 @@ class FOIRequestNotificationUser(db.Model):
             else:
                 if(requestby == 'IAO'):
                     dbquery = basequery.filter(or_(or_(FOIRestrictedMinistryRequest.isrestricted == False, FOIRestrictedMinistryRequest.isrestricted == None), and_(FOIRestrictedMinistryRequest.isrestricted == True, FOIRequests.assignedto == userid))).filter(ministryfilter)
-                    print("IAO-daterangetype", daterangetype)
-                    print("IAO-fromdate", fromdate)
-                    print("IAO-fromdate", todate)
-                    print("IAO-dbquery", dbquery)
                 else:
                     dbquery = basequery.filter(or_(or_(ministry_restricted_requests.isrestricted == False, ministry_restricted_requests.isrestricted == None), and_(ministry_restricted_requests.isrestricted == True, FOIRequests.assignedministryperson == userid))).filter(ministryfilter)
-                    print("MI-daterangetype", daterangetype)
-                    print("MI-fromdate", fromdate)
-                    print("MI-fromdate", todate)
-                    print("MI-dbquery", dbquery)
                 
         if(keyword is None):
-            print("keyword-dbquery", dbquery)
             return dbquery
         else:
-            print("keyword-dbquery", dbquery.filter(or_(*filtercondition)))
             return dbquery.filter(or_(*filtercondition))
 
     
