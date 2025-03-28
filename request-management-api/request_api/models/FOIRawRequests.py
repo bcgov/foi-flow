@@ -822,7 +822,7 @@ class FOIRawRequest(db.Model):
     @classmethod
     def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
         basequery = FOIRawRequest.getbasequery(None, userid, isiaorestrictedfilemanager)
-        basequery.add_columns(literal(None).label('closereason'))
+        basequery = basequery.add_columns(literal(None).label('closereason'))
 
         #filter/search
         filtercondition = FOIRawRequest.getfilterforadvancedsearch(params)
