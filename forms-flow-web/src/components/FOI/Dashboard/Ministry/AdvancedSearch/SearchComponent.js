@@ -343,10 +343,10 @@ const AdvancedSearch = ({ userDetail }) => {
         setRequestState([])
       } else if (event.target.value.length === (Object.entries(StateEnum).length)) {
         setRequestState([...Object.entries(StateEnum).map(([key, value]) => value.label), "All"])
+      } else {
+        setRequestState(event.target.value);
       }
-    } else {
-      setRequestState(event.target.value);
-    }
+    } 
   };
 
   const handleRequestStatusChange = (event) => {
