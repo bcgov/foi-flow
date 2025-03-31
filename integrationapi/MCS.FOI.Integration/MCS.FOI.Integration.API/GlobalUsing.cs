@@ -17,4 +17,3 @@ global using MCS.FOI.Integration.API;
 global using MCS.FOI.Integration.Application.Model;
 global using MCS.FOI.Integration.Application;
 global using MCS.FOI.Integration.Infrastructure;
-global using MCS.FOI.Integration.Infrastructure.Extensions;

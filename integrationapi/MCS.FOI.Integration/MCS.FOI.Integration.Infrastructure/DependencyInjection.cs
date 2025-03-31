@@ -1,6 +1,4 @@
-﻿using MCS.FOI.Integration.Infrastructure.Repositories;
-
-namespace MCS.FOI.Integration.Infrastructure
+﻿namespace MCS.FOI.Integration.Infrastructure
 {
     public static class DependencyInjection
     {
@@ -57,14 +55,7 @@ namespace MCS.FOI.Integration.Infrastructure
 
             services.AddTransient<IRedisDbContext, RedisDbContext>();
             services.AddScoped(typeof(IRedisRepository<>), typeof(RedisRepository<>));
-
-            services.AddScoped(typeof(IEFRepository<>), typeof(EFRepository<>));
             services.AddScoped<IDapperRepository, DapperRepository>();
-
-            #region Repository Injection
-            services.AddTransient<ITemplateRepository, TemplateRepository>();
-            services.AddTransient<ITemplateFieldMappingRepository, TemplateFieldMappingRepository>();
-            #endregion
 
             return services;
         }

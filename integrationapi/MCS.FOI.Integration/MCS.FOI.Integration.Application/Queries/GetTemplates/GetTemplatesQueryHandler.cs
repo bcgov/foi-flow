@@ -2,15 +2,15 @@
 {
     public class GetTemplatesQueryHandler : IQueryHandler<GetTemplatesQuery, IEnumerable<TemplateResult>>
     {
-        private readonly ITemplateRepository _templateRepository;
+       private readonly ITemplateDataService _templateDataService;
 
-        public GetTemplatesQueryHandler(ITemplateRepository templateRepository)
+        public GetTemplatesQueryHandler(ITemplateDataService templateDataService)
         {
-            _templateRepository = templateRepository;
+            _templateDataService = templateDataService;
         }
         public async Task<IEnumerable<TemplateResult>> Handle(GetTemplatesQuery request, CancellationToken cancellationToken)
         {
-            var templates = await _templateRepository.GetAsync();
+            var templates = await _templateDataService.GetAllTemplates();
             var result = IMap.Mapper.Map<IEnumerable<TemplateResult>>(templates.OrderBy(x => x.TemplateName));
 
             return result;

@@ -10,8 +10,6 @@ builder.Services
 
 var app = builder.Build();
 
-await app.ConfigureMigrationAsync(builder);
-
 app.Configure();
 
 await app.RunAsync();

@@ -1,22 +1,18 @@
-﻿using MCS.FOI.Integration.Application.Extensions;
-using MCS.FOI.Integration.Application.Helpers;
+﻿using MCS.FOI.Integration.Application.Helpers;
 
 namespace MCS.FOI.Integration.Application.Services.TemplateService
 {
     public class TemplateMappingService : ITemplateMappingService
     {
         private readonly ITemplateDataService _templateDataService;
-        private readonly ITemplateFieldMappingRepository _templateFieldMapping;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public TemplateMappingService(
-            ITemplateFieldMappingRepository templateFieldMapping,
             ITemplateDataService templateDataService,
             IConfiguration configuration,
             IHttpContextAccessor httpContextAccessor)
         {
-            _templateFieldMapping = templateFieldMapping;
             _templateDataService = templateDataService;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
@@ -24,7 +20,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
 
         public async Task<IEnumerable<TemplateFieldMappingDto>> GenerateFieldsMapping(int foiRequestId, int foiMinistryRequestId)
         {
-            var templateFieldMapping = await _templateFieldMapping.GetAsync(r => r.IsActive);
+            var templateFieldMapping = await _templateDataService.GetTemplateFieldMapping();
 
             var mappedFields = IMap.Mapper.Map<IEnumerable<TemplateFieldMappingDto>>(templateFieldMapping);
             var templateFieldDto = mappedFields.Where(r => r.FieldType.Equals("String")).ToList();
@@ -133,7 +129,6 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
             var applicantCategory = await _templateDataService.GetApplicantCategory(request.ApplicantCategoryId);
             var receivedModes = await _templateDataService.GetReceivedModes(request.ReceivedModeId ?? 0);
             var foiPersonalAttribute = await _templateDataService.GetRequestPersonalAttributes(request.FOIRequestId, requestMinistry.Version);
-
             var assignee = await _templateDataService.GetAssignee(requestMinistry.FOIMinistryRequestId);
             var originalLdd = await _templateDataService.GetRequestOriginalDueDate(requestMinistry.FOIMinistryRequestId);
             var foiRequestExtension = await _templateDataService.GetExtensions(requestMinistry.FOIMinistryRequestId, requestMinistry.Version);
