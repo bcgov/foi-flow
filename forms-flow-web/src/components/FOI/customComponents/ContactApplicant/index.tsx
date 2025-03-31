@@ -135,10 +135,11 @@ export const ContactApplicant = ({
 
     // Replace \n (newlines) that are NOT inside <p> with <br>
     tempDiv.querySelectorAll("p").forEach((p) => {
-      if (!p.textContent?.trim() || p.innerHTML.trim() === "&nbsp;") return;
+      const textContent = p.textContent?.trim();
+      if (!textContent || textContent === " " || textContent === "&nbsp;") return;
     
       const nextNode = p.nextSibling;
-      if (nextNode?.nodeType === Node.TEXT_NODE && nextNode.nodeValue?.trim() === "\n") {
+      if (nextNode?.nodeType === Node.TEXT_NODE && /^[ \t\r]*\n[ \t\r]*$/.test(nextNode.nodeValue ?? "")) {
         p.insertAdjacentHTML("afterend", "<br>");
       }
     });
@@ -219,7 +220,6 @@ export const ContactApplicant = ({
     setFiles([]);
     setEditorValue("");
     setSelectedCorrespondence({});
-    setSelectedEmails(requestDetails.email ? [requestDetails.email] : []);
     setCurrentTemplate(0);
     
   }
@@ -599,7 +599,7 @@ export const ContactApplicant = ({
       assignedGroupEmail: requestDetails.assignedGroupEmail,
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: "sfdt"
+      templatetype: templateId?"":"sfdt"
     };
     saveEmailCorrespondence(
       data,
@@ -642,7 +642,7 @@ export const ContactApplicant = ({
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName)) ) ? "CFRFee" : "";
     let israwrequest = selectedCorrespondence?.israwrequest ||
       requestDetails.requeststatuslabel == StateEnum.appfeeowing.label ||
       requestDetails.requeststatuslabel == StateEnum.intakeinprogress.label ||
@@ -660,7 +660,7 @@ export const ContactApplicant = ({
       emails: selectedEmails,
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: "sfdt"
+      templatetype: templateId?"":"sfdt"
     };
     saveDraftCorrespondence(
       data,
@@ -689,7 +689,7 @@ export const ContactApplicant = ({
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName)) ) ? "CFRFee" : "";
     let israwrequest = selectedCorrespondence.israwrequest || false;
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
@@ -706,7 +706,9 @@ export const ContactApplicant = ({
         "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS),
         "axisRequestId": requestNumber
       }],
-      israwrequest: israwrequest
+      israwrequest: israwrequest,
+      templatename: curTemplateName,
+      templatetype: templateId?"":"sfdt"
     };
     saveEmailCorrespondence(
       data,
@@ -951,7 +953,7 @@ export const ContactApplicant = ({
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = (templateId && [1, 2].includes(templateId)) ? "CFRFee" : "";
+    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName)) ) ? "CFRFee" : "";
     let israwrequest = selectedCorrespondence.israwrequest || false;
     let data = {
       correspondenceid:correspondenceId,
@@ -967,7 +969,7 @@ export const ContactApplicant = ({
       emails: selectedEmails,
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: "sfdt"
+      templatetype: templateId?"":"sfdt"
     };
     editDraftCorrespondence(
       data,

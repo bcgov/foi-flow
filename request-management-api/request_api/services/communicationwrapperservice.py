@@ -46,6 +46,8 @@ class communicationwrapperservice:
                         # template["name"] = applicantcorrespondencelog["templatename"]
                         # template["description"] = applicantcorrespondencelog["templatename"]
                     return communicationemailservice().send(template, applicantcorrespondencelog)
+                else:
+                    return {"success" : False, "message": "No Email", "identifier": -1}
 
 
     def __handle_fee_email(self, requestid, ministryrequestid, result, applicantcorrespondencelog):
