@@ -7,5 +7,7 @@
         Task<T> QuerySingleAsync<T>(string query, object parameters = null);
 
         Task<IEnumerable<dynamic>> QueryDynamicAsync(string query, object parameters = null);
+
+        Task UpdateAsync<T>(string updateQuery, IEnumerable<T> items);
     }
 }

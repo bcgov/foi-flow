@@ -23,5 +23,9 @@
         Task<IEnumerable<FOIRequestPersonalAttributeDto>> GetRequestPersonalAttributes(int foiRequestId, int version);
         Task<IEnumerable<FOIOpenInformationRequestsDto>> GetOpenInformationRequests(int ministryRequestId, int versionId);
         Task<IEnumerable<FOIRawRequestDTO>> GetRawRequest(int foiRequestId);
+        Task<IEnumerable<TemplateDto>> GetTemplates(string fileName);
+        Task<IEnumerable<TemplateFieldMappingDto>> GetTemplateFieldMapping();
+        Task<IEnumerable<TemplateDto>> GetAllTemplates();
+        Task UpdateTemplates(IEnumerable<TemplateDto> templates);
     }
 }

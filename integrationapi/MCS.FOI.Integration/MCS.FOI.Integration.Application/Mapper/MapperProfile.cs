@@ -4,10 +4,8 @@
     {
         public MapperProfile() 
         {
-            CreateMap<TemplateFieldMapping, TemplateFieldMappingDto>().ReverseMap();
-            CreateMap<Core.Entities.Template, TemplateResult>().ReverseMap();
-            CreateMap<Core.Entities.Template, TemplateDto>().ReverseMap();
             CreateMap<GetCorrespondenceRequest, GetCorrespondenceCommand>().ReverseMap();
+            CreateMap<TemplateDto, TemplateResult>().ReverseMap();
         }
     }
 }

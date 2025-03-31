@@ -9,6 +9,30 @@
             _repository = repository;
         }
 
+        public async Task<IEnumerable<TemplateFieldMappingDto>> GetTemplateFieldMapping()
+        {
+            const string query = @"SELECT * FROM public.""TemplateFieldMapping"" WHERE isactive = true";
+            return (await _repository.QueryAsync<TemplateFieldMappingDto>(query));
+        }
+
+        public async Task<IEnumerable<TemplateDto>> GetTemplates(string fileName)
+        {
+            const string query = @"SELECT * FROM public.""Template"" WHERE isactive = true and filename = @FileName";
+            return (await _repository.QueryAsync<TemplateDto>(query, new { FileName = fileName }));
+        }
+
+        public async Task UpdateTemplates(IEnumerable<TemplateDto> templates)
+        {
+            const string updateQuery = @"UPDATE public.""Template"" SET ""EncodedContent"" = @EncodedContent WHERE ""Id"" = @Id";
+            await _repository.UpdateAsync(updateQuery, templates);
+        }
+
+        public async Task<IEnumerable<TemplateDto>> GetAllTemplates()
+        {
+            const string query = @"SELECT * FROM public.""Template"" WHERE isactive = true";
+            return (await _repository.QueryAsync<TemplateDto>(query));
+        }
+
         public async Task<FOIRequestDto> GetRequest(int foiRequestId)
         {
             const string query = @"SELECT * FROM public.""FOIRequests"" WHERE foirequestid = @FOIRequestId";

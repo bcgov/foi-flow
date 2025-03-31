@@ -1,22 +1,28 @@
-﻿namespace MCS.FOI.Integration.Application.Commands.GetCorrespondence
+﻿using Microsoft.AspNetCore.Hosting;
+using Syncfusion.DocIO.DLS;
+
+namespace MCS.FOI.Integration.Application.Commands.GetCorrespondence
 {
     public class GetCorrespondenceCommandHandler : ICommandHandler<GetCorrespondenceCommand, string>
     {
         private readonly ITemplateMappingService _templateMapping;
         private readonly IS3ConnectionService _s3StorageService;
-        private readonly ITemplateRepository _templateRepository;
         private readonly ITemplateRedisCacheRepository _templateCacheService;
+        private readonly ITemplateDataService _templateDataService;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
         public GetCorrespondenceCommandHandler(
             ITemplateMappingService templateMapping,
             IS3ConnectionService s3StorageService,
-            ITemplateRepository templateRepository,
-            ITemplateRedisCacheRepository templateCacheService)
+            ITemplateRedisCacheRepository templateCacheService,
+            ITemplateDataService templateDataService,
+            IWebHostEnvironment hostingEnvironment)
         {
             _templateMapping = templateMapping;
             _s3StorageService = s3StorageService;
-            _templateRepository = templateRepository;
             _templateCacheService = templateCacheService;
+            _templateDataService = templateDataService;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public async Task<string> Handle(GetCorrespondenceCommand command, CancellationToken cancellationToken = default)
@@ -51,14 +57,24 @@
             outputStream.Position = 0;
 
             var sfdt = ConvertToSfdt(outputStream);
-           
+            SaveToFile(outputStream, "GeneratedDocuments", $"{template.TemplateId}-{template.TemplateName}.docx");
             return sfdt;
+        }
+
+        private void SaveToFile(Stream stream, string folder, string fileName)
+        {
+            var outputPath = Path.Combine(_hostingEnvironment.ContentRootPath, folder, fileName);
+            Directory.CreateDirectory(Path.GetDirectoryName(outputPath)!);
+
+            stream.Position = 0;
+            using var outputFileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
+            stream.CopyTo(outputFileStream);
         }
 
         #region Template Retrieval
         private async Task<TemplateDto> GetTemplateAsync(string fileName)
         {
-            var template = await _templateRepository.GetAsync(r => r.IsActive && r.FileName.Equals(fileName));
+            var template = await _templateDataService.GetTemplates(fileName);
             return IMap.Mapper.Map<TemplateDto>(template?.FirstOrDefault());
         }
         #endregion
@@ -130,7 +146,7 @@
             {
                 if (!string.IsNullOrEmpty(field.FieldValue))
                 {
-                    // Check if the value contains HTML content (a simple check for "<p>" or "<div>")
+                     // Check if the value contains HTML content (a simple check for "<p>" or "<div>")
                     if (field.FieldValue.Contains("<p>") || field.FieldValue.Contains("<div>") || field.FieldValue.Contains("<table>"))
                     {
                         ReplacePlaceholderWithHtml(document, field.FieldName, field.FieldValue);
@@ -142,6 +158,7 @@
                 }
             }
         }
+
 
         private void ReplacePlaceholder(WordDocument document, string placeholder, string replacement)
         {
