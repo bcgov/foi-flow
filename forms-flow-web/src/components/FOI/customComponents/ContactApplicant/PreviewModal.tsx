@@ -66,7 +66,7 @@ export const PreviewModal = React.memo(({
   const templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo);
   const handleSend = () => {
     const callback = (templateVariables: any) => {
-      handleSave(renderTemplate(template, innerhtml, templateVariables));
+      handleSave( applyVariables(innerhtml, templateVariables ) );
     };
     getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback);
     // handleSave(innerhtml);
