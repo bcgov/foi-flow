@@ -23,6 +23,10 @@ def upgrade():
         update public."ProgramAreas"
         set name = 'Ministry of Education and Child Care' where bcgovcode = 'ECC';
         update public."ProgramAreas"
+        set name = 'Ministry of Post-Secondary and Future Skills' where bcgovcode = 'PSE';
+        update public."ProgramAreas"
+        set name = 'Ministry of Jobs, Economic Development and Innovation' where bcgovcode = 'JED';
+        update public."ProgramAreas"
         set isactive = false where iaocode in ('AED', 'BRD', 'EDU', 'EML', 'JER','MHA', 'MMA');
     ''')
     
@@ -35,6 +39,10 @@ def downgrade():
         set name = 'Ministry of Transportation and Infrastructure' where bcgovcode = 'TRAN';
         update public."ProgramAreas"
         set name = 'Education and Child Care' where bcgovcode = 'ECC';
+        update public."ProgramAreas"
+        set name = 'Post-Secondary Education and Future Skills' where bcgovcode = 'PSE';
+        update public."ProgramAreas"
+        set name = 'Jobs, Economic Development and Innovation' where bcgovcode = 'JED';
         update public."ProgramAreas"
         set isactive = true where iaocode in ('AED', 'BRD', 'EDU', 'EML', 'JER','MHA', 'MMA');
     ''')

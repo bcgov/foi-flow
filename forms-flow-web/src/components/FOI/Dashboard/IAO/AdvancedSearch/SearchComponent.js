@@ -429,7 +429,14 @@ const AdvancedSearch = ({ userDetail }) => {
   };
 
   const getMappedMinistriesValue = (ministries) => {
-    return ministries.flatMap(ministry => MappedMinistries[ministry] || [ministry])    
+    const selected = new Set(selectedPublicBodies)
+    const mapped = new Set(Object.keys(MappedMinistries))
+    var newministries = new Set(ministries)
+    const unselected = selected.difference(newministries)
+    if (unselected.size > 0 && mapped.intersection(unselected).size > 0) {
+      newministries = selected.difference(new Set(MappedMinistries[[...unselected][0]]))
+    }
+    return [...newministries].flatMap(ministry => MappedMinistries[ministry] || [ministry])    
   }
 
   const ClickableChip = ({ clicked, ...rest }) => {
