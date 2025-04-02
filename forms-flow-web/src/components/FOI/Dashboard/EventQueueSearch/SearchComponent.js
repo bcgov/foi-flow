@@ -88,6 +88,10 @@ const EventQueueSearch = ({ userDetail }) => {
     setToDate("");
   };
 
+  const disableApplySearch = () => {
+    return !selectedDateRangeType || !fromDate || !toDate;
+  }
+
   return (
     <Grid item container xs={12} >
       <Grid item xs={12}>
@@ -98,7 +102,7 @@ const EventQueueSearch = ({ userDetail }) => {
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth>
-                <InputLabel id="date-type-label" shrink>Type of Date Range</InputLabel>
+                <InputLabel id="date-type-label" required={true} shrink>Type of Date Range</InputLabel>
                 <Select labelId="date-type-label" id="date-type" displayEmpty value={selectedDateRangeType} onChange={(e) => {
                     setSelectedDateRangeType(e.target.value);
                     resetMaxFromDate(e.target.value);
@@ -114,19 +118,19 @@ const EventQueueSearch = ({ userDetail }) => {
 
             <Grid container item direction="row"  justifyContent="flex-start" alignItems="center" xs={12} sx={{ mb: "1em"}}>
               <Grid item xs={5}>
-                <TextField id="from-date" label="From" type="date" InputLabelProps={{ shrink: true }} variant="outlined" value={fromDate || ""} InputProps={{ inputProps: { max: formatDate(toDate) || maxFromDate } }} onChange={(e) => setFromDate(formatDate(e.target.value))} disabled={!selectedDateRangeType} fullWidth />
+                <TextField id="from-date" label="From" required={true} type="date" InputLabelProps={{ shrink: true }} variant="outlined" value={fromDate || ""} InputProps={{ inputProps: { max: formatDate(toDate) || maxFromDate } }} onChange={(e) => setFromDate(formatDate(e.target.value))} disabled={!selectedDateRangeType} fullWidth />
               </Grid>
               <Grid item xs={2}>
                 <Typography align="center" sx={{ fontWeight: "bold" }} variant="h6">to</Typography>
               </Grid>
               <Grid item xs={5}>
-                <TextField id="to-date" label="To" type="date" InputLabelProps={{ shrink: true }} InputProps={{ inputProps: { min: formatDate(fromDate), max: maxToDate } }} value={toDate || ""} onChange={(e) => setToDate(formatDate(e.target.value))} disabled={!selectedDateRangeType} variant="outlined" fullWidth />
+                <TextField id="to-date" label="To" required={true} type="date" InputLabelProps={{ shrink: true }} InputProps={{ inputProps: { min: formatDate(fromDate), max: maxToDate } }} value={toDate || ""} onChange={(e) => setToDate(formatDate(e.target.value))} disabled={!selectedDateRangeType} variant="outlined" fullWidth />
               </Grid>
             </Grid>
 
             <Grid item xs={12} container direction="row" columnSpacing={1}>
               <Grid item>
-                <Button color="primary" sx={{ backgroundColor: "#38598A", color: "white", fontWeight: "bold", textTransform: "none" }} variant="contained" onClick={handleApplySearchFilters} disableElevation>
+                <Button color="primary" disabled={disableApplySearch()} sx={{ backgroundColor: "#38598A", color: "white", fontWeight: "bold", textTransform: "none" }} variant="contained" onClick={handleApplySearchFilters} disableElevation>
                   Apply Search
                 </Button>
               </Grid>
