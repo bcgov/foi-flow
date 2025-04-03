@@ -205,16 +205,18 @@ class factRequestDetails(db.Model):
             datefilter = params.get('daterangetype')
             if (datefilter):
                 query = ''
+                if len(filterbysearchcondition + requesttypecondition) > 0:
+                   query += ' AND '
                 if params.get('fromdate'):
-                    query += ('AND {0} >= ' + params.get('fromdate')) 
+                    query += (''' {0} >= \'''' + params.get('fromdate') + '\' AND') 
                 if params.get('todate'):
-                    query += ('AND {0} <= ' + params.get('todate')) 
+                    query += (''' {0} <= \'''' + params.get('todate') + '\'') 
                 if (datefilter == 'receivedDate'):
-                    query.format('receiveddate')
+                    query = query.format('receiveddate')
                 if (datefilter == 'duedate'):
-                    query.format('targetdate')
+                    query = query.format('targetdate')
                 if (datefilter == 'closedate'):
-                    query.format('closeddate')
+                    query = query.format('closeddate')
                 basequery += query
             
             if(len(filterbysearchcondition + requesttypecondition) == 0 and not datefilter): # if no conditions have been set so far, then any other conditions do not apply to historical search, so return empty array
