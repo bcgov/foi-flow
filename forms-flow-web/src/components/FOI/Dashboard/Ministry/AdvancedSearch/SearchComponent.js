@@ -396,7 +396,7 @@ const AdvancedSearch = ({ userDetail }) => {
     if (unselected.size > 0 && mapped.intersection(unselected).size > 0) {
       newministries = selected.difference(new Set(MappedMinistries[[...unselected][0]]))
     }
-    return [...newministries].flatMap(ministry => MappedMinistries[ministry] || [ministry])    
+    return [... new Set([...newministries].flatMap(ministry => MappedMinistries[ministry] || [ministry]))]
   }
 
   const ClickableChip = ({ clicked, ...rest }) => {
