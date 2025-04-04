@@ -973,7 +973,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       <MenuItem disabled value="" key="program-area-all">
                         <em>All</em>
                       </MenuItem>
-                      {programAreaList.sort((a, b) => a.name.localeCompare(b.name)).map((programArea) => (
+                      {programAreaList.filter(p => p.isactive).sort((a, b) => a.name.localeCompare(b.name)).map((programArea) => (
                         <MenuItem
                           key={`program-area-${programArea.programareaid}`}
                           value={programArea.bcgovcode}

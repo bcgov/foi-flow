@@ -25,7 +25,7 @@ class ProgramArea(db.Model):
             bcgovcodefilter.append(ProgramArea.bcgovcode == group.replace(' Ministry Team', ''))
 
         programarea_schema = ProgramAreaSchema(many=True)
-        query = db.session.query(ProgramArea).filter(or_(*bcgovcodefilter)).order_by(ProgramArea.bcgovcode.asc()).all()
+        query = db.session.query(ProgramArea).filter_by(isactive=True).filter(or_(*bcgovcodefilter)).order_by(ProgramArea.bcgovcode.asc()).all()
         return programarea_schema.dump(query)
 
     @classmethod
