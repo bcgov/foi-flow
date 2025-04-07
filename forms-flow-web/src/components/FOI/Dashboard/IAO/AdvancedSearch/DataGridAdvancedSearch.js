@@ -450,7 +450,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   
 
   const getTableInfo = (userGroups) => {
-    let tableInfo = defaultTableInfo;
+    var tableInfo = defaultTableInfo;
     if (!userGroups || isIntakeTeam(userGroups)) {
       tableInfo = defaultTableInfo;
     }
@@ -490,7 +490,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       }
     }
   
-    return defaultTableInfo;
+    return tableInfo;
   };
   const tableInfo = getTableInfo(user.groups);
   
