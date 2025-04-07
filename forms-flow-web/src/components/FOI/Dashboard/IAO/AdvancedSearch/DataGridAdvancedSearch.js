@@ -490,7 +490,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       }
     }
   
-    return defaultTableInfo;
+    return tableInfo;
   };
   const tableInfo = getTableInfo(user.groups);
   
