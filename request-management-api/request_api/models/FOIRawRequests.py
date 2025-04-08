@@ -961,7 +961,7 @@ class FOIRawRequest(db.Model):
             if (flag.lower() == 'oipc'): # no results for raw oipc
                 requestflagscondition.append(FOIRawRequest.findfield('axisRequestId') == 'thisismeanttoreturnafilterconditionwith0results')
             if (flag.lower() == 'phased'):
-                requestflagscondition.append(FOIMinistryRequest.findfield('isphasedrelease', iaoassignee, ministryassignee) == True)
+                requestflagscondition.append(FOIRawRequest.findfield('axisRequestId') == 'thisismeanttoreturnafilterconditionwith0results')
                 continue
         return requestflagscondition
 
