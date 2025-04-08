@@ -66,7 +66,7 @@ export const ContactApplicant = ({
   const [showLagacyEditor, setShowLagacyEditor] = useState<boolean>(false);
   const [enableAutoFocus, setEnableAutoFocus] = useState<boolean>(false);
 
-  const selectTemplate = (event: React.ChangeEvent<{}>, item: Template | null) => {
+  const selectTemplateFromDropdown = (event: React.ChangeEvent<{}>, item: Template | null) => {
     // console.log("Selected option:", item?.label);
 
     if(item?.templateid) {
@@ -1298,7 +1298,7 @@ export const ContactApplicant = ({
               className="email-template-dropdown"
               list={options}
               disabledValues={disabledOptions}
-              onChange={selectTemplate}
+              onChange={selectTemplateFromDropdown}
               label="Select Template"
             />
           </Grid>
@@ -1375,6 +1375,7 @@ export const ContactApplicant = ({
                 setEditDraftTrigger = {setEditDraftTrigger}
                 editSfdtDraft = {editSfdtDraft}
                 enableAutoFocus = {enableAutoFocus}
+                selectedEmails={selectedEmails}
               />
             </>
           }

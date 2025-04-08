@@ -24,7 +24,9 @@ export const DocEditor = ({
     setEditDraftTrigger,
     editSfdtDraft,
     enableAutoFocus,
+    selectedEmails
 }: any) => {
+    const EMAILLISTTEMPLATEVARIABLE = '[SELECTEDEMAILSLIST-NONESELECTED]'
     const [container, setContainer] = React.useState<DocumentEditorContainerComponent | null>(null);
     const userDetail: any|null = useSelector((state: any)=> state.user.userDetail);
 
@@ -131,6 +133,29 @@ export const DocEditor = ({
             container.documentEditor.open(curTemplate);
         }
     }, [curTemplate]);
+
+    // This is used to dynamically replace the list of selectec emails in the template
+    const [emailListString, setEmailListString] = React.useState<string>('');
+    React.useEffect(() => {
+        if (container && curTemplate) {
+            let newEmailList = ''
+            selectedEmails?.forEach((email: any, index: number) => {
+            newEmailList = newEmailList + email
+            if (index < selectedEmails?.length - 1) newEmailList = newEmailList + ', '
+            })
+            if (newEmailList === '') newEmailList = EMAILLISTTEMPLATEVARIABLE
+
+            container.documentEditor.search.findAll(EMAILLISTTEMPLATEVARIABLE)
+            if (container.documentEditor.search.searchResults.length > 0) {
+                container.documentEditor.search.searchResults.replaceAll(newEmailList)
+                setEmailListString(newEmailList)
+            } else if (newEmailList != emailListString && emailListString.length > 3) {
+                container.documentEditor.search.findAll(emailListString)
+                container.documentEditor.search.searchResults.replaceAll(newEmailList)
+                setEmailListString(newEmailList)
+            }
+        }
+    }, [selectedEmails, curTemplate]);
 
     const getSfdtString = () => {
         if (container) {
