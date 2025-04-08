@@ -74,8 +74,8 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
 
             string GetAddress()
             {
-                var addressParts = new[] { rawRequest?.Address, rawRequest?.City, rawRequest?.Province, rawRequest?.Country, rawRequest?.Postal };
-                return string.Join(" ", addressParts.Where(adrs => !string.IsNullOrWhiteSpace(adrs)));
+                var addressParts = new[] { applicantFullName, rawRequest?.Address, rawRequest?.City + ' ' + rawRequest?.Province + ' ' + rawRequest?.Postal };
+                return string.Join("\n", addressParts.Where(adrs => !string.IsNullOrWhiteSpace(adrs)));
             }
 
             string FormatFullName(string? firstName, string? lastName) =>
@@ -85,7 +85,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
             {
                 ["[REQUESTNUMBER]"] = rawRequest?.AxisRequestId,
                 ["[TODAYDATE]"] = DateHelper.GetTodayDate(),
-                ["[RQREMAIL]"] = rawRequest?.Email,
+                ["[RQREMAIL]"] = "[SELECTEDEMAILSLIST-NONESELECTED]",
                 ["[RQRFAX]"] = faxNumber,
                 ["[ADDRESS]"] = GetAddress()?.ToString(),
                 ["[RFNAME]"] = rawRequest?.FirstName,
@@ -165,14 +165,12 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
             {
                 var addressParts = new[]
                 {
+                    string.Join(" ", new[] { applicant?.FirstName, applicant?.MiddleName, applicant?.LastName }.Where(name => !string.IsNullOrWhiteSpace(name))),
                     GetContactInfo("address"),
                     GetContactInfo("addressSecondary"),
-                    GetContactInfo("city"),
-                    GetContactInfo("province"),
-                    GetContactInfo("country"),
-                    GetContactInfo("postal")
+                    string.Join(" ", new[] { GetContactInfo("city"), GetContactInfo("province"), GetContactInfo("postal") }.Where(location => !string.IsNullOrWhiteSpace(location)))
                 };
-                return string.Join(" ", addressParts.Where(part => !string.IsNullOrWhiteSpace(part)));
+                return string.Join("\n", addressParts.Where(part => !string.IsNullOrWhiteSpace(part)));
             }
 
             var templateData = new Dictionary<string, string?>
@@ -180,7 +178,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
                     ["[REQUESTNUMBER]"] = requestMinistry.AxisRequestId,
                     ["[OIPCNUMBER]"] =  ProcessOipcDetails(oipcDetails).oipcNumber,
                     ["[TODAYDATE]"] = DateHelper.GetTodayDate(),
-                    ["[RQREMAIL]"] = GetContactInfo("email"),
+                    ["[RQREMAIL]"] = "[SELECTEDEMAILSLIST-NONESELECTED]",
                     ["[RQRFAX]"] = faxNumber,
                     ["[ADDRESS]"] = GetFullAddress().ToString(),
                     ["[RFNAME]"] = applicant?.FirstName,
