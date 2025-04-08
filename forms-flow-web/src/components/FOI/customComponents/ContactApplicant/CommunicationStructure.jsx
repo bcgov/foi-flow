@@ -21,6 +21,7 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
+import Tooltip from "@mui/material/Tooltip";
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
@@ -310,6 +311,11 @@ const CommunicationStructure = ({correspondence, currentIndex,
       </Dialog>
     )
   };
+let emailList = ''
+correspondence?.emails.forEach((email, index) => {
+  emailList = emailList + email
+  if (index < correspondence.emails.length - 1) emailList = emailList + ', '
+})
 const emailText = correspondence?.emails.length == 1 ? correspondence.emails[0] : correspondence.emails.length > 1 ? correspondence.emails[0] + ' +' + (correspondence.emails.length - 1) : ''
 const dateText = correspondence.date == correspondence.created_at ? correspondence.date.toUpperCase() : correspondence.date.split('|')[0].trim()
   return (
@@ -327,7 +333,7 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
                     {correspondence && (
                       <>
                       <div className="templateUser">{correspondence.category === "response" ? "Applicant Response": getTemplateName(correspondence)} - {fullName} </div> |  
-                        {correspondence?.emails.length > 0 ? <div className="templateUser"> {emailText} |</div> : ''} 
+                        {correspondence?.emails.length > 1 ? <><div className="templateUser"><Tooltip title={emailList} disableInteractive placement="top">{emailText}</Tooltip></div> |</>: correspondence?.emails.length == 1 ? <><div className="templateUser"> {emailText} </div>|</> : ''} 
                         <div className="templateTime">{dateText.toUpperCase()} </div>  
                         <div className="templateTime">{correspondence.edited ? "Edited": ""} </div>
                       </>
