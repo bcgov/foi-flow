@@ -21,7 +21,8 @@ import {
 
 const tokenRefreshInterval = 180000; // how often we should check for token expiry --> 180000 = 3 mins
 const tokenUpdateThreshold = 600; // if token expires in less than 10 minutes (600 seconds), refresh token
-
+let keycloakInitialized = false;
+let keycloakInitPromise = null;
 /**
  * Initializes Keycloak instance and calls the provided callback function if successfully authenticated.
  *
@@ -30,7 +31,17 @@ const tokenUpdateThreshold = 600; // if token expires in less than 10 minutes (6
 
 const initKeycloak = (store, ...rest) => {
   const done = rest.length ? rest[0] : () => {};
-  KeycloakData.init({
+
+  if (keycloakInitialized) {
+    if (keycloakInitPromise) {
+      keycloakInitPromise.then(() => done(null, KeycloakData));
+    }
+    return keycloakInitPromise;
+  }
+
+  keycloakInitialized = true;
+
+  keycloakInitPromise = KeycloakData.init({
     onLoad: "check-sso",
     promiseType: "native",
     silentCheckSsoRedirectUri:
@@ -44,14 +55,14 @@ const initKeycloak = (store, ...rest) => {
         store.dispatch(setUserRole(UserRoles));
         store.dispatch(setUserToken(KeycloakData.token));
 
-        KeycloakData.loadUserInfo().then((res) => {  
+        KeycloakData.loadUserInfo().then((res) => {
           //Begin - Changes for IDIR mapping
           if ("identity_provider" in res && res["identity_provider"] == "idir") {
               let claim_name =  "foi_preferred_username" in res ? "foi_preferred_username" : "preferred_username"
               let claim_value =  res[claim_name].toLowerCase()
               res["preferred_username"] = claim_value.endsWith("@idir") ? claim_value : claim_value.concat("@idir")
-          }  
-          //End - Changed for IDIR mapping        
+          }
+          //End - Changed for IDIR mapping
           store.dispatch(setUserDetails(res));
           const userGroups = res.groups.map((group) => group.slice(1));
           const authorized =
@@ -71,7 +82,11 @@ const initKeycloak = (store, ...rest) => {
       doLogin();
     }
   });
+
+   return keycloakInitPromise;
+
 };
+
 let refreshInterval;
 const refreshToken = (store) => {
   refreshInterval = setInterval(() => {
@@ -113,7 +128,7 @@ const getToken = () => KeycloakData.token;
 const UserService ={
   initKeycloak,
   userLogout,
-  getToken, 
+  getToken,
   authenticateAnonymousUser
 };
 

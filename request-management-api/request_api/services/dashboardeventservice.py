@@ -15,13 +15,13 @@ class dashboardeventservice:
     """ FOI Event Dashboard
     """
     
-    def geteventqueuepagination(self, queuetype, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):
+    def geteventqueuepagination(self, queuetype, daterangetype:None, fromdate:None, todate:None, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):
         _filterfields = self.__validateandtransform(filterfields)
         notifications = None
         if AuthHelper.getusertype() == "iao" and (queuetype is None or queuetype == "all"):                                                                                           
-                notifications = FOIRequestNotificationDashboard.getiaoeventpagination(groups, page, size, sortingitems, sortingorders, _filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager())
+                notifications = FOIRequestNotificationDashboard.getiaoeventpagination(daterangetype, fromdate, todate, groups, page, size, sortingitems, sortingorders, _filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager())
         elif  AuthHelper.getusertype() == "ministry" and (queuetype is not None and queuetype == "ministry"):
-                notifications = FOIRequestNotificationDashboard.getministryeventpagination(groups, page, size, sortingitems, sortingorders, _filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.isministryrestrictedfilemanager())
+                notifications = FOIRequestNotificationDashboard.getministryeventpagination(daterangetype, fromdate, todate, groups, page, size, sortingitems, sortingorders, _filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.isministryrestrictedfilemanager())
         if notifications is not None:
             eventqueue = []
             for notification in notifications.items:
