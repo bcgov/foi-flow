@@ -1433,10 +1433,6 @@ export const ContactApplicant = ({
             >
               {previewButtonValue}
             </button>
-            <div className="tooltip-floatRight tooltip-preview">
-              <CustomizedTooltip content={tooltipPreview} position={""} />
-              <p className="hideContent" id="popup-1">Information1</p>
-            </div>
           </div>
         </div>
         <Grid
