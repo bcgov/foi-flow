@@ -3129,7 +3129,7 @@ const Attachment = React.memo(
       (division) => {
         return !record.attributes?.personalattributes?.personaltag || (record.attributes?.personalattributes?.personaltag && division.divisionname != record.attributes?.personalattributes?.personaltag);
       }) || [];
-    const removeInValidTagsFromDivisions = record.attributes?.divisions.filter(
+    const removeInValidTagsFromDivisions = record.attributes?.divisions?.filter(
       (division) => {
         return division.divisionname != "TBD";
       });
@@ -3333,7 +3333,7 @@ const Attachment = React.memo(
           alignItems="flex-start"
         >
           <Grid item xs={6}>
-            {removeInValidTagsFromDivisions.length > 0 && removeInValidTagsFromDivisions.map((division, i) => (
+            {removeInValidTagsFromDivisions?.length > 0 && removeInValidTagsFromDivisions?.map((division, i) => (
               <Chip
                 item
                 key={i}
@@ -3361,9 +3361,9 @@ const Attachment = React.memo(
                 style={{
                   backgroundColor: "#003366",
                   margin:
-                    record.isattachment && removeInValidTagsFromDivisions.length === 0
+                    record.isattachment && removeInValidTagsFromDivisions?.length === 0
                       ? "4px 4px 4px 95px"
-                      : removeInValidTagsFromDivisions.length === 0
+                      : removeInValidTagsFromDivisions?.length === 0
                       ? "4px 4px 4px 35px"
                       : "4px",
                 }}
