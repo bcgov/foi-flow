@@ -311,10 +311,10 @@ const CommunicationStructure = ({correspondence, currentIndex,
       </Dialog>
     )
   };
-let emailList = ''
+let emailListText = ''
 correspondence?.emails.forEach((email, index) => {
-  emailList = emailList + email
-  if (index < correspondence.emails.length - 1) emailList = emailList + ', '
+  emailListText = emailListText + email
+  if (index < correspondence.emails.length - 1) emailListText = emailListText + ', '
 })
 const emailText = correspondence?.emails.length == 1 ? correspondence.emails[0] : correspondence.emails.length > 1 ? correspondence.emails[0] + ' +' + (correspondence.emails.length - 1) : ''
 const dateText = correspondence.date == correspondence.created_at ? correspondence.date.toUpperCase() : correspondence.date.split('|')[0].trim()
@@ -333,7 +333,7 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
                     {correspondence && (
                       <>
                       <div className="templateUser">{correspondence.category === "response" ? "Applicant Response": getTemplateName(correspondence)} - {fullName} </div> |  
-                        {correspondence?.emails.length > 1 ? <><div className="templateUser"><Tooltip title={emailList} disableInteractive placement="top">{emailText}</Tooltip></div> |</>: correspondence?.emails.length == 1 ? <><div className="templateUser"> {emailText} </div>|</> : ''} 
+                        {correspondence?.emails.length > 1 ? <><div className="templateUser"><Tooltip title={emailListText} disableInteractive placement="top">{emailText}</Tooltip></div> |</>: correspondence?.emails.length == 1 ? <><div className="templateUser"> {emailText} </div>|</> : ''} 
                         <div className="templateTime">{dateText.toUpperCase()} </div>  
                         <div className="templateTime">{correspondence.edited ? "Edited": ""} </div>
                       </>
