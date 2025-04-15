@@ -94,28 +94,23 @@ jobs:
         shell: bash
         run: |
           oc login --server=${{secrets.OPENSHIFT4_LOGIN_REGISTRY}} --token=${{secrets.OPENSHIFT4_SA_TOKEN}}
-
       - name: Tools project
         shell: bash
         run: |
           oc project ${{ env.TOOLS_NAME }}-tools
-
       - name: Build from ${{ env.BRANCH_NAME }} branch
         shell: bash
         run: |
           oc patch bc/${{ env.APP_NAME }}-build -p '{"spec":{"source":{"git":{"ref":"${{ env.BRANCH_NAME }}"}}}}'
-
       - name: Start Build Openshift
         shell: bash
         run: |
           oc start-build ${{ env.APP_NAME }}-build --wait
-
       - name: Tag+Deploy for ${{ env.TAG_NAME }}
         shell: bash
         run: |
           oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:${{ env.TAG_NAME }}
-
       # - name: Watch new rollout (trigger by image change in Openshift)
       #   shell: bash
       #   run: |
-      #     oc rollout status dc/${{ env.APP_NAME }}-{{ env.ENV_TAG_NAME }} -n ${{ env.TOOLS_NAME }}-${{ env.ENV_NAME }} -w
+      # oc rollout status dc/${{ env.APP_NAME }}-{{ env.ENV_TAG_NAME }} -n ${{ env.TOOLS_NAME }}-${{ env.ENV_NAME }} -w
