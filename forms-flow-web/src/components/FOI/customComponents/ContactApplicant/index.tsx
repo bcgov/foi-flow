@@ -66,7 +66,7 @@ export const ContactApplicant = ({
   const [showLagacyEditor, setShowLagacyEditor] = useState<boolean>(false);
   const [enableAutoFocus, setEnableAutoFocus] = useState<boolean>(false);
 
-  const selectTemplateFromDropdown = (event: React.ChangeEvent<{}>, item: Template | null) => {
+  const selectTemplateFromDropdown = (event: React.ChangeEvent<{}> | null, item: Template | null) => {
     // console.log("Selected option:", item?.label);
 
     if(item?.templateid) {
@@ -176,6 +176,8 @@ export const ContactApplicant = ({
       setFiles([emailAttachment])
     }
     await exportPDF(dispatch, newData, attachBlobPdf);
+    const aplicantCoverEmailTemplate = templates.find((template: any) => template.label === 'A - Applicant Cover Email');
+    selectTemplateFromDropdown(null, aplicantCoverEmailTemplate)
   }
 
   
