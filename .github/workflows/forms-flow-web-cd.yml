@@ -27,6 +27,11 @@ jobs:
 
     if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'
     steps:
+      - name: Install oc
+        uses: redhat-actions/oc-installer@v1
+        with:
+          oc_version: '4.6'
+
       - uses: actions/checkout@v2
 
       - name: Install OpenShift CLI
