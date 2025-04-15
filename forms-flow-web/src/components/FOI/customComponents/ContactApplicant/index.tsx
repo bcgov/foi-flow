@@ -125,24 +125,27 @@ export const ContactApplicant = ({
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlString;
   
-    // Find the <p class="Header"> element.
-    const headerParagraph = tempDiv.querySelector('p.Header');
-  
-    // Remove the element if it exists.
-    if (headerParagraph) {
-      headerParagraph.remove();
-    }
-
-    // Replace \n (newlines) that are NOT inside <p> with <br>
-    tempDiv.querySelectorAll("p").forEach((p) => {
-      const textContent = p.textContent?.trim();
-      if (!textContent || textContent === " " || textContent === "&nbsp;") return;
-    
-      const nextNode = p.nextSibling;
-      if (nextNode?.nodeType === Node.TEXT_NODE && /^[ \t\r]*\n[ \t\r]*$/.test(nextNode.nodeValue ?? "")) {
-        p.insertAdjacentHTML("afterend", "<br>");
+    // Find the <p class="Header"> or <h1 class="Heading_1"> elements.
+    const removeHeader = () => {
+      const header = tempDiv.querySelector('p.Header, h1.Heading_1');
+      if (header) {
+        header.remove();
+        removeHeader()
       }
-    });
+    }
+    removeHeader();
+
+    // Commented below out because this is unnecessary for now
+    // Replace \n (newlines) that are NOT inside <p> with <br>
+    // tempDiv.querySelectorAll("p").forEach((p) => {
+    //   const textContent = p.textContent?.trim();
+    //   if (!textContent || textContent === " " || textContent === "&nbsp;") return;
+    
+    //   const nextNode = p.nextSibling;
+    //   if (nextNode?.nodeType === Node.TEXT_NODE && /^[ \t\r]*\n[ \t\r]*$/.test(nextNode.nodeValue ?? "")) {
+    //     p.insertAdjacentHTML("afterend", "<br>");
+    //   }
+    // });
 
     // Return the modified HTML string.
     return tempDiv.innerHTML;
