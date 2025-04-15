@@ -20,6 +20,7 @@ export const DocEditor = ({
     setPreviewTrigger,
     addAttachment,
     savepdf,
+    attachpdf,
     editDraftTrigger,
     setEditDraftTrigger,
     editSfdtDraft,
@@ -37,6 +38,9 @@ export const DocEditor = ({
         switch (args.item.id) {
             case "savepdf":
                 savepdf(getSfdtString());
+                break;
+            case "attachpdf":
+                attachpdf(getSfdtString());
                 break;
             case "attachments":
                 addAttachment();
@@ -65,6 +69,12 @@ export const DocEditor = ({
         text: onWrapText("Save as PDF"),
         id: "savepdf"
     };
+    let attachPdfBtn: CustomToolbarItemModel = {
+        prefixIcon: "e-icons e-large e-custom-export-pdf",
+        tooltipText: "Attach as a PDF File",
+        text: onWrapText("Attach as PDF"),
+        id: "attachpdf"
+    };
     let attachmentBtn: CustomToolbarItemModel = {
         prefixIcon: "e-icons e-large e-custom-attachment",
         tooltipText: "Add attachments",
@@ -74,6 +84,7 @@ export const DocEditor = ({
 
     let items: (CustomToolbarItemModel | ToolbarItem)[] = [
         savePdfBtn,
+        attachPdfBtn,
         "Separator",
         "Undo",
         "Redo",

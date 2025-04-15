@@ -162,6 +162,22 @@ export const ContactApplicant = ({
     await exportPDF(dispatch, newData, saveBlobToPdf);
   }
 
+  const attachPdf = async (sfdtString: string) => {
+    let newData = {
+      "FileName": "emailattachment.pdf",
+      "Content": sfdtString
+    };
+    const attachBlobPdf = async (pdf: any) => {
+      const blob = new Blob([pdf], { type: 'application/pdf' });
+      const emailAttachment = new File([blob], "emailattachment.pdf", { type: 'application/pdf' })
+      //@ts-ignore
+      emailAttachment.filename = 'emailattachment.pdf'
+      // @ts-ignore
+      setFiles([emailAttachment])
+    }
+    await exportPDF(dispatch, newData, attachBlobPdf);
+  }
+
   
 
   const currentCFRForm: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
@@ -1374,6 +1390,7 @@ export const ContactApplicant = ({
                 setPreviewTrigger = {setPreviewTrigger}
                 addAttachment={openAttachmentModal}
                 savepdf = {savePdf}
+                attachpdf = {attachPdf}
                 editDraftTrigger = {editDraftTrigger}
                 setEditDraftTrigger = {setEditDraftTrigger}
                 editSfdtDraft = {editSfdtDraft}
@@ -1385,7 +1402,12 @@ export const ContactApplicant = ({
           <div>
           {files.map((file: any, index: number) => (
             <div className="email-attachment-item" key={file.filename}>
-              <u>{file.filename}</u>
+              <u 
+                onClick={() => {
+                  const fileURL = URL.createObjectURL(files[index]);
+                  window.open(fileURL);
+                }}
+              >{file.filename}</u>
               <i
                 className="fa fa-times-circle"
                 onClick={() => removeFile(index)}
