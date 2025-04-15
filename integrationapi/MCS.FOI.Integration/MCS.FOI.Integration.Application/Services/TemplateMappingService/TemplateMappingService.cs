@@ -74,7 +74,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
 
             string GetAddress()
             {
-                var addressParts = new[] { applicantFullName, rawRequest?.Address, rawRequest?.City + ' ' + rawRequest?.Province + ' ' + rawRequest?.Postal };
+                var addressParts = new[] { applicantFullName, rawRequest?.Address, rawRequest?.AddressSecondary, rawRequest?.City + ' ' + rawRequest?.Province + ' ' + rawRequest?.Postal };
                 return string.Join("\n", addressParts.Where(adrs => !string.IsNullOrWhiteSpace(adrs)));
             }
 
