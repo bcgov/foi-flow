@@ -21,7 +21,7 @@ RUN dotnet publish -c Release -o out
 # Use the official .NET runtime image as a base image for the final stage.
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 
-COPY fonts/*.ttf /usr/share/fonts/truetype/bcsans/
+COPY fonts/ /usr/share/fonts/truetype/
 RUN apt-get update && apt-get install -y --no-install-recommends fontconfig
 RUN fc-cache -f -v
 # Install required native dependencies for SkiaSharp
