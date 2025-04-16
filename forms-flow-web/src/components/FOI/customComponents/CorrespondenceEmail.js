@@ -135,6 +135,7 @@ export default function CorrespondenceEmail({
       let i=1;
       if (requestemailList && requestemailList.length > 0) {
         for (let email of requestemailList) {
+          if (!email.email) continue;
               menuItems.push(<MenuItem className={`${classes.item} foi-watcher-menuitem`}  
                 key={`${email.email}`}
                 value={`${email.email}`}
