@@ -55,6 +55,7 @@ export const ContactApplicant = ({
 }: any) => {
   const [curTemplate, setCurTemplate] = useState<string>('');
   const [curTemplateName, setCurTemplateName] = useState<string>('');
+  const [emailSubject, setEmailSubject] = useState<string>('');
 
   const dispatch = useDispatch();
   const templateList: any = useSelector((state: any) => state.foiRequests.foiEmailTemplates);
@@ -484,6 +485,10 @@ export const ContactApplicant = ({
     // loadTemplate(+e.target.value);
   }
 
+  const handleEmailSubjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmailSubject(e.target.value);
+  }
+
   //When templates are selected from list
   const handleTemplateSelection = (template: any, index: number) => {
     if(template.templateid) {
@@ -607,6 +612,7 @@ export const ContactApplicant = ({
       correspondenceid:correspondenceId,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": emailContent,
+        "emailsubject": emailSubject,
         "id": approvedForm?.cfrfeeid,
         "type": type
       }),
@@ -672,6 +678,7 @@ export const ContactApplicant = ({
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": html?html:editorValue,
+        "emailsubject": emailSubject,
         "id": approvedForm?.cfrfeeid,
         "type": type,
         "emaildraft": sfdtString?sfdtString:""
@@ -717,6 +724,7 @@ export const ContactApplicant = ({
       correspondenceid:correspondenceId,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": editorValue,
+        "emailsubject": emailSubject,
         "id": approvedForm?.cfrfeeid,
         "type": type
       }),
@@ -981,6 +989,7 @@ export const ContactApplicant = ({
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": html,
+        "emailsubject": emailSubject,
         "id": approvedForm?.cfrfeeid,
         "type": type,
         "emaildraft": sfdtString
@@ -1308,56 +1317,76 @@ export const ContactApplicant = ({
         <Grid
           container
           direction="row"
-          justifyContent="flex-end"
-          spacing={1}
+          justifyContent="flex-start"
           className="select-template-bottom-margin"
         >
-          <Grid item xs={'auto'}>
-          </Grid>
-          <Grid item xs={3}>
-            <CustomAutocomplete
-              className="email-template-dropdown"
-              list={options}
-              disabledValues={disabledOptions}
-              onChange={selectTemplateFromDropdown}
-              label="Select Template"
-            />
-          </Grid>
-          {/* <Grid item xs={3}>
+          <Grid xs={6}>
             <TextField
-              className="email-template-dropdown"
-              id="emailtemplate"
-              label={currentTemplate === 0 ? "Select Template" : ""}
-              inputProps={{ "aria-labelledby": "emailtemplate-label" }}
-              InputLabelProps={{ shrink: false }}
-              select
-              name="emailtemplate"
-              value={currentTemplate}
-              onChange={handleTemplateChange}
-              placeholder="Select Template"
+              className="email-subject-field"
+              label="Customize Email Subject"
+              name="emailsubject"
+              value={emailSubject}
+              onChange={handleEmailSubjectChange}
               variant="outlined"
               margin='normal'
               size="small"
               fullWidth
             >
-              {templates.map((template: any, index: any) => (
-                <MenuItem
-                  key={index}
-                  value={index}
-                >
-                  {template.label}
-                </MenuItem>
-              ))}
+              {emailSubject}
             </TextField>
-          </Grid> */}
-          <Grid item xs={'auto'}>
-          <CorrespondenceEmail 
-            ministryId={ministryId}
-            requestId={requestId}
-            selectedEmails={selectedEmails}
-            setSelectedEmails={setSelectedEmails}
-            defaultEmail={requestDetails.email}
-          />
+          </Grid>
+          <Grid xs={6}
+            container
+            direction="row"
+            justifyContent="flex-end"
+            spacing={1}
+            className="select-template-bottom-margin"
+          >
+            <Grid item xs={6}>
+              <CustomAutocomplete
+                className="email-template-dropdown"
+                list={options}
+                disabledValues={disabledOptions}
+                onChange={selectTemplateFromDropdown}
+                label="Select Template"
+              />
+            </Grid>
+            {/* <Grid item xs={3}>
+              <TextField
+                className="email-template-dropdown"
+                id="emailtemplate"
+                label={currentTemplate === 0 ? "Select Template" : ""}
+                inputProps={{ "aria-labelledby": "emailtemplate-label" }}
+                InputLabelProps={{ shrink: false }}
+                select
+                name="emailtemplate"
+                value={currentTemplate}
+                onChange={handleTemplateChange}
+                placeholder="Select Template"
+                variant="outlined"
+                margin='normal'
+                size="small"
+                fullWidth
+              >
+                {templates.map((template: any, index: any) => (
+                  <MenuItem
+                    key={index}
+                    value={index}
+                  >
+                    {template.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid> */}
+            <Grid item xs={'auto'}>
+              <CorrespondenceEmail 
+                ministryId={ministryId}
+                requestId={requestId}
+                selectedEmails={selectedEmails}
+                setSelectedEmails={setSelectedEmails}
+                defaultEmail={requestDetails.email}
+              />
+            </Grid>
           </Grid>
         </Grid>
         <div className="correspondence-editor">

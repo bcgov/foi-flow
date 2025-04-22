@@ -29,7 +29,10 @@ class communicationemailservice:
             to = self.__getsenders(correspondencelog)
             attributes =  self.__getattributes(correspondencelog)
             subject = ""
-            if template is None:
+            customizedsubject = self.__getsubject(correspondencelog)
+            if len(customizedsubject) > 0:
+                subject = customizedsubject
+            elif template is None:
                 if 'templatename' in correspondencelog and correspondencelog['templatename'] is not None:
                     subject = templateconfig().getsubject(correspondencelog['templatename'], attributes)
                 else:
@@ -42,6 +45,10 @@ class communicationemailservice:
         except Exception as ex:
             logging.exception(ex)
 
+    def __getsubject(self,correspondencelog):
+        data = json.loads(correspondencelog['correspondencemessagejson'])
+        subject = data['emailsubject'] if 'emailsubject' in data else ""
+        return subject
     
     def __getbody(self,correspondencelog):
         data = json.loads(correspondencelog['correspondencemessagejson'])
