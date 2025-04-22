@@ -20,7 +20,7 @@ defaults:
 
 jobs:
   forms-flow-web-docker-build-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: Build dockerfile to ensure it works
 
     steps:
