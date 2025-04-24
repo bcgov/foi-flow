@@ -20,6 +20,7 @@ export const PreviewModal = React.memo(({
   modalOpen,
   handleClose,
   handleSave,
+  handleExportAsPdfButton,
   innerhtml,
   handleExport,
   attachments,
@@ -113,6 +114,7 @@ export const PreviewModal = React.memo(({
         <EmailExport 
           handleExport={handleExport}
           content={emailTemplate}
+          handleExportAsPdfButton={handleExportAsPdfButton}
         />
       }
       { enableSend && 
