@@ -71,7 +71,7 @@ export const ContactApplicant = ({
   const [showLagacyEditor, setShowLagacyEditor] = useState<boolean>(false);
   const [enableAutoFocus, setEnableAutoFocus] = useState<boolean>(false);
 
-  const [showAttachmentAsPdfModal, setShowAttachAsPdfModal] = useState(false);
+  const [showAttachAsPdfModal, setShowAttachAsPdfModal] = useState(false);
   const [attachPdfTrigger, setAttachPdfTrigger] = useState(false);
   const [exportPdfTrigger, setExportPdfTrigger] = useState(false);
 
@@ -1598,7 +1598,7 @@ export const ContactApplicant = ({
       currentResponseDate={currentResponseDate}
     /> 
     <AttachAsPdfModal
-      modalOpen={showAttachmentAsPdfModal}
+      modalOpen={showAttachAsPdfModal}
       handleClose={() => setShowAttachAsPdfModal(false)}
       handleAttachAsPdf={() => {setAttachPdfTrigger(true); setShowAttachAsPdfModal(false);}}
     />

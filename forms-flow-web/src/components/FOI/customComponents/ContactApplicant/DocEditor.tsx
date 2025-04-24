@@ -136,6 +136,7 @@ export const DocEditor = ({
             container.documentEditor.spellChecker.enableOptimizedSpellCheck = true;
             container.documentEditor.currentUser = userDetail.preferred_username;
             container.documentEditor.enableTrackChanges = false;
+            container.documentEditor.setDefaultCharacterFormat({ fontFamily: 'BCSans', fontSize: 10 });
             //load template/draft
             if (curTemplate) {
                 container.documentEditor.open(curTemplate);
