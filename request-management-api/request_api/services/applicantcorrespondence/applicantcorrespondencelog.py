@@ -245,6 +245,7 @@ class applicantcorrespondenceservice:
             "parentapplicantcorrespondenceid":_correpondencelog['parentapplicantcorrespondenceid'],
             "templateid":_correpondencelog['templateid'],
             "text": self.__getvaluefromschema(_sentcorrespondencemessagejson, 'message') if _sentcorrespondencemessagejson is not None else self.__getvaluefromjson(_correspondencemessagejson, 'emailhtml') if _isjson else None,
+            "emailsubject": self.__getvaluefromjson(_correspondencemessagejson, 'emailsubject') if _isjson else None,
             "id": self.__getvaluefromjson(_correspondencemessagejson, 'id') if _isjson else None,
             "type": self.__getvaluefromjson(_correspondencemessagejson, 'type') if _isjson else None,
             "created_at":self.__pstformat(_correpondencelog['created_at']),

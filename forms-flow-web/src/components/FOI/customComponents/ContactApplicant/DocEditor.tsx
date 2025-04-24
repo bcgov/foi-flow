@@ -21,6 +21,11 @@ export const DocEditor = ({
     addAttachment,
     savepdf,
     attachpdf,
+    attachPdfTrigger,
+    setAttachPdfTrigger,
+    exportAsPdf,
+    exportPdfTrigger,
+    setExportPdfTrigger,
     editDraftTrigger,
     setEditDraftTrigger,
     editSfdtDraft,
@@ -63,18 +68,18 @@ export const DocEditor = ({
     }
 
     //Custom toolbar item.
-    let savePdfBtn: CustomToolbarItemModel = {
-        prefixIcon: "e-icons e-large e-custom-export-pdf",
-        tooltipText: "Save as a PDF File",
-        text: onWrapText("Save as PDF"),
-        id: "savepdf"
-    };
-    let attachPdfBtn: CustomToolbarItemModel = {
-        prefixIcon: "e-icons e-large e-custom-export-pdf",
-        tooltipText: "Attach as a PDF File",
-        text: onWrapText("Attach as PDF"),
-        id: "attachpdf"
-    };
+    // let savePdfBtn: CustomToolbarItemModel = {
+    //     prefixIcon: "e-icons e-large e-custom-export-pdf",
+    //     tooltipText: "Save as a PDF File",
+    //     text: onWrapText("Save as PDF"),
+    //     id: "savepdf"
+    // };
+    // let attachPdfBtn: CustomToolbarItemModel = {
+    //     prefixIcon: "e-icons e-large e-custom-export-pdf",
+    //     tooltipText: "Attach current content as a PDF File",
+    //     text: onWrapText("Attach as PDF"),
+    //     id: "attachpdf"
+    // };
     let attachmentBtn: CustomToolbarItemModel = {
         prefixIcon: "e-icons e-large e-custom-attachment",
         tooltipText: "Add attachments",
@@ -83,8 +88,8 @@ export const DocEditor = ({
     };
 
     let items: (CustomToolbarItemModel | ToolbarItem)[] = [
-        savePdfBtn,
-        attachPdfBtn,
+        // savePdfBtn,
+        // attachPdfBtn,
         "Separator",
         "Undo",
         "Redo",
@@ -131,6 +136,7 @@ export const DocEditor = ({
             container.documentEditor.spellChecker.enableOptimizedSpellCheck = true;
             container.documentEditor.currentUser = userDetail.preferred_username;
             container.documentEditor.enableTrackChanges = false;
+            container.documentEditor.setDefaultCharacterFormat({ fontFamily: 'BCSans', fontSize: 10 });
             //load template/draft
             if (curTemplate) {
                 container.documentEditor.open(curTemplate);
@@ -197,6 +203,20 @@ export const DocEditor = ({
             setPreviewTrigger(false);
         }
     }, [previewTrigger]);
+
+    React.useEffect(() => {
+        if (attachPdfTrigger) {
+            attachpdf(getSfdtString());
+            setAttachPdfTrigger(false);
+        }
+    }, [attachPdfTrigger]);
+
+    React.useEffect(() => {
+        if (exportPdfTrigger) {
+            exportAsPdf(getSfdtString());
+            setExportPdfTrigger(false);
+        }
+    }, [exportPdfTrigger]);
 
     return (
         <DocumentEditorContainerComponent

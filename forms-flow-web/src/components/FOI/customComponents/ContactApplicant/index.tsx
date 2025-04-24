@@ -43,6 +43,9 @@ import CloseIcon from '@material-ui/icons/Close';
 import { DocEditor } from './DocEditor';
 import CustomAutocomplete from '../Autocomplete'
 import { saveAs } from "file-saver";
+import { AttachAsPdfModal } from './AttachAsPdfModal';
+import { downloadZip } from 'client-zip';
+import { formatDateInPst } from '../../../../helper/FOI/helper';
 
 export const ContactApplicant = ({
   requestNumber,
@@ -59,6 +62,7 @@ export const ContactApplicant = ({
 
   const dispatch = useDispatch();
   const templateList: any = useSelector((state: any) => state.foiRequests.foiEmailTemplates);
+  const user = useSelector((reduxState: any) => reduxState.user.userDetail);
   const [options, setOptions] = useState<Template[]>([]);
   const [disabledOptions, setDisabledOptions] = useState<Template[]>([]);
   const [saveSfdtDraftTrigger, setSaveSfdtDraftTrigger] = useState<boolean>(false);
@@ -66,6 +70,10 @@ export const ContactApplicant = ({
   const [editDraftTrigger, setEditDraftTrigger] = useState<boolean>(false);
   const [showLagacyEditor, setShowLagacyEditor] = useState<boolean>(false);
   const [enableAutoFocus, setEnableAutoFocus] = useState<boolean>(false);
+
+  const [showAttachAsPdfModal, setShowAttachAsPdfModal] = useState(false);
+  const [attachPdfTrigger, setAttachPdfTrigger] = useState(false);
+  const [exportPdfTrigger, setExportPdfTrigger] = useState(false);
 
   const selectTemplateFromDropdown = (event: React.ChangeEvent<{}> | null, item: Template | null) => {
     // console.log("Selected option:", item?.label);
@@ -159,6 +167,53 @@ export const ContactApplicant = ({
     const saveBlobToPdf = async (pdf: any) => {
       const blob = new Blob([pdf], { type: 'application/pdf' });
       saveAs(blob, 'email.pdf');
+    }
+    await exportPDF(dispatch, newData, saveBlobToPdf);
+  }
+
+  const handleExportAsPdfButton = () => {
+    setExportPdfTrigger(true);
+  }
+
+  const exportAsPdf = async (sfdtString: string) => {
+    const attachments = await saveExport();
+    let fileInfoList = attachments.map((attachment: any) => {
+      return  {
+        filename: attachment.filename,
+        s3sourceuri: attachment.url
+      }
+    })
+    let blobs: any  = [];
+    try {
+      const response = await getOSSHeaderDetails(fileInfoList, dispatch);
+      for (let header of response.data) {
+        await getFileFromS3(header, (_err: any, res: any) => {
+          let blob = new Blob([res.data], {type: "application/octet-stream"});
+          blobs.push({name: header.filename, lastModified: res.headers['last-modified'], input: blob})
+        });
+      }
+    } catch (error) {
+      console.log(error)
+    }
+
+    let newData = {
+      "FileName": "email.pdf",
+      "Content": sfdtString
+    };
+    const saveBlobToPdf = async (pdf: any) => {
+      const currentEditorContentAsPdfBlob = new Blob([pdf], { type: 'application/pdf' });
+      blobs.push({name: "Email Body.pdf", lastModified: new Date(), input: currentEditorContentAsPdfBlob})
+      const zipfile = await downloadZip(blobs).blob()
+      toast.success("Message has been exported successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      }); 
+      saveAs(zipfile, user?.preferred_username + " | " + formatDateInPst(new Date(), "yyyy MMM dd | hh:mm aa") + ".zip");
     }
     await exportPDF(dispatch, newData, saveBlobToPdf);
   }
@@ -827,6 +882,7 @@ export const ContactApplicant = ({
     setEditMode(true);
     setShowEditor(true);
     setSelectedEmails(i.emails);
+    setEmailSubject(i.emailsubject);
     if (i.attachments)
       setFiles(i.attachments);
     setCorrespondenceId(i.applicantcorrespondenceid);
@@ -1422,6 +1478,11 @@ export const ContactApplicant = ({
                 addAttachment={openAttachmentModal}
                 savepdf = {savePdf}
                 attachpdf = {attachPdf}
+                attachPdfTrigger={attachPdfTrigger}
+                setAttachPdfTrigger={setAttachPdfTrigger}
+                exportAsPdf={exportAsPdf}
+                exportPdfTrigger={exportPdfTrigger}
+                setExportPdfTrigger={setExportPdfTrigger}
                 editDraftTrigger = {editDraftTrigger}
                 setEditDraftTrigger = {setEditDraftTrigger}
                 editSfdtDraft = {editSfdtDraft}
@@ -1454,6 +1515,7 @@ export const ContactApplicant = ({
               modalOpen={previewModal}
               handleClose={handlePreviewClose}
               handleSave={save}
+              handleExportAsPdfButton={handleExportAsPdfButton}
               innerhtml={editorValue}
               handleExport={saveExport}
               attachments={files}
@@ -1471,6 +1533,14 @@ export const ContactApplicant = ({
             Cancel
           </button>     
           */ }    
+        <button
+          className="btn addCorrespondence"
+          data-variant="contained"
+          onClick={() => {setShowAttachAsPdfModal(true);}}
+          color="primary"
+        >
+          Attach as PDF
+        </button>
         <button
           className="btn addCorrespondence"
           data-variant="contained" 
@@ -1527,6 +1597,11 @@ export const ContactApplicant = ({
       bcgovcode={undefined}
       currentResponseDate={currentResponseDate}
     /> 
+    <AttachAsPdfModal
+      modalOpen={showAttachAsPdfModal}
+      handleClose={() => setShowAttachAsPdfModal(false)}
+      handleAttachAsPdf={() => {setAttachPdfTrigger(true); setShowAttachAsPdfModal(false);}}
+    />
     <div className="email-change-dialog">
       <Dialog
         open={openConfirmationModal}
