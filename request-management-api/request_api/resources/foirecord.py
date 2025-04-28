@@ -27,6 +27,7 @@ from marshmallow import INCLUDE
 import json
 from flask_cors import cross_origin
 import asyncio
+import traceback
 
 
 API = Namespace('FOIWatcher', description='Endpoints for FOI record management')
@@ -274,7 +275,8 @@ class UpdateRequestsPageCount(Resource):
             requestjson = request.get_json()
             ministryrequestid = requestjson['ministryrequestid']  if requestjson.get("ministryrequestid") != None else None
             if ministryrequestid:
-                asyncio.ensure_future(recordservice().updatepagecount(ministryrequestid, AuthHelper.getuserid()))
+                event_loop = asyncio.get_running_loop()
+                asyncio.run_coroutine_threadsafe(recordservice().updatepagecount(ministryrequestid, AuthHelper.getuserid()), event_loop)
                 return {'status': True, 'message': 'async updatepagecount function called'} , 200
             else:
                 return {'status': True, 'message':'ministryrequestid is none'} , 200
@@ -300,7 +302,8 @@ class UpdateRequestsPageCountOption2(Resource):
             requestid = requestjson['requestid']  if requestjson.get("requestid") != None else None
             print(f'option 2 >>> requestid = {requestid}, ministryrequestid = {ministryrequestid}')
             if ministryrequestid:
-                asyncio.ensure_future(recordservice().calculatepagecount(requestid, ministryrequestid, AuthHelper.getuserid()))
+                event_loop = asyncio.get_running_loop()
+                asyncio.run_coroutine_threadsafe(recordservice().calculatepagecount(requestid, ministryrequestid, AuthHelper.getuserid()), event_loop)
                 return {'status': True, 'message': 'async calculatepagecount function called'} , 200
             else:
                 return {'status': True, 'message':'ministryrequestid is none'} , 200
@@ -325,6 +328,8 @@ class FOIRequestGetRecord(Resource):
             result = recordservice().gethistoricaldocuments(axisrequestid)
             return json.dumps(result), 200
         except KeyError as error:
+            traceback.print_exc() 
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
         except Exception as exception:
+            traceback.print_exc() 
             return {'status': False, 'message': str(exception)}, 500

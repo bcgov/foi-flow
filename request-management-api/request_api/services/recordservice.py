@@ -247,7 +247,7 @@ class recordservice(recordservicebase):
     
     def gethistoricaldocuments(self, axisrequestid):
         documents = HistoricalRecords.getdocuments(axisrequestid)
-        if (documents[0]['iscorresponcedocument']):
+        if (len(documents) > 0 and documents[0]['iscorresponcedocument']):
             for document in documents:
                 if len(document['attributes']) > 0:
                     document['category'] = 'response'
