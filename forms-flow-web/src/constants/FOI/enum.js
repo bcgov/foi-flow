@@ -170,6 +170,7 @@ const MimeTypeList = Object.freeze({
     ".wmv",
     ".mpg",
     ".mpeg",
+    ".zip",
   ],
 });
 
