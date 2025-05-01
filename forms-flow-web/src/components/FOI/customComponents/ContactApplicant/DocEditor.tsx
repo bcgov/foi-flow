@@ -233,7 +233,7 @@ export const DocEditor = ({
         }
     }
 
-    const autofillFileNumber = () => {
+    const replaceFileNumber = () => {
         if (container && curTemplate) {
             let selectedNumber = '';
             if (requestDetails?.requestType == 'general') selectedNumber = '30';
@@ -265,7 +265,7 @@ export const DocEditor = ({
     React.useEffect(() => {
         if (container && curTemplate) {
             replaceEmailList();
-            autofillFileNumber();
+            replaceFileNumber();
         }
     }, [selectedEmails, curTemplate]);
 
