@@ -118,12 +118,12 @@ const RequestHeader = React.memo(({
               showFlag={requestDetails.isconsultflag === true}
               isDisabled={true}
             />
-            {/* <RequestFlag
+            <RequestFlag
               type="phasedrelease"
               requestDetails={requestDetails}
               isActive={requestDetails.isphasedrelease}
-              handleSelect={() => console.log('selected')}
-            /> */}
+              isDisabled={true}
+            />
         </div>
       );
     return (
