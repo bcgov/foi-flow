@@ -6,6 +6,7 @@ import { ClickEventArgs } from '@syncfusion/ej2-navigations';
 import { FOI_TEMPLATE_API_URL } from "../../../../apiManager/endpoints/config"
 import { SF_KEY } from "../../../../constants/constants";
 import { registerLicense } from '@syncfusion/ej2-base';
+import { HeaderLogoBase64 } from '../../../../assets/FOI/images/HeaderLogoBase64';
 
 registerLicense(SF_KEY);
 DocumentEditorContainerComponent.Inject(Toolbar, SpellChecker);
@@ -33,8 +34,13 @@ export const DocEditor = ({
     selectedEmails
 }: any) => {
     const EMAILLISTTEMPLATEVARIABLE = '[SELECTEDEMAILSLIST-NONESELECTED]'
+    // These are the phrases from the templates the precede email and file, to ensure that emails and numbers in other locations aren't replaced
+    const EMAILPREFIXES = [`Sent via email:  `, `Sent via email: `, `Sent by email to: `, `Sent by email to:  `, `Applicant email address:  `]
+    const FILEPREFIXES = ['File:  292-40/', 'File:  292-30/', 'File:  292-30\\', 'File:  292- 30/', 'File:  292- 40/']
     const [container, setContainer] = React.useState<DocumentEditorContainerComponent | null>(null);
     const userDetail: any|null = useSelector((state: any)=> state.user.userDetail);
+    let requestDetails: any|null = useSelector((state: any) => state.foiRequests.foiRequestDetail);
+    const requestNumber = requestDetails?.axisRequestId ? requestDetails.axisRequestId : requestDetails?.idNumber;
 
     // let container: DocumentEditorContainerComponent;
     // console.log("FormatType: ", FormatType);
@@ -68,12 +74,12 @@ export const DocEditor = ({
     }
 
     //Custom toolbar item.
-    // let savePdfBtn: CustomToolbarItemModel = {
-    //     prefixIcon: "e-icons e-large e-custom-export-pdf",
-    //     tooltipText: "Save as a PDF File",
-    //     text: onWrapText("Save as PDF"),
-    //     id: "savepdf"
-    // };
+    let savePdfBtn: CustomToolbarItemModel = {
+        prefixIcon: "e-icons e-large e-custom-export-pdf",
+        tooltipText: "Save as a PDF File",
+        text: onWrapText("Save as PDF"),
+        id: "savepdf"
+    };
     // let attachPdfBtn: CustomToolbarItemModel = {
     //     prefixIcon: "e-icons e-large e-custom-export-pdf",
     //     tooltipText: "Attach current content as a PDF File",
@@ -88,7 +94,7 @@ export const DocEditor = ({
     };
 
     let items: (CustomToolbarItemModel | ToolbarItem)[] = [
-        // savePdfBtn,
+        savePdfBtn,
         // attachPdfBtn,
         "Separator",
         "Undo",
@@ -127,6 +133,64 @@ export const DocEditor = ({
         fontFamilies: ['Algerian', 'Arial', 'Calibri', 'Cambria', 'BC Sans'],
     };
 
+    const insertHeader = () => {
+        if (container) {
+            container.documentEditor.selection.sectionFormat.differentFirstPage = true;
+            container.documentEditor.selection.goToPage(1);
+            container.documentEditor.selection.goToHeader();
+            container.documentEditor.selection.sectionFormat.headerDistance = 0;
+            container.documentEditor.selection.paragraphFormat.textAlignment = 'Center';
+            container.documentEditor.editor.insertImage(HeaderLogoBase64, 144, 135);
+            container.documentEditor.selection.closeHeaderFooter();
+        }
+    }
+
+    const insertFooter = () => {
+        if (container) {
+            container.documentEditor.selection.sectionFormat.differentFirstPage = true;
+            container.documentEditor.selection.goToPage(1);
+            container.documentEditor.selection.goToFooter();
+            container.documentEditor.selection.sectionFormat.footerDistance = 10;
+            container.documentEditor.selection.characterFormat.fontSize = 7;
+            container.documentEditor.selection.characterFormat.fontFamily = 'BC Sans';
+            container.documentEditor.editor.insertTable(1,4)
+            container.documentEditor.editor.applyBorders({type: 'NoBorder'});
+            container.documentEditor.editor.applyBorders({type: 'TopBorder'});
+            container.documentEditor.selection.characterFormat.bold = true;
+            container.documentEditor.editor.insertText("Ministry of Citizens' Services");
+            container.documentEditor.selection.characterFormat.bold = false;
+            container.documentEditor.selection.moveNextPosition();
+            container.documentEditor.editor.applyBorders({type: 'NoBorder'});
+            container.documentEditor.editor.applyBorders({type: 'TopBorder'});
+            container.documentEditor.editor.insertText("Information Access Operations / Children and Family Access Services");
+            container.documentEditor.selection.moveNextPosition();
+            container.documentEditor.editor.applyBorders({type: 'NoBorder'});
+            container.documentEditor.editor.applyBorders({type: 'TopBorder'});
+            container.documentEditor.editor.insertText("Mailing Address:\nPO Box 9569 Stn Prov Govt\nVictoria BC V8W 9K1");
+            container.documentEditor.selection.moveNextPosition();
+            container.documentEditor.editor.applyBorders({type: 'NoBorder'});
+            container.documentEditor.editor.applyBorders({type: 'TopBorder'});
+            container.documentEditor.editor.insertText("Website: \n");
+            container.documentEditor.editor.insertHyperlink('https://www.gov.bc.ca/freedomofinformation', 'www.gov.bc.ca/freedomofinformation');
+            container.documentEditor.editor.insertText("\n");
+            container.documentEditor.selection.characterFormat.fontSize = 7;
+            container.documentEditor.selection.characterFormat.fontFamily = 'BC Sans';
+            container.documentEditor.editor.insertText("Telephone: 250 387-1321\nFax: 250 387-9843");
+            container.documentEditor.selection.closeHeaderFooter();
+        }
+    }
+
+    const insertPageNumbers = () => {
+        if (container) {
+            container.documentEditor.selection.goToPage(2);
+            container.documentEditor.selection.goToHeader();
+            container.documentEditor.selection.paragraphFormat.textAlignment = 'Center';
+            container.documentEditor.selection.characterFormat.fontFamily = 'BC Sans';
+            container.documentEditor.editor.insertPageNumber();
+            container.documentEditor.selection.closeHeaderFooter();
+        }
+    }
+
     function onCreated(): void  {
         //initialze enable spell checker
         if(container) {
@@ -136,7 +200,8 @@ export const DocEditor = ({
             container.documentEditor.spellChecker.enableOptimizedSpellCheck = true;
             container.documentEditor.currentUser = userDetail.preferred_username;
             container.documentEditor.enableTrackChanges = false;
-            container.documentEditor.setDefaultCharacterFormat({ fontFamily: 'BCSans', fontSize: 10 });
+            container.documentEditor.setDefaultCharacterFormat({ fontFamily: 'BC Sans', fontSize: 10 });
+            container.documentEditor.characterFormat.fontFamily = 'BC Sans';
             //load template/draft
             if (curTemplate) {
                 container.documentEditor.open(curTemplate);
@@ -144,16 +209,7 @@ export const DocEditor = ({
         }
     };
 
-    React.useEffect(() => {
-        // load template
-        if (container && curTemplate) {
-            container.documentEditor.open(curTemplate);
-        }
-    }, [curTemplate]);
-
-    // This is used to dynamically replace the list of selectec emails in the template
-    const [emailListString, setEmailListString] = React.useState<string>('');
-    React.useEffect(() => {
+    const replaceEmailList = () => {
         if (container && curTemplate) {
             let newEmailList = ''
             selectedEmails?.forEach((email: any, index: number) => {
@@ -161,16 +217,55 @@ export const DocEditor = ({
             if (index < selectedEmails?.length - 1) newEmailList = newEmailList + ', '
             })
             if (newEmailList === '') newEmailList = EMAILLISTTEMPLATEVARIABLE
-
-            container.documentEditor.search.findAll(EMAILLISTTEMPLATEVARIABLE)
-            if (container.documentEditor.search.searchResults.length > 0) {
-                container.documentEditor.search.searchResults.replaceAll(newEmailList)
-                setEmailListString(newEmailList)
-            } else if (newEmailList != emailListString && emailListString.length > 3) {
-                container.documentEditor.search.findAll(emailListString)
-                container.documentEditor.search.searchResults.replaceAll(newEmailList)
-                setEmailListString(newEmailList)
+            for (let prefix of EMAILPREFIXES) {
+                container.documentEditor.search.findAll(prefix + EMAILLISTTEMPLATEVARIABLE)
+                if (container.documentEditor.search.searchResults.length > 0) {
+                    container.documentEditor.search.searchResults.replaceAll(prefix + newEmailList)
+                    setEmailListString(newEmailList)
+                    break;
+                } else if (newEmailList != emailListString && emailListString.length > 3) {
+                    container.documentEditor.search.findAll(emailListString)
+                    container.documentEditor.search.searchResults.replaceAll(newEmailList)
+                    setEmailListString(newEmailList)
+                    break;
+                }
             }
+        }
+    }
+
+    const replaceFileNumber = () => {
+        if (container && curTemplate) {
+            let selectedNumber = '';
+            if (requestDetails?.requestType == 'general') selectedNumber = '30';
+            if (requestDetails?.requestType == 'personal') selectedNumber = '40';
+            // if (externalConsult) numberToFill = '45';
+            for (let file of FILEPREFIXES) {
+                container.documentEditor.search.findAll(file + requestNumber)
+                if (container.documentEditor.search.searchResults.length > 0) {
+                    const replacedFile = file.replace(/-\s?\d{2}/g, `-${selectedNumber}`);
+                    container.documentEditor.search.searchResults.replaceAll(replacedFile + requestNumber)
+                    break;
+                }
+            }
+        }
+    }
+
+    React.useEffect(() => {
+        // load template
+        if (container && curTemplate) {
+            container.documentEditor.open(curTemplate);
+            insertHeader();
+            insertFooter();
+            insertPageNumbers();
+        }
+    }, [curTemplate]);
+
+    // This is used to dynamically replace the list of selectec emails in the template
+    const [emailListString, setEmailListString] = React.useState<string>('');
+    React.useEffect(() => {
+        if (container && curTemplate) {
+            replaceEmailList();
+            replaceFileNumber();
         }
     }, [selectedEmails, curTemplate]);
 
