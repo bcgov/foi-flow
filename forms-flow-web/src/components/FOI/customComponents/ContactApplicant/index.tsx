@@ -43,7 +43,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import { DocEditor } from './DocEditor';
 import CustomAutocomplete from '../Autocomplete'
 import { saveAs } from "file-saver";
-import { AttachAsPdfModal } from './AttachAsPdfModal';
 import { downloadZip } from 'client-zip';
 import { formatDateInPst } from '../../../../helper/FOI/helper';
 
@@ -71,9 +70,29 @@ export const ContactApplicant = ({
   const [showLagacyEditor, setShowLagacyEditor] = useState<boolean>(false);
   const [enableAutoFocus, setEnableAutoFocus] = useState<boolean>(false);
 
-  const [showAttachAsPdfModal, setShowAttachAsPdfModal] = useState(false);
   const [attachPdfTrigger, setAttachPdfTrigger] = useState(false);
   const [exportPdfTrigger, setExportPdfTrigger] = useState(false);
+
+  const showAttachAsPdfModal = () => {
+    setOpenConfirmationModal(true);
+    setConfirmationFor("attach-as-pdf")
+    setConfirmationTitle("Warning: Attaching as PDF file")
+    setConfirmationMessage("The current content will no longer be available for editing after attaching it as a PDF file. If you may still need to make edits, please save a draft first.");
+  }
+
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const showSelectTemplateModal = (event: any, item: any) => {
+    if (item === null) {
+      selectTemplateFromDropdown(null, item);
+      setSelectedTemplate(null);
+    } else {
+      setSelectedTemplate(item);
+      setOpenConfirmationModal(true);
+      setConfirmationFor("select-template")
+      setConfirmationTitle("Warning: Changing Content")
+      setConfirmationMessage("The current content will be overwritten if you select a different template. Do you want to continue?");
+    }
+  }
 
   const selectTemplateFromDropdown = (event: React.ChangeEvent<{}> | null, item: Template | null) => {
     // console.log("Selected option:", item?.label);
@@ -125,40 +144,41 @@ export const ContactApplicant = ({
     };
     const loadPreview = async (html: string) => {
       // setEditorValue(html.replace("<body bgcolor=\"#FFFFFF\">", "<body bgcolor=\"#FFFFFF\" style=\"width: 6.5in; margin-left: auto; margin-right: auto; padding: 1in;\">"));
-      setEditorValue( removeHeaderParagraph(html) );
+      // setEditorValue( removeHeaderParagraph(html) );
+      setEditorValue( html );
     }
     await exportSFDT(dispatch, newData, loadPreview);
   };
-  const removeHeaderParagraph = (htmlString: string) => {
-    // Create a temporary DOM element to parse the HTML string.
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlString;
+  // const removeHeaderParagraph = (htmlString: string) => {
+  //   // Create a temporary DOM element to parse the HTML string.
+  //   const tempDiv = document.createElement('div');
+  //   tempDiv.innerHTML = htmlString;
   
-    // Find the <p class="Header"> or <h1 class="Heading_1"> elements.
-    const removeHeader = () => {
-      const header = tempDiv.querySelector('p.Header, h1.Heading_1');
-      if (header) {
-        header.remove();
-        removeHeader()
-      }
-    }
-    removeHeader();
+  //   // Find the <p class="Header"> or <h1 class="Heading_1"> elements.
+  //   const removeHeader = () => {
+  //     const header = tempDiv.querySelector('p.Header, h1.Heading_1');
+  //     if (header) {
+  //       header.remove();
+  //       removeHeader()
+  //     }
+  //   }
+  //   removeHeader();
 
-    // Commented below out because this is unnecessary for now
-    // Replace \n (newlines) that are NOT inside <p> with <br>
-    // tempDiv.querySelectorAll("p").forEach((p) => {
-    //   const textContent = p.textContent?.trim();
-    //   if (!textContent || textContent === " " || textContent === "&nbsp;") return;
+  //   // Commented below out because this is unnecessary for now
+  //   // Replace \n (newlines) that are NOT inside <p> with <br>
+  //   // tempDiv.querySelectorAll("p").forEach((p) => {
+  //   //   const textContent = p.textContent?.trim();
+  //   //   if (!textContent || textContent === " " || textContent === "&nbsp;") return;
     
-    //   const nextNode = p.nextSibling;
-    //   if (nextNode?.nodeType === Node.TEXT_NODE && /^[ \t\r]*\n[ \t\r]*$/.test(nextNode.nodeValue ?? "")) {
-    //     p.insertAdjacentHTML("afterend", "<br>");
-    //   }
-    // });
+  //   //   const nextNode = p.nextSibling;
+  //   //   if (nextNode?.nodeType === Node.TEXT_NODE && /^[ \t\r]*\n[ \t\r]*$/.test(nextNode.nodeValue ?? "")) {
+  //   //     p.insertAdjacentHTML("afterend", "<br>");
+  //   //   }
+  //   // });
 
-    // Return the modified HTML string.
-    return tempDiv.innerHTML;
-  }
+  //   // Return the modified HTML string.
+  //   return tempDiv.innerHTML;
+  // }
   const savePdf = async (sfdtString: string) => {
     let newData = {
       "FileName": "email.pdf",
@@ -341,6 +361,11 @@ export const ContactApplicant = ({
       clearcorrespondence();
     } else if (confirmationFor === "delete-response") {
       deleteResponseAction();
+    } else if (confirmationFor === "attach-as-pdf") {
+      setAttachPdfTrigger(true);
+    } else if (confirmationFor === "select-template") {
+      selectTemplateFromDropdown(null, selectedTemplate);
+      setSelectedTemplate(null);
     }
   }
 
@@ -1403,7 +1428,7 @@ export const ContactApplicant = ({
                 className="email-template-dropdown"
                 list={options}
                 disabledValues={disabledOptions}
-                onChange={selectTemplateFromDropdown}
+                onChange={showSelectTemplateModal}
                 label="Select Template"
               />
             </Grid>
@@ -1536,7 +1561,7 @@ export const ContactApplicant = ({
         <button
           className="btn addCorrespondence"
           data-variant="contained"
-          onClick={() => {setShowAttachAsPdfModal(true);}}
+          onClick={() => {showAttachAsPdfModal()}}
           color="primary"
         >
           Attach as PDF
@@ -1597,11 +1622,6 @@ export const ContactApplicant = ({
       bcgovcode={undefined}
       currentResponseDate={currentResponseDate}
     /> 
-    <AttachAsPdfModal
-      modalOpen={showAttachAsPdfModal}
-      handleClose={() => setShowAttachAsPdfModal(false)}
-      handleAttachAsPdf={() => {setAttachPdfTrigger(true); setShowAttachAsPdfModal(false);}}
-    />
     <div className="email-change-dialog">
       <Dialog
         open={openConfirmationModal}
