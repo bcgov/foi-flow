@@ -339,7 +339,7 @@ class recordservice(recordservicebase):
                         "trigger": 'recordupload',
                         "createdby": userid,
                         "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false',
-                        "usertoken": AuthHelper.getauthtoken()
+                        "usertoken": AuthHelper.getauthtoken(),
                     }
                     if extension in FILE_CONVERSION_FILE_TYPES:
                         if entry['attributes']['filesize'] < int(self.conversionlargefilesizelimit):
@@ -396,6 +396,18 @@ class recordservice(recordservicebase):
         if not record.get("isduplicate", False) and not record["attributes"].get("isportfolio", False) and not record['attributes'].get('incompatible', False):
             return True
         return False
+    
+    def retrieverecordbyprocessversion(self, requestid, ministryrequestid, requestdata, userid):
+        recordids = requestdata["recordids"]
+        recordretrieveversion= requestdata["recordretrieveversion"]
+        if(len(recordids) > 0):
+            _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/update/retrieveversion', {'ministryrequestid': ministryrequestid, 
+                                            'recordids': recordids, "recordretrieveversion":recordretrieveversion})
+            if err:
+                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1,  [record['documentmasterid'] for record in requestdata['records']])
+            return DefaultMethodResult(True,'Record updated in Doc Reviewer DB', -1, [record['documentmasterid'] for record in requestdata['records']])
+        else:
+            return DefaultMethodResult(False,'Error in updating Record', -1, [record['documentmasterid'] for record in requestdata['records']])
 
     
 

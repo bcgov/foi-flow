@@ -820,3 +820,32 @@ export const updateUserLockedRecords = (data, requestId, ministryId, ...rest) =>
       });
   };
 }
+
+export const retrieveSelectedRecordVersion = (
+  requestId,
+  ministryId,
+  data,
+  ...rest
+) => {
+  let apiUrl = replaceUrl(
+    replaceUrl(API.FOI_RETRIEVE_RECORDS, "<ministryrequestid>", ministryId),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    const done = fnDone(rest);
+    httpPOSTRequest(apiUrl, data)
+      .then((res) => {
+        if (res.data && res.data.status) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error("Error in retrieving uncompressed files");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+      });
+  };
+};
