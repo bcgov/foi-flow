@@ -49,7 +49,7 @@ class senderservice:
 
         msg['From'] = from_email
         if isinstance(emails, list):
-            msg['To'] = ",".join(emails)
+            msg['To'] = ", ".join(emails)
         else:
             msg['To'] = emails
         msg['Subject'] = subject
