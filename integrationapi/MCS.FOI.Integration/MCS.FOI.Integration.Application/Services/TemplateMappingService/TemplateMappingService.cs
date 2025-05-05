@@ -71,6 +71,8 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
             var officeName = ministryName.StartsWith("Ministry of ", StringComparison.OrdinalIgnoreCase) ? ministryName.Substring(12) : ministryName;
             var faxNumber = _configuration.GetValue<string>("FaxNumber") ?? "(250) 3879843";
             var assigneeEmail = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty;
+            var startDate = !string.IsNullOrEmpty(rawRequest?.FromDate) ? DateHelper.FormatDate(rawRequest?.FromDate) : string.Empty;
+            var endDate = !string.IsNullOrEmpty(rawRequest?.ToDate) ? DateHelper.FormatDate(rawRequest?.ToDate) : string.Empty;
 
             string GetAddress()
             {
@@ -97,6 +99,8 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
                 ["[REQUESTERCATEGORY]"] = rawRequest?.Category,
                 ["[RECEIVEDDATE]"] = receivedDate,
                 ["[REQUESTDESCRIPTION]"] = rawRequest?.Description,
+                ["[STARTDATE]"] = startDate,
+                ["[ENDDATE]"] = endDate,
                 ["[PERFECTEDDATE]"] = DateHelper.FormatDate(rawRequest?.FromDate),
                 ["[DUEDATE]"] = DateHelper.FormatDate(rawRequest?.DueDate),
                 ["[STREET1]"] = rawRequest?.Address,
@@ -190,6 +194,8 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
                     ["[REQUESTERCATEGORY]"] = primaryApplicantCategory?.Description?.ToString(),
                     ["[RECEIVEDDATE]"] = DateHelper.FormatDate(request.ReceivedDate),
                     ["[REQUESTDESCRIPTION]"] = request?.InitialDescription,
+                    ["[STARTDATE]"] = DateHelper.FormatDate(request?.InitialRecordSearchFromDate),
+                    ["[ENDDATE]"] = DateHelper.FormatDate(request?.InitialRecordSearchToDate),
                     ["[PERFECTEDDATE]"] = DateHelper.FormatDate(request?.InitialRecordSearchFromDate),
                     ["[APPLICATION_FEE_AMOUNT]"] = fee?.AmountPaid?.ToString("F2") ?? string.Empty,
                     ["[OIPCORDERNUMBER]"] = string.Join(",", ProcessOipcDetails(oipcDetails).oipcOrderNumber),
