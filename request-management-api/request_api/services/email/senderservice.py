@@ -53,6 +53,7 @@ class senderservice:
         else:
             msg['To'] = emails
         print('msg[\'To\'] = ', msg['To'])
+        print('emails: ', emails)
         msg['Subject'] = subject
         formattedContent, embeddedImages = embeddedimagehandler().formatembeddedimage(content)
         part = MIMEText(formattedContent, "html")
@@ -80,7 +81,7 @@ class senderservice:
                 smtpobj.starttls()
                 smtpobj.ehlo()
                 #smtpobj.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
-                smtpobj.sendmail(msg['From'],  msg['To'], msg.as_string())
+                smtpobj.sendmail(msg['From'], emails, msg.as_string())
                 smtpobj.quit()
                 logging.debug("End: Send email for request")
                 return {"success" : True, "message": "Sent successfully", "identifier": -1}   
