@@ -52,6 +52,7 @@ class senderservice:
             msg['To'] = ", ".join(emails)
         else:
             msg['To'] = emails
+        print('msg[\'To\'] = ', msg['To'])
         msg['Subject'] = subject
         formattedContent, embeddedImages = embeddedimagehandler().formatembeddedimage(content)
         part = MIMEText(formattedContent, "html")
