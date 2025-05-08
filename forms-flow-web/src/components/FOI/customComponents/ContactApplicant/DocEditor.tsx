@@ -13,6 +13,7 @@ DocumentEditorContainerComponent.Inject(Toolbar, SpellChecker);
 
 export const DocEditor = ({
     curTemplate,
+    selectedTemplate,
     saveSfdtDraft,
     saveSfdtDraftTrigger,
     setSaveSfdtDraftTrigger,
@@ -37,6 +38,7 @@ export const DocEditor = ({
     // These are the phrases from the templates the precede email and file, to ensure that emails and numbers in other locations aren't replaced
     const EMAILPREFIXES = [`Sent via email:  `, `Sent via email: `, `Sent by email to: `, `Sent by email to:  `, `Applicant email address:  `]
     const FILEPREFIXES = ['File:  292-40/', 'File:  292-30/', 'File:  292-30\\', 'File:  292- 30/', 'File:  292- 40/']
+    const SKIPHEADERFOOTERINSERT = ['A - Applicant Cover Email']
     const [container, setContainer] = React.useState<DocumentEditorContainerComponent | null>(null);
     const userDetail: any|null = useSelector((state: any)=> state.user.userDetail);
     let requestDetails: any|null = useSelector((state: any) => state.foiRequests.foiRequestDetail);
@@ -134,7 +136,7 @@ export const DocEditor = ({
     };
 
     const insertHeader = () => {
-        if (container) {
+        if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label)) {
             container.documentEditor.selection.sectionFormat.differentFirstPage = true;
             container.documentEditor.selection.goToPage(1);
             container.documentEditor.selection.goToHeader();
@@ -146,7 +148,7 @@ export const DocEditor = ({
     }
 
     const insertFooter = () => {
-        if (container) {
+        if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label)) {
             container.documentEditor.selection.sectionFormat.differentFirstPage = true;
             container.documentEditor.selection.goToPage(1);
             container.documentEditor.selection.goToFooter();
@@ -194,7 +196,7 @@ export const DocEditor = ({
     function onCreated(): void  {
         //initialze enable spell checker
         if(container) {
-            container.documentEditor.spellChecker.languageID = 1033; // LCID for "en-US"
+            container.documentEditor.spellChecker.languageID = 4105; // 1033 is LCID for "en-US", 4105 is LCID for "en-CA"
             container.documentEditor.spellChecker.removeUnderline = false;
             container.documentEditor.spellChecker.allowSpellCheckAndSuggestion = true;
             container.documentEditor.spellChecker.enableOptimizedSpellCheck = true;
