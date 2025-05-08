@@ -57,7 +57,8 @@ export const ContactApplicant = ({
 }: any) => {
   const [curTemplate, setCurTemplate] = useState<string>('');
   const [curTemplateName, setCurTemplateName] = useState<string>('');
-  const [emailSubject, setEmailSubject] = useState<string>('');
+  const defaultEmailSubject = `Your FOI Request [${requestNumber || requestId}]`
+  const [emailSubject, setEmailSubject] = useState<string>(defaultEmailSubject);
 
   const dispatch = useDispatch();
   const templateList: any = useSelector((state: any) => state.foiRequests.foiEmailTemplates);
@@ -223,7 +224,7 @@ export const ContactApplicant = ({
     };
     const saveBlobToPdf = async (pdf: any) => {
       const currentEditorContentAsPdfBlob = new Blob([pdf], { type: 'application/pdf' });
-      blobs.push({name: "Email Body.pdf", lastModified: new Date(), input: currentEditorContentAsPdfBlob})
+      blobs.push({name: `Correspondence Letter - ${requestNumber}.pdf`, lastModified: new Date(), input: currentEditorContentAsPdfBlob})
       const zipfile = await downloadZip(blobs).blob()
       toast.success("Message has been exported successfully", {
         position: "top-right",
