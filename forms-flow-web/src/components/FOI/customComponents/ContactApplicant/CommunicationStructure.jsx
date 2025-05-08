@@ -34,7 +34,7 @@ import { getTemplateVariables } from './util';
 import { DownloadCorrespondenceModal } from './DownloadCorrespondenceModal';
 
 
-const CommunicationStructure = ({correspondence, currentIndex,
+const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
   fullName, ministryId=null, editDraft, deleteDraft, deleteResponse, modalFor, setModalFor,setModal,setUpdateAttachment, 
   setSelectedCorrespondence, setCurrentResponseDate, applicantCorrespondenceTemplates, templateVariableInfo}) => {
 
@@ -271,11 +271,14 @@ const CommunicationStructure = ({correspondence, currentIndex,
 
 
   const getTemplateName = (correspondence) => {
-    if(correspondence.templatename) {
-      return correspondence.templatename;
-    } else {
-      return applicantCorrespondenceTemplates.find((obj)=> obj.templateid == correspondence.templateId)?.description
-    }
+    if (correspondence?.emailsubject) return correspondence.emailsubject
+    if (!correspondence?.sentby) return applicantCorrespondenceTemplates.find((obj)=> obj.templateid == correspondence.templateId)?.description
+    return `Your FOI Request [${requestNumber}]`
+    // if(correspondence.templatename) {
+    //   return correspondence.templatename;
+    // } else {
+    //   return applicantCorrespondenceTemplates.find((obj)=> obj.templateid == correspondence.templateId)?.description
+    // }
   }
   
 
