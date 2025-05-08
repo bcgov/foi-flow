@@ -72,7 +72,7 @@ export const ContactApplicant = ({
 
   const [attachPdfTrigger, setAttachPdfTrigger] = useState(false);
   const [exportPdfTrigger, setExportPdfTrigger] = useState(false);
-  const [attachAsPdfFilename, setAttachAsPdfFilename] = useState(requestNumber ? `Correspondence Letter - ${requestNumber}` : "");
+  const [attachAsPdfFilename, setAttachAsPdfFilename] = useState(requestNumber || "");
 
   const showAttachAsPdfModal = () => {
     setOpenConfirmationModal(true);
