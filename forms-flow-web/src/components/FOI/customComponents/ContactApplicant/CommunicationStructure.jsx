@@ -25,7 +25,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as html2pdf from 'html-to-pdf-js';
 import CommunicationUploadModal from '../Comments/CommunicationUploadModal';
 import { ClickableChip } from '../../Dashboard/utils';
@@ -39,6 +39,7 @@ const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
   setSelectedCorrespondence, setCurrentResponseDate, applicantCorrespondenceTemplates, templateVariableInfo}) => {
 
   // console.log("correspondence: ", correspondence);
+  const templateList = useSelector((state) => state.foiRequests.foiEmailTemplates);
   const dispatch = useDispatch();
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [communicationUploadModalOpen, setCommunicationUploadModalOpen] = useState(false);
@@ -271,8 +272,8 @@ const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
 
 
   const getTemplateName = (correspondence) => {
+    if (!correspondence?.sentby && correspondence?.templatename) return templateList.find((obj)=> obj.fileName == correspondence.templatename)?.templateName
     if (correspondence?.emailsubject) return correspondence.emailsubject
-    if (!correspondence?.sentby) return applicantCorrespondenceTemplates.find((obj)=> obj.templateid == correspondence.templateId)?.description
     return `Your FOI Request [${requestNumber}]`
     // if(correspondence.templatename) {
     //   return correspondence.templatename;
