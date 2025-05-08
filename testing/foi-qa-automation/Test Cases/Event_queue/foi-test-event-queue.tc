@@ -4,5 +4,6 @@
    <name>foi-test-event-queue</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>ed6ee9b8-3a63-4f1d-9df9-9a88b42ee99b</testCaseGuid>
 </TestCaseEntity>

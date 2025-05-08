@@ -4,6 +4,7 @@
    <name>foi-test-watch-request</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>d3316af9-94bc-4e83-98f9-55c8a5c12b1f</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

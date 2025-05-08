@@ -83,9 +83,11 @@ WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/comment/div_Comment 
 
 WebDriver user1 = DriverFactory.getWebDriver()
 
-WebDriver user2 = CustomKeywords.'browser.newWindow.open'()
+WebUI.openBrowser('')
 
-DriverFactory.changeWebDriver(user2)
+not_run: WebDriver user2 = CustomKeywords.'browser.newWindow.open'()
+
+not_run: DriverFactory.changeWebDriver(user2)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
@@ -104,7 +106,7 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
 WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_comment reply text area'), 'test reply')
 
-WebUI.click(findTestObject('Page_foi.flow/comment/button_reply 1_postBtn'), FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_U-0045750/svg_Post Comment'), FailureHandling.STOP_ON_FAILURE)
 
 DriverFactory.changeWebDriver(user1)
 

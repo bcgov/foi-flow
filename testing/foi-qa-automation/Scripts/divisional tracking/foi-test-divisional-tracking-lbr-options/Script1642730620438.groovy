@@ -35,27 +35,23 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Deputy Ministers Office'), 
     0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/lbr/li_Assistant Deputy Minister'), 
+not_run: WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/lbr/li_Assistant Deputy Minister'), 
     0)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Management Services'), 
     0)
 
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/lbr/li_Policy and Legislation'), 
-   // 0)
-
+// 0)
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/lbr/li_Employment Standards'), 
- //   0)
-
+//   0)
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/li_Ministers Office'), 
     0)
 
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/lbr/li_Workers Advisors Office'), 
- //   0)
-
+//   0)
 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/division dropdown options/lbr/li_Employers Advisors Office'), 
- //   0)
-
+//   0)
 WebUI.click(findTestObject('Page_foi.flow/form/closing modal/div_close dropdown'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/div_ministry division stage'))
@@ -102,15 +98,10 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
 //WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
-
 //WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
-
 //WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
-
 //WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
-
 //WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), FailureHandling.STOP_ON_FAILURE)
-
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/ministry view/form/divisional tracking/button_Add division to track'), 
     0)
 

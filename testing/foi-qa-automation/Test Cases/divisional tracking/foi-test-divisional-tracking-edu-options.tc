@@ -4,6 +4,7 @@
    <name>foi-test-divisional-tracking-edu-options</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>1e09c293-2205-40c9-974a-997adb2f5be6</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

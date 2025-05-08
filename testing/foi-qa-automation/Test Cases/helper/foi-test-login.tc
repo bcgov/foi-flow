@@ -4,6 +4,7 @@
    <name>foi-test-login</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>3f220393-47f8-4636-b07b-478d88449d74</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

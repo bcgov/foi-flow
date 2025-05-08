@@ -4,6 +4,7 @@
    <name>foi-test-attachment-from-public</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>6197041f-4b04-4167-beba-7d75b589171f</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

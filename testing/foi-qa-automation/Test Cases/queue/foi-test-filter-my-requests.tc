@@ -4,6 +4,7 @@
    <name>foi-test-filter-my-requests</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>4b2180a7-b21a-4ad7-a1c9-4acf62267197</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

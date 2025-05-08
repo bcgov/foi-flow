@@ -4,6 +4,7 @@
    <name>foi-test-request-form-behaviour</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>7cb3e0a0-1040-44b2-92dc-58ad8cbdb7a5</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

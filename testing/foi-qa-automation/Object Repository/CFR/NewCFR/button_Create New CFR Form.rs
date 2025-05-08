@@ -6,15 +6,16 @@
    <elementGuidId>5772ca7d-a3a3-4b81-960f-153f5bd2eddd</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>XPATH</key>
+         <value>(//button[@type='button'])[15]</value>
+      </entry>
+      <entry>
          <key>CSS</key>
          <value>button.col-lg-4.btn.btn-bottom.btn-cancel</value>
       </entry>
-      <entry>
-         <key>XPATH</key>
-         <value>(//button[@type='button'])[12]</value>
-      </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,7 +23,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
-      <webElementGuid>0e34bc6e-88b7-49b9-a929-dba47f50b1e4</webElementGuid>
+      <webElementGuid>776b9c70-afe1-4c79-ba2c-bedd0e2c8cd7</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -30,7 +31,7 @@
       <name>type</name>
       <type>Main</type>
       <value>button</value>
-      <webElementGuid>a498a96d-5b05-4f0b-a1ac-c78ae2691694</webElementGuid>
+      <webElementGuid>710f3ea5-bcf1-402c-b39f-12bd4adb69a0</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -38,7 +39,7 @@
       <name>class</name>
       <type>Main</type>
       <value>col-lg-4 btn btn-bottom btn-cancel</value>
-      <webElementGuid>3cb8ce28-5b9b-4ced-bda3-1ec3082f9e78</webElementGuid>
+      <webElementGuid>da5768e3-5d60-46c5-ad10-8f5cac560248</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -46,7 +47,7 @@
       <name>text</name>
       <type>Main</type>
       <value>+ Create New CFR Form</value>
-      <webElementGuid>ef971a19-b385-4261-95ff-d68552b9a125</webElementGuid>
+      <webElementGuid>6de904f1-6eea-43e1-aade-7ba001127f2f</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -54,23 +55,23 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;CFRForm&quot;)/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;MuiBox-root css-1cidgyh&quot;]/div[@class=&quot;foi-request-form&quot;]/div[@class=&quot;container foi-review-request-container cfrform-container&quot;]/div[@class=&quot;foi-bottom-button-group cfrform&quot;]/button[@class=&quot;col-lg-4 btn btn-bottom btn-cancel&quot;]</value>
-      <webElementGuid>11bd2115-c68a-4d5c-a786-b322508dd1d6</webElementGuid>
+      <webElementGuid>9648ad03-d0e6-4e2d-a0a6-ed147a7e4568</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:attributes</name>
       <type>Main</type>
-      <value>(//button[@type='button'])[12]</value>
-      <webElementGuid>a01e63d1-1427-4e4a-ab90-3d41fc47bb4e</webElementGuid>
+      <value>(//button[@type='button'])[15]</value>
+      <webElementGuid>3b58a629-d670-433a-9a02-ba3388a25400</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='CFRForm']/div/form/div/div[2]/div[5]/button[2]</value>
-      <webElementGuid>a7bca21a-a6cf-4dc5-af43-44b4e8f90e54</webElementGuid>
+      <value>//div[@id='Fees']/div/form/div/div[2]/div[6]/button[2]</value>
+      <webElementGuid>43684a26-7109-4747-adbb-0bf72531536a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,7 +79,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Save'])[2]/following::button[1]</value>
-      <webElementGuid>09ac1c79-6dac-4051-8112-df24d0436d59</webElementGuid>
+      <webElementGuid>1e4b0ba8-f2d3-43ea-a7da-10274047b93b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -86,7 +87,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Combined suggestions for futher clarifications'])[2]/following::button[2]</value>
-      <webElementGuid>9ae8e94b-512e-4b94-8d78-c34109c4bc1e</webElementGuid>
+      <webElementGuid>30902679-d9f3-4081-a315-23bb873e74ff</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,7 +95,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Request #ABC-2099-14102'])[1]/preceding::button[1]</value>
-      <webElementGuid>6f9fa73d-d298-44b1-b9fb-4f22bd632a19</webElementGuid>
+      <webElementGuid>392a1c67-a87b-46c9-8aa9-9f13c5c253fd</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,15 +103,15 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='+ Add Attachment'])[1]/preceding::button[1]</value>
-      <webElementGuid>3fd26044-1f8e-4052-ab08-bfb500ccc62d</webElementGuid>
+      <webElementGuid>2de1a867-f4e6-43b3-9c26-e1de24bddd55</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:neighbor</name>
       <type>Main</type>
-      <value>//*/text()[normalize-space(.)='+ Create New CFR Form']/parent::*</value>
-      <webElementGuid>6efeff2b-9a09-4438-bd69-1305c00e7a1a</webElementGuid>
+      <value>//*/text()[normalize-space(.)='+ Create New Processing Fee Form']/parent::*</value>
+      <webElementGuid>a23cf385-8ce4-485b-b4eb-125bc272f74e</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -118,14 +119,14 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//button[2]</value>
-      <webElementGuid>f1836448-3c98-48fd-8011-52c07ed446cb</webElementGuid>
+      <webElementGuid>d5e26283-f37b-44d0-a574-a3926663f1ee</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//button[@type = 'button' and (text() = '+ Create New CFR Form' or . = '+ Create New CFR Form')]</value>
-      <webElementGuid>20968179-1b2b-4db9-9721-6591828d5a43</webElementGuid>
+      <value>//button[@type = 'button' and (text() = '+ Create New Processing Fee Form' or . = '+ Create New Processing Fee Form')]</value>
+      <webElementGuid>44c9822a-c37d-4235-a94c-e963db8ec587</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

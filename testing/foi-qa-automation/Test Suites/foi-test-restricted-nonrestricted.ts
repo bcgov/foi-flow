@@ -15,14 +15,14 @@
       <guid>bb0636f0-87b7-4e47-a5b1-e2f8126b705c</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/Restriced-Nonresticted-Requests/foi-test-IAO-restricted-nonrestricted</testCaseId>
+      <testCaseId>Test Cases/Restricted-Nonrestricted-Requests/foi-test-IAO-restricted-nonrestricted</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
    <testCaseLink>
       <guid>5406754e-b7ed-4685-b7ec-9602d304a598</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/Restriced-Nonresticted-Requests/foi-test-ministry-restricted-nonrestricted</testCaseId>
+      <testCaseId>Test Cases/Restricted-Nonrestricted-Requests/foi-test-ministry-restricted-nonrestricted</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
    </testCaseLink>
 </TestSuiteEntity>

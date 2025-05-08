@@ -6,15 +6,16 @@
    <elementGuidId>bb01313a-db1b-4c26-8a4d-8388c84d862c</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>XPATH</key>
+         <value>//div[2]/div/div[2]/div/div/div/div</value>
+      </entry>
+      <entry>
          <key>CSS</key>
          <value>#cfrStatus</value>
       </entry>
-      <entry>
-         <key>XPATH</key>
-         <value>//div[@id='cfrstatuscontainer']</value>
-      </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>

@@ -7,14 +7,19 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='Comments']/div/div[3]/div/div[2]</value>
+         <value>(//button[@type='button'])[16]</value>
       </entry>
       <entry>
          <key>CSS</key>
          <value>div.col-lg-1.paperplanecontainer</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[@class = 'postBtn']</value>
+      </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -22,6 +27,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
+      <webElementGuid>ca4c0edf-3b98-4104-9763-db6e3eb0e058</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -29,6 +35,7 @@
       <name>class</name>
       <type>Main</type>
       <value>postBtn</value>
+      <webElementGuid>67c32bec-a878-4199-ac61-89325d8cf711</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -36,6 +43,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;inputBox&quot;]/div[@class=&quot;inputActions&quot;]/div[@class=&quot;col-lg-1 paperplanecontainer&quot;]/button[@class=&quot;postBtn&quot;]</value>
+      <webElementGuid>0337505f-d4ae-40b8-9316-c15e1689b4c8</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -43,6 +51,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Comments']/div/div[3]/div/div[2]/button</value>
+      <webElementGuid>bc704ed8-e5cf-45f5-9dfa-7c435c647967</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -50,6 +59,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='+ Add Comment'])[1]/following::div[17]</value>
+      <webElementGuid>c0e38e9f-b1a2-412f-8852-c3e8920e055a</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -57,6 +67,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Request #U-00512'])[2]/following::div[18]</value>
+      <webElementGuid>3106580d-af3f-4da4-b036-da07465adbf3</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -64,6 +75,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='All Comments'])[1]/preceding::div[1]</value>
+      <webElementGuid>4ea16cf3-b23d-4f70-84c6-b1192ef52d34</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -71,6 +83,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Request History'])[1]/preceding::div[1]</value>
+      <webElementGuid>10ef284c-4cb1-4b96-a207-e53d042c7263</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,5 +91,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/div/div[3]/div/div[2]</value>
+      <webElementGuid>cf8ebfef-dc8b-4be6-af9e-401c7e909445</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

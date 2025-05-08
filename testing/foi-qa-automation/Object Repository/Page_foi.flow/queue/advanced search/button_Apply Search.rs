@@ -6,19 +6,20 @@
    <elementGuidId>270f1ec6-8b17-4af4-8bc1-7dc61a37e6c1</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>button.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary.MuiButton-sizeMedium.MuiButton-containedSizeMedium.MuiButton-fullWidth.MuiButtonBase-root.css-1ghx10w</value>
-      </entry>
-      <entry>
          <key>BASIC</key>
          <value>//button[@type = 'button' and (text() = 'Apply Search' or . = 'Apply Search')]</value>
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>(//button[@type='button'])[17]</value>
+         <value>(//button[@type='button'])[9]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>button.MuiButton-root.MuiButton-contained.MuiButton-containedPrimary.MuiButton-sizeMedium.MuiButton-containedSizeMedium.MuiButton-fullWidth.MuiButtonBase-root.css-1ghx10w</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -26,7 +27,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
-      <webElementGuid>c95f1b55-dad6-40db-af4d-29870ce2e09a</webElementGuid>
+      <webElementGuid>6b99e83c-19df-42e0-b607-2d7d56ff5e2d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,7 +35,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-fullWidth MuiButtonBase-root  css-1ghx10w</value>
-      <webElementGuid>e96310e8-e4e9-45d1-8234-81868d368586</webElementGuid>
+      <webElementGuid>12b80f56-d4d2-4b4e-b99e-9e90eab94ac7</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -42,7 +43,7 @@
       <name>tabindex</name>
       <type>Main</type>
       <value>0</value>
-      <webElementGuid>1cfd8a57-79b7-4062-86ed-569f38c139b7</webElementGuid>
+      <webElementGuid>22513810-8a72-4c83-ac9f-35eaa21b1647</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -50,7 +51,7 @@
       <name>type</name>
       <type>Main</type>
       <value>button</value>
-      <webElementGuid>a677d4ac-2d62-40c0-99a4-b2d2c8636d10</webElementGuid>
+      <webElementGuid>e49b45ba-f55f-45e6-a45d-e12f9fd862d0</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -58,7 +59,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Apply Search</value>
-      <webElementGuid>32aa95e5-532e-4dcf-8e3f-90bb3e7cea2a</webElementGuid>
+      <webElementGuid>8ac3a7ab-3562-46ab-95b4-a927c6700654</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -66,23 +67,23 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 foi-grid-container css-tuxzvu&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-p4ki1t&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-grid-xs-12 css-obit8q&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-15j76c0&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 css-1kvg8j5&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-grid-xs-12 jss6 css-15jjeey&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-grid-xs-12 css-1qv1jgt&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-3 css-4xkoi8&quot;]/button[@class=&quot;MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-fullWidth MuiButtonBase-root  css-1ghx10w&quot;]</value>
-      <webElementGuid>33ab576b-1519-43d2-882c-e33e03ca4e61</webElementGuid>
+      <webElementGuid>2e714359-134b-433d-ba54-dce293c7f423</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:attributes</name>
       <type>Main</type>
-      <value>(//button[@type='button'])[17]</value>
-      <webElementGuid>77fdb82d-84db-48c6-bb28-b1862ecda839</webElementGuid>
+      <value>(//button[@type='button'])[9]</value>
+      <webElementGuid>e88c0ea5-f308-4d64-8bab-73f9a4c3706b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='app']/div/div[3]/div/div[3]/div/div/div/div[3]/div[12]/div/button</value>
-      <webElementGuid>7370e1d1-0e0d-4544-806f-b2c4d69c8bc2</webElementGuid>
+      <value>//div[@id='app']/div/div[3]/div/div[2]/div/div/div/div[2]/div[5]/div/button</value>
+      <webElementGuid>b6dfafa4-7200-4750-abfe-1df79f32cfa5</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -90,7 +91,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Public Body'])[2]/following::button[1]</value>
-      <webElementGuid>f8b0baa0-58fe-4543-8e31-06c0de509432</webElementGuid>
+      <webElementGuid>883b26c6-2cee-42b8-b602-058b49af8913</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -98,7 +99,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='All'])[1]/following::button[1]</value>
-      <webElementGuid>0ef934fe-1752-42fa-81f4-5e455114b3ad</webElementGuid>
+      <webElementGuid>5348fadd-4df1-4d05-bbd8-f48d3caa88bf</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -106,7 +107,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Clear All Filters'])[1]/preceding::button[1]</value>
-      <webElementGuid>2609a502-31df-47a0-a472-47ed2c85a720</webElementGuid>
+      <webElementGuid>58628345-0caf-4ee0-a2a9-ffee8cf839f1</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -114,7 +115,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Search Results'])[1]/preceding::button[2]</value>
-      <webElementGuid>71f46b4b-fe11-47ef-9ff0-582126afd2b9</webElementGuid>
+      <webElementGuid>4907252d-9f4e-4bc2-8f1d-f9d33d9b14b0</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -122,15 +123,15 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Apply Search']/parent::*</value>
-      <webElementGuid>e2aedfb2-9ddb-4433-a37b-86d471d9c68f</webElementGuid>
+      <webElementGuid>c410cf11-d0b3-4a6b-be8b-1011bef67909</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:position</name>
       <type>Main</type>
-      <value>//div[12]/div/button</value>
-      <webElementGuid>00f7ad46-30d2-4204-aee3-38ff2a11064f</webElementGuid>
+      <value>//div[5]/div/button</value>
+      <webElementGuid>f9b4df05-cf66-4224-9f9b-9ffc964d6dde</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -138,6 +139,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//button[@type = 'button' and (text() = 'Apply Search' or . = 'Apply Search')]</value>
-      <webElementGuid>5497d6c2-b574-4817-817a-ee311ce9d2b8</webElementGuid>
+      <webElementGuid>8cfde1a2-0e07-433f-b955-0b0e8d745d3d</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

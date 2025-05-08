@@ -17,7 +17,14 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 
-WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+WebUI.openBrowser(GlobalVariable.BASE_URL)
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('username') : GlobalVariable.username, ('password') : GlobalVariable.password
+        , ('variable') : GlobalVariable.BASE_URL], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.maximizeWindow()
+
+WebUI.click(findTestObject('Page_foi.flow/queue/button_Add Request'))
 
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant First Name_MuiInputBase'), 
     'value', applicantFirstname, 0)
@@ -27,6 +34,8 @@ WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/appl
 
 WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/inputs/applicant details/input_Applicant Email_MuiInputBase'), 
     'value', email, 0)
+
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/applicant details/div_Category'), 0)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/inputs/applicant details/div_Category'), category)
 

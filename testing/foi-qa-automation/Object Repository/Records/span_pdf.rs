@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='Records']/div/div[2]/div[2]/div/div[3]/span[2]</value>
+         <value>//div[@id='Records']/div/div[2]/div[7]/div/div[3]/span[2]</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -15,6 +15,7 @@
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,7 +23,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>span</value>
-      <webElementGuid>cbb0c74e-fc14-4b81-a4ef-fdff7339e4cb</webElementGuid>
+      <webElementGuid>ed8faac5-62a0-4e82-9c4a-1f0420e4c4d4</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +31,7 @@
       <name>class</name>
       <type>Main</type>
       <value>number-spacing</value>
-      <webElementGuid>c383636b-96b7-41bc-a737-326ba2978100</webElementGuid>
+      <webElementGuid>23e69e38-d7a1-4ae6-ae2c-38069baa1709</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -38,7 +39,7 @@
       <name>text</name>
       <type>Main</type>
       <value>5</value>
-      <webElementGuid>76342cea-5e35-4092-84e1-de83ac69f4f7</webElementGuid>
+      <webElementGuid>6b95087e-6a0d-46cd-bce2-9549f6c902f4</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,7 +47,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Records&quot;)/div[@class=&quot;jss49&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root jss62 MuiGrid-container MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-direction-xs-row-reverse MuiGrid-grid-xs-3&quot;]/span[1]/span[@class=&quot;number-spacing&quot;]</value>
-      <webElementGuid>85d4420f-5755-4916-b21a-58989600c914</webElementGuid>
+      <webElementGuid>c799a772-f0e9-432d-9d0f-d09fd2435160</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -54,7 +55,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Records']/div/div[2]/div[4]/div/div[4]/span/span[2]</value>
-      <webElementGuid>fc131214-d41b-47e3-8aea-a7f0d11adda5</webElementGuid>
+      <webElementGuid>61932fe1-a093-4b77-b454-dbe682b16433</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -62,7 +63,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Batches Uploaded:'])[1]/following::span[1]</value>
-      <webElementGuid>48b1e4f8-b4ed-4a73-bb43-01e28a236f5b</webElementGuid>
+      <webElementGuid>a1f6d368-e0ef-4b9d-a4e2-9c7f0e543f9e</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -70,7 +71,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Files Converted to PDF:'])[1]/following::span[4]</value>
-      <webElementGuid>96a5e49d-e180-4627-a282-26011ac17f44</webElementGuid>
+      <webElementGuid>5e62c2c9-d094-4cf8-8c2d-35413be96e75</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,7 +79,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Filter Records'])[1]/preceding::span[1]</value>
-      <webElementGuid>cddd2736-67ca-494a-a10a-89e8d51aaf0a</webElementGuid>
+      <webElementGuid>9549c65e-9981-44bb-ab14-1d275e63f545</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -86,7 +87,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='​'])[5]/preceding::span[1]</value>
-      <webElementGuid>2d567aae-336f-49aa-8385-6d08a06ec973</webElementGuid>
+      <webElementGuid>c8a766dd-e0fe-4195-8e15-d9353d6e6539</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,7 +95,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//span/span[2]</value>
-      <webElementGuid>7aefb27a-8610-4db9-8918-c433dc404450</webElementGuid>
+      <webElementGuid>0608c850-11f3-4f16-97b5-e6bfabc89a78</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,6 +103,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//span[(text() = '5' or . = '5')]</value>
-      <webElementGuid>c52bada3-4030-4b82-9974-f4a389dfe7a5</webElementGuid>
+      <webElementGuid>b12eaf0b-6d30-4c9c-9d2e-c68f9c720ada</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

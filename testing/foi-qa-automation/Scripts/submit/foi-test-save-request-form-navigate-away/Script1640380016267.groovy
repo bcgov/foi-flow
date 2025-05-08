@@ -20,7 +20,9 @@ import org.openqa.selenium.remote.server.handler.GetAlertText as GetAlertText
 import org.openqa.selenium.remote.server.handler.GetAlertText as Keys
 import groovy.json.JsonSlurper as JsonSlurper
 
-WebUI.openBrowser(GlobalVariable.BASE_URL)
+WebUI.openBrowser('')
+
+WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [:], FailureHandling.STOP_ON_FAILURE)
 

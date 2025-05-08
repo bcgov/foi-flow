@@ -6,19 +6,20 @@
    <elementGuidId>c475a62a-9e59-481f-bc7a-99e98a8a174a</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>button.btn-bottom.btn-save.jss33</value>
+         <key>XPATH</key>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/preceding::button[1]</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[(text() = 'Save Change' or . = 'Save Change')]</value>
       </entry>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='state-change-dialog']/div[3]/div/div[3]/button</value>
+         <key>CSS</key>
+         <value>button.btn-bottom.btn-save.jss33</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>

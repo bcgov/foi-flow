@@ -4,6 +4,7 @@
    <name>foi-test-notification-panel</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>9c01bf8a-7ded-470e-893b-ce997b864f89</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

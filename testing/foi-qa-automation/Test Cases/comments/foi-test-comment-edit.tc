@@ -4,6 +4,7 @@
    <name>foi-test-comment-edit</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>0a339828-ab8a-43e6-b834-ca509af3c2e8</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

@@ -6,15 +6,16 @@
    <elementGuidId>f327d4b8-911e-4c9f-bf99-447cfd74acb7</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>XPATH</key>
+         <value>//*/text()[normalize-space(.)='Unrestricted']/parent::*</value>
+      </entry>
+      <entry>
          <key>CSS</key>
          <value>li.MuiButtonBase-root.MuiListItem-root.MuiMenuItem-root.MuiMenuItem-gutters.MuiListItem-gutters.MuiListItem-button</value>
       </entry>
-      <entry>
-         <key>XPATH</key>
-         <value>//div[@id='menu-']/div[3]/ul/li</value>
-      </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>

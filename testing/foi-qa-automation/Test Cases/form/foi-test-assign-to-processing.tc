@@ -4,6 +4,7 @@
    <name>foi-test-assign-to-processing</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>b8d0ae06-10af-414f-965e-e444f3d0d097</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

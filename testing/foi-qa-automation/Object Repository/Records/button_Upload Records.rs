@@ -6,15 +6,16 @@
    <elementGuidId>2eeb938e-2365-4117-a10d-c0a5a4b2800f</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>XPATH</key>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Files Uploaded:'])[1]/preceding::button[1]</value>
+      </entry>
+      <entry>
          <key>CSS</key>
          <value>button.btn.addAttachment.jss81</value>
       </entry>
-      <entry>
-         <key>XPATH</key>
-         <value>//div[@id='Records']/div/div[2]/div/button</value>
-      </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>

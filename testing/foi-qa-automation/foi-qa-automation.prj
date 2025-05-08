@@ -4,9 +4,12 @@
    <name>foi-qa-automation</name>
    <tag></tag>
    <UUID>03c51503-f9cf-4c96-a61c-3d441e2c75a0</UUID>
+   <freeLicense>false</freeLicense>
    <migratedVersion>5.9.0</migratedVersion>
+   <modifiedEdition>ENTERPRISE</modifiedEdition>
+   <modifiedVersion>10.1.1</modifiedVersion>
    <pageLoadTimeout>0</pageLoadTimeout>
-   <projectFileLocation>C:\foi-flow\testing\foi-qa-automation\foi-qa-automation.prj</projectFileLocation>
+   <projectFileLocation>C:\Projects\foi-flow\testing\foi-qa-automation\foi-qa-automation.prj</projectFileLocation>
    <sourceContent>
       <sourceFolderList>
          <sourceFolderConfiguration>

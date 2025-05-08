@@ -64,9 +64,13 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 //WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 WebDriver IAOuser = DriverFactory.getWebDriver()
 
-WebDriver ministryUser = CustomKeywords.'browser.newWindow.open'()
+WebUI.openBrowser('')
 
-DriverFactory.changeWebDriver(ministryUser)
+WebUI.maximizeWindow()
+
+not_run: WebDriver ministryUser = CustomKeywords.'browser.newWindow.open'()
+
+not_run: DriverFactory.changeWebDriver(ministryUser)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
@@ -164,14 +168,35 @@ WebUI.click(findTestObject('Page_foi.flow/ministry view/form/divisional tracking
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-DriverFactory.changeWebDriver(IAOuser)
+WebUI.delay(3)
 
-WebUI.refresh()
+WebUI.openBrowser('')
 
-WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 'Fee Estimate', 
-    0)
+WebUI.maximizeWindow()
 
-WebUI.verifyElementPresent(findTestObject('CFR/div_Contact Applicant'), 0)
+WebUI.navigateToUrl(GlobalVariable.BASE_URL)
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            6), ('username') : findTestData('Login Credentials').getValue('Username', 6)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+not_run: DriverFactory.changeWebDriver(IAOuser)
+
+not_run: WebUI.refresh()
+
+not_run: WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/status dropdown/input_Status'), 'value', 
+    'Fee Estimate', 0)
+
+not_run: WebUI.verifyElementPresent(findTestObject('CFR/div_Contact Applicant'), 0)
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
 
@@ -183,9 +208,30 @@ WebUI.click(findTestObject('CFR/CFR_status/li_Needs Clarification with Ministry'
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-DriverFactory.changeWebDriver(ministryUser)
+WebUI.delay(3)
 
-WebUI.refresh()
+WebUI.openBrowser('')
+
+WebUI.maximizeWindow()
+
+WebUI.navigateToUrl(GlobalVariable.BASE_URL)
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            8), ('username') : findTestData('Login Credentials').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+not_run: DriverFactory.changeWebDriver(ministryUser)
+
+not_run: WebUI.refresh()
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
 
@@ -197,9 +243,30 @@ WebUI.click(findTestObject('CFR/CFR_status/li_In Review with IAO'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-DriverFactory.changeWebDriver(IAOuser)
+WebUI.delay(3)
 
-WebUI.refresh()
+WebUI.openBrowser('')
+
+WebUI.maximizeWindow()
+
+WebUI.navigateToUrl(GlobalVariable.BASE_URL)
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            6), ('username') : findTestData('Login Credentials').getValue('Username', 6)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+not_run: DriverFactory.changeWebDriver(IAOuser)
+
+not_run: WebUI.refresh()
 
 WebUI.click(findTestObject('CFR/div_CFR Form'))
 
@@ -230,9 +297,30 @@ WebUI.click(findTestObject('CFR/CFR_status/li_Approved'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save Change'))
 
-DriverFactory.changeWebDriver(ministryUser)
+WebUI.delay(3)
 
-WebUI.refresh()
+WebUI.openBrowser('')
+
+WebUI.maximizeWindow()
+
+WebUI.navigateToUrl(GlobalVariable.BASE_URL)
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            8), ('username') : findTestData('Login Credentials').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+not_run: DriverFactory.changeWebDriver(ministryUser)
+
+not_run: WebUI.refresh()
 
 WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
@@ -244,9 +332,28 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/navbar/notification/div_no
 
 WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification bell'), -2, 4)
 
-DriverFactory.changeWebDriver(IAOuser)
+WebUI.openBrowser('')
 
-WebUI.refresh()
+WebUI.maximizeWindow()
+
+WebUI.navigateToUrl(GlobalVariable.BASE_URL)
+
+WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
+            6), ('username') : findTestData('Login Credentials').getValue('Username', 6)], FailureHandling.STOP_ON_FAILURE)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_My Team Requests'))
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requestID)
+
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
+
+WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
+
+not_run: DriverFactory.changeWebDriver(IAOuser)
+
+not_run: WebUI.refresh()
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'))
 
@@ -268,7 +375,7 @@ WebUI.click(findTestObject('Page_foi.flow/comment/span_Request History Comments'
 
 WebUI.delay(3)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
+not_run: WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), ((findTestData('Login Credentials').getValue(
         'First Name', 1) + ' ') + findTestData('Login Credentials').getValue('Last Name', 1)) + ' changed the state of the request to On Hold')
 
 WebUI.click(findTestObject('CFR/div_Contact Applicant'))

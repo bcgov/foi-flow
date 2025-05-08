@@ -6,15 +6,15 @@
    <elementGuidId>d8ec2046-81f8-467f-b369-1e386cd787a5</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value></value>
+         <key>XPATH</key>
+         <value>//a[contains(text(),'Pay Online')]</value>
       </entry>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='ContactApplicant']/div/div[3]/div/div/div/div[2]/p[5]/a</value>
+         <key>CSS</key>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>

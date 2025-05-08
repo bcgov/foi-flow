@@ -4,6 +4,7 @@
    <name>foi-test-divisional-tracking-lbr-options</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>3836ded1-4126-42b5-8c52-b3af08755e9c</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

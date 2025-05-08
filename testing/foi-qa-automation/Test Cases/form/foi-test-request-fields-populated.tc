@@ -4,6 +4,7 @@
    <name>foi-test-request-fields-populated</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>be03f266-f2cf-48f5-84e3-a021ad0a79a3</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

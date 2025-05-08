@@ -4,6 +4,7 @@
    <name>foi-test-request-queue-order-and-search</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>f5683338-ba03-433e-b65b-dee630b19041</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

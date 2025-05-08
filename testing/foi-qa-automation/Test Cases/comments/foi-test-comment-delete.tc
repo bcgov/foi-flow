@@ -4,6 +4,7 @@
    <name>foi-test-comment-delete</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>7cb53d9c-aa74-4efa-ac2c-9f0f63de9a69</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

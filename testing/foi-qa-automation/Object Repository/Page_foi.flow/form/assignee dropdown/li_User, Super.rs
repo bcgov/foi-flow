@@ -7,18 +7,18 @@
    <selectorCollection>
       <entry>
          <key>CSS</key>
-         <value></value>
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='menu-']/div[3]/ul/li[54]</value>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='serviceaccount, record'])[1]/preceding::li[2]</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[(text() = 'User, Super' or . = 'User, Super')]</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>

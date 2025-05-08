@@ -4,6 +4,7 @@
    <name>foi-test-request-description-history-personal</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>e7795fd8-9030-42bd-97d0-7d573c830a9b</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

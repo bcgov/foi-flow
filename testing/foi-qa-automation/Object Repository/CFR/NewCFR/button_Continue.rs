@@ -6,15 +6,16 @@
    <elementGuidId>ae2d048d-e662-4a0f-93ea-1777d9f0aa69</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>XPATH</key>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Close'])[2]/following::button[1]</value>
+      </entry>
+      <entry>
          <key>CSS</key>
          <value>div.MuiDialogActions-root.MuiDialogActions-spacing > button.btn-bottom.btn-save.btn</value>
       </entry>
-      <entry>
-         <key>XPATH</key>
-         <value>(.//*[normalize-space(text()) and normalize-space(.)='Close'])[1]/following::button[1]</value>
-      </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,7 +23,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
-      <webElementGuid>b3c45beb-dc06-48ab-b1be-d2f6c7d29e89</webElementGuid>
+      <webElementGuid>ed92f060-3208-49bd-80bb-e61a84d69bb3</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +31,7 @@
       <name>class</name>
       <type>Main</type>
       <value>btn-bottom btn-save btn</value>
-      <webElementGuid>ff61154a-bb93-47fc-a12e-b5299a56108c</webElementGuid>
+      <webElementGuid>bdd9a59e-c23f-439f-8069-f16c3b8b8677</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -38,7 +39,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Continue</value>
-      <webElementGuid>152b3e88-8365-4f23-b616-681e1d605efe</webElementGuid>
+      <webElementGuid>802cc6eb-5b8e-491a-b491-a62aa1f0b665</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,7 +47,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>/html[1]/body[@class=&quot;no-scroll&quot;]/div[@class=&quot;MuiDialog-root&quot;]/div[@class=&quot;MuiDialog-container MuiDialog-scrollPaper&quot;]/div[@class=&quot;MuiPaper-root MuiDialog-paper MuiDialog-paperScrollPaper MuiDialog-paperWidthMd MuiDialog-paperFullWidth MuiPaper-elevation24 MuiPaper-rounded&quot;]/div[@class=&quot;MuiDialogActions-root MuiDialogActions-spacing&quot;]/button[@class=&quot;btn-bottom btn-save btn&quot;]</value>
-      <webElementGuid>57283813-1e24-4f4e-96ff-c438e5a3e8fc</webElementGuid>
+      <webElementGuid>7f644606-6ad4-449d-87d8-d39b49ddc159</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -54,7 +55,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Close'])[1]/following::button[1]</value>
-      <webElementGuid>4406ae2a-1dd5-4482-b5d3-46f6ef042ecb</webElementGuid>
+      <webElementGuid>b6447939-3488-4ffe-bbd1-4291727bbcb9</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -62,7 +63,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/preceding::button[1]</value>
-      <webElementGuid>b74ae937-093b-405e-b7c4-743a5faa0e90</webElementGuid>
+      <webElementGuid>09033cd4-2120-43a9-9565-43fc8ab1107e</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -70,7 +71,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Continue']/parent::*</value>
-      <webElementGuid>53394365-2342-447c-8591-04ff0ab497c4</webElementGuid>
+      <webElementGuid>22eee8b0-1121-429e-a4cc-2fffbb14ae9d</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,7 +79,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/div/div[3]/button</value>
-      <webElementGuid>0e805a1a-8599-4452-8c6c-e60015d7a99f</webElementGuid>
+      <webElementGuid>a2346192-4217-469f-8f85-2be921a8f07b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -86,6 +87,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//button[(text() = 'Continue' or . = 'Continue')]</value>
-      <webElementGuid>0e51fc35-5559-4094-9fbb-c9865e139a3b</webElementGuid>
+      <webElementGuid>0c26ef68-623d-4c6f-ae0e-7c927015b26d</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>
