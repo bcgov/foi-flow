@@ -4,5 +4,6 @@
    <name>foi-test-intake in-progress-App-fee-hold</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>b5acf83e-919d-48f2-9d04-b8aeca24e6dc</testCaseGuid>
 </TestCaseEntity>

@@ -7,17 +7,18 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='Records']/div/div[2]/div[2]/div/div[2]/span[2]</value>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Duplicates Removed:'])[1]/following::span[1]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[(text() = '2' or . = '2')]</value>
       </entry>
-      <entry>
-         <key>CSS</key>
-      </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>

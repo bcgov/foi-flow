@@ -50,7 +50,7 @@
       <guid>21de153a-0aea-4f0c-9214-c3d2ebde0bd8</guid>
       <isReuseDriver>false</isReuseDriver>
       <isRun>true</isRun>
-      <testCaseId>Test Cases/CFR/CFR_noemail_worfflow</testCaseId>
+      <testCaseId>Test Cases/CFR/CFR_noemail_workflow</testCaseId>
       <usingDataBindingAtTestSuiteLevel>true</usingDataBindingAtTestSuiteLevel>
       <variableLink>
          <testDataLinkId></testDataLinkId>

@@ -6,19 +6,20 @@
    <elementGuidId>835d0ae2-8c12-40ca-ae6b-8a69ee9483c0</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>svg.svg-inline--fa.fa-clone.fa-w-16.fa-2x.jss61</value>
+         <key>XPATH</key>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='INCOMPATIBLE'])[1]/following::*[name()='svg'][5]</value>
       </entry>
       <entry>
-         <key>XPATH</key>
-         <value>(.//*[normalize-space(text()) and normalize-space(.)='INCOMPATIBLE'])[1]/following::*[name()='svg'][1]</value>
+         <key>CSS</key>
+         <value>svg.svg-inline--fa.fa-clone.fa-w-16.fa-2x.jss61</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>id(&quot;Records&quot;)/div[@class=&quot;jss50&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root jss52 MuiGrid-container MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6&quot;]/svg[@class=&quot;svg-inline--fa fa-clone fa-w-16 fa-2x jss61&quot;]</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>CSS</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -26,7 +27,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>svg</value>
-      <webElementGuid>7729406a-b95d-4990-8280-48900aea0979</webElementGuid>
+      <webElementGuid>9dd55984-dcfd-47f6-b4e6-c6009b452f46</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -34,7 +35,7 @@
       <name>aria-hidden</name>
       <type>Main</type>
       <value>true</value>
-      <webElementGuid>e83830ad-087b-47d0-a317-c95742e4458b</webElementGuid>
+      <webElementGuid>ba42b42a-e205-4b4d-8458-b9342796cae0</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -42,7 +43,7 @@
       <name>focusable</name>
       <type>Main</type>
       <value>false</value>
-      <webElementGuid>b7cb3b15-aa52-43dc-8b32-c6d2813e4aa7</webElementGuid>
+      <webElementGuid>b1dcd323-183e-4d7d-aa63-4fb4840a3809</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -50,7 +51,7 @@
       <name>data-prefix</name>
       <type>Main</type>
       <value>far</value>
-      <webElementGuid>72c27939-0ae5-4f39-8511-d3f850ddfc04</webElementGuid>
+      <webElementGuid>f4089e9f-288a-45a6-ac50-fff0f199d53a</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -58,7 +59,7 @@
       <name>data-icon</name>
       <type>Main</type>
       <value>clone</value>
-      <webElementGuid>1d0789ad-1c8a-43af-a170-b4bb927a38f8</webElementGuid>
+      <webElementGuid>4e1b673f-5ce9-46c3-bf85-50765436e9a1</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -66,7 +67,7 @@
       <name>class</name>
       <type>Main</type>
       <value>svg-inline--fa fa-clone fa-w-16 fa-2x jss61</value>
-      <webElementGuid>e125e92c-8d42-4a07-8ee8-162d03c13373</webElementGuid>
+      <webElementGuid>f98cbe87-7235-4b37-8b44-a308d21a138c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -74,7 +75,7 @@
       <name>role</name>
       <type>Main</type>
       <value>img</value>
-      <webElementGuid>5272088d-7308-4f77-95dc-59ecd0755bdb</webElementGuid>
+      <webElementGuid>0d214c20-8d0e-40db-82cf-2b6ec18717e6</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -82,7 +83,7 @@
       <name>xmlns</name>
       <type>Main</type>
       <value>http://www.w3.org/2000/svg</value>
-      <webElementGuid>5025f1e7-9465-42c6-98f6-834fc9c6f76e</webElementGuid>
+      <webElementGuid>64e39c40-453d-4017-a509-52d6fdf56c28</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -90,7 +91,7 @@
       <name>viewBox</name>
       <type>Main</type>
       <value>0 0 512 512</value>
-      <webElementGuid>b1d4f2a3-11e3-4ec2-b17f-59bc0a3742a7</webElementGuid>
+      <webElementGuid>759eb882-6975-4e20-9691-76a552817c06</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -98,7 +99,7 @@
       <name>color</name>
       <type>Main</type>
       <value>#FF873D</value>
-      <webElementGuid>5c132236-72cc-4edc-b3a4-aed059963f08</webElementGuid>
+      <webElementGuid>1061022c-11f2-4dc7-90ca-a1fdb9c63c02</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -106,7 +107,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Records&quot;)/div[@class=&quot;jss50&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root jss52 MuiGrid-container MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6&quot;]/svg[@class=&quot;svg-inline--fa fa-clone fa-w-16 fa-2x jss61&quot;]</value>
-      <webElementGuid>5832061c-8be2-4e6a-b335-ae6ae767e394</webElementGuid>
+      <webElementGuid>13f55c22-e525-4262-8f8b-4b65e3044f0d</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -114,7 +115,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='INCOMPATIBLE'])[1]/following::*[name()='svg'][1]</value>
-      <webElementGuid>acf527e8-72d1-4314-af5f-7b191b2f9ea6</webElementGuid>
+      <webElementGuid>eb4a648e-2fff-4692-a52e-8c6461d5c0aa</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -122,7 +123,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='ERRORS'])[1]/following::*[name()='svg'][1]</value>
-      <webElementGuid>6b6f784c-9b2d-4c6a-bea1-a6c871bc2424</webElementGuid>
+      <webElementGuid>103db226-c6db-42e4-b164-9f1033784972</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -130,6 +131,6 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='download.png'])[1]/preceding::*[name()='svg'][1]</value>
-      <webElementGuid>ae253859-e98a-4c63-874f-2f1ea4f963cf</webElementGuid>
+      <webElementGuid>cb5e04fc-05d5-46a2-9f60-726bda3a2320</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

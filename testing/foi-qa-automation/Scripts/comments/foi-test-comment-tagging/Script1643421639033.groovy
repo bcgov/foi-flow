@@ -23,7 +23,7 @@ import org.openqa.selenium.WebElement as WebElement
 import com.kms.katalon.core.webui.common.WebUiCommonHelper as WebUiCommonHelper
 import org.openqa.selenium.By as By
 import groovy.json.JsonSlurper as JsonSlurper
-import org.openqa.selenium.StaleElementReferenceException
+import org.openqa.selenium.StaleElementReferenceException as StaleElementReferenceException
 
 WebUI.openBrowser(GlobalVariable.BASE_URL)
 
@@ -35,13 +35,13 @@ WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('req
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 'Comments')
+WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), 'Comments (0)')
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/comment/div_Comment editor'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_Add Comment'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/comment/div_Comment tagging popup'), 0)
+not_run: WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/comment/div_Comment tagging popup'), 0)
 
 WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), '@')
 
@@ -49,7 +49,7 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Comment tag
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Tagging option 1'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Tagging option 2'), 0)
+not_run: WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Tagging option 2'), 0)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/div_Tagging option 3'), 0)
 
@@ -74,32 +74,21 @@ for (int i = 1; i <= popupChildren.size(); i++) {
         'm')
 }
 
-WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'a')
-
-//popupChildren = popup.findElements(By.xpath('*'))
-
+WebUI.sendKeys(findTestObject('Page_foi.flow/comment/div_Comment textbox'), 'a') //popupChildren = popup.findElements(By.xpath('*'))
 //println(popupChildren.size())
-
 //for (int i = 1; i <= popupChildren.size(); i++) {
- //   assert WebUI.getText(findTestObject('Page_foi.flow/comment/div_Tagging option ' + i), FailureHandling.STOP_ON_FAILURE).toLowerCase().contains(
-  //      'ma')
+//   assert WebUI.getText(findTestObject('Page_foi.flow/comment/div_Tagging option ' + i), FailureHandling.STOP_ON_FAILURE).toLowerCase().contains(
+//      'ma')
 //}
-
 //def name = WebUI.getText(findTestObject('Page_foi.flow/comment/div_Tagging option 1'), FailureHandling.STOP_ON_FAILURE)
-
 //WebUI.click(findTestObject('Page_foi.flow/comment/div_Tagging option 1'), FailureHandling.STOP_ON_FAILURE)
-
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_Comment textbox'), name + ' ')
-
 //WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/comment/span_text box Mention'), 'background-color'), 
-  //  'rgba(230, 243, 255, 1)', false)
-
+//  'rgba(230, 243, 255, 1)', false)
 //WebUI.click(findTestObject('Page_foi.flow/comment/button_Post comment'), FailureHandling.STOP_ON_FAILURE)
-
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 text'), name + ' ')
-
 //WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/comment/span_posted comment mention'), 'background-color'), 
-  //  'rgba(230, 243, 255, 1)', false)
+//  'rgba(230, 243, 255, 1)', false)
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {

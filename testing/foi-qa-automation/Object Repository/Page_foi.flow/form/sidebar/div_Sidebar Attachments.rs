@@ -10,14 +10,15 @@
          <value>//div[@name='Attachments']</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>div[name=&quot;Request&quot;]</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+      </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -25,6 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
+      <webElementGuid>7ae4464e-390f-4ed7-9e55-66df313d830e</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -32,6 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>tablinks active</value>
+      <webElementGuid>927be787-9ccd-4a45-b123-1e8bb3bb5fc2</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -39,6 +42,7 @@
       <name>name</name>
       <type>Main</type>
       <value>Request</value>
+      <webElementGuid>dd4cf53f-a742-467f-a8cb-ff21e7b082fb</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,6 +50,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Request</value>
+      <webElementGuid>9fce4721-2e95-42b2-876e-4e4561d89651</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -53,6 +58,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;foiformcontent&quot;]/div[@class=&quot;foitabbedContainer&quot;]/div[@class=&quot;foitabheadercollection foitabheaderdefaultBG&quot;]/div[@class=&quot;tab&quot;]/div[@class=&quot;tablinks active&quot;]</value>
+      <webElementGuid>83ec63ba-a65f-4af9-9a30-a3d710ab1987</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -60,6 +66,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//div[@name='Attachments']</value>
+      <webElementGuid>00e4e524-e560-4abe-a48e-170bec1cc7b9</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -67,6 +74,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='app']/div/div[3]/div/div/div[3]/div</value>
+      <webElementGuid>d6e90fac-9153-4c36-a75b-cfd60d17eed8</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -74,6 +82,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='​'])[1]/following::div[2]</value>
+      <webElementGuid>eb650f3e-6d97-439b-8954-3a9a76ecab69</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -81,6 +90,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Unopened'])[1]/following::div[2]</value>
+      <webElementGuid>7fc4961f-3482-4a06-8547-9448736f97ad</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -88,6 +98,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Attachments'])[1]/preceding::div[1]</value>
+      <webElementGuid>b8e9cea7-fd90-4115-b434-efd26d3edee0</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -95,6 +106,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Comments'])[1]/preceding::div[2]</value>
+      <webElementGuid>fdac019c-bd89-43aa-a8e9-655755dea573</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,6 +114,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Request']/parent::*</value>
+      <webElementGuid>15bc20b8-9713-4863-a2ea-41b06c158e77</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -109,5 +122,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/div/div/div[3]/div</value>
+      <webElementGuid>0dfe90bc-6eeb-4604-a2d7-03741d5a0232</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

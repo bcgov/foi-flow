@@ -5,7 +5,9 @@
    <tag></tag>
    <elementGuidId>2205eca3-b999-4e4d-b750-5eb0ebb68ab5</elementGuidId>
    <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>false</useRalativeImagePath>
+   <autoUpdateContent>true</autoUpdateContent>
    <connectionTimeout>0</connectionTimeout>
    <followRedirects>false</followRedirects>
    <httpBody></httpBody>
@@ -21,10 +23,12 @@
       <name>Content-Type</name>
       <type>Main</type>
       <value>application/json</value>
+      <webElementGuid>7e3b439f-6365-44a2-b8f1-e40d849322aa</webElementGuid>
    </httpHeaderProperties>
    <katalonVersion>8.2.0</katalonVersion>
    <maxResponseSize>0</maxResponseSize>
    <migratedVersion>5.4.1</migratedVersion>
+   <path></path>
    <restRequestMethod>POST</restRequestMethod>
    <restUrl>${URL}/api/foirawrequests</restUrl>
    <serviceType>RESTful</serviceType>

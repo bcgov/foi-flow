@@ -4,5 +4,6 @@
    <name>CFR_fee waiverflow</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>d2432984-a4bb-4b23-91bb-d02531058029</testCaseGuid>
 </TestCaseEntity>

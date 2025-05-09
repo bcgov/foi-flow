@@ -54,11 +54,13 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 //WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 WebDriver IAOuser = DriverFactory.getWebDriver()
 
-WebDriver ministryUser = CustomKeywords.'browser.newWindow.open'()
-
-DriverFactory.changeWebDriver(ministryUser)
+WebUI.openBrowser('')
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
+
+not_run: DriverFactory.changeWebDriver(ministryUser)
+
+not_run: WebDriver ministryUser = CustomKeywords.'browser.newWindow.open'()
 
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
             8), ('username') : findTestData('Login Credentials').getValue('Username', 8)], FailureHandling.STOP_ON_FAILURE)

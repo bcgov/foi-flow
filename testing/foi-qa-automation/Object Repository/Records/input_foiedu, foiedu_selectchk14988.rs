@@ -6,19 +6,20 @@
    <elementGuidId>eeba0d59-4eea-4d13-856c-d5b3220e3df6</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>BASIC</key>
-         <value>//*[@type = 'checkbox' and @id = 'selectchk14988']</value>
+         <key>XPATH</key>
+         <value>//div[4]/div/input</value>
       </entry>
       <entry>
          <key>CSS</key>
          <value>#selectchk14988</value>
       </entry>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='Records']/div/div[2]/div[6]/div[4]/div/input</value>
+         <key>BASIC</key>
+         <value>//*[@type = 'checkbox' and @id = 'selectchk14988']</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>

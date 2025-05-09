@@ -4,6 +4,7 @@
    <name>foi-test-attachment-replace</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>c8be0c7b-292e-4e3f-b306-272e1ce11bd3</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

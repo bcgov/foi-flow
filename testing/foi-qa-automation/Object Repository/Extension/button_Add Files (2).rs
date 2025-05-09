@@ -10,15 +10,16 @@
          <value>(//button[@type='button'])[22]</value>
       </entry>
       <entry>
-         <key>BASIC</key>
-         <value>//button[@class = 'btn-add-files' and @type = 'button' and (text() = 'Add Files' or . = 'Add Files')]</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>button.btn-add-files</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[@class = 'btn-add-files' and @type = 'button' and (text() = 'Add Files' or . = 'Add Files')]</value>
+      </entry>
    </selectorCollection>
-   <selectorMethod>CSS</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>true</isSelected>

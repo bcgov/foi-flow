@@ -4,6 +4,7 @@
    <name>foi-test-advanced-search-by-id</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>6c03bf51-007a-4b81-acac-2440ffea0c34</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

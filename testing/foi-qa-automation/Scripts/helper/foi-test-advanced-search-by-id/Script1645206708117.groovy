@@ -25,18 +25,19 @@ WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/div_advanced sea
 
 WebUI.setText(findTestObject('Page_foi.flow/queue/advanced search/input_advancedSearch'), requestID)
 
-WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/input_Request State_unopened'))
+WebUI.click(findTestObject('Page_foi.flow/queue/Page_FOI Advanced Search/div_All'))
 
-WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/div_ID NUMBER'))
+WebUI.click(findTestObject('Page_foi.flow/queue/Page_FOI Advanced Search/Page_FOI Advanced Search/span_Unopened'))
+
+WebUI.click(findTestObject('Page_FOI Advanced Search/div_Clear All Filters_MuiBackdrop-root MuiBackdrop-invisible MuiModal-backdrop css-esi9ax'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/queue/advanced search/button_Apply Search'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/queue/advanced search/button_Apply Search'))
 
-if (clickOnRequest) {
-    WebUI.scrollToElement(findTestObject('Page_foi.flow/queue/div_request queue row by id', [('requestID') : 'U-00' + requestID]), 
-        0)
+WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
-    WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row by id', [('requestID') : 'U-00' + requestID]))
-}
+WebUI.scrollToElement(findTestObject('Page_FOI Advanced Search/div_general'), 0)
+
+WebUI.click(findTestObject('Page_FOI Advanced Search/Page_FOI Advanced Search/div_general'))
 

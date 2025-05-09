@@ -6,14 +6,19 @@
    <elementGuidId>dbd40363-a10a-4bda-a752-6ca854e72f48</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
+         <key>BASIC</key>
+         <value>//*[(text() = 'Intake, FOI' or . = 'Intake, FOI')]</value>
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='menu-']/div[3]/ul/li[11]</value>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Kan, Nicholas'])[1]/preceding::li[2]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
       </entry>
    </selectorCollection>
    <selectorMethod>BASIC</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>

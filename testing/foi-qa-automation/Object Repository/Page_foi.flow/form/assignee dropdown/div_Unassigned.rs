@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='ministryAssignedTo']</value>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='​'])[1]/following::div[7]</value>
       </entry>
       <entry>
          <key>CSS</key>
@@ -15,6 +15,7 @@
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,7 +23,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
-      <webElementGuid>e1b8b9d5-53d8-4908-be71-a2b83399c03a</webElementGuid>
+      <webElementGuid>c4f7600c-7d76-405d-9b90-a3299e52c509</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -30,7 +31,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiSelect-root MuiSelect-select MuiSelect-selectMenu MuiSelect-outlined MuiInputBase-input MuiOutlinedInput-input</value>
-      <webElementGuid>d21632aa-3452-43b5-a73b-5339f1f63db6</webElementGuid>
+      <webElementGuid>1f4e015a-1e62-4b20-b8b3-5af7f163d210</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -38,7 +39,7 @@
       <name>tabindex</name>
       <type>Main</type>
       <value>0</value>
-      <webElementGuid>db74a50f-7553-47fc-a977-e338852cab0f</webElementGuid>
+      <webElementGuid>fc2f130a-06a8-438b-9f9f-196d9be4784a</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,7 +47,7 @@
       <name>role</name>
       <type>Main</type>
       <value>button</value>
-      <webElementGuid>500954b8-9d9d-4f82-b326-955662e629b3</webElementGuid>
+      <webElementGuid>52e57a2c-ded1-499f-a670-7d87d217a4d6</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -54,7 +55,7 @@
       <name>aria-haspopup</name>
       <type>Main</type>
       <value>listbox</value>
-      <webElementGuid>4eaef33c-d5ba-49a6-9f79-f385a4e05af9</webElementGuid>
+      <webElementGuid>4a80c903-34bd-41b9-a9fc-cd60adbb511e</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -62,7 +63,7 @@
       <name>aria-labelledby</name>
       <type>Main</type>
       <value>ministryAssignedTo-label ministryAssignedTo</value>
-      <webElementGuid>9cb01753-88e0-400d-8666-c6c1b2b1c34a</webElementGuid>
+      <webElementGuid>345f4a35-1120-4eae-bfac-15483fe60a3b</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -70,7 +71,7 @@
       <name>id</name>
       <type>Main</type>
       <value>ministryAssignedTo</value>
-      <webElementGuid>20630c68-8fb3-4016-b374-ca6ed01ff94e</webElementGuid>
+      <webElementGuid>9a38d477-602f-43b8-a893-b81cc5bcab23</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -78,7 +79,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Unassigned</value>
-      <webElementGuid>646ed95f-6d34-4842-ae9e-3710c4e6de5d</webElementGuid>
+      <webElementGuid>d1678f2c-05e4-4241-8c8a-4720750adb07</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -86,23 +87,23 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;ministryAssignedTo&quot;)</value>
-      <webElementGuid>0b33416e-2eaa-42d4-9699-999760af4d94</webElementGuid>
+      <webElementGuid>312c5d6d-2cf9-421f-b72f-c3dd61971b49</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:attributes</name>
       <type>Main</type>
-      <value>//div[@id='ministryAssignedTo']</value>
-      <webElementGuid>57f36cf2-3d41-4b7f-b8a9-9680d315c7f3</webElementGuid>
+      <value>//div[@id='assignedTo']</value>
+      <webElementGuid>eda35e8b-12d0-4e6f-9714-c44dcbbc6bee</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:idRelative</name>
       <type>Main</type>
-      <value>//div[@id='Request']/div/div/form/div[2]/div[2]/div/div/div/div/div</value>
-      <webElementGuid>e209852c-a4c4-4713-9e91-8cb56f38e578</webElementGuid>
+      <value>//div[@id='Request']/div/div/form/div/div[2]/div/div/div/div</value>
+      <webElementGuid>a870ec5d-142c-42f5-af8b-d5e8fbeddd76</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -110,7 +111,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='​'])[1]/following::div[7]</value>
-      <webElementGuid>3a17f10b-22b5-4c2d-9963-f668c1f8696a</webElementGuid>
+      <webElementGuid>1015a4e3-90ea-4a98-a865-e8130bcad1b8</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -118,7 +119,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Applicant Details'])[1]/preceding::div[2]</value>
-      <webElementGuid>a8fe7495-8f84-44b8-908f-5eae4f1cfdd3</webElementGuid>
+      <webElementGuid>ddf37b15-5a0d-469c-8e4a-292c898b5345</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -126,7 +127,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Unassigned']/parent::*</value>
-      <webElementGuid>0dbeb578-a040-4662-9e13-afcb1267dd73</webElementGuid>
+      <webElementGuid>bc883620-ab37-4e4f-b25b-6d80032e022b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -134,14 +135,14 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div[2]/div/div/div/div/div</value>
-      <webElementGuid>f3e88a40-2e8a-441f-92ed-86502471e3f7</webElementGuid>
+      <webElementGuid>db356993-b45e-429e-9ce7-660c5b59eed0</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
       <matchCondition>equals</matchCondition>
       <name>xpath:customAttributes</name>
       <type>Main</type>
-      <value>//div[@id = 'ministryAssignedTo' and (text() = 'Unassigned' or . = 'Unassigned')]</value>
-      <webElementGuid>111ffcd2-4903-4dce-8c4f-6adcd264b8bc</webElementGuid>
+      <value>//div[@id = 'assignedTo' and (text() = 'Unassigned' or . = 'Unassigned')]</value>
+      <webElementGuid>9a87a480-05d6-4601-832d-36ec50380d1e</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

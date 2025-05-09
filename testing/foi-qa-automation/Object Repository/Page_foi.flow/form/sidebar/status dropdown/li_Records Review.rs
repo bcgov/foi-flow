@@ -14,10 +14,11 @@
       </entry>
       <entry>
          <key>BASIC</key>
-         <value>//*[(text() = 'Fee Estimate' or . = 'Fee Estimate')]</value>
+         <value>//*[(text() = 'Records Review' or . = 'Records Review')]</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -25,6 +26,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>li</value>
+      <webElementGuid>04808100-28a1-4fa8-8703-cef0a1199ef3</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -32,6 +34,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-state-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button</value>
+      <webElementGuid>eed05ea3-0555-473a-a443-55669fdcd6bd</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -39,6 +42,7 @@
       <name>tabindex</name>
       <type>Main</type>
       <value>-1</value>
+      <webElementGuid>72e83c51-c267-4cdd-91f4-0138e5b2f138</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,6 +50,7 @@
       <name>role</name>
       <type>Main</type>
       <value>option</value>
+      <webElementGuid>c47e84ae-9c70-4b46-a3d7-81386025ebab</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -53,6 +58,7 @@
       <name>aria-disabled</name>
       <type>Main</type>
       <value>false</value>
+      <webElementGuid>9eadb99e-20fd-46d6-bf38-9059573def77</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -60,6 +66,7 @@
       <name>data-value</name>
       <type>Main</type>
       <value>Records Review</value>
+      <webElementGuid>f3913372-bb1a-4782-a456-2436a3401c63</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -67,6 +74,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Records Review</value>
+      <webElementGuid>e2ad4374-faa4-47c7-9b6b-05f23beee8d1</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -74,6 +82,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;menu-&quot;)/div[@class=&quot;MuiPaper-root MuiMenu-paper MuiPopover-paper MuiPaper-elevation8 MuiPaper-rounded&quot;]/ul[@class=&quot;MuiList-root MuiMenu-list MuiList-padding&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-state-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button&quot;]</value>
+      <webElementGuid>97a3600b-c847-4911-be9e-ce8f2f5dff81</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -81,6 +90,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='menu-']/div[3]/ul/li[2]</value>
+      <webElementGuid>a9a42bf1-3cce-4489-9c66-900e7cecebdb</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -88,6 +98,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Call For Records'])[2]/following::li[1]</value>
+      <webElementGuid>ad7a8339-b923-4f9b-af4a-26bfcca431d2</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -95,6 +106,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='`'])[2]/following::li[2]</value>
+      <webElementGuid>188cf290-b30a-4a89-9da3-5f09166b6d70</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,6 +114,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Harms Assessment'])[1]/preceding::li[1]</value>
+      <webElementGuid>bd93b184-3e9f-454e-9bb6-9597319a9621</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -109,6 +122,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Deduplication'])[1]/preceding::li[2]</value>
+      <webElementGuid>18ba369b-cd44-4013-a788-da7d50e8645e</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -116,6 +130,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Fee Estimate']/parent::*</value>
+      <webElementGuid>444b4e32-7ee3-49c0-af60-cbbee15063da</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -123,5 +138,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/div[3]/ul/li[2]</value>
+      <webElementGuid>015a2b43-f04b-4381-a8cc-1e08fe7d31a0</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

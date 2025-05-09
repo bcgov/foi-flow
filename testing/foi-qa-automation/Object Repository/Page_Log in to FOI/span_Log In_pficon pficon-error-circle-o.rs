@@ -7,7 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='kc-content-wrapper']/div/span</value>
+         <value>//span</value>
       </entry>
       <entry>
          <key>BASIC</key>
@@ -18,7 +18,8 @@
          <value>span.pficon.pficon-error-circle-o</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>

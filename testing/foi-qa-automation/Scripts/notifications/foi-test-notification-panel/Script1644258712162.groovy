@@ -33,9 +33,11 @@ requestID = WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Tit
 
 WebDriver user1 = DriverFactory.getWebDriver()
 
-WebDriver user2 = CustomKeywords.'browser.newWindow.open'()
+WebUI.openBrowser('')
 
-DriverFactory.changeWebDriver(user2)
+not_run: WebDriver user2 = CustomKeywords.'browser.newWindow.open'()
+
+not_run: DriverFactory.changeWebDriver(user2)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
@@ -71,9 +73,11 @@ WebUI.clickOffset(findTestObject('Page_foi.flow/navbar/notification/notification
 
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/navbar/notification/div_notification popup'), 0)
 
-WebDriver user3 = CustomKeywords.'browser.newWindow.open'()
+WebUI.openBrowser('')
 
-DriverFactory.changeWebDriver(user3)
+not_run: WebDriver user3 = CustomKeywords.'browser.newWindow.open'()
+
+not_run: DriverFactory.changeWebDriver(user3)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 

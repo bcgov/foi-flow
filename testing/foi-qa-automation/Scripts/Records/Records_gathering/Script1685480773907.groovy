@@ -54,9 +54,11 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 //WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 WebDriver IAOuser = DriverFactory.getWebDriver()
 
-WebDriver ministryUser = CustomKeywords.'browser.newWindow.open'()
+WebUI.openBrowser('')
 
-DriverFactory.changeWebDriver(ministryUser)
+not_run: WebDriver ministryUser = CustomKeywords.'browser.newWindow.open'()
+
+not_run: DriverFactory.changeWebDriver(ministryUser)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
@@ -126,12 +128,12 @@ WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-u
 
 WebUI.click(findTestObject('Records/button_Add Files'))
 
-println(RunConfiguration.getProjectDir() + '/Test Attachments')
+not_run: println(RunConfiguration.getProjectDir() + '/Test Attachments')
 
-WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
+not_run: WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-upload-input'), RunConfiguration.getProjectDir() + 
     '/Test Attachments/50mb.pdf')
 
-WebUI.click(findTestObject('Records/button_Add Files'))
+not_run: WebUI.click(findTestObject('Records/button_Add Files'))
 
 println(RunConfiguration.getProjectDir() + '/Test Attachments')
 

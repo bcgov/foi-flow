@@ -4,5 +4,6 @@
    <name>Records_options</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>2a1f1f85-b6f0-44e2-bfd9-d5d28ccc5bdf</testCaseGuid>
 </TestCaseEntity>

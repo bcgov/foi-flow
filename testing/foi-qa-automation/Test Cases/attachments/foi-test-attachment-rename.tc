@@ -4,6 +4,7 @@
    <name>foi-test-attachment-rename</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>e32e4ef6-69b7-4e4e-98ab-e2c0c354fcb1</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

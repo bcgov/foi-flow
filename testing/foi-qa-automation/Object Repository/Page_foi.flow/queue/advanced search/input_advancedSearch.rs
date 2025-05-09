@@ -6,15 +6,20 @@
    <elementGuidId>c915fecb-3706-46f3-95c6-28040109b50f</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//input[@id='advancedSearch']</value>
+         <key>BASIC</key>
+         <value>//*[@id = 'advancedSearch' and @placeholder = 'Search' and @type = 'text']</value>
       </entry>
       <entry>
          <key>CSS</key>
          <value>#advancedSearch</value>
       </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//input[@id='advancedSearch']</value>
+      </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,6 +27,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>input</value>
+      <webElementGuid>72a57cd8-8a9f-40d7-b8b9-cff9ee141220</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -29,6 +35,7 @@
       <name>id</name>
       <type>Main</type>
       <value>advancedSearch</value>
+      <webElementGuid>70e12ef6-4608-4530-bb66-d61c7834c52d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -36,6 +43,7 @@
       <name>placeholder</name>
       <type>Main</type>
       <value>Search</value>
+      <webElementGuid>29502dc8-5fd9-4bd2-a44d-e8abc4d867c2</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -43,6 +51,7 @@
       <name>type</name>
       <type>Main</type>
       <value>text</value>
+      <webElementGuid>257b3ab8-114a-40a9-a3c7-fbde606f6741</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -50,6 +59,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiInputBase-input MuiInputBase-inputAdornedStart css-mnn31</value>
+      <webElementGuid>f8e7a6a8-92a1-411d-b1f4-9d7536907b05</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -57,6 +67,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;advancedSearch&quot;)</value>
+      <webElementGuid>7be2ffeb-a59b-4915-8eb7-15cceed90cb2</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -64,6 +75,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//input[@id='advancedSearch']</value>
+      <webElementGuid>6050c7d0-e94c-4871-ba05-539193be444c</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -71,6 +83,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='app']/div/div[3]/div/div[3]/div/div/div/div/div/div/input</value>
+      <webElementGuid>31860363-1f84-42fc-861e-ea24e1c6e58b</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,6 +91,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/div/div[3]/div/div/div/div/div/div/input</value>
+      <webElementGuid>42396c0c-d1f2-4152-82ce-78226a5c92c8</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -85,5 +99,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//input[@id = 'advancedSearch' and @placeholder = 'Search' and @type = 'text']</value>
+      <webElementGuid>c3de1d5c-ee3d-4d69-9c16-3269f6134f04</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

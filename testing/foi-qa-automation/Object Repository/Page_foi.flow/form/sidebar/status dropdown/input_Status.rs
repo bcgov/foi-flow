@@ -7,8 +7,7 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='foi-status-dropdown']/following-sibling::input
-</value>
+         <value>//body</value>
       </entry>
       <entry>
          <key>BASIC</key>
@@ -19,6 +18,7 @@
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -26,5 +26,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//body</value>
+      <webElementGuid>dcb14251-b4cb-4c91-a560-8a1a8dad8d3f</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

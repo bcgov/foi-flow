@@ -4,5 +4,6 @@
    <name>Records_duplicate_scenario</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>06f68f49-5fa8-41fd-98f1-a406d0f4bd08</testCaseGuid>
 </TestCaseEntity>

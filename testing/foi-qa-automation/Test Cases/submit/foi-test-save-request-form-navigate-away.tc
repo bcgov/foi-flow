@@ -4,6 +4,7 @@
    <name>foi-test-save-request-form-navigate-away</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>fc616e6d-f5ce-437a-9790-6e5c8144a1d5</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

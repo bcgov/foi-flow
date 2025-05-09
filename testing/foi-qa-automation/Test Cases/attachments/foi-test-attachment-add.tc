@@ -4,6 +4,7 @@
    <name>foi-test-attachment-add</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>13dacce6-5fda-41cf-ab5f-9d5d09aa800c</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

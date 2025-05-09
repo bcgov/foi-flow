@@ -7,18 +7,19 @@
    <selectorCollection>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='Records']/div/div[2]/div[4]/div/div[4]/span/span[2]</value>
-      </entry>
-      <entry>
-         <key>BASIC</key>
-         <value>//*[(text() = '5' or . = '5')]</value>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Batches Uploaded:'])[1]/following::span[1]</value>
       </entry>
       <entry>
          <key>CSS</key>
          <value>span > span.number-spacing</value>
       </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = '5' or . = '5')]</value>
+      </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>

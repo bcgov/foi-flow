@@ -6,19 +6,20 @@
    <elementGuidId>94c9b722-cc2c-4e7f-9af5-7663c7706214</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>div.col-lg-2.foi-details-col</value>
-      </entry>
-      <entry>
          <key>XPATH</key>
-         <value>//div[@id='CFRForm']/div/form/div/div[2]/div[3]/div/div[2]/div/div/div/div/div[2]/div[2]</value>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Estimated Total'])[1]/following::div[1]</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[(text() = '$270.8' or . = '$270.8')]</value>
       </entry>
+      <entry>
+         <key>CSS</key>
+         <value>div.col-lg-2.foi-details-col</value>
+      </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>

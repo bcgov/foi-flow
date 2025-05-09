@@ -4,26 +4,24 @@
    <name>div_request queue row by id state</name>
    <tag></tag>
    <elementGuidId>11df2f08-cbfc-487a-b7b0-4a8dd9c77d60</elementGuidId>
-   <imagePath></imagePath>
    <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Unassigned'])[1]/preceding::div[1]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+      </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[@data-field = 'currentState']</value>
       </entry>
       <entry>
          <key>IMAGE</key>
-         <value></value>
-      </entry>
-      <entry>
-         <key>XPATH</key>
-         <value>//div[@data-id='${requestID}']/div[@data-field='currentState']</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
-         <value></value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -31,6 +29,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
+      <webElementGuid>7ca6fc30-a472-437b-a31b-03298c7fa5df</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -38,6 +37,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiDataGrid-cell MuiDataGrid-cell--textLeft</value>
+      <webElementGuid>ac9f8dc5-22ba-44ec-a1cd-a557a77cc5ff</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -45,6 +45,7 @@
       <name>role</name>
       <type>Main</type>
       <value>cell</value>
+      <webElementGuid>7061da15-7c36-480f-b1a7-cc0a51455963</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -52,6 +53,7 @@
       <name>data-value</name>
       <type>Main</type>
       <value>Unopened</value>
+      <webElementGuid>c505f494-00e4-463f-a008-be02ed8b1d15</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -59,6 +61,7 @@
       <name>data-field</name>
       <type>Main</type>
       <value>currentState</value>
+      <webElementGuid>2bdccaee-175f-41c4-b374-d6d53ddd3862</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -66,6 +69,7 @@
       <name>data-rowindex</name>
       <type>Main</type>
       <value>0</value>
+      <webElementGuid>d221d71b-a102-471d-b4c1-a0846a25e74c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -73,6 +77,7 @@
       <name>data-colindex</name>
       <type>Main</type>
       <value>3</value>
+      <webElementGuid>247c5b89-af69-43da-9547-2bb10be25c66</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -80,6 +85,7 @@
       <name>data-rowselected</name>
       <type>Main</type>
       <value>false</value>
+      <webElementGuid>04b4626d-f474-4a02-8d73-76d3277cafbd</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -87,6 +93,7 @@
       <name>data-mode</name>
       <type>Main</type>
       <value>view</value>
+      <webElementGuid>dfcc8860-761c-40d5-a4cd-01760ed0f673</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -94,6 +101,7 @@
       <name>aria-colindex</name>
       <type>Main</type>
       <value>4</value>
+      <webElementGuid>026c2f69-260d-4437-ac76-23f933018fec</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -101,6 +109,7 @@
       <name>tabindex</name>
       <type>Main</type>
       <value>-1</value>
+      <webElementGuid>6c639b79-c944-42f4-90ea-579047595185</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -108,6 +117,7 @@
       <name>text</name>
       <type>Main</type>
       <value>Unopened</value>
+      <webElementGuid>f961c851-1d20-4292-b55d-494d33125aef</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -115,6 +125,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;col-sm-12 col-md-12 foi-grid-container&quot;]/div[@class=&quot;jss1&quot;]/div[@class=&quot;MuiDataGrid-root MuiDataGrid-root foi-data-grid&quot;]/div[@class=&quot;MuiDataGrid-main&quot;]/div[2]/div[@class=&quot;MuiDataGrid-windowContainer&quot;]/div[@class=&quot;MuiDataGrid-window&quot;]/div[@class=&quot;MuiDataGrid-dataContainer&quot;]/div[@class=&quot;MuiDataGrid-viewport&quot;]/div[@class=&quot;MuiDataGrid-renderingZone&quot;]/div[@class=&quot;Mui-even super-app-theme--unopened MuiDataGrid-row&quot;]/div[@class=&quot;MuiDataGrid-cell MuiDataGrid-cell--textLeft&quot;]</value>
+      <webElementGuid>b8efece6-3d42-46d6-aeba-630b7c075dee</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -122,6 +133,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='app']/div/div[3]/div/div[3]/div/div[2]/div[2]/div/div/div/div/div/div/div[4]</value>
+      <webElementGuid>471e8dad-2629-4518-ac5c-96e461c9fa6d</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -129,6 +141,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='U-00292'])[1]/following::div[1]</value>
+      <webElementGuid>78497c44-b04b-4d40-b3d9-0c89b062a143</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -136,6 +149,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='personal'])[1]/following::div[2]</value>
+      <webElementGuid>a5dc08dd-dae5-4883-9497-5145e66454b9</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -143,6 +157,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Unassigned'])[1]/preceding::div[1]</value>
+      <webElementGuid>5ae9e8b9-d928-4cf3-abd4-4bcc74de2763</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -150,6 +165,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='No'])[1]/preceding::div[3]</value>
+      <webElementGuid>058b90cb-8a49-470a-b65f-83607f3f3358</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -157,6 +173,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Unopened']/parent::*</value>
+      <webElementGuid>351243ec-fcf1-42f6-91fd-e3e5872814f3</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -164,5 +181,6 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div[2]/div/div/div/div/div/div/div[4]</value>
+      <webElementGuid>c3a57c01-5526-45e0-af71-fc31a79dcf16</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

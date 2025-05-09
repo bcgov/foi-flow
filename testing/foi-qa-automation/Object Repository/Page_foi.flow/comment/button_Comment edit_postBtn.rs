@@ -14,7 +14,8 @@
          <value>button.postBtn</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -22,6 +23,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
+      <webElementGuid>813794cd-2cb7-4ef5-a94e-d8108078ec80</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -29,6 +31,7 @@
       <name>class</name>
       <type>Main</type>
       <value>postBtn</value>
+      <webElementGuid>dadd7ea6-a676-420b-9302-41ab08dba534</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -36,6 +39,7 @@
       <name>type</name>
       <type>Main</type>
       <value>button</value>
+      <webElementGuid>7b796ce5-ad76-4e87-beb9-a524d5b2054c</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -43,6 +47,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;inputActions&quot;]/div[@class=&quot;col-lg-1 paperplanecontainer&quot;]/button[@class=&quot;postBtn&quot;]</value>
+      <webElementGuid>f0b3908d-9d50-48bc-b97b-cc6a229e1f5d</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -50,6 +55,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>(//button[@type='button'])[13]</value>
+      <webElementGuid>11957fdd-eb69-4a59-a367-6a84daab7e0c</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -57,6 +63,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Comments']/div/div[3]/div[2]/div/div/div[2]/button</value>
+      <webElementGuid>f3f768e9-556d-44f8-bcf7-4946918b6202</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -64,6 +71,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='test 2'])[1]/following::button[1]</value>
+      <webElementGuid>5955d9bc-4837-4650-a7e9-a3d2f9eb78cc</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -71,6 +79,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='User Comments'])[1]/following::button[7]</value>
+      <webElementGuid>9f72e8cc-64c0-4a33-8a68-8dc6ac95a81d</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,6 +87,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='User, Super'])[1]/preceding::button[1]</value>
+      <webElementGuid>d5f21941-aafe-4f09-995a-a2dc337eb1ad</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -85,6 +95,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/div[2]/div/div/div[2]/button</value>
+      <webElementGuid>cbb3431f-13b5-45f3-ae69-5e8d21cd0efa</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -92,5 +103,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//button[@type = 'button']</value>
+      <webElementGuid>c86de05d-a19f-4949-a6f5-c73f410d4bbb</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

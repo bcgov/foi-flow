@@ -24,9 +24,10 @@ WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : passwo
 
 WebUI.maximizeWindow()
 
-WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : requestID], FailureHandling.STOP_ON_FAILURE)
+WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('requestID') : '', ('clickOnRequest') : true], 
+    FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
+WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Unassigned'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/li_Intake, FOI (1)'))
 

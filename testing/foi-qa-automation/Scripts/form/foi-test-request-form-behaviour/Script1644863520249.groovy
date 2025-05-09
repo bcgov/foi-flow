@@ -45,6 +45,8 @@ WebUI.verifyMatch(WebUI.getCSSValue(findTestObject('Page_foi.flow/form/inputs/re
 assert WebUI.getAttribute(findTestObject('Page_foi.flow/form/inputs/request details/input_Delivery Mode parent'), 'class').contains(
     'Mui-error') == true
 
+WebUI.scrollToElement(findTestObject('Page_foi.flow/form/inputs/applicant details/div_Category'), 0)
+
 WebUI.click(findTestObject('Page_foi.flow/form/inputs/applicant details/div_Category'))
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/inputs/applicant details/category dropdown/li_Business'), 
@@ -152,7 +154,9 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/span_User Comme
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 0 //WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/i_Home logo'), 0)
     //WebUI.verifyElementAttributeValue(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 'href', GlobalVariable.BASE_URL + 
     //'/foi/dashboard', 0 
-    ) //@Keyword
+    //@Keyword
+    )
+
 //) //def clickUsingJS(TestObject to, int timeout)
 //{
 //WebDriver driver = DriverFactory.getWebDriver()
@@ -160,7 +164,6 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/sidebar/a_FOI'), 0
 //JavascriptExecutor executor = ((driver) as JavascriptExecutor)
 //executor.executeScript('arguments[0].click()', element)
 //}
-
 WebUI.closeBrowser()
 
 @com.kms.katalon.core.annotation.SetUp

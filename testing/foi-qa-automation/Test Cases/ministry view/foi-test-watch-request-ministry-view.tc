@@ -4,6 +4,7 @@
    <name>foi-test-watch-request-ministry-view</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>47ec9572-7ed1-4999-83f1-d6760440cf6f</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

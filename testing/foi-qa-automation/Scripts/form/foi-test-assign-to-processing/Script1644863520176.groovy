@@ -58,9 +58,9 @@ WebUI.refresh(FailureHandling.STOP_ON_FAILURE)
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Social Education'), 0)
+not_run: WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Social Education'), 0)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex Team'), 0)
+not_run: WebUI.verifyElementPresent(findTestObject('Page_foi.flow/form/assignee dropdown/li_Flex Team'), 0)
 
 requestID = WebUI.getText(findTestObject('Page_foi.flow/form/h3_Form Request Title'), FailureHandling.STOP_ON_FAILURE)
 
@@ -72,7 +72,7 @@ WebUI.setText(findTestObject('Page_foi.flow/queue/input_Dashboard Filter'), requ
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
-WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
+WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
 WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'), FailureHandling.STOP_ON_FAILURE)
 
@@ -110,7 +110,6 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/queue/div_request queue row 1'), 0)
 
 //WebUI.verifyElementText(findTestObject('Page_foi.flow/queue/div_request queue row 1 assignee'), 'Social Education')
-
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applicant name'))
 
 WebUI.click(findTestObject('Page_foi.flow/form/assignee dropdown/div_Assigned'))

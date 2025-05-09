@@ -20,7 +20,6 @@ import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
 import groovy.json.JsonSlurper as JsonSlurper
 
 //WebUI.openBrowser(GlobalVariable.BASE_URL)
-
 WebUI.callTestCase(findTestCase('helper/foi-test-login'), [('password') : findTestData('Login Credentials').getValue('Password', 
             1), ('username') : findTestData('Login Credentials').getValue('Username', 1)], FailureHandling.STOP_ON_FAILURE)
 
@@ -41,9 +40,9 @@ WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1'))
 
 WebUI.scrollToElement(findTestObject('Page_foi.flow/form/button_Save'), 0)
 
-WebUI.click(findTestObject('Extension/svg_Pending_MuiSvgIcon-root'))
+not_run: WebUI.click(findTestObject('Extension/svg_Pending_MuiSvgIcon-root'))
 
-WebUI.click(findTestObject('Extension/li_Edit'))
+not_run: WebUI.click(findTestObject('Page_IAO-2014-50017/li_Edit'))
 
 WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT)
 
@@ -61,5 +60,6 @@ WebUI.uploadFile(findTestObject('Page_foi.flow/attachment/input_Add Files_file-u
     '/Test Attachments/test2.docx')
 
 WebUI.click(findTestObject('Extension/Extension_Denial/button_Save'))
+
 WebUI.delay(5)
 

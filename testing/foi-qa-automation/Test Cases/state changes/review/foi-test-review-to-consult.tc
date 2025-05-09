@@ -4,6 +4,7 @@
    <name>foi-test-review-to-consult</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>95ba88fa-758c-410d-a067-973ae0b6c7b0</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

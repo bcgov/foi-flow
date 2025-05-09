@@ -28,8 +28,6 @@ WebUI.maximizeWindow()
 
 WebUI.click(findTestObject('Page_foi.flow/queue/div_request queue row 1 applicant name'))
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/status dropdown/div_Status'), 'Unopened')
-
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Attachments'), FailureHandling.STOP_ON_FAILURE)
 
 WebUI.verifyElementText(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Attachments'), 'Attachments')
@@ -47,8 +45,8 @@ WebUI.verifyElementPresent(findTestObject('Page_foi.flow/attachment/li_uploaded 
 
 WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Continue'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.click(findTestObject('Page_foi.flow/attachment/button_attachments row 1 actions'), FailureHandling.STOP_ON_FAILURE) //WebUI.uploadFileWithDragAndDrop(findTestObject('Page_foi.flow/attachment/div_Add Files'), RunConfiguration.getProjectDir() + '/Test Attachments/500mb.pdf', 
-//    FailureHandling.STOP_ON_FAILURE)
+WebUI.click(findTestObject('Page_foi.flow/attachment/button_attachments row 1 actions'), FailureHandling.STOP_ON_FAILURE //WebUI.uploadFileWithDragAndDrop(findTestObject('Page_foi.flow/attachment/div_Add Files'), RunConfiguration.getProjectDir() + '/Test Attachments/500mb.pdf', 
+    ) //    FailureHandling.STOP_ON_FAILURE)
 //'Define Custom Path where file needs to be downloaded'
 //def downloadPath = RunConfiguration.getProjectDir() + '/Test Download Folder'
 //

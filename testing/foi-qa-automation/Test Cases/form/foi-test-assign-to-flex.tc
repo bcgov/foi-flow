@@ -4,6 +4,7 @@
    <name>foi-test-assign-to-flex</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>be3f1168-4d60-40ed-ba89-a5698cff3a4c</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

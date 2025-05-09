@@ -4,5 +4,6 @@
    <name>Records_gathering</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>3be0ad86-6230-41a5-9c04-c502cb65cae9</testCaseGuid>
 </TestCaseEntity>

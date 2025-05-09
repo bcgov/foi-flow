@@ -17,6 +17,8 @@ import com.kms.katalon.core.windows.keyword.WindowsBuiltinKeywords as Windows
 import internal.GlobalVariable as GlobalVariable
 import org.openqa.selenium.Keys as Keys
 
+WebUI.openBrowser(GlobalVariable.BASE_URL)
+
 WebUI.delay(5)
 
 WebUI.click(findTestObject('Page_foi.flow/sign in/button_Log In'))

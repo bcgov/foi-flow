@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TestCaseEntity>
    <description></description>
-   <name>CFR_noemail_worfflow</name>
+   <name>CFR_noemail_workflow</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>f0facce8-2db2-46fb-b19c-1e0aa55c98a7</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

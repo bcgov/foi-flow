@@ -54,9 +54,11 @@ WebUI.delay(GlobalVariable.DEFAULT_TIMEOUT, FailureHandling.STOP_ON_FAILURE)
 //WebUI.click(findTestObject('Page_foi.flow/navbar/button_Sign Out'))
 WebDriver IAOuser = DriverFactory.getWebDriver()
 
-WebDriver ministryUser = CustomKeywords.'browser.newWindow.open'()
+not_run: WebDriver ministryUser = CustomKeywords.'browser.newWindow.open'()
 
-DriverFactory.changeWebDriver(ministryUser)
+not_run: DriverFactory.changeWebDriver(ministryUser)
+
+WebUI.openBrowser('')
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 

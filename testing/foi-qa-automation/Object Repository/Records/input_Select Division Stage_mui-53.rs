@@ -6,19 +6,20 @@
    <elementGuidId>beef20d9-b1a8-41d6-b42c-0404b0f70224</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>CSS</key>
-         <value>#mui-53</value>
+         <key>XPATH</key>
+         <value>//div[@id='foi-division-row0']/div[2]/div/div/div/input</value>
       </entry>
       <entry>
-         <key>XPATH</key>
-         <value>//input[@id='mui-53']</value>
+         <key>CSS</key>
+         <value>#mui-53</value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[@type = 'text' and @role = 'combobox' and @value = 'Select Division Stage']</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
