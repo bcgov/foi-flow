@@ -57,7 +57,8 @@ export const ContactApplicant = ({
 }: any) => {
   const [curTemplate, setCurTemplate] = useState<string>('');
   const [curTemplateName, setCurTemplateName] = useState<string>('');
-  const [emailSubject, setEmailSubject] = useState<string>('');
+  const defaultEmailSubject = `Your FOI Request [${requestNumber || requestId}]`
+  const [emailSubject, setEmailSubject] = useState<string>(defaultEmailSubject);
 
   const dispatch = useDispatch();
   const templateList: any = useSelector((state: any) => state.foiRequests.foiEmailTemplates);
@@ -72,6 +73,7 @@ export const ContactApplicant = ({
 
   const [attachPdfTrigger, setAttachPdfTrigger] = useState(false);
   const [exportPdfTrigger, setExportPdfTrigger] = useState(false);
+  const [attachAsPdfFilename, setAttachAsPdfFilename] = useState(requestNumber || "");
 
   const showAttachAsPdfModal = () => {
     setOpenConfirmationModal(true);
@@ -222,7 +224,7 @@ export const ContactApplicant = ({
     };
     const saveBlobToPdf = async (pdf: any) => {
       const currentEditorContentAsPdfBlob = new Blob([pdf], { type: 'application/pdf' });
-      blobs.push({name: "Email Body.pdf", lastModified: new Date(), input: currentEditorContentAsPdfBlob})
+      blobs.push({name: `Correspondence Letter - ${requestNumber}.pdf`, lastModified: new Date(), input: currentEditorContentAsPdfBlob})
       const zipfile = await downloadZip(blobs).blob()
       toast.success("Message has been exported successfully", {
         position: "top-right",
@@ -240,14 +242,14 @@ export const ContactApplicant = ({
 
   const attachPdf = async (sfdtString: string) => {
     let newData = {
-      "FileName": "emailattachment.pdf",
+      "FileName": `${attachAsPdfFilename}.pdf`,
       "Content": sfdtString
     };
     const attachBlobPdf = async (pdf: any) => {
       const blob = new Blob([pdf], { type: 'application/pdf' });
-      const emailAttachment = new File([blob], "emailattachment.pdf", { type: 'application/pdf' })
+      const emailAttachment = new File([blob], `${attachAsPdfFilename}.pdf`, { type: 'application/pdf' })
       //@ts-ignore
-      emailAttachment.filename = 'emailattachment.pdf'
+      emailAttachment.filename = `${attachAsPdfFilename}.pdf`
       // @ts-ignore
       setFiles([emailAttachment])
     }
@@ -365,7 +367,7 @@ export const ContactApplicant = ({
       setAttachPdfTrigger(true);
     } else if (confirmationFor === "select-template") {
       selectTemplateFromDropdown(null, selectedTemplate);
-      setSelectedTemplate(null);
+      // setSelectedTemplate(null);
     }
   }
 
@@ -1181,6 +1183,7 @@ export const ContactApplicant = ({
     >
       <CommunicationStructure
         correspondence={message}
+        requestNumber={requestNumber || requestId}
         currentIndex={index}
         fullName={getFullname(message.createdby)}
         ministryId={ministryId}
@@ -1494,6 +1497,7 @@ export const ContactApplicant = ({
             <>
               <DocEditor
                 curTemplate = {curTemplate}
+                selectedTemplate={selectedTemplate}
                 saveSfdtDraft = {saveSfdtDraft}
                 saveSfdtDraftTrigger = {saveSfdtDraftTrigger}
                 setSaveSfdtDraftTrigger = {setSaveSfdtDraftTrigger}
@@ -1645,6 +1649,25 @@ export const ContactApplicant = ({
               {confirmationMessage}
             </span>
           </DialogContentText>
+          {confirmationFor === "attach-as-pdf" && <div className="row">
+            <div className="col-sm-1"></div>
+              <div className="col-sm-9">
+                <TextField
+                  id="emailattachmentfilename"
+                  label="Attachment Name"
+                  required={true}
+                  inputProps={{ "aria-labelledby": "emailattachmentfilename-label" }}
+                  InputLabelProps={{ shrink: true }}
+                  variant="outlined"
+                  fullWidth
+                  value={attachAsPdfFilename}
+                  onChange={(e) => {setAttachAsPdfFilename(e.target.value)}}
+                  error={attachAsPdfFilename === ""}
+                />
+              </div>
+              <div className="col-sm-1 extension-name">.pdf</div>
+            <div className="col-sm-1"></div>
+          </div>}
         </DialogContent>
         <DialogActions>
           <button

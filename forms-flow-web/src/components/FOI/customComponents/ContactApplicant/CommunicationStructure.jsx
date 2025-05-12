@@ -25,7 +25,7 @@ import Tooltip from "@mui/material/Tooltip";
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as html2pdf from 'html-to-pdf-js';
 import CommunicationUploadModal from '../Comments/CommunicationUploadModal';
 import { ClickableChip } from '../../Dashboard/utils';
@@ -34,11 +34,12 @@ import { getTemplateVariables } from './util';
 import { DownloadCorrespondenceModal } from './DownloadCorrespondenceModal';
 
 
-const CommunicationStructure = ({correspondence, currentIndex,
+const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
   fullName, ministryId=null, editDraft, deleteDraft, deleteResponse, modalFor, setModalFor,setModal,setUpdateAttachment, 
   setSelectedCorrespondence, setCurrentResponseDate, applicantCorrespondenceTemplates, templateVariableInfo}) => {
 
   // console.log("correspondence: ", correspondence);
+  const templateList = useSelector((state) => state.foiRequests.foiEmailTemplates);
   const dispatch = useDispatch();
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [communicationUploadModalOpen, setCommunicationUploadModalOpen] = useState(false);
@@ -263,7 +264,7 @@ const CommunicationStructure = ({correspondence, currentIndex,
       }
     }
     html2pdf().from(element).outputPdf('blob').then(async (blob) => {
-      blobs.push({name: "Email Body.pdf", lastModified: new Date(), input: blob})
+      blobs.push({name: `Correspondence Letter - ${requestNumber}.pdf`, lastModified: new Date(), input: blob})
       const zipfile = await downloadZip(blobs).blob()
       saveAs(zipfile, fullName + " " + correspondence.date.replace(/\|/g, "") + ".zip");
     });
@@ -271,11 +272,14 @@ const CommunicationStructure = ({correspondence, currentIndex,
 
 
   const getTemplateName = (correspondence) => {
-    if(correspondence.templatename) {
-      return correspondence.templatename;
-    } else {
-      return applicantCorrespondenceTemplates.find((obj)=> obj.templateid == correspondence.templateId)?.description
-    }
+    if (!correspondence?.sentby && correspondence?.templatename) return templateList.find((obj)=> obj.fileName == correspondence.templatename)?.templateName
+    if (correspondence?.emailsubject) return correspondence.emailsubject
+    return `Your FOI Request [${requestNumber}]`
+    // if(correspondence.templatename) {
+    //   return correspondence.templatename;
+    // } else {
+    //   return applicantCorrespondenceTemplates.find((obj)=> obj.templateid == correspondence.templateId)?.description
+    // }
   }
   
 
