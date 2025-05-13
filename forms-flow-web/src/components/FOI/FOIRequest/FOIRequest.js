@@ -13,6 +13,7 @@ import RequestDetails from "./RequestDetails";
 import ExtensionDetails from "./ExtensionDetails";
 import AdditionalApplicantDetails from "./AdditionalApplicantDetails";
 import BottomButtonGroup from "./BottomButtonGroup";
+import InternalConsultation from "./InternalConsultation/index";
 import { useParams } from "react-router-dom";
 import {
   fetchFOICategoryList,
@@ -726,6 +727,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     axisRequestId: "",
   };
 
+  const requiredInternalConsultValues = {
+    internalConsultationDueDate: "",
+  }
+
   //below states are used to find if required fields are set or not
   const [
     requiredRequestDescriptionValues,
@@ -747,6 +752,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [requiredAxisDetails, setRequiredAxisDetails] = React.useState(
     requiredAxisDetailsValue
   );
+  const [requiredInternalConsult, setRequiredInternalConsultValues] = React.useState(
+    requiredInternalConsultValues
+  );
+       
   //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
   const handleInitialRequiredRequestDescriptionValues = React.useCallback(
     (requestDescriptionObject) => {
@@ -765,6 +774,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   }, []);
   const handleAxisDetailsInitialValue = React.useCallback((value) => {
     setRequiredAxisDetails(value);
+  }, []);
+  const handleInternalConsultInitialValues = React.useCallback((value) => {
+    setRequiredInternalConsultValues(value);
   }, []);
 
   const handleApplicantDetailsValue = (value, name) => {
@@ -801,6 +813,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const handleAssignedToValue = (value) => {
     setAssignedToValue(value);
   };
+  const handleInternalConsultationValues = (value, name) => {
+    const detailsData = assignValue(requiredInternalConsult, value, name);
+    setRequiredInternalConsultValues(detailsData);
+  }
 
   const saveOIPCNoReview = () => {
     const toastID = toast.loading("Saving request with removed OIPC review...")
@@ -1532,7 +1548,17 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           isHistoricalRequest={isHistoricalRequest}
                         />
                       )}
-
+                      <InternalConsultation
+                        programAreaList={programAreaList}
+                        requestDetails={requestDetails}
+                        requestState={requestState}
+                        handleInternalConsultationValues={
+                          handleInternalConsultationValues }
+                        handleInternalConsultInitialValues={
+                          handleInternalConsultInitialValues}
+                        createSaveRequestObject={createSaveRequestObject}
+                        disableInput={disableInput || isHistoricalRequest}
+                      />
                       <BottomButtonGroup
                         stateChanged={stateChanged}
                         isValidationError={isValidationError}
