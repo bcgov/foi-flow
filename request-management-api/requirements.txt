@@ -31,7 +31,7 @@ flask-marshmallow==0.11.0
 flask-restplus
 flask_restx
 flask-cors==4.0.2
-gunicorn==22.0.0
+gunicorn==23.0.0
 idna==2.10
 itsdangerous==2.0.1
 jaeger-client==4.4.0
@@ -49,7 +49,7 @@ pyrsistent==0.17.3
 python-dateutil==2.8.1
 python-dotenv==0.16.0
 python-editor==1.0.4
-python-jose==3.2.0
+python-jose==3.4.0
 pytz==2021.1
 requests==2.31.0
 rsa==4.7.2
@@ -69,7 +69,7 @@ Flask-SocketIO==5.3.6
 Flask-Login==0.5.0
 eventlet==0.35.2
 uritemplate.py==3.0.2
-urllib3==1.26.15
+urllib3==1.26.17
 ndg-httpsclient
 pyopenssl
 pyasn1

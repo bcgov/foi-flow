@@ -27,6 +27,7 @@ from marshmallow import INCLUDE
 import json
 from flask_cors import cross_origin
 import asyncio
+import traceback
 
 
 API = Namespace('FOIWatcher', description='Endpoints for FOI record management')
@@ -327,8 +328,10 @@ class FOIRequestGetRecord(Resource):
             result = recordservice().gethistoricaldocuments(axisrequestid)
             return json.dumps(result), 200
         except KeyError as error:
+            traceback.print_exc() 
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
         except Exception as exception:
+            traceback.print_exc() 
             return {'status': False, 'message': str(exception)}, 500
         
 @cors_preflight('POST,OPTIONS')

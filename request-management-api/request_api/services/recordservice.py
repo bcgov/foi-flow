@@ -221,13 +221,20 @@ class recordservice(recordservicebase):
     
     def getpdfstitchpackagetodownload(self, ministryid, category):
         response, err = self.makedocreviewerrequest('GET', '/api/pdfstitch/{0}/{1}'.format(ministryid, category))
-        if response is not None and "createdat" in response:
+        if (category == "redlinephase" or category == "responsepackagephase") and response is not None:
+            for package in response:
+                if "createdat" in package:
+                    string_datetime = maya.parse(package["createdat"]).datetime(to_timezone='America/Vancouver', naive=False).strftime('%Y %b %d | %I:%M %p').upper()
+                    package["createdat_datetime"] = string_datetime 
+        elif response is not None and "createdat" in response:
             string_datetime = maya.parse(response["createdat"]).datetime(to_timezone='America/Vancouver', naive=False).strftime('%Y %b %d | %I:%M %p').upper()
             response["createdat_datetime"] = string_datetime
         return response
 
     def getpdfstichstatus(self, ministryid, category):
         response, err = self.makedocreviewerrequest('GET', '/api/pdfstitchjobstatus/{0}/{1}'.format(ministryid, category))
+        if (category == "redlinephase" or category == "responsepackagephase") and response is not None:
+            return json.dumps(response)
         if response is not None and "status" in response:
             return response.get("status")
         return ""
@@ -240,7 +247,7 @@ class recordservice(recordservicebase):
     
     def gethistoricaldocuments(self, axisrequestid):
         documents = HistoricalRecords.getdocuments(axisrequestid)
-        if (documents[0]['iscorresponcedocument']):
+        if (len(documents) > 0 and documents[0]['iscorresponcedocument']):
             for document in documents:
                 if len(document['attributes']) > 0:
                     document['category'] = 'response'
