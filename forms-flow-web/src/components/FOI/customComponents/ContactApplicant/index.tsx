@@ -141,7 +141,7 @@ export const ContactApplicant = ({
     // pass html string to preview modal
     // console.log("preview:", JSON.stringify(sfdtString));
     let newData = {
-      "FileName": "email.html",
+      "FileName": `${emailSubject}.pdf`,
       "Content": sfdtString
     };
     const loadPreview = async (html: string) => {
@@ -150,6 +150,17 @@ export const ContactApplicant = ({
       setEditorValue( html );
     }
     await exportSFDT(dispatch, newData, loadPreview);
+    if (selectedEmails.length == 0) {
+      const attachBlobPdf = async (pdf: any) => {
+        const blob = new Blob([pdf], { type: 'application/pdf' });
+        const emailAttachment = new File([blob], `Export - ${emailSubject}.pdf`, { type: 'application/pdf' })
+        //@ts-ignore
+        emailAttachment.filename = `Export - ${emailSubject}.pdf`
+        // @ts-ignore
+        setFiles((prev) => [...prev, emailAttachment])
+      }
+      await exportPDF(dispatch, newData, attachBlobPdf);
+    }
   };
   // const removeHeaderParagraph = (htmlString: string) => {
   //   // Create a temporary DOM element to parse the HTML string.
@@ -183,12 +194,12 @@ export const ContactApplicant = ({
   // }
   const savePdf = async (sfdtString: string) => {
     let newData = {
-      "FileName": "email.pdf",
+      "FileName": `${emailSubject}.pdf`,
       "Content": sfdtString
     };
     const saveBlobToPdf = async (pdf: any) => {
       const blob = new Blob([pdf], { type: 'application/pdf' });
-      saveAs(blob, 'email.pdf');
+      saveAs(blob, `${emailSubject}.pdf`);
     }
     await exportPDF(dispatch, newData, saveBlobToPdf);
   }
@@ -219,7 +230,7 @@ export const ContactApplicant = ({
     }
 
     let newData = {
-      "FileName": "email.pdf",
+      "FileName": `Correspondence Letter - ${requestNumber}.pdf`,
       "Content": sfdtString
     };
     const saveBlobToPdf = async (pdf: any) => {
@@ -344,6 +355,7 @@ export const ContactApplicant = ({
     setCorrespondenceId(null);
     setSelectedEmails([]);
     setCurrentTemplate(0);
+    setEmailSubject(defaultEmailSubject);
   }
 
   const handleConfirmationClose = () => {     
@@ -384,6 +396,7 @@ export const ContactApplicant = ({
   
   const [files, setFiles] = useState([]);
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
+  const [initialTemplates, setInitialTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
   const isEnabledTemplate = (item: any) => {
     var name:string = item?.name ? item.name : item?.fileName ? item.fileName : "";
@@ -494,6 +507,7 @@ export const ContactApplicant = ({
 
     setOptions(_templates);
     setDisabledOptions(_templates.filter((item)=>item.disabled === true).map((item)=>item.value));
+    setInitialTemplates(_templates);
     setTemplates(_templates);
   }, [applicantCorrespondence, requestExtensions, dispatch, templateList]);
 
@@ -630,7 +644,13 @@ export const ContactApplicant = ({
           return corr;
         }
       })
+      let _filteredTemplates = initialTemplates.filter((template: any) => {
+        if (correspondenceFilter === "templates") {
+          return template.label.includes(filterValue)
+        }
+      })
       setCorrespondences(_filteredMessages);
+      setTemplates(_filteredTemplates);
       
     }
  }
@@ -705,7 +725,7 @@ export const ContactApplicant = ({
         "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS),
         "axisRequestId": requestNumber
       }],
-      assignedGroupEmail: requestDetails.assignedGroupEmail,
+      from_email: requestDetails.assignedGroupEmail,
       israwrequest: israwrequest,
       templatename: curTemplateName,
       templatetype: templateId?"":"sfdt"
@@ -805,7 +825,7 @@ export const ContactApplicant = ({
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondenceid:correspondenceId,
       correspondencemessagejson: JSON.stringify({
-        "emailhtml": editorValue,
+        "emailhtml": "<div>Email exported as attachment</div>",
         "emailsubject": emailSubject,
         "id": approvedForm?.cfrfeeid,
         "type": type
@@ -1164,6 +1184,12 @@ export const ContactApplicant = ({
 
   const [previewModal, setPreviewModal] = useState(false);
   const handlePreviewClose = () => {
+    if (selectedEmails.length == 0) {
+      setFiles((prev) => {
+        const filesWithRemovedPreviewFile = prev.filter((file: any) => file.filename != `Export - ${emailSubject}.pdf`)
+        return filesWithRemovedPreviewFile
+      })
+    }
     setPreviewModal(false);
   }
 
@@ -1551,6 +1577,7 @@ export const ContactApplicant = ({
               templateInfo={templates[currentTemplate]}
               enableSend={selectedEmails.length > 0}
               selectedEmails={selectedEmails}
+              emailSubject={emailSubject}
             />  
             {/*
             <button
