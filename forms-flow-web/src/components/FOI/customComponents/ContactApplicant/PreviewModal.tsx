@@ -26,7 +26,8 @@ export const PreviewModal = React.memo(({
   attachments,
   templateInfo,
   enableSend,
-  selectedEmails
+  selectedEmails,
+  emailSubject
 }: previewParams) => {
 
   const dispatch = useDispatch();
@@ -94,7 +95,12 @@ export const PreviewModal = React.memo(({
       <DialogContent>
         <DialogContentText id="state-change-dialog-description" component={'span'}>
           <div className="state-change-email-note">
-          {enableSend && selectedEmails.length > 0 && (<p>Email to: {selectedEmails.join(', ')}</p>)}
+          {enableSend && selectedEmails.length > 0 && (
+            <>
+            <p><span style={{fontWeight: 'bold'}}>Email from: </span>{requestDetails.assignedGroupEmail}</p>
+            <p><span style={{fontWeight: 'bold'}}>Email to: </span>{selectedEmails.join(', ')}</p>
+            <p><span style={{fontWeight: 'bold'}}>Email subject: </span>{emailSubject}</p>
+            </>)}
           {!enableSend && (<p>No email address has been selected to send this correspondence to. Instead, you can export this correspondence as a PDF.</p>)}
           </div>
           <div className="preview-container">
