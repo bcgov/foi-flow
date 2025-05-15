@@ -55,6 +55,5 @@ def list_routes():
 
 
 if __name__ == '__main__':\
-    print("Hello, it's Adam")
     logging.log(logging.INFO, 'Running the Manager')
     MANAGER.run()
