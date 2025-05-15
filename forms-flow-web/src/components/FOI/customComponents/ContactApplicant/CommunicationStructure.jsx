@@ -46,6 +46,7 @@ const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
   const [downloadCorrespondenceModalOpen, setDownloadCorrespondenceModalOpen] = useState(false);
   const [anchorPosition, setAnchorPosition] = useState(null);
   const [deletePopoverOpen, setDeletePopoverOpen] = useState(false);
+  const [renameEmailSubject, setRenameEmailSubject] = useState(false);
   const ref = useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close() : {};
 
@@ -202,9 +203,6 @@ const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
 
   const download = async () => {
     setDownloadCorrespondenceModalOpen(false);
-    const elementToClickForExpand = document.querySelector(`#communication-accordion-${currentIndex}`);
-    let isAriaExpanded = elementToClickForExpand.ariaExpanded
-    if (isAriaExpanded == 'false') elementToClickForExpand.click();
     let fileInfoList = correspondence.attachments.map(attachment => {
       return  {
         filename: attachment.filename,
@@ -248,22 +246,37 @@ const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
         closeButton: true
       });
     }
-    const element = document.querySelector(`[data-communication-div-id="${currentIndex}"]`).cloneNode(true);
+    let element = correspondence?.text
 
     // For drafts, remove the relevant variables that have been filled in
     if (correspondence.category == "draft") {
       const template = applicantCorrespondenceTemplates.find(template => template.templateid == correspondence.templateid)
       const { requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData } = templateVariableInfo
       let variables = getTemplateVariables(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, template)
-      variables = variables.filter(variable => {
-        const includedVariables = ["{{firstName}}", "{{lastName}}", "{{address}}"]
-        return includedVariables.includes(variable.name)
+      let firstName, lastName, address, secondaryAddress, postal;
+      variables.forEach((variable) => {
+        if (variable.name == "{{firstName}}") firstName = variable.value
+        if (variable.name == "{{lastName}}") lastName = variable.value
+        if (variable.name == "{{address}}") address = variable.value
+        if (variable.name == "{{secondaryAddress}}") secondaryAddress = variable.value
+        if (variable.name == "{{postal}}") postal = variable.value
       })
-      for (let variable of variables) {
-        element.innerHTML = element.innerHTML.replaceAll(variable.value, 'APPLICANT')
+      let addressStartIndex = element.indexOf(address)
+      let secondaryAddressStartIndex = element.indexOf(secondaryAddress)
+      let postalStartIndex = element.indexOf(postal)
+      let endIndex;
+      if (postalStartIndex != -1) endIndex = postalStartIndex + postal.length // if postal code exists, it is end of address string
+      if (secondaryAddressStartIndex != -1) endIndex = secondaryAddressStartIndex + secondaryAddress.length // if secondary address
+      if (postalStartIndex == -1 && secondaryAddressStartIndex == -1) endIndex = addressStartIndex + address.length // if only primary
+      // slice must be done first so indexes don't change
+      if (addressStartIndex && addressStartIndex != -1 && endIndex && endIndex != -1) {
+        element = element.slice(0, addressStartIndex) + 'ADDRESS REDACTED' + element.slice(endIndex)
       }
+      // then replace first and last name
+      element = element.replaceAll(firstName, 'APPLICANT')
+      element = element.replaceAll(lastName, 'APPLICANT')
     }
-    html2pdf().from(element).outputPdf('blob').then(async (blob) => {
+    html2pdf().set({margin: 20}).from(element).outputPdf('blob').then(async (blob) => {
       blobs.push({name: `Correspondence Letter - ${requestNumber}.pdf`, lastModified: new Date(), input: blob})
       const zipfile = await downloadZip(blobs).blob()
       saveAs(zipfile, fullName + " " + correspondence.date.replace(/\|/g, "") + ".zip");
@@ -281,6 +294,7 @@ const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
     //   return applicantCorrespondenceTemplates.find((obj)=> obj.templateid == correspondence.templateId)?.description
     // }
   }
+  const [emailSubject, setEmailSubject] = useState(correspondence.category === "response" ? "Applicant Response": getTemplateName(correspondence));
   
 
   const DeleteAction = () => {

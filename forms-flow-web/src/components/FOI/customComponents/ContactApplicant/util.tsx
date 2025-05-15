@@ -89,6 +89,8 @@ export const getTemplateVariables = (requestDetails: any, requestExtensions: any
     {name: "{{description}}", value: requestDetails.description},
     {name: "{{selectedMinistry}}", value: requestDetails?.selectedMinistries[0].name},
     {name: "{{address}}", value: requestDetails.address},
+    {name: "{{addressSecondary}}", value: requestDetails.addressSecondary},
+    {name: "{{postal}}", value: requestDetails.postal},
     {name: "{{dueDate}}", value: convertDate(requestDetails.dueDate)},
     {name: "{{receivedDate}}", value: convertDate(requestDetails.receivedDate)},
     {name: "{{pbExtensionDueDays}}", value: pbExtension[0]},
