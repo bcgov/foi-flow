@@ -108,4 +108,4 @@ jobs:
         shell: bash
         run: |
           oc project d7abee-dev
-          oc rollout restart deployment/forms-flow-web
+          oc rollout restart deployment/request-management-api
