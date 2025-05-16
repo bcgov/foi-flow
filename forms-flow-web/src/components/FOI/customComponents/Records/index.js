@@ -97,7 +97,8 @@ import {
   faLinkSlash,
   faDownload,
   faMinimize,
-  faMaximize
+  faMaximize,
+  faMagnifyingGlass
 } from "@fortawesome/free-solid-svg-icons";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -354,9 +355,10 @@ export const RecordsLog = ({
 
   const isDisableRedactRecords = (allRecords) => {
     return allRecords.some(record =>
-      record.failed ||
+      record.failed ||!record.isredactionready ||
       (!record.iscompressed &&
         (record.selectedfileprocessversion !== 1 || !record.selectedfileprocessversion))
+        
     );
   };
   
@@ -991,11 +993,13 @@ export const RecordsLog = ({
   };
 
   const downloadDocument = (file, isPDF = false, originalfile = false) => {
+    var filePath = ('ocrfilepath' in file && file.ocrfilepath != null)? file.ocrfilepath : ('compresseds3uripath' in file && file.compresseds3uripath != null)? 
+          file.compresseds3uripath : file.s3uripath
     var s3filepath = !originalfile
-      ? file.s3uripath
+      ? filePath
       : !file.isattachment
       ? file.originalfile
-      : file.s3uripath;
+      : filePath;
     var filename = !originalfile
       ? file.filename
       : !file.isattachment
@@ -3377,6 +3381,13 @@ const Attachment = React.memo(
       return false;
     }
 
+    const showOCRTag= (record)=> {
+      if (record.ocrfilepath != null && (!record.selectedfileprocessversion 
+        || record.selectedfileprocessversion != 2 ))
+        return true;
+      return false;
+    }
+
     return (
       <>
         <Grid
@@ -3507,9 +3518,11 @@ const Attachment = React.memo(
               <span>Error due to timeout</span>
             ) : !record.isdedupecomplete?(
               <span>Deduplication & file conversion in progress</span>
-            ): (
+            ): !record.iscompressed ? (
               <span>Compression in progress</span>
-            ) }
+            ) : (
+              <span>OCR in progress</span>
+            )}
             <AttachmentPopup
               indexValue={indexValue}
               record={record}
@@ -3644,6 +3657,29 @@ const Attachment = React.memo(
                   margin: "4px 10px",
                 }}
               />
+              {showOCRTag(record) &&
+                <Chip
+                  key={record.recordid+"ocr"}
+                  icon={
+                    <FontAwesomeIcon
+                      icon={faMagnifyingGlass}
+                      size="sm"
+                      style={{
+                        color:"#38598A",
+                      }}
+                    />
+                  }
+                  label="Searchable (OCR)"
+                  size="small"
+                  className={clsx(classes.chip, classes.chipPrimary)}
+                  style={{
+                    color: "#003366",
+                    backgroundColor:"#fff",
+                    border: "1px solid #38598A",
+                    margin: "4px 4px",
+                  }}
+                />
+              }
           </Grid>
 
           <Grid

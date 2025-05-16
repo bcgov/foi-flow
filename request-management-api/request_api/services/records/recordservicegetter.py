@@ -90,7 +90,9 @@ class recordservicegetter(recordservicebase):
             _record["isconverted"] = self.__getisconverted(_computingresponse)
             _record["iscompressed"] = self.__getiscompressed(_computingresponse)
             _record["isdedupecomplete"]= self.__getisdedupecomplete(_computingresponse)
+            #_record["isocrcompleted"] = self.__getisocrcompleted(_computingresponse)
             _record["selectedfileprocessversion"] = _computingresponse["selectedfileprocessversion"]
+            _record["needs_ocr"] = _computingresponse["needs_ocr"]
             _computingresponse_err = self.__getcomputingerror(_computingresponse)
             if _computingresponse_err is not None:
                 _record["failed"] = _computingresponse_err
@@ -98,12 +100,19 @@ class recordservicegetter(recordservicebase):
             if _computingresponse["isduplicate"]:
                 _record["duplicatemasterid"] = _computingresponse["duplicatemasterid"]
                 _record["duplicateof"] = _computingresponse["duplicateof"]
-            if _record["iscompressed"]:
-                _record["s3uripath"] = _computingresponse["compressedfilepath"] if "compressedfilepath" in _computingresponse else _computingresponse["filepath"]
+            _record["s3uripath"] = _computingresponse["filepath"]
+            if _record["iscompressed"] and "compressedfilepath" in _computingresponse:
+                _record["compresseds3uripath"] = _computingresponse["compressedfilepath"]
+            if "ocrfilepath" in _computingresponse:
+                _record["ocrfilepath"] = _computingresponse["ocrfilepath"]
             for attachment in _computingresponse["attachments"]:
                 _attachement = self.__pstformat(attachment)
                 _attachement["isattachment"] = True
-                _attachement["s3uripath"] =  attachment["compressedfilepath"] if "compressedfilepath" in attachment else attachment["filepath"]
+                _attachement["s3uripath"] = attachment["filepath"]
+                if "compressedfilepath" in attachment:
+                    _attachement["compresseds3uripath"] = attachment["compressedfilepath"]
+                if "ocrfilepath" in _attachement:
+                    _attachement["ocrfilepath"] = attachment["ocrfilepath"]
                 _attachement["rootparentid"] = record["recordid"]
                 _attachement["rootdocumentmasterid"] = record["documentmasterid"]
                 _attachement["createdby"] = record["createdby"]
@@ -256,6 +265,11 @@ class recordservicegetter(recordservicebase):
             return True
         return False
     
+    # def __getisocrcompleted(self, _computingresponse):
+    #     if _computingresponse["compressionstatus"] == "completed":
+    #         return True
+    #     return False
+    
 
     def __getcomputingerror(self, computingresponse):
         if computingresponse["conversionstatus"] == "error":
@@ -264,6 +278,10 @@ class recordservicegetter(recordservicebase):
             return "deduplication. " + computingresponse["message"] if "message" in computingresponse else "deduplication"
         elif computingresponse["compressionstatus"] == "error":
             return "compression. " + computingresponse["message"] if "message" in computingresponse else "compression"
+        elif computingresponse["ocractivemqstatus"] == "error":
+            return "ocr-queue. " + computingresponse["message"] if "message" in computingresponse else "ocr-queue"
+        elif computingresponse["azureocrjobstatus"] == "error":
+            return "ocr. " + computingresponse["message"] if "message" in computingresponse else "ocr"
         return None
 
     def __getcomputingsummary(self, computingresponse):
