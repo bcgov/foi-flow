@@ -16,6 +16,7 @@ from .ApplicantCategories import ApplicantCategory
 from .FOIRequestWatchers import FOIRequestWatcher
 from .FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from .ProgramAreas import ProgramArea
+from .CloseReasons import CloseReason
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 from .FOIAssignees import FOIAssignee
 from .FOIRequestExtensions import FOIRequestExtension
@@ -1219,7 +1220,8 @@ class FOIMinistryRequest(db.Model):
             SubjectCode.name.label('subjectcode'),
             FOIMinistryRequest.isoipcreview.label('isoipcreview'),
             FOIMinistryRequest.isphasedrelease.label('isphasedrelease'),
-            literal(None).label('oipc_number')
+            literal(None).label('oipc_number'),
+            CloseReason.name.label('closereason')
         ]
 
         basequery = _session.query(
@@ -1289,6 +1291,10 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 SubjectCode,
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
+                                isouter=True
+                            ).join(
+                                CloseReason,
+                                CloseReason.closereasonid == FOIMinistryRequest.closereasonid,
                                 isouter=True
                             )
                             

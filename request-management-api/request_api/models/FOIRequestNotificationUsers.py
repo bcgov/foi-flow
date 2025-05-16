@@ -1,7 +1,7 @@
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey
 from .db import  db, ma
-from datetime import datetime as datetime2
+from datetime import datetime as datetime2, time
 from sqlalchemy.orm import relationship,backref, aliased
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
@@ -10,6 +10,8 @@ from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nu
 from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text
+from flask import current_app
+import pytz
 import logging
 import json
 f = open('common/notificationtypes.json', encoding="utf8")
@@ -153,15 +155,31 @@ class FOIRequestNotificationUser(db.Model):
 
     # Begin of Dashboard functions
     @classmethod
-    def geteventsubquery(cls, groups, filterfields, keyword, additionalfilter, userid, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
+    def geteventsubquery(cls, daterangetype, fromdate, todate, groups, filterfields, keyword, additionalfilter, userid, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
         #for queue/dashboard
         _session = db.session
 
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
-        ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
-        
+        ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)      
         #ministry filter for group/team
         ministryfilter = FOIRequestNotificationUser.getgroupfilters(groups)
+
+        if daterangetype == 'eventDate' and (not fromdate or not todate):
+            return _session.query().filter(False)
+
+        if daterangetype == 'eventDate':
+            pacific = pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])
+
+            if isinstance(fromdate, str):
+                fromdate = datetime2.strptime(fromdate, "%Y-%m-%d").date()
+            if isinstance(todate, str):
+                todate = datetime2.strptime(todate, "%Y-%m-%d").date()
+
+            fromdate = pacific.localize(datetime2.combine(fromdate, time.min)).astimezone(pytz.utc)
+            todate = pacific.localize(datetime2.combine(todate, time.max)).astimezone(pytz.utc)
+        else:
+            fromdate = None
+            todate = None
 
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
@@ -195,6 +213,12 @@ class FOIRequestNotificationUser(db.Model):
             FOINotifications.id.label('id')        
         ]
 
+        notification_join_conditions = [FOINotifications.axisnumber == FOIRequests.axisrequestid]
+        if fromdate:
+            notification_join_conditions.append(FOINotifications.created_at >= fromdate)
+        if todate:
+            notification_join_conditions.append(FOINotifications.created_at <= todate)
+
         basequery = _session.query(
                                 *selectedcolumns
                             ).join(
@@ -213,9 +237,9 @@ class FOIRequestNotificationUser(db.Model):
                                 isouter=True
                             ).join(
                                 FOINotifications,    
-                                and_(FOINotifications.axisnumber == FOIRequests.axisrequestid),
+                                and_(*notification_join_conditions),
                             ).filter(FOIRequests.requeststatuslabel != StateName.closed.name)
-                            
+            
         if(additionalfilter == 'watchingRequests'):
             #watchby
             #activefilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)

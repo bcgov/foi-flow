@@ -72,7 +72,8 @@ class rawrequestservice:
                 workflowservice().createinstance(redispubservice.foirequestqueueredischannel, json_data)
             except Exception as ex:
                 logging.error(ex)
-                asyncio.ensure_future(redispubservice.publishrequest(json_data))
+                event_loop = asyncio.get_running_loop()
+                asyncio.run_coroutine_threadsafe(redispubservice.publishrequest(json_data), event_loop)
         return result
 
     @staticmethod

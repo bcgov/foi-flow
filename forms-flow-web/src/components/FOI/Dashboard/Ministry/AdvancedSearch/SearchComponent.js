@@ -25,7 +25,7 @@ import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import ListItemText from "@mui/material/ListItemText";
 import Select from "@mui/material/Select";
-import { SearchFilter, DateRangeTypes } from "./enum";
+import { SearchFilter, DateRangeTypes, MappedMinistries } from "./enum";
 import {
   ConditionalComponent,
   formatDate,
@@ -245,7 +245,7 @@ const AdvancedSearch = ({ userDetail }) => {
     handleUpdateSearchFilter({
       search: searchFilterSelected,
       keywords: keywordsMode ? keywords : [searchText.trim()],
-      requestState: requestState,
+      requestState: requestState.filter(s => s !== 'All'),
       requestType: getTrueKeysFromCheckboxObject(requestTypes),
       requestFlags: getTrueKeysFromCheckboxObject(requestFlags),
       requestStatus: getTrueKeysFromCheckboxObject(requestStatus),
@@ -332,7 +332,21 @@ const AdvancedSearch = ({ userDetail }) => {
   };
 
   const handleRequestStateChange = (event) => {
-    setRequestState(event.target.value);
+    if (event.target.value.includes("All")) {
+      if (!requestState.includes("All")) {
+        setRequestState([...Object.entries(StateEnum).map(([key, value]) => value.label), "All"])
+      } else if (event.target.value.length < (Object.entries(StateEnum).length + 1)) {
+        setRequestState(event.target.value.filter(s => s !== 'All'))
+      }
+    } else if (!event.target.value.includes("All")) {
+      if (requestState.includes("All")) {
+        setRequestState([])
+      } else if (event.target.value.length === (Object.entries(StateEnum).length)) {
+        setRequestState([...Object.entries(StateEnum).map(([key, value]) => value.label), "All"])
+      } else {
+        setRequestState(event.target.value);
+      }
+    } 
   };
 
   const handleRequestStatusChange = (event) => {
@@ -370,9 +384,20 @@ const AdvancedSearch = ({ userDetail }) => {
     } = event;
     setSelectedPublicBodies(
       // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
+      typeof value === "string" ? value.split(",") : getMappedMinistriesValue(value)
     );
   };
+
+  const getMappedMinistriesValue = (ministries) => {
+    const selected = new Set(selectedPublicBodies)
+    const mapped = new Set(Object.keys(MappedMinistries))
+    var newministries = new Set(ministries)
+    const unselected = selected.difference(newministries)
+    if (unselected.size > 0 && mapped.intersection(unselected).size > 0) {
+      newministries = selected.difference(new Set(MappedMinistries[[...unselected][0]]))
+    }
+    return [... new Set([...newministries].flatMap(ministry => MappedMinistries[ministry] || [ministry]))]
+  }
 
   const ClickableChip = ({ clicked, ...rest }) => {
     if (!clicked) {
@@ -623,10 +648,16 @@ const AdvancedSearch = ({ userDetail }) => {
                           return <em>All</em>;
                         }
 
-                        return selected.map(value => Object.values(StateEnum).find(state => state.label === value).name).join(", ");
+                        return selected.filter(s => s !== 'All').map(value => Object.values(StateEnum).find(state => state.label === value).name).join(", ");
                       }}
                     >
-                      <MenuItem disabled value="" key="request-state-all">
+                      <MenuItem value="All" key="request-state-all">
+                          <Checkbox
+                            checked={
+                              requestState.indexOf("All") > -1
+                            }
+                            color="success"
+                          />
                         <em>All</em>
                       </MenuItem>
                       {Object.entries(StateEnum).filter(([key, value]) => ![
@@ -942,7 +973,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       <MenuItem disabled value="" key="program-area-all">
                         <em>All</em>
                       </MenuItem>
-                      {programAreaList.map((programArea) => (
+                      {programAreaList.filter(p => p.isactive).sort((a, b) => a.name.localeCompare(b.name)).map((programArea) => (
                         <MenuItem
                           key={`program-area-${programArea.programareaid}`}
                           value={programArea.bcgovcode}

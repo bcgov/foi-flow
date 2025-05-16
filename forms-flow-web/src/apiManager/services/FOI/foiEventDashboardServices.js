@@ -19,7 +19,10 @@ export const fetchFOIEventListByPage = (
   filters = null,
   keyword = null,
   additionalFilter = "All",
-  userID = null
+  userID = null,
+  dateRangeType = null,
+  fromDate = null,
+  toDate = null
 ) => {
   let sortingItems = [];
   let sortingOrders = [];
@@ -42,6 +45,9 @@ export const fetchFOIEventListByPage = (
         keyword: keyword,
         additionalfilter: additionalFilter,
         userid: userID,
+        dateRangeType: dateRangeType,
+        fromDate: fromDate,
+        toDate: toDate,
       },
       UserService.getToken()
     )
@@ -60,7 +66,17 @@ export const fetchFOIEventListByPage = (
   };
 };
 
-export const fetchFOIMinistryEventListByPage = (page = 1, size = 10, sort = [{field:'defaultSorting', sort:'asc'}], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
+export const fetchFOIMinistryEventListByPage = (
+  page = 1, 
+  size = 10, 
+  sort = [{field:'defaultSorting', sort:'asc'}], 
+  filters = null, 
+  keyword = null, 
+  additionalFilter = 'All', 
+  userID = null,
+  dateRangeType = null,
+  fromDate = null,
+  toDate = null) => {
   let sortingItems = [];
   let sortingOrders = [];
   sort.forEach((item)=>{
@@ -81,7 +97,10 @@ export const fetchFOIMinistryEventListByPage = (page = 1, size = 10, sort = [{fi
             "filters": filters,
             "keyword": keyword,
             "additionalfilter": additionalFilter,
-            "userid": userID
+            "userid": userID,
+            "dateRangeType": dateRangeType,
+            "fromDate": fromDate,
+            "toDate": toDate,
           },
           UserService.getToken())
       .then((res) => {

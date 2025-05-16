@@ -121,7 +121,8 @@ jobs:
         run: |
           oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:${{ env.TAG_NAME }}
 
-      - name: Watch new rollout (trigger by image change in Openshift)
+      - name: Rollout Restart Deployment
         shell: bash
         run: |
-          oc rollout status dc/${{ env.APP_NAME }} -n ${{ env.TOOLS_NAME }}-${{ env.ENV_NAME }} -w
+          oc project d7abee-dev
+          oc rollout restart deployment/forms-flow-bpm

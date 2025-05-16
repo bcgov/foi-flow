@@ -94,7 +94,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     dispatch(push(`/foi/ministryreview/${row.id}/ministryrequest/${row.ministryrequestid}`));
   };
 
-  const columns = React.useRef([
+  const columns = [
     {
       field: "flags",
       headerName: "FLAGS",
@@ -168,7 +168,18 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       hide: true,
       renderCell: (_params) => <span></span>,
     },
-  ]);
+  ];
+
+  if (searchResults?.data.filter(r => r.currentState === 'Closed').length > 0) {
+    columns.push({
+      field: "closereason",
+      headerName: "CLOSE REASON",
+      headerAlign: "left",
+      renderCell: hyperlinkRenderCellforMinistry,
+      cellClassName: 'foi-advanced-search-result-cell',
+      flex: 1,
+    }) 
+  }
 
   if (advancedSearchComponentLoading && queryData) {
     return (
@@ -197,7 +208,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
             className="foi-data-grid"
             getRowId={(row) => row.idNumber}
             rows={searchResults?.data || []}
-            columns={columns.current}
+            columns={columns}
             rowHeight={30}
             headerHeight={50}
             rowCount={searchResults?.meta?.total || 0}

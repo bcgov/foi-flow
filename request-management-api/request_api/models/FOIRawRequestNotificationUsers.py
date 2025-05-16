@@ -1,12 +1,14 @@
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey
 from .db import  db, ma
-from datetime import datetime as datetime2, timezone
+from datetime import datetime as datetime2, timezone, time
 from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text
+from flask import current_app
+import pytz
 import logging
 import json
 from sqlalchemy.sql.sqltypes import DateTime, String, Date, Integer
@@ -136,7 +138,7 @@ class FOIRawRequestNotificationUser(db.Model):
     # Begin of Dashboard functions
 
     @classmethod
-    def getbasequery(cls, groups, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False):
+    def getbasequery(cls, groups, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, daterangetype=None, fromdate=None, todate=None):
         _session = db.session
 
         selectedcolumns = [      
@@ -158,6 +160,23 @@ class FOIRawRequestNotificationUser(db.Model):
             FOINotifications.id.label('id')          
         ]
 
+        if daterangetype == 'eventDate' and (not fromdate or not todate):
+            return _session.query().filter(False)
+
+        if daterangetype == 'eventDate':
+            pacific = pytz.timezone(current_app.config['LEGISLATIVE_TIMEZONE'])
+
+            if isinstance(fromdate, str):
+                fromdate = datetime2.strptime(fromdate, "%Y-%m-%d").date()
+            if isinstance(todate, str):
+                todate = datetime2.strptime(todate, "%Y-%m-%d").date()
+
+            fromdate = pacific.localize(datetime2.combine(fromdate, time.min)).astimezone(pytz.utc)
+            todate = pacific.localize(datetime2.combine(todate, time.max)).astimezone(pytz.utc)
+        else:
+            fromdate = None
+            todate = None
+
         basequery = _session.query(
                                         *selectedcolumns
                                 ).join(
@@ -165,6 +184,11 @@ class FOIRawRequestNotificationUser(db.Model):
                                         and_(FOIRawRequests.axisrequestid == FOINotifications.axisnumber),
                                 )
         
+        if fromdate:
+            basequery = basequery.filter(FOINotifications.created_at >= fromdate)
+        if todate:
+            basequery = basequery.filter(FOINotifications.created_at <= todate)
+
         if additionalfilter is not None:
             if(additionalfilter == 'watchingRequests' and userid is not None):
                 #watchby
@@ -183,8 +207,8 @@ class FOIRawRequestNotificationUser(db.Model):
 
 
     @classmethod
-    def getrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
-        basequery = FOIRawRequestNotificationUser.getbasequery(groups, additionalfilter, userid, isiaorestrictedfilemanager)
+    def getrequestssubquery(cls, daterangetype, fromdate, todate, groups, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager):
+        basequery = FOIRawRequestNotificationUser.getbasequery(groups, additionalfilter, userid, isiaorestrictedfilemanager, daterangetype, fromdate, todate,)
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = FOIRawRequestNotificationUser.getfilterforrequestssubquery(filterfields, keyword)

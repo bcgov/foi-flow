@@ -1,6 +1,6 @@
 import {   cellTooltipRender,
     eventCellTooltipRender
-  } from "./utils";
+  } from "../utils";
    
   const EventQueueIAOColumns = [
   

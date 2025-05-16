@@ -97,6 +97,7 @@ class ProcessingTeamWithKeycloackGroup(Enum):
     childrenfamilyteam = "Children and Family Team"
     childreneducationteam = "Children and Education Team"
     coordinatedresponseunit = "Coordinated Response Unit"
+    bcpsteam = "BCPS Team"
 
     @staticmethod
     def list():

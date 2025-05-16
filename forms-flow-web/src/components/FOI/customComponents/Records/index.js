@@ -35,8 +35,10 @@ import {
   checkForRecordsChange,
   fetchPDFStitchedRecordForConsults,
   editPersonalAttributes,
+  updateUserLockedRecords,
   fetchPDFStitchedRecordsForPhasedRedlines,
-  fetchPDFStitchedRecordsForPhasedResponsePackages
+  fetchPDFStitchedRecordsForPhasedResponsePackages,
+  retrieveSelectedRecordVersion
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
   saveRequestDetails,
@@ -94,6 +96,9 @@ import {
   faPenToSquare,
   faLinkSlash,
   faDownload,
+  faMinimize,
+  faMaximize,
+  faMagnifyingGlass
 } from "@fortawesome/free-solid-svg-icons";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -324,7 +329,6 @@ export const RecordsLog = ({
     ministryCode == "MCF" &&
       requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
   );
-
   useEffect(() => {
     setRecords(recordsObj?.records);
     let nonDuplicateRecords = recordsObj?.records?.filter(
@@ -336,6 +340,7 @@ export const RecordsLog = ({
     dispatch(checkForRecordsChange(requestId, ministryId));
     //To manage enabling and disabling of download for harms package
     recordsDownloadList[1].disabled = enableHarmsDonwnload();
+    // isDisableRedactRecords(recordsObj?.records)
   }, [recordsObj]);
 
   useEffect(() => {
@@ -347,6 +352,16 @@ export const RecordsLog = ({
       setRecordsDownloadList(recordsDownloadList.filter((record) => record.id !== 6));
     }
   }, []);
+
+  const isDisableRedactRecords = (allRecords) => {
+    return allRecords.some(record =>
+      record.failed ||!record.isredactionready ||
+      (!record.iscompressed &&
+        (record.selectedfileprocessversion !== 1 || !record.selectedfileprocessversion))
+        
+    );
+  };
+  
 
   const [currentEditRecord, setCurrentEditRecord] = useState();
   const [editTagModalOpen, setEditTagModalOpen] = useState(false);
@@ -403,7 +418,7 @@ export const RecordsLog = ({
           }
         }
         if(record.attributes?.personalattributes?.personaltag && MCFSections?.sections) {
-          if(_personalTagFilters.filter((pt)=>{return pt.divisionname === record.attributes.personalattributes.personaltag}).length === 0) {
+          if(_personalTagFilters.filter((pt)=>{return pt.name === record.attributes.personalattributes.personaltag}).length === 0) {
             _personalTagFilters = _personalTagFilters.concat(MCFSections.sections.filter((d)=>{return d.name === record.attributes.personalattributes.personaltag}));
           }
         }
@@ -978,11 +993,13 @@ export const RecordsLog = ({
   };
 
   const downloadDocument = (file, isPDF = false, originalfile = false) => {
+    var filePath = ('ocrfilepath' in file && file.ocrfilepath != null)? file.ocrfilepath : ('compresseds3uripath' in file && file.compresseds3uripath != null)? 
+          file.compresseds3uripath : file.s3uripath
     var s3filepath = !originalfile
-      ? file.s3uripath
+      ? filePath
       : !file.isattachment
       ? file.originalfile
-      : file.s3uripath;
+      : filePath;
     var filename = !originalfile
       ? file.filename
       : !file.isattachment
@@ -1513,6 +1530,21 @@ export const RecordsLog = ({
     );
   };
 
+  const retrieveRecordVersion = (action, records) => {
+    const recordIds = records?.map(record => record.id);
+    dispatch(
+      retrieveSelectedRecordVersion(
+        requestId,
+        ministryId,
+        { recordids: recordIds,
+          recordretrieveversion: action
+         }));
+    //     (err, _res) => {
+    //     }
+    //   )
+    // );
+  }
+
   const hasDocumentsToExport =
     records?.filter(
       (record) => !(isMinistryCoordinator && record.category == "personal")
@@ -1524,6 +1556,11 @@ export const RecordsLog = ({
     setUpdateAttachment(_record);
     setMultipleFiles(false);
     switch (action) {
+      case "retrieve_uncompressed":
+        const records = Array.isArray(_record) ? _record : [_record];
+        retrieveRecordVersion(action, records);
+        setModal(false);
+        break;
       case "replace":
         setreplaceRecord(_record);
         setModalFor("replace");
@@ -2315,25 +2352,29 @@ export const RecordsLog = ({
             {(isMinistryCoordinator == false &&
               records?.length > 0 &&
               DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
-                <Grid item xs={isScanningTeamMember ? 1 : 1}>
-                <a
-                  href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
-                  target="_blank"
-                >
-                  <button
-                    className={clsx(
-                      "btn",
-                      "addAttachment",
-                      classes.createButton
-                    )}
-                    variant="contained"
-                    // onClick={}
-                    color="primary"
+                <Tooltip title={<div style={{ fontSize: "11px" }}>Some files are still processing or have errors. 
+                  Please ensure that all files are successfully processed.</div>}>
+                  <Grid item xs={isScanningTeamMember ? 1 : 1}>
+                  <a
+                    href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
+                    target="_blank"
                   >
-                    Redact Records
-                  </button>
-                </a>
-                </Grid>
+                    <button
+                      className={clsx(
+                        "btn",
+                        "addAttachment",
+                        classes.createButton
+                      )}
+                      variant="contained"
+                      // onClick={}
+                      disabled={isDisableRedactRecords(records)}
+                      color="primary"
+                    >
+                      Redact Records
+                    </button>
+                  </a>
+                  </Grid>
+                </Tooltip>
               )
             )}
             <Grid item xs={3}>
@@ -2884,6 +2925,34 @@ export const RecordsLog = ({
                   </button>
                 </span>
               </Tooltip>
+              <Tooltip
+                title={
+                  !checkIsAnySelected() ? (
+                    <div style={{ fontSize: "11px" }}>
+                      To retrieve uncompressed files:{" "}
+                      <ul>
+                        <li>at least one record must be selected</li>
+                      </ul>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: "11px" }}>Retrieve Uncompressed files</div>
+                  )
+                }
+                sx={{ fontSize: "11px" }}
+              >
+                <span>
+                  <button
+                    className={` btn`}
+                    onClick={() => handlePopupButtonClick("retrieve_uncompressed")}
+                    disabled={lockRecords || !checkIsAnySelected() || isHistoricalRequest}
+                    style={
+                      lockRecords || !checkIsAnySelected() ? { pointerEvents: "none" } : {}
+                    }
+                  >
+                    <FontAwesomeIcon icon={faMinimize} size="lg" color="#38598A" />
+                  </button>
+                </span>
+              </Tooltip>
             </Grid>
             <Grid
               container
@@ -3252,7 +3321,7 @@ const Attachment = React.memo(
       (division) => {
         return !record.attributes?.personalattributes?.personaltag || (record.attributes?.personalattributes?.personaltag && division.divisionname != record.attributes?.personalattributes?.personaltag);
       }) || [];
-    const removeInValidTagsFromDivisions = record.attributes?.divisions.filter(
+    const removeInValidTagsFromDivisions = record.attributes?.divisions?.filter(
       (division) => {
         return division.divisionname != "TBD";
       });
@@ -3306,6 +3375,21 @@ const Attachment = React.memo(
         );
       }
     };
+
+    const showCompressedTag= (record)=> {
+      /**TODO: Create ENUM for document processes */
+      if (record.iscompressed && (!record.selectedfileprocessversion 
+        || record.selectedfileprocessversion != 1 ))
+        return true;
+      return false;
+    }
+
+    const showOCRTag= (record)=> {
+      if (record.ocrfilepath != null && (!record.selectedfileprocessversion 
+        || record.selectedfileprocessversion != 2 ))
+        return true;
+      return false;
+    }
 
     return (
       <>
@@ -3385,12 +3469,19 @@ const Attachment = React.memo(
             <span title={record.filename} className={classes.filename}>
               {record.filename}{" "}
             </span>
-            <span className={classes.fileSize}>
+            {/* <span className={classes.fileSize}>
               {record?.attributes?.filesize > 0
                 ? (record?.attributes?.filesize / 1024).toFixed(2)
                 : 0}{" "}
-              KB
-            </span>
+              KB -orginal
+            </span> */}
+            <span className={classes.fileSize}>
+            {(
+              (record?.iscompressed
+                ? record?.attributes?.compressedfilesize || 0
+                : record?.attributes?.filesize || 0) / 1024
+            ).toFixed(2)} KB
+          </span>
           </Grid>
           <Grid
             item
@@ -3428,8 +3519,12 @@ const Attachment = React.memo(
             ) : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
                 true && isRetry == false ? (
               <span>Error due to timeout</span>
-            ) : (
+            ) : !record.isdedupecomplete?(
               <span>Deduplication & file conversion in progress</span>
+            ): !record.iscompressed ? (
+              <span>Compression in progress</span>
+            ) : (
+              <span>OCR in progress</span>
             )}
             <AttachmentPopup
               indexValue={indexValue}
@@ -3456,7 +3551,7 @@ const Attachment = React.memo(
           alignItems="flex-start"
         >
           <Grid item xs={6}>
-            {removeInValidTagsFromDivisions.length > 0 && removeInValidTagsFromDivisions.map((division, i) => (
+            {removeInValidTagsFromDivisions?.length > 0 && removeInValidTagsFromDivisions?.map((division, i) => (
               <Chip
                 item
                 key={i}
@@ -3484,9 +3579,9 @@ const Attachment = React.memo(
                 style={{
                   backgroundColor: "#003366",
                   margin:
-                    record.isattachment && removeInValidTagsFromDivisions.length === 0
+                    record.isattachment && removeInValidTagsFromDivisions?.length === 0
                       ? "4px 4px 4px 95px"
-                      : removeInValidTagsFromDivisions.length === 0
+                      : removeInValidTagsFromDivisions?.length === 0
                       ? "4px 4px 4px 35px"
                       : "4px",
                 }}
@@ -3544,7 +3639,29 @@ const Attachment = React.memo(
                 }}
               />
             }
+              <Chip
+                key={record.recordid}
+                icon={
+                  <FontAwesomeIcon
+                    icon={showCompressedTag(record) ? faMinimize : faMaximize}
+                    size="sm"
+                    style={{
+                      color:"#38598A",
+                    }}
+                  />
+                }
+                label={showCompressedTag(record) ? "Compressed" : "Uncompressed"}
+                size="small"
+                className={clsx(classes.chip, classes.chipPrimary)}
+                style={{
+                  color: "#003366",
+                  backgroundColor:"#fff",
+                  border: "1px solid #38598A",
+                  margin: "4px 10px",
+                }}
+              />
           </Grid>
+
           <Grid
             item
             xs={2}
@@ -3631,6 +3748,11 @@ const AttachmentPopup = React.memo(
     const handleRename = () => {
       closeTooltip();
       handlePopupButtonClick("rename", record);
+    };
+
+    const handleRetrieveFileVersion = (retrieveVersion) => {
+      closeTooltip();
+      handlePopupButtonClick(retrieveVersion, record);
     };
 
     const handleReplace = () => {
@@ -3778,6 +3900,17 @@ const AttachmentPopup = React.memo(
               </MenuItem>
             ) : (
               ""
+            )}
+            {!isHistoricalRequest && !record.selectedfileprocessversion && (
+              <MenuItem
+                disabled={lockRecords || disableMinistryUser}
+                onClick={() => {
+                  handleRetrieveFileVersion("retrieve_uncompressed");
+                  setPopoverOpen(false);
+                }}
+              >
+                Retrieve Uncompressed
+              </MenuItem>
             )}
             {(!record.attributes?.isattachment ||
               record.attributes?.isattachment === undefined) && !isHistoricalRequest && (

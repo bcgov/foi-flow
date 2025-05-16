@@ -124,6 +124,7 @@ const StateDropDown = ({
       return appendedList;
     }
     const isMCFMinistryTeam = userDetail?.groups?.some(str => str.includes("MCF Ministry Team"))
+
     switch (_state.toLowerCase()) {
       case StateEnum.unopened.name.toLowerCase():
         return _stateList.unopened;
@@ -139,19 +140,19 @@ const StateDropDown = ({
           if (previousState === StateEnum.intakeinprogress.name) {
             return appendRecordsReadyForReview(_stateList.intakeinprogress);
           } else if (previousState === StateEnum.open.name)
-            return appendRecordsReadyForReview(_stateList.open);
+            return consultflag ? appendRecordsReadyForReview(_stateList.openforconsult) : appendRecordsReadyForReview(_stateList.open);
           else if (previousState === StateEnum.review.name)
-            return _stateList.review; // already has RRR state
+            return consultflag ? _stateList.reviewforConsult : _stateList.review; // already has RRR state
           else if (previousState === StateEnum.consult.name)
-            return _stateList.consult; // this already has RRR state
+            return consultflag ? _stateList.consultforConsult : _stateList.consult; // this already has RRR state
           else if (previousState === StateEnum.response.name)
-            return appendRecordsReadyForReview(_stateList.response);
+            return consultflag ? appendRecordsReadyForReview(_stateList.responseforConsult) : appendRecordsReadyForReview(_stateList.response);
           else if (previousState === StateEnum.appfeeowing.name)
             return appendRecordsReadyForReview(_stateList.appfeeowing);
           else if (previousState === StateEnum.recordsreadyforreview.name)
-            return _stateList.recordsreadyforreview;
+            return consultflag ? _stateList.recordsreadyforreviewforConsult : _stateList.recordsreadyforreview;
         } else {
-          return _stateList.peerreview;
+          return consultflag ? _stateList.peerreviewforConsult : _stateList.peerreview;
         }
       case StateEnum.open.name.toLowerCase():
         return consultflag ? _stateList.openforconsult : _stateList.open;
@@ -160,6 +161,9 @@ const StateDropDown = ({
       case StateEnum.redirect.name.toLowerCase():
         return _stateList.redirect;
       case StateEnum.callforrecords.name.toLowerCase():
+        if (consultflag) { 
+          return _stateList.callforrecordsForConsult; 
+        }
         if (_isMinistryCoordinator) {
           if (isMCFMinistryTeam) {
             return appendRecordsReadyForReview(_stateList.callforrecordsforpersonal);
@@ -175,12 +179,15 @@ const StateDropDown = ({
           return _stateList.callforrecordscfdmsdpersonal;
         return _stateList.callforrecords;
       case StateEnum.tagging.name.toLowerCase():
-        return _stateList.tagging;
+        return consultflag ? _stateList.taggingforConsult : _stateList.tagging;
       case StateEnum.readytoscan.name.toLowerCase():
-        return _stateList.readytoscan;
+        return consultflag ? _stateList.readytoscanforConsult : _stateList.readytoscan;
       case StateEnum.recordsreadyforreview.name.toLowerCase():
-        return _stateList.recordsreadyforreview;
+        return consultflag ? _stateList.recordsreadyforreviewforConsult : _stateList.recordsreadyforreview;
       case StateEnum.review.name.toLowerCase():
+        if (consultflag) { 
+          return _stateList.reviewforConsult; 
+        }
         if (
           personalIAO &&
           (requestDetails.bcgovcode.toLowerCase() === "mcf" ||
@@ -204,20 +211,23 @@ const StateDropDown = ({
         }
         return _stateList.onhold;
       case StateEnum.consult.name.toLowerCase():
-        return _stateList.consult;
+        return consultflag ? _stateList.consultforConsult : _stateList.consult;
       case StateEnum.signoff.name.toLowerCase():
-        return _stateList.signoff;
+        return consultflag ? _stateList.signoffforConsult : _stateList.signoff;
       case StateEnum.feeassessed.name.toLowerCase():
+        if (consultflag) { 
+          return _stateList.feeassessedforConsult; 
+        }
         if (personalIAO) return _stateList.feeassessedforpersonal;
         return _stateList.feeassessed;
       case StateEnum.deduplication.name.toLowerCase():
-        if (!isMCFMinistryTeam) {
-          return _stateList.deduplication.filter(_state => _state.status.toLowerCase() !== StateEnum.recordsreadyforreview.name.toLowerCase());
-        }
-        return _stateList.deduplication;
+        return consultflag ? _stateList.deduplicationforConsult : _stateList.deduplication;
       case StateEnum.harms.name.toLowerCase():
-        return _stateList.harms;
+        return consultflag ? _stateList.harmsforConsult : _stateList.harms;
       case StateEnum.response.name.toLowerCase():
+        if (consultflag) { 
+          return _stateList.responseforConsult; 
+        }
         if (personalIAO) return _stateList.responseforpersonal;
         else if (cfrFeeData?.balanceremaining > 0 && cfrStatus === "approved") {
           return _stateList.response;

@@ -74,13 +74,16 @@ class EventPagination(Resource):
             if(len(_filterfields) == 0):
                 _filterfields = DEFAULT_FILTER_FIELDS
             _keyword = flask.request.args.get('keyword', None, type=str)
+            _dateRangeType = flask.request.args.get('dateRangeType', "", type=str)
+            _fromDate = flask.request.args.get('fromDate', "", type=str)
+            _toDate = flask.request.args.get('toDate', "", type=str)
+
 
             events = []
             statuscode = 200
             if AuthHelper.getusertype() == "iao" or AuthHelper.getusertype() == "ministry":  
-                groups =  AuthHelper.getusergroups() if AuthHelper.getusertype() == "iao" else AuthHelper.getministrygroups()      
-                                                                                              
-                events = dashboardeventservice().geteventqueuepagination(queuetype, groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
+                groups =  AuthHelper.getusergroups() if AuthHelper.getusertype() == "iao" else AuthHelper.getministrygroups()                                             
+                events = dashboardeventservice().geteventqueuepagination(queuetype, _dateRangeType, _fromDate, _toDate, groups, _page, _size, _sortingitems, _sortingorders, _filterfields, _keyword, _additionalfilter, _userid)
             else:
                 statuscode = 401  
 
