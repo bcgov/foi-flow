@@ -2352,26 +2352,29 @@ export const RecordsLog = ({
             {(isMinistryCoordinator == false &&
               records?.length > 0 &&
               DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
-                <Grid item xs={isScanningTeamMember ? 1 : 1}>
-                <a
-                  href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
-                  target="_blank"
-                >
-                  <button
-                    className={clsx(
-                      "btn",
-                      "addAttachment",
-                      classes.createButton
-                    )}
-                    variant="contained"
-                    // onClick={}
-                    disabled={isDisableRedactRecords(records)}
-                    color="primary"
+                <Tooltip title={<div style={{ fontSize: "11px" }}>Some files are still processing or have errors. 
+                  Please ensure that all files are successfully processed.</div>}>
+                  <Grid item xs={isScanningTeamMember ? 1 : 1}>
+                  <a
+                    href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
+                    target="_blank"
                   >
-                    Redact Records
-                  </button>
-                </a>
-                </Grid>
+                    <button
+                      className={clsx(
+                        "btn",
+                        "addAttachment",
+                        classes.createButton
+                      )}
+                      variant="contained"
+                      // onClick={}
+                      disabled={isDisableRedactRecords(records)}
+                      color="primary"
+                    >
+                      Redact Records
+                    </button>
+                  </a>
+                  </Grid>
+                </Tooltip>
               )
             )}
             <Grid item xs={3}>
@@ -3657,29 +3660,6 @@ const Attachment = React.memo(
                   margin: "4px 10px",
                 }}
               />
-              {showOCRTag(record) &&
-                <Chip
-                  key={record.recordid+"ocr"}
-                  icon={
-                    <FontAwesomeIcon
-                      icon={faMagnifyingGlass}
-                      size="sm"
-                      style={{
-                        color:"#38598A",
-                      }}
-                    />
-                  }
-                  label="Searchable (OCR)"
-                  size="small"
-                  className={clsx(classes.chip, classes.chipPrimary)}
-                  style={{
-                    color: "#003366",
-                    backgroundColor:"#fff",
-                    border: "1px solid #38598A",
-                    margin: "4px 4px",
-                  }}
-                />
-              }
           </Grid>
 
           <Grid
