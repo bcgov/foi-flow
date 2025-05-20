@@ -108,6 +108,8 @@ jobs:
         shell: bash
         run: |
           oc project d7abee-dev
-          oc rollout restart deployment/forms-flow-web
+          : # oc rollout restart deployment/forms-flow-web
+          oc rollout dc/forms-flow-web
           oc project d106d6-dev
-          oc rollout restart deployment/forms-flow-web
+          oc rollout dc/forms-flow-web
+          : #oc rollout restart deployment/forms-flow-web
