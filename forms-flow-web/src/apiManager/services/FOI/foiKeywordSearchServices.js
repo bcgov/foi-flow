@@ -13,6 +13,7 @@ export const getCrossTextSearchAuth = ({
 
   httpGETRequest(
     API.FOI_GET_CROSSTEXTSEARCH_AUTH,
+    {},
     UserService.getToken()
   )
     .then((res) => {
@@ -38,7 +39,7 @@ export const getSolrKeywordSearchData = ({
     dispatch,
   }) => {
 
-    let isBearer = false;  
+    let isBearer = false;
     const serializedQueryParams = new URLSearchParams(queryParams).toString();
     const fixedQueryParams = serializedQueryParams.replace(/\+/g, '%20');
     let solrEndPoint = `${FOI_SOLR_API_BASE}/solr/foisearch/select?${fixedQueryParams}`;
@@ -62,7 +63,7 @@ export const getSolrKeywordSearchData = ({
       });
   };
 
-  
+
   export const getKeywordSearchRequestDetails = ({
     foirequestNumbers,
     callback,
@@ -73,7 +74,7 @@ export const getSolrKeywordSearchData = ({
     let apiUrlPost = API.FOI_GET_CROSSTEXTSEARCH_REQUEST_DETAILS;
     httpPOSTRequest(apiUrlPost, requestjson, UserService.getToken() ?? '', true)
       .then((res) => {
-        if (res.data) {           
+        if (res.data) {
           callback(res.data);
         } else {
           errorCallback("Failed to retrieve keyword search request details.");

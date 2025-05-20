@@ -1,19 +1,19 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector, useContext } from "react-redux";
 import { push } from "connected-react-router";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import Grid from "@mui/material/Grid";
 import Queue from "./Queue";
-import EventQueue from "../EventQueue"
 import AdvancedSearch from "./AdvancedSearch";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import Divider from "@mui/material/Divider";
 import { ButtonBase } from "@mui/material";
 import { getTableInfo } from "./columns";
-import { getIAOEventQueueTableInfo } from "../EventQueueColumns"
+import { getIAOEventQueueTableInfo } from "../EventQueueSearch/EventQueueColumns"
 import { setShowAdvancedSearch, setResumeDefaultSorting, setShowEventQueue, setShowKeywordSearch } from "../../../../actions/FOI/foiRequestActions";
 import KeywordSearch from "./KeywordSearch";
+import EventQueueSearch from "../EventQueueSearch/index";
 
 const useStyles = makeStyles(() => ({
   displayed: {
@@ -219,7 +219,7 @@ const Dashboard = ({ userDetail }) => {
           //   [classes.hidden]: !showEventQueue,
           // })}
         >
-          <EventQueue userDetail={userDetail} eventQueueTableInfo={eventQueueTableInfo} />
+         <EventQueueSearch userDetail={userDetail} eventQueueTableInfo={eventQueueTableInfo}></EventQueueSearch>
         </Grid>
         }
         { showAdvancedSearch &&
