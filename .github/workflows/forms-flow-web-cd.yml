@@ -107,7 +107,13 @@ jobs:
       - name: Rollout Restart Deployment
         shell: bash
         run: |
-          oc project d7abee-dev
-          oc rollout restart deployment/forms-flow-web
-          oc project d106d6-dev
-          oc rollout restart deployment/forms-flow-web
+          if  [ ${{ github.ref_name }} == 'dev' ]; then
+            oc project d7abee-dev
+            oc rollout restart deployment/forms-flow-web
+            oc project d106d6-dev
+            oc rollout restart deployment/forms-flow-web
+          elif [ ${{ github.ref_name }} == 'test-marshal' ]; then
+            oc project d7abee-test
+            oc rollout dc/forms-flow-web
+            : #oc project d106d6-dev
+            : #oc rollout restart deployment/forms-flow-web
