@@ -276,11 +276,11 @@ class recordservicegetter(recordservicebase):
             return "conversion"
         elif computingresponse["deduplicationstatus"] == "error":
             return "deduplication. " + computingresponse["message"] if "message" in computingresponse else "deduplication"
-        elif computingresponse["compressionstatus"] == "error":
+        elif "compressionstatus" in computingresponse and computingresponse["compressionstatus"] == "error":
             return "compression. " + computingresponse["message"] if "message" in computingresponse else "compression"
-        elif computingresponse["ocractivemqstatus"] == "error":
+        elif "ocractivemqstatus" in computingresponse and computingresponse["ocractivemqstatus"] == "error":
             return "ocr-queue. " + computingresponse["message"] if "message" in computingresponse else "ocr-queue"
-        elif computingresponse["azureocrjobstatus"] == "error":
+        elif "azureocrjobstatus" in computingresponse and computingresponse["azureocrjobstatus"] == "error":
             return "ocr. " + computingresponse["message"] if "message" in computingresponse else "ocr"
         return None
 
