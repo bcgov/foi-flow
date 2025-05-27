@@ -9,9 +9,10 @@ class AttachmentSchema(Schema):
         unknown = EXCLUDE    
     filename = fields.Str(data_key="filename",required=True,allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     url = fields.Str(data_key="url",required=True,allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
+    applicantcorrespondenceattachmentid = fields.Integer(data_key="applicantcorrespondenceattachmentid", required=False, allow_none=False)
    
 
-class FOIApplicantCorrespondenceSchema(Schema):
+class FOIApplicantCorrespondenceLogSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
         """Exclude unknown fields in the deserialized output."""
 

@@ -113,6 +113,13 @@
   u {
     cursor: pointer;
   }
+  a {
+    color: white;
+    text-decoration: underline;
+  }
+  a:hover{
+    color: inherit;
+}
 }
 
 .preview-container {

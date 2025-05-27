@@ -398,7 +398,7 @@ export const ContactApplicant = ({
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
   const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
   
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState<any[]>([]);
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
   const [initialTemplates, setInitialTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
@@ -1073,7 +1073,18 @@ export const ContactApplicant = ({
   const editCorrespondence = async (sfdtString: string, html: string) => {
     setDisablePreview(true);
     setPreviewModal(false);
-    const attachments = await saveAttachments(files);
+    let filesToUpload = [];
+    let existingAttachments = [];
+    for (let file of files) {
+      if (file instanceof File) {
+        filesToUpload.push(file)
+      } else {
+        let existingAttachment = {...file, url: file.documenturipath}
+        existingAttachments.push(existingAttachment)
+      }
+    }
+    const newAttachments = await saveAttachments(filesToUpload);
+    const attachments = [...existingAttachments, ...newAttachments]
     let callback = (_res: string) => {
       clearcorrespondence();
       changeCorrespondenceFilter("drafts");
@@ -1551,21 +1562,29 @@ export const ContactApplicant = ({
             </>
           }
           <div>
-          {files.map((file: any, index: number) => (
+          {files.map((file: any, index: number) => {
+            let fileComponent;
+            let filename = file.filename
+            if (file instanceof Blob) {
+              fileComponent = 
+                (<u 
+                  onClick={() => {
+                    const fileURL = URL.createObjectURL(files[index]);
+                    window.open(fileURL);
+                  }}>{filename}</u>
+                )
+            } else {
+              fileComponent = <a href={`/foidocument?id=${ministryId}&filepath=${file.documenturipath.split('/').slice(4).join('/')}`} target="_blank">{file.filename}</a>
+            }
+            return (
             <div className="email-attachment-item" key={file.filename}>
-              <u 
-                onClick={() => {
-                  const fileURL = URL.createObjectURL(files[index]);
-                  window.open(fileURL);
-                }}
-              >{file.filename}</u>
+              {fileComponent}
               <i
                 className="fa fa-times-circle"
                 onClick={() => removeFile(index)}
               >
               </i>
-            </div>
-          ))}
+            </div>)})}
           </div>
         </div>
         <div id="correspondence-editor-ql-toolbar" className="ql-toolbar ql-snow">
@@ -1624,7 +1643,7 @@ export const ContactApplicant = ({
         <Grid
           container
           direction="row"
-          justify="flex-start"
+          justifyContent="flex-start"
           alignItems="flex-start"
           spacing={1}
         >

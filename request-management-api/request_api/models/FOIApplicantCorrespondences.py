@@ -96,12 +96,21 @@ class FOIApplicantCorrespondence(db.Model):
                 correpondenceattachments = []
                 for _attachment in attachments:
                     attachment = FOIApplicantCorrespondenceAttachment()
-                    attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
-                    attachment.applicantcorrespondence_version = newapplicantcorrepondencelog.version
-                    attachment.attachmentdocumenturipath = _attachment['url']
-                    attachment.attachmentfilename = _attachment['filename']
-                    attachment.createdby = newapplicantcorrepondencelog.createdby
-                    attachment.version = 1
+                    if 'applicantcorrespondenceattachmentid' in _attachment:
+                        existingattachment = FOIApplicantCorrespondenceAttachment().getapplicantcorrespondenceattachmentbyid(_attachment['applicantcorrespondenceattachmentid'])
+                        attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
+                        attachment.applicantcorrespondence_version = newapplicantcorrepondencelog.version
+                        attachment.attachmentdocumenturipath = existingattachment['attachmentdocumenturipath']
+                        attachment.attachmentfilename = existingattachment['attachmentfilename']
+                        attachment.createdby = existingattachment['createdby']
+                        attachment.version = existingattachment['version'] + 1
+                    else:
+                        attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
+                        attachment.applicantcorrespondence_version = newapplicantcorrepondencelog.version
+                        attachment.attachmentdocumenturipath = _attachment['url']
+                        attachment.attachmentfilename = _attachment['filename']
+                        attachment.createdby = newapplicantcorrepondencelog.createdby
+                        attachment.version = 1
                     correpondenceattachments.append(attachment)
                 FOIApplicantCorrespondenceAttachment().saveapplicantcorrespondenceattachments(newapplicantcorrepondencelog.foiministryrequest_id , correpondenceattachments)
             if(emails is not None and len(emails) > 0):
