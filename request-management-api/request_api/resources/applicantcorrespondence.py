@@ -28,7 +28,7 @@ import json
 from flask_cors import cross_origin
 import request_api
 from request_api.utils.cache import cache_filter, response_filter
-from request_api.schemas.foiapplicantcorrespondencelog import  FOIApplicantCorrespondenceSchema, FOIApplicantCorrespondenceEmailSchema, FOIApplicantCorrespondenceResponseSchema, FOIApplicantCorrespondenceEditResponseSchema 
+from request_api.schemas.foiapplicantcorrespondencelog import  FOIApplicantCorrespondenceLogSchema, FOIApplicantCorrespondenceEmailSchema, FOIApplicantCorrespondenceResponseSchema, FOIApplicantCorrespondenceEditResponseSchema 
 from request_api.auth import auth, AuthHelper
 from request_api.services.requestservice import requestservice
 from request_api.services.cfrfeeservice import cfrfeeservice
@@ -95,7 +95,7 @@ class FOIFlowApplicantCorrespondence(Resource):
     def post(requestid, ministryrequestid):
         try:
             requestjson = request.get_json()
-            applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson)
+            applicantcorrespondencelog = FOIApplicantCorrespondenceLogSchema().load(data=requestjson)
             if ministryrequestid == 'None':
                 rawrequestid = requestid
             else:
@@ -117,7 +117,7 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
     def post(requestid, ministryrequestid):
         try:
             requestjson = request.get_json()
-            correspondenceschemaobj = FOIApplicantCorrespondenceSchema().load(data=requestjson)
+            correspondenceschemaobj = FOIApplicantCorrespondenceLogSchema().load(data=requestjson)
             if ministryrequestid == 'None':
                 rawrequestid = requestid
             else:
@@ -146,7 +146,7 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
                 rawrequestid = requestid
             else:
                 rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
-            applicantcorrespondencelog = FOIApplicantCorrespondenceSchema().load(data=requestjson) 
+            applicantcorrespondencelog = FOIApplicantCorrespondenceLogSchema().load(data=requestjson)
             if ministryrequestid == 'None' or "israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"] == True:
                 result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelog, AuthHelper.getuserid(), True)
             else:

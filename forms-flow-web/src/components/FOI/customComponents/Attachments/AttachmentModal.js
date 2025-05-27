@@ -67,7 +67,7 @@ export default function AttachmentModal({
   uploadFor = "attachment",
   maxNoFiles,
   bcgovcode,
-  existingDocuments = [],
+  existingDocuments,
   divisions = [],
   replacementfiletypes = [],
   totalUploadedRecordSize = 0,
@@ -608,9 +608,9 @@ export default function AttachmentModal({
   const isSaveDisabled = () => {
     if (modalFor === "delete") {
       return false;
-    } else if (files.length === 0 && existingDocuments.length === 0) {
+    } else if (files.length === 0 && existingDocuments?.length === 0) {
       return true;
-    } else if (uploadFor === "response" && (files.length > 1 ||  existingDocuments.length > 1)) {
+    } else if (uploadFor === "response" && (files.length > 1 ||  existingDocuments?.length > 1)) {
       return true;
     } else if (modalFor === "add") {
       if(requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && bcgovcode == "MCF") {

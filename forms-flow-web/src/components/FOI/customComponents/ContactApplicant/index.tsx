@@ -140,7 +140,11 @@ export const ContactApplicant = ({
   const preview = async (sfdtString: string) => {
     // pass html string to preview modal
     // console.log("preview:", JSON.stringify(sfdtString));
-    let newData = {
+    let newDataHtml = {
+      "FileName": `${emailSubject}.html`,
+      "Content": sfdtString
+    };
+    let newDataPdf = {
       "FileName": `${emailSubject}.pdf`,
       "Content": sfdtString
     };
@@ -149,7 +153,7 @@ export const ContactApplicant = ({
       // setEditorValue( removeHeaderParagraph(html) );
       setEditorValue( html );
     }
-    await exportSFDT(dispatch, newData, loadPreview);
+    await exportSFDT(dispatch, newDataHtml, loadPreview);
     if (selectedEmails.length == 0) {
       const attachBlobPdf = async (pdf: any) => {
         const blob = new Blob([pdf], { type: 'application/pdf' });
@@ -159,7 +163,7 @@ export const ContactApplicant = ({
         // @ts-ignore
         setFiles((prev) => [...prev, emailAttachment])
       }
-      await exportPDF(dispatch, newData, attachBlobPdf);
+      await exportPDF(dispatch, newDataPdf, attachBlobPdf);
     }
   };
   // const removeHeaderParagraph = (htmlString: string) => {
@@ -262,7 +266,7 @@ export const ContactApplicant = ({
       //@ts-ignore
       emailAttachment.filename = `${attachAsPdfFilename}.pdf`
       // @ts-ignore
-      setFiles([emailAttachment])
+      setFiles((prev) => [...prev, emailAttachment])
     }
     await exportPDF(dispatch, newData, attachBlobPdf);
     const aplicantCoverEmailTemplate = templates.find((template: any) => template.label === 'A - Applicant Cover Email');
@@ -394,7 +398,7 @@ export const ContactApplicant = ({
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
   const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
   
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState<any[]>([]);
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
   const [initialTemplates, setInitialTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
 
@@ -1069,7 +1073,18 @@ export const ContactApplicant = ({
   const editCorrespondence = async (sfdtString: string, html: string) => {
     setDisablePreview(true);
     setPreviewModal(false);
-    const attachments = await saveAttachments(files);
+    let filesToUpload = [];
+    let existingAttachments = [];
+    for (let file of files) {
+      if (file instanceof File) {
+        filesToUpload.push(file)
+      } else {
+        let existingAttachment = {...file, url: file.documenturipath}
+        existingAttachments.push(existingAttachment)
+      }
+    }
+    const newAttachments = await saveAttachments(filesToUpload);
+    const attachments = [...existingAttachments, ...newAttachments]
     let callback = (_res: string) => {
       clearcorrespondence();
       changeCorrespondenceFilter("drafts");
@@ -1547,21 +1562,29 @@ export const ContactApplicant = ({
             </>
           }
           <div>
-          {files.map((file: any, index: number) => (
+          {files.map((file: any, index: number) => {
+            let fileComponent;
+            let filename = file.filename
+            if (file instanceof Blob) {
+              fileComponent = 
+                (<u 
+                  onClick={() => {
+                    const fileURL = URL.createObjectURL(files[index]);
+                    window.open(fileURL);
+                  }}>{filename}</u>
+                )
+            } else {
+              fileComponent = <a href={`/foidocument?id=${ministryId}&filepath=${file.documenturipath.split('/').slice(4).join('/')}`} target="_blank">{file.filename}</a>
+            }
+            return (
             <div className="email-attachment-item" key={file.filename}>
-              <u 
-                onClick={() => {
-                  const fileURL = URL.createObjectURL(files[index]);
-                  window.open(fileURL);
-                }}
-              >{file.filename}</u>
+              {fileComponent}
               <i
                 className="fa fa-times-circle"
                 onClick={() => removeFile(index)}
               >
               </i>
-            </div>
-          ))}
+            </div>)})}
           </div>
         </div>
         <div id="correspondence-editor-ql-toolbar" className="ql-toolbar ql-snow">
@@ -1620,7 +1643,7 @@ export const ContactApplicant = ({
         <Grid
           container
           direction="row"
-          justify="flex-start"
+          justifyContent="flex-start"
           alignItems="flex-start"
           spacing={1}
         >
