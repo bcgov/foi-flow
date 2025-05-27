@@ -140,7 +140,11 @@ export const ContactApplicant = ({
   const preview = async (sfdtString: string) => {
     // pass html string to preview modal
     // console.log("preview:", JSON.stringify(sfdtString));
-    let newData = {
+    let newDataHtml = {
+      "FileName": `${emailSubject}.html`,
+      "Content": sfdtString
+    };
+    let newDataPdf = {
       "FileName": `${emailSubject}.pdf`,
       "Content": sfdtString
     };
@@ -149,7 +153,7 @@ export const ContactApplicant = ({
       // setEditorValue( removeHeaderParagraph(html) );
       setEditorValue( html );
     }
-    await exportSFDT(dispatch, newData, loadPreview);
+    await exportSFDT(dispatch, newDataHtml, loadPreview);
     if (selectedEmails.length == 0) {
       const attachBlobPdf = async (pdf: any) => {
         const blob = new Blob([pdf], { type: 'application/pdf' });
@@ -159,7 +163,7 @@ export const ContactApplicant = ({
         // @ts-ignore
         setFiles((prev) => [...prev, emailAttachment])
       }
-      await exportPDF(dispatch, newData, attachBlobPdf);
+      await exportPDF(dispatch, newDataPdf, attachBlobPdf);
     }
   };
   // const removeHeaderParagraph = (htmlString: string) => {
