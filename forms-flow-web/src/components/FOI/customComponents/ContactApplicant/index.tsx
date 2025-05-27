@@ -266,7 +266,7 @@ export const ContactApplicant = ({
       //@ts-ignore
       emailAttachment.filename = `${attachAsPdfFilename}.pdf`
       // @ts-ignore
-      setFiles([emailAttachment])
+      setFiles((prev) => [...prev, emailAttachment])
     }
     await exportPDF(dispatch, newData, attachBlobPdf);
     const aplicantCoverEmailTemplate = templates.find((template: any) => template.label === 'A - Applicant Cover Email');
