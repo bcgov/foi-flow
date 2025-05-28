@@ -27,6 +27,7 @@ export const PreviewModal = React.memo(({
   templateInfo,
   enableSend,
   selectedEmails,
+  selectedCCEmails,
   emailSubject
 }: previewParams) => {
 
@@ -98,7 +99,8 @@ export const PreviewModal = React.memo(({
           {enableSend && selectedEmails.length > 0 && (
             <>
             <p><span style={{fontWeight: 'bold'}}>Email from: </span>{requestDetails.assignedGroupEmail}</p>
-            <p><span style={{fontWeight: 'bold'}}>Email to: </span>{selectedEmails.join(', ')}</p>
+            <p><span style={{fontWeight: 'bold'}}>Email to: </span>{selectedEmails?.join(', ')}</p>
+            <p><span style={{fontWeight: 'bold'}}>CC to: </span>{selectedCCEmails?.join(', ')}</p>
             <p><span style={{fontWeight: 'bold'}}>Email subject: </span>{emailSubject}</p>
             </>)}
           {!enableSend && (<p>No email address has been selected to send this correspondence to. Instead, you can export this correspondence as a PDF.</p>)}

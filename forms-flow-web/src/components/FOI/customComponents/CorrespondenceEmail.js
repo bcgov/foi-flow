@@ -46,14 +46,16 @@ export default function CorrespondenceEmail({
   requestId,
   selectedEmails,
   setSelectedEmails,
-  defaultEmail
+  defaultEmail,
+  requestemailList,
+  setRequestemailList,
+  buttonText
 }) {   
   
     
     const classes = useStyles();
     const dispatch = useDispatch();
     const [newCorrespondenceEmail, setNewCorrespondenceEmail] = React.useState();
-    const [requestemailList, setRequestemailList] = React.useState([]);    
     const [noOfSelectedEmails, setNoOfSelectedEmails] = React.useState(0);
     const [showAddEmail, setShowAddEmail] = React.useState(false);
     const [validation, setValidation] = React.useState({});
@@ -196,7 +198,7 @@ export default function CorrespondenceEmail({
       <>
       <div>
             <div className="foi-email-all">
-                <button className="foi-eye-container email-correspondence-button"> <i className="fa fa-envelope"></i> Email To</button>
+                <button className="foi-eye-container email-correspondence-button"> <i className="fa fa-envelope"></i> {buttonText}</button>
                 <div className="foi-watcher-select">
                     <i className="fa fa-user-o"></i>                    
                     <InputLabel id="foi-watcher-label">
