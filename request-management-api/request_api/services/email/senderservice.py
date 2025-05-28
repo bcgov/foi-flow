@@ -38,7 +38,7 @@ class senderservice:
     def send_by_request(self, subject, content, _messageattachmentlist, requestjson):
         return self.send(subject, content, _messageattachmentlist, requestjson["email"])
 
-    def send(self, subject, content, _messageattachmentlist, emails, from_email = None):
+    def send(self, subject, content, _messageattachmentlist, emails, ccemails = None, from_email = None):
         logging.debug("Begin: Send email for request ")
 
         content = content.replace('src=\\\"', 'src="')
@@ -52,8 +52,8 @@ class senderservice:
             msg['To'] = ", ".join(emails)
         else:
             msg['To'] = emails
-        print('msg[\'To\'] = ', msg['To'])
-        print('emails: ', emails)
+        if isinstance(ccemails, list):
+            msg['Cc'] = ", ".join(ccemails)
         msg['Subject'] = subject
         formattedContent, embeddedImages = embeddedimagehandler().formatembeddedimage(content)
         part = MIMEText(formattedContent, "html")
@@ -81,7 +81,7 @@ class senderservice:
                 smtpobj.starttls()
                 smtpobj.ehlo()
                 #smtpobj.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
-                smtpobj.sendmail(msg['From'], emails, msg.as_string())
+                smtpobj.sendmail(msg['From'], emails + ccemails, msg.as_string())
                 smtpobj.quit()
                 logging.debug("End: Send email for request")
                 return {"success" : True, "message": "Sent successfully", "identifier": -1}   

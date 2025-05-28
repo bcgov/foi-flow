@@ -50,7 +50,7 @@ export default function CorrespondenceEmail({
   requestemailList,
   setRequestemailList,
   buttonText
-}) {   
+}) {
   
     
     const classes = useStyles();
@@ -105,8 +105,8 @@ export default function CorrespondenceEmail({
         //console.log("newCorrespondenceEmail:",newCorrespondenceEmail)
         currentemail = newCorrespondenceEmail
       }
-      if (selectedEmails.includes(currentemail)) {
-        let filteredArray = selectedEmails.filter(function(e) { return e !== currentemail })
+      if (selectedEmails?.includes(currentemail)) {
+        let filteredArray = selectedEmails?.filter(function(e) { return e !== currentemail })
         setSelectedEmails(filteredArray);        
       } else{
         setSelectedEmails((existingEmails) => {
@@ -144,7 +144,7 @@ export default function CorrespondenceEmail({
                 divider={i == requestemailList.length} >
                   <Checkbox id='email' inputProps={{'aria-labelledby': 'watcher'}}  
                   name={`${email.email}`} 
-                  checked={selectedEmails.indexOf(`${email.email}`) > -1}/>
+                  checked={selectedEmails?.indexOf(`${email.email}`) > -1}/>
                    {email.email}
                </MenuItem>);
                i++;
@@ -190,7 +190,7 @@ export default function CorrespondenceEmail({
    }
 
    const renderValue = (_option) => {
-    setNoOfSelectedEmails(selectedEmails.length);
+    setNoOfSelectedEmails(selectedEmails?.length);
     return <span>{noOfSelectedEmails}</span>;
   }
 

@@ -21,6 +21,7 @@ class FOIApplicantCorrespondenceEmailRawRequest(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=False)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
+    iscarboncopy = db.Column(db.Boolean(), unique=False, nullable=True)
                  
     applicantcorrespondence_id =db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondences.applicantcorrespondenceid'))
     applicantcorrespondence_version = db.Column(db.Integer, db.ForeignKey('FOIApplicantCorrespondences.version')) 
@@ -36,13 +37,13 @@ class FOIApplicantCorrespondenceEmailRawRequest(db.Model):
     def getapplicantcorrespondenceemails(cls,requestid):
         correspondence_emails = []
         try:
-            sql = """select correspondence_to, 
+            sql = """select correspondence_to, iscarboncopy, 
                         applicantcorrespondence_id, applicantcorrespondence_version  from "FOIApplicantCorrespondenceEmailsRawRequests" fce join "FOIApplicantCorrespondencesRawRequests" fc 
                         on fce.applicantcorrespondence_id  = fc.applicantcorrespondenceid and fce.applicantcorrespondence_version = fc."version" 
                         where fc.foirawrequest_id = :requestid;""" 
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
-                correspondence_emails.append({"correspondence_to": row["correspondence_to"], "applicantcorrespondence_id": row["applicantcorrespondence_id"],
+                correspondence_emails.append({"correspondence_to": row["correspondence_to"], "iscarboncopy": row["iscarboncopy"], "applicantcorrespondence_id": row["applicantcorrespondence_id"],
                                             "applicantcorrespondence_version": row["applicantcorrespondence_version"]})
         except Exception as ex:
             logging.error(ex)
@@ -53,5 +54,5 @@ class FOIApplicantCorrespondenceEmailRawRequest(db.Model):
     
 class FOIApplicantCorrespondenceEmailRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceemailid','applicantcorrespondence_id', 'applicantcorrespondence_version','correspondence_to','created_at','createdby')
+        fields = ('applicantcorrespondenceemailid','applicantcorrespondence_id', 'applicantcorrespondence_version','correspondence_to','created_at','createdby', 'iscarboncopy')
     

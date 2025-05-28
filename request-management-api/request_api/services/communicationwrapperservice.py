@@ -38,7 +38,7 @@ class communicationwrapperservice:
                 return self.__handle_fee_email(requestid, ministryrequestid, result, applicantcorrespondencelog)
             # Handle non-fee templates - Send email for non-fee templates with email recipients
             else:
-                if "emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0:
+                if ("emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0) or ("ccemails" in applicantcorrespondencelog and len(applicantcorrespondencelog["ccemails"]) > 0):
                     if applicantcorrespondencelog["templatename"] is None:
                         template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
                     else:

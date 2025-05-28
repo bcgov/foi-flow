@@ -88,7 +88,7 @@ class FOIApplicantCorrespondence(db.Model):
         return correspondence_schema.dump(query)
 
     @classmethod
-    def saveapplicantcorrespondence(cls, newapplicantcorrepondencelog, attachments, emails)->DefaultMethodResult: 
+    def saveapplicantcorrespondence(cls, newapplicantcorrepondencelog, attachments, emails, ccemails)->DefaultMethodResult: 
         try:
             db.session.add(newapplicantcorrepondencelog)
             db.session.commit()
@@ -113,15 +113,26 @@ class FOIApplicantCorrespondence(db.Model):
                         attachment.version = 1
                     correpondenceattachments.append(attachment)
                 FOIApplicantCorrespondenceAttachment().saveapplicantcorrespondenceattachments(newapplicantcorrepondencelog.foiministryrequest_id , correpondenceattachments)
+            correspondenceemails = []
             if(emails is not None and len(emails) > 0):
-                correspondenceemails = []
                 for _email in emails:
                     email = FOIApplicantCorrespondenceEmail()
                     email.applicantcorrespondence_id = newapplicantcorrepondencelog.applicantcorrespondenceid
                     email.applicantcorrespondence_version = newapplicantcorrepondencelog.version
                     email.correspondence_to = _email
                     email.createdby = newapplicantcorrepondencelog.createdby
+                    email.iscarboncopy = False
                     correspondenceemails.append(email)
+            if(ccemails is not None and len(ccemails) > 0):
+                for _email in ccemails:
+                    email = FOIApplicantCorrespondenceEmail()
+                    email.applicantcorrespondence_id = newapplicantcorrepondencelog.applicantcorrespondenceid
+                    email.applicantcorrespondence_version = newapplicantcorrepondencelog.version
+                    email.correspondence_to = _email
+                    email.createdby = newapplicantcorrepondencelog.createdby
+                    email.iscarboncopy = True
+                    correspondenceemails.append(email)
+            if len(correspondenceemails) > 0:
                 FOIApplicantCorrespondenceEmail().saveapplicantcorrespondenceemail(newapplicantcorrepondencelog.applicantcorrespondenceid , correspondenceemails)
             return DefaultMethodResult(True,'applicantcorrepondence log added',newapplicantcorrepondencelog.applicantcorrespondenceid)
         except Exception:
