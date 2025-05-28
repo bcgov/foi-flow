@@ -977,6 +977,7 @@ export const retrieveSelectedRecordVersion = (
     httpPOSTRequest(apiUrl, data)
       .then((res) => {
         if (res.data && res.data.status) {
+          dispatch(fetchFOIRecords(requestId, ministryId));
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));

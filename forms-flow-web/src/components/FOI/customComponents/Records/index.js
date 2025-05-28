@@ -98,7 +98,8 @@ import {
   faDownload,
   faMinimize,
   faMaximize,
-  faMagnifyingGlass
+  faMagnifyingGlass,
+  faRotate,
 } from "@fortawesome/free-solid-svg-icons";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -1481,31 +1482,43 @@ export const RecordsLog = ({
   };
 
   const retryDocument = (record) => {
-    record.trigger = "recordretry";
-    record.service = record.failed ? record.failed : "all";
-    if (record.isattachment) {
-      var parentRecord = recordsObj?.records?.find(
-        (r) => (r.recordid = record.rootparentid)
-      );
-      record.attributes.divisions = parentRecord.attributes.divisions;
-      record.attributes.batch = parentRecord.attributes.batch;
-      record.attributes.extension = record["s3uripath"].substr(
-        record["s3uripath"].lastIndexOf("."),
-        record["s3uripath"].length
-      );
-      record.attributes.incompatible = false;
-      record.attributes.isattachment = true;
-    }
-    if (record.service === "deduplication") {
-      record["s3uripath"] =
-        record["s3uripath"].substr(0, record["s3uripath"].lastIndexOf(".")) +
-        ".pdf";
+    let selectedRecords =[]
+    if (Object.keys(record).length === 0)
+      selectedRecords = records.filter((record) => record.isselected);
+    else
+      selectedRecords = [record]
+    for (let record of selectedRecords) {
+      record.trigger = "recordretry";
+      let retryServiceName = record.failed ? record.failed.split('.')[0] : "all" ;
+      if (retryServiceName == 'ocr-queue')
+        retryServiceName='ocr'
+      console.log(retryServiceName);
+      record.service = retryServiceName
+      //record.failed ? record.failed : "all";
+      if (record.isattachment) {
+        var parentRecord = recordsObj?.records?.find(
+          (r) => (r.recordid = record.rootparentid)
+        );
+        record.attributes.divisions = parentRecord.attributes.divisions;
+        record.attributes.batch = parentRecord.attributes.batch;
+        record.attributes.extension = record["s3uripath"].substr(
+          record["s3uripath"].lastIndexOf("."),
+          record["s3uripath"].length
+        );
+        record.attributes.incompatible = false;
+        record.attributes.isattachment = true;
+      }
+      if (record.service === "deduplication") {
+        record["s3uripath"] =
+          record["s3uripath"].substr(0, record["s3uripath"].lastIndexOf(".")) +
+          ".pdf";
+      }
     }
     dispatch(
       retryFOIRecordProcessing(
         requestId,
         ministryId,
-        { records: [record] },
+        { records: selectedRecords },
         (err, _res) => {
           dispatchRequestAttachment(err);
         }
@@ -1530,13 +1543,19 @@ export const RecordsLog = ({
     );
   };
 
-  const retrieveRecordVersion = (action, records) => {
-    const recordIds = records?.map(record => record.id);
+  const retrieveRecordVersion = (action, record) => {
+    console.log("-->",Object.keys(record).length)
+    let selectedRecords=[]
+    if(Object.keys(record).length === 0)
+      selectedRecords = records.filter((record) => record.isselected);
+    else
+      selectedRecords = [record]
+    const documentMasterIds = selectedRecords?.map(record => record.documentmasterid);
     dispatch(
       retrieveSelectedRecordVersion(
         requestId,
         ministryId,
-        { recordids: recordIds,
+        { documentmasterids: documentMasterIds,
           recordretrieveversion: action
          }));
     //     (err, _res) => {
@@ -1557,8 +1576,7 @@ export const RecordsLog = ({
     setMultipleFiles(false);
     switch (action) {
       case "retrieve_uncompressed":
-        const records = Array.isArray(_record) ? _record : [_record];
-        retrieveRecordVersion(action, records);
+        retrieveRecordVersion(action, _record);
         setModal(false);
         break;
       case "replace":
@@ -1854,6 +1872,42 @@ export const RecordsLog = ({
     }
     return false;
   };
+
+  const disableMultiRetrieve = () => {
+      let selectedRecords = records.filter((record) => record.isselected);
+      if (selectedRecords?.length <=0)
+        return true
+      for (let record of selectedRecords) {
+        if (record.selectedfileprocessversion) return true;
+        if (record.attachments) {
+          for (let attachment of record.attachments) {
+            if (record.selectedfileprocessversion) return true;
+          }
+        }
+      }
+      return false;
+  }
+
+  const disableMultiRetry = () => {
+      let selectedRecords = records.filter((record) => record.isselected);
+      if (selectedRecords?.length <=0)
+        return true
+      for (let record of selectedRecords) {
+        if (record.isredactionready || record.selectedfileprocessversion ||
+              (!record.failed && !isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
+                  true)) return true;
+        if (record.attachments) {
+          for (let attachment of record.attachments) {
+            if (record.isredactionready || record.selectedfileprocessversion ||
+              !record.failed || !isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
+                  true) return true;
+          }
+        }
+      }
+      return false;
+  }
+
+  
 
   const displaySizeLimit = () => {
     if(RECORD_DOWNLOAD_SIZE_LIMIT >= (1024*1024*1024))
@@ -2927,11 +2981,12 @@ export const RecordsLog = ({
               </Tooltip>
               <Tooltip
                 title={
-                  !checkIsAnySelected() ? (
+                  disableMultiRetrieve() ? (
                     <div style={{ fontSize: "11px" }}>
                       To retrieve uncompressed files:{" "}
                       <ul>
                         <li>at least one record must be selected</li>
+                        <li>selected records must not have been retrieved already.</li>
                       </ul>
                     </div>
                   ) : (
@@ -2943,13 +2998,42 @@ export const RecordsLog = ({
                 <span>
                   <button
                     className={` btn`}
-                    onClick={() => handlePopupButtonClick("retrieve_uncompressed")}
-                    disabled={lockRecords || !checkIsAnySelected() || isHistoricalRequest}
+                    onClick={() => handlePopupButtonClick("retrieve_uncompressed", {})}
+                    disabled={lockRecords || disableMultiRetrieve() || isHistoricalRequest}
                     style={
                       lockRecords || !checkIsAnySelected() ? { pointerEvents: "none" } : {}
                     }
                   >
                     <FontAwesomeIcon icon={faMinimize} size="lg" color="#38598A" />
+                  </button>
+                </span>
+              </Tooltip>
+              <Tooltip
+                title={
+                  disableMultiRetry() ? (
+                    <div style={{ fontSize: "11px" }}>
+                      To retry failed files:{" "}
+                      <ul>
+                        <li>at least one record must be selected</li>
+                        <li>only records with a failed status should be selected</li>
+                      </ul>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: "11px" }}>Retry Failed files</div>
+                  )
+                }
+                sx={{ fontSize: "11px" }}
+              >
+                <span>
+                  <button
+                    className={` btn`}
+                    onClick={() => handlePopupButtonClick("retry", {})}
+                    disabled={lockRecords || disableMultiRetry() || isHistoricalRequest}
+                    style={
+                      lockRecords || disableMultiRetry() ? { pointerEvents: "none" } : {}
+                    }
+                  >
+                    <FontAwesomeIcon icon={faRotate} size="lg" color="#38598A" />
                   </button>
                 </span>
               </Tooltip>
@@ -3436,14 +3520,14 @@ const Attachment = React.memo(
                 color="#FAA915"
                 className={classes.statusIcons}
               />
-            ) : record.isredactionready ? (
+            ) : record.isredactionready || record.selectedfileprocessversion? (
               <FontAwesomeIcon
                 icon={faCheckCircle}
                 size="2x"
                 color="#1B8103"
                 className={classes.statusIcons}
               />
-            ) : record.failed ? (
+            ) : record.failed && !record.selectedfileprocessversion ? (
               <FontAwesomeIcon
                 icon={faExclamationCircle}
                 size="2x"
@@ -3451,7 +3535,7 @@ const Attachment = React.memo(
                 className={classes.statusIcons}
               />
             ) : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
-                true && isRetry == false ? (
+                true && isRetry == false && !record.selectedfileprocessversion? (
               <FontAwesomeIcon
                 icon={faExclamationCircle}
                 size="2x"
@@ -3508,22 +3592,22 @@ const Attachment = React.memo(
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
                 }}
-                title={record.failed ? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
+                title={record.failed && !record.selectedfileprocessversion? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
               >
-                {record.failed ? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
+                {record.failed && !record.selectedfileprocessversion? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
               </span>
-            ) : record.isredactionready ? (
+            ) : record.isredactionready || record.selectedfileprocessversion ? (
               <span>Ready for Redaction</span>
-            ) : record.failed ? (
+            ) : record.failed && !record.selectedfileprocessversion? (
               <span>Error during {record.failed}</span>
             ) : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
-                true && isRetry == false ? (
+                true && isRetry == false && !record.selectedfileprocessversion ? (
               <span>Error due to timeout</span>
             ) : !record.isdedupecomplete?(
               <span>Deduplication & file conversion in progress</span>
             ): !record.iscompressed ? (
               <span>Compression in progress</span>
-            ) : (
+            ) : record.needs_ocr && (
               <span>OCR in progress</span>
             )}
             <AttachmentPopup
@@ -3750,7 +3834,7 @@ const AttachmentPopup = React.memo(
       handlePopupButtonClick("rename", record);
     };
 
-    const handleRetrieveFileVersion = (retrieveVersion) => {
+    const handleRetrieveFileVersion = (retrieveVersion, record) => {
       closeTooltip();
       handlePopupButtonClick(retrieveVersion, record);
     };
@@ -3790,7 +3874,7 @@ const AttachmentPopup = React.memo(
       handlePopupButtonClick("delete", record);
     };
 
-    const handleRetry = () => {
+    const handleRetry = (record) => {
       setRetry(true);
       closeTooltip();
       handlePopupButtonClick("retry", record);
@@ -3905,7 +3989,7 @@ const AttachmentPopup = React.memo(
               <MenuItem
                 disabled={lockRecords || disableMinistryUser}
                 onClick={() => {
-                  handleRetrieveFileVersion("retrieve_uncompressed");
+                  handleRetrieveFileVersion("retrieve_uncompressed", record);
                   setPopoverOpen(false);
                 }}
               >
@@ -3973,13 +4057,13 @@ const AttachmentPopup = React.memo(
                 : "Download"}
             </MenuItem>
             {!record.isattachment && !isHistoricalRequest && <DeleteMenu />}
-            {!record.isredactionready &&
+            {!record.isredactionready && !record.selectedfileprocessversion &&
               (record.failed ||
                 isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
                   true) && (
                 <MenuItem
                   onClick={() => {
-                    handleRetry();
+                    handleRetry(record);
                     setPopoverOpen(false);
                   }}
                 >
