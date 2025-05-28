@@ -44,6 +44,9 @@ import {
   fetchFOIHistoricalRequestDescriptionList,
   fetchHistoricalExtensions
 } from "../../../apiManager/services/FOI/foiRequestServices";
+import {
+  fetchFOIRequestConsults,
+} from "../../../apiManager/services/FOI/foiRequestConsultServices"
 import { fetchFOIRequestAttachmentsList } from "../../../apiManager/services/FOI/foiAttachmentServices";
 import { fetchCFRForm } from "../../../apiManager/services/FOI/foiCFRFormServices";
 import {
@@ -194,6 +197,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   // );
   let requestApplicantProfile = useSelector(
     (state) => state.foiRequests.foiRequestApplicantProfile
+  )
+  let requestConsults = useSelector(
+    (state) => state.foiRequests.foiRequestConsults
   )
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
@@ -382,6 +388,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     dispatch(fetchOIPCStatuses());
     dispatch(fetchOIPCReviewtypes());
     dispatch(fetchOIPCInquiryoutcomes());
+    dispatch(fetchFOIRequestConsults(ministryId));
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
@@ -813,10 +820,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const handleAssignedToValue = (value) => {
     setAssignedToValue(value);
   };
-  const handleInternalConsultationValues = (value, name) => {
-    const detailsData = assignValue(requiredInternalConsult, value, name);
-    setRequiredInternalConsultValues(detailsData);
-  }
+  // const handleInternalConsultationValues = (value, name) => {
+  //   const detailsData = assignValue(requiredInternalConsult, value, name);
+  //   setRequiredInternalConsultValues(detailsData);
+  // }
 
   const saveOIPCNoReview = () => {
     const toastID = toast.loading("Saving request with removed OIPC review...")
@@ -1548,17 +1555,18 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           isHistoricalRequest={isHistoricalRequest}
                         />
                       )}
+                      {requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
                       <InternalConsultation
-                        programAreaList={programAreaList}
-                        requestDetails={requestDetails}
-                        requestState={requestState}
-                        handleInternalConsultationValues={
-                          handleInternalConsultationValues }
-                        handleInternalConsultInitialValues={
-                          handleInternalConsultInitialValues}
-                        createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput || isHistoricalRequest}
-                      />
+                            requestId={requestId}
+                            ministryId={ministryId}
+                            programAreaList={programAreaList}
+                            requestDetails={requestDetails}
+                            requestConsults={requestConsults}
+                            requestState={requestState}
+                            disableInput={disableInput || isHistoricalRequest}
+                          />
+                      )}
+                      
                       <BottomButtonGroup
                         stateChanged={stateChanged}
                         isValidationError={isValidationError}

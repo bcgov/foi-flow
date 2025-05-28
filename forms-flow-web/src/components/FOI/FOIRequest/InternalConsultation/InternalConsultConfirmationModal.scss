@@ -1,0 +1,229 @@
+.custom-dialog-actions .btn-bottom {
+    height: 43px !important;
+    font-size: 16px !important;
+    font-style: normal;
+    font-weight: 700;
+}
+
+.custom-dialog-actions .btn-save {
+    border-radius: 3px;
+    font-size: small;
+    flex-basis: 50% 
+}
+
+.custom-dialog-actions .btn-save:disabled {
+    opacity: 0.65;
+}
+
+.consult-confirmation-dialog{
+     width: 787px !important;
+     padding-bottom: 15px !important;
+}
+
+#consult-confirmation-dialog-title {
+    font-family: "BCSans-Bold", sans-serif!important; 
+    padding: 30px 26px 30px 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.consult-confirmation-header {
+    color: #036;
+    font-size: 32px;
+    font-weight: bold;
+    font-family: "BCSans-Bold", sans-serif !important;
+    flex-direction: column;
+    flex-basis: 70%;
+    margin-top: 49px !important;
+    margin-left: 36px;
+}
+#consult-modal-text .modal-msg{
+    text-align:left !important;
+    padding-left:75px !important;
+    padding-top: 10px !important;
+}
+
+.consult-confirmation-dialog-title .title-col2 {
+    flex-basis: 25%
+}
+
+.consult-confirmation-dialog-title .consult-title-col3 {
+    flex-basis: 5% !important
+}
+
+#consult-confirmation-dialog-content{
+    overflow:hidden !important;
+    padding-top:10px;
+}
+
+#consult-confirmation-dialog-title .MuiIconButton-root {
+    background-color: #036 ;
+    color: white;
+    border-radius: unset;
+    height:68px;
+    top:-43px;
+    left:26px;
+}
+
+.consult-title-col3 .MuiIconButton-label{
+    width: 50px !important;
+}
+
+.consult-title-col3 .MuiSvgIcon-root {
+    width: 46px !important;
+    font-size: 40px !important;
+  }
+
+
+#state-change-content {
+    padding: 15px 50px 50px 50px;
+}
+
+#state-change-dialog-description {
+    display: block;
+    color: #313132 !important
+}
+.consult-confirmation-dialog .ministries-list-container {
+    margin-top: -58px; 
+    padding-left: 41px;
+    padding-right: 41px;
+    color:#313132 !important;
+    font-size: 16px !important;
+    font-weight: 400 !important;
+  }
+
+.confirmation-message {
+    color: #313132 !important;
+    font-size: 18px;
+    font-weight: 700;
+    margin-left: -32px;
+    margin-top: -20px;
+}
+.confirmation-message-detail{
+    color: black; 
+    font-size: 18px;
+    margin-left: -32px;
+}
+
+.help-box {
+    display: flex;
+    align-items: flex-start;
+    background-color: #FAF9F8;
+    border-left: 5px solid #3470B1;
+    padding: 16px 20px;
+    margin-top: 22px;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-left: 39px;
+    margin-right: 39px;
+    color: #333;
+  
+}
+
+  .consult-help-inline {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    margin-left:13px;
+  
+    .consult-help-icon {
+        font-size: 20px;
+        color: #013366;
+        margin-right: 5px;
+    }
+  
+    .consult-help-title {
+        font-weight: 700;
+        color: #013366;
+        white-space: nowrap;
+        font-size:16px;
+        margin-right: 6px;
+    }
+  
+    .consult-help-description {
+      color:#474543;
+      font-size: 16px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+  }
+
+  .custom-dialog-actions{
+    width:703px !important;
+    margin-left: 44px !important;
+  }
+
+.table-assignedto {
+    width: 80% !important;
+    margin-left: 20px;
+    margin-top: 1rem;
+}
+
+.table-assignedto th {
+    width: 40%;
+}
+
+.MuiDialogActions-root {
+    padding: 20px 20px 30px !important;
+    justify-content: center !important;
+    flex-direction: row;
+}
+
+.table th, .table td {
+    padding: 0.4rem 0.4rem 0.4rem 0.75rem !important;
+}
+
+.confirm-modal-row {
+    margin: 30px;
+    padding: 0px 40px;
+}
+
+.first-row {
+    margin-top: 0px;
+}
+
+.confirm-label-area {
+    padding-left: 5px;
+}
+
+.confirm-label-content {
+    padding-left: 35px;
+}
+
+.modal-message {
+    margin-left: 50px;
+    margin-bottom: 20px;
+}
+
+
+.dialog-content {
+    margin: auto;
+}
+
+.dialog-content-nomargin {
+    margin: initial;
+}
+
+#consult-confirmation-dialog .MuiDialogContent-root{
+    padding: 20px 100px !important;
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
+}
+
+#consult-confirmation-dialog .MuiDialogActions-root {
+    padding: 20px 100px !important;
+}
+
+#state-change-dialog-checkbox {
+    padding-bottom: 20px;
+    padding-left: 100px;
+}
+
+.state-change-dialog-error {
+    font-size: 14px;
+    padding: 20px 100px;
+    color: #9e2929;
+}

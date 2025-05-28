@@ -1,14 +1,11 @@
-import React from "react";
 import "./CustomSwitch.scss";
 
-const CustomSwitch = ({ checked, onChange, disabled }) => {
-    console.log("CustomSwitch rendered with checked:", checked);
-    // const handleClick = () => {
-    //     if (!disabled && onChange) {
-    //         onChange(!checked);
-    //     }
-    //     };
+type CustomSwitchProps = {
+  checked: boolean;
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+};
 
+const CustomSwitch: React.FC<CustomSwitchProps> = ({ checked, onChange }) => {
   return (
     <label className="custom-switch">
       <input type="checkbox" checked={checked} onChange={onChange} className="visually-hidden"/>

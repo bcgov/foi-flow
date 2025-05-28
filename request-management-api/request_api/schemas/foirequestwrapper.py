@@ -222,3 +222,27 @@ class FOIRequestMinistrySchema(Schema):
     ministrysignoffapproval = fields.Nested(CreateMinistrySignOffApprovalSchema, data_key="ministrysignoffapproval", allow_none=True)
     userrecordslockstatus = fields.Bool(data_key="userrecordslockstatus", allow_none=True)
     isconsultflag = fields.Bool(data_key="isconsultflag", missing=False)#missing is deprecated, use load_default for marshmallow >3.12
+
+class FOIMinistryRequestConsultSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+        unknown = EXCLUDE
+
+    consultId = fields.Int(data_key="consultId", allow_none=False)
+    version = fields.Int(data_key="version", allow_none=False)
+    foiMinistryRequestId = fields.Int(data_key="foiMinistryRequestId", allow_none=False)
+    foiMinistryRequestVersionId = fields.Int(data_key="foiMinistryRequestVersionId", allow_none=False)
+    fileNumber = fields.Str(data_key="fileNumber", allow_none=False, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
+    consultAssignedTo = fields.Str(data_key="consultAssignedTo", allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    requestStatusId = fields.Int(data_key="requeststatusid", allow_none=False)
+    consultTypeId = fields.Int(data_key="consultTypeId", allow_none=False)
+    programAreaId = fields.Int(data_key="programAreaId", allow_none=False)
+    subjectCode = fields.Str(data_key="subjectCode", allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
+    dueDate = fields.Date(data_key="dueDate", allow_none=False)
+    closedDate = fields.DateTime(data_key="closedDate", allow_none=True)
+    createdAt = fields.DateTime(data_key="createdAt", allow_none=True)
+    createdBy = fields.Str(data_key="createdBy", allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    updatedAt = fields.DateTime(data_key="updatedAt", allow_none=True)
+    updatedBy = fields.Str(data_key="updatedBy", allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    isActive = fields.Bool(data_key="isActive", allow_none=False)
+    

@@ -196,6 +196,9 @@ const API = {
   FOI_GET_OIPC_INQUIRYOUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/inquiryoutcomes`,
   FOI_GET_COMMENT_TYPES: `${FOI_BASE_API_URL}/api/foiflow/commenttypes`,
 
+  FOI_POST_REQUEST_CONSULTS: `${FOI_BASE_API_URL}/api/foiconsult/<foirequestid>/ministryrequest/<foiministryrequestid>`,
+  FOI_GET_REQUEST_CONSULTS: `${FOI_BASE_API_URL}/api/foiconsult/ministryrequest/<ministryrequestid>`,
+
   FOI_GET_CROSSTEXTSEARCH_AUTH: `${FOI_BASE_API_URL}/api/foicrosstextsearch/authstring`,
   FOI_GET_CROSSTEXTSEARCH_REQUEST_DETAILS: `${FOI_BASE_API_URL}/api/foicrosstextsearch/requests`,
 };
