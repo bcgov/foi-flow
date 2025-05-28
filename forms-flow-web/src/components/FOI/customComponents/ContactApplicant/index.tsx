@@ -1589,6 +1589,7 @@ export const ContactApplicant = ({
                 editSfdtDraft = {editSfdtDraft}
                 enableAutoFocus = {enableAutoFocus}
                 selectedEmails={selectedEmails}
+                selectedCCEmails={selectedCCEmails}
               />
             </>
           }
