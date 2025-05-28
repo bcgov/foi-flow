@@ -347,7 +347,7 @@ class RetrieveFOIDocument(Resource):
     def post(requestid, ministryrequestid):
         try:
             requestjson = request.get_json()
-            if len(requestjson["recordids"]) <=0:
+            if len(requestjson["documentmasterids"]) <=0:
                 return {'status': False, 'message':"No records selected"}, 500
             result = recordservice().retrieverecordbyprocessversion(requestid, ministryrequestid, requestjson, AuthHelper.getuserid())
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200

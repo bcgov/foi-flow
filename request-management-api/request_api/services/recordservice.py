@@ -31,6 +31,8 @@ class recordservice(recordservicebase):
     stitchinglargefilesizelimit= getenv('STITCHING_STREAM_SEPARATION_FILE_SIZE_LIMIT',524288000)
     pdfstitchstreamkey_largefiles = getenv('EVENT_QUEUE_PDFSTITCH_LARGE_FILE_STREAMKEY')
     pagecalculatorstreamkey = getenv('EVENT_QUEUE_PAGECALCULATOR_STREAM_KEY')
+    compressionstreamkey = getenv('EVENT_QUEUE_COMPRESSION_STREAMKEY')
+    ocrstreamkey = getenv('EVENT_QUEUE_OCR_STREAMKEY')
     
     s3host = getenv('OSS_S3_HOST')
 
@@ -123,6 +125,16 @@ class recordservice(recordservicebase):
                     return DefaultMethodResult(False,'File Conversion only accepts the following formats: ' + ', '.join(FILE_CONVERSION_FILE_TYPES), -1, record['recordid'])
                 else:
                     streamkey = self.conversionstreamkey
+            elif record['service'] == 'compression':
+                if extension not in (".pdf", ".jpg", ".jpeg"):
+                    return DefaultMethodResult(False,'File Conversion only accepts the following formats: ' + ', '.join(FILE_CONVERSION_FILE_TYPES), -1, record['recordid'])
+                else:
+                    streamkey = self.compressionstreamkey
+            elif record['service'] == 'ocr':
+                if extension != ".pdf":
+                    return DefaultMethodResult(False,'File Conversion only accepts the following formats: ' + ', '.join(FILE_CONVERSION_FILE_TYPES), -1, record['recordid'])
+                else:
+                    streamkey = self.ocrstreamkey
             else:
                 streamkey = self.dedupestreamkey if extension in DEDUPE_FILE_TYPES else self.conversionstreamkey
             jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
@@ -131,7 +143,10 @@ class recordservice(recordservicebase):
                 'trigger': record['trigger'],
                 'ministryrequestid': ministryrequestid
             })
-            if err:
+            print("\nministryrequestid:",ministryrequestid)
+            print("\njobids:",jobids)
+            print("\nERROR:",err)
+            if err and err is not None:
                 return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
             streamobject = {
                 "s3filepath": record['s3uripath'],
@@ -151,6 +166,7 @@ class recordservice(recordservicebase):
                 streamobject['outputdocumentmasterid'] = record['outputdocumentmasterid']
             if record['trigger'] == 'recordreplace' and record['attributes']['isattachment'] == True:
                 streamobject['originaldocumentmasterid'] = record['documentmasterid']
+            print("Streamkey:",streamkey)
             return eventqueueservice().add(streamkey, streamobject)
 
     def replace(self, _requestid, ministryrequestid, recordid, recordschema, userid):
@@ -405,16 +421,18 @@ class recordservice(recordservicebase):
         return False
     
     def retrieverecordbyprocessversion(self, requestid, ministryrequestid, requestdata, userid):
-        recordids = requestdata["recordids"]
+        documentmasterids = requestdata["documentmasterids"]
         recordretrieveversion= requestdata["recordretrieveversion"]
-        if(len(recordids) > 0):
+        if(len(documentmasterids) > 0):
             _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/update/retrieveversion', {'ministryrequestid': ministryrequestid, 
-                                            'recordids': recordids, "recordretrieveversion":recordretrieveversion})
-            if err:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1,  [record['documentmasterid'] for record in requestdata['records']])
-            return DefaultMethodResult(True,'Record updated in Doc Reviewer DB', -1, [record['documentmasterid'] for record in requestdata['records']])
+                                            'documentmasterids': documentmasterids, "recordretrieveversion":recordretrieveversion})
+            print("err::", err)
+            print("_apiresponse:", _apiresponse)
+            if err and err is not None:
+                return DefaultMethodResult(False,f"Error in contacting Doc Reviewer API in retrieving record version - {err}", -1, ministryrequestid )
+            return DefaultMethodResult(True,'Record version retrieved in Doc Reviewer DB ', -1, ministryrequestid)
         else:
-            return DefaultMethodResult(False,'Error in updating Record', -1, [record['documentmasterid'] for record in requestdata['records']])
+            return DefaultMethodResult(False,'No records to retrieve record version', -1, ministryrequestid)
 
     
 
