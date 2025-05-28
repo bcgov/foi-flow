@@ -1564,6 +1564,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             requestConsults={requestConsults}
                             requestState={requestState}
                             disableInput={disableInput || isHistoricalRequest}
+                            setUnSavedRequest={setUnSavedRequest}
                           />
                       )}
                       

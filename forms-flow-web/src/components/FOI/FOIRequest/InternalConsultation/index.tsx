@@ -71,7 +71,8 @@ const InternalConsultation = ({
     requestDetails,
     requestConsults,
     requestState,
-    disableInput
+    disableInput,
+    setUnSavedRequest,
   }:any) => {
     const classes = useStyles();
     const MinistriesListTyped = MinistriesList as React.FC<any>;
@@ -111,12 +112,7 @@ const InternalConsultation = ({
     },[requestDetails])
 
     useEffect(() => {
-      
-      console.log("foiConsultTransactionData changed:", foiConsultTransactionData);
-
-
       setConsultData(foiConsultTransactionData);
-
     }, [foiConsultTransactionData]);
 
 
@@ -128,6 +124,7 @@ const InternalConsultation = ({
       //validate the program area list
       const isMinistrySelected = updatedProgramAreaList.some((programArea:any) => programArea.isChecked);
       setIsMinistryValid(isMinistrySelected);
+      setUnSavedRequest(true);
       
       // handleInternalConsultationValues(countOfMinistrySelected(updatedProgramAreaList) === 1 && updatedProgramAreaList.some((programArea:any) =>
       //   (programArea.isChecked && isValidMinistryCode(programArea.bcgovcode, masterProgramAreaList))), 
@@ -138,6 +135,7 @@ const InternalConsultation = ({
 
     const handleSubjectCodeChange = (e:any) => {
       setSelectedSubjectCode(e.target.value);
+      setUnSavedRequest(true);
       //handleInternalConsultationValues(e.target.checked, FOI_COMPONENT_CONSTANTS.SUBJECT_CODE)
       //createSaveRequestObject(FOI_COMPONENT_CONSTANTS.SUBJECT_CODE, e.target.value);
     }
@@ -149,8 +147,7 @@ const InternalConsultation = ({
       // Validate the due date
       const isValid = newDueDate && new Date(newDueDate) >= new Date(requestDetails.receivedDate);
       setIsDueDateValid(isValid);
-      console.log("isDueDateValid:", isValid);
-
+      setUnSavedRequest(true);
       //event bubble up- update the required fields to validate later
       //handleInternalConsultationValues(event.target.value, FOI_COMPONENT_CONSTANTS.TO_DATE);
       // createSaveRequestObject(FOI_COMPONENT_CONSTANTS.TO_DATE, event.target.value);
@@ -213,7 +210,7 @@ const InternalConsultation = ({
       if (validateInternalConsultation()) {
         const selectedMinistries = localProgramAreaList.filter((programArea:any) => programArea.isChecked); 
         const finalSubjectCode = selectedSubjectCode.toLowerCase().includes("select") ? null : selectedSubjectCode;
-
+        setUnSavedRequest(true);
         setSaveModal((prev: any) => ({
           ...prev,
           show: true,
@@ -377,6 +374,7 @@ const InternalConsultation = ({
                   handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList}
                   requestDetails={requestDetails}
                   requestConsults={requestConsults}
+                  setUnSavedRequest={setUnSavedRequest}
                 />
                 )}
               </div>  

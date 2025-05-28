@@ -27,12 +27,14 @@ import { useEffect, useState } from "react";
     handleUpdatedMasterProgramAreaList,
     requestDetails,
     requestConsults,
+    setUnSavedRequest,
   }: any) => {
 
     const dispatch = useDispatch();
     const MinistriesListTyped = MinistriesList as React.FC<any>;
 
     const handleConfirmation = () => {
+      setUnSavedRequest(false);
       const checkedItems = masterProgramAreaList.filter((programArea:any) => programArea.isChecked);
       if (modal.title === "Internal Consultation") {
         const subjectCode = modal.confirmationData?.subjectCode;
