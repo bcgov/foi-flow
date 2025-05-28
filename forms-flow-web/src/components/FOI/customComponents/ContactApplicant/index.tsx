@@ -154,7 +154,7 @@ export const ContactApplicant = ({
       setEditorValue( html );
     }
     await exportSFDT(dispatch, newDataHtml, loadPreview);
-    if (selectedEmails.length == 0) {
+    if (selectedEmails?.length == 0 && selectedCCEmails?.length == 0) {
       const attachBlobPdf = async (pdf: any) => {
         const blob = new Blob([pdf], { type: 'application/pdf' });
         const emailAttachment = new File([blob], `Export - ${emailSubject}.pdf`, { type: 'application/pdf' })
@@ -1208,7 +1208,7 @@ export const ContactApplicant = ({
 
   const [previewModal, setPreviewModal] = useState(false);
   const handlePreviewClose = () => {
-    if (selectedEmails.length == 0) {
+    if (selectedEmails?.length == 0 && selectedCCEmails?.length == 0) {
       setFiles((prev) => {
         const filesWithRemovedPreviewFile = prev.filter((file: any) => file.filename != `Export - ${emailSubject}.pdf`)
         return filesWithRemovedPreviewFile
@@ -1629,7 +1629,7 @@ export const ContactApplicant = ({
               handleExport={saveExport}
               attachments={files}
               templateInfo={templates[currentTemplate]}
-              enableSend={selectedEmails.length > 0}
+              enableSend={selectedEmails?.length > 0 || selectedCCEmails?.length > 0}
               selectedEmails={selectedEmails}
               selectedCCEmails={selectedCCEmails}
               emailSubject={emailSubject}

@@ -96,7 +96,7 @@ export const PreviewModal = React.memo(({
       <DialogContent>
         <DialogContentText id="state-change-dialog-description" component={'span'}>
           <div className="state-change-email-note">
-          {enableSend && selectedEmails.length > 0 && (
+          {enableSend && (selectedEmails?.length > 0 || selectedCCEmails?.length > 0) && (
             <>
             <p><span style={{fontWeight: 'bold'}}>Email from: </span>{requestDetails.assignedGroupEmail}</p>
             <p><span style={{fontWeight: 'bold'}}>Email to: </span>{selectedEmails?.join(', ')}</p>
