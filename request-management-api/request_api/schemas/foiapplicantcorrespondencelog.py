@@ -22,6 +22,7 @@ class FOIApplicantCorrespondenceLogSchema(Schema):
     correspondencemessagejson = fields.Str(data_key="correspondencemessagejson",allow_none=False)
     attachments = fields.Nested(AttachmentSchema, many=True, required=False,allow_none=True)
     emails = fields.List(fields.Str(),data_key="emails", required=False,allow_none=True)
+    ccemails = fields.List(fields.Str(),data_key="ccemails", required=False,allow_none=True)
     from_email = fields.Str(data_key="from_email", required=False,allow_none=True)
     attributes = fields.List(
         fields.Dict(fields.Str(), fields.Str()),

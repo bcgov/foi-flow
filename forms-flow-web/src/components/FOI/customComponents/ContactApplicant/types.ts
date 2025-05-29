@@ -33,6 +33,7 @@ export type previewParams = {
   templateInfo: any;
   enableSend: boolean;
   selectedEmails: string[];
+  selectedCCEmails: string[];
   emailSubject: string;
 }
  export type downloadCorrespondenceParams = {

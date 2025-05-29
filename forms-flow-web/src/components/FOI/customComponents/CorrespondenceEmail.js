@@ -46,14 +46,16 @@ export default function CorrespondenceEmail({
   requestId,
   selectedEmails,
   setSelectedEmails,
-  defaultEmail
-}) {   
+  defaultEmail,
+  requestemailList,
+  setRequestemailList,
+  buttonText
+}) {
   
     
     const classes = useStyles();
     const dispatch = useDispatch();
     const [newCorrespondenceEmail, setNewCorrespondenceEmail] = React.useState();
-    const [requestemailList, setRequestemailList] = React.useState([]);    
     const [noOfSelectedEmails, setNoOfSelectedEmails] = React.useState(0);
     const [showAddEmail, setShowAddEmail] = React.useState(false);
     const [validation, setValidation] = React.useState({});
@@ -103,8 +105,8 @@ export default function CorrespondenceEmail({
         //console.log("newCorrespondenceEmail:",newCorrespondenceEmail)
         currentemail = newCorrespondenceEmail
       }
-      if (selectedEmails.includes(currentemail)) {
-        let filteredArray = selectedEmails.filter(function(e) { return e !== currentemail })
+      if (selectedEmails?.includes(currentemail)) {
+        let filteredArray = selectedEmails?.filter(function(e) { return e !== currentemail })
         setSelectedEmails(filteredArray);        
       } else{
         setSelectedEmails((existingEmails) => {
@@ -142,7 +144,7 @@ export default function CorrespondenceEmail({
                 divider={i == requestemailList.length} >
                   <Checkbox id='email' inputProps={{'aria-labelledby': 'watcher'}}  
                   name={`${email.email}`} 
-                  checked={selectedEmails.indexOf(`${email.email}`) > -1}/>
+                  checked={selectedEmails?.indexOf(`${email.email}`) > -1}/>
                    {email.email}
                </MenuItem>);
                i++;
@@ -188,7 +190,7 @@ export default function CorrespondenceEmail({
    }
 
    const renderValue = (_option) => {
-    setNoOfSelectedEmails(selectedEmails.length);
+    setNoOfSelectedEmails(selectedEmails?.length);
     return <span>{noOfSelectedEmails}</span>;
   }
 
@@ -196,7 +198,7 @@ export default function CorrespondenceEmail({
       <>
       <div>
             <div className="foi-email-all">
-                <button className="foi-eye-container email-correspondence-button"> <i className="fa fa-envelope"></i> Email To</button>
+                <button className="foi-eye-container email-correspondence-button"> <i className="fa fa-envelope"></i> {buttonText}</button>
                 <div className="foi-watcher-select">
                     <i className="fa fa-user-o"></i>                    
                     <InputLabel id="foi-watcher-label">

@@ -154,7 +154,7 @@ export const ContactApplicant = ({
       setEditorValue( html );
     }
     await exportSFDT(dispatch, newDataHtml, loadPreview);
-    if (selectedEmails.length == 0) {
+    if (selectedEmails?.length == 0 && selectedCCEmails?.length == 0) {
       const attachBlobPdf = async (pdf: any) => {
         const blob = new Blob([pdf], { type: 'application/pdf' });
         const emailAttachment = new File([blob], `Export - ${emailSubject}.pdf`, { type: 'application/pdf' })
@@ -358,6 +358,7 @@ export const ContactApplicant = ({
     setSelectedCorrespondence({});
     setCorrespondenceId(null);
     setSelectedEmails([]);
+    setSelectedCCEmails([])
     setCurrentTemplate(0);
     setEmailSubject(defaultEmailSubject);
   }
@@ -556,6 +557,8 @@ export const ContactApplicant = ({
   const [editorValue, setEditorValue] = useState("")
   const [currentTemplate, setCurrentTemplate] = useState(0)
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
+  const [selectedCCEmails, setSelectedCCEmails] = useState<string[]>([]);
+  const [requestemailList, setRequestemailList] = useState([]);
   // Create a ref to store the Quill instance
   const quillRef = useRef(null);
 
@@ -723,6 +726,7 @@ export const ContactApplicant = ({
         "type": type
       }),
       emails: selectedEmails,
+      ccemails: selectedCCEmails,
       foiministryrequest_id: ministryId,
       attachments: attachments,
       attributes: [{ 
@@ -792,6 +796,7 @@ export const ContactApplicant = ({
       foiministryrequest_id: ministryId,
       attachments: attachments,
       emails: selectedEmails,
+      ccemails: selectedCCEmails,
       israwrequest: israwrequest,
       templatename: curTemplateName,
       templatetype: templateId?"":"sfdt"
@@ -933,6 +938,7 @@ export const ContactApplicant = ({
     setEditMode(true);
     setShowEditor(true);
     setSelectedEmails(i.emails);
+    setSelectedCCEmails(i.ccemails);
     setEmailSubject(i.emailsubject);
     if (i.attachments)
       setFiles(i.attachments);
@@ -1016,6 +1022,7 @@ export const ContactApplicant = ({
         setCurrentTemplate(0);
         setFiles([]);
         setSelectedEmails([]);
+        setSelectedCCEmails([]);
         setShowEditor(false)
         setEditMode(false);
         setSelectedCorrespondence({});
@@ -1038,6 +1045,7 @@ export const ContactApplicant = ({
           setCurrentTemplate(0);
           setFiles([]);
           setSelectedEmails([]);
+          setSelectedCCEmails([]);
           setShowEditor(false);
           setEditMode(false);
           setSelectedCorrespondence({});
@@ -1115,6 +1123,7 @@ export const ContactApplicant = ({
       foiministryrequest_id: ministryId,
       attachments: attachments,
       emails: selectedEmails,
+      ccemails: selectedCCEmails,
       israwrequest: israwrequest,
       templatename: curTemplateName,
       templatetype: templateId?"":"sfdt"
@@ -1199,7 +1208,7 @@ export const ContactApplicant = ({
 
   const [previewModal, setPreviewModal] = useState(false);
   const handlePreviewClose = () => {
-    if (selectedEmails.length == 0) {
+    if (selectedEmails?.length == 0 && selectedCCEmails?.length == 0) {
       setFiles((prev) => {
         const filesWithRemovedPreviewFile = prev.filter((file: any) => file.filename != `Export - ${emailSubject}.pdf`)
         return filesWithRemovedPreviewFile
@@ -1445,6 +1454,37 @@ export const ContactApplicant = ({
           justifyContent="flex-start"
           className="select-template-bottom-margin"
         >
+          <Grid item xs={'auto'}>
+              <CorrespondenceEmail 
+                ministryId={ministryId}
+                requestId={requestId}
+                selectedEmails={selectedEmails}
+                setSelectedEmails={setSelectedEmails}
+                defaultEmail={requestDetails.email}
+                requestemailList={requestemailList}
+                setRequestemailList={setRequestemailList}
+                buttonText={"Email To"}
+              />
+            </Grid>
+            <Grid item xs={'auto'}>
+              <CorrespondenceEmail 
+                ministryId={ministryId}
+                requestId={requestId}
+                selectedEmails={selectedCCEmails}
+                setSelectedEmails={setSelectedCCEmails}
+                defaultEmail={requestDetails.email}
+                requestemailList={requestemailList}
+                setRequestemailList={setRequestemailList}
+                buttonText={"CC To"}
+              />
+            </Grid>
+        </Grid>
+        <Grid
+          container
+          direction="row"
+          justifyContent="flex-start"
+          className="select-template-bottom-margin"
+        >
           <Grid xs={6}>
             <TextField
               className="email-subject-field"
@@ -1503,15 +1543,6 @@ export const ContactApplicant = ({
                 ))}
               </TextField>
             </Grid> */}
-            <Grid item xs={'auto'}>
-              <CorrespondenceEmail 
-                ministryId={ministryId}
-                requestId={requestId}
-                selectedEmails={selectedEmails}
-                setSelectedEmails={setSelectedEmails}
-                defaultEmail={requestDetails.email}
-              />
-            </Grid>
           </Grid>
         </Grid>
         <div className="correspondence-editor">
@@ -1558,6 +1589,7 @@ export const ContactApplicant = ({
                 editSfdtDraft = {editSfdtDraft}
                 enableAutoFocus = {enableAutoFocus}
                 selectedEmails={selectedEmails}
+                selectedCCEmails={selectedCCEmails}
               />
             </>
           }
@@ -1598,8 +1630,9 @@ export const ContactApplicant = ({
               handleExport={saveExport}
               attachments={files}
               templateInfo={templates[currentTemplate]}
-              enableSend={selectedEmails.length > 0}
+              enableSend={selectedEmails?.length > 0 || selectedCCEmails?.length > 0}
               selectedEmails={selectedEmails}
+              selectedCCEmails={selectedCCEmails}
               emailSubject={emailSubject}
             />  
             {/*

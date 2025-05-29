@@ -53,6 +53,7 @@ class applicantcorrespondenceservice:
                 correpondencelog = self.__createcorrespondencelog(_correpondencelog, attachments)
                 #Email block - Begin
                 correpondencelog['emails'] = self.__getcorrespondenceemailbyid(_correspondenceemails,  _correpondencelog['applicantcorrespondenceid'], _correpondencelog['version'])
+                correpondencelog['ccemails'] = self.__getcorrespondenceCCemailbyid(_correspondenceemails,  _correpondencelog['applicantcorrespondenceid'], _correpondencelog['version'])
                 #Email block - End
                 correspondencelogs.append(correpondencelog)
         # Since we're merging raw and ministry requests, resort by date
@@ -63,7 +64,10 @@ class applicantcorrespondenceservice:
         return [x for x in attachments if x['applicantcorrespondenceid'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion]
 
     def __getcorrespondenceemailbyid(self, emails, correspondenceid, correspondenceversion):
-        return [x['correspondence_to'] for x in emails if x['applicantcorrespondence_id'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion]
+        return [x['correspondence_to'] for x in emails if x['applicantcorrespondence_id'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion and x['iscarboncopy'] is not True]
+
+    def __getcorrespondenceCCemailbyid(self, emails, correspondenceid, correspondenceversion):
+        return [x['correspondence_to'] for x in emails if x['applicantcorrespondence_id'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion and x['iscarboncopy'] is True]
     
     def saveapplicantcorrespondencelog(self, requestid, ministryrequestid, data, userid, isdraft=False):
         applicantcorrespondence = FOIApplicantCorrespondence()
@@ -89,11 +93,12 @@ class applicantcorrespondenceservice:
                 applicantcorrespondence.sent_at = datetime.now()
                 applicantcorrespondence.sentby = userid
         emails = data['emails'] if 'emails' in data else None   
+        ccemails = data['ccemails'] if 'ccemails' in data else None
         applicantcorrespondence.response_at = data['responsedate'] if 'responsedate' in data and data['responsedate'] is not None else datetime.now()
         applicantcorrespondence.templatename = data['templatename'] if 'templatename' in data and data['templatename'] is not None else None
         applicantcorrespondence.templatetype = data['templatetype'] if 'templatetype' in data and data['templatetype'] is not None else None
 
-        return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails)        
+        return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails, ccemails)
 
     def saveapplicantcorrespondencelogforrawrequest(self, requestid, data, userid, isdraft=False):
         applicantcorrespondence = FOIApplicantCorrespondenceRawRequest()
@@ -121,10 +126,11 @@ class applicantcorrespondenceservice:
                 applicantcorrespondence.sent_at = datetime.now()
                 applicantcorrespondence.sentby = userid
         emails = data['emails'] if 'emails' in data else None   
+        ccemails = data['ccemails'] if 'ccemails' in data else None
         applicantcorrespondence.response_at = data['responsedate'] if 'responsedate' in data and data['responsedate'] is not None else datetime.now()
         applicantcorrespondence.templatename = data['templatename'] if 'templatename' in data and data['templatename'] is not None else None
         applicantcorrespondence.templatetype = data['templatetype'] if 'templatetype' in data and data['templatetype'] is not None else None
-        return FOIApplicantCorrespondenceRawRequest.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails)
+        return FOIApplicantCorrespondenceRawRequest.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails, ccemails)
     
     def editapplicantcorrespondencelogforministry(self, ministryrequestid, data, userid):
         correspondence = FOIApplicantCorrespondence.getapplicantcorrespondencebyid(data['correspondenceid'])

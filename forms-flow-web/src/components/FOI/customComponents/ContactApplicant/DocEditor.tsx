@@ -32,7 +32,8 @@ export const DocEditor = ({
     setEditDraftTrigger,
     editSfdtDraft,
     enableAutoFocus,
-    selectedEmails
+    selectedEmails,
+    selectedCCEmails
 }: any) => {
     const EMAILLISTTEMPLATEVARIABLE = '[SELECTEDEMAILSLIST-NONESELECTED]'
     // These are the phrases from the templates the precede email and file, to ensure that emails and numbers in other locations aren't replaced
@@ -215,8 +216,12 @@ export const DocEditor = ({
         if (container && curTemplate) {
             let newEmailList = ''
             selectedEmails?.forEach((email: any, index: number) => {
-            newEmailList = newEmailList + email
-            if (index < selectedEmails?.length - 1) newEmailList = newEmailList + ', '
+                newEmailList = newEmailList + email
+                if (index < selectedEmails?.length - 1 || selectedCCEmails?.length > 0) newEmailList = newEmailList + ', '
+            })
+            selectedCCEmails?.forEach((email: any, index: number) => {
+                newEmailList = newEmailList + email
+                if (index < selectedCCEmails?.length - 1) newEmailList = newEmailList + ', '
             })
             if (newEmailList === '') newEmailList = EMAILLISTTEMPLATEVARIABLE
             for (let prefix of EMAILPREFIXES) {
@@ -269,7 +274,7 @@ export const DocEditor = ({
             replaceEmailList();
             replaceFileNumber();
         }
-    }, [selectedEmails, curTemplate]);
+    }, [selectedEmails, selectedCCEmails, curTemplate]);
 
     const getSfdtString = () => {
         if (container) {
