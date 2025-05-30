@@ -41,7 +41,7 @@ export const getSolrKeywordSearchData = ({
     let isBearer = false;  
     const serializedQueryParams = new URLSearchParams(queryParams).toString();
     const fixedQueryParams = serializedQueryParams.replace(/\+/g, '%20');
-    let solrEndPoint = `${FOI_SOLR_API_BASE}/select?${fixedQueryParams}`;
+    let solrEndPoint = `${FOI_SOLR_API_BASE}/select?${fixedQueryParams}`; 
     httpGETRequest(
       solrEndPoint,
       {},
