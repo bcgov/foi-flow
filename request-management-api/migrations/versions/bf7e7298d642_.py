@@ -32,6 +32,7 @@ def upgrade():
                ('First Nations Information', True),
                ('Outside Scope of Publication Policy', True),
                ('Personal Information', True),
+               ('Legal Reasons', True),
                ('Public Body Decision', True),
                ('Security Information', True);''')
 
