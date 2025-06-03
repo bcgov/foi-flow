@@ -22,6 +22,7 @@ export const DocEditor = ({
     setPreviewTrigger,
     addAttachment,
     savepdf,
+    emailSubject,
     attachpdf,
     attachPdfTrigger,
     setAttachPdfTrigger,
@@ -53,6 +54,9 @@ export const DocEditor = ({
             case "savepdf":
                 savepdf(getSfdtString());
                 break;
+            case "savedocx":
+                container?.documentEditor.save(emailSubject, 'Docx')
+                break;
             case "attachpdf":
                 attachpdf(getSfdtString());
                 break;
@@ -83,6 +87,12 @@ export const DocEditor = ({
         text: onWrapText("Save as PDF"),
         id: "savepdf"
     };
+    let saveDocxBtn: CustomToolbarItemModel = {
+        prefixIcon: "e-icons e-large e-custom-export-docx",
+        tooltipText: "Save as a docx file",
+        text: onWrapText("Save as docx"),
+        id: "savedocx"
+    };
     // let attachPdfBtn: CustomToolbarItemModel = {
     //     prefixIcon: "e-icons e-large e-custom-export-pdf",
     //     tooltipText: "Attach current content as a PDF File",
@@ -98,6 +108,7 @@ export const DocEditor = ({
 
     let items: (CustomToolbarItemModel | ToolbarItem)[] = [
         savePdfBtn,
+        saveDocxBtn,
         // attachPdfBtn,
         "Separator",
         "Undo",

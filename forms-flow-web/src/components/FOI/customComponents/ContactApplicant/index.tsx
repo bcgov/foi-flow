@@ -57,8 +57,8 @@ export const ContactApplicant = ({
 }: any) => {
   const [curTemplate, setCurTemplate] = useState<string>('');
   const [curTemplateName, setCurTemplateName] = useState<string>('');
-  const defaultEmailSubject = `Your FOI Request [${requestNumber || requestId}]`
-  const [emailSubject, setEmailSubject] = useState<string>(defaultEmailSubject);
+  const [selectedCorrespondence, setSelectedCorrespondence] = useState <any> ({});
+  const [emailSubject, setEmailSubject] = useState<string>(`Your FOI Request [${requestNumber || requestId}]`);
 
   const dispatch = useDispatch();
   const templateList: any = useSelector((state: any) => state.foiRequests.foiEmailTemplates);
@@ -307,7 +307,6 @@ export const ContactApplicant = ({
   const [confirmationFor, setConfirmationFor] = useState("");
   const [confirmationTitle, setConfirmationTitle] = useState("");
   const [confirmationMessage, setConfirmationMessage] = useState("");
-  const [selectedCorrespondence, setSelectedCorrespondence] = useState <any> ({});
   const [currentResponseDate, setCurrentResponseDate] = useState <any> ("");
   const [extension, setExtension] = useState("");
 
@@ -360,7 +359,7 @@ export const ContactApplicant = ({
     setSelectedEmails([]);
     setSelectedCCEmails([])
     setCurrentTemplate(0);
-    setEmailSubject(defaultEmailSubject);
+    setEmailSubject(`Your FOI Request [${requestNumber || requestId}]`);
   }
 
   const handleConfirmationClose = () => {     
@@ -1342,7 +1341,7 @@ export const ContactApplicant = ({
               disabled={false}
               sx={{ display: "flex" }}
             >
-              Message to Applicant
+              Select Template
             </MenuItem>
             <MenuItem
               onClick={() => openResponseModal()}
@@ -1350,7 +1349,7 @@ export const ContactApplicant = ({
               disabled={false}
               sx={{ display: "flex" }}
             >
-              Attach Response
+              Upload Correspondence
             </MenuItem>
             </div>
           </TextField>
@@ -1578,6 +1577,7 @@ export const ContactApplicant = ({
                 setPreviewTrigger = {setPreviewTrigger}
                 addAttachment={openAttachmentModal}
                 savepdf = {savePdf}
+                emailSubject={emailSubject || `Your FOI Request [${requestNumber || requestId}]`}
                 attachpdf = {attachPdf}
                 attachPdfTrigger={attachPdfTrigger}
                 setAttachPdfTrigger={setAttachPdfTrigger}
