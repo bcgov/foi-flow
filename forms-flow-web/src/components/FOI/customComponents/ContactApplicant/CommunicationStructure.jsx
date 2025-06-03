@@ -329,12 +329,25 @@ const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
       </Dialog>
     )
   };
-let fullEmailListText = ''
+let fullEmailListText = correspondence?.emails?.length > 0 ? 'Email To: ' : '';
 correspondence?.emails.forEach((email, index) => {
   fullEmailListText = fullEmailListText + email
   if (index < correspondence.emails.length - 1) fullEmailListText = fullEmailListText + ', '
 })
-const emailText = correspondence?.emails.length == 1 ? correspondence.emails[0] : correspondence.emails.length > 1 ? correspondence.emails[0] + ' +' + (correspondence.emails.length - 1) : ''
+let fullCCEmailListText = correspondence?.ccemails?.length > 0 ? 'CC To: ' : '';
+correspondence?.ccemails.forEach((email, index) => {
+  fullCCEmailListText = fullCCEmailListText + email
+  if (index < correspondence.ccemails.length - 1) fullCCEmailListText = fullCCEmailListText + ', '
+})
+let popoverEmailList = fullEmailListText + '\n' + fullCCEmailListText;
+const totalNumberOfEmails = correspondence?.emails?.length + correspondence?.ccemails?.length
+let emailText = '';
+if (correspondence?.emails?.length > 0) {
+  emailText = correspondence.emails[0];
+} else if (correspondence?.ccemails?.length > 0) {
+  emailText = correspondence.ccemails[0]
+}
+if (totalNumberOfEmails > 1) emailText = emailText + ` +${totalNumberOfEmails - 1}`
 const dateText = correspondence.date == correspondence.created_at ? correspondence.date.toUpperCase() : correspondence.date.split('|')[0].trim()
   return (
     <>
@@ -351,7 +364,7 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
                     {correspondence && (
                       <>
                       <div className="templateUser">{correspondence.category === "response" ? "Applicant Response": getTemplateName(correspondence)} - {fullName} </div> |  
-                        {correspondence?.emails.length > 1 ? <><div className="templateUser"><Tooltip title={fullEmailListText} disableInteractive placement="top">{emailText}</Tooltip></div> |</>: correspondence?.emails.length == 1 ? <><div className="templateUser"> {emailText} </div>|</> : ''} 
+                        {totalNumberOfEmails > 1 ? <><div className="templateUser"><Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{popoverEmailList}</span>} disableInteractive placement="top">{emailText}</Tooltip></div> |</>: totalNumberOfEmails == 1 ? <><div className="templateUser"> {emailText} </div>|</> : ''} 
                         <div className="templateTime">{dateText.toUpperCase()} </div>  
                         <div className="templateTime">{correspondence.edited ? "Edited": ""} </div>
                       </>
@@ -392,7 +405,7 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
             <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} >
             </div>
             {correspondence && correspondence.attachments?.map((attachment) => (
-            <div className="email-attachment-item" key={attachment.filename}>
+            <div className="email-attachment-item" key={attachment.applicantcorrespondenceattachmentid + attachment.filename}>
               <a href={`/foidocument?id=${ministryId}&filepath=${attachment.documenturipath.split('/').slice(4).join('/')}`} target="_blank">{attachment.filename}</a>
             </div>
             ))}
