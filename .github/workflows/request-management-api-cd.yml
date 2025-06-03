@@ -2,6 +2,7 @@ name: Request Management API CD
 
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - dev
