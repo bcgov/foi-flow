@@ -313,6 +313,44 @@ export const editCorrespondenceResponse = (
     });
 };
 
+export const updateApplicantCorrespondence = (
+  data,
+  ministryId,
+  requestId,
+  dispatch,
+  callback,
+  errorCallback,
+) => {
+  if (!ministryId) {
+    ministryId = 'None';
+  }
+  dispatch(setFOICorrespondenceLoader(true));
+  const apiUrl = replaceUrl(replaceUrl(
+    API.FOI_UPDATE_APPLICANT_CORRESPONDENCE,
+    "<ministryrequestid>",
+    ministryId), 
+    "<requestid>", requestId
+  );
+  httpPOSTRequest(apiUrl, data)
+    .then((res) => {
+      if (res.data) {
+        if (callback) {
+          callback(res.data);
+        }
+      } else {
+        dispatch(serviceActionError(res));
+        throw new Error();
+      }
+    })
+    .catch((error) => {
+      console.log("An error occured while trying to update the correspondence", error);
+      catchError(error, dispatch);
+      if (errorCallback) {
+        errorCallback("An error occured while trying to update the correspondence");
+      }
+    });
+};
+
 export const fetchApplicantCorrespondenceTemplates = (
   errorCallback = null
 ) => {

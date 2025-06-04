@@ -27,16 +27,30 @@ import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 import { useDispatch, useSelector } from "react-redux";
 import * as html2pdf from 'html-to-pdf-js';
-import CommunicationUploadModal from '../Comments/CommunicationUploadModal';
 import { ClickableChip } from '../../Dashboard/utils';
 import { toast } from 'react-toastify';
 import { getTemplateVariables } from './util';
 import { DownloadCorrespondenceModal } from './DownloadCorrespondenceModal';
 
-
-const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
-  fullName, ministryId=null, editDraft, deleteDraft, deleteResponse, modalFor, setModalFor,setModal,setUpdateAttachment, 
-  setSelectedCorrespondence, setCurrentResponseDate, applicantCorrespondenceTemplates, templateVariableInfo}) => {
+const CommunicationStructure = ({
+  correspondence, 
+  requestNumber, 
+  currentIndex,
+  fullName, 
+  ministryId=null, 
+  editDraft, 
+  deleteDraft, 
+  deleteResponse, 
+  modalFor, 
+  setModalFor,
+  setModal,
+  setUpdateAttachment, 
+  setSelectedCorrespondence, 
+  setCurrentResponseDate, 
+  applicantCorrespondenceTemplates, 
+  templateVariableInfo,
+  showRenameEmailSubjectModal
+}) => {
 
   // console.log("correspondence: ", correspondence);
   const templateList = useSelector((state) => state.foiRequests.foiEmailTemplates);
@@ -46,7 +60,6 @@ const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
   const [downloadCorrespondenceModalOpen, setDownloadCorrespondenceModalOpen] = useState(false);
   const [anchorPosition, setAnchorPosition] = useState(null);
   const [deletePopoverOpen, setDeletePopoverOpen] = useState(false);
-  const [renameEmailSubject, setRenameEmailSubject] = useState(false);
   const ref = useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close() : {};
 
@@ -93,17 +106,29 @@ const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
 
   const ActionsPopover = () => {
 
-    const renderDownloadMenuItem = () => (
-      <MenuItem
-        onClick={(e) => {
-          e.stopPropagation();
-          setModalFor("downloadcorrespondence")
-          setDownloadCorrespondenceModalOpen(true);
-          setPopoverOpen(false);
-        }}
-      >
-        Download
-      </MenuItem>
+    const renderCorrespondenceMenuItems = () => (
+      <>
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            setModalFor("downloadcorrespondence")
+            setDownloadCorrespondenceModalOpen(true);
+            setPopoverOpen(false);
+          }}
+        >
+          Download
+        </MenuItem>
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedCorrespondence(correspondence);
+            showRenameEmailSubjectModal();
+            setPopoverOpen(false);
+          }}
+        >
+          Rename Subject
+        </MenuItem>
+      </>
     );
   
     const renderDraftMenuItems = () => (
@@ -140,17 +165,25 @@ const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
           Change Date
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            setUpdateAttachment(correspondence.attachments[0]);
-            setModalFor("rename");
-            setModal(true);
+          onClick={(e) => {
+            e.stopPropagation();
             setSelectedCorrespondence(correspondence);
+            showRenameEmailSubjectModal();
             setPopoverOpen(false);
           }}
         >
-          Rename
+          Rename Subject
         </MenuItem>
-        {renderDownloadMenuItem()}
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            setModalFor("downloadcorrespondence")
+            setDownloadCorrespondenceModalOpen(true);
+            setPopoverOpen(false);
+          }}
+        >
+          Download
+        </MenuItem>
         <MenuItem onClick={() => deleteResponse(correspondence)}>Delete</MenuItem>
       </>
     );
@@ -178,19 +211,13 @@ const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
         >
           {correspondence && (
             <MenuList>
-              {correspondence.category === "correspondence" && renderDownloadMenuItem()}
+              {correspondence.category === "correspondence" && renderCorrespondenceMenuItems()}
               {correspondence.category === "draft" && renderDraftMenuItems()}
               {correspondence.category === "response" && renderResponseMenuItems()}
             </MenuList>
           )}
         </Popover>
         {/* <DeleteAction /> */}
-        <CommunicationUploadModal 
-          openModal={communicationUploadModalOpen} 
-          setOpenModal={setCommunicationUploadModalOpen}
-          message={{ body: "", title: "Add Response" }}
-          ministryId={ministryId}
-        />
         <DownloadCorrespondenceModal modalOpen={downloadCorrespondenceModalOpen} setModalOpen={setDownloadCorrespondenceModalOpen} handleSave={download} modalFor={modalFor} />
       </div>
     );
@@ -246,7 +273,7 @@ const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
         closeButton: true
       });
     }
-    let element = correspondence?.text
+    let element = correspondence?.text || document.createElement('div');
 
     // For drafts, remove the relevant variables that have been filled in
     if (correspondence.category == "draft") {
@@ -285,8 +312,9 @@ const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
 
 
   const getTemplateName = (correspondence) => {
-    if (!correspondence?.sentby && correspondence?.templatename) return templateList.find((obj)=> obj.fileName == correspondence.templatename)?.templateName
     if (correspondence?.emailsubject) return correspondence.emailsubject
+    if (!correspondence?.sentby && correspondence?.templatename) return templateList.find((obj)=> obj.fileName == correspondence.templatename)?.templateName
+    if (correspondence.category === "response") return "Applicant Response"
     return `Your FOI Request [${requestNumber}]`
     // if(correspondence.templatename) {
     //   return correspondence.templatename;
@@ -294,8 +322,6 @@ const CommunicationStructure = ({correspondence, requestNumber, currentIndex,
     //   return applicantCorrespondenceTemplates.find((obj)=> obj.templateid == correspondence.templateId)?.description
     // }
   }
-  const [emailSubject, setEmailSubject] = useState(correspondence.category === "response" ? "Applicant Response": getTemplateName(correspondence));
-  
 
   const DeleteAction = () => {
     return (
@@ -363,7 +389,7 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
                   <div className="templateInfo">
                     {correspondence && (
                       <>
-                      <div className="templateUser">{correspondence.category === "response" ? "Applicant Response": getTemplateName(correspondence)} - {fullName} </div> |  
+                      <div className="templateUser">{getTemplateName(correspondence)} - {fullName} </div> |  
                         {totalNumberOfEmails > 1 ? <><div className="templateUser"><Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{popoverEmailList}</span>} disableInteractive placement="top">{emailText}</Tooltip></div> |</>: totalNumberOfEmails == 1 ? <><div className="templateUser"> {emailText} </div>|</> : ''} 
                         <div className="templateTime">{dateText.toUpperCase()} </div>  
                         <div className="templateTime">{correspondence.edited ? "Edited": ""} </div>
@@ -404,9 +430,27 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
           <AccordionDetails>
             <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} >
             </div>
-            {correspondence && correspondence.attachments?.map((attachment) => (
+            {correspondence && correspondence.attachments?.map((attachment, index) => (
             <div className="email-attachment-item" key={attachment.applicantcorrespondenceattachmentid + attachment.filename}>
               <a href={`/foidocument?id=${ministryId}&filepath=${attachment.documenturipath.split('/').slice(4).join('/')}`} target="_blank">{attachment.filename}</a>
+              {/* Uncomment below to rename individual attachements - backend still needs work */}
+              {/* <IconButton
+                aria-label= "actions"
+                id={`ellipse-icon-${currentIndex}`}
+                key={`ellipse-icon-${currentIndex}`}
+                // color="inherit"
+                className="attachment-actions"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setUpdateAttachment(correspondence.attachments[index]);
+                    setModalFor("rename");
+                    setModal(true);
+                    setSelectedCorrespondence(correspondence);
+                    setPopoverOpen(false);
+                }}
+              >
+                <MoreHorizIcon />
+              </IconButton> */}
             </div>
             ))}
           </AccordionDetails>
