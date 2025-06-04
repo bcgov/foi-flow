@@ -33,6 +33,14 @@ class FOIApplicantCorrespondenceLogSchema(Schema):
     templatename = fields.Str(data_key="templatename",allow_none=True)
     templatetype = fields.Str(data_key="templatetype",allow_none=True)
 
+class FOIApplicantCorrespondenceLogUpdateSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+        unknown = EXCLUDE    
+    correspondenceid = fields.Int(data_key="correspondenceid",required=False, allow_none=True)
+    emailsubject = fields.Str(data_key="emailsubject", required=False)
+    israwrequest = fields.Bool(data_key="israwrequest",required=False,allow_none=True)
+
 class FOIApplicantCorrespondenceEmailSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
         """Exclude unknown fields in the deserialized output."""

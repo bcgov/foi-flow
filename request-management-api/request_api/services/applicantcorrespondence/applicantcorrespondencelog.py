@@ -10,6 +10,7 @@ from request_api.models.FOIApplicantCorrespondenceAttachmentsRawRequests import 
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
 
+from sqlalchemy.sql.expression import null
 import maya
 import json
 import html
@@ -178,6 +179,46 @@ class applicantcorrespondenceservice:
             attachresponse = self.__updateattachmentversionrawrequest(data, userid)
             return response
         return response
+
+    def updateapplicantcorrespondencelogforrawrequest(self, rawrequestid, data, userid):
+        correspondencelog = FOIApplicantCorrespondenceRawRequest().getapplicantcorrespondencebyid(data['correspondenceid'])
+        updated_correspondencelog = FOIApplicantCorrespondenceRawRequest()
+        updated_correspondencelog.__dict__.update(correspondencelog)
+        updated_correspondencelog.foirawrequestversion_id =FOIRawRequest.getversionforrequest(requestid=rawrequestid)
+        updated_correspondencelog.created_at = datetime.now()
+        updated_correspondencelog.createdby = userid
+        updated_correspondencelog.version = correspondencelog['version'] + 1
+        # Update attributes here
+        if 'emailsubject' in data:
+            if 'correspondencemessagejson' in correspondencelog and correspondencelog['correspondencemessagejson'] is not None:
+                correspondencemessagejson = json.loads(correspondencelog['correspondencemessagejson'])
+            else:
+                correspondencemessagejson = {}
+            correspondencemessagejson['emailsubject'] = data['emailsubject']
+        updated_correspondencelog.correspondencemessagejson = json.dumps(correspondencemessagejson)
+        # Ensure null value persists for json column
+        if updated_correspondencelog.sentcorrespondencemessage is None: updated_correspondencelog.sentcorrespondencemessage = null()
+        return FOIApplicantCorrespondenceRawRequest.updateapplicantcorrespondence(rawrequestid, updated_correspondencelog, userid)
+
+    def updateapplicantcorrespondencelogforministry(self, ministryrequestid, data, userid):
+        correspondencelog = FOIApplicantCorrespondence().getapplicantcorrespondencebyid(data['correspondenceid'])
+        updated_correspondencelog = FOIApplicantCorrespondence()
+        updated_correspondencelog.__dict__.update(correspondencelog)
+        updated_correspondencelog.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid)
+        updated_correspondencelog.created_at = datetime.now()
+        updated_correspondencelog.createdby = userid
+        updated_correspondencelog.version = correspondencelog['version'] + 1
+        # Update attributes here
+        if 'emailsubject' in data:
+            if 'correspondencemessagejson' in correspondencelog and correspondencelog['correspondencemessagejson'] is not None:
+                correspondencemessagejson = json.loads(correspondencelog['correspondencemessagejson'])
+            else:
+                correspondencemessagejson = {}
+            correspondencemessagejson['emailsubject'] = data['emailsubject']
+        updated_correspondencelog.correspondencemessagejson = json.dumps(correspondencemessagejson)
+        # Ensure null value persists for json column
+        if updated_correspondencelog.sentcorrespondencemessage is None: updated_correspondencelog.sentcorrespondencemessage = null()
+        return FOIApplicantCorrespondence.updateapplicantcorrespondence(ministryrequestid, updated_correspondencelog, userid)
 
     def deleteapplicantcorrespondencelogministry(self, ministryrequestid, correpondenceid, userid):
         return FOIApplicantCorrespondence.deleteapplicantcorrespondence(ministryrequestid,correpondenceid,userid)        

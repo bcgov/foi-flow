@@ -2,10 +2,10 @@ from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
 from .db import  db, ma
 from datetime import datetime
-from sqlalchemy.orm import relationship,backref
+from sqlalchemy.orm import relationship,backref,aliased
 from .default_method_result import DefaultMethodResult
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_,and_,text
+from sqlalchemy import or_,and_,text,func
 import logging
 
 class FOIApplicantCorrespondenceAttachment(db.Model):
@@ -53,7 +53,31 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
     @classmethod
     def getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(cls,applicantcorrespondenceid):
         correspondenceattachment_schema = FOIApplicantCorrespondenceAttachmentSchema(many=True)
-        query = db.session.query(FOIApplicantCorrespondenceAttachment).filter(FOIApplicantCorrespondenceAttachment.applicantcorrespondenceid == applicantcorrespondenceid).order_by(FOIApplicantCorrespondenceAttachment.applicantcorrespondenceattachmentid.asc()).all()
+
+        # Subquery: Get max version for each applicantcorrespondenceattachmentid
+        subquery = db.session.query(
+            FOIApplicantCorrespondenceAttachment.applicantcorrespondenceattachmentid,
+            func.max(FOIApplicantCorrespondenceAttachment.version).label("max_version")
+        ).filter(
+            FOIApplicantCorrespondenceAttachment.applicantcorrespondenceid == applicantcorrespondenceid
+        ).group_by(
+            FOIApplicantCorrespondenceAttachment.applicantcorrespondenceattachmentid
+        ).subquery()
+
+        # Alias the main table
+        alias = aliased(FOIApplicantCorrespondenceAttachment)
+
+        # Join with subquery to get only latest version of each attachment
+        query = db.session.query(alias).join(
+            subquery,
+            and_(
+                alias.applicantcorrespondenceattachmentid == subquery.c.applicantcorrespondenceattachmentid,
+                alias.version == subquery.c.max_version
+            )
+        ).filter(
+            alias.applicantcorrespondenceid == applicantcorrespondenceid
+        ).order_by(alias.applicantcorrespondenceattachmentid.asc()).all()
+
         return correspondenceattachment_schema.dump(query)
     
     @classmethod
