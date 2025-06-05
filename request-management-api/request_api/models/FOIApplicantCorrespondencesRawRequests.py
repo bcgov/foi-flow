@@ -79,7 +79,7 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
         return correspondence_schema.dump(query)
 
     @classmethod
-    def saveapplicantcorrespondence(cls, newapplicantcorrepondencelog, attachments, emails, ccemails)->DefaultMethodResult: 
+    def saveapplicantcorrespondence(cls, newapplicantcorrepondencelog, attachments, emails = None, ccemails = None)->DefaultMethodResult: 
         try:
             db.session.add(newapplicantcorrepondencelog)
             db.session.commit()

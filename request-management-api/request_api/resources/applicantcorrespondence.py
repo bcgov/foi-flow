@@ -113,7 +113,7 @@ class FOIFlowApplicantCorrespondence(Resource):
     @cross_origin(origins=allowedorigins())
     @auth.require
     @auth.hasusertype('iao')
-    def post(requestid, ministryrequestid):
+    def post(requestid, ministryrequestid): # This endpoint updates associated attachments and emails as well
         try:
             requestjson = request.get_json()
             applicantcorrespondencelogupdate = FOIApplicantCorrespondenceLogUpdateSchema().load(data=requestjson)
