@@ -54,6 +54,7 @@ const CommunicationStructure = ({
 
   // console.log("correspondence: ", correspondence);
   const templateList = useSelector((state) => state.foiRequests.foiEmailTemplates);
+  const requestDetails = useSelector((state) => state.foiRequests.foiRequestDetail);
   const dispatch = useDispatch();
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [communicationUploadModalOpen, setCommunicationUploadModalOpen] = useState(false);
@@ -273,7 +274,14 @@ const CommunicationStructure = ({
         closeButton: true
       });
     }
-    let element = correspondence?.text || document.createElement('div');
+    const headerDiv = document.createElement("div");
+
+    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText() || 'Email to: None selected'}\n ${getFullCCEmailListText() || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`;
+    headerDiv.style.fontSize = "12px";
+    headerDiv.style.fontFamily = "BCSans"
+    headerDiv.style.marginBottom = "20px";
+    let element = headerDiv.outerHTML
+    if (correspondence?.text) element = element + correspondence?.text
 
     // For drafts, remove the relevant variables that have been filled in
     if (correspondence.category == "draft") {
@@ -355,16 +363,25 @@ const CommunicationStructure = ({
       </Dialog>
     )
   };
-let fullEmailListText = correspondence?.emails?.length > 0 ? 'Email To: ' : '';
-correspondence?.emails.forEach((email, index) => {
-  fullEmailListText = fullEmailListText + email
-  if (index < correspondence.emails.length - 1) fullEmailListText = fullEmailListText + ', '
-})
-let fullCCEmailListText = correspondence?.ccemails?.length > 0 ? 'CC To: ' : '';
-correspondence?.ccemails.forEach((email, index) => {
-  fullCCEmailListText = fullCCEmailListText + email
-  if (index < correspondence.ccemails.length - 1) fullCCEmailListText = fullCCEmailListText + ', '
-})
+
+const getFullEmailListText = () => {
+  let fullEmailListText = correspondence?.emails?.length > 0 ? 'Email To: ' : '';
+  correspondence?.emails.forEach((email, index) => {
+    fullEmailListText = fullEmailListText + email
+    if (index < correspondence.emails.length - 1) fullEmailListText = fullEmailListText + ', '
+  })
+  return fullEmailListText;
+}
+const fullEmailListText = getFullEmailListText();
+const getFullCCEmailListText = () => {
+  let fullCCEmailListText = correspondence?.ccemails?.length > 0 ? 'CC To: ' : '';
+  correspondence?.ccemails.forEach((email, index) => {
+    fullCCEmailListText = fullCCEmailListText + email
+    if (index < correspondence.ccemails.length - 1) fullCCEmailListText = fullCCEmailListText + ', '
+  })
+  return fullCCEmailListText;
+}
+const fullCCEmailListText = getFullCCEmailListText();
 let popoverEmailList = fullEmailListText + '\n' + fullCCEmailListText;
 const totalNumberOfEmails = correspondence?.emails?.length + correspondence?.ccemails?.length
 let emailText = '';
