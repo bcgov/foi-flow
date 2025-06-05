@@ -64,7 +64,6 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
             FOIApplicantCorrespondenceAttachment.applicantcorrespondenceattachmentid
         ).subquery()
 
-        # Alias the main table
         alias = aliased(FOIApplicantCorrespondenceAttachment)
 
         # Join with subquery to get only latest version of each attachment
