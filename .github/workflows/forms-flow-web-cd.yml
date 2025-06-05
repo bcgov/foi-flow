@@ -19,7 +19,7 @@ defaults:
     working-directory: ./forms-flow-web
 
 env:
-  APP_NAME: "forms-flow-web"
+  APP_NAME: "forms-flow-web-002"
 
 jobs:
   forms-flow-web-cd-by-push:
