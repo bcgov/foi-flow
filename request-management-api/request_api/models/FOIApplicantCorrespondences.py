@@ -92,27 +92,32 @@ class FOIApplicantCorrespondence(db.Model):
         try:
             db.session.add(newapplicantcorrepondencelog)
             db.session.commit()
+
+            # Save new attachments
+            correspondenceattachments = []
             if(attachments is not None and len(attachments) > 0):
-                correpondenceattachments = []
                 for _attachment in attachments:
                     attachment = FOIApplicantCorrespondenceAttachment()
-                    if 'applicantcorrespondenceattachmentid' in _attachment:
-                        existingattachment = FOIApplicantCorrespondenceAttachment().getapplicantcorrespondenceattachmentbyid(_attachment['applicantcorrespondenceattachmentid'])
-                        attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
-                        attachment.applicantcorrespondence_version = newapplicantcorrepondencelog.version
-                        attachment.attachmentdocumenturipath = existingattachment['attachmentdocumenturipath']
-                        attachment.attachmentfilename = existingattachment['attachmentfilename']
-                        attachment.createdby = existingattachment['createdby']
-                        attachment.version = existingattachment['version'] + 1
-                    else:
-                        attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
-                        attachment.applicantcorrespondence_version = newapplicantcorrepondencelog.version
-                        attachment.attachmentdocumenturipath = _attachment['url']
-                        attachment.attachmentfilename = _attachment['filename']
-                        attachment.createdby = newapplicantcorrepondencelog.createdby
-                        attachment.version = 1
-                    correpondenceattachments.append(attachment)
-                FOIApplicantCorrespondenceAttachment().saveapplicantcorrespondenceattachments(newapplicantcorrepondencelog.foiministryrequest_id , correpondenceattachments)
+                    attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
+                    attachment.applicantcorrespondence_version = newapplicantcorrepondencelog.version
+                    attachment.attachmentdocumenturipath = _attachment['url']
+                    attachment.attachmentfilename = _attachment['filename']
+                    attachment.createdby = newapplicantcorrepondencelog.createdby
+                    attachment.version = 1
+                    correspondenceattachments.append(attachment)
+
+            # Update existing attachments
+            existingattachments = FOIApplicantCorrespondenceAttachment().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(newapplicantcorrepondencelog.applicantcorrespondenceid)
+            for _existingattachment in existingattachments:
+                attachment = FOIApplicantCorrespondenceAttachment()
+                attachment.__dict__.update(_existingattachment)
+                attachment.version = _existingattachment['version'] + 1
+                attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
+                attachment.applicantcorrespondence_version = newapplicantcorrepondencelog.version
+                correspondenceattachments.append(attachment)
+            if (len(correspondenceattachments) > 0):
+                FOIApplicantCorrespondenceAttachment().saveapplicantcorrespondenceattachments(newapplicantcorrepondencelog.foiministryrequest_id, correspondenceattachments)
+
             correspondenceemails = []
             if(emails is not None and len(emails) > 0):
                 for _email in emails:
@@ -140,51 +145,6 @@ class FOIApplicantCorrespondence(db.Model):
         finally:
             db.session.close()
             
-
-    @classmethod
-    def updateapplicantcorrespondence(cls, ministryrequestid, updated_correspondencelog, userid)->DefaultMethodResult: 
-        try:
-            db.session.add(updated_correspondencelog)
-            updatedcorrespondencelogid = updated_correspondencelog.applicantcorrespondenceid
-            updatedcorrespondenceversion = updated_correspondencelog.version
-            updatedcorrespondenceministryrequestid = updated_correspondencelog.foiministryrequest_id
-            db.session.commit()
-            
-            # Update attachments to match new correspondence version
-            attachments = FOIApplicantCorrespondenceAttachment().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(updatedcorrespondencelogid)
-            if(attachments is not None and len(attachments) > 0):
-                correpondenceattachments = []
-                for _attachment in attachments:
-                    attachment = FOIApplicantCorrespondenceAttachment()
-                    attachment.__dict__.update(_attachment)
-                    attachment.applicantcorrespondenceid = updatedcorrespondencelogid
-                    attachment.applicantcorrespondence_version = updatedcorrespondenceversion
-                    attachment.createdby = userid
-                    attachment.version = _attachment['version'] + 1
-                    correpondenceattachments.append(attachment)
-                FOIApplicantCorrespondenceAttachment().saveapplicantcorrespondenceattachments(updatedcorrespondenceministryrequestid , correpondenceattachments)
-            
-            # Update emails to match new correspondence version 
-            emails = FOIApplicantCorrespondenceEmail().getapplicantcorrespondenceemails(ministryrequestid)
-            emailsbycorrespondence = cls.__getemailsincorrespondence(cls, emails, updatedcorrespondencelogid, updatedcorrespondenceversion - 1)
-            correspondenceemails = []
-            if(emailsbycorrespondence is not None and len(emailsbycorrespondence) > 0):
-                for _email in emailsbycorrespondence:
-                    email = FOIApplicantCorrespondenceEmail()
-                    email.__dict__.update(_email)
-                    email.applicantcorrespondence_id = updatedcorrespondencelogid
-                    email.applicantcorrespondence_version = updatedcorrespondenceversion
-                    correspondenceemails.append(email)
-                FOIApplicantCorrespondenceEmail().saveapplicantcorrespondenceemail(updatedcorrespondencelogid , correspondenceemails)
-            return DefaultMethodResult(True,'applicantcorrepondence log added',updatedcorrespondencelogid)
-        except Exception as e:
-            print('EXCEPTION: ')
-            print(e)
-            return DefaultMethodResult(False,'applicantcorrepondence log exception while updating correspondence',updatedcorrespondencelogid)
-        finally:
-            db.session.close()
-
-
     @classmethod
     def deleteapplicantcorrespondence(cls, ministryid, correspondenceid,userid)->DefaultMethodResult: 
         correspondence = FOIApplicantCorrespondence.getapplicantcorrespondencebyid(correspondenceid)
