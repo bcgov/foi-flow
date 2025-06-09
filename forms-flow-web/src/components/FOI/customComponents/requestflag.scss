@@ -24,6 +24,10 @@
         padding-left: 14px;
         margin-top: 3px;
     }
+    
+    .consultation-type-icon{
+        display: none;
+    }
 
     .restrict-label {
         border: 1px solid #a0192f;
@@ -50,6 +54,26 @@
 
     .consultation-inactive-dropdown {
         width: 160px;
+    }
+
+    .consultation-type-select {
+        width: 240px !important;
+    }
+
+    .consultation-type-dropdown {
+        width: 225px !important;
+        margin-top: 8px !important;
+    }
+
+    .consultation-type-dropdown .MuiSelect-select {
+        content: "Select consultation type" !important;
+    }
+
+    .consult-selected{
+        background: #FFF !important;
+        pointer-events: none !important;
+        width: 175px !important;
+        overflow: hidden !important;
     }
     
     .request-flag-dropdown .MuiSelect-icon {
@@ -84,5 +108,3 @@
 .modal-msg-description {
     padding-top: 25px;
 }
-
-

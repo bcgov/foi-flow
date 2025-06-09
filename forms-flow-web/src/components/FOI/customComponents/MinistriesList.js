@@ -19,14 +19,15 @@ const useStyles = makeStyles((_theme) => ({
     color: "#9e2929",
     marginTop: '12px'
   },
-  showInternalConsultFieldValidation:{
-    color: "#CE3E39",
-    fontStyle: 'italic',
-    marginTop: '5px'
+  showInternalConsultFieldValidation: {
+    color: "#CE3E39 !important",
+    fontStyle: "italic !important",
+    marginTop: "5px",
+    fontSize: "13px !important",
   },
-  hideInternalConsultFieldValidation:{
-    visibility: 'hidden'
-  }
+  hideInternalConsultFieldValidation: {
+    visibility: "hidden !important",
+  },
 }));
 
 const MinistriesList = React.memo(
@@ -36,7 +37,7 @@ const MinistriesList = React.memo(
     disableInput,
     isMultiSelectMode = false,
     showOnlySelected = false,
-    isInternalConsultValidationError,
+    isInternalConsultValidationError = false,
   }) => {
     const classes = useStyles();
     const { ministryId } = useParams();

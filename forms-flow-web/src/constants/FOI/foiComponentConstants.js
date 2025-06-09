@@ -1,6 +1,8 @@
 const FOI_COMPONENT_CONSTANTS = {
     ASSIGNED_TO: "assignedTo",
     MINISTRY_ASSIGNED_TO: "ministryAssignedTo",
+    CONSULT_ASSIGNED_TO: "consultAssignedTo",
+    CONSULT_ASSIGNED_GROUP: "consultAssignedGroup",
     APPLICANT_FIRST_NAME: "firstName",
     APPLICANT_LAST_NAME: "lastName",
     APPLICANT_MIDDLE_NAME: "middleName",
@@ -37,6 +39,7 @@ const FOI_COMPONENT_CONSTANTS = {
     DESCRIPTION: "description",
     IS_PROGRAM_AREA_SELECTED: "isProgramAreaSelected",
     PROGRAM_AREA_LIST: "programAreaList",
+    CONSULT_PROGRAM_AREA_LIST: "consultProgramAreaList",
 
     REQUEST_TYPE: "requestType",
     RECEIVED_MODE: "receivedMode",
@@ -45,6 +48,7 @@ const FOI_COMPONENT_CONSTANTS = {
     RECEIVED_DATE_UF: "receivedDateUF",
     REQUEST_START_DATE: "requestStartDate",
     DUE_DATE: "dueDate",
+    CONSULT_DUE_DATE: "consultDueDate",
 
     PERSONAL_HEALTH_NUMBER: "personalHealthNumber",
     CORRECTIONS_NUMBER: "correctionalServiceNumber",
@@ -64,11 +68,14 @@ const FOI_COMPONENT_CONSTANTS = {
     PROGRAM_AREA_SELECTED: "selected",
     ADDITIONAL_PERSONAL_INFORMATION: "additionalPersonalInfo",
     ADDREQUEST: "addrequest",
+    ADDCONSULTREQUEST: "addconsultrequest",
     HISTORICAL_REQUEST: "historicalrequest",
     RQUESTDETAILS_INITIALVALUES: "initialValues",
     ASSIGNEE_GROUPS: ["Intake Team", "Flex Team", "Processing Team"],
     ONLINE_FORM: "Online Form",
     ADD_REQUEST: "Add Request",
+    ADD_CONSULT_REQUEST: "Add Consult",
+    ADD_CONSULTATION_REQUEST: "Add Consultation",
     REVIEW_REQUEST: "Review Request",
     ISPIIREDACTED:"ispiiredacted",
     DIVISION:"division",
@@ -79,7 +86,9 @@ const FOI_COMPONENT_CONSTANTS = {
     DIVISION_RECEIVED_DATE: "divisionReceivedDate",
 
     SUBJECT_CODE: "subjectCode",
-    LINKED_REQUESTS: "linkedRequests"
+    CONSULT_SUBJECT_CODE: "consultSubjectCode",
+    LINKED_REQUESTS: "linkedRequests",
+    CONSULT_TYPE: "consultType",
   };
   
   export default FOI_COMPONENT_CONSTANTS;

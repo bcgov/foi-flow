@@ -18,6 +18,14 @@ import {
   
 };
 
+export const saveConsultAssignee = (data, ministryId, consultId, isMinistryCoordinator, ...rest) => {
+  const done = fnDone(rest);
+  if (consultId)
+    return saveFOIMinistryConsultRequestAssignee(data, ministryId, consultId, isMinistryCoordinator, done)
+  else 
+    return saveFOIRawConsultRequestAssignee(data, ministryId, done)
+};
+
 const saveFOIMinistryRequestAssignee = (data, requestId, ministryId, isMinistryCoordinator, done) => {
   let userType = "iao";
     if (isMinistryCoordinator)
@@ -70,3 +78,56 @@ const saveFOIMinistryRequestAssignee = (data, requestId, ministryId, isMinistryC
       });
     };
   }
+
+  const saveFOIMinistryConsultRequestAssignee = (data, ministryId, consultId, isMinistryCoordinator, done) => {
+    let userType = "iao";
+      if (isMinistryCoordinator)
+        userType = "ministry"
+      let apiUrl = "";
+      if (ministryId && consultId) {
+        apiUrl = replaceUrl(replaceUrl(replaceUrl(
+          API.FOI_POST_MINISTRY_CONSULT_REQUEST_ASSIGNEE_API,
+          "<ministryid>",
+          ministryId
+        ), "<consultid>", consultId), "<usertype>", userType);
+        return (dispatch) => {
+          httpPOSTRequest(apiUrl, data)
+            .then((res) => {
+              if (res.data) {
+                done(null, res.data);
+              } else {
+                dispatch(serviceActionError(res));
+                throw new Error(`Error while saving the Assgnee for the (ministry# ${ministryId})`);            
+              }
+            })
+            .catch((error) => {
+              done(error);
+              catchError(error, dispatch);
+            });
+        };
+      }
+    }
+
+    const saveFOIRawConsultRequestAssignee = (data, requestId, ministryId, done) => {
+      let apiUrl = replaceUrl(replaceUrl(
+        API.FOI_POST_RAW_CONSULT_REQUEST_ASSIGNEE_API,
+        "<foirequestid>",
+        requestId
+      ), "<foiministryrequestid>", ministryId);
+  
+      return (dispatch) => {
+        httpPOSTRequest(apiUrl, data)
+        .then((res) => {
+          if (res.data) {
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            throw new Error(`Error while saving the Assgnee for the (request# ${ministryId})`);            
+          }
+        })
+        .catch((error) => {
+          done(error);
+          catchError(error, dispatch);
+        });
+      };
+    }

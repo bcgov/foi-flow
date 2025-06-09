@@ -198,6 +198,9 @@ const API = {
 
   FOI_POST_REQUEST_CONSULTS: `${FOI_BASE_API_URL}/api/foiconsult/<foirequestid>/ministryrequest/<foiministryrequestid>`,
   FOI_GET_REQUEST_CONSULTS: `${FOI_BASE_API_URL}/api/foiconsult/ministryrequest/<ministryrequestid>`,
+  FOI_GET_ORIGINAL_REQUEST_DETAILS: `${FOI_BASE_API_URL}/api/foiconsult/axisrequestid/<axisrequestid>`,
+  FOI_POST_RAW_CONSULT_REQUEST_ASSIGNEE_API: `${FOI_BASE_API_URL}/api/foiconsult/<foirequestid>/ministryrequest/<foiministryrequestid>/assignee`,
+  FOI_POST_MINISTRY_CONSULT_REQUEST_ASSIGNEE_API: `${FOI_BASE_API_URL}/api/foiconsult/<foirequestid>/ministryrequest/<foiministryrequestid>/<usertype>/assignee`,
 
   FOI_GET_CROSSTEXTSEARCH_AUTH: `${FOI_BASE_API_URL}/api/foicrosstextsearch/authstring`,
   FOI_GET_CROSSTEXTSEARCH_REQUEST_DETAILS: `${FOI_BASE_API_URL}/api/foicrosstextsearch/requests`,

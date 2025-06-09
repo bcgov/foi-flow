@@ -3,7 +3,8 @@ import API from "../../endpoints";
 import {
   serviceActionError,
   setFOILoader,
-  setFOIRequestConsults
+  setFOIRequestConsults,
+  setFOIRequestDetail,
 } from "../../../actions/FOI/foiRequestActions";
 import { fnDone, catchError } from "./foiServicesUtil";
 // import UserService from "../../../services/UserService";
@@ -65,4 +66,37 @@ export const saveFOIRequestConsults = (requestId, ministryId, data, ...rest) => 
           catchError(error, dispatch);
         });
     };
+};
+
+export const fetchOriginalRequestDetails = (axisrequestid, ...rest) => {
+  const done = fnDone(rest);
+  
+  if (!axisrequestid) {
+    return () => {};
+  }
+  const foiRequestDetailsAPIUrl = replaceUrl(
+    replaceUrl(API.FOI_GET_ORIGINAL_REQUEST_DETAILS),
+    "<axisrequestid>",
+    axisrequestid
+  );
+  return (dispatch) => {
+    httpGETRequest(foiRequestDetailsAPIUrl, {})
+      .then((res) => {
+          if (res.status === 200) {
+            if(res.data.ispresent === true){
+              done(null, { foiministryrequest: res.data.foiministryrequest, ispresent: true });
+              dispatch(setFOIRequestDetail(res.data.foiministryrequest));
+            } else if (res.data.ispresent === false){
+              done(null, { foiministryrequest: {}, ispresent: false });
+            }
+          } else {
+            const errorMessage = res.data?.message || 'Unknown error occurred';
+            dispatch(serviceActionError({ message: errorMessage }));
+            throw new Error(errorMessage);
+          }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+      });
+  };
 };

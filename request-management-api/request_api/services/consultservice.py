@@ -5,6 +5,7 @@ from request_api.models.FOIMinistryRequestConsults import FOIMinistryRequestCons
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.ProgramAreas import ProgramArea
 from request_api.models.FOIRequestStatus import FOIRequestStatus
+from request_api.services.requestservice import requestservice
 import json
 class consultservice:
     """ FOI consult management service
@@ -35,14 +36,14 @@ class consultservice:
 
         return enriched_consults
     
-    def createconsultrequest(self, foiconsult, userid, foiministryrequestid):
+    def createconsultrequest(self, foiconsult, userid, foiministryrequestid, assigneedata):
         """Create the consult request."""
         foiministryrequest = FOIMinistryRequest().getrequestbyministryrequestid(foiministryrequestid)
         for consult in foiconsult:
             consult['foiMinistryRequestVersionId'] = foiministryrequest['version']
             consult['foiMinistryRequestId'] = foiministryrequestid
             consult['requeststatusid'] = foiministryrequest['requeststatus.requeststatusid']
-        created_consults = FOIMinistryRequestConsults().createconsults(foiconsult, userid)
+        created_consults = FOIMinistryRequestConsults().createconsults(foiconsult, userid, assigneedata)
 
 
         enriched_consults = []
@@ -74,3 +75,12 @@ class consultservice:
         foiconsult['foiMinistryRequestId'] = foiministryrequestid
         result = FOIMinistryRequestConsults().updateconsults(foiconsult, userid)
         return None
+    
+    def getoriginalrequestDetailsByAxisRequestId(self, axisrequestid):
+        """Get the request details based on axisrequestid."""
+        foiministryrequest = FOIMinistryRequestConsults().getoriginalrequestDetailsByAxisRequestId(axisrequestid)
+        if foiministryrequest:
+            result = requestservice().getrequestdetails(foiministryrequest['foirequest_id'],foiministryrequest['foiministryrequestid'])
+        else:
+            result = None    
+        return result

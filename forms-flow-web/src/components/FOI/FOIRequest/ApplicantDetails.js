@@ -12,6 +12,8 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import { Chip } from '@mui/material';
 
 const ApplicantDetails = React.memo(
   ({
@@ -23,7 +25,8 @@ const ApplicantDetails = React.memo(
     requestStatus,
     defaultExpanded,
     showHistory,
-    warning
+    warning,
+    isDataSynced,
   }) => {
 
     const useStyles = makeStyles({
@@ -259,6 +262,13 @@ const ApplicantDetails = React.memo(
         <Accordion defaultExpanded={defaultExpanded}>
           <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} id="applicantDetails-header">
             <Typography className={classes.heading}>APPLICANT DETAILS</Typography>
+            {isDataSynced && (
+              <Chip
+                  icon={<CheckCircleOutlineIcon className="synced-data-icon"/>}
+                  label={"Synchronized data"}
+                  className="synced-data-chip"
+              />
+            )}
           </AccordionSummary>
         <AccordionDetails>
           <div>
@@ -279,7 +289,7 @@ const ApplicantDetails = React.memo(
                 fullWidth
                 onChange={handleFirtNameChange}
                 required={isConsultFlagFieldRequired}
-                disabled={disableInput}
+                disabled={disableInput || isDataSynced}
                 error={isConsultFlagFieldRequired && applicantFirstNameText === ""}
               />
               <TextField
@@ -291,7 +301,7 @@ const ApplicantDetails = React.memo(
                 variant="outlined"
                 className={isConsultFlagFieldRequired &&warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) && classes.warning}
                 fullWidth
-                disabled={disableInput}
+                disabled={disableInput || isDataSynced}
                 onChange={handleMiddleNameChange}
               />
               <TextField
@@ -305,7 +315,7 @@ const ApplicantDetails = React.memo(
                 fullWidth
                 onChange={handleLastNameChange}
                 required={isConsultFlagFieldRequired}
-                disabled={disableInput}
+                disabled={disableInput || isDataSynced}
                 error={isConsultFlagFieldRequired && applicantLastNameText === ""}
               />
             </div>
@@ -319,7 +329,7 @@ const ApplicantDetails = React.memo(
                 className={warning && warning(FOI_COMPONENT_CONSTANTS.ORGANIZATION) && classes.warning}
                 variant="outlined"
                 fullWidth
-                disabled={disableInput}
+                disabled={disableInput || isDataSynced}
                 onChange={handleOrganizationChange}
               />
               <TextField
@@ -335,7 +345,7 @@ const ApplicantDetails = React.memo(
                 className={warning && warning(FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) && classes.warning}
                 fullWidth
                 required
-                disabled={disableInput || disableFieldForMinistryRequest}
+                disabled={disableInput || disableFieldForMinistryRequest || isDataSynced}
                 error={selectedCategory.toLowerCase().includes("select")}
               >
                 {menuItems}
@@ -349,7 +359,7 @@ const ApplicantDetails = React.memo(
                 variant="outlined"
                 className={warning && warning(FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS) && classes.warning}
                 fullWidth
-                disabled={disableInput}
+                disabled={disableInput || isDataSynced}
                 onChange={handleAlsoKnownAsChange}
               />}
             </div>

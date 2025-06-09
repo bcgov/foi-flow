@@ -5,7 +5,6 @@ import { StateEnum } from "../../../../constants/FOI/statusEnum";
 import { AccordionDetails, AccordionSummary, TextField, Input, Typography } from "@material-ui/core";
 import { makeStyles } from '@material-ui/styles';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import InputAdornment from "@material-ui/core/InputAdornment";
 import MenuItem from '@material-ui/core/MenuItem';
 // import MultiMinistrySelector from '../../customComponents/MultiMinistrySelector';

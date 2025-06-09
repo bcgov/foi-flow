@@ -43,12 +43,17 @@ import { useEffect, useState } from "react";
             selectedMinistries: checkedItems,
             subjectCode: modal.confirmationData?.subjectCode,
             dueDate: modal.confirmationData?.dueDate,
+            consultAssignedTo: modal.confirmationData?.consultAssignedTo,
+            assignedGroup: modal.confirmationData?.assignedGroup,
+            consultTypeId: modal.confirmationData?.consultTypeId,
+            consultAssigneeVal: modal.confirmationData?.consultAssigneeVal
           });
         
           const consultFormattedData: ConsultTransactionObject[] = (checkedItems || []).map((ministry:any) => ({
           fileNumber: requestDetails?.axisRequestId ? `${requestDetails.axisRequestId}-CON` : "",
-          consultAssignedTo: requestDetails?.assignedTo ?? null,
-          consultTypeId: ConsultTypes.Internal,
+          consultAssignedTo: modal.confirmationData?.consultAssignedTo? modal.confirmationData?.consultAssignedTo : null,
+          consultAssigneeVal: modal.confirmationData?.consultAssigneeVal? modal.confirmationData?.consultAssigneeVal : null,
+          consultTypeId: modal.confirmationData?.consultTypeId? modal.confirmationData?.consultTypeId : ConsultTypes.Internal,
           programAreaId: ministry.programareaid,
           subjectCode: subjectCode ? subjectCode : null,
           dueDate: dueDate ?? null,
@@ -70,7 +75,6 @@ import { useEffect, useState } from "react";
                           draggable: true,
                           progress: undefined,
                         });
-                        console.log("res : ",res)
                         dispatch(fetchFOIRequestConsults(ministryId));
                       } else {
                         toast.error(
@@ -116,12 +120,6 @@ import { useEffect, useState } from "react";
         confirmationData: null,
       }));
     };
-  
-
-    // const handleMinistriesChange = (updatedList: any[]) => {
-    // setSelectedMinistriesState(updatedList);
-    // handleUpdatedMasterProgramAreaList(updatedList); 
-    // };
 
     return (
       <div className="consult-confirmation-dialog">
