@@ -450,7 +450,6 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
             {correspondence && correspondence.attachments?.map((attachment, index) => (
             <div className="email-attachment-item" key={attachment.applicantcorrespondenceattachmentid + attachment.filename}>
               <a href={`/foidocument?id=${ministryId}&filepath=${attachment.documenturipath.split('/').slice(4).join('/')}`} target="_blank">{attachment.filename}</a>
-              {/* Uncomment below to rename individual attachements - backend still needs work */}
               <IconButton
                 aria-label= "actions"
                 id={`ellipse-icon-${currentIndex}`}
