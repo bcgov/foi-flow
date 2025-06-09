@@ -79,12 +79,14 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
         return correspondence_schema.dump(query)
 
     @classmethod
-    def saveapplicantcorrespondence(cls, newapplicantcorrepondencelog, attachments, emails, ccemails)->DefaultMethodResult: 
+    def saveapplicantcorrespondence(cls, newapplicantcorrepondencelog, attachments, emails = None, ccemails = None)->DefaultMethodResult: 
         try:
             db.session.add(newapplicantcorrepondencelog)
             db.session.commit()
+
+            # Save new attachments
+            correspondenceattachments = []
             if(attachments is not None and len(attachments) > 0):
-                correpondenceattachments = []
                 for _attachment in attachments:
                     attachment = FOIApplicantCorrespondenceAttachmentRawRequest()
                     attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
@@ -93,8 +95,20 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
                     attachment.attachmentfilename = _attachment['filename']
                     attachment.createdby = newapplicantcorrepondencelog.createdby
                     attachment.version = 1
-                    correpondenceattachments.append(attachment)
-                FOIApplicantCorrespondenceAttachmentRawRequest().saveapplicantcorrespondenceattachments(newapplicantcorrepondencelog.foirawrequest_id , correpondenceattachments)
+                    correspondenceattachments.append(attachment)
+
+            # Update existing attachments
+            existingattachments = FOIApplicantCorrespondenceAttachmentRawRequest().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(newapplicantcorrepondencelog.applicantcorrespondenceid)
+            for _existingattachment in existingattachments:
+                attachment = FOIApplicantCorrespondenceAttachmentRawRequest()
+                attachment.__dict__.update(_existingattachment)
+                attachment.version = _existingattachment['version'] + 1
+                attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
+                attachment.applicantcorrespondence_version = newapplicantcorrepondencelog.version
+                correspondenceattachments.append(attachment)
+            if (len(correspondenceattachments) > 0):
+                FOIApplicantCorrespondenceAttachmentRawRequest().saveapplicantcorrespondenceattachments(newapplicantcorrepondencelog.foirawrequest_id , correspondenceattachments)
+
             correspondenceemails = []
             if(emails is not None and len(emails) > 0):
                 for _email in emails:
@@ -123,8 +137,6 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
             return DefaultMethodResult(False,'applicantcorrepondence log exception while adding attachments',newapplicantcorrepondencelog.applicantcorrespondenceid)
         finally:
             db.session.close()
-            
-
 
     @classmethod
     def deleteapplicantcorrespondence(cls, rawrequestid, correspondenceid,userid)->DefaultMethodResult: 
@@ -153,6 +165,8 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
 #         else:
 #             return DefaultMethodResult(False,'Applicant correspondence not exists',-1)        
 
+    def __getemailsincorrespondence(cls, emails, correspondenceid, correspondenceversion):
+        return [x for x in emails if x['applicantcorrespondence_id'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion]
 class FOIApplicantCorrespondenceRawRequestSchema(ma.Schema):
     class Meta:
         fields = ('applicantcorrespondenceid', 'version', 'parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foirawrequest_id','foirawrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby', 'isdraft', 'isdeleted', 'isresponse', 'response_at', 'israwrequest', 'templatename', 'templatetype')

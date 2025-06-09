@@ -104,6 +104,7 @@
   color: white;
   margin: 10px 15px;
   padding: 5px 10px;
+  display: flex;
   i {
     float: right;
     font-size: 20px;
@@ -116,10 +117,17 @@
   a {
     color: white;
     text-decoration: underline;
+    margin-top: auto;
+    margin-bottom: auto;
   }
   a:hover{
     color: inherit;
-}
+  }
+  .attachment-actions {
+    max-height: 20px;
+    color: white;
+    margin-left: auto;
+  }
 }
 
 .preview-container {

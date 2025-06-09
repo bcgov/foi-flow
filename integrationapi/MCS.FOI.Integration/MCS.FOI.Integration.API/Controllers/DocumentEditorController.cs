@@ -156,31 +156,33 @@
         //    return sfdtText;
         //}
 
-        //[AcceptVerbs("Post")]
-        //[HttpPost]
-        //[Route("SystemClipboard")]
-        //public string SystemClipboard([FromBody] CustomParameter param)
-        //{
-        //    if (param.content != null && param.content != "")
-        //    {
-        //        try
-        //        {
-        //            //Hooks MetafileImageParsed event.
-        //            WordDocument.MetafileImageParsed += DocumentEditorHelper.OnMetafileImageParsed;
-        //            WordDocument document = WordDocument.LoadString(param.content, DocumentEditorHelper.GetFormatType(param.type.ToLower()));
-        //            //Unhooks MetafileImageParsed event.
-        //            WordDocument.MetafileImageParsed -= DocumentEditorHelper.OnMetafileImageParsed;
-        //            string json = Newtonsoft.Json.JsonConvert.SerializeObject(document);
-        //            document.Dispose();
-        //            return json;
-        //        }
-        //        catch (Exception)
-        //        {
-        //            return "";
-        //        }
-        //    }
-        //    return "";
-        //}
+        [AcceptVerbs("Post")]
+        [HttpPost]
+        [EnableCors("AllowAllOrigins")]
+        [AllowAnonymous]
+        [Route("SystemClipboard")]
+        public string SystemClipboard([FromBody] CustomParameter param)
+        {
+           if (param.content != null && param.content != "")
+           {
+               try
+               {
+                   //Hooks MetafileImageParsed event.
+                   WordDocument.MetafileImageParsed += DocumentEditorHelper.OnMetafileImageParsed;
+                   WordDocument document = WordDocument.LoadString(param.content, DocumentEditorHelper.GetFormatType(param.type.ToLower()));
+                   //Unhooks MetafileImageParsed event.
+                   WordDocument.MetafileImageParsed -= DocumentEditorHelper.OnMetafileImageParsed;
+                   string json = Newtonsoft.Json.JsonConvert.SerializeObject(document);
+                   document.Dispose();
+                   return json;
+               }
+               catch (Exception)
+               {
+                   return "";
+               }
+           }
+           return "";
+        }
 
         //[AcceptVerbs("Post")]
         //[HttpPost]

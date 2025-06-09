@@ -28,7 +28,7 @@ import json
 from flask_cors import cross_origin
 import request_api
 from request_api.utils.cache import cache_filter, response_filter
-from request_api.schemas.foiapplicantcorrespondencelog import  FOIApplicantCorrespondenceLogSchema, FOIApplicantCorrespondenceEmailSchema, FOIApplicantCorrespondenceResponseSchema, FOIApplicantCorrespondenceEditResponseSchema 
+from request_api.schemas.foiapplicantcorrespondencelog import  FOIApplicantCorrespondenceLogSchema, FOIApplicantCorrespondenceLogUpdateSchema, FOIApplicantCorrespondenceEmailSchema, FOIApplicantCorrespondenceResponseSchema 
 from request_api.auth import auth, AuthHelper
 from request_api.services.requestservice import requestservice
 from request_api.services.cfrfeeservice import cfrfeeservice
@@ -105,6 +105,29 @@ class FOIFlowApplicantCorrespondence(Resource):
         except BusinessException:
             return "Error happened while saving applicant correspondence log", 500
 
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiflow/applicantcorrespondence/update/<requestid>/<ministryrequestid>')
+class FOIFlowApplicantCorrespondence(Resource):
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.hasusertype('iao')
+    def post(requestid, ministryrequestid): # This endpoint updates associated attachments and emails as well
+        try:
+            requestjson = request.get_json()
+            applicantcorrespondencelogupdate = FOIApplicantCorrespondenceLogUpdateSchema().load(data=requestjson)
+            if ministryrequestid == 'None':
+                rawrequestid = requestid
+            else:
+                rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
+            if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelogupdate and applicantcorrespondencelogupdate["israwrequest"]) is True:
+                result = applicantcorrespondenceservice().editapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelogupdate, AuthHelper.getuserid())
+            else:
+                result = applicantcorrespondenceservice().editapplicantcorrespondencelogforministry(ministryrequestid, applicantcorrespondencelogupdate, AuthHelper.getuserid())
+            return {'status': result.success, 'message': result.message, 'id': result.identifier}, 200
+        except BusinessException:
+            return "Error happened while saving applicant correspondence log", 500
 
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiflow/applicantcorrespondence/draft/<requestid>/<ministryrequestid>')
@@ -244,32 +267,6 @@ class FOIFlowApplicantCorrespondenceResponse(Resource):
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
             return "Error happened while saving  applicant correspondence log" , 500 
-        
-
-@cors_preflight('POST,OPTIONS')
-@API.route('/foiflow/applicantcorrespondence/response/edit/<ministryrequestid>/<rawrequestid>')
-class FOIFlowApplicantCorrespondenceEditResponse(Resource):
-
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    def post(ministryrequestid, rawrequestid):
-        try:
-            if ministryrequestid == 'None':
-                rawrequestidforrequest = rawrequestid
-            else:
-                rawrequestidforrequest = requestservice().getrawrequestidbyfoirequestid(rawrequestid)
-            requestjson = request.get_json()
-            correspondenceemail = FOIApplicantCorrespondenceEditResponseSchema().load(data=requestjson) 
-            if ministryrequestid == 'None' or 'israwrequest' in requestjson and requestjson['israwrequest'] == True:
-                result = applicantcorrespondenceservice().editapplicantcorrespondencelogforrawrequest(rawrequestidforrequest, correspondenceemail, AuthHelper.getuserid())
-            elif ministryrequestid != 'None' or 'israwrequest' in requestjson and requestjson['israwrequest'] == False:
-                result = applicantcorrespondenceservice().editapplicantcorrespondencelogforministry(ministryrequestid, correspondenceemail, AuthHelper.getuserid())
-            
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
-        except BusinessException:
-            return "Error happened while saving  applicant correspondence log" , 500
         
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiflow/applicantcorrespondence/response/delete/<ministryrequestid>/<rawrequestid>/<correspondenceid>')

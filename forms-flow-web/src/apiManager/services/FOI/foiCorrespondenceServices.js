@@ -275,10 +275,10 @@ export const saveCorrespondenceResponse = (
     });
 };
 
-export const editCorrespondenceResponse = (
+export const updateApplicantCorrespondence = (
   data,
   ministryId,
-  rawRequestId,
+  requestId,
   dispatch,
   callback,
   errorCallback,
@@ -288,10 +288,10 @@ export const editCorrespondenceResponse = (
   }
   dispatch(setFOICorrespondenceLoader(true));
   const apiUrl = replaceUrl(replaceUrl(
-    API.FOI_EDIT_RESPONSE_EMAIL_CORRESPONDENCE,
+    API.FOI_UPDATE_APPLICANT_CORRESPONDENCE,
     "<ministryrequestid>",
     ministryId), 
-    "<rawrequestid>", rawRequestId
+    "<requestid>", requestId
   );
   httpPOSTRequest(apiUrl, data)
     .then((res) => {
@@ -305,10 +305,10 @@ export const editCorrespondenceResponse = (
       }
     })
     .catch((error) => {
-      console.log("An error occured while trying to save response from applicant", error);
+      console.log("An error occured while trying to update the correspondence", error);
       catchError(error, dispatch);
       if (errorCallback) {
-        errorCallback("An error occured while trying to save response from applicant");
+        errorCallback("An error occured while trying to update the correspondence");
       }
     });
 };

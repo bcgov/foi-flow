@@ -442,7 +442,7 @@ export default function AttachmentModal({
         if (isMCFMSDPersonal && !isMinistryCoordinator) {
           return { title: "Add Scanned Records", body: "" };
         } else if (uploadFor === "response") {
-          return { title: "Add Response", body: "" };
+          return { title: "Add Correspondence", body: "" };
         } else {
           return { title: "Add Attachment", body: "" };
         }
@@ -610,7 +610,7 @@ export default function AttachmentModal({
       return false;
     } else if (files.length === 0 && existingDocuments?.length === 0) {
       return true;
-    } else if (uploadFor === "response" && (files.length > 1 ||  existingDocuments?.length > 1)) {
+    } else if (uploadFor === "response" && (files.length > maxNoFiles ||  existingDocuments?.length > maxNoFiles)) {
       return true;
     } else if (modalFor === "add") {
       if(requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && bcgovcode == "MCF") {

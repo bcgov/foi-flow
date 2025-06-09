@@ -2,7 +2,8 @@ from sqlalchemy.sql.schema import ForeignKeyConstraint
 from .db import  db, ma
 from datetime import datetime
 from .default_method_result import DefaultMethodResult
-from sqlalchemy import text
+from sqlalchemy import text, and_, func
+from sqlalchemy.orm import aliased
 import logging
 
 class FOIApplicantCorrespondenceAttachmentRawRequest(db.Model):
@@ -50,7 +51,30 @@ class FOIApplicantCorrespondenceAttachmentRawRequest(db.Model):
     @classmethod
     def getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(cls,applicantcorrespondenceid):
         correspondenceattachment_schema = FOIApplicantCorrespondenceAttachmentRawRequestSchema(many=True)
-        query = db.session.query(FOIApplicantCorrespondenceAttachmentRawRequest).filter(FOIApplicantCorrespondenceAttachmentRawRequest.applicantcorrespondenceid == applicantcorrespondenceid).order_by(FOIApplicantCorrespondenceAttachmentRawRequest.applicantcorrespondenceattachmentid.asc()).all()
+
+        # Subquery: Get max version for each applicantcorrespondenceattachmentid
+        subquery = db.session.query(
+            FOIApplicantCorrespondenceAttachmentRawRequest.applicantcorrespondenceattachmentid,
+            func.max(FOIApplicantCorrespondenceAttachmentRawRequest.version).label("max_version")
+        ).filter(
+            FOIApplicantCorrespondenceAttachmentRawRequest.applicantcorrespondenceid == applicantcorrespondenceid
+        ).group_by(
+            FOIApplicantCorrespondenceAttachmentRawRequest.applicantcorrespondenceattachmentid
+        ).subquery()
+
+        alias = aliased(FOIApplicantCorrespondenceAttachmentRawRequest)
+
+        # Join with subquery to get only latest version of each attachment
+        query = db.session.query(alias).join(
+            subquery,
+            and_(
+                alias.applicantcorrespondenceattachmentid == subquery.c.applicantcorrespondenceattachmentid,
+                alias.version == subquery.c.max_version
+            )
+        ).filter(
+            alias.applicantcorrespondenceid == applicantcorrespondenceid
+        ).order_by(alias.applicantcorrespondenceattachmentid.asc()).all()
+
         return correspondenceattachment_schema.dump(query)
     
     @classmethod

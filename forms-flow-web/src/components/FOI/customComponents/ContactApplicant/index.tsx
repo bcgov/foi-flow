@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import type { Template } from './types';
 import { fetchApplicantCorrespondence, saveEmailCorrespondence, saveDraftCorrespondence, 
   editDraftCorrespondence, deleteDraftCorrespondence, deleteResponseCorrespondence, saveCorrespondenceResponse, 
-  editCorrespondenceResponse, fetchEmailTemplate, exportSFDT, exportPDF} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+  fetchEmailTemplate, exportSFDT, exportPDF, updateApplicantCorrespondence} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
@@ -75,11 +75,22 @@ export const ContactApplicant = ({
   const [exportPdfTrigger, setExportPdfTrigger] = useState(false);
   const [attachAsPdfFilename, setAttachAsPdfFilename] = useState(requestNumber || "");
 
+  useEffect(() => {
+    setEmailSubject(selectedCorrespondence?.emailsubject)
+  }, [selectedCorrespondence])
+
   const showAttachAsPdfModal = () => {
     setOpenConfirmationModal(true);
     setConfirmationFor("attach-as-pdf")
     setConfirmationTitle("Warning: Attaching as PDF file")
     setConfirmationMessage("The current content will no longer be available for editing after attaching it as a PDF file. If you may still need to make edits, please save a draft first.");
+  }
+
+  const showRenameEmailSubjectModal = () => {
+    setOpenConfirmationModal(true);
+    setConfirmationFor("rename-email-subject")
+    setConfirmationTitle("Rename Email Subject")
+    setConfirmationMessage("This will appear as the subject in the correspondence log and also the email subject for any sent emails.")
   }
 
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
@@ -384,7 +395,48 @@ export const ContactApplicant = ({
     } else if (confirmationFor === "select-template") {
       selectTemplateFromDropdown(null, selectedTemplate);
       // setSelectedTemplate(null);
+    } else if (confirmationFor === "rename-email-subject") {
+      updateCorrespondence({ emailsubject: emailSubject })
     }
+  }
+
+  const updateCorrespondence = (attributes: any) => {
+    const data = {
+      ...attributes,
+      correspondenceid: selectedCorrespondence.applicantcorrespondenceid,
+      israwrequest: selectedCorrespondence.israwrequest
+    }
+
+    const callback = (data: any) => {
+      clearcorrespondence(); 
+      dispatch(setFOICorrespondenceLoader(false));
+      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+      toast.success("Email subject has been renamed successfully", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
+    }
+
+    const errorCallback = (message: string) => {
+      clearcorrespondence(); 
+      dispatch(setFOICorrespondenceLoader(false));
+      toast.error(message, {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
+    }
+    setOpenConfirmationModal(false);
+    updateApplicantCorrespondence(data, ministryId, requestId, dispatch, callback, errorCallback)
   }
 
   const formHistory: Array<any> = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
@@ -662,6 +714,9 @@ export const ContactApplicant = ({
  }
 
   const saveAttachments = async (attachmentfiles: any) => {
+    attachmentfiles = attachmentfiles.filter((file: any) => {
+      return file instanceof File}
+    )
     const fileInfoList = attachmentfiles?.map((file: any) => {
       return {
         ministrycode: ministryCode,
@@ -1148,11 +1203,11 @@ export const ContactApplicant = ({
 
   const handleRename = (_attachment: any, newFilename: string) => {
     setModal(false);
-    let correspondenceAttachmentId = selectedCorrespondence.attachments[0].applicantcorrespondenceattachmentid;
+    let correspondenceAttachmentId = _attachment.applicantcorrespondenceattachmentid;
     let correspondenceId = selectedCorrespondence.applicantcorrespondenceid;
 
     if (updateAttachment.filename !== newFilename) {
-      editCorrespondenceResponse(
+      updateApplicantCorrespondence(
         { filename: newFilename, correspondenceattachmentid: correspondenceAttachmentId, correspondenceid: correspondenceId, israwrequest: selectedCorrespondence.israwrequest }, 
         ministryId, 
         requestId, 
@@ -1179,7 +1234,7 @@ export const ContactApplicant = ({
 
   const handleChangeResponseDate = (newDate: string) => {
     setModal(false);
-    editCorrespondenceResponse(
+    updateApplicantCorrespondence(
       {responsedate: newDate, correspondenceid: selectedCorrespondence.applicantcorrespondenceid, israwrequest: selectedCorrespondence.israwrequest}, 
       ministryId, 
       requestId, 
@@ -1247,6 +1302,7 @@ export const ContactApplicant = ({
         setUpdateAttachment={setUpdateAttachment}
         applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
         templateVariableInfo={{requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData}}
+        showRenameEmailSubjectModal={showRenameEmailSubjectModal}
       />
     </div>
   ))
@@ -1496,7 +1552,6 @@ export const ContactApplicant = ({
               size="small"
               fullWidth
             >
-              {emailSubject}
             </TextField>
           </Grid>
           <Grid xs={6}
@@ -1612,7 +1667,7 @@ export const ContactApplicant = ({
             <div className="email-attachment-item" key={file.filename}>
               {fileComponent}
               <i
-                className="fa fa-times-circle"
+                className="fa fa-times-circle attachment-actions"
                 onClick={() => removeFile(index)}
               >
               </i>
@@ -1705,7 +1760,7 @@ export const ContactApplicant = ({
       handleChangeResponseDate={handleChangeResponseDate}
       isMinistryCoordinator={false}
       uploadFor={uploadFor}
-      maxNoFiles={uploadFor === "response" ? 1 : 10}
+      maxNoFiles={uploadFor === "response" ? 10 : 10}
       bcgovcode={undefined}
       currentResponseDate={currentResponseDate}
     /> 
@@ -1749,6 +1804,24 @@ export const ContactApplicant = ({
                 />
               </div>
               <div className="col-sm-1 extension-name">.pdf</div>
+            <div className="col-sm-1"></div>
+          </div>}
+          {confirmationFor === "rename-email-subject" && <div className="row">
+            <div className="col-sm-1"></div>
+              <div className="col-sm-9">
+                <TextField
+                  id="renameemailsubject"
+                  label="Rename Email Subject"
+                  required={true}
+                  inputProps={{ "aria-labelledby": "renameemailsubject-label" }}
+                  InputLabelProps={{ shrink: true }}
+                  variant="outlined"
+                  fullWidth
+                  value={emailSubject}
+                  onChange={(e) => {setEmailSubject(e.target.value)}}
+                  error={emailSubject === ""}
+                />
+              </div>
             <div className="col-sm-1"></div>
           </div>}
         </DialogContent>
