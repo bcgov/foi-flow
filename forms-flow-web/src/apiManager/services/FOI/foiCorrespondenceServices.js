@@ -275,44 +275,6 @@ export const saveCorrespondenceResponse = (
     });
 };
 
-export const editCorrespondenceResponse = (
-  data,
-  ministryId,
-  rawRequestId,
-  dispatch,
-  callback,
-  errorCallback,
-) => {
-  if (!ministryId) {
-    ministryId = 'None';
-  }
-  dispatch(setFOICorrespondenceLoader(true));
-  const apiUrl = replaceUrl(replaceUrl(
-    API.FOI_EDIT_RESPONSE_EMAIL_CORRESPONDENCE,
-    "<ministryrequestid>",
-    ministryId), 
-    "<rawrequestid>", rawRequestId
-  );
-  httpPOSTRequest(apiUrl, data)
-    .then((res) => {
-      if (res.data) {
-        if (callback) {
-          callback(res.data);
-        }
-      } else {
-        dispatch(serviceActionError(res));
-        throw new Error();
-      }
-    })
-    .catch((error) => {
-      console.log("An error occured while trying to save response from applicant", error);
-      catchError(error, dispatch);
-      if (errorCallback) {
-        errorCallback("An error occured while trying to save response from applicant");
-      }
-    });
-};
-
 export const updateApplicantCorrespondence = (
   data,
   ministryId,

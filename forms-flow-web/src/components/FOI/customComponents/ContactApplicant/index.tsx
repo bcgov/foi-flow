@@ -9,8 +9,7 @@ import { toast } from "react-toastify";
 import type { Template } from './types';
 import { fetchApplicantCorrespondence, saveEmailCorrespondence, saveDraftCorrespondence, 
   editDraftCorrespondence, deleteDraftCorrespondence, deleteResponseCorrespondence, saveCorrespondenceResponse, 
-  editCorrespondenceResponse, fetchEmailTemplate, exportSFDT, exportPDF,
-  updateApplicantCorrespondence} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+  fetchEmailTemplate, exportSFDT, exportPDF, updateApplicantCorrespondence} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
@@ -1201,11 +1200,11 @@ export const ContactApplicant = ({
 
   const handleRename = (_attachment: any, newFilename: string) => {
     setModal(false);
-    let correspondenceAttachmentId = selectedCorrespondence.attachments[0].applicantcorrespondenceattachmentid;
+    let correspondenceAttachmentId = _attachment.applicantcorrespondenceattachmentid;
     let correspondenceId = selectedCorrespondence.applicantcorrespondenceid;
 
     if (updateAttachment.filename !== newFilename) {
-      editCorrespondenceResponse(
+      updateApplicantCorrespondence(
         { filename: newFilename, correspondenceattachmentid: correspondenceAttachmentId, correspondenceid: correspondenceId, israwrequest: selectedCorrespondence.israwrequest }, 
         ministryId, 
         requestId, 
@@ -1232,7 +1231,7 @@ export const ContactApplicant = ({
 
   const handleChangeResponseDate = (newDate: string) => {
     setModal(false);
-    editCorrespondenceResponse(
+    updateApplicantCorrespondence(
       {responsedate: newDate, correspondenceid: selectedCorrespondence.applicantcorrespondenceid, israwrequest: selectedCorrespondence.israwrequest}, 
       ministryId, 
       requestId, 

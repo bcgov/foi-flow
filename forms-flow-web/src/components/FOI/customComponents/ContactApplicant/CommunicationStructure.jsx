@@ -451,7 +451,7 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
             <div className="email-attachment-item" key={attachment.applicantcorrespondenceattachmentid + attachment.filename}>
               <a href={`/foidocument?id=${ministryId}&filepath=${attachment.documenturipath.split('/').slice(4).join('/')}`} target="_blank">{attachment.filename}</a>
               {/* Uncomment below to rename individual attachements - backend still needs work */}
-              {/* <IconButton
+              <IconButton
                 aria-label= "actions"
                 id={`ellipse-icon-${currentIndex}`}
                 key={`ellipse-icon-${currentIndex}`}
@@ -467,7 +467,7 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
                 }}
               >
                 <MoreHorizIcon />
-              </IconButton> */}
+              </IconButton>
             </div>
             ))}
           </AccordionDetails>
