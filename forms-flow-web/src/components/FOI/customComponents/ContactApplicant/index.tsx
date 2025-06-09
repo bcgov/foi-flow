@@ -714,6 +714,9 @@ export const ContactApplicant = ({
  }
 
   const saveAttachments = async (attachmentfiles: any) => {
+    attachmentfiles = attachmentfiles.filter((file: any) => {
+      return file instanceof File}
+    )
     const fileInfoList = attachmentfiles?.map((file: any) => {
       return {
         ministrycode: ministryCode,
