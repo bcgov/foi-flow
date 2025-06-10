@@ -33,6 +33,10 @@ class recordservice(recordservicebase):
     pagecalculatorstreamkey = getenv('EVENT_QUEUE_PAGECALCULATOR_STREAM_KEY')
     compressionstreamkey = getenv('EVENT_QUEUE_COMPRESSION_STREAMKEY')
     ocrstreamkey = getenv('EVENT_QUEUE_OCR_STREAMKEY')
+    largefilecompressionstreamkey = getenv('EVENT_QUEUE_COMPRESSION_LARGE_FILE_STREAMKEY')
+    largefileocrstreamkey = getenv('EVENT_QUEUE_OCR_LARGE_FILE_STREAMKEY')
+    compressionlargefilesizelimit=getenv('COMPRESSION_STREAM_SEPARATION_FILE_SIZE_LIMIT',104857600)
+    ocrlargefilesizelimit= getenv('OCR_STREAM_SEPARATION_FILE_SIZE_LIMIT',104857600)
     
     s3host = getenv('OSS_S3_HOST')
 
@@ -119,22 +123,37 @@ class recordservice(recordservicebase):
                 if extension not in DEDUPE_FILE_TYPES:
                     return DefaultMethodResult(False,'Dedupe only accepts the following formats: ' + ', '.join(DEDUPE_FILE_TYPES), -1, record['recordid'])
                 else:
-                    streamkey = self.dedupestreamkey
+                    if ('convertedfilesize' in record['attributes'] and record['attributes']['convertedfilesize'] < int(self.dedupelargefilesizelimit) or 
+                        'convertedfilesize' not in record['attributes'] and record['attributes']['filesize'] < int(self.dedupelargefilesizelimit)):
+                        streamkey= self.dedupestreamkey
+                    else:
+                        streamkey= self.largefilededupestreamkey
             elif record['service'] == 'conversion':
                 if extension not in FILE_CONVERSION_FILE_TYPES:
                     return DefaultMethodResult(False,'File Conversion only accepts the following formats: ' + ', '.join(FILE_CONVERSION_FILE_TYPES), -1, record['recordid'])
                 else:
-                    streamkey = self.conversionstreamkey
+                    if record['attributes']['filesize'] < int(self.conversionlargefilesizelimit):
+                        streamkey =self.conversionstreamkey
+                    else:
+                        streamkey =self.largefileconversionstreamkey
             elif record['service'] == 'compression':
                 if extension not in (".pdf", ".jpg", ".jpeg"):
                     return DefaultMethodResult(False,'File Conversion only accepts the following formats: ' + ', '.join(FILE_CONVERSION_FILE_TYPES), -1, record['recordid'])
                 else:
-                    streamkey = self.compressionstreamkey
+                    if ('convertedfilesize' in record['attributes'] and record['attributes']['convertedfilesize'] < int(self.compressionlargefilesizelimit) or 
+                        'convertedfilesize' not in record['attributes'] and record['attributes']['filesize'] < int(self.compressionlargefilesizelimit)):
+                        streamkey= self.compressionstreamkey
+                    else:
+                        streamkey= self.largefilecompressionstreamkey
             elif record['service'] == 'ocr':
                 if extension != ".pdf":
                     return DefaultMethodResult(False,'File Conversion only accepts the following formats: ' + ', '.join(FILE_CONVERSION_FILE_TYPES), -1, record['recordid'])
                 else:
-                    streamkey = self.ocrstreamkey
+                    if ('compressedfilesize' in record['attributes'] and record['attributes']['compressedfilesize'] < int(self.ocrlargefilesizelimit) or 
+                        'compressedfilesize' not in record['attributes'] and record['attributes']['filesize'] < int(self.ocrlargefilesizelimit)):
+                        streamkey = self.ocrstreamkey
+                    else:
+                        streamkey= self.largefileocrstreamkey
             else:
                 streamkey = self.dedupestreamkey if extension in DEDUPE_FILE_TYPES else self.conversionstreamkey
             jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
