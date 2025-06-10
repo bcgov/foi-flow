@@ -7,4 +7,6 @@ import './styles.scss';
 const store = StoreService.configureStore();
 const history = StoreService.history;
 
+console.log("hello, world!);
+
 ReactDOM.render(<App {...{ store, history }} />, document.getElementById("app"));
