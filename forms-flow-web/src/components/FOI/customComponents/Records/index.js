@@ -3607,7 +3607,7 @@ const Attachment = React.memo(
               <span>Deduplication & file conversion in progress</span>
             ): !record.iscompressed ? (
               <span>Compression in progress</span>
-            ) : record.needs_ocr && (
+            ) : (
               <span>OCR in progress</span>
             )}
             <AttachmentPopup

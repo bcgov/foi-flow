@@ -92,7 +92,7 @@ class recordservicegetter(recordservicebase):
             _record["isdedupecomplete"]= self.__getisdedupecomplete(_computingresponse)
             #_record["isocrcompleted"] = self.__getisocrcompleted(_computingresponse)
             _record["selectedfileprocessversion"] = _computingresponse["selectedfileprocessversion"]
-            _record["needs_ocr"] = _computingresponse["needs_ocr"]
+            #_record["needs_ocr"] = _computingresponse["needs_ocr"]
             _computingresponse_err = self.__getcomputingerror(_computingresponse)
             if _computingresponse_err is not None:
                 _record["failed"] = _computingresponse_err
