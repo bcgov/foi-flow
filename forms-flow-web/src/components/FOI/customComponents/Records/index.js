@@ -356,9 +356,10 @@ export const RecordsLog = ({
 
   const isDisableRedactRecords = (allRecords) => {
     return allRecords.some(record =>
-      record.failed ||!record.isredactionready ||
-      (!record.iscompressed &&
-        (record.selectedfileprocessversion !== 1 || !record.selectedfileprocessversion))
+      record.failed ||!record.isredactionready||(!record.attributes.incompatible && 
+        !record.selectedfileprocessversion && !record.ocrfilepath)
+      // || (!record.attributes.incompatible && !record.iscompressed &&
+      //   (record.selectedfileprocessversion !== 1 || !record.selectedfileprocessversion))
         
     );
   };
