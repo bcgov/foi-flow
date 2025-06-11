@@ -76,7 +76,7 @@ export const ContactApplicant = ({
   const [attachAsPdfFilename, setAttachAsPdfFilename] = useState(requestNumber || "");
 
   useEffect(() => {
-    setEmailSubject(selectedCorrespondence?.emailsubject)
+    if (selectedCorrespondence?.emailsubject) setEmailSubject(selectedCorrespondence?.emailsubject)
   }, [selectedCorrespondence])
 
   const showAttachAsPdfModal = () => {
@@ -1302,6 +1302,7 @@ export const ContactApplicant = ({
         setUpdateAttachment={setUpdateAttachment}
         applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
         templateVariableInfo={{requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData}}
+        emailSubject={emailSubject}
         showRenameEmailSubjectModal={showRenameEmailSubjectModal}
       />
     </div>
