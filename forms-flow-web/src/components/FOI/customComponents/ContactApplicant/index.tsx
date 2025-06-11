@@ -1146,7 +1146,6 @@ export const ContactApplicant = ({
       }
     }
     const newAttachments = await saveAttachments(filesToUpload);
-    const attachments = [...existingAttachments, ...newAttachments]
     let callback = (_res: string) => {
       clearcorrespondence();
       changeCorrespondenceFilter("drafts");
@@ -1175,7 +1174,7 @@ export const ContactApplicant = ({
         "emaildraft": sfdtString
       }),
       foiministryrequest_id: ministryId,
-      attachments: attachments,
+      attachments: newAttachments,
       emails: selectedEmails,
       ccemails: selectedCCEmails,
       israwrequest: israwrequest,
@@ -1197,7 +1196,7 @@ export const ContactApplicant = ({
     );
     setFOICorrespondenceLoader(false);
     setDisablePreview(false);
-    return attachments;
+    return [...existingAttachments, ...newAttachments];
   };
   const [updateAttachment, setUpdateAttachment] = useState<any>({});
 
