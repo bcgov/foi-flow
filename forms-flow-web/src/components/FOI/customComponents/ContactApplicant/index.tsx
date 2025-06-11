@@ -58,7 +58,7 @@ export const ContactApplicant = ({
   const [curTemplate, setCurTemplate] = useState<string>('');
   const [curTemplateName, setCurTemplateName] = useState<string>('');
   const [selectedCorrespondence, setSelectedCorrespondence] = useState <any> ({});
-  const [emailSubject, setEmailSubject] = useState<string>(`Your FOI Request [${requestNumber || requestId}]`);
+  const [emailSubject, setEmailSubject] = useState<string>(`Your FOI Request ${requestNumber || requestId}`);
 
   const dispatch = useDispatch();
   const templateList: any = useSelector((state: any) => state.foiRequests.foiEmailTemplates);
@@ -370,7 +370,7 @@ export const ContactApplicant = ({
     setSelectedEmails([]);
     setSelectedCCEmails([])
     setCurrentTemplate(0);
-    setEmailSubject(`Your FOI Request [${requestNumber || requestId}]`);
+    setEmailSubject(`Your FOI Request ${requestNumber || requestId}`);
   }
 
   const handleConfirmationClose = () => {     
@@ -888,7 +888,7 @@ export const ContactApplicant = ({
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondenceid:correspondenceId,
       correspondencemessagejson: JSON.stringify({
-        "emailhtml": "<div>Email exported as attachment</div>",
+        "emailhtml": "<div></div>",
         "emailsubject": emailSubject,
         "id": approvedForm?.cfrfeeid,
         "type": type
@@ -1632,7 +1632,7 @@ export const ContactApplicant = ({
                 setPreviewTrigger = {setPreviewTrigger}
                 addAttachment={openAttachmentModal}
                 savepdf = {savePdf}
-                emailSubject={emailSubject || `Your FOI Request [${requestNumber || requestId}]`}
+                emailSubject={emailSubject || `Your FOI Request ${requestNumber || requestId}`}
                 attachpdf = {attachPdf}
                 attachPdfTrigger={attachPdfTrigger}
                 setAttachPdfTrigger={setAttachPdfTrigger}
