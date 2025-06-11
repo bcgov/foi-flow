@@ -49,6 +49,7 @@ const CommunicationStructure = ({
   setCurrentResponseDate, 
   applicantCorrespondenceTemplates, 
   templateVariableInfo,
+  emailSubject,
   showRenameEmailSubjectModal
 }) => {
 
@@ -276,7 +277,7 @@ const CommunicationStructure = ({
     }
     const headerDiv = document.createElement("div");
 
-    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText() || 'Email to: None selected'}\n ${getFullCCEmailListText() || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`;
+    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText() || 'Email to: None selected'}\n ${getFullCCEmailListText() || 'CC to: None selected'}\nEmail Subject: ${emailSubject}\nSent: ${correspondence?.date}\n`;
     headerDiv.style.fontSize = "12px";
     headerDiv.style.fontFamily = "BCSans"
     headerDiv.style.marginBottom = "20px";
@@ -296,13 +297,13 @@ const CommunicationStructure = ({
         if (variable.name == "{{secondaryAddress}}") secondaryAddress = variable.value
         if (variable.name == "{{postal}}") postal = variable.value
       })
-      let addressStartIndex = element.indexOf(address)
+      let addressStartIndex = element.indexOf(address) // -1 if undefined
       let secondaryAddressStartIndex = element.indexOf(secondaryAddress)
       let postalStartIndex = element.indexOf(postal)
       let endIndex;
-      if (postalStartIndex != -1) endIndex = postalStartIndex + postal.length // if postal code exists, it is end of address string
-      if (secondaryAddressStartIndex != -1) endIndex = secondaryAddressStartIndex + secondaryAddress.length // if secondary address
-      if (postalStartIndex == -1 && secondaryAddressStartIndex == -1) endIndex = addressStartIndex + address.length // if only primary
+      if (postalStartIndex != -1 && postal) endIndex = postalStartIndex + postal.length // if postal code exists, it is end of address string
+      if (secondaryAddressStartIndex != -1 && secondaryAddress) endIndex = secondaryAddressStartIndex + secondaryAddress.length // if secondary address
+      if (postalStartIndex == -1 && secondaryAddressStartIndex == -1 && addressStartIndex != -1 && address) endIndex = addressStartIndex + address.length // if only primary
       // slice must be done first so indexes don't change
       if (addressStartIndex && addressStartIndex != -1 && endIndex && endIndex != -1) {
         element = element.slice(0, addressStartIndex) + 'ADDRESS REDACTED' + element.slice(endIndex)
@@ -323,7 +324,7 @@ const CommunicationStructure = ({
     if (correspondence?.emailsubject) return correspondence.emailsubject
     if (!correspondence?.sentby && correspondence?.templatename) return templateList.find((obj)=> obj.fileName == correspondence.templatename)?.templateName
     if (correspondence.category === "response") return "Applicant Response"
-    return `Your FOI Request [${requestNumber}]`
+    return `Your FOI Request ${requestNumber}`
     // if(correspondence.templatename) {
     //   return correspondence.templatename;
     // } else {
