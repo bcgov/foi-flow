@@ -107,4 +107,4 @@ jobs:
       - name: Watch new rollout (trigger by image change in Openshift)
         shell: bash
         run: |
-          oc rollout status dc/${{ env.APP_NAME }} -n ${{ env.TOOLS_NAME }}-${{ env.ENV_NAME }} -w
+          oc rollout status dc/forms-flow-web-002 -n ${{ env.TOOLS_NAME }}-${{ env.ENV_NAME }} -w
