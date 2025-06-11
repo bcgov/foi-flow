@@ -113,22 +113,33 @@ const CommunicationStructure = ({
         <MenuItem
           onClick={(e) => {
             e.stopPropagation();
-            setModalFor("downloadcorrespondence")
-            setDownloadCorrespondenceModalOpen(true);
-            setPopoverOpen(false);
-          }}
-        >
-          Download
-        </MenuItem>
-        <MenuItem
-          onClick={(e) => {
-            e.stopPropagation();
             setSelectedCorrespondence(correspondence);
             showRenameEmailSubjectModal();
             setPopoverOpen(false);
           }}
         >
           Rename Subject
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            setModalFor("changeresponsedate");
+            setCurrentResponseDate(correspondence.date);
+            setModal(true);
+            setSelectedCorrespondence(correspondence);
+            setPopoverOpen(false);
+          }}
+        >
+          Change Date
+        </MenuItem>
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            setModalFor("downloadcorrespondence")
+            setDownloadCorrespondenceModalOpen(true);
+            setPopoverOpen(false);
+          }}
+        >
+          Download
         </MenuItem>
       </>
     );
@@ -312,8 +323,9 @@ const CommunicationStructure = ({
       element = element.replaceAll(firstName, 'APPLICANT')
       element = element.replaceAll(lastName, 'APPLICANT')
     }
+    let emailFilename = emailSubject ? `${emailSubject}.pdf` : `Correspondence Letter - ${requestNumber}.pdf`
     html2pdf().set({margin: 20}).from(element).outputPdf('blob').then(async (blob) => {
-      blobs.push({name: `Correspondence Letter - ${requestNumber}.pdf`, lastModified: new Date(), input: blob})
+      blobs.push({name: emailFilename, lastModified: new Date(), input: blob})
       const zipfile = await downloadZip(blobs).blob()
       saveAs(zipfile, fullName + " " + correspondence.date.replace(/\|/g, "") + ".zip");
     });
@@ -321,6 +333,7 @@ const CommunicationStructure = ({
 
 
   const getTemplateName = (correspondence) => {
+    if (emailSubject) return emailSubject
     if (correspondence?.emailsubject) return correspondence.emailsubject
     if (!correspondence?.sentby && correspondence?.templatename) return templateList.find((obj)=> obj.fileName == correspondence.templatename)?.templateName
     if (correspondence.category === "response") return "Applicant Response"
