@@ -176,7 +176,7 @@ export const DocEditor = ({
             container.documentEditor.selection.moveNextPosition();
             container.documentEditor.editor.applyBorders({type: 'NoBorder'});
             container.documentEditor.editor.applyBorders({type: 'TopBorder'});
-            container.documentEditor.editor.insertText("Information Access Operations / Children and Family Access Services");
+            container.documentEditor.editor.insertText("FOI Operations / Children and Family Access Services");
             container.documentEditor.selection.moveNextPosition();
             container.documentEditor.editor.applyBorders({type: 'NoBorder'});
             container.documentEditor.editor.applyBorders({type: 'TopBorder'});
