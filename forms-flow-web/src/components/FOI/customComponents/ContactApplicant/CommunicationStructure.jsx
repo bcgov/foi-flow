@@ -113,22 +113,33 @@ const CommunicationStructure = ({
         <MenuItem
           onClick={(e) => {
             e.stopPropagation();
-            setModalFor("downloadcorrespondence")
-            setDownloadCorrespondenceModalOpen(true);
-            setPopoverOpen(false);
-          }}
-        >
-          Download
-        </MenuItem>
-        <MenuItem
-          onClick={(e) => {
-            e.stopPropagation();
             setSelectedCorrespondence(correspondence);
             showRenameEmailSubjectModal();
             setPopoverOpen(false);
           }}
         >
           Rename Subject
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            setModalFor("changeresponsedate");
+            setCurrentResponseDate(correspondence.date);
+            setModal(true);
+            setSelectedCorrespondence(correspondence);
+            setPopoverOpen(false);
+          }}
+        >
+          Change Date
+        </MenuItem>
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            setModalFor("downloadcorrespondence")
+            setDownloadCorrespondenceModalOpen(true);
+            setPopoverOpen(false);
+          }}
+        >
+          Download
         </MenuItem>
       </>
     );
@@ -277,7 +288,7 @@ const CommunicationStructure = ({
     }
     const headerDiv = document.createElement("div");
 
-    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText() || 'Email to: None selected'}\n ${getFullCCEmailListText() || 'CC to: None selected'}\nEmail Subject: ${emailSubject}\nSent: ${correspondence?.date}\n`;
+    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText() || 'Email to: None selected'}\n ${getFullCCEmailListText() || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`;
     headerDiv.style.fontSize = "12px";
     headerDiv.style.fontFamily = "BCSans"
     headerDiv.style.marginBottom = "20px";
@@ -312,8 +323,9 @@ const CommunicationStructure = ({
       element = element.replaceAll(firstName, 'APPLICANT')
       element = element.replaceAll(lastName, 'APPLICANT')
     }
+    let emailFilename = correspondence?.emailsubject ? `${correspondence?.emailsubject}.pdf` : `Correspondence Letter - ${requestNumber}.pdf`
     html2pdf().set({margin: 20}).from(element).outputPdf('blob').then(async (blob) => {
-      blobs.push({name: `Correspondence Letter - ${requestNumber}.pdf`, lastModified: new Date(), input: blob})
+      blobs.push({name: emailFilename, lastModified: new Date(), input: blob})
       const zipfile = await downloadZip(blobs).blob()
       saveAs(zipfile, fullName + " " + correspondence.date.replace(/\|/g, "") + ".zip");
     });
