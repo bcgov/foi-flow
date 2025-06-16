@@ -61,6 +61,9 @@ const CommunicationStructure = ({
   const [communicationUploadModalOpen, setCommunicationUploadModalOpen] = useState(false);
   const [downloadCorrespondenceModalOpen, setDownloadCorrespondenceModalOpen] = useState(false);
   const [anchorPosition, setAnchorPosition] = useState(null);
+  const [attachmentAnchorPosition, setAttachmentAnchorPosition] = useState(null);
+  const [attachmentPopoverOpen, setAttachmentPopoverOpen] = useState(false)
+  const [attachmentDownloadLink, setAttachmentDownloadLink] = useState('')
   const [deletePopoverOpen, setDeletePopoverOpen] = useState(false);
   const ref = useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close() : {};
@@ -235,6 +238,59 @@ const CommunicationStructure = ({
       </div>
     );
   };
+
+  const renderAttachmentMenuItems = () => (
+    <>
+      <MenuItem
+        onClick={(e) => {
+          e.stopPropagation();
+          setModalFor("rename");
+          setModal(true);
+          setSelectedCorrespondence(correspondence);
+          setPopoverOpen(false);
+        }}
+      >
+        Rename Attachment
+      </MenuItem>
+      <MenuItem
+        onClick={(e) => {
+          e.stopPropagation();
+          setPopoverOpen(false);
+        }}
+      >
+        <a style={{color: "black", textDecoration: "none"}} href={attachmentDownloadLink} target="_blank">
+          Download</a>
+      </MenuItem>
+    </>
+  )
+
+  const AttachmentActionsPopover = () => {
+    return (<Popover
+    anchorReference="anchorPosition"
+    anchorPosition={
+      attachmentAnchorPosition && {
+        top: attachmentAnchorPosition.top,
+        left: attachmentAnchorPosition.left,
+      }
+    }
+    open={attachmentPopoverOpen}
+    anchorOrigin={{
+      vertical: "top",
+      horizontal: "left",
+    }}
+    transformOrigin={{
+      vertical: "top",
+      horizontal: "left",
+    }}
+    onClose={() => setAttachmentPopoverOpen(false)}
+  >
+    {correspondence && (
+      <MenuList>
+        {renderAttachmentMenuItems()}
+      </MenuList>
+    )}
+  </Popover>)
+  }
 
   const handleDialogClose = () => {
     closeTooltip()
@@ -471,15 +527,18 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
                 className="attachment-actions"
                 onClick={(e) => {
                     e.stopPropagation();
+                    setAttachmentPopoverOpen(true)
                     setUpdateAttachment(correspondence.attachments[index]);
-                    setModalFor("rename");
-                    setModal(true);
                     setSelectedCorrespondence(correspondence);
-                    setPopoverOpen(false);
+                    setAttachmentDownloadLink(`/foidocument?id=${ministryId}&filepath=${attachment.documenturipath.split('/').slice(4).join('/')}`)
+                    setAttachmentAnchorPosition(
+                      e.currentTarget.getBoundingClientRect()
+                      );
                 }}
               >
                 <MoreHorizIcon />
               </IconButton>
+              <AttachmentActionsPopover />
             </div>
             ))}
           </AccordionDetails>
