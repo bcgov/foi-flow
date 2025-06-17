@@ -1232,6 +1232,8 @@ export const ContactApplicant = ({
   }
 
   const handleChangeResponseDate = (newDate: string) => {
+    const newDateObj = new Date(newDate)
+    newDate = newDateObj.toISOString();
     setModal(false);
     updateApplicantCorrespondence(
       {responsedate: newDate, correspondenceid: selectedCorrespondence.applicantcorrespondenceid, israwrequest: selectedCorrespondence.israwrequest}, 

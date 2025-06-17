@@ -460,7 +460,6 @@ if (correspondence?.emails?.length > 0) {
   emailText = correspondence.ccemails[0]
 }
 if (totalNumberOfEmails > 1) emailText = emailText + ` +${totalNumberOfEmails - 1}`
-const dateText = correspondence.date == correspondence.created_at ? correspondence.date.toUpperCase() : correspondence.date.split('|')[0].trim()
   return (
     <>
       <div className="communication-accordion" {...(correspondence ? {"data-communication-div-id":`${currentIndex}`} : {})}>
@@ -477,7 +476,7 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
                       <>
                       <div className="templateUser">{getTemplateName(correspondence)} - {fullName} </div> |  
                         {totalNumberOfEmails > 1 ? <><div className="templateUser"><Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{popoverEmailList}</span>} disableInteractive placement="top">{emailText}</Tooltip></div> |</>: totalNumberOfEmails == 1 ? <><div className="templateUser"> {emailText} </div>|</> : ''} 
-                        <div className="templateTime">{dateText.toUpperCase()} </div>  
+                        <div className="templateTime">{correspondence?.date?.toUpperCase()} </div>
                         <div className="templateTime">{correspondence.edited ? "Edited": ""} </div>
                       </>
                     )

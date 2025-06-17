@@ -147,7 +147,7 @@ class applicantcorrespondenceservice:
             updt_correspondence.sent_at = datetime.now()
             updt_correspondence.sentby = userid
         if 'responsedate' in data and data['responsedate'] is not None:
-            updt_correspondence.response_at = data['responsedate'] + ' ' + datetime.now().time().strftime("%H:%M:%S")
+            updt_correspondence.response_at = data['responsedate']
         if 'isdraft' in data and data['isdraft'] is not None:
             updt_correspondence.isdraft = data['isdraft']
         if 'correspondencemessagejson' in data and data['correspondencemessagejson'] is not None:
@@ -182,7 +182,7 @@ class applicantcorrespondenceservice:
             updt_correspondence.sent_at = datetime.now()
             updt_correspondence.sentby = userid
         if 'responsedate' in data and data['responsedate'] is not None:
-            updt_correspondence.response_at = data['responsedate'] + ' ' + datetime.now().time().strftime("%H:%M:%S")
+            updt_correspondence.response_at = data['responsedate']
         if 'isdraft' in data and data['isdraft'] is not None:
             updt_correspondence.isdraft = data['isdraft']
         if 'correspondencemessagejson' in data and data['correspondencemessagejson'] is not None:

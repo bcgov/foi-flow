@@ -920,7 +920,7 @@ const ModalForChangeResponseDate = ({
         <TextField
           id="changeresponsedate"
           label="Change Response Date"
-          type="date"
+          type="datetime-local"
           inputProps={{ "aria-labelledby": "changeResponseDate-label" }}
           InputLabelProps={{ shrink: true }}
           variant="outlined"
