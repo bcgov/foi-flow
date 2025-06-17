@@ -356,8 +356,8 @@ export const RecordsLog = ({
 
   const isDisableRedactRecords = (allRecords) => {
     return allRecords.some(record =>
-      record.failed ||!record.isredactionready||(!record.attributes.incompatible && 
-        !record.selectedfileprocessversion && !record.ocrfilepath)
+      !record.isredactionready && !record.attributes.incompatible && 
+        !record.selectedfileprocessversion && !record.ocrfilepath
       // || (!record.attributes.incompatible && !record.iscompressed &&
       //   (record.selectedfileprocessversion !== 1 || !record.selectedfileprocessversion))
         
@@ -1879,10 +1879,10 @@ export const RecordsLog = ({
       if (selectedRecords?.length <=0)
         return true
       for (let record of selectedRecords) {
-        if (record.selectedfileprocessversion) return true;
+        if (record.selectedfileprocessversion || record.attributes?.incompatible) return true;
         if (record.attachments) {
           for (let attachment of record.attachments) {
-            if (record.selectedfileprocessversion) return true;
+            if (record.selectedfileprocessversion || record.attributes?.incompatible) return true;
           }
         }
       }
@@ -3562,9 +3562,10 @@ const Attachment = React.memo(
             </span> */}
             <span className={classes.fileSize}>
             {(
-              (record?.iscompressed
-                ? record?.attributes?.compressedfilesize || 0
-                : record?.attributes?.filesize || 0) / 1024
+              (
+                record?.attributes?.ocrfilesize ? record?.attributes?.ocrfilesize 
+                : record?.attributes?.compressedfilesize 
+                ?? record?.attributes?.filesize ?? 0) / 1024
             ).toFixed(2)} KB
           </span>
           </Grid>
@@ -3986,7 +3987,8 @@ const AttachmentPopup = React.memo(
             ) : (
               ""
             )}
-            {!isHistoricalRequest && !record.selectedfileprocessversion && (
+            {!isHistoricalRequest && !record.selectedfileprocessversion && 
+              !record.attributes?.incompatible && (
               <MenuItem
                 disabled={lockRecords || disableMinistryUser}
                 onClick={() => {

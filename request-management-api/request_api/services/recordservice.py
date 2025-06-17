@@ -162,9 +162,8 @@ class recordservice(recordservicebase):
                 'trigger': record['trigger'],
                 'ministryrequestid': ministryrequestid
             })
-            print("\nministryrequestid:",ministryrequestid)
             print("\njobids:",jobids)
-            print("\nERROR:",err)
+            #print("\nERROR:",err)
             if err and err is not None:
                 return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
             streamobject = {
@@ -185,7 +184,6 @@ class recordservice(recordservicebase):
                 streamobject['outputdocumentmasterid'] = record['outputdocumentmasterid']
             if record['trigger'] == 'recordreplace' and record['attributes']['isattachment'] == True:
                 streamobject['originaldocumentmasterid'] = record['documentmasterid']
-            print("Streamkey:",streamkey)
             return eventqueueservice().add(streamkey, streamobject)
 
     def replace(self, _requestid, ministryrequestid, recordid, recordschema, userid):
@@ -445,8 +443,7 @@ class recordservice(recordservicebase):
         if(len(documentmasterids) > 0):
             _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/update/retrieveversion', {'ministryrequestid': ministryrequestid, 
                                             'documentmasterids': documentmasterids, "recordretrieveversion":recordretrieveversion})
-            print("err::", err)
-            print("_apiresponse:", _apiresponse)
+            #print("_apiresponse:", _apiresponse)
             if err and err is not None:
                 return DefaultMethodResult(False,f"Error in contacting Doc Reviewer API in retrieving record version - {err}", -1, ministryrequestid )
             return DefaultMethodResult(True,'Record version retrieved in Doc Reviewer DB ', -1, ministryrequestid)
