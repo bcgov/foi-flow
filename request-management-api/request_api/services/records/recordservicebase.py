@@ -22,7 +22,6 @@ class recordservicebase:
 
     def makedocreviewerrequest(self, method, url, payload=None):
         token = AuthHelper.getauthtoken()
-        print("payload:",json.dumps(payload))
         try:
             response = requests.request(
                 method=method,

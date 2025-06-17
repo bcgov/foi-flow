@@ -1879,10 +1879,10 @@ export const RecordsLog = ({
       if (selectedRecords?.length <=0)
         return true
       for (let record of selectedRecords) {
-        if (record.selectedfileprocessversion) return true;
+        if (record.selectedfileprocessversion || record.attributes?.incompatible) return true;
         if (record.attachments) {
           for (let attachment of record.attachments) {
-            if (record.selectedfileprocessversion) return true;
+            if (record.selectedfileprocessversion || record.attributes?.incompatible) return true;
           }
         }
       }
@@ -3987,7 +3987,8 @@ const AttachmentPopup = React.memo(
             ) : (
               ""
             )}
-            {!isHistoricalRequest && !record.selectedfileprocessversion && (
+            {!isHistoricalRequest && !record.selectedfileprocessversion && 
+              !record.attributes?.incompatible && (
               <MenuItem
                 disabled={lockRecords || disableMinistryUser}
                 onClick={() => {

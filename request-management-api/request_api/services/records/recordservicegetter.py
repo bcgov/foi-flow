@@ -42,7 +42,7 @@ class recordservicegetter(recordservicebase):
                         _record = self.__preparerecord(
                             record, _computingresponse, computingresponses, divisions
                         )
-                        print("\n__record:",_record)
+                        #print("\n__record:",_record)
 
                         if not _record["attributes"].get("isportfolio", False):
                             resultrecords.append(_record)
