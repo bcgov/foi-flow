@@ -1551,7 +1551,7 @@ export const RecordsLog = ({
       selectedRecords = records.filter((record) => record.isselected);
     else
       selectedRecords = [record]
-    const documentMasterIds = selectedRecords?.map(record => record.documentmasterid);
+    const documentMasterIds = selectedRecords?.map(record => record.converteddocmasterid ?? record.documentmasterid);
     dispatch(
       retrieveSelectedRecordVersion(
         requestId,
