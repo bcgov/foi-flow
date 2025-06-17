@@ -176,7 +176,7 @@ export const DocEditor = ({
             container.documentEditor.selection.moveNextPosition();
             container.documentEditor.editor.applyBorders({type: 'NoBorder'});
             container.documentEditor.editor.applyBorders({type: 'TopBorder'});
-            container.documentEditor.editor.insertText("Information Access Operations / Children and Family Access Services");
+            container.documentEditor.editor.insertText("FOI Operations");
             container.documentEditor.selection.moveNextPosition();
             container.documentEditor.editor.applyBorders({type: 'NoBorder'});
             container.documentEditor.editor.applyBorders({type: 'TopBorder'});
@@ -195,7 +195,7 @@ export const DocEditor = ({
     }
 
     const insertPageNumbers = () => {
-        if (container) {
+        if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label)) {
             container.documentEditor.selection.goToPage(2);
             container.documentEditor.selection.goToHeader();
             container.documentEditor.selection.sectionFormat.headerDistance = 10;
