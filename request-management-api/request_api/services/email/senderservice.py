@@ -76,6 +76,8 @@ class senderservice:
             msg.attach(msgImg)
         
         try:
+            if ccemails is None:
+                ccemails = []
             with smtplib.SMTP(MAIL_SERVER_SMTP,  MAIL_SERVER_SMTP_PORT) as smtpobj:
                 smtpobj.ehlo()
                 smtpobj.starttls()
