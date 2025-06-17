@@ -86,6 +86,7 @@ class recordservicegetter(recordservicebase):
             _record["trigger"] = _computingresponse["trigger"]
             _record["documentmasterid"] = _computingresponse["documentmasterid"]
             _record["outputdocumentmasterid"] = documentmasterid
+            _record["converteddocmasterid"] = _computingresponse["converteddocmasterid"]
             _record["isselected"] = False
             _record["isconverted"] = self.__getisconverted(_computingresponse)
             _record["iscompressed"] = self.__getiscompressed(_computingresponse)
