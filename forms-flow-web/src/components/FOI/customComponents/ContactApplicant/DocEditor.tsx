@@ -165,7 +165,7 @@ export const DocEditor = ({
             container.documentEditor.selection.goToPage(1);
             container.documentEditor.selection.goToFooter();
             container.documentEditor.selection.sectionFormat.footerDistance = 10;
-            container.documentEditor.selection.characterFormat.fontSize = 7;
+            container.documentEditor.selection.characterFormat.fontSize = 9;
             container.documentEditor.selection.characterFormat.fontFamily = 'BC Sans';
             container.documentEditor.editor.insertTable(1,4)
             container.documentEditor.editor.applyBorders({type: 'NoBorder'});
@@ -176,7 +176,7 @@ export const DocEditor = ({
             container.documentEditor.selection.moveNextPosition();
             container.documentEditor.editor.applyBorders({type: 'NoBorder'});
             container.documentEditor.editor.applyBorders({type: 'TopBorder'});
-            container.documentEditor.editor.insertText("Information Access Operations / Children and Family Access Services");
+            container.documentEditor.editor.insertText("FOI Operations");
             container.documentEditor.selection.moveNextPosition();
             container.documentEditor.editor.applyBorders({type: 'NoBorder'});
             container.documentEditor.editor.applyBorders({type: 'TopBorder'});
@@ -187,21 +187,32 @@ export const DocEditor = ({
             container.documentEditor.editor.insertText("Website: \n");
             container.documentEditor.editor.insertHyperlink('https://www.gov.bc.ca/freedomofinformation', 'www.gov.bc.ca/freedomofinformation');
             container.documentEditor.editor.insertText("\n");
-            container.documentEditor.selection.characterFormat.fontSize = 7;
+            container.documentEditor.selection.characterFormat.fontSize = 9;
             container.documentEditor.selection.characterFormat.fontFamily = 'BC Sans';
-            container.documentEditor.editor.insertText("Telephone: 250 387-1321\nFax: 250 387-9843");
+            container.documentEditor.editor.insertText("Phone: 250 387-1321\nFax: 250 387-9843");
             container.documentEditor.selection.closeHeaderFooter();
         }
     }
 
     const insertPageNumbers = () => {
-        if (container) {
+        if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label)) {
             container.documentEditor.selection.goToPage(2);
             container.documentEditor.selection.goToHeader();
+            container.documentEditor.selection.sectionFormat.headerDistance = 10;
             container.documentEditor.selection.paragraphFormat.textAlignment = 'Center';
             container.documentEditor.selection.characterFormat.fontFamily = 'BC Sans';
             container.documentEditor.editor.insertPageNumber();
             container.documentEditor.selection.closeHeaderFooter();
+
+            const numberOfPages = container.documentEditor.pageCount
+            for (let page = 2; page <= numberOfPages; page++) {
+                container.documentEditor.selection.goToPage(page)
+                container.documentEditor.selection.goToHeader();
+                container.documentEditor.selection.sectionFormat.headerDistance = 10;
+                container.documentEditor.selection.paragraphFormat.textAlignment = 'Center';
+                container.documentEditor.selection.characterFormat.fontFamily = 'BC Sans';
+                container.documentEditor.selection.closeHeaderFooter();
+            }
         }
     }
 
