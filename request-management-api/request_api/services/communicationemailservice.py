@@ -48,7 +48,7 @@ class communicationemailservice:
 
     def __getsubject(self,correspondencelog):
         data = json.loads(correspondencelog['correspondencemessagejson'])
-        subject = data['emailsubject'] if 'emailsubject' in data else ""
+        subject = data['subject'] if 'subject' in data else ""
         return subject
     
     def __getbody(self,correspondencelog):

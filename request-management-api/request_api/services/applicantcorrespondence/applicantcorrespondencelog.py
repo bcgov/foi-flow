@@ -152,12 +152,12 @@ class applicantcorrespondenceservice:
             updt_correspondence.isdraft = data['isdraft']
         if 'correspondencemessagejson' in data and data['correspondencemessagejson'] is not None:
             updt_correspondence.correspondencemessagejson = data['correspondencemessagejson']
-        if 'emailsubject' in data:
+        if 'subject' in data:
             if 'correspondencemessagejson' in correspondence and correspondence['correspondencemessagejson'] is not None:
                 correspondencemessagejson = json.loads(correspondence['correspondencemessagejson'])
             else:
                 correspondencemessagejson = {}
-            correspondencemessagejson['emailsubject'] = data['emailsubject']
+            correspondencemessagejson['subject'] = data['subject']
             updt_correspondence.correspondencemessagejson = json.dumps(correspondencemessagejson)
         if updt_correspondence.sentcorrespondencemessage is None: updt_correspondence.sentcorrespondencemessage = null()
         response = FOIApplicantCorrespondence.saveapplicantcorrespondence(updt_correspondence, None, None)
@@ -187,12 +187,12 @@ class applicantcorrespondenceservice:
             updt_correspondence.isdraft = data['isdraft']
         if 'correspondencemessagejson' in data and data['correspondencemessagejson'] is not None:
             updt_correspondence.correspondencemessagejson = data['correspondencemessagejson']
-        if 'emailsubject' in data:
+        if 'subject' in data:
             if 'correspondencemessagejson' in correspondence and correspondence['correspondencemessagejson'] is not None:
                 correspondencemessagejson = json.loads(correspondence['correspondencemessagejson'])
             else:
                 correspondencemessagejson = {}
-            correspondencemessagejson['emailsubject'] = data['emailsubject']
+            correspondencemessagejson['subject'] = data['subject']
             updt_correspondence.correspondencemessagejson = json.dumps(correspondencemessagejson)
         if updt_correspondence.sentcorrespondencemessage is None: updt_correspondence.sentcorrespondencemessage = null()
         response = FOIApplicantCorrespondenceRawRequest.saveapplicantcorrespondence(updt_correspondence, None, None)
@@ -317,7 +317,7 @@ class applicantcorrespondenceservice:
             "parentapplicantcorrespondenceid":_correpondencelog['parentapplicantcorrespondenceid'],
             "templateid":_correpondencelog['templateid'],
             "text": self.__getvaluefromschema(_sentcorrespondencemessagejson, 'message') if _sentcorrespondencemessagejson is not None else self.__getvaluefromjson(_correspondencemessagejson, 'emailhtml') if _isjson else None,
-            "emailsubject": self.__getvaluefromjson(_correspondencemessagejson, 'emailsubject') if _isjson else None,
+            "subject": self.__getvaluefromjson(_correspondencemessagejson, 'subject') if _isjson else None,
             "id": self.__getvaluefromjson(_correspondencemessagejson, 'id') if _isjson else None,
             "type": self.__getvaluefromjson(_correspondencemessagejson, 'type') if _isjson else None,
             "created_at":self.__pstformat(_correpondencelog['created_at']),

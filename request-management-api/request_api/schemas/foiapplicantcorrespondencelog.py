@@ -38,7 +38,7 @@ class FOIApplicantCorrespondenceLogUpdateSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
         unknown = EXCLUDE    
     correspondenceid = fields.Int(data_key="correspondenceid",required=False, allow_none=True)
-    emailsubject = fields.Str(data_key="emailsubject", required=False)
+    subject = fields.Str(data_key="subject", required=False)
     israwrequest = fields.Bool(data_key="israwrequest",required=False,allow_none=True)
     responsedate = fields.Str(data_key="responsedate",required=False, allow_none=True)
     correspondenceattachmentid = fields.Int(data_key="correspondenceattachmentid",required=False,allow_none=True)
