@@ -3562,7 +3562,7 @@ const Attachment = React.memo(
             </span> */}
             <span className={classes.fileSize}>
             {(
-              (
+              (record?.selectedfileprocessversion == 1 ? record?.attributes?.filesize :
                 record?.attributes?.ocrfilesize ? record?.attributes?.ocrfilesize 
                 : record?.attributes?.compressedfilesize 
                 ?? record?.attributes?.filesize ?? 0) / 1024
