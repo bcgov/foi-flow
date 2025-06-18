@@ -457,7 +457,6 @@ export const ContactApplicant = ({
   const isEnabledTemplate = (item: any) => {
     var name:string = item?.name ? item.name : item?.fileName ? item.fileName : "";
    if (['PAYONLINE', 'PAYOUTSTANDING'].includes(name)) { 
-    return true;
       return !isFeeTemplateDisabled(currentCFRForm, name); 
    } else if (['EXTENSIONS-PB'].includes(name)) {
       return getExtensionType(requestDetails, requestExtensions) === "PB";
