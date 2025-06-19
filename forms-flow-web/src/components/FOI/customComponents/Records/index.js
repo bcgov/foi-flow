@@ -995,24 +995,32 @@ export const RecordsLog = ({
   };
 
   const downloadDocument = (file, isPDF = false, originalfile = false) => {
-    var filePath = ('ocrfilepath' in file && file.ocrfilepath != null)? file.ocrfilepath : ('compresseds3uripath' in file && file.compresseds3uripath != null)? 
-          file.compresseds3uripath : file.s3uripath
+    var filePath = (file.selectedfileprocessversion != 1  && 'ocrfilepath' in file && file.ocrfilepath != null)? file.ocrfilepath
+                    : ( file.selectedfileprocessversion != 1  && 'compresseds3uripath' in file && file.compresseds3uripath != null)? 
+                    file.compresseds3uripath : file.s3uripath
     var s3filepath = !originalfile
       ? filePath
       : !file.isattachment
-      ? file.originalfile
+      ? getOriginalFileS3Path(file.originalfile ? file.originalfile : file.s3uripath)
       : filePath;
     var filename = !originalfile
       ? file.filename
       : !file.isattachment
-      ? file.originalfilename
+      ? (file.originalfilename? file.originalfilename : file.filename)
       : file.filename;
     if (isPDF) {
       s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
       filename = filename + ".pdf";
     }
-    const toastID = toast.loading("Downloading file (0%)");
-    getFOIS3DocumentPreSignedUrl(
+    if (originalfile && !file.isattachment)
+      attemptDownload(s3filepath, filename,(file.originalfile ? file.originalfile : file.s3uripath));
+    else
+      attemptDownload(s3filepath, filename);
+  };
+
+  const attemptDownload = (s3filepath, filename, fallbackPath = null) =>{
+      const toastID = toast.loading("Downloading file (0%)");
+      getFOIS3DocumentPreSignedUrl(
       s3filepath.split("/").slice(4).join("/"),
       ministryId,
       dispatch,
@@ -1021,13 +1029,39 @@ export const RecordsLog = ({
           getFileFromS3(
             { filepath: res },
             (_err, response) => {
+              if (_err || !response || !response.data) {
+                const hasOriginalKeyword = s3filepath.split("/").pop().replace(/\.[^/.]+$/, "").endsWith("ORIGINAL");
+                if (fallbackPath && hasOriginalKeyword) {
+                  // Retry with the fallback path
+                  attemptDownload(fallbackPath, filename); // No further fallback
+                }
+                else{
+                  // let blob = new Blob([response.data], {
+                  //   type: "application/octet-stream",
+                  // });
+                  // saveAs(blob, filename);
+                  toast.update(toastID, {
+                    render: "File download failed",
+                    type: "error",
+                    className: "file-upload-toast",
+                    isLoading: false,
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    closeButton: true,
+                  });
+                }
+                return;
+              }
               let blob = new Blob([response.data], {
-                type: "application/octet-stream",
+                  type: "application/octet-stream",
               });
               saveAs(blob, filename);
               toast.update(toastID, {
-                render: _err ? "File download failed" : "Download complete",
-                type: _err ? "error" : "success",
+                render: "Download complete",
+                type: "success",
                 className: "file-upload-toast",
                 isLoading: false,
                 autoClose: 3000,
@@ -1051,11 +1085,34 @@ export const RecordsLog = ({
             }
           );
         }
+        else{
+          toast.update(toastID, {
+            render: "File download failed",
+            type: "error",
+            className: "file-upload-toast",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            closeButton: true,
+          });
+          return;
+        }
       },
       isHistoricalRequest ? "historical" : "records",      
       isHistoricalRequest ? undefined : bcgovcode
     );
-  };
+  }
+
+  const getOriginalFileS3Path = (path) => {
+    const extIndex = path.lastIndexOf(".");
+    if (extIndex === -1) return path + "ORIGINAL";
+    console.log("ORIGINAL path:",path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex))
+    return path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex);
+  }
+
 
     const handlePhasePackageDownload = (packageObj, itemid) => {
       const phasedDownloadStatuses = itemid === 2 ? phasedRedlineDownloadStatuses : phasedResponsePackageDownloadStatuses;
@@ -4022,17 +4079,17 @@ const AttachmentPopup = React.memo(
                 Replace Attachment
               </MenuItem>
             )}
-            {record.originalfile != "" && record.originalfile != undefined && (
-              <MenuItem
-                onClick={() => {
-                  handleDownloadoriginal();
-                  setPopoverOpen(false);
-                }}
-              >
-                Download Original
-              </MenuItem>
-            )}
-            {((record.isredactionready && record.isconverted) ||
+            {/* {record.originalfile != "" && record.originalfile != undefined && ( */}
+            <MenuItem
+              onClick={() => {
+                handleDownloadoriginal();
+                setPopoverOpen(false);
+              }}
+            >
+              Download Original
+            </MenuItem>
+            {/* )} */}
+            {((record.isredactionready) ||
               (record.attributes?.isattachment &&
                 record.attributes?.trigger === "recordreplace")) && (
               <MenuItem
@@ -4047,7 +4104,7 @@ const AttachmentPopup = React.memo(
                   : "Download Converted"}
               </MenuItem>
             )}
-            <MenuItem
+            {/* <MenuItem
               onClick={() => {
                 handleDownload();
                 setPopoverOpen(false);
@@ -4055,10 +4112,12 @@ const AttachmentPopup = React.memo(
             >
               {record.originalfile != "" && record.originalfile != undefined
                 ? "Download Replaced"
-                : record.attributes?.isattachment
-                ? "Download Original"
-                : "Download"}
-            </MenuItem>
+                : "Download Original"
+                // record.attributes?.isattachment
+                // ? "Download Original"
+                // : "Download"
+                }
+            </MenuItem> */}
             {!record.isattachment && !isHistoricalRequest && <DeleteMenu />}
             {!record.isredactionready && !record.selectedfileprocessversion &&
               (record.failed ||
