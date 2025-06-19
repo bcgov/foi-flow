@@ -71,6 +71,7 @@ class applicantcorrespondenceservice:
         return [x['correspondence_to'] for x in emails if x['applicantcorrespondence_id'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion and x['iscarboncopy'] is True]
     
     def saveapplicantcorrespondencelog(self, requestid, ministryrequestid, data, userid, isdraft=False):
+        print("=========================saveapplicantcorrespondencelog=============================")
         applicantcorrespondence = FOIApplicantCorrespondence()
         if "correspondenceid" in data and data['correspondenceid'] is not None:
             correspondence = FOIApplicantCorrespondence.getapplicantcorrespondencebyid(data['correspondenceid'])
@@ -85,7 +86,8 @@ class applicantcorrespondenceservice:
         applicantcorrespondence.isdraft = isdraft
         if userid == 'system':
             applicantcorrespondence.sentcorrespondencemessage = data['correspondencemessagejson']
-            applicantcorrespondence.sentby = 'System Generated Email'
+            # applicantcorrespondence.sentby = 'System Generated Email'
+            applicantcorrespondence.sentby = userid
             applicantcorrespondence.sent_at = datetime.now()
         else:
             applicantcorrespondence.correspondencemessagejson = data['correspondencemessagejson'] if 'correspondencemessagejson' in data else None
@@ -117,7 +119,8 @@ class applicantcorrespondenceservice:
         applicantcorrespondence.isdraft = isdraft
         if userid == 'system':
             applicantcorrespondence.sentcorrespondencemessage = data['correspondencemessagejson']
-            applicantcorrespondence.sentby = 'System Generated Email'
+            #applicantcorrespondence.sentby = 'System Generated Email'
+            applicantcorrespondence.sentby = userid
             applicantcorrespondence.sent_at = datetime.now()
         else:
             #try commenting out the line below when sending ministry request - see if it still causes error
