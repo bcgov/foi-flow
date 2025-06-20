@@ -4089,35 +4089,44 @@ const AttachmentPopup = React.memo(
               Download Original
             </MenuItem>
             {/* )} */}
-            {((record.isredactionready && (record.isconverted || record.iscompressed || record.ocrfilepath)) ||
-              (record.attributes?.isattachment &&
-                record.attributes?.trigger === "recordreplace")) && (
+            {(record.attributes?.isattachment &&
+                record.attributes?.trigger === "recordreplace") && (
               <MenuItem
                 onClick={() => {
                   handleDownloadPDF();
                   setPopoverOpen(false);
                 }}
               >
-                {record.attributes?.isattachment &&
-                record.attributes?.trigger === "recordreplace"
-                  ? "Download Replaced"
-                  : "Download Converted"}
+                Download Replaced
               </MenuItem>
             )}
-            {/* <MenuItem
-              onClick={() => {
-                handleDownload();
-                setPopoverOpen(false);
-              }}
-            >
-              {record.originalfile != "" && record.originalfile != undefined
-                ? "Download Replaced"
-                : "Download Original"
-                // record.attributes?.isattachment
-                // ? "Download Original"
-                // : "Download"
-                }
-            </MenuItem> */}
+            {(record.isredactionready && (record.isconverted || record.iscompressed ||
+                 record.ocrfilepath))&& (
+              <MenuItem
+                onClick={() => {
+                  handleDownload()
+                  setPopoverOpen(false);
+                }}
+              >
+                Download Converted
+              </MenuItem>
+            )}
+            {record.originalfile != "" && record.originalfile != undefined &&
+              <MenuItem
+                onClick={() => {
+                  handleDownload();
+                  setPopoverOpen(false);
+                }}
+              >
+                Download Replaced
+                  {/* && "Download Replaced"
+                  // : "Download Original"
+                  // record.attributes?.isattachment
+                  // ? "Download Original"
+                  // : "Download" */}
+              </MenuItem>
+            }
+
             {!record.isattachment && !isHistoricalRequest && <DeleteMenu />}
             {!record.isredactionready && !record.selectedfileprocessversion &&
               (record.failed ||
