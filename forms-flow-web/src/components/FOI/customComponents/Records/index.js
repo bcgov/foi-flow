@@ -4089,7 +4089,7 @@ const AttachmentPopup = React.memo(
               Download Original
             </MenuItem>
             {/* )} */}
-            {((record.isredactionready) ||
+            {((record.isredactionready && (record.isconverted || record.iscompressed || record.ocrfilepath)) ||
               (record.attributes?.isattachment &&
                 record.attributes?.trigger === "recordreplace")) && (
               <MenuItem
