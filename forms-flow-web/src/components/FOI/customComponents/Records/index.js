@@ -4114,16 +4114,11 @@ const AttachmentPopup = React.memo(
             {record.originalfile != "" && record.originalfile != undefined &&
               <MenuItem
                 onClick={() => {
-                  handleDownload();
+                  handleDownloadoriginal();
                   setPopoverOpen(false);
                 }}
               >
                 Download Replaced
-                  {/* && "Download Replaced"
-                  // : "Download Original"
-                  // record.attributes?.isattachment
-                  // ? "Download Original"
-                  // : "Download" */}
               </MenuItem>
             }
 
