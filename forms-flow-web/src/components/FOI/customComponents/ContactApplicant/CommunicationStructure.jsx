@@ -391,6 +391,9 @@ const CommunicationStructure = ({
     if (correspondence?.subject) return correspondence.subject
     if (!correspondence?.sentby && correspondence?.templatename) return templateList.find((obj)=> obj.fileName == correspondence.templatename)?.templateName
     if (correspondence.category === "response") return "Applicant Response"
+    if (correspondence?.sentby == "System Generated Email" && 
+      (correspondence?.text.includes("as you have additional options outside of paying the fee") || 
+      correspondence?.text.includes("has received your payment for FOI request"))) return "Fee Estimate / Outstanding Fee"
     return `Your FOI Request ${requestNumber}`
     // if(correspondence.templatename) {
     //   return correspondence.templatename;
