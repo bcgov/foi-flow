@@ -77,6 +77,7 @@ class emailservice:
                 "attachments": attachmentlist
             }
             print("===__pre_send_correspondence_audit=====")
+            print("emailschema :",emailschema)
             # return applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, data, 'system')
             return applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, data, AuthHelper.getuserid())
         
