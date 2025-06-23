@@ -17,6 +17,7 @@ from request_api.services.eventservice import eventservice
 from request_api.services.requestservice import requestservice
 from request_api.services.applicantcorrespondence.applicantcorrespondencelog  import applicantcorrespondenceservice
 from request_api.utils.enums import ServiceName
+from request_api.auth import AuthHelper
 import logging
 
 class emailservice:
@@ -75,7 +76,9 @@ class emailservice:
                 "correspondencemessagejson": {"message": content},
                 "attachments": attachmentlist
             }
-            return applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, data, 'system')
+            print("===__pre_send_correspondence_audit=====")
+            # return applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, data, 'system')
+            return applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, data, AuthHelper.getuserid())
         
 
     def __upload_sent_email(self, servicekey, ministryrequestid, requestjson):
