@@ -72,6 +72,8 @@ class applicantcorrespondenceservice:
     
     def saveapplicantcorrespondencelog(self, requestid, ministryrequestid, data, userid, isdraft=False):
         print("=========================saveapplicantcorrespondencelog=============================")
+        print("userid : ",userid)
+        print("=========================saveapplicantcorrespondencelog=============================")
         applicantcorrespondence = FOIApplicantCorrespondence()
         if "correspondenceid" in data and data['correspondenceid'] is not None:
             correspondence = FOIApplicantCorrespondence.getapplicantcorrespondencebyid(data['correspondenceid'])
@@ -104,6 +106,9 @@ class applicantcorrespondenceservice:
         return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails, ccemails)
 
     def saveapplicantcorrespondencelogforrawrequest(self, requestid, data, userid, isdraft=False):
+        print("=========================saveapplicantcorrespondencelogforrawrequest=============================")
+        print("userid : ",userid)
+        print("=========================saveapplicantcorrespondencelogforrawrequest=============================")
         applicantcorrespondence = FOIApplicantCorrespondenceRawRequest()
         if "correspondenceid" in data and data['correspondenceid'] is not None:
             correspondence = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencebyid(data['correspondenceid'])
