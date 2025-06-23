@@ -78,12 +78,18 @@ class senderservice:
         try:
             if ccemails is None:
                 ccemails = []
+            if isinstance(emails, str):
+                emails = [emails]
+            if not isinstance(ccemails, list):
+                ccemails = [ccemails]
+
+            all_recipients = emails + ccemails
             with smtplib.SMTP(MAIL_SERVER_SMTP,  MAIL_SERVER_SMTP_PORT) as smtpobj:
                 smtpobj.ehlo()
                 smtpobj.starttls()
                 smtpobj.ehlo()
                 #smtpobj.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
-                smtpobj.sendmail(msg['From'], emails + ccemails, msg.as_string())
+                smtpobj.sendmail(msg['From'], all_recipients, msg.as_string())
                 smtpobj.quit()
                 logging.debug("End: Send email for request")
                 return {"success" : True, "message": "Sent successfully", "identifier": -1}   
