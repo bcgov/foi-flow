@@ -28,7 +28,7 @@ export const PreviewModal = React.memo(({
   enableSend,
   selectedEmails,
   selectedCCEmails,
-  emailSubject
+  correspondenceSubject
 }: previewParams) => {
 
   const dispatch = useDispatch();
@@ -100,7 +100,7 @@ export const PreviewModal = React.memo(({
             <p><span style={{fontWeight: 'bold'}}>Email from: </span>{requestDetails.assignedGroupEmail}</p>
             <p><span style={{fontWeight: 'bold'}}>Email to: </span>{selectedEmails?.join(', ')}</p>
             <p><span style={{fontWeight: 'bold'}}>CC to: </span>{selectedCCEmails?.join(', ')}</p>
-            <p><span style={{fontWeight: 'bold'}}>Email subject: </span>{emailSubject}</p>
+            <p><span style={{fontWeight: 'bold'}}>Email subject: </span>{correspondenceSubject}</p>
             </>
           </div>
           <div className="preview-container">

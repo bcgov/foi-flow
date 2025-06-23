@@ -22,7 +22,7 @@ export const DocEditor = ({
     setPreviewTrigger,
     addAttachment,
     savepdf,
-    emailSubject,
+    correspondenceSubject,
     attachpdf,
     attachPdfTrigger,
     setAttachPdfTrigger,
@@ -55,7 +55,7 @@ export const DocEditor = ({
                 savepdf(getSfdtString());
                 break;
             case "savedocx":
-                container?.documentEditor.save(emailSubject, 'Docx')
+                container?.documentEditor.save(correspondenceSubject, 'Docx')
                 break;
             case "attachpdf":
                 attachpdf(getSfdtString());

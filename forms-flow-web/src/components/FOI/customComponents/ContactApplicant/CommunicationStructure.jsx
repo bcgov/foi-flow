@@ -49,8 +49,7 @@ const CommunicationStructure = ({
   setCurrentResponseDate, 
   applicantCorrespondenceTemplates, 
   templateVariableInfo,
-  emailSubject,
-  showRenameEmailSubjectModal
+  showRenameCorrespondenceSubjectModal
 }) => {
 
   // console.log("correspondence: ", correspondence);
@@ -117,7 +116,7 @@ const CommunicationStructure = ({
           onClick={(e) => {
             e.stopPropagation();
             setSelectedCorrespondence(correspondence);
-            showRenameEmailSubjectModal();
+            showRenameCorrespondenceSubjectModal();
             setPopoverOpen(false);
           }}
         >
@@ -184,7 +183,7 @@ const CommunicationStructure = ({
           onClick={(e) => {
             e.stopPropagation();
             setSelectedCorrespondence(correspondence);
-            showRenameEmailSubjectModal();
+            showRenameCorrespondenceSubjectModal();
             setPopoverOpen(false);
           }}
         >
@@ -344,7 +343,7 @@ const CommunicationStructure = ({
     }
     const headerDiv = document.createElement("div");
 
-    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText() || 'Email to: None selected'}\n ${getFullCCEmailListText() || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`;
+    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText() || 'Email to: None selected'}\n ${getFullCCEmailListText() || 'CC to: None selected'}\nEmail Subject: ${correspondence?.subject}\nSent: ${correspondence?.date}\n`;
     headerDiv.style.fontSize = "12px";
     headerDiv.style.fontFamily = "BCSans"
     headerDiv.style.marginBottom = "20px";
@@ -379,7 +378,7 @@ const CommunicationStructure = ({
       element = element.replaceAll(firstName, 'APPLICANT')
       element = element.replaceAll(lastName, 'APPLICANT')
     }
-    let emailFilename = correspondence?.emailsubject ? `${correspondence?.emailsubject}.pdf` : `Correspondence Letter - ${requestNumber}.pdf`
+    let emailFilename = correspondence?.subject ? `${correspondence?.subject}.pdf` : `Correspondence Letter - ${requestNumber}.pdf`
     html2pdf().set({margin: 20}).from(element).outputPdf('blob').then(async (blob) => {
       blobs.push({name: emailFilename, lastModified: new Date(), input: blob})
       const zipfile = await downloadZip(blobs).blob()
@@ -389,7 +388,7 @@ const CommunicationStructure = ({
 
 
   const getTemplateName = (correspondence) => {
-    if (correspondence?.emailsubject) return correspondence.emailsubject
+    if (correspondence?.subject) return correspondence.subject
     if (!correspondence?.sentby && correspondence?.templatename) return templateList.find((obj)=> obj.fileName == correspondence.templatename)?.templateName
     if (correspondence.category === "response") return "Applicant Response"
     return `Your FOI Request ${requestNumber}`

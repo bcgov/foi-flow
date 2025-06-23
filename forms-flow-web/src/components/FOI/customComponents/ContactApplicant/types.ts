@@ -34,7 +34,7 @@ export type previewParams = {
   enableSend: boolean;
   selectedEmails: string[];
   selectedCCEmails: string[];
-  emailSubject: string;
+  correspondenceSubject: string;
 }
  export type downloadCorrespondenceParams = {
   modalOpen: boolean;

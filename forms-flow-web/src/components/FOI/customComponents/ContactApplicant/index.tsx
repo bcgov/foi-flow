@@ -58,7 +58,7 @@ export const ContactApplicant = ({
   const [curTemplate, setCurTemplate] = useState<string>('');
   const [curTemplateName, setCurTemplateName] = useState<string>('');
   const [selectedCorrespondence, setSelectedCorrespondence] = useState <any> ({});
-  const [emailSubject, setEmailSubject] = useState<string>(`Your FOI Request ${requestNumber || requestId}`);
+  const [correspondenceSubject, setCorrespondenceSubject] = useState<string>(`Your FOI Request ${requestNumber || requestId}`);
 
   const dispatch = useDispatch();
   const templateList: any = useSelector((state: any) => state.foiRequests.foiEmailTemplates);
@@ -76,7 +76,7 @@ export const ContactApplicant = ({
   const [attachAsPdfFilename, setAttachAsPdfFilename] = useState(requestNumber || "");
 
   useEffect(() => {
-    if (selectedCorrespondence?.emailsubject) setEmailSubject(selectedCorrespondence?.emailsubject)
+    if (selectedCorrespondence?.subject) setCorrespondenceSubject(selectedCorrespondence?.subject)
   }, [selectedCorrespondence])
 
   const showAttachAsPdfModal = () => {
@@ -86,10 +86,10 @@ export const ContactApplicant = ({
     setConfirmationMessage("The current content will no longer be available for editing after attaching it as a PDF file. If you may still need to make edits, please save a draft first.");
   }
 
-  const showRenameEmailSubjectModal = () => {
+  const showRenameCorrespondenceSubjectModal = () => {
     setOpenConfirmationModal(true);
-    setConfirmationFor("rename-email-subject")
-    setConfirmationTitle("Rename Email Subject")
+    setConfirmationFor("rename-correspondence-subject")
+    setConfirmationTitle("Rename Subject")
     setConfirmationMessage("This will appear as the subject in the correspondence log and also the email subject for any sent emails.")
   }
 
@@ -152,11 +152,11 @@ export const ContactApplicant = ({
     // pass html string to preview modal
     // console.log("preview:", JSON.stringify(sfdtString));
     let newDataHtml = {
-      "FileName": `${emailSubject}.html`,
+      "FileName": `${correspondenceSubject}.html`,
       "Content": sfdtString
     };
     let newDataPdf = {
-      "FileName": `${emailSubject}.pdf`,
+      "FileName": `${correspondenceSubject}.pdf`,
       "Content": sfdtString
     };
     const loadPreview = async (html: string) => {
@@ -168,9 +168,9 @@ export const ContactApplicant = ({
     if (selectedEmails?.length == 0 && selectedCCEmails?.length == 0) {
       const attachBlobPdf = async (pdf: any) => {
         const blob = new Blob([pdf], { type: 'application/pdf' });
-        const emailAttachment = new File([blob], `Export - ${emailSubject}.pdf`, { type: 'application/pdf' })
+        const emailAttachment = new File([blob], `Export - ${correspondenceSubject}.pdf`, { type: 'application/pdf' })
         //@ts-ignore
-        emailAttachment.filename = `Export - ${emailSubject}.pdf`
+        emailAttachment.filename = `Export - ${correspondenceSubject}.pdf`
         // @ts-ignore
         setFiles((prev) => [...prev, emailAttachment])
       }
@@ -209,12 +209,12 @@ export const ContactApplicant = ({
   // }
   const savePdf = async (sfdtString: string) => {
     let newData = {
-      "FileName": `${emailSubject}.pdf`,
+      "FileName": `${correspondenceSubject}.pdf`,
       "Content": sfdtString
     };
     const saveBlobToPdf = async (pdf: any) => {
       const blob = new Blob([pdf], { type: 'application/pdf' });
-      saveAs(blob, `${emailSubject}.pdf`);
+      saveAs(blob, `${correspondenceSubject}.pdf`);
     }
     await exportPDF(dispatch, newData, saveBlobToPdf);
   }
@@ -370,7 +370,7 @@ export const ContactApplicant = ({
     setSelectedEmails([]);
     setSelectedCCEmails([])
     setCurrentTemplate(0);
-    setEmailSubject(`Your FOI Request ${requestNumber || requestId}`);
+    setCorrespondenceSubject(`Your FOI Request ${requestNumber || requestId}`);
   }
 
   const handleConfirmationClose = () => {     
@@ -395,8 +395,8 @@ export const ContactApplicant = ({
     } else if (confirmationFor === "select-template") {
       selectTemplateFromDropdown(null, selectedTemplate);
       // setSelectedTemplate(null);
-    } else if (confirmationFor === "rename-email-subject") {
-      updateCorrespondence({ emailsubject: emailSubject })
+    } else if (confirmationFor === "rename-correspondence-subject") {
+      updateCorrespondence({ subject: correspondenceSubject })
     }
   }
 
@@ -639,8 +639,8 @@ export const ContactApplicant = ({
     // loadTemplate(+e.target.value);
   }
 
-  const handleEmailSubjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmailSubject(e.target.value);
+  const handleCorrespondenceSubjectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCorrespondenceSubject(e.target.value);
   }
 
   //When templates are selected from list
@@ -775,7 +775,7 @@ export const ContactApplicant = ({
       correspondenceid:correspondenceId,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": emailContent,
-        "emailsubject": emailSubject,
+        "subject": correspondenceSubject,
         "id": approvedForm?.cfrfeeid,
         "type": type
       }),
@@ -842,7 +842,7 @@ export const ContactApplicant = ({
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": html?html:editorValue,
-        "emailsubject": emailSubject,
+        "subject": correspondenceSubject,
         "id": approvedForm?.cfrfeeid,
         "type": type,
         "emaildraft": sfdtString?sfdtString:""
@@ -889,7 +889,7 @@ export const ContactApplicant = ({
       correspondenceid:correspondenceId,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": "<div></div>",
-        "emailsubject": emailSubject,
+        "subject": correspondenceSubject,
         "id": approvedForm?.cfrfeeid,
         "type": type
       }),
@@ -993,7 +993,7 @@ export const ContactApplicant = ({
     setShowEditor(true);
     setSelectedEmails(i.emails);
     setSelectedCCEmails(i.ccemails);
-    setEmailSubject(i.emailsubject);
+    setCorrespondenceSubject(i.subject);
     if (i.attachments)
       setFiles(i.attachments);
     setCorrespondenceId(i.applicantcorrespondenceid);
@@ -1168,7 +1168,7 @@ export const ContactApplicant = ({
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": html,
-        "emailsubject": emailSubject,
+        "subject": correspondenceSubject,
         "id": approvedForm?.cfrfeeid,
         "type": type,
         "emaildraft": sfdtString
@@ -1265,7 +1265,7 @@ export const ContactApplicant = ({
   const handlePreviewClose = () => {
     if (selectedEmails?.length == 0 && selectedCCEmails?.length == 0) {
       setFiles((prev) => {
-        const filesWithRemovedPreviewFile = prev.filter((file: any) => file.filename != `Export - ${emailSubject}.pdf`)
+        const filesWithRemovedPreviewFile = prev.filter((file: any) => file.filename != `Export - ${correspondenceSubject}.pdf`)
         return filesWithRemovedPreviewFile
       })
     }
@@ -1303,8 +1303,7 @@ export const ContactApplicant = ({
         setUpdateAttachment={setUpdateAttachment}
         applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
         templateVariableInfo={{requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData}}
-        emailSubject={emailSubject}
-        showRenameEmailSubjectModal={showRenameEmailSubjectModal}
+        showRenameCorrespondenceSubjectModal={showRenameCorrespondenceSubjectModal}
       />
     </div>
   ))
@@ -1544,11 +1543,11 @@ export const ContactApplicant = ({
         >
           <Grid xs={6}>
             <TextField
-              className="email-subject-field"
-              label="Customize Email Subject"
-              name="emailsubject"
-              value={emailSubject}
-              onChange={handleEmailSubjectChange}
+              className="correspondence-subject-field"
+              label="Customize Correspondence Subject"
+              name="correspondencesubject"
+              value={correspondenceSubject}
+              onChange={handleCorrespondenceSubjectChange}
               variant="outlined"
               margin='normal'
               size="small"
@@ -1634,7 +1633,7 @@ export const ContactApplicant = ({
                 setPreviewTrigger = {setPreviewTrigger}
                 addAttachment={openAttachmentModal}
                 savepdf = {savePdf}
-                emailSubject={emailSubject || `Your FOI Request ${requestNumber || requestId}`}
+                correspondenceSubject={correspondenceSubject || `Your FOI Request ${requestNumber || requestId}`}
                 attachpdf = {attachPdf}
                 attachPdfTrigger={attachPdfTrigger}
                 setAttachPdfTrigger={setAttachPdfTrigger}
@@ -1690,7 +1689,7 @@ export const ContactApplicant = ({
               enableSend={selectedEmails?.length > 0 || selectedCCEmails?.length > 0}
               selectedEmails={selectedEmails}
               selectedCCEmails={selectedCCEmails}
-              emailSubject={emailSubject}
+              correspondenceSubject={correspondenceSubject}
             />  
             {/*
             <button
@@ -1808,20 +1807,20 @@ export const ContactApplicant = ({
               <div className="col-sm-1 extension-name">.pdf</div>
             <div className="col-sm-1"></div>
           </div>}
-          {confirmationFor === "rename-email-subject" && <div className="row">
+          {confirmationFor === "rename-correspondence-subject" && <div className="row">
             <div className="col-sm-1"></div>
               <div className="col-sm-9">
                 <TextField
-                  id="renameemailsubject"
-                  label="Rename Email Subject"
+                  id="renamecorrespondencesubject"
+                  label="Rename Subject"
                   required={true}
-                  inputProps={{ "aria-labelledby": "renameemailsubject-label" }}
+                  inputProps={{ "aria-labelledby": "renamecorrespondencesubject-label" }}
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
                   fullWidth
-                  value={emailSubject}
-                  onChange={(e) => {setEmailSubject(e.target.value)}}
-                  error={emailSubject === ""}
+                  value={correspondenceSubject}
+                  onChange={(e) => {setCorrespondenceSubject(e.target.value)}}
+                  error={correspondenceSubject === ""}
                 />
               </div>
             <div className="col-sm-1"></div>
