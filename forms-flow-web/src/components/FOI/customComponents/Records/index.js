@@ -11,6 +11,7 @@ import {
   postFOIS3DocumentPreSignedUrl,
   getFOIS3DocumentPreSignedUrl,
   completeMultiPartUpload,
+  downloadFileFromS3,
 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import {
   saveFOIRequestAttachmentsList,
@@ -1001,7 +1002,7 @@ export const RecordsLog = ({
     var s3filepath = !originalfile
       ? filePath
       : !file.isattachment
-      ? getOriginalFileS3Path(file.originalfile ? file.originalfile : file.s3uripath)
+      ? getOriginalFileS3Path(file.originalfile ? file.originalfile : file.s3uripath , file?.attributes?.incompatible)
       : filePath;
     var filename = !originalfile
       ? file.filename
@@ -1026,12 +1027,15 @@ export const RecordsLog = ({
       dispatch,
       (err, res) => {
         if (!err) {
-          getFileFromS3(
+          downloadFileFromS3(
             { filepath: res },
             (_err, response) => {
-              if (_err || !response || !response.data) {
+              const is404 = (_err && _err.status === 404) ||
+                (response && response.status === 404);
+              if (_err || !response || !response.data || is404) {
                 const hasOriginalKeyword = s3filepath.split("/").pop().replace(/\.[^/.]+$/, "").endsWith("ORIGINAL");
                 if (fallbackPath && hasOriginalKeyword) {
+                  toast.dismiss(toastID);
                   // Retry with the fallback path
                   attemptDownload(fallbackPath, filename); // No further fallback
                 }
@@ -1073,15 +1077,17 @@ export const RecordsLog = ({
               });
             },
             (progressEvent) => {
-              toast.update(toastID, {
-                render:
-                  "Downloading file (" +
-                  Math.floor(
-                    (progressEvent.loaded / progressEvent.total) * 100
-                  ) +
-                  "%)",
-                isLoading: true,
-              });
+              if(progressEvent.total > 0){
+                toast.update(toastID, {
+                  render:
+                    "Downloading file (" +
+                    Math.floor(
+                      (progressEvent.loaded / progressEvent.total) * 100
+                    ) +
+                    "%)",
+                  isLoading: true,
+                });
+              }
             }
           );
         }
@@ -1106,9 +1112,13 @@ export const RecordsLog = ({
     );
   }
 
-  const getOriginalFileS3Path = (path) => {
+  const getOriginalFileS3Path = (path, isIncompatible) => {
     const extIndex = path.lastIndexOf(".");
-    if (extIndex === -1) return path + "ORIGINAL";
+    if (extIndex === -1) 
+      return path;
+    let extension=path.slice(extIndex)
+    if ([".png", ".jpg", ".jpeg"].includes(extension) || isIncompatible)
+      return path;
     console.log("ORIGINAL path:",path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex))
     return path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex);
   }
