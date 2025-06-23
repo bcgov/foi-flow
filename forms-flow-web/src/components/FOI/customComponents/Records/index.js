@@ -4111,10 +4111,10 @@ const AttachmentPopup = React.memo(
               </MenuItem>
             )}
             {(record.isredactionready && (record.isconverted || record.iscompressed ||
-                 record.ocrfilepath))&& (
+                 record.ocrfilepath) && !record.attributes.incompatible) && (
               <MenuItem
                 onClick={() => {
-                  handleDownload()
+                  {["png", "jpg", "jpeg"].includes(record?.filename?.split('.')?.pop()) ? handleDownload() : handleDownloadPDF() }
                   setPopoverOpen(false);
                 }}
               >
