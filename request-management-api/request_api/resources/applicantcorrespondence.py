@@ -94,11 +94,8 @@ class FOIFlowApplicantCorrespondence(Resource):
     @auth.hasusertype('iao')
     def post(requestid, ministryrequestid):
         try:
-            print("======/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>======")
             requestjson = request.get_json()
             applicantcorrespondencelog = FOIApplicantCorrespondenceLogSchema().load(data=requestjson)
-            print("applicantcorrespondencelog : ",applicantcorrespondencelog)
-            print("==========================================================================================")
             if ministryrequestid == 'None':
                 rawrequestid = requestid
             else:
@@ -144,8 +141,6 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
         try:
             requestjson = request.get_json()
             correspondenceschemaobj = FOIApplicantCorrespondenceLogSchema().load(data=requestjson)
-            print("===========/foiflow/applicantcorrespondence/draft/<requestid>/<ministryrequestid>==========")
-            print("AuthHelper.getuserid() : ",AuthHelper.getuserid())
             if ministryrequestid == 'None':
                 rawrequestid = requestid
             else:
@@ -170,8 +165,6 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
     def post(requestid, ministryrequestid):
         try:
             requestjson = request.get_json()
-            print("===================/foiflow/applicantcorrespondence/draft/edit/<requestid>/<ministryrequestid>============")
-            print("AuthHelper.getuserid() : ",AuthHelper.getuserid())
             if ministryrequestid == 'None':
                 rawrequestid = requestid
             else:
@@ -261,8 +254,6 @@ class FOIFlowApplicantCorrespondenceResponse(Resource):
     def post(ministryrequestid, rawrequestid):
         try:
             requestjson = request.get_json()
-            print("===================/foiflow/applicantcorrespondence/response/<ministryrequestid>/<rawrequestid>============")
-            print("AuthHelper.getuserid() : ",AuthHelper.getuserid())
             if ministryrequestid == 'None':
                 rawrequestidforrequest = rawrequestid
             else:
