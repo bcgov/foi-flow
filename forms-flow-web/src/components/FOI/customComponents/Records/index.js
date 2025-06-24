@@ -1012,9 +1012,14 @@ export const RecordsLog = ({
       // ? (file.originalfilename? file.originalfilename : file.filename)
       // : file.filename;
     //if (isPDF && !downloadReplacedOriginal) {
-    if (!["png", "jpg", "jpeg", "pdf"].includes(extension) && !downloadReplacedOriginal && !originalfile) {
-      s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
-      filename = filename + ".pdf";
+    if (!["png", "jpg", "jpeg", "pdf"].includes(extension)) {
+      if (isPDF){
+        s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
+        filename = filename + ".pdf";
+      }
+      else if (!originalfile && !downloadReplacedOriginal){
+        filename = filename + ".pdf";
+      }
     }
     if (originalfile && !file.isattachment)
       attemptDownload(s3filepath, filename,(file.originalfile ? file.originalfile : file.s3uripath));
@@ -4116,7 +4121,7 @@ const AttachmentPopup = React.memo(
                 record.attributes?.trigger === "recordreplace") && (
               <MenuItem
                 onClick={() => {
-                  handleDownloadReplaced();
+                  handleDownloadPDF();
                   setPopoverOpen(false);
                 }}
               >
