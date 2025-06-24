@@ -27,8 +27,6 @@ class emailservice:
     def send(self, servicename, requestid, ministryrequestid, emailschema):
         try:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
-            print("============emailservice=============")
-            print("requestjson : ",requestjson)
             _templatename = self.__getvaluefromschema(emailschema, "templatename")
             servicename = _templatename  if servicename == ServiceName.correspondence.value.upper() else servicename            
             _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
@@ -73,14 +71,12 @@ class emailservice:
         if _applicantcorrespondenceid and isnotreceipt:
             return applicantcorrespondenceservice().updateapplicantcorrespondencelog(_applicantcorrespondenceid, {"message": content})
         else:
-            print("recipient_email : ",recipient_email)
             data = {
                 "templateid": None,
                 "correspondencemessagejson": {"message": content},
                 "attachments": attachmentlist,
                 "emails": [recipient_email] if recipient_email else []
             }
-            print("===__pre_send_correspondence_audit=====")
             return applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, data, 'system')
         
 
