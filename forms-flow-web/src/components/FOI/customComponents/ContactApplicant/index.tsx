@@ -93,6 +93,15 @@ export const ContactApplicant = ({
     setConfirmationMessage("This will appear as the subject in the correspondence log and also the email subject for any sent emails.")
   }
 
+  const [filterConfirmationModalState, setfilterConfirmationModalState] = useState('')
+  const showChangeCorrespondenceFilterModal = (filter: string) => {
+    setfilterConfirmationModalState(filter)
+    setOpenConfirmationModal(true);
+    setConfirmationFor("change-correspondence-filter")
+    setConfirmationTitle("Warning: Changing Tabs")
+    setConfirmationMessage("If you change tabs the content in the letter and email editor will be lost. Do you want to continue? If you wish to save your work before changing tabs, save the letter or email as a draft.")
+  }
+
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
   const showSelectTemplateModal = (event: any, item: any) => {
     if (item === null) {
@@ -397,6 +406,8 @@ export const ContactApplicant = ({
       // setSelectedTemplate(null);
     } else if (confirmationFor === "rename-correspondence-subject") {
       updateCorrespondence({ subject: correspondenceSubject })
+    } else if (confirmationFor === "change-correspondence-filter") {
+      changeCorrespondenceFilter(filterConfirmationModalState)
     }
   }
 
@@ -1478,7 +1489,13 @@ export const ContactApplicant = ({
                 label={"LOG"}
                 color="primary"
                 size="small"
-                onClick={() => changeCorrespondenceFilter("log")}
+                onClick={() => {
+                  if (showEditor) {
+                    showChangeCorrespondenceFilterModal("log")
+                  } else {
+                    changeCorrespondenceFilter("log")
+                  }
+                }}
                 clicked={correspondenceFilter === "log"}
               />
               <ClickableChip
@@ -1487,7 +1504,13 @@ export const ContactApplicant = ({
                 label={"TEMPLATES"}
                 color="primary"
                 size="small"
-                onClick={() => changeCorrespondenceFilter("templates")}
+                onClick={() => {
+                  if (showEditor) {
+                    showChangeCorrespondenceFilterModal("templates")
+                  } else {
+                    changeCorrespondenceFilter("templates")
+                  }
+                }}
                 clicked={correspondenceFilter === "templates"}
               />
               <ClickableChip
@@ -1496,7 +1519,13 @@ export const ContactApplicant = ({
                 label={"DRAFTS"}
                 color="primary"
                 size="small"
-                onClick={() => changeCorrespondenceFilter("drafts")}
+                onClick={() => {
+                  if (showEditor) {
+                    showChangeCorrespondenceFilterModal("drafts")
+                  } else {
+                    changeCorrespondenceFilter("drafts")
+                  }
+                }}
                 clicked={correspondenceFilter === "drafts"}
               />
             </Stack>
