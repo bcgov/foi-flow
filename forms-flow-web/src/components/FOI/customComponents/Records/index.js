@@ -995,20 +995,20 @@ export const RecordsLog = ({
     }
   };
 
-  const downloadDocument = (file, isPDF = false, originalfile = false) => {
-    var filePath = (file.selectedfileprocessversion != 1  && 'ocrfilepath' in file && file.ocrfilepath != null)? file.ocrfilepath
+  const downloadDocument = (file, isPDF = false, originalfile = false, downloadReplacedOriginal = false) => {
+    var filePath = downloadReplacedOriginal ? file.s3uripath : (file.selectedfileprocessversion != 1  && 'ocrfilepath' in file && file.ocrfilepath != null)? file.ocrfilepath
                     : ( file.selectedfileprocessversion != 1  && 'compresseds3uripath' in file && file.compresseds3uripath != null)? 
                     file.compresseds3uripath : file.s3uripath
     var s3filepath = !originalfile
-      ? filePath
-      : !file.isattachment
-      ? getOriginalFileS3Path(file.originalfile ? file.originalfile : file.s3uripath , file?.attributes?.incompatible)
-      : filePath;
+      ? filePath : getOriginalFileS3Path((file.originalfile && !downloadReplacedOriginal) ? file.originalfile : file.s3uripath , file?.attributes?.incompatible)
+      // : !file.isattachment
+      // ? getOriginalFileS3Path(file.originalfile ? file.originalfile : file.s3uripath , file?.attributes?.incompatible)
+      // : filePath;
     var filename = !originalfile
-      ? file.filename
-      : !file.isattachment
-      ? (file.originalfilename? file.originalfilename : file.filename)
-      : file.filename;
+      ? file.filename :((file.originalfilename && !downloadReplacedOriginal)? file.originalfilename : file.filename)
+      // : !file.isattachment
+      // ? (file.originalfilename? file.originalfilename : file.filename)
+      // : file.filename;
     if (isPDF) {
       s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
       filename = filename + ".pdf";
@@ -1667,12 +1667,17 @@ export const RecordsLog = ({
         setModal(false);
         break;
       case "downloadPDF":
-        downloadDocument(_record, true);
+        downloadDocument(_record, true, true, true);
         setModalFor("download");
         setModal(false);
         break;
       case "downloadoriginal":
         downloadDocument(_record, false, true);
+        setModalFor("download");
+        setModal(false);
+        break;
+      case "downloadreplaced":
+        downloadDocument(_record, false, true, true);
         setModalFor("download");
         setModal(false);
         break;
@@ -3933,6 +3938,11 @@ const AttachmentPopup = React.memo(
       handlePopupButtonClick("downloadoriginal", record);
     };
 
+    const handleDownloadReplaced = () => {
+      closeTooltip();
+      handlePopupButtonClick("downloadreplaced", record);
+    };
+
     const handleView = () => {
       closeTooltip();
       opendocumentintab(record, ministryId);
@@ -4114,7 +4124,7 @@ const AttachmentPopup = React.memo(
                  record.ocrfilepath) && !record.attributes.incompatible) && (
               <MenuItem
                 onClick={() => {
-                  {["png", "jpg", "jpeg"].includes(record?.filename?.split('.')?.pop()) ? handleDownload() : handleDownloadPDF() }
+                  {["png", "jpg", "jpeg", "pdf"].includes(record?.filename?.split('.')?.pop()) ? handleDownload() : handleDownloadPDF() }
                   setPopoverOpen(false);
                 }}
               >
@@ -4124,7 +4134,7 @@ const AttachmentPopup = React.memo(
             {record.originalfile != "" && record.originalfile != undefined &&
               <MenuItem
                 onClick={() => {
-                  handleDownloadoriginal();
+                  handleDownloadReplaced();
                   setPopoverOpen(false);
                 }}
               >
