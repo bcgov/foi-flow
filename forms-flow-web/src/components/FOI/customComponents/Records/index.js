@@ -996,6 +996,8 @@ export const RecordsLog = ({
   };
 
   const downloadDocument = (file, isPDF = false, originalfile = false, downloadReplacedOriginal = false) => {
+    
+    const extension = file?.filename?.split('.')?.pop()
     var filePath = downloadReplacedOriginal ? file.s3uripath : (file.selectedfileprocessversion != 1  && 'ocrfilepath' in file && file.ocrfilepath != null)? file.ocrfilepath
                     : ( file.selectedfileprocessversion != 1  && 'compresseds3uripath' in file && file.compresseds3uripath != null)? 
                     file.compresseds3uripath : file.s3uripath
@@ -1009,7 +1011,8 @@ export const RecordsLog = ({
       // : !file.isattachment
       // ? (file.originalfilename? file.originalfilename : file.filename)
       // : file.filename;
-    if (isPDF) {
+    //if (isPDF && !downloadReplacedOriginal) {
+    if (!["png", "jpg", "jpeg", "pdf"].includes(extension) && !downloadReplacedOriginal) {
       s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
       filename = filename + ".pdf";
     }
@@ -1117,7 +1120,7 @@ export const RecordsLog = ({
     if (extIndex === -1) 
       return path;
     let extension=path.slice(extIndex)
-    if ([".png", ".jpg", ".jpeg"].includes(extension) || isIncompatible)
+    if (extension?.toLowerCase() != ".pdf" || isIncompatible)
       return path;
     console.log("ORIGINAL path:",path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex))
     return path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex);
@@ -4113,7 +4116,7 @@ const AttachmentPopup = React.memo(
                 record.attributes?.trigger === "recordreplace") && (
               <MenuItem
                 onClick={() => {
-                  handleDownloadPDF();
+                  handleDownloadReplaced();
                   setPopoverOpen(false);
                 }}
               >
@@ -4124,7 +4127,7 @@ const AttachmentPopup = React.memo(
                  record.ocrfilepath) && !record.attributes.incompatible) && (
               <MenuItem
                 onClick={() => {
-                  {["png", "jpg", "jpeg", "pdf"].includes(record?.filename?.split('.')?.pop()) ? handleDownload() : handleDownloadPDF() }
+                  handleDownload()
                   setPopoverOpen(false);
                 }}
               >
