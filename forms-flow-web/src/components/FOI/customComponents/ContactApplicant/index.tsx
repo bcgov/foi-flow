@@ -1314,6 +1314,7 @@ export const ContactApplicant = ({
         setUpdateAttachment={setUpdateAttachment}
         applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
         templateVariableInfo={{requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData}}
+        correspondenceSubject={correspondenceSubject}
         showRenameCorrespondenceSubjectModal={showRenameCorrespondenceSubjectModal}
       />
     </div>
