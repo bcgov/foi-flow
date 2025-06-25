@@ -49,6 +49,7 @@ const CommunicationStructure = ({
   setCurrentResponseDate, 
   applicantCorrespondenceTemplates, 
   templateVariableInfo,
+  correspondenceSubject,
   showRenameCorrespondenceSubjectModal
 }) => {
 
@@ -343,7 +344,7 @@ const CommunicationStructure = ({
     }
     const headerDiv = document.createElement("div");
 
-    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText() || 'Email to: None selected'}\n ${getFullCCEmailListText() || 'CC to: None selected'}\nEmail Subject: ${correspondence?.subject}\nSent: ${correspondence?.date}\n`;
+    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText() || 'Email to: None selected'}\n ${getFullCCEmailListText() || 'CC to: None selected'}\nEmail Subject: ${correspondenceSubject}\nSent: ${correspondence?.date}\n`;
     headerDiv.style.fontSize = "12px";
     headerDiv.style.fontFamily = "BCSans"
     headerDiv.style.marginBottom = "20px";
