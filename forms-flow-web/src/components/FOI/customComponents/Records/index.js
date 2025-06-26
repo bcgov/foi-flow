@@ -1033,7 +1033,7 @@ export const RecordsLog = ({
         filename = filename + ".pdf";
       }
     }
-    if (originalfile && !file.isattachment)
+    if (originalfile)
       attemptDownload(s3filepath, filename,(file.originalfile ? file.originalfile : file.s3uripath));
     else
       attemptDownload(s3filepath, filename);
