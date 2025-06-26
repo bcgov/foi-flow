@@ -1473,7 +1473,7 @@ export const ContactApplicant = ({
         <Grid container xs={6} direction="row" justifyContent='flex-end'>
         <ConditionalComponent condition={correspondenceFilter === "log"}>
             <button
-              className="btn addAttachment foi-export-button exportAllButton"
+              className="btn exportAllButton"
               onClick={exportAll}
               color="primary"
             >

@@ -16,6 +16,19 @@
   }
 }
 
+.exportAllButton {
+  margin-right: 4px;
+  margin-left: 4px;
+  width: 100%;
+  max-width: 200px;
+  background-color: #FFFFFF;
+  color: #38598A !important;
+  outline-color: #38598A;
+  outline-style: solid;
+  outline-offset: -1px;
+  font-family: BCSans-Bold, sans-serif !important;
+}
+
 .addCorrespondence-menuitem {
   li.MuiMenuItem-root {
     background-color: #FFF !important; 
