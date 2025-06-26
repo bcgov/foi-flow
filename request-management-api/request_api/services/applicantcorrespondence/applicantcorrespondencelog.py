@@ -98,7 +98,7 @@ class applicantcorrespondenceservice:
         applicantcorrespondence.response_at = data['responsedate'] if 'responsedate' in data and data['responsedate'] is not None else datetime.now()
         applicantcorrespondence.templatename = data['templatename'] if 'templatename' in data and data['templatename'] is not None else None
         applicantcorrespondence.templatetype = data['templatetype'] if 'templatetype' in data and data['templatetype'] is not None else None
-
+        applicantcorrespondence.emailsubject = json.loads(applicantcorrespondence.correspondencemessagejson).get('subject', '')
         return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails, ccemails)
 
     def saveapplicantcorrespondencelogforrawrequest(self, requestid, data, userid, isdraft=False):
@@ -332,6 +332,7 @@ class applicantcorrespondenceservice:
             "draft": self.__getvaluefromjson(_correspondencemessagejson, 'emaildraft') if _isjson else None,
             "templatename": _correpondencelog['templatename'],
             "templatetype": _correpondencelog['templatetype'],
+            "emailsubject": _correpondencelog['emailsubject'],
         }        
         return correpondencelog
     
