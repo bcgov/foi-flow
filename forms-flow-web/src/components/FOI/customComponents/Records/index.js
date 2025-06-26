@@ -356,14 +356,26 @@ export const RecordsLog = ({
   }, []);
 
   const isDisableRedactRecords = (allRecords) => {
-    return allRecords.some(record =>
-      !record.isredactionready && !record.attributes.incompatible && 
-        !record.selectedfileprocessversion && !record.ocrfilepath
-      // || (!record.attributes.incompatible && !record.iscompressed &&
-      //   (record.selectedfileprocessversion !== 1 || !record.selectedfileprocessversion))
-        
-    );
-  };
+
+    const isInvalid = (record) =>
+      !record.isredactionready &&
+      !record.attributes?.incompatible &&
+      !record.selectedfileprocessversion &&
+      !record.ocrfilepath;
+
+    const isInvalidAttachment = (record) =>
+      !record.isredactionready &&
+      !record.attributes?.incompatible
+
+    return allRecords.some(record =>{
+      if(isInvalid(record)) return true;
+
+      if (Array.isArray(record.attachments)) {
+        return record.attachments.some(isInvalidAttachment);
+      }
+      return false;
+    });
+  }
   
 
   const [currentEditRecord, setCurrentEditRecord] = useState();
