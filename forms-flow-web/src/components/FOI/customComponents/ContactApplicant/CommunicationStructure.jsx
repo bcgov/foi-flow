@@ -31,6 +31,7 @@ import { ClickableChip } from '../../Dashboard/utils';
 import { toast } from 'react-toastify';
 import { getTemplateVariables } from './util';
 import { DownloadCorrespondenceModal } from './DownloadCorrespondenceModal';
+import { getCorrespondenceSubject, getFullEmailListText, getFullCCEmailListText } from './helper';
 
 const CommunicationStructure = ({
   correspondence, 
@@ -344,7 +345,7 @@ const CommunicationStructure = ({
     }
     const headerDiv = document.createElement("div");
 
-    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText() || 'Email to: None selected'}\n ${getFullCCEmailListText() || 'CC to: None selected'}\nEmail Subject: ${correspondenceSubject}\nSent: ${correspondence?.date}\n`;
+    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondenceSubject}\nSent: ${correspondence?.date}\n`;
     headerDiv.style.fontSize = "12px";
     headerDiv.style.fontFamily = "BCSans"
     headerDiv.style.marginBottom = "20px";
@@ -387,22 +388,6 @@ const CommunicationStructure = ({
     });
   }
 
-
-  const getTemplateName = (correspondence) => {
-    if (correspondence?.subject) return correspondence.subject
-    if (!correspondence?.sentby && correspondence?.templatename) return templateList.find((obj)=> obj.fileName == correspondence.templatename)?.templateName
-    if (correspondence.category === "response") return "Applicant Response"
-    if (correspondence?.sentby == "System Generated Email" && 
-      (correspondence?.text.includes("as you have additional options outside of paying the fee") || 
-      correspondence?.text.includes("has received your payment for FOI request"))) return "Fee Estimate / Outstanding Fee"
-    return `Your FOI Request ${requestNumber}`
-    // if(correspondence.templatename) {
-    //   return correspondence.templatename;
-    // } else {
-    //   return applicantCorrespondenceTemplates.find((obj)=> obj.templateid == correspondence.templateId)?.description
-    // }
-  }
-
   const DeleteAction = () => {
     return (
         <Dialog
@@ -436,24 +421,8 @@ const CommunicationStructure = ({
     )
   };
 
-const getFullEmailListText = () => {
-  let fullEmailListText = correspondence?.emails?.length > 0 ? 'Email To: ' : '';
-  correspondence?.emails.forEach((email, index) => {
-    fullEmailListText = fullEmailListText + email
-    if (index < correspondence.emails.length - 1) fullEmailListText = fullEmailListText + ', '
-  })
-  return fullEmailListText;
-}
-const fullEmailListText = getFullEmailListText();
-const getFullCCEmailListText = () => {
-  let fullCCEmailListText = correspondence?.ccemails?.length > 0 ? 'CC To: ' : '';
-  correspondence?.ccemails.forEach((email, index) => {
-    fullCCEmailListText = fullCCEmailListText + email
-    if (index < correspondence.ccemails.length - 1) fullCCEmailListText = fullCCEmailListText + ', '
-  })
-  return fullCCEmailListText;
-}
-const fullCCEmailListText = getFullCCEmailListText();
+const fullEmailListText = getFullEmailListText(correspondence);
+const fullCCEmailListText = getFullCCEmailListText(correspondence);
 let popoverEmailList = fullEmailListText + '\n' + fullCCEmailListText;
 const totalNumberOfEmails = correspondence?.emails?.length + correspondence?.ccemails?.length
 let emailText = '';
@@ -477,7 +446,7 @@ if (totalNumberOfEmails > 1) emailText = emailText + ` +${totalNumberOfEmails - 
                   <div className="templateInfo">
                     {correspondence && (
                       <>
-                      <div className="templateUser">{getTemplateName(correspondence)} - {fullName} </div> |  
+                      <div className="templateUser">{getCorrespondenceSubject(correspondence, templateList, requestNumber)} - {fullName} </div> |  
                         {totalNumberOfEmails > 1 ? <><div className="templateUser"><Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{popoverEmailList}</span>} disableInteractive placement="top">{emailText}</Tooltip></div> |</>: totalNumberOfEmails == 1 ? <><div className="templateUser"> {emailText} </div>|</> : ''} 
                         <div className="templateTime">{correspondence?.date?.toUpperCase()} </div>
                         <div className="templateTime">{correspondence.edited ? "Edited": ""} </div>

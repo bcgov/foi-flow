@@ -152,6 +152,7 @@ export const DocEditor = ({
             container.documentEditor.selection.sectionFormat.differentFirstPage = true;
             container.documentEditor.selection.goToPage(1);
             container.documentEditor.selection.goToHeader();
+            container.documentEditor.editor.clearFormatting();
             container.documentEditor.selection.sectionFormat.headerDistance = 0;
             container.documentEditor.selection.paragraphFormat.textAlignment = 'Center';
             container.documentEditor.editor.insertImage(HeaderLogoBase64, 144, 135);
