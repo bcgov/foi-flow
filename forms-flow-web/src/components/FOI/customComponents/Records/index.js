@@ -3650,11 +3650,10 @@ const Attachment = React.memo(
                 color="#A0192F"
                 className={classes.statusIcons}
               />
-            ) : (record.updated_at != null && record.updated_at != undefined) ? 
-                  isrecordtimeout(record.updated_at, RECORD_PROCESSING_HRS) == true && isRetry == false 
-                  && !record.selectedfileprocessversion : 
-                  isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true && isRetry == false 
-                  && !record.selectedfileprocessversion?(
+            ) : ((record.updated_at != null && record.updated_at != undefined) 
+                    ? isrecordtimeout(record.updated_at, RECORD_PROCESSING_HRS) == true 
+                    : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) && 
+                  isRetry == false && !record.selectedfileprocessversion ?(
                 // isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
                 // true && isRetry == false && !record.selectedfileprocessversion? (
               <FontAwesomeIcon
