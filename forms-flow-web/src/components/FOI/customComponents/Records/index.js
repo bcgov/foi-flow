@@ -356,14 +356,26 @@ export const RecordsLog = ({
   }, []);
 
   const isDisableRedactRecords = (allRecords) => {
-    return allRecords.some(record =>
-      !record.isredactionready && !record.attributes.incompatible && 
-        !record.selectedfileprocessversion && !record.ocrfilepath
-      // || (!record.attributes.incompatible && !record.iscompressed &&
-      //   (record.selectedfileprocessversion !== 1 || !record.selectedfileprocessversion))
-        
-    );
-  };
+
+    const isInvalid = (record) =>
+      !record.isredactionready &&
+      !record.attributes?.incompatible &&
+      !record.selectedfileprocessversion &&
+      !record.ocrfilepath;
+
+    const isInvalidAttachment = (record) =>
+      !record.isredactionready &&
+      !record.attributes?.incompatible
+
+    return allRecords.some(record =>{
+      if(isInvalid(record)) return true;
+
+      if (Array.isArray(record.attachments)) {
+        return record.attachments.some(isInvalidAttachment);
+      }
+      return false;
+    });
+  }
   
 
   const [currentEditRecord, setCurrentEditRecord] = useState();
@@ -2484,33 +2496,56 @@ export const RecordsLog = ({
               </Tooltip>
             </Grid> :  <Grid item xs={isScanningTeamMember ? 1 : 1}></Grid>
             }
-            {(isMinistryCoordinator == false &&
+            {isMinistryCoordinator == false &&
               records?.length > 0 &&
               DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
-                <Tooltip title={<div style={{ fontSize: "11px" }}>Some files are still processing or have errors. 
-                  Please ensure that all files are successfully processed.</div>}>
-                  <Grid item xs={isScanningTeamMember ? 1 : 1}>
-                  <a
-                    href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
-                    target="_blank"
-                  >
-                    <button
-                      className={clsx(
-                        "btn",
-                        "addAttachment",
-                        classes.createButton
-                      )}
-                      variant="contained"
-                      // onClick={}
-                      disabled={isDisableRedactRecords(records)}
-                      color="primary"
+                // <Tooltip title={<div style={{ fontSize: "11px" }}>Some files are still processing or have errors. 
+                //   Please ensure that all files are successfully processed.</div>}>
+                  <Grid item xs={1}>
+                    {isDisableRedactRecords(records) ? (
+                      <Tooltip
+                        title={
+                          <div style={{ fontSize: "11px" }}>
+                            Some files are still processing or have errors.
+                            Please ensure that all files are successfully processed.
+                          </div>
+                        }>
+                      <span>
+                        <a
+                          href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
+                          target="_blank"
+                        >
+                          <button
+                            className={clsx(
+                              "btn",
+                              "addAttachment",
+                              classes.createButton
+                            )}
+                            variant="contained"
+                            // onClick={}
+                            disabled={isDisableRedactRecords(records)}
+                            color="primary"
+                          >
+                            Redact Records
+                          </button>
+                        </a>
+                        </span>
+                      </Tooltip>
+                    ): (
+                    <a
+                      href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
+                      target="_blank"
                     >
-                      Redact Records
-                    </button>
-                  </a>
-                  </Grid>
-                </Tooltip>
-              )
+                      <button
+                        className={clsx("btn", "addAttachment", classes.createButton)}
+                        variant="contained"
+                        color="primary"
+                      >
+                        Redact Records
+                      </button>
+                    </a>
+                  )}
+                </Grid>
             )}
             <Grid item xs={3}>
               {hasDocumentsToDownload && !isHistoricalRequest && (
