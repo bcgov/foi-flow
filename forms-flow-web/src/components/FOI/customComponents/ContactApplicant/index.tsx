@@ -253,9 +253,9 @@ export const ContactApplicant = ({
     if (correspondence?.text) element = element + correspondence?.text
     // No drafts being downloaded as part of export all
     let emailFilename = correspondence?.subject ? `${correspondence?.subject}.pdf` : `Correspondence Letter - ${requestNumber}.pdf`
-    html2pdf().set({margin: 20}).from(element).outputPdf('blob').then(async (blob: Blob) => {
-      blobs.push({name: folderName + '/' + emailFilename, lastModified: new Date(), input: blob})
-    });
+    const pdfEmailBlob = await html2pdf().set({margin: 20}).from(element).outputPdf('blob')
+    blobs.push({name: folderName + '/' + emailFilename, lastModified: new Date(), input: pdfEmailBlob})
+    if (correspondence.attachments.length == 0) return {folder: folderName, status: 'success'}
 
     try {
       const response = await getOSSHeaderDetails(fileInfoList, dispatch);
