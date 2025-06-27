@@ -29,28 +29,13 @@ class communicationemailservice:
             to = self.__getsenders(correspondencelog)
             ccemails = self.__getccemails(correspondencelog)
             attributes =  self.__getattributes(correspondencelog)
-            subject = ""
-            customizedsubject = self.__getsubject(correspondencelog)
-            if len(customizedsubject) > 0:
-                subject = customizedsubject
-            elif template is None:
-                if 'templatename' in correspondencelog and correspondencelog['templatename'] is not None:
-                    subject = templateconfig().getsubject(correspondencelog['templatename'], attributes)
-                else:
-                    subject = templateconfig().getsubject("", attributes)
-            else:
-                subject = templateconfig().getsubject(template.name, attributes)
+            subject = correspondencelog['emailsubject']
             messageattachmentlist = self.__getattachments(correspondencelog)
             _messagepart = templateservice().decorate_template(template, messagepart, attributes, correspondencelog)
             return senderservice().send(subject, _messagepart, messageattachmentlist, to, ccemails, correspondencelog.get('from_email', None))
         except Exception as ex:
             logging.exception(ex)
 
-    def __getsubject(self,correspondencelog):
-        data = json.loads(correspondencelog['correspondencemessagejson'])
-        subject = data['subject'] if 'subject' in data else ""
-        return subject
-    
     def __getbody(self,correspondencelog):
         data = json.loads(correspondencelog['correspondencemessagejson'])
         return data['emailhtml']
