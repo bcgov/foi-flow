@@ -35,30 +35,50 @@ class applicantcorrespondenceservice:
         """ Returns the active applicant correspondence logs
         """
         _correspondencelogs = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencesrawrequests(rawrequestid)
+        print('**_correspondencelogs: ', _correspondencelogs)
         _correspondenceattachments = FOIApplicantCorrespondenceAttachmentRawRequest.getcorrespondenceattachmentsbyrawrequestid(rawrequestid)
+        print('**_correspondenceattachments: ', _correspondenceattachments)
         _correspondenceemails = FOIApplicantCorrespondenceEmailRawRequest.getapplicantcorrespondenceemails(rawrequestid)
+        print('**_correspondenceemails: ', _correspondenceemails)
         if ministryrequestid != 'None':
+            print('getting FOIApplicantCorrespondence')
             _correspondencelogs.extend(FOIApplicantCorrespondence.getapplicantcorrespondences(ministryrequestid))
+            print('getting FOIApplicantCorrespondenceAttachment')
             _correspondenceattachments.extend(FOIApplicantCorrespondenceAttachment.getcorrespondenceattachmentsbyministryid(ministryrequestid))
+            print('getting FOIApplicantCorrespondenceEmail')
             _correspondenceemails.extend(FOIApplicantCorrespondenceEmail.getapplicantcorrespondenceemails(ministryrequestid))
+        print('****Final:')
+        print('_correspondencelogs: ', _correspondencelogs)
+        print('_correspondenceattachments: ', _correspondenceattachments)
+        print('_correspondenceemails: ', _correspondenceemails)
         correspondencelogs =[]
         for _correpondencelog in _correspondencelogs:
                 attachments = []
+                print('getting attachments')
                 for _attachment in self.__getattachmentsbyid(_correspondenceattachments, _correpondencelog['applicantcorrespondenceid'], _correpondencelog['version']):
+                    print('formatting attachments')
                     attachment = {
                         "applicantcorrespondenceattachmentid" : _attachment['applicantcorrespondenceattachmentid'],
                         "documenturipath" : _attachment['attachmentdocumenturipath'],
                         "filename" : _attachment['attachmentfilename'],
                     }
+                    print('appending attachments')
                     attachments.append(attachment)
+                print('attachment appended')
+                print('creating correspondence log')
                 correpondencelog = self.__createcorrespondencelog(_correpondencelog, attachments)
                 #Email block - Begin
+                print('getting emails')
                 correpondencelog['emails'] = self.__getcorrespondenceemailbyid(_correspondenceemails,  _correpondencelog['applicantcorrespondenceid'], _correpondencelog['version'])
+                print('getting ccemails')
                 correpondencelog['ccemails'] = self.__getcorrespondenceCCemailbyid(_correspondenceemails,  _correpondencelog['applicantcorrespondenceid'], _correpondencelog['version'])
                 #Email block - End
+                print('appending logs')
                 correspondencelogs.append(correpondencelog)
         # Since we're merging raw and ministry requests, resort by date
+        print('sorting logs')
         correspondencelogs.sort(key=lambda x: datetime.strptime(x['date'], '%Y %b %d | %I:%M %p'), reverse=True)
+        print('returning logs')
         return correspondencelogs
     
     def __getattachmentsbyid(self, attachments, correspondenceid, correspondenceversion):
@@ -308,12 +328,18 @@ class applicantcorrespondenceservice:
         return [x for x in emails if x['applicantcorrespondence_id'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion]
 
     def __createcorrespondencelog(self, _correpondencelog, attachments):
+        print('getting jsonobject')
         (_correspondencemessagejson, _isjson) = self.__getjsonobject(_correpondencelog['correspondencemessagejson']) if _correpondencelog['correspondencemessagejson'] is not None else (None, None)
+        print('loading _sentcorrespondencemessagejson')
         _sentcorrespondencemessagejson = json.loads(_correpondencelog["sentcorrespondencemessage"]) if _correpondencelog['sentcorrespondencemessage'] not in [None,''] else None
+        print('getting issentmessgae')
         issentmessage = _sentcorrespondencemessagejson is not None and 'sent_at' in _correpondencelog and _correpondencelog['sent_at'] is not None
+        print('getting _date')
         _date = self.__pstformat(_correpondencelog['sent_at']) if issentmessage else self.__pstformat(_correpondencelog['created_at'])
         if "response_at" in _correpondencelog and _correpondencelog["response_at"] is not None:
+            print('overwriting _date from response_at')
             _date = self.__pstformat(_correpondencelog["response_at"])
+        print('formatting correpondencelog')
         correpondencelog ={
             "applicantcorrespondenceid":_correpondencelog['applicantcorrespondenceid'],
             "parentapplicantcorrespondenceid":_correpondencelog['parentapplicantcorrespondenceid'],
