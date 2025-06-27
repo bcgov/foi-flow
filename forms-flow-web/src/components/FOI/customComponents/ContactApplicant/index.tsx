@@ -245,7 +245,7 @@ export const ContactApplicant = ({
 
     let folderName = convertDateStringToNumeric(correspondence?.date).replaceAll(":", "_") + ' - ' + getCorrespondenceSubject(correspondence, templateList, requestNumber)
     const headerDiv = document.createElement("div");
-    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondenceSubject}\nSent: ${correspondence?.date}\n`;
+    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`;
     headerDiv.style.fontSize = "12px";
     headerDiv.style.fontFamily = "BCSans"
     headerDiv.style.marginBottom = "20px";
