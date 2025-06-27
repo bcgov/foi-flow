@@ -31,6 +31,12 @@ class recordservice(recordservicebase):
     stitchinglargefilesizelimit= getenv('STITCHING_STREAM_SEPARATION_FILE_SIZE_LIMIT',524288000)
     pdfstitchstreamkey_largefiles = getenv('EVENT_QUEUE_PDFSTITCH_LARGE_FILE_STREAMKEY')
     pagecalculatorstreamkey = getenv('EVENT_QUEUE_PAGECALCULATOR_STREAM_KEY')
+    compressionstreamkey = getenv('EVENT_QUEUE_COMPRESSION_STREAMKEY')
+    ocrstreamkey = getenv('EVENT_QUEUE_OCR_STREAMKEY')
+    largefilecompressionstreamkey = getenv('EVENT_QUEUE_COMPRESSION_LARGE_FILE_STREAMKEY')
+    largefileocrstreamkey = getenv('EVENT_QUEUE_OCR_LARGE_FILE_STREAMKEY')
+    compressionlargefilesizelimit=getenv('COMPRESSION_STREAM_SEPARATION_FILE_SIZE_LIMIT',104857600)
+    ocrlargefilesizelimit= getenv('OCR_STREAM_SEPARATION_FILE_SIZE_LIMIT',104857600)
     
     s3host = getenv('OSS_S3_HOST')
 
@@ -117,21 +123,49 @@ class recordservice(recordservicebase):
                 if extension not in DEDUPE_FILE_TYPES:
                     return DefaultMethodResult(False,'Dedupe only accepts the following formats: ' + ', '.join(DEDUPE_FILE_TYPES), -1, record['recordid'])
                 else:
-                    streamkey = self.dedupestreamkey
+                    if ('convertedfilesize' in record['attributes'] and record['attributes']['convertedfilesize'] < int(self.dedupelargefilesizelimit) or 
+                        'convertedfilesize' not in record['attributes'] and record['attributes']['filesize'] < int(self.dedupelargefilesizelimit)):
+                        streamkey= self.dedupestreamkey
+                    else:
+                        streamkey= self.largefilededupestreamkey
             elif record['service'] == 'conversion':
                 if extension not in FILE_CONVERSION_FILE_TYPES:
                     return DefaultMethodResult(False,'File Conversion only accepts the following formats: ' + ', '.join(FILE_CONVERSION_FILE_TYPES), -1, record['recordid'])
                 else:
-                    streamkey = self.conversionstreamkey
+                    if record['attributes']['filesize'] < int(self.conversionlargefilesizelimit):
+                        streamkey =self.conversionstreamkey
+                    else:
+                        streamkey =self.largefileconversionstreamkey
+            elif record['service'] == 'compression':
+                if extension not in (".pdf", ".jpg", ".jpeg"):
+                    return DefaultMethodResult(False,'File Conversion only accepts the following formats: ' + ', '.join(FILE_CONVERSION_FILE_TYPES), -1, record['recordid'])
+                else:
+                    if ('convertedfilesize' in record['attributes'] and record['attributes']['convertedfilesize'] < int(self.compressionlargefilesizelimit) or 
+                        'convertedfilesize' not in record['attributes'] and record['attributes']['filesize'] < int(self.compressionlargefilesizelimit)):
+                        streamkey= self.compressionstreamkey
+                    else:
+                        streamkey= self.largefilecompressionstreamkey
+            elif record['service'] == 'ocr':
+                if extension != ".pdf":
+                    return DefaultMethodResult(False,'File Conversion only accepts the following formats: ' + ', '.join(FILE_CONVERSION_FILE_TYPES), -1, record['recordid'])
+                else:
+                    if ('compressedfilesize' in record['attributes'] and record['attributes']['compressedfilesize'] < int(self.ocrlargefilesizelimit) or 
+                        'compressedfilesize' not in record['attributes'] and record['attributes']['filesize'] < int(self.ocrlargefilesizelimit)):
+                        streamkey = self.ocrstreamkey
+                    else:
+                        streamkey= self.largefileocrstreamkey
             else:
                 streamkey = self.dedupestreamkey if extension in DEDUPE_FILE_TYPES else self.conversionstreamkey
+            print("!!!!!!!",[record])
             jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
                 'records': [record],
                 'batch': record['attributes']['batch'],
                 'trigger': record['trigger'],
                 'ministryrequestid': ministryrequestid
             })
-            if err:
+            print("\njobids:",jobids)
+            #print("\nERROR:",err)
+            if err and err is not None:
                 return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
             streamobject = {
                 "s3filepath": record['s3uripath'],
@@ -346,7 +380,7 @@ class recordservice(recordservicebase):
                         "trigger": 'recordupload',
                         "createdby": userid,
                         "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false',
-                        "usertoken": AuthHelper.getauthtoken()
+                        "usertoken": AuthHelper.getauthtoken(),
                     }
                     if extension in FILE_CONVERSION_FILE_TYPES:
                         if entry['attributes']['filesize'] < int(self.conversionlargefilesizelimit):
@@ -403,6 +437,19 @@ class recordservice(recordservicebase):
         if not record.get("isduplicate", False) and not record["attributes"].get("isportfolio", False) and not record['attributes'].get('incompatible', False):
             return True
         return False
+    
+    def retrieverecordbyprocessversion(self, requestid, ministryrequestid, requestdata, userid):
+        documentmasterids = requestdata["documentmasterids"]
+        recordretrieveversion= requestdata["recordretrieveversion"]
+        if(len(documentmasterids) > 0):
+            _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/update/retrieveversion', {'ministryrequestid': ministryrequestid, 
+                                            'documentmasterids': documentmasterids, "recordretrieveversion":recordretrieveversion})
+            #print("_apiresponse:", _apiresponse)
+            if err and err is not None:
+                return DefaultMethodResult(False,f"Error in contacting Doc Reviewer API in retrieving record version - {err}", -1, ministryrequestid )
+            return DefaultMethodResult(True,'Record version retrieved in Doc Reviewer DB ', -1, ministryrequestid)
+        else:
+            return DefaultMethodResult(False,'No records to retrieve record version', -1, ministryrequestid)
 
     
 
