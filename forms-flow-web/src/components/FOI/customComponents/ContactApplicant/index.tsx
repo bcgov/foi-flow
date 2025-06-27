@@ -4,7 +4,7 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from "@mui/material/InputAdornment";
 import MenuItem from '@mui/material/MenuItem';
 import './index.scss'
-import { errorToast, getFullnameList } from "../../../../helper/FOI/helper";
+import { ConditionalComponent, errorToast, getFullnameList } from "../../../../helper/FOI/helper";
 import { toast } from "react-toastify";
 import type { Template } from './types';
 import { fetchApplicantCorrespondence, saveEmailCorrespondence, saveDraftCorrespondence, 
@@ -45,6 +45,9 @@ import CustomAutocomplete from '../Autocomplete'
 import { saveAs } from "file-saver";
 import { downloadZip } from 'client-zip';
 import { formatDateInPst } from '../../../../helper/FOI/helper';
+import { getCorrespondenceSubject, getFullEmailListText, getFullCCEmailListText, convertDateStringToNumeric } from './helper';
+//@ts-ignore
+import * as html2pdf from 'html-to-pdf-js';
 
 export const ContactApplicant = ({
   requestNumber,
@@ -230,6 +233,95 @@ export const ContactApplicant = ({
 
   const handleExportAsPdfButton = () => {
     setExportPdfTrigger(true);
+  }
+
+  const downloadForExport = async (correspondence: any, blobs: any) => {
+    let fileInfoList = correspondence.attachments.map((attachment: any) => {
+      return  {
+        filename: attachment.filename,
+        s3sourceuri: attachment.documenturipath
+      }
+    })
+
+    let folderName = convertDateStringToNumeric(correspondence?.date).replaceAll(":", "_") + ' - ' + getCorrespondenceSubject(correspondence, templateList, requestNumber)
+    const headerDiv = document.createElement("div");
+    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondenceSubject}\nSent: ${correspondence?.date}\n`;
+    headerDiv.style.fontSize = "12px";
+    headerDiv.style.fontFamily = "BCSans"
+    headerDiv.style.marginBottom = "20px";
+    let element = headerDiv.outerHTML
+    if (correspondence?.text) element = element + correspondence?.text
+    // No drafts being downloaded as part of export all
+    let emailFilename = correspondence?.subject ? `${correspondence?.subject}.pdf` : `Correspondence Letter - ${requestNumber}.pdf`
+    html2pdf().set({margin: 20}).from(element).outputPdf('blob').then(async (blob: Blob) => {
+      blobs.push({name: folderName + '/' + emailFilename, lastModified: new Date(), input: blob})
+    });
+
+    try {
+      const response = await getOSSHeaderDetails(fileInfoList, dispatch);
+      for (let header of response.data) {
+        await getFileFromS3(header, (_err: any, res: any) => {
+          let blob = new Blob([res.data], {type: "application/octet-stream"});
+          blobs.push({name: folderName + '/' + header.filename, lastModified: res.headers['last-modified'], input: blob})
+        });
+      }
+      return {folder: folderName, status: 'success'}
+    } catch (error) {
+      console.log(error)
+      return {folder: folderName, status: 'failed'}
+    }
+  }
+
+  const exportAll = async () => {
+    const toastOptions = {
+      render: `Exporting correspondences complete`,
+      type: "success",
+      className: "file-upload-toast",
+      isLoading: false,
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      closeButton: true
+    }
+    const toastID = toast.loading(`Exporting all correspondences, this may take a moment...`);
+    let blobs: any = [];
+    try {
+      const fetchPromises = correspondences.map(async (correspondence: any) => {
+        const result = await downloadForExport(correspondence, blobs)
+        return result;
+      })
+      const results = await Promise.all(fetchPromises)
+      const failedAttachments = [];
+      for (let result of results) {
+        if (result.status == "failed") {
+          failedAttachments.push(result.folder)
+          toast.error(`Exporting attachments for ${result.folder} failed.`)
+        }
+      }
+      const zipfile = await downloadZip(blobs).blob()
+      const zipfileName = requestNumber ? requestNumber : `U-00${requestId}`
+      saveAs(zipfile, zipfileName + "- Correspondence" + ".zip");
+      if (failedAttachments.length > 0) {
+        toast.update(toastID, {...toastOptions, 
+          render: `Download complete, but the following correspondences have failed to download all attachments: ${failedAttachments.join(', \n')}`,
+          type: "error",
+          autoClose: false
+        });
+      } else {
+        toast.update(toastID, {...toastOptions, 
+          render: `Exporting correspondences complete`,
+          type: "success"
+        });
+      }
+    } catch (error) {
+      console.log(error)
+      toast.update(toastID, {...toastOptions,
+        render: `Exporting correspondences failed.`,
+        type: "error"
+      });
+    }
   }
 
   const exportAsPdf = async (sfdtString: string) => {
@@ -1378,19 +1470,16 @@ export const ContactApplicant = ({
             {getRequestNumber()}
           </h1>
         </Grid>
-        <Grid item xs={3}>
-          {/* <ConditionalComponent condition={hasDocumentsToExport}>
+        <Grid container xs={6} direction="row" justifyContent='flex-end'>
+        <ConditionalComponent condition={correspondenceFilter === "log"}>
             <button
-              className="btn addAttachment foi-export-button"
-              variant="contained"
-              onClick={downloadAllDocuments}
+              className="btn exportAllButton"
+              onClick={exportAll}
               color="primary"
             >
               Export All
             </button>
-          </ConditionalComponent> */}
-        </Grid>
-        <Grid container xs={3} direction="row" justifyContent='flex-end'>
+          </ConditionalComponent>
           <TextField
             className="btn addCorrespondence"
             color="primary"
