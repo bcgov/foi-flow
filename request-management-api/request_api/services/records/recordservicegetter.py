@@ -257,7 +257,7 @@ class recordservicegetter(recordservicebase):
         return False
     
     def __getiscompressed(self, _computingresponse):
-        if _computingresponse["compressionstatus"] == "completed":
+        if "compressionstatus" in _computingresponse and _computingresponse["compressionstatus"] == "completed":
             return True
         return False
     
@@ -292,7 +292,7 @@ class recordservicegetter(recordservicebase):
                 _convertedfiles += 1
             if entry["deduplicationstatus"] == "completed":
                 _dedupedfiles += 1
-            if entry["compressionstatus"] == "completed":
+            if "compressionstatus" in entry and entry["compressionstatus"] == "completed":
                 _compressedfiles += 1
             if entry["isduplicate"] == True:
                 _removedfiles += 1
