@@ -6,6 +6,7 @@ from request_api.models.FOIRequests import FOIRequest
 from datetime import datetime
 import dateutil.parser
 import maya
+import json
 from enum import Enum
 from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice 
 from request_api.services.requestservice import requestservice
@@ -13,12 +14,29 @@ from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.paymentservice import paymentservice
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.services.communicationemailservice import communicationemailservice
+from request_api.services.email.templates.templateconfig import templateconfig
 
 class communicationwrapperservice:
     """ FOI communication wrapper service
     """
 
     def send_email(self, requestid, rawrequestid, ministryrequestid, applicantcorrespondencelog):
+        # Get the correct email subject
+        data = json.loads(applicantcorrespondencelog['correspondencemessagejson'])
+        attributes = applicantcorrespondencelog["attributes"][0]
+        emailsubject = ""
+        customizedsubject = data['subject'] if 'subject' in data else ""
+        if len(customizedsubject) > 0:
+            emailsubject = customizedsubject
+        elif template is None:
+            if 'templatename' in applicantcorrespondencelog and applicantcorrespondencelog['templatename'] is not None:
+                emailsubject = templateconfig().getsubject(applicantcorrespondencelog['templatename'], attributes)
+            else:
+                emailsubject = templateconfig().getsubject("", attributes)
+        else:
+            emailsubject = templateconfig().getsubject(template.name, attributes)
+        applicantcorrespondencelog['emailsubject'] = emailsubject
+        print('applicantcorrespondencelog: ', applicantcorrespondencelog)
         # Save correspondence log based on request type
         if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
