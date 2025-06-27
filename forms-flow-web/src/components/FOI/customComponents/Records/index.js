@@ -11,6 +11,7 @@ import {
   postFOIS3DocumentPreSignedUrl,
   getFOIS3DocumentPreSignedUrl,
   completeMultiPartUpload,
+  downloadFileFromS3,
 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import {
   saveFOIRequestAttachmentsList,
@@ -355,14 +356,26 @@ export const RecordsLog = ({
   }, []);
 
   const isDisableRedactRecords = (allRecords) => {
-    return allRecords.some(record =>
-      !record.isredactionready && !record.attributes.incompatible && 
-        !record.selectedfileprocessversion && !record.ocrfilepath
-      // || (!record.attributes.incompatible && !record.iscompressed &&
-      //   (record.selectedfileprocessversion !== 1 || !record.selectedfileprocessversion))
-        
-    );
-  };
+
+    const isInvalid = (record) =>
+      !record.isredactionready &&
+      !record.attributes?.incompatible &&
+      !record.selectedfileprocessversion &&
+      !record.ocrfilepath;
+
+    const isInvalidAttachment = (record) =>
+      !record.isredactionready &&
+      !record.attributes?.incompatible
+
+    return allRecords.some(record =>{
+      if(isInvalid(record)) return true;
+
+      if (Array.isArray(record.attachments)) {
+        return record.attachments.some(isInvalidAttachment);
+      }
+      return false;
+    });
+  }
   
 
   const [currentEditRecord, setCurrentEditRecord] = useState();
@@ -994,25 +1007,33 @@ export const RecordsLog = ({
     }
   };
 
-  const downloadDocument = (file, isPDF = false, originalfile = false) => {
-    var filePath = (file.selectedfileprocessversion != 1  && 'ocrfilepath' in file && file.ocrfilepath != null)? file.ocrfilepath
+  const downloadDocument = (file, isPDF = false, originalfile = false, downloadReplacedOriginal = false) => {
+    
+    const extension = file?.filename?.split('.')?.pop()
+    var filePath = downloadReplacedOriginal ? file.s3uripath : (file.selectedfileprocessversion != 1  && 'ocrfilepath' in file && file.ocrfilepath != null)? file.ocrfilepath
                     : ( file.selectedfileprocessversion != 1  && 'compresseds3uripath' in file && file.compresseds3uripath != null)? 
                     file.compresseds3uripath : file.s3uripath
     var s3filepath = !originalfile
-      ? filePath
-      : !file.isattachment
-      ? getOriginalFileS3Path(file.originalfile ? file.originalfile : file.s3uripath)
-      : filePath;
+      ? filePath : getOriginalFileS3Path((file.originalfile && !downloadReplacedOriginal) ? file.originalfile : file.s3uripath , file?.attributes?.incompatible)
+      // : !file.isattachment
+      // ? getOriginalFileS3Path(file.originalfile ? file.originalfile : file.s3uripath , file?.attributes?.incompatible)
+      // : filePath;
     var filename = !originalfile
-      ? file.filename
-      : !file.isattachment
-      ? (file.originalfilename? file.originalfilename : file.filename)
-      : file.filename;
-    if (isPDF) {
-      s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
-      filename = filename + ".pdf";
+      ? file.filename :((file.originalfilename && !downloadReplacedOriginal)? file.originalfilename : file.filename)
+      // : !file.isattachment
+      // ? (file.originalfilename? file.originalfilename : file.filename)
+      // : file.filename;
+    //if (isPDF && !downloadReplacedOriginal) {
+    if (!["png", "jpg", "jpeg", "pdf"].includes(extension)) {
+      if (isPDF){
+        s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
+        filename = filename + ".pdf";
+      }
+      else if (!originalfile && !downloadReplacedOriginal){
+        filename = filename + ".pdf";
+      }
     }
-    if (originalfile && !file.isattachment)
+    if (originalfile)
       attemptDownload(s3filepath, filename,(file.originalfile ? file.originalfile : file.s3uripath));
     else
       attemptDownload(s3filepath, filename);
@@ -1026,12 +1047,15 @@ export const RecordsLog = ({
       dispatch,
       (err, res) => {
         if (!err) {
-          getFileFromS3(
+          downloadFileFromS3(
             { filepath: res },
             (_err, response) => {
-              if (_err || !response || !response.data) {
+              const is404 = (_err && _err.status === 404) ||
+                (response && response.status === 404);
+              if (_err || !response || !response.data || is404) {
                 const hasOriginalKeyword = s3filepath.split("/").pop().replace(/\.[^/.]+$/, "").endsWith("ORIGINAL");
                 if (fallbackPath && hasOriginalKeyword) {
+                  toast.dismiss(toastID);
                   // Retry with the fallback path
                   attemptDownload(fallbackPath, filename); // No further fallback
                 }
@@ -1073,15 +1097,17 @@ export const RecordsLog = ({
               });
             },
             (progressEvent) => {
-              toast.update(toastID, {
-                render:
-                  "Downloading file (" +
-                  Math.floor(
-                    (progressEvent.loaded / progressEvent.total) * 100
-                  ) +
-                  "%)",
-                isLoading: true,
-              });
+              if(progressEvent.total > 0){
+                toast.update(toastID, {
+                  render:
+                    "Downloading file (" +
+                    Math.floor(
+                      (progressEvent.loaded / progressEvent.total) * 100
+                    ) +
+                    "%)",
+                  isLoading: true,
+                });
+              }
             }
           );
         }
@@ -1106,9 +1132,13 @@ export const RecordsLog = ({
     );
   }
 
-  const getOriginalFileS3Path = (path) => {
+  const getOriginalFileS3Path = (path, isIncompatible) => {
     const extIndex = path.lastIndexOf(".");
-    if (extIndex === -1) return path + "ORIGINAL";
+    if (extIndex === -1) 
+      return path;
+    let extension=path.slice(extIndex)
+    if (extension?.toLowerCase() != ".pdf" || isIncompatible)
+      return path;
     console.log("ORIGINAL path:",path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex))
     return path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex);
   }
@@ -1657,12 +1687,17 @@ export const RecordsLog = ({
         setModal(false);
         break;
       case "downloadPDF":
-        downloadDocument(_record, true);
+        downloadDocument(_record, true, true, true);
         setModalFor("download");
         setModal(false);
         break;
       case "downloadoriginal":
         downloadDocument(_record, false, true);
+        setModalFor("download");
+        setModal(false);
+        break;
+      case "downloadreplaced":
+        downloadDocument(_record, false, true, true);
         setModalFor("download");
         setModal(false);
         break;
@@ -2461,33 +2496,56 @@ export const RecordsLog = ({
               </Tooltip>
             </Grid> :  <Grid item xs={isScanningTeamMember ? 1 : 1}></Grid>
             }
-            {(isMinistryCoordinator == false &&
+            {isMinistryCoordinator == false &&
               records?.length > 0 &&
               DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
-                <Tooltip title={<div style={{ fontSize: "11px" }}>Some files are still processing or have errors. 
-                  Please ensure that all files are successfully processed.</div>}>
-                  <Grid item xs={isScanningTeamMember ? 1 : 1}>
-                  <a
-                    href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
-                    target="_blank"
-                  >
-                    <button
-                      className={clsx(
-                        "btn",
-                        "addAttachment",
-                        classes.createButton
-                      )}
-                      variant="contained"
-                      // onClick={}
-                      disabled={isDisableRedactRecords(records)}
-                      color="primary"
+                // <Tooltip title={<div style={{ fontSize: "11px" }}>Some files are still processing or have errors. 
+                //   Please ensure that all files are successfully processed.</div>}>
+                  <Grid item xs={1}>
+                    {isDisableRedactRecords(records) ? (
+                      <Tooltip
+                        title={
+                          <div style={{ fontSize: "11px" }}>
+                            Some files are still processing or have errors.
+                            Please ensure that all files are successfully processed.
+                          </div>
+                        }>
+                      <span>
+                        <a
+                          href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
+                          target="_blank"
+                        >
+                          <button
+                            className={clsx(
+                              "btn",
+                              "addAttachment",
+                              classes.createButton
+                            )}
+                            variant="contained"
+                            // onClick={}
+                            disabled={isDisableRedactRecords(records)}
+                            color="primary"
+                          >
+                            Redact Records
+                          </button>
+                        </a>
+                        </span>
+                      </Tooltip>
+                    ): (
+                    <a
+                      href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
+                      target="_blank"
                     >
-                      Redact Records
-                    </button>
-                  </a>
-                  </Grid>
-                </Tooltip>
-              )
+                      <button
+                        className={clsx("btn", "addAttachment", classes.createButton)}
+                        variant="contained"
+                        color="primary"
+                      >
+                        Redact Records
+                      </button>
+                    </a>
+                  )}
+                </Grid>
             )}
             <Grid item xs={3}>
               {hasDocumentsToDownload && !isHistoricalRequest && (
@@ -3592,8 +3650,12 @@ const Attachment = React.memo(
                 color="#A0192F"
                 className={classes.statusIcons}
               />
-            ) : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
-                true && isRetry == false && !record.selectedfileprocessversion? (
+            ) : ((record.updated_at != null && record.updated_at != undefined) 
+                    ? isrecordtimeout(record.updated_at, RECORD_PROCESSING_HRS) == true 
+                    : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) && 
+                  isRetry == false && !record.selectedfileprocessversion ?(
+                // isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
+                // true && isRetry == false && !record.selectedfileprocessversion? (
               <FontAwesomeIcon
                 icon={faExclamationCircle}
                 size="2x"
@@ -3923,6 +3985,11 @@ const AttachmentPopup = React.memo(
       handlePopupButtonClick("downloadoriginal", record);
     };
 
+    const handleDownloadReplaced = () => {
+      closeTooltip();
+      handlePopupButtonClick("downloadreplaced", record);
+    };
+
     const handleView = () => {
       closeTooltip();
       opendocumentintab(record, ministryId);
@@ -4101,7 +4168,7 @@ const AttachmentPopup = React.memo(
               </MenuItem>
             )}
             {(record.isredactionready && (record.isconverted || record.iscompressed ||
-                 record.ocrfilepath))&& (
+                 record.ocrfilepath) && !record.attributes.incompatible) && (
               <MenuItem
                 onClick={() => {
                   handleDownload()
@@ -4114,7 +4181,7 @@ const AttachmentPopup = React.memo(
             {record.originalfile != "" && record.originalfile != undefined &&
               <MenuItem
                 onClick={() => {
-                  handleDownloadoriginal();
+                  handleDownloadReplaced();
                   setPopoverOpen(false);
                 }}
               >

@@ -25,7 +25,7 @@ class recordservicegetter(recordservicebase):
             resultrecords = []
             if len(uploadedrecords) > 0:
                 computingresponses, err = self.getdatafromdocreviewer(uploadedrecords, ministryrequestid)
-                print("computingresponses:",computingresponses)
+                #print("computingresponses:",computingresponses)
                 if err is None:
                     (
                         _convertedfiles,
