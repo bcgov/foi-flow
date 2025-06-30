@@ -153,8 +153,15 @@ export const DocEditor = ({
             container.documentEditor.selection.goToPage(1);
             container.documentEditor.selection.goToHeader();
             container.documentEditor.editor.clearFormatting();
+            container.documentEditor.selection.selectAll();
+            container.documentEditor.editor.delete();
             container.documentEditor.selection.sectionFormat.headerDistance = 0;
             container.documentEditor.selection.paragraphFormat.textAlignment = 'Center';
+            container.documentEditor.selection.paragraphFormat.afterSpacing = 0;
+            container.documentEditor.selection.paragraphFormat.beforeSpacing = 0;
+            container.documentEditor.selection.paragraphFormat.leftIndent = 0;
+            container.documentEditor.selection.paragraphFormat.rightIndent = 0;
+            container.documentEditor.selection.characterFormat.fontFamily = 'BC Sans';
             container.documentEditor.editor.insertImage(HeaderLogoBase64, 144, 135);
             container.documentEditor.selection.closeHeaderFooter();
         }
@@ -166,6 +173,9 @@ export const DocEditor = ({
             container.documentEditor.selection.goToPage(1);
             container.documentEditor.selection.goToFooter();
             container.documentEditor.editor.clearFormatting();
+            container.documentEditor.selection.selectAll();
+            container.documentEditor.editor.delete();
+            container.documentEditor.selection.paragraphFormat.lineSpacing = 1;
             container.documentEditor.selection.sectionFormat.footerDistance = 10;
             container.documentEditor.selection.characterFormat.fontSize = 8;
             container.documentEditor.selection.paragraphFormat.afterSpacing = 0;
@@ -222,7 +232,7 @@ export const DocEditor = ({
         if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label)) {
             container.documentEditor.selection.goToPage(2);
             container.documentEditor.selection.goToHeader();
-            container.documentEditor.selection.sectionFormat.headerDistance = 10;
+            container.documentEditor.selection.sectionFormat.headerDistance = 20;
             container.documentEditor.selection.paragraphFormat.textAlignment = 'Center';
             container.documentEditor.selection.characterFormat.fontFamily = 'BC Sans';
             container.documentEditor.editor.insertPageNumber();
@@ -232,7 +242,10 @@ export const DocEditor = ({
             for (let page = 2; page <= numberOfPages; page++) {
                 container.documentEditor.selection.goToPage(page)
                 container.documentEditor.selection.goToHeader();
-                container.documentEditor.selection.sectionFormat.headerDistance = 10;
+                container.documentEditor.selection.sectionFormat.oddPageFooter.linkToPrevious = false;
+                container.documentEditor.selection.sectionFormat.evenPageFooter.linkToPrevious = false;
+                container.documentEditor.selection.sectionFormat.headerDistance = 20;
+                container.documentEditor.selection.characterFormat.fontSize = 10;
                 container.documentEditor.selection.paragraphFormat.textAlignment = 'Center';
                 container.documentEditor.selection.characterFormat.fontFamily = 'BC Sans';
                 container.documentEditor.selection.closeHeaderFooter();
