@@ -40,6 +40,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CloseIcon from '@material-ui/icons/Close';
+import { HtmlTooltip } from '../Tooltip/MuiTooltip/Tooltip';
 import { DocEditor } from './DocEditor';
 import CustomAutocomplete from '../Autocomplete'
 import { saveAs } from "file-saver";
@@ -1842,10 +1843,20 @@ export const ContactApplicant = ({
               data-variant="contained"
               onClick={() => {setPreviewModal(true);setPreviewTrigger(true);} }
               color="primary"
-              // disabled={(currentTemplate <= 0)}
+              disabled={selectedEmails?.length == 0 && selectedCCEmails?.length == 0}
             >
               {previewButtonValue}
             </button>
+          {(selectedEmails?.length === 0 && selectedCCEmails?.length === 0) && (
+            <HtmlTooltip title="Please select an email in Email To or CC To." placement="right">
+              <img
+                src="/assets/Images/infoicon.svg"
+                alt="info"
+                width="20px"
+                style={{ cursor: 'pointer' }}
+              />
+            </HtmlTooltip>
+          )}
           </div>
         </div>
         <Grid
