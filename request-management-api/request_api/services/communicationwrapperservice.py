@@ -26,6 +26,10 @@ class communicationwrapperservice:
         attributes = applicantcorrespondencelog["attributes"][0]
         emailsubject = ""
         customizedsubject = data['subject'] if 'subject' in data else ""
+        if applicantcorrespondencelog["templatename"] is None:
+            template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
+        else:
+            template = None
         if len(customizedsubject) > 0:
             emailsubject = customizedsubject
         elif template is None:
@@ -57,10 +61,6 @@ class communicationwrapperservice:
             # Handle non-fee templates - Send email for non-fee templates with email recipients
             else:
                 if ("emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0) or ("ccemails" in applicantcorrespondencelog and len(applicantcorrespondencelog["ccemails"]) > 0):
-                    if applicantcorrespondencelog["templatename"] is None:
-                        template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
-                    else:
-                        template = None
                         # template["name"] = applicantcorrespondencelog["templatename"]
                         # template["description"] = applicantcorrespondencelog["templatename"]
                     return communicationemailservice().send(template, applicantcorrespondencelog)
