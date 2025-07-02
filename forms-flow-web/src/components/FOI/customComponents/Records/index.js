@@ -3584,12 +3584,12 @@ const Attachment = React.memo(
       return false;
     }
 
-    const showOCRTag= (record)=> {
-      if (record.ocrfilepath != null && (!record.selectedfileprocessversion 
-        || record.selectedfileprocessversion != 2 ))
-        return true;
-      return false;
-    }
+    // const showOCRTag= (record)=> {
+    //   if (record.ocrfilepath != null && (!record.selectedfileprocessversion 
+    //     || record.selectedfileprocessversion != 2 ))
+    //     return true;
+    //   return false;
+    // }
 
     return (
       <>
