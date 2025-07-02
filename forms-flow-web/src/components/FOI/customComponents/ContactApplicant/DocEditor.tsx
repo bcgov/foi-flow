@@ -242,9 +242,14 @@ export const DocEditor = ({
             for (let page = 2; page <= numberOfPages; page++) {
                 container.documentEditor.selection.goToPage(page)
                 container.documentEditor.selection.goToHeader();
+                container.documentEditor.selection.selectAll();
                 container.documentEditor.selection.sectionFormat.oddPageFooter.linkToPrevious = false;
                 container.documentEditor.selection.sectionFormat.evenPageFooter.linkToPrevious = false;
-                container.documentEditor.selection.sectionFormat.headerDistance = 20;
+                container.documentEditor.selection.sectionFormat.firstPageFooter.linkToPrevious = false;
+                container.documentEditor.selection.sectionFormat.oddPageHeader.linkToPrevious = false;
+                container.documentEditor.selection.sectionFormat.evenPageHeader.linkToPrevious = false;
+                container.documentEditor.selection.sectionFormat.firstPageHeader.linkToPrevious = false;
+                container.documentEditor.selection.sectionFormat.headerDistance = 30;
                 container.documentEditor.selection.characterFormat.fontSize = 10;
                 container.documentEditor.selection.paragraphFormat.textAlignment = 'Center';
                 container.documentEditor.selection.characterFormat.fontFamily = 'BC Sans';
