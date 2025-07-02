@@ -78,6 +78,7 @@ export const ContactApplicant = ({
   const [attachPdfTrigger, setAttachPdfTrigger] = useState(false);
   const [exportPdfTrigger, setExportPdfTrigger] = useState(false);
   const [attachAsPdfFilename, setAttachAsPdfFilename] = useState(requestNumber || "");
+  const [responseTitle, setResponseTitle] = useState<string>('');
 
   useEffect(() => {
     if (selectedCorrespondence?.subject) setCorrespondenceSubject(selectedCorrespondence?.subject)
@@ -1053,7 +1054,8 @@ export const ContactApplicant = ({
       let israwrequest = ministryId ? false : true;
       let data = {
         attachments: responseattachments,
-        israwrequest: israwrequest
+        israwrequest: israwrequest,
+        responseTitle: responseTitle
       };
       saveCorrespondenceResponse(
         data,
@@ -1363,6 +1365,10 @@ export const ContactApplicant = ({
         console.log('Error updating response date: ', errorMessage)}
     )
   }
+
+  const handleChangeResponseTitle = (title: string) => {
+    setResponseTitle(title);
+  };
   const [showEditor, setShowEditor] = useState(false)
 
   const [previewModal, setPreviewModal] = useState(false);
@@ -1383,6 +1389,8 @@ export const ContactApplicant = ({
         <p>Please select a template and add an attachment before previewing the email</p>
       </div>]
   };
+
+
 
   let correspondenceList;
   correspondenceList = correspondences.map((message: any, index: any) => (
@@ -1894,6 +1902,7 @@ export const ContactApplicant = ({
       maxNoFiles={uploadFor === "response" ? 10 : 10}
       bcgovcode={undefined}
       currentResponseDate={currentResponseDate}
+      handleChangeResponseTitle={handleChangeResponseTitle}
     /> 
     <div className="email-change-dialog">
       <Dialog

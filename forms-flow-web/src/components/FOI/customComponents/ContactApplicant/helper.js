@@ -1,7 +1,7 @@
 export const getCorrespondenceSubject = (correspondence, templateList, requestNumber) => {
     if (correspondence?.subject) return correspondence.subject
     if (!correspondence?.sentby && correspondence?.templatename) return templateList.find((obj)=> obj.fileName == correspondence.templatename)?.templateName
-    if (correspondence.category === "response") return "Applicant Response"
+    if (correspondence.category === "response") return correspondence.responsetitle?.trim() ? correspondence.responsetitle : "Applicant Response";
     if ((correspondence?.sentby == "System Generated Email" || correspondence?.sentby == "system") && 
       (correspondence?.text.includes("as you have additional options outside of paying the fee") || 
       correspondence?.text.includes("has received your payment for FOI request"))) return "Fee Estimate / Outstanding Fee"

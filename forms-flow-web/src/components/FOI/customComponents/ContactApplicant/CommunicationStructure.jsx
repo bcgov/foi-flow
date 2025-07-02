@@ -54,7 +54,6 @@ const CommunicationStructure = ({
   showRenameCorrespondenceSubjectModal
 }) => {
 
-  // console.log("correspondence: ", correspondence);
   const templateList = useSelector((state) => state.foiRequests.foiEmailTemplates);
   const requestDetails = useSelector((state) => state.foiRequests.foiRequestDetail);
   const dispatch = useDispatch();

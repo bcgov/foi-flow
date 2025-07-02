@@ -119,6 +119,7 @@ class applicantcorrespondenceservice:
         applicantcorrespondence.templatename = data['templatename'] if 'templatename' in data and data['templatename'] is not None else None
         applicantcorrespondence.templatetype = data['templatetype'] if 'templatetype' in data and data['templatetype'] is not None else None
         applicantcorrespondence.emailsubject = data['emailsubject'] if 'emailsubject' in data else ''
+        applicantcorrespondence.responsetitle = data['responsetitle'] if 'responsetitle' in data else ''
         return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails, ccemails)
 
     def saveapplicantcorrespondencelogforrawrequest(self, requestid, data, userid, isdraft=False):
@@ -153,6 +154,7 @@ class applicantcorrespondenceservice:
         applicantcorrespondence.templatename = data['templatename'] if 'templatename' in data and data['templatename'] is not None else None
         applicantcorrespondence.templatetype = data['templatetype'] if 'templatetype' in data and data['templatetype'] is not None else None
         applicantcorrespondence.emailsubject = data['emailsubject'] if 'emailsubject' in data else ''
+        applicantcorrespondence.responsetitle = data['responsetitle'] if 'responsetitle' in data else ''
         return FOIApplicantCorrespondenceRawRequest.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails, ccemails)
     
     def editapplicantcorrespondencelogforministry(self, ministryrequestid, data, userid):
@@ -360,6 +362,7 @@ class applicantcorrespondenceservice:
             "templatename": _correpondencelog['templatename'],
             "templatetype": _correpondencelog['templatetype'],
             "emailsubject": _correpondencelog['emailsubject'],
+            "responsetitle": _correpondencelog['responsetitle'],
         }        
         return correpondencelog
     
