@@ -43,7 +43,7 @@ class FOIApplicantCorrespondence(db.Model):
     templatename = db.Column(db.String(255), unique=False, nullable=True)
     templatetype = db.Column(db.String(120), unique=False, nullable=True)
     emailsubject = db.Column(db.String(255), unique=False, nullable=True)
-    responsetitle = db.Column(db.String(255), unique=False, nullable=True)
+    correspondencesubject = db.Column(db.String(255), unique=False, nullable=True)
     
     #ForeignKey References       
     foiministryrequest_id =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
@@ -56,7 +56,7 @@ class FOIApplicantCorrespondence(db.Model):
         try:
             sql = """select distinct on (applicantcorrespondenceid) applicantcorrespondenceid, templateid , correspondencemessagejson , version, 
                         created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at,
-                         isdraft, isdeleted, isresponse, response_at, templatename, templatetype, emailsubject, responsetitle
+                         isdraft, isdeleted, isresponse, response_at, templatename, templatetype, emailsubject, correspondencesubject
                          from "FOIApplicantCorrespondences" fpa 
                         where foiministryrequest_id = :ministryrequestid
                     order by applicantcorrespondenceid desc, version desc""" 
@@ -69,7 +69,7 @@ class FOIApplicantCorrespondence(db.Model):
                                             "sentcorrespondencemessage": row["sentcorrespondencemessage"], "parentapplicantcorrespondenceid": row["parentapplicantcorrespondenceid"],
                                             "sent_at": row["sent_at"], "sentby": row["sentby"],
                                             "isdraft": row["isdraft"], "isresponse": row["isresponse"], "response_at": row["response_at"],
-                                            "templatename": row["templatename"], "templatetype": row["templatetype"], "emailsubject": row["emailsubject"], "responsetitle": row["responsetitle"]})
+                                            "templatename": row["templatename"], "templatetype": row["templatetype"], "emailsubject": row["emailsubject"], "correspondencesubject": row["correspondencesubject"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -179,4 +179,4 @@ class FOIApplicantCorrespondence(db.Model):
 
 class FOIApplicantCorrespondenceSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceid', 'version', 'parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby', 'isdraft', 'isdeleted', 'isresponse', 'response_at', 'templatename', 'templatetype', 'emailsubject', 'responsetitle')
+        fields = ('applicantcorrespondenceid', 'version', 'parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby', 'isdraft', 'isdeleted', 'isresponse', 'response_at', 'templatename', 'templatetype', 'emailsubject', 'correspondencesubject')

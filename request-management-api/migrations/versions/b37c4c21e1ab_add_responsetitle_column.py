@@ -17,10 +17,10 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('FOIApplicantCorrespondences', sa.Column('responsetitle', sa.String(length=255), nullable=True))
-    op.add_column('FOIApplicantCorrespondencesRawRequests', sa.Column('responsetitle', sa.String(length=255), nullable=True))
+    op.add_column('FOIApplicantCorrespondences', sa.Column('correspondencesubject', sa.String(length=255), nullable=True))
+    op.add_column('FOIApplicantCorrespondencesRawRequests', sa.Column('correspondencesubject', sa.String(length=255), nullable=True))
 
 
 def downgrade():
-    op.drop_column('FOIApplicantCorrespondences', 'responsetitle')
-    op.drop_column('FOIApplicantCorrespondencesRawRequests', 'responsetitle')
+    op.drop_column('FOIApplicantCorrespondences', 'correspondencesubject')
+    op.drop_column('FOIApplicantCorrespondencesRawRequests', 'correspondencesubject')

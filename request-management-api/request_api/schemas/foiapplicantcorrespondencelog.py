@@ -59,5 +59,5 @@ class FOIApplicantCorrespondenceResponseSchema(Schema):
         unknown = EXCLUDE    
     attachments = fields.Nested(AttachmentSchema, many=True, required=False,allow_none=True)
     responsedate = fields.Str(data_key="responsedate",required=False, allow_none=True)
-    responsetitle = fields.Str(data_key="responseTitle",required=False, allow_none=True)
+    correspondencesubject = fields.Str(data_key="correspondencesubject",required=False, allow_none=True)
 

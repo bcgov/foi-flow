@@ -78,7 +78,6 @@ export const ContactApplicant = ({
   const [attachPdfTrigger, setAttachPdfTrigger] = useState(false);
   const [exportPdfTrigger, setExportPdfTrigger] = useState(false);
   const [attachAsPdfFilename, setAttachAsPdfFilename] = useState(requestNumber || "");
-  const [responseTitle, setResponseTitle] = useState<string>('');
 
   useEffect(() => {
     if (selectedCorrespondence?.subject) setCorrespondenceSubject(selectedCorrespondence?.subject)
@@ -1055,7 +1054,7 @@ export const ContactApplicant = ({
       let data = {
         attachments: responseattachments,
         israwrequest: israwrequest,
-        responseTitle: responseTitle
+        correspondencesubject: correspondenceSubject
       };
       saveCorrespondenceResponse(
         data,
@@ -1367,7 +1366,7 @@ export const ContactApplicant = ({
   }
 
   const handleChangeResponseTitle = (title: string) => {
-    setResponseTitle(title);
+    setCorrespondenceSubject(title);
   };
   const [showEditor, setShowEditor] = useState(false)
 

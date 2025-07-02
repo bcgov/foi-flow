@@ -40,7 +40,7 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
     templatename = db.Column(db.String(255), unique=False, nullable=True)
     templatetype = db.Column(db.String(120), unique=False, nullable=True)
     emailsubject = db.Column(db.String(255), unique=False, nullable=True)
-    responsetitle = db.Column(db.String(255), unique=False, nullable=True)
+    correspondencesubject = db.Column(db.String(255), unique=False, nullable=True)
     
     #ForeignKey References       
     foirawrequest_id =db.Column(db.Integer, db.ForeignKey('FOIRawRequests.requestid'))
@@ -52,7 +52,7 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
         try:
             sql = """select distinct on (applicantcorrespondenceid) applicantcorrespondenceid, templateid , correspondencemessagejson , version, 
                         created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at,
-                         isdraft, isdeleted, isresponse, response_at, israwrequest, templatename, templatetype, emailsubject, responsetitle
+                         isdraft, isdeleted, isresponse, response_at, israwrequest, templatename, templatetype, emailsubject, correspondencesubject
                          from "FOIApplicantCorrespondencesRawRequests" rawcorr 
                         where 
                             foirawrequest_id = :requestid
@@ -66,7 +66,7 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
                                             "sentcorrespondencemessage": row["sentcorrespondencemessage"], "parentapplicantcorrespondenceid": row["parentapplicantcorrespondenceid"],
                                             "sent_at": row["sent_at"], "sentby": row["sentby"],
                                             "isdraft": row["isdraft"], "isresponse": row["isresponse"], "response_at": row["response_at"], "israwrequest": row["israwrequest"],
-                                            "templatename": row["templatename"], "templatetype": row["templatetype"], "emailsubject": row["emailsubject"], "responsetitle": row["responsetitle"]})
+                                            "templatename": row["templatename"], "templatetype": row["templatetype"], "emailsubject": row["emailsubject"], "correspondencesubject": row["correspondencesubject"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -171,5 +171,5 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
         return [x for x in emails if x['applicantcorrespondence_id'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion]
 class FOIApplicantCorrespondenceRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceid', 'version', 'parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foirawrequest_id','foirawrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby', 'isdraft', 'isdeleted', 'isresponse', 'response_at', 'israwrequest', 'templatename', 'templatetype', 'emailsubject', 'responsetitle')
+        fields = ('applicantcorrespondenceid', 'version', 'parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foirawrequest_id','foirawrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby', 'isdraft', 'isdeleted', 'isresponse', 'response_at', 'israwrequest', 'templatename', 'templatetype', 'emailsubject', 'correspondencesubject')
     
