@@ -331,6 +331,7 @@ export const RecordsLog = ({
     ministryCode == "MCF" &&
       requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
   );
+  const [retrieveSelectedRecords, setRetrieveSelectedRecords] = useState({});
   useEffect(() => {
     setRecords(recordsObj?.records);
     let nonDuplicateRecords = recordsObj?.records?.filter(
@@ -794,8 +795,10 @@ export const RecordsLog = ({
           )
         );
       }
+    } else if(modalFor.toLowerCase() === "retrieve_uncompressed" && value){
+        retrieveRecordVersion("retrieve_uncompressed", retrieveSelectedRecords)
     } else if (files) {
-      saveDocument(value, fileInfoList, files);
+        saveDocument(value, fileInfoList, files);
     }
   };
 
@@ -1664,8 +1667,9 @@ export const RecordsLog = ({
     setMultipleFiles(false);
     switch (action) {
       case "retrieve_uncompressed":
-        retrieveRecordVersion(action, _record);
-        setModal(false);
+        setModalFor("retrieve_uncompressed");
+        setModal(true);
+        setRetrieveSelectedRecords(_record);
         break;
       case "replace":
         setreplaceRecord(_record);
@@ -3221,6 +3225,7 @@ export const RecordsLog = ({
             requestType={requestType}
             isScanningTeamMember={isScanningTeamMember}
             curPersonalAttributes={curPersonalAttributes}
+            retrieveSelectedRecords={retrieveSelectedRecords}
           />}
           <div className="state-change-dialog">
             <Dialog
@@ -3512,7 +3517,7 @@ const Attachment = React.memo(
     setEditTagModalOpen,
     setCurrentEditRecord,
     isHistoricalRequest,
-    lockRecords
+    lockRecords,
   }) => {
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
@@ -3643,7 +3648,7 @@ const Attachment = React.memo(
                 color="#1B8103"
                 className={classes.statusIcons}
               />
-            ) : record.failed && !record.selectedfileprocessversion ? (
+            ) : record.failed && !record.selectedfileprocessversion && record.attributes.trigger != "recordreplace"? (
               <FontAwesomeIcon
                 icon={faExclamationCircle}
                 size="2x"
@@ -3653,7 +3658,7 @@ const Attachment = React.memo(
             ) : ((record.updated_at != null && record.updated_at != undefined) 
                     ? isrecordtimeout(record.updated_at, RECORD_PROCESSING_HRS) == true 
                     : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) && 
-                  isRetry == false && !record.selectedfileprocessversion ?(
+                  isRetry == false && !record.selectedfileprocessversion && record.attributes.trigger != "recordreplace" ?(
                 // isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
                 // true && isRetry == false && !record.selectedfileprocessversion? (
               <FontAwesomeIcon
