@@ -1245,6 +1245,7 @@ export const ContactApplicant = ({
       maxNoFiles={uploadFor === "response" ? 1 : 10}
       bcgovcode={undefined}
       currentResponseDate={currentResponseDate}
+      retrieveSelectedRecords={() => {}}
     /> 
     <div className="email-change-dialog">
       <Dialog
