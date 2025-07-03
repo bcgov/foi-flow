@@ -3648,7 +3648,7 @@ const Attachment = React.memo(
                 color="#1B8103"
                 className={classes.statusIcons}
               />
-            ) : record.failed && !record.selectedfileprocessversion ? (
+            ) : record.failed && !record.selectedfileprocessversion && record.attributes.trigger != "recordreplace"? (
               <FontAwesomeIcon
                 icon={faExclamationCircle}
                 size="2x"
@@ -3658,7 +3658,7 @@ const Attachment = React.memo(
             ) : ((record.updated_at != null && record.updated_at != undefined) 
                     ? isrecordtimeout(record.updated_at, RECORD_PROCESSING_HRS) == true 
                     : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) && 
-                  isRetry == false && !record.selectedfileprocessversion ?(
+                  isRetry == false && !record.selectedfileprocessversion && record.attributes.trigger != "recordreplace" ?(
                 // isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
                 // true && isRetry == false && !record.selectedfileprocessversion? (
               <FontAwesomeIcon
