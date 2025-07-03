@@ -44,6 +44,7 @@ class FOIApplicantCorrespondence(db.Model):
     templatetype = db.Column(db.String(120), unique=False, nullable=True)
     emailsubject = db.Column(db.String(255), unique=False, nullable=True)
     correspondencesubject = db.Column(db.String(255), unique=False, nullable=True)
+    is_sent_successfully = db.Column(db.Boolean, nullable=True)
     
     #ForeignKey References       
     foiministryrequest_id =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
@@ -56,7 +57,7 @@ class FOIApplicantCorrespondence(db.Model):
         try:
             sql = """select distinct on (applicantcorrespondenceid) applicantcorrespondenceid, templateid , correspondencemessagejson , version, 
                         created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at,
-                         isdraft, isdeleted, isresponse, response_at, templatename, templatetype, emailsubject, correspondencesubject
+                         isdraft, isdeleted, isresponse, response_at, templatename, templatetype, emailsubject, correspondencesubject, is_sent_successfully
                          from "FOIApplicantCorrespondences" fpa 
                         where foiministryrequest_id = :ministryrequestid
                     order by applicantcorrespondenceid desc, version desc""" 
@@ -69,7 +70,8 @@ class FOIApplicantCorrespondence(db.Model):
                                             "sentcorrespondencemessage": row["sentcorrespondencemessage"], "parentapplicantcorrespondenceid": row["parentapplicantcorrespondenceid"],
                                             "sent_at": row["sent_at"], "sentby": row["sentby"],
                                             "isdraft": row["isdraft"], "isresponse": row["isresponse"], "response_at": row["response_at"],
-                                            "templatename": row["templatename"], "templatetype": row["templatetype"], "emailsubject": row["emailsubject"], "correspondencesubject": row["correspondencesubject"]})
+                                            "templatename": row["templatename"], "templatetype": row["templatetype"], "emailsubject": row["emailsubject"], "correspondencesubject": row["correspondencesubject"],
+                                            "is_sent_successfully": row["is_sent_successfully"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -173,10 +175,31 @@ class FOIApplicantCorrespondence(db.Model):
             return DefaultMethodResult(True,'Applicant correspondence updated for Id',applicantcorrespondenceid)
         else:
             return DefaultMethodResult(False,'Applicant correspondence not exists',-1)        
+
+    @classmethod
+    def updateissentsuccessfullyforministryrequest(cls, ministryrequestid, correspondenceid, is_sent_successfully, subject)->DefaultMethodResult: 
+        try:
+            correspondence = (
+                db.session.query(FOIApplicantCorrespondence)
+                .filter(FOIApplicantCorrespondence.foiministryrequest_id == ministryrequestid, FOIApplicantCorrespondence.applicantcorrespondenceid == correspondenceid)
+                .order_by(FOIApplicantCorrespondence.version.desc())
+                .first()
+            )
+            if not correspondence:
+                return DefaultMethodResult(False, 'Correspondence not found', correspondenceid)
+            correspondence.is_sent_successfully = is_sent_successfully
+            if subject is not None: correspondence.emailsubject = subject
+            db.session.commit()  
+            return DefaultMethodResult(True,'Correspondence is_sent_successfully updated ', correspondenceid)
+        except:
+            db.session.rollback()
+            raise   
+        finally:
+            db.session.close()
     
     def __getemailsincorrespondence(cls, emails, correspondenceid, correspondenceversion):
         return [x for x in emails if x['applicantcorrespondence_id'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion]
 
 class FOIApplicantCorrespondenceSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceid', 'version', 'parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby', 'isdraft', 'isdeleted', 'isresponse', 'response_at', 'templatename', 'templatetype', 'emailsubject', 'correspondencesubject')
+        fields = ('applicantcorrespondenceid', 'version', 'parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby', 'isdraft', 'isdeleted', 'isresponse', 'response_at', 'templatename', 'templatetype', 'emailsubject', 'correspondencesubject', 'is_sent_successfully')

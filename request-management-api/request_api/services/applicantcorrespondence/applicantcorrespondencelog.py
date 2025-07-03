@@ -205,6 +205,12 @@ class applicantcorrespondenceservice:
             return response
         return response
 
+    def updateissentsuccessfullyforrawrequest(self, rawrequestid, correspondenceid, is_sent_succesfully):
+        return FOIApplicantCorrespondenceRawRequest.updateissentsuccessfullyforrawrequest(rawrequestid, correspondenceid, is_sent_succesfully)
+    
+    def updateissentsuccessfullyforministryrequest(self, ministryrequestid, correspondenceid, is_sent_succesfully, subject = None):
+        return FOIApplicantCorrespondence.updateissentsuccessfullyforministryrequest(ministryrequestid, correspondenceid, is_sent_succesfully, subject)
+
     def deleteapplicantcorrespondencelogministry(self, ministryrequestid, correpondenceid, userid):
         return FOIApplicantCorrespondence.deleteapplicantcorrespondence(ministryrequestid,correpondenceid,userid)        
     
@@ -336,6 +342,7 @@ class applicantcorrespondenceservice:
             "templatetype": _correpondencelog['templatetype'],
             "emailsubject": _correpondencelog['emailsubject'],
             "correspondencesubject": _correpondencelog['correspondencesubject'],
+            "is_sent_successfully": _correpondencelog['is_sent_successfully'] if 'is_sent_successfully' in _correpondencelog else None
         }        
         return correpondencelog
     
