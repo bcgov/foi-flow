@@ -80,7 +80,7 @@ export const ContactApplicant = ({
   const [attachAsPdfFilename, setAttachAsPdfFilename] = useState(requestNumber || "");
 
   useEffect(() => {
-    if (selectedCorrespondence?.subject) setCorrespondenceSubject(selectedCorrespondence?.subject)
+    if (selectedCorrespondence?.correspondencesubject) setCorrespondenceSubject(selectedCorrespondence?.correspondencesubject)
   }, [selectedCorrespondence])
 
   const showAttachAsPdfModal = () => {
@@ -508,7 +508,8 @@ export const ContactApplicant = ({
     const data = {
       ...attributes,
       correspondenceid: selectedCorrespondence.applicantcorrespondenceid,
-      israwrequest: selectedCorrespondence.israwrequest
+      israwrequest: selectedCorrespondence.israwrequest,
+      correspondencesubject: correspondenceSubject
     }
 
     const callback = (data: any) => {
@@ -894,7 +895,8 @@ export const ContactApplicant = ({
       from_email: requestDetails.assignedGroupEmail,
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: templateId?"":"sfdt"
+      templatetype: templateId?"":"sfdt",
+      correspondencesubject: correspondenceSubject
     };
     saveEmailCorrespondence(
       data,
@@ -1006,7 +1008,8 @@ export const ContactApplicant = ({
       }],
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: templateId?"":"sfdt"
+      templatetype: templateId?"":"sfdt",
+      correspondencesubject: correspondenceSubject
     };
     saveEmailCorrespondence(
       data,
@@ -1053,7 +1056,8 @@ export const ContactApplicant = ({
       let israwrequest = ministryId ? false : true;
       let data = {
         attachments: responseattachments,
-        israwrequest: israwrequest
+        israwrequest: israwrequest,
+        correspondencesubject: correspondenceSubject
       };
       saveCorrespondenceResponse(
         data,
@@ -1363,6 +1367,10 @@ export const ContactApplicant = ({
         console.log('Error updating response date: ', errorMessage)}
     )
   }
+
+  const handleChangeResponseTitle = (title: string) => {
+    setCorrespondenceSubject(title);
+  };
   const [showEditor, setShowEditor] = useState(false)
 
   const [previewModal, setPreviewModal] = useState(false);
@@ -1383,6 +1391,8 @@ export const ContactApplicant = ({
         <p>Please select a template and add an attachment before previewing the email</p>
       </div>]
   };
+
+
 
   let correspondenceList;
   correspondenceList = correspondences.map((message: any, index: any) => (
@@ -1894,6 +1904,7 @@ export const ContactApplicant = ({
       maxNoFiles={uploadFor === "response" ? 10 : 10}
       bcgovcode={undefined}
       currentResponseDate={currentResponseDate}
+      handleChangeResponseTitle={handleChangeResponseTitle}
     /> 
     <div className="email-change-dialog">
       <Dialog

@@ -99,6 +99,7 @@ class applicantcorrespondenceservice:
         applicantcorrespondence.templatename = data['templatename'] if 'templatename' in data and data['templatename'] is not None else None
         applicantcorrespondence.templatetype = data['templatetype'] if 'templatetype' in data and data['templatetype'] is not None else None
         if 'emailsubject' in data: applicantcorrespondence.emailsubject = data['emailsubject']
+        if 'correspondencesubject' in data: applicantcorrespondence.correspondencesubject = data['correspondencesubject']
         return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails, ccemails)
 
     def saveapplicantcorrespondencelogforrawrequest(self, requestid, data, userid, isdraft=False):
@@ -132,6 +133,7 @@ class applicantcorrespondenceservice:
         applicantcorrespondence.templatename = data['templatename'] if 'templatename' in data and data['templatename'] is not None else None
         applicantcorrespondence.templatetype = data['templatetype'] if 'templatetype' in data and data['templatetype'] is not None else None
         if 'emailsubject' in data: applicantcorrespondence.emailsubject = data['emailsubject']
+        if 'correspondencesubject' in data: applicantcorrespondence.correspondencesubject = data['correspondencesubject']
         return FOIApplicantCorrespondenceRawRequest.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails, ccemails)
     
     def editapplicantcorrespondencelogforministry(self, ministryrequestid, data, userid):
@@ -153,6 +155,8 @@ class applicantcorrespondenceservice:
             updt_correspondence.isdraft = data['isdraft']
         if 'correspondencemessagejson' in data and data['correspondencemessagejson'] is not None:
             updt_correspondence.correspondencemessagejson = data['correspondencemessagejson']
+        if 'correspondencesubject' in data and data['correspondencesubject'] is not None:
+            updt_correspondence.correspondencesubject = data['correspondencesubject']
         if 'subject' in data:
             if 'correspondencemessagejson' in correspondence and correspondence['correspondencemessagejson'] is not None:
                 correspondencemessagejson = json.loads(correspondence['correspondencemessagejson'])
@@ -188,6 +192,8 @@ class applicantcorrespondenceservice:
             updt_correspondence.isdraft = data['isdraft']
         if 'correspondencemessagejson' in data and data['correspondencemessagejson'] is not None:
             updt_correspondence.correspondencemessagejson = data['correspondencemessagejson']
+        if 'correspondencesubject' in data and data['correspondencesubject'] is not None:
+            updt_correspondence.correspondencesubject = data['correspondencesubject']
         if 'subject' in data:
             if 'correspondencemessagejson' in correspondence and correspondence['correspondencemessagejson'] is not None:
                 correspondencemessagejson = json.loads(correspondence['correspondencemessagejson'])
@@ -202,6 +208,12 @@ class applicantcorrespondenceservice:
             emailsresponse = self.__updateemailsversionrawrequest(rawrequestid, oldcorrespondenceid, oldcorrespondenceversion, userid)
             return response
         return response
+
+    def updateissentsuccessfullyforrawrequest(self, rawrequestid, correspondenceid, is_sent_succesfully):
+        return FOIApplicantCorrespondenceRawRequest.updateissentsuccessfullyforrawrequest(rawrequestid, correspondenceid, is_sent_succesfully)
+    
+    def updateissentsuccessfullyforministryrequest(self, ministryrequestid, correspondenceid, is_sent_succesfully, subject = None):
+        return FOIApplicantCorrespondence.updateissentsuccessfullyforministryrequest(ministryrequestid, correspondenceid, is_sent_succesfully, subject)
 
     def deleteapplicantcorrespondencelogministry(self, ministryrequestid, correpondenceid, userid):
         return FOIApplicantCorrespondence.deleteapplicantcorrespondence(ministryrequestid,correpondenceid,userid)        
@@ -333,6 +345,8 @@ class applicantcorrespondenceservice:
             "templatename": _correpondencelog['templatename'],
             "templatetype": _correpondencelog['templatetype'],
             "emailsubject": _correpondencelog['emailsubject'],
+            "correspondencesubject": _correpondencelog['correspondencesubject'],
+            "is_sent_successfully": _correpondencelog['is_sent_successfully'] if 'is_sent_successfully' in _correpondencelog else None
         }        
         return correpondencelog
     

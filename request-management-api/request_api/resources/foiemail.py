@@ -24,6 +24,7 @@ from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.emailservice import emailservice
 from request_api.services.requestservice import requestservice
+from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice 
 from request_api.utils.enums import ServiceName
 from request_api.schemas.foiemail import  FOIEmailSchema
 
@@ -49,6 +50,8 @@ class FOISendEmail(Resource):
             requestjson = request.get_json()
             emailschema = FOIEmailSchema().load(requestjson)
             result = emailservice().send(servicename.upper(), requestid, ministryrequestid, emailschema)
+            is_sent_successfully = True if result["success"] == True else False
+            if result['identifier'] > 0: applicantcorrespondenceservice().updateissentsuccessfullyforministryrequest(ministryrequestid, result['identifier'], is_sent_successfully, result['subject'])
             return json.dumps(result), 200 if result["success"] == True else 500
         except ValueError as err:
             return {'status': 500, 'message': str(err)}, 500

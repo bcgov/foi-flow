@@ -47,6 +47,7 @@ class communicationwrapperservice:
         else:
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
 
+        sendemailresult = {"success" : False, "message": "Email has not been sent", "identifier": -1}
         if result.success == True:
             # raw requests should never be fee emails so they would only get handled by else statement
             # Handle fee processing templates
@@ -63,9 +64,19 @@ class communicationwrapperservice:
                 if ("emails" in applicantcorrespondencelog and len(applicantcorrespondencelog["emails"]) > 0) or ("ccemails" in applicantcorrespondencelog and len(applicantcorrespondencelog["ccemails"]) > 0):
                         # template["name"] = applicantcorrespondencelog["templatename"]
                         # template["description"] = applicantcorrespondencelog["templatename"]
-                    return communicationemailservice().send(template, applicantcorrespondencelog)
+                    sendemailresult = communicationemailservice().send(template, applicantcorrespondencelog)
+                    # Update the sent status in the correspondence log after sending the email
+                    is_sent_succesfully = sendemailresult["success"]
+                    if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
+                        applicantcorrespondenceservice().updateissentsuccessfullyforrawrequest(rawrequestid, result.identifier, is_sent_succesfully)
+                    else:
+                        applicantcorrespondenceservice().updateissentsuccessfullyforministryrequest(ministryrequestid, result.identifier, is_sent_succesfully)
+                    return sendemailresult
                 else:
                     return {"success" : False, "message": "No Email", "identifier": -1}
+        elif result.success == False:
+            sendemailresult = {"success" : False, "message": result.message, "identifier": -1}
+        return sendemailresult
 
 
     def __handle_fee_email(self, requestid, ministryrequestid, result, applicantcorrespondencelog):

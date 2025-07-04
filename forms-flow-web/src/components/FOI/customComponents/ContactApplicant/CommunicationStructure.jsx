@@ -54,7 +54,6 @@ const CommunicationStructure = ({
   showRenameCorrespondenceSubjectModal
 }) => {
 
-  // console.log("correspondence: ", correspondence);
   const templateList = useSelector((state) => state.foiRequests.foiEmailTemplates);
   const requestDetails = useSelector((state) => state.foiRequests.foiRequestDetail);
   const dispatch = useDispatch();
@@ -432,6 +431,8 @@ if (correspondence?.emails?.length > 0) {
   emailText = correspondence.ccemails[0]
 }
 if (totalNumberOfEmails > 1) emailText = emailText + ` +${totalNumberOfEmails - 1}`
+let labelText = correspondence.sentby ? 'emailed' : 'printed'
+if (correspondence?.is_sent_successfully == false) labelText = 'failed to send email' 
   return (
     <>
       <div className="communication-accordion" {...(correspondence ? {"data-communication-div-id":`${currentIndex}`} : {})}>
@@ -459,7 +460,7 @@ if (totalNumberOfEmails > 1) emailText = emailText + ` +${totalNumberOfEmails - 
                     </>
                     )
                     }
-                    {correspondence. category != 'response' && <div className="templateUser">{correspondence.category !== "draft" && <ClickableChip clicked={true} color={'primary'} label={correspondence.sentby ? 'emailed' : 'printed'} size="small" />}</div>}
+                    {correspondence. category != 'response' && <div className="templateUser">{correspondence.category !== "draft" && <ClickableChip clicked={true} color={correspondence?.is_sent_successfully == false ? 'red' : 'primary'} label={labelText} size="small" />}</div>}
                     </div>
                 </div>
               </div>
