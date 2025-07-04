@@ -155,6 +155,8 @@ class applicantcorrespondenceservice:
             updt_correspondence.isdraft = data['isdraft']
         if 'correspondencemessagejson' in data and data['correspondencemessagejson'] is not None:
             updt_correspondence.correspondencemessagejson = data['correspondencemessagejson']
+        if 'correspondencesubject' in data and data['correspondencesubject'] is not None:
+            updt_correspondence.correspondencesubject = data['correspondencesubject']
         if 'subject' in data:
             if 'correspondencemessagejson' in correspondence and correspondence['correspondencemessagejson'] is not None:
                 correspondencemessagejson = json.loads(correspondence['correspondencemessagejson'])
@@ -190,6 +192,8 @@ class applicantcorrespondenceservice:
             updt_correspondence.isdraft = data['isdraft']
         if 'correspondencemessagejson' in data and data['correspondencemessagejson'] is not None:
             updt_correspondence.correspondencemessagejson = data['correspondencemessagejson']
+        if 'correspondencesubject' in data and data['correspondencesubject'] is not None:
+            updt_correspondence.correspondencesubject = data['correspondencesubject']
         if 'subject' in data:
             if 'correspondencemessagejson' in correspondence and correspondence['correspondencemessagejson'] is not None:
                 correspondencemessagejson = json.loads(correspondence['correspondencemessagejson'])

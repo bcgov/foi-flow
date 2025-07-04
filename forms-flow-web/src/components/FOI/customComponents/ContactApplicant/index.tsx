@@ -80,7 +80,7 @@ export const ContactApplicant = ({
   const [attachAsPdfFilename, setAttachAsPdfFilename] = useState(requestNumber || "");
 
   useEffect(() => {
-    if (selectedCorrespondence?.subject) setCorrespondenceSubject(selectedCorrespondence?.subject)
+    if (selectedCorrespondence?.correspondencesubject) setCorrespondenceSubject(selectedCorrespondence?.correspondencesubject)
   }, [selectedCorrespondence])
 
   const showAttachAsPdfModal = () => {
@@ -505,10 +505,12 @@ export const ContactApplicant = ({
   }
 
   const updateCorrespondence = (attributes: any) => {
+    console.log("correspondenceSubject : ",correspondenceSubject)
     const data = {
       ...attributes,
       correspondenceid: selectedCorrespondence.applicantcorrespondenceid,
-      israwrequest: selectedCorrespondence.israwrequest
+      israwrequest: selectedCorrespondence.israwrequest,
+      correspondencesubject: correspondenceSubject
     }
 
     const callback = (data: any) => {
@@ -894,7 +896,8 @@ export const ContactApplicant = ({
       from_email: requestDetails.assignedGroupEmail,
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: templateId?"":"sfdt"
+      templatetype: templateId?"":"sfdt",
+      correspondencesubject: correspondenceSubject
     };
     saveEmailCorrespondence(
       data,
@@ -1006,7 +1009,8 @@ export const ContactApplicant = ({
       }],
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: templateId?"":"sfdt"
+      templatetype: templateId?"":"sfdt",
+      correspondencesubject: correspondenceSubject
     };
     saveEmailCorrespondence(
       data,
