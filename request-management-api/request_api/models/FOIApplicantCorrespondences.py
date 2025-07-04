@@ -188,7 +188,9 @@ class FOIApplicantCorrespondence(db.Model):
             if not correspondence:
                 return DefaultMethodResult(False, 'Correspondence not found', correspondenceid)
             correspondence.is_sent_successfully = is_sent_successfully
-            if subject is not None: correspondence.emailsubject = subject
+            if subject is not None: 
+                correspondence.emailsubject = subject
+                correspondence.correspondencesubject = subject
             db.session.commit()  
             return DefaultMethodResult(True,'Correspondence is_sent_successfully updated ', correspondenceid)
         except:
