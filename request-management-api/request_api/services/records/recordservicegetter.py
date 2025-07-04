@@ -37,7 +37,7 @@ class recordservicegetter(recordservicebase):
                         _computingresponse = self.__getcomputingresponse(
                             computingresponses, "recordid", record
                         )
-                        //print("\n_computingresponse:",_computingresponse)
+                        #print("\n_computingresponse:",_computingresponse)
 
                         _record = self.__preparerecord(
                             record, _computingresponse, computingresponses, divisions
