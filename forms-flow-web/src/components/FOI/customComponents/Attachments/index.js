@@ -486,6 +486,8 @@ export const AttachmentSection = ({
             handleReclassify={handleReclassify}
             maxNoFiles={10}
             isMinistryCoordinator={isMinistryCoordinator}
+            retrieveRecordVersion={() => {}}
+
           />
         </>
       )}
