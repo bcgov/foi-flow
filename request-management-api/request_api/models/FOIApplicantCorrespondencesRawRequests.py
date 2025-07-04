@@ -41,6 +41,7 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
     templatetype = db.Column(db.String(120), unique=False, nullable=True)
     emailsubject = db.Column(db.String(255), unique=False, nullable=True)
     correspondencesubject = db.Column(db.String(255), unique=False, nullable=True)
+    is_sent_successfully = db.Column(db.Boolean, nullable=True)
     
     #ForeignKey References       
     foirawrequest_id =db.Column(db.Integer, db.ForeignKey('FOIRawRequests.requestid'))
@@ -52,7 +53,7 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
         try:
             sql = """select distinct on (applicantcorrespondenceid) applicantcorrespondenceid, templateid , correspondencemessagejson , version, 
                         created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at,
-                         isdraft, isdeleted, isresponse, response_at, israwrequest, templatename, templatetype, emailsubject, correspondencesubject
+                         isdraft, isdeleted, isresponse, response_at, israwrequest, templatename, templatetype, emailsubject, correspondencesubject, is_sent_successfully
                          from "FOIApplicantCorrespondencesRawRequests" rawcorr 
                         where 
                             foirawrequest_id = :requestid
@@ -66,7 +67,8 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
                                             "sentcorrespondencemessage": row["sentcorrespondencemessage"], "parentapplicantcorrespondenceid": row["parentapplicantcorrespondenceid"],
                                             "sent_at": row["sent_at"], "sentby": row["sentby"],
                                             "isdraft": row["isdraft"], "isresponse": row["isresponse"], "response_at": row["response_at"], "israwrequest": row["israwrequest"],
-                                            "templatename": row["templatename"], "templatetype": row["templatetype"], "emailsubject": row["emailsubject"], "correspondencesubject": row["correspondencesubject"]})
+                                            "templatename": row["templatename"], "templatetype": row["templatetype"], "emailsubject": row["emailsubject"], "correspondencesubject": row["correspondencesubject"],
+                                            "is_sent_successfully": row["is_sent_successfully"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -156,6 +158,26 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
         finally:
             db.session.close()
 
+    @classmethod
+    def updateissentsuccessfullyforrawrequest(cls, rawrequestid, correspondenceid, is_sent_successfully)->DefaultMethodResult: 
+        try:
+            correspondence = (
+                db.session.query(FOIApplicantCorrespondenceRawRequest)
+                .filter(FOIApplicantCorrespondenceRawRequest.foirawrequest_id == rawrequestid, FOIApplicantCorrespondenceRawRequest.applicantcorrespondenceid == correspondenceid)
+                .order_by(FOIApplicantCorrespondenceRawRequest.version.desc())
+                .first()
+            )
+            if not correspondence:
+                return DefaultMethodResult(False, 'Correspondence not found', correspondenceid)
+            correspondence.is_sent_successfully = is_sent_successfully
+            db.session.commit()  
+            return DefaultMethodResult(True,'Correspondence is_sent_successfully updated ', correspondenceid)
+        except:
+            db.session.rollback()
+            raise   
+        finally:
+            db.session.close()
+
 #     @classmethod
 #     def updatesentcorrespondence(cls, applicantcorrespondenceid, content)->DefaultMethodResult: 
 #         dbquery = db.session.query(FOIApplicantCorrespondence)
@@ -171,5 +193,5 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
         return [x for x in emails if x['applicantcorrespondence_id'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion]
 class FOIApplicantCorrespondenceRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceid', 'version', 'parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foirawrequest_id','foirawrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby', 'isdraft', 'isdeleted', 'isresponse', 'response_at', 'israwrequest', 'templatename', 'templatetype', 'emailsubject', 'correspondencesubject')
+        fields = ('applicantcorrespondenceid', 'version', 'parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foirawrequest_id','foirawrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby', 'isdraft', 'isdeleted', 'isresponse', 'response_at', 'israwrequest', 'templatename', 'templatetype', 'emailsubject', 'correspondencesubject', 'is_sent_successfully')
     
