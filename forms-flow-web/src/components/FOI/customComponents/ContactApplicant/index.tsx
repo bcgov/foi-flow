@@ -505,7 +505,6 @@ export const ContactApplicant = ({
   }
 
   const updateCorrespondence = (attributes: any) => {
-    console.log("correspondenceSubject : ",correspondenceSubject)
     const data = {
       ...attributes,
       correspondenceid: selectedCorrespondence.applicantcorrespondenceid,
