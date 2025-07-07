@@ -25,6 +25,8 @@ class emailservice:
     """
   
     def send(self, servicename, requestid, ministryrequestid, emailschema):
+        subject = None
+        savedcorrespondence = None
         try:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
             _templatename = self.__getvaluefromschema(emailschema, "templatename")
@@ -34,11 +36,13 @@ class emailservice:
             if (_applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
                 servicename = _templatename.upper() if _templatename else ""
             _messageattachmentlist = self.__get_attachments(ministryrequestid, emailschema, servicename)
-            self.__pre_send_correspondence_audit(requestid, ministryrequestid,emailschema, content, templateconfig().isnotreceipt(servicename), _messageattachmentlist, recipient_email=requestjson.get("email"))
+            savedcorrespondence = self.__pre_send_correspondence_audit(requestid, ministryrequestid,emailschema, content, templateconfig().isnotreceipt(servicename), _messageattachmentlist, recipient_email=requestjson.get("email"))
             subject = templateconfig().getsubject(servicename, requestjson)
-            return senderservice().send(subject, _messagepart, _messageattachmentlist, requestjson.get("email"))
+            emailresult = senderservice().send(subject, _messagepart, _messageattachmentlist, requestjson.get("email"))
+            return {"success": emailresult["success"], "message": emailresult["message"], "identifier": savedcorrespondence.identifier, "subject": subject}
         except Exception as ex:
             logging.exception(ex)
+            return {"success": False, "message": "Failed to send email", "identifier": savedcorrespondence.identifier if savedcorrespondence else -1, "subject": subject}
 
     def acknowledge(self, servicename, requestid, ministryrequestid):
         try:
