@@ -790,28 +790,44 @@ export const ContactApplicant = ({
   }
 
   const onFilterChange = (filterValue: string) => {
-    if(filterValue === "") {
-      const logItems = applicantCorrespondence.filter((corr: any) => corr.category !== "draft" && corr.category !== "templates");
-      setCorrespondences(logItems);
-    } else{
-      let _filteredMessages = applicantCorrespondence.filter((corr: any) => {
-        // Filter only LOG items and match search keyword in correspondence subject
-        const isSearchableCategory = corr.category !== "draft" && corr.category !== "templates";
-        const matchesSearch = corr.correspondencesubject?.toLowerCase().includes(filterValue.toLowerCase());
-        if (isSearchableCategory && matchesSearch) {
-          return true;
-        }
-      })
-      let _filteredTemplates = initialTemplates.filter((template: any) => {
-        if (correspondenceFilter === "templates") {
-          return template.label.includes(filterValue)
-        }
-      })
-      setCorrespondences(_filteredMessages);
-      setTemplates(_filteredTemplates);
-      
+    const searchLower = filterValue.toLowerCase();
+    let _filteredMessages: any[] = [];
+    let _filteredTemplates: any[] = [];
+  
+    if (filterValue === "") {
+      switch (correspondenceFilter) {
+        case "log":
+          _filteredMessages = applicantCorrespondence.filter(
+            (corr: any) => corr.category !== "draft" && corr.category !== "templates"
+          );
+          break;
+        case "drafts":
+          _filteredMessages = applicantCorrespondence.filter(
+            (corr: any) => corr.category === "draft"
+          );
+          break;
+      }
+    } else {
+      switch (correspondenceFilter) {
+        case "log":
+          _filteredMessages = applicantCorrespondence.filter((corr: any) =>
+            corr.category !== "draft" &&
+            corr.category !== "templates" &&
+            corr.correspondencesubject?.toLowerCase().includes(searchLower)
+          );
+          break;
+        case "drafts":
+          _filteredMessages = applicantCorrespondence.filter((corr: any) =>
+            corr.category === "draft" &&
+            corr.subject?.toLowerCase().includes(searchLower)
+          );
+          break;
+      }
     }
- }
+  
+    setCorrespondences(_filteredMessages);
+    setTemplates(_filteredTemplates);
+  };
 
   const saveAttachments = async (attachmentfiles: any) => {
     attachmentfiles = attachmentfiles.filter((file: any) => {
