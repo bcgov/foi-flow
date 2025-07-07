@@ -101,14 +101,15 @@ class FOIApplicantCorrespondence(db.Model):
             correspondenceattachments = []
             if(attachments is not None and len(attachments) > 0):
                 for _attachment in attachments:
-                    attachment = FOIApplicantCorrespondenceAttachment()
-                    attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
-                    attachment.applicantcorrespondence_version = newapplicantcorrepondencelog.version
-                    attachment.attachmentdocumenturipath = _attachment['url']
-                    attachment.attachmentfilename = _attachment['filename']
-                    attachment.createdby = newapplicantcorrepondencelog.createdby
-                    attachment.version = 1
-                    correspondenceattachments.append(attachment)
+                    if 'applicantcorrespondenceattachmentid' not in _attachment:
+                        attachment = FOIApplicantCorrespondenceAttachment()
+                        attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
+                        attachment.applicantcorrespondence_version = newapplicantcorrepondencelog.version
+                        attachment.attachmentdocumenturipath = _attachment['url']
+                        attachment.attachmentfilename = _attachment['filename']
+                        attachment.createdby = newapplicantcorrepondencelog.createdby
+                        attachment.version = 1
+                        correspondenceattachments.append(attachment)
 
             # Update existing attachments
             existingattachments = FOIApplicantCorrespondenceAttachment().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(newapplicantcorrepondencelog.applicantcorrespondenceid)
