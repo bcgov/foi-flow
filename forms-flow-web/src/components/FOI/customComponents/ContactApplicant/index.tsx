@@ -790,21 +790,16 @@ export const ContactApplicant = ({
   }
 
   const onFilterChange = (filterValue: string) => {
-    
-    const getTemplateName = (templateId: any) => {
-      return applicantCorrespondenceTemplates.find((obj: any)=> obj.templateid == templateId)?.description
-    }
     if(filterValue === "") {
-      setCorrespondences(applicantCorrespondence);
+      const logItems = applicantCorrespondence.filter((corr: any) => corr.category !== "draft" && corr.category !== "templates");
+      setCorrespondences(logItems);
     } else{
       let _filteredMessages = applicantCorrespondence.filter((corr: any) => {
-        // Filter through template names, and for responses include "applicant response"
-        const templateName = corr.templatename ? corr.templatename : getTemplateName(corr.templateid)
-        if(templateName && templateName.toLowerCase().indexOf(filterValue.toLowerCase()) >= 0) {
-          return corr;
-        } 
-        if(corr.category == "response" && "applicant response".indexOf(filterValue.toLowerCase()) >= 0) {
-          return corr;
+        // Filter only LOG items and match search keyword in correspondence subject
+        const isSearchableCategory = corr.category !== "draft" && corr.category !== "templates";
+        const matchesSearch = corr.correspondencesubject?.toLowerCase().includes(filterValue.toLowerCase());
+        if (isSearchableCategory && matchesSearch) {
+          return true;
         }
       })
       let _filteredTemplates = initialTemplates.filter((template: any) => {
