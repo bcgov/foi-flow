@@ -1027,7 +1027,7 @@ export const RecordsLog = ({
       // ? (file.originalfilename? file.originalfilename : file.filename)
       // : file.filename;
     //if (isPDF && !downloadReplacedOriginal) {
-    if (!["png", "jpg", "jpeg", "pdf"].includes(extension)) {
+    if (!["png", "jpg", "jpeg", "pdf"].includes(extension.toLowerCase())) {
       if (isPDF || file.selectedfileprocessversion == 1){
         s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
         filename = filename + ".pdf";
