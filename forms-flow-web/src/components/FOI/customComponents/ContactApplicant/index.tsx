@@ -855,7 +855,18 @@ export const ContactApplicant = ({
   const save = async (emailContent: string, skiptoast=false) => {
     setDisablePreview(true);
     setPreviewModal(false);
-    const attachments = await saveAttachments(files);
+    let filesToUpload = [];
+    let existingAttachments = [];
+    for (let file of files) {
+      if (file instanceof File) {
+        filesToUpload.push(file)
+      } else {
+        let existingAttachment = {...file, url: file.documenturipath}
+        existingAttachments.push(existingAttachment)
+      }
+    }
+    const newAttachments = await saveAttachments(filesToUpload);
+    const attachments = [...existingAttachments, ...newAttachments]
     let callback = (_res: string) => {
       clearcorrespondence();
       changeCorrespondenceFilter("log");

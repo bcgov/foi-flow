@@ -229,7 +229,9 @@ export const DocEditor = ({
     }
 
     const insertPageNumbers = () => {
-        if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label)) {
+        let numberOfPages = 0;
+        if (container) numberOfPages = container.documentEditor.pageCount
+        if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label) && numberOfPages > 1) {
             container.documentEditor.selection.goToPage(2);
             container.documentEditor.selection.goToHeader();
             container.documentEditor.selection.sectionFormat.headerDistance = 20;
@@ -238,7 +240,6 @@ export const DocEditor = ({
             container.documentEditor.editor.insertPageNumber();
             container.documentEditor.selection.closeHeaderFooter();
 
-            const numberOfPages = container.documentEditor.pageCount
             for (let page = 2; page <= numberOfPages; page++) {
                 container.documentEditor.selection.goToPage(page)
                 container.documentEditor.selection.goToHeader();
