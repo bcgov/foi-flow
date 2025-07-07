@@ -385,7 +385,7 @@ const CommunicationStructure = ({
     //   element = element.replaceAll(firstName, 'APPLICANT')
     //   element = element.replaceAll(lastName, 'APPLICANT')
     // }
-    let emailFilename = correspondence?.subject ? `${correspondence?.subject}.pdf` : `Correspondence Letter - ${requestNumber}.pdf`
+    let emailFilename = correspondence?.correspondencesubject ? `${correspondence?.correspondencesubject}.pdf` : `Correspondence Letter - ${requestNumber}.pdf`
     html2pdf().set({margin: 20}).from(element).outputPdf('blob').then(async (blob) => {
       blobs.push({name: emailFilename, lastModified: new Date(), input: blob})
       const zipfile = await downloadZip(blobs).blob()
