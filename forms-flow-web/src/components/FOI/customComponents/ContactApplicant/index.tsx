@@ -245,6 +245,7 @@ export const ContactApplicant = ({
     })
 
     let folderName = convertDateStringToNumeric(correspondence?.date).replaceAll(":", "_") + ' - ' + getCorrespondenceSubject(correspondence, templateList, requestNumber)
+    folderName = folderName.replaceAll(/[^a-z A-Z0-9_-]/g, "");
     const headerDiv = document.createElement("div");
     headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`;
     headerDiv.style.fontSize = "12px";
@@ -253,7 +254,8 @@ export const ContactApplicant = ({
     let element = headerDiv.outerHTML
     if (correspondence?.text) element = element + correspondence?.text
     // No drafts being downloaded as part of export all
-    let emailFilename = correspondence?.subject ? `${correspondence?.subject}.pdf` : `Correspondence Letter - ${requestNumber}.pdf`
+    let emailFilename = correspondence?.correspondencesubject ? `${correspondence?.correspondencesubject}.pdf` : `Correspondence Letter - ${requestNumber}.pdf`
+    emailFilename = emailFilename.replaceAll(/[^a-z A-Z0-9_-]/g, "");
     const pdfEmailBlob = await html2pdf().set({margin: 20}).from(element).outputPdf('blob')
     blobs.push({name: folderName + '/' + emailFilename, lastModified: new Date(), input: pdfEmailBlob})
     if (correspondence.attachments.length == 0) return {folder: folderName, status: 'success'}
@@ -1123,7 +1125,7 @@ export const ContactApplicant = ({
     setShowEditor(true);
     setSelectedEmails(i.emails);
     setSelectedCCEmails(i.ccemails);
-    setCorrespondenceSubject(i.subject);
+    setCorrespondenceSubject(i.correspondencesubject);
     if (i.attachments)
       setFiles(i.attachments);
     setCorrespondenceId(i.applicantcorrespondenceid);
