@@ -345,7 +345,13 @@ const CommunicationStructure = ({
     }
     const headerDiv = document.createElement("div");
 
-    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`;
+    let innerTextString = '';
+    if (correspondence.category == "draft") {
+      innerTextString = ''
+    } else {
+      innerTextString = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`
+    }
+    headerDiv.innerText = innerTextString;
     headerDiv.style.fontSize = "12px";
     headerDiv.style.fontFamily = "BCSans"
     headerDiv.style.marginBottom = "20px";
@@ -353,33 +359,33 @@ const CommunicationStructure = ({
     if (correspondence?.text) element = element + correspondence?.text
 
     // For drafts, remove the relevant variables that have been filled in
-    if (correspondence.category == "draft") {
-      const template = applicantCorrespondenceTemplates.find(template => template.templateid == correspondence.templateid)
-      const { requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData } = templateVariableInfo
-      let variables = getTemplateVariables(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, template)
-      let firstName, lastName, address, secondaryAddress, postal;
-      variables.forEach((variable) => {
-        if (variable.name == "{{firstName}}") firstName = variable.value
-        if (variable.name == "{{lastName}}") lastName = variable.value
-        if (variable.name == "{{address}}") address = variable.value
-        if (variable.name == "{{secondaryAddress}}") secondaryAddress = variable.value
-        if (variable.name == "{{postal}}") postal = variable.value
-      })
-      let addressStartIndex = element.indexOf(address) // -1 if undefined
-      let secondaryAddressStartIndex = element.indexOf(secondaryAddress)
-      let postalStartIndex = element.indexOf(postal)
-      let endIndex;
-      if (postalStartIndex != -1 && postal) endIndex = postalStartIndex + postal.length // if postal code exists, it is end of address string
-      if (secondaryAddressStartIndex != -1 && secondaryAddress) endIndex = secondaryAddressStartIndex + secondaryAddress.length // if secondary address
-      if (postalStartIndex == -1 && secondaryAddressStartIndex == -1 && addressStartIndex != -1 && address) endIndex = addressStartIndex + address.length // if only primary
-      // slice must be done first so indexes don't change
-      if (addressStartIndex && addressStartIndex != -1 && endIndex && endIndex != -1) {
-        element = element.slice(0, addressStartIndex) + 'ADDRESS REDACTED' + element.slice(endIndex)
-      }
-      // then replace first and last name
-      element = element.replaceAll(firstName, 'APPLICANT')
-      element = element.replaceAll(lastName, 'APPLICANT')
-    }
+    // if (correspondence.category == "draft") {
+    //   const template = applicantCorrespondenceTemplates.find(template => template.templateid == correspondence.templateid)
+    //   const { requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData } = templateVariableInfo
+    //   let variables = getTemplateVariables(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, template)
+    //   let firstName, lastName, address, secondaryAddress, postal;
+    //   variables.forEach((variable) => {
+    //     if (variable.name == "{{firstName}}") firstName = variable.value
+    //     if (variable.name == "{{lastName}}") lastName = variable.value
+    //     if (variable.name == "{{address}}") address = variable.value
+    //     if (variable.name == "{{secondaryAddress}}") secondaryAddress = variable.value
+    //     if (variable.name == "{{postal}}") postal = variable.value
+    //   })
+    //   let addressStartIndex = element.indexOf(address) // -1 if undefined
+    //   let secondaryAddressStartIndex = element.indexOf(secondaryAddress)
+    //   let postalStartIndex = element.indexOf(postal)
+    //   let endIndex;
+    //   if (postalStartIndex != -1 && postal) endIndex = postalStartIndex + postal.length // if postal code exists, it is end of address string
+    //   if (secondaryAddressStartIndex != -1 && secondaryAddress) endIndex = secondaryAddressStartIndex + secondaryAddress.length // if secondary address
+    //   if (postalStartIndex == -1 && secondaryAddressStartIndex == -1 && addressStartIndex != -1 && address) endIndex = addressStartIndex + address.length // if only primary
+    //   // slice must be done first so indexes don't change
+    //   if (addressStartIndex && addressStartIndex != -1 && endIndex && endIndex != -1) {
+    //     element = element.slice(0, addressStartIndex) + 'ADDRESS REDACTED' + element.slice(endIndex)
+    //   }
+    //   // then replace first and last name
+    //   element = element.replaceAll(firstName, 'APPLICANT')
+    //   element = element.replaceAll(lastName, 'APPLICANT')
+    // }
     let emailFilename = correspondence?.subject ? `${correspondence?.subject}.pdf` : `Correspondence Letter - ${requestNumber}.pdf`
     html2pdf().set({margin: 20}).from(element).outputPdf('blob').then(async (blob) => {
       blobs.push({name: emailFilename, lastModified: new Date(), input: blob})
