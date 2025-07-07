@@ -792,33 +792,44 @@ export const ContactApplicant = ({
   }
 
   const onFilterChange = (filterValue: string) => {
-    
-    const getTemplateName = (templateId: any) => {
-      return applicantCorrespondenceTemplates.find((obj: any)=> obj.templateid == templateId)?.description
+    const searchLower = filterValue.toLowerCase();
+    let _filteredMessages: any[] = [];
+    let _filteredTemplates: any[] = [];
+  
+    if (filterValue === "") {
+      switch (correspondenceFilter) {
+        case "log":
+          _filteredMessages = applicantCorrespondence.filter(
+            (corr: any) => corr.category !== "draft" && corr.category !== "templates"
+          );
+          break;
+        case "drafts":
+          _filteredMessages = applicantCorrespondence.filter(
+            (corr: any) => corr.category === "draft"
+          );
+          break;
+      }
+    } else {
+      switch (correspondenceFilter) {
+        case "log":
+          _filteredMessages = applicantCorrespondence.filter((corr: any) =>
+            corr.category !== "draft" &&
+            corr.category !== "templates" &&
+            corr.correspondencesubject?.toLowerCase().includes(searchLower)
+          );
+          break;
+        case "drafts":
+          _filteredMessages = applicantCorrespondence.filter((corr: any) =>
+            corr.category === "draft" &&
+            corr.subject?.toLowerCase().includes(searchLower)
+          );
+          break;
+      }
     }
-    if(filterValue === "") {
-      setCorrespondences(applicantCorrespondence);
-    } else{
-      let _filteredMessages = applicantCorrespondence.filter((corr: any) => {
-        // Filter through template names, and for responses include "applicant response"
-        const templateName = corr.templatename ? corr.templatename : getTemplateName(corr.templateid)
-        if(templateName && templateName.toLowerCase().indexOf(filterValue.toLowerCase()) >= 0) {
-          return corr;
-        } 
-        if(corr.category == "response" && "applicant response".indexOf(filterValue.toLowerCase()) >= 0) {
-          return corr;
-        }
-      })
-      let _filteredTemplates = initialTemplates.filter((template: any) => {
-        if (correspondenceFilter === "templates") {
-          return template.label.includes(filterValue)
-        }
-      })
-      setCorrespondences(_filteredMessages);
-      setTemplates(_filteredTemplates);
-      
-    }
- }
+  
+    setCorrespondences(_filteredMessages);
+    setTemplates(_filteredTemplates);
+  };
 
   const saveAttachments = async (attachmentfiles: any) => {
     attachmentfiles = attachmentfiles.filter((file: any) => {
