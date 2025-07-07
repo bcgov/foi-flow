@@ -1028,7 +1028,7 @@ export const RecordsLog = ({
       // : file.filename;
     //if (isPDF && !downloadReplacedOriginal) {
     if (!["png", "jpg", "jpeg", "pdf"].includes(extension)) {
-      if (isPDF){
+      if (isPDF || file.selectedfileprocessversion == 1){
         s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
         filename = filename + ".pdf";
       }
@@ -3124,7 +3124,7 @@ export const RecordsLog = ({
                       lockRecords || !checkIsAnySelected() ? { pointerEvents: "none" } : {}
                     }
                   >
-                    <FontAwesomeIcon icon={faMinimize} size="lg" color="#38598A" />
+                    <FontAwesomeIcon icon={faMaximize} size="lg" color="#38598A" />
                   </button>
                 </span>
               </Tooltip>
