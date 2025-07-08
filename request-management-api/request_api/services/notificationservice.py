@@ -38,6 +38,7 @@ class notificationservice:
         foirequest = self.getrequest(requestid, requesttype)
         print("BANG", foirequest)
         print("requestid", requestid)
+        print("requesttype", requesttype)
         if iscleanup == True:
             self.__cleanupnotifications(requesttype, notificationtype['name'], foirequest)
         return self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest, requestjson)
@@ -156,6 +157,7 @@ class notificationservice:
     def __cleanupnotifications(self, requesttype, notificationtype, foirequest):
         notificationtypelabels = self.__getcleanupnotificationids(notificationtype)
         if requesttype == "ministryrequest":
+            print("foirequestFINAL", foirequest)
             idnumber = foirequest["filenumber"]
             _ids = FOIRequestNotification.getnotificationidsbynumberandtype(idnumber, notificationtypelabels)
         else:
