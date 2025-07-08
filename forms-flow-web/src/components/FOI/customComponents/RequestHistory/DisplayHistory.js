@@ -8,6 +8,8 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CommentHistory from './CommentHistory';
+import { useSelector } from 'react-redux';
+import { getCorrespondenceSubject } from '../ContactApplicant/helper';
 
 const DisplayHistory = ({
   requesthistory,
@@ -18,10 +20,11 @@ const DisplayHistory = ({
   commentTypes,
   ministryId,
   applicantCorrespondenceTemplates,
+  requestNumber,
 }) => {
   const [fullnameList, setFullnameList] = useState(getFullnameList);
   const [showmorehidden, setshowmorehidden] = useState(false);
-
+  const templateList = useSelector(state => state.foiRequests.foiEmailTemplates);
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find((u) => u.username === userId);
     return user && user.fullname ? user.fullname : userId;
@@ -228,7 +231,7 @@ const DisplayHistory = ({
   
   const rendertemplateinfo = (item, fullName, emailText, dateText) => (
     <>
-      <div className="templateUser"> {item.category === "response" ? "Applicant Response" : getTemplateName(item.templateid)} - {fullName}</div> |
+      <div className="templateUser"> {getCorrespondenceSubject(item, templateList, requestNumber) + " - " + fullName}</div> |
       {item.emails.length > 0 && <div className="templateUser"> {emailText} |</div>}
       <div className="templateTime">{dateText.toUpperCase()}</div>
       <div className="templateTime">{item.edited ? "Edited" : ""}</div>
