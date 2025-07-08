@@ -36,6 +36,8 @@ class notificationservice:
     
     def createnotification(self, message, requestid, requesttype, notificationtype, userid, iscleanup=True, requestjson=None):
         foirequest = self.getrequest(requestid, requesttype)
+        print("BANG", foirequest)
+        print("requestid", requestid)
         if iscleanup == True:
             self.__cleanupnotifications(requesttype, notificationtype['name'], foirequest)
         return self.__createnotification(message, requestid, requesttype, notificationtype, userid, foirequest, requestjson)
