@@ -19,7 +19,7 @@ class openinfoevent:
     def createopeninfoassigneeevent(self, ministryrequestid, requestid, userid, username, assigneedetails):
         comment = {"comment": '{0} assigned this request to {1}'.format(username,assigneedetails['assignedToName']), 'ministryrequestid': ministryrequestid}
         _commentresponse = commentservice().createministryrequestcomment(comment, userid, 2)
-        notificationservice().dismissnotifications_by_requestid_type(requestid, "ministryrequest", OpenInfoNotificationType.OI_ASSIGNEE.value)
+        notificationservice().dismissnotifications_by_requestid_type(ministryrequestid, "ministryrequest", OpenInfoNotificationType.OI_ASSIGNEE.value)
         _notificationtype = NotificationType.getnotificationtypeid(OpenInfoNotificationType.OI_ASSIGNEE.value)
         _notificationmessage = 'New Request Assigned to You.'
         _notificationresponse = self.__createnotification(ministryrequestid, userid, _notificationtype, _notificationmessage, {"oiassignedto": assigneedetails['assignedTo']})
@@ -58,7 +58,7 @@ class openinfoevent:
 
             _notificationresponse = notificationservice().createnotification(
                 {"message": notification_message},
-                requestid,
+                ministryrequestid,
                 "ministryrequest",
                 notificationtype,
                 userid,
