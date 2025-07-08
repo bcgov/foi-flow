@@ -245,6 +245,7 @@ export const ContactApplicant = ({
     })
 
     let folderName = convertDateStringToNumeric(correspondence?.date).replaceAll(":", "_") + ' - ' + getCorrespondenceSubject(correspondence, templateList, requestNumber)
+    folderName = folderName.replaceAll(/[^a-z A-Z0-9_\-]/g, "");
     const headerDiv = document.createElement("div");
     headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`;
     headerDiv.style.fontSize = "12px";
@@ -253,7 +254,7 @@ export const ContactApplicant = ({
     let element = headerDiv.outerHTML
     if (correspondence?.text) element = element + correspondence?.text
     // No drafts being downloaded as part of export all
-    let emailFilename = correspondence?.subject ? `${correspondence?.subject}.pdf` : `Correspondence Letter - ${requestNumber}.pdf`
+    let emailFilename = correspondence?.correspondencesubject ? `${correspondence?.correspondencesubject.replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf` : `${getCorrespondenceSubject(correspondence, templateList, requestNumber).replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf`
     const pdfEmailBlob = await html2pdf().set({margin: 20}).from(element).outputPdf('blob')
     blobs.push({name: folderName + '/' + emailFilename, lastModified: new Date(), input: pdfEmailBlob})
     if (correspondence.attachments.length == 0) return {folder: folderName, status: 'success'}
@@ -866,7 +867,18 @@ export const ContactApplicant = ({
   const save = async (emailContent: string, skiptoast=false) => {
     setDisablePreview(true);
     setPreviewModal(false);
-    const attachments = await saveAttachments(files);
+    let filesToUpload = [];
+    let existingAttachments = [];
+    for (let file of files) {
+      if (file instanceof File) {
+        filesToUpload.push(file)
+      } else {
+        let existingAttachment = {...file, url: file.documenturipath}
+        existingAttachments.push(existingAttachment)
+      }
+    }
+    const newAttachments = await saveAttachments(filesToUpload);
+    const attachments = [...existingAttachments, ...newAttachments]
     let callback = (_res: string) => {
       clearcorrespondence();
       changeCorrespondenceFilter("log");
@@ -970,7 +982,8 @@ export const ContactApplicant = ({
       ccemails: selectedCCEmails,
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: templateId?"":"sfdt"
+      templatetype: templateId?"":"sfdt",
+      correspondencesubject: correspondenceSubject
     };
     saveDraftCorrespondence(
       data,
@@ -1112,7 +1125,7 @@ export const ContactApplicant = ({
     setShowEditor(true);
     setSelectedEmails(i.emails);
     setSelectedCCEmails(i.ccemails);
-    setCorrespondenceSubject(i.subject);
+    setCorrespondenceSubject(i.correspondencesubject);
     if (i.attachments)
       setFiles(i.attachments);
     setCorrespondenceId(i.applicantcorrespondenceid);
