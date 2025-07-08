@@ -168,6 +168,7 @@ class FOIApplicantCorrespondence(db.Model):
 
     @classmethod
     def updatesentcorrespondence(cls, applicantcorrespondenceid, content)->DefaultMethodResult: 
+        print("===========updatesentcorrespondence=============")
         dbquery = db.session.query(FOIApplicantCorrespondence)
         _correspondence = dbquery.filter_by(applicantcorrespondenceid=applicantcorrespondenceid)
         if(_correspondence.count() > 0) :
