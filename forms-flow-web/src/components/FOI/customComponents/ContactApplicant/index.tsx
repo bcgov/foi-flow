@@ -814,13 +814,13 @@ export const ContactApplicant = ({
           _filteredMessages = applicantCorrespondence.filter((corr: any) =>
             corr.category !== "draft" &&
             corr.category !== "templates" &&
-            corr.correspondencesubject?.toLowerCase().includes(searchLower)
+            getCorrespondenceSubject(corr, templateList, requestNumber).toLowerCase().includes(searchLower)
           );
           break;
         case "drafts":
           _filteredMessages = applicantCorrespondence.filter((corr: any) =>
             corr.category === "draft" &&
-            corr.subject?.toLowerCase().includes(searchLower)
+            getCorrespondenceSubject(corr, templateList, requestNumber).toLowerCase().includes(searchLower)
           );
           break;
       }
