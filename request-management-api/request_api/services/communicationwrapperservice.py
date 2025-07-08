@@ -25,12 +25,12 @@ class communicationwrapperservice:
         data = json.loads(applicantcorrespondencelog['correspondencemessagejson'])
         attributes = applicantcorrespondencelog["attributes"][0]
         emailsubject = ""
-        customizedsubject = data['subject'] if 'subject' in data else ""
+        customizedsubject = applicantcorrespondencelog['correspondencesubject'] if 'correspondencesubject' in applicantcorrespondencelog else ""
         if applicantcorrespondencelog["templatename"] is None:
             template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
         else:
             template = None
-        if len(customizedsubject) > 0:
+        if customizedsubject and len(customizedsubject) > 0:
             emailsubject = customizedsubject
         elif template is None:
             if 'templatename' in applicantcorrespondencelog and applicantcorrespondencelog['templatename'] is not None:
