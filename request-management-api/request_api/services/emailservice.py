@@ -123,7 +123,7 @@ class emailservice:
     def __getvaluefromschema(self, emailschema, property):
         return emailschema.get(property) if property in emailschema  else None
     
-    def _get_subjects_if_exist(correspondence):
+    def _get_subjects_if_exist(self, correspondence):
         result = {}
         if correspondence:
             if getattr(correspondence, "emailsubject", ''):
