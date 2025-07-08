@@ -22,8 +22,7 @@ class openinfoevent:
         notificationservice().dismissnotifications_by_requestid_type(requestid, "ministryrequest", OpenInfoNotificationType.OI_ASSIGNEE.value)
         _notificationtype = NotificationType.getnotificationtypeid(OpenInfoNotificationType.OI_ASSIGNEE.value)
         _notificationmessage = 'New Request Assigned to You.'
-        print("ministryrequestid: ", ministryrequestid)
-        _notificationresponse = self.__createnotification(requestid, userid, _notificationtype, _notificationmessage, {"oiassignedto": assigneedetails['assignedTo']})
+        _notificationresponse = self.__createnotification(ministryrequestid, userid, _notificationtype, _notificationmessage, {"oiassignedto": assigneedetails['assignedTo']})
         if _commentresponse.success == True and _notificationresponse.success == True:
             return DefaultMethodResult(True,'Comment posted',requestid)
         else:
@@ -41,8 +40,7 @@ class openinfoevent:
         _commentresponse = commentservice().createministryrequestcomment(comment, userid, 2)
         _notificationtype = NotificationType.getnotificationtypeid('OI State')
         _notificationmessage = "Moved to " + (oistatus or "Unopened") + " State"
-        print("ministryrequestid: ", ministryrequestid)
-        _notificationresponse = self.__createnotification(requestid, userid, _notificationtype, _notificationmessage, {"oiassignedto": _openinfo.get('oiassignedto')})
+        _notificationresponse = self.__createnotification(ministryrequestid, userid, _notificationtype, _notificationmessage, {"oiassignedto": _openinfo.get('oiassignedto')})
         if _commentresponse.success == True and _notificationresponse.success == True:
             return DefaultMethodResult(True,'Comment posted',requestid)
         else:
