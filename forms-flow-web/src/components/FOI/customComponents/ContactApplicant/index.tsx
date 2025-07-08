@@ -983,7 +983,8 @@ export const ContactApplicant = ({
       ccemails: selectedCCEmails,
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: templateId?"":"sfdt"
+      templatetype: templateId?"":"sfdt",
+      correspondencesubject: correspondenceSubject
     };
     saveDraftCorrespondence(
       data,
