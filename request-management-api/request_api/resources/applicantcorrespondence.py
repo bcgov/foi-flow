@@ -94,8 +94,12 @@ class FOIFlowApplicantCorrespondence(Resource):
     @auth.hasusertype('iao')
     def post(requestid, ministryrequestid):
         try:
+            print("============/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>================")
             requestjson = request.get_json()
+            print("requestjson: ", requestjson)
             applicantcorrespondencelog = FOIApplicantCorrespondenceLogSchema().load(data=requestjson)
+            print("applicantcorrespondencelog: ", applicantcorrespondencelog)
+            print("==================================================================================================")
             if ministryrequestid == 'None':
                 rawrequestid = requestid
             else:

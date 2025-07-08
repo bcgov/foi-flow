@@ -28,6 +28,7 @@ class emailservice:
         subject = None
         savedcorrespondence = None
         try:
+            print("============send function================")
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
             _templatename = self.__getvaluefromschema(emailschema, "templatename")
             servicename = _templatename  if servicename == ServiceName.correspondence.value.upper() else servicename            
