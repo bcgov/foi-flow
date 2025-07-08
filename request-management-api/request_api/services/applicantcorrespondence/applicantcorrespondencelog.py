@@ -71,6 +71,7 @@ class applicantcorrespondenceservice:
         return [x['correspondence_to'] for x in emails if x['applicantcorrespondence_id'] == correspondenceid and x['applicantcorrespondence_version'] == correspondenceversion and x['iscarboncopy'] is True]
     
     def saveapplicantcorrespondencelog(self, requestid, ministryrequestid, data, userid, isdraft=False):
+        print("============saveapplicantcorrespondencelog================")
         applicantcorrespondence = FOIApplicantCorrespondence()
         if "correspondenceid" in data and data['correspondenceid'] is not None:
             correspondence = FOIApplicantCorrespondence.getapplicantcorrespondencebyid(data['correspondenceid'])
@@ -100,6 +101,9 @@ class applicantcorrespondenceservice:
         applicantcorrespondence.templatetype = data['templatetype'] if 'templatetype' in data and data['templatetype'] is not None else None
         if 'emailsubject' in data: applicantcorrespondence.emailsubject = data['emailsubject']
         if 'correspondencesubject' in data: applicantcorrespondence.correspondencesubject = data['correspondencesubject']
+        print("applicantcorrespondence.emailsubject : ", applicantcorrespondence.emailsubject)
+        print("applicantcorrespondence.correspondencesubject: ", applicantcorrespondence.correspondencesubject)
+        print("============/saveapplicantcorrespondencelog================")
         return FOIApplicantCorrespondence.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails, ccemails)
 
     def saveapplicantcorrespondencelogforrawrequest(self, requestid, data, userid, isdraft=False):
