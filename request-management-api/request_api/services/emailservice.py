@@ -85,10 +85,7 @@ class emailservice:
             print("_applicantcorrespondenceid and isnotreceipt")
             _applicantcorrespondence = applicantcorrespondenceservice().getapplicantcorrespondencelogbyid(_applicantcorrespondenceid)
             print("fetch from _applicantcorrespondence : ",_applicantcorrespondence)
-            content_to_update = {"message" : content }
-            content_to_update.update(self._get_subjects_if_exist(_applicantcorrespondence))
-            print("content_to_update : ",content_to_update)
-            return applicantcorrespondenceservice().updateapplicantcorrespondencelog(_applicantcorrespondenceid, content_to_update)
+            return applicantcorrespondenceservice().updateapplicantcorrespondencelog(_applicantcorrespondenceid, {"message": content})
         else:
             data = {
                 "templateid": None,
@@ -122,14 +119,3 @@ class emailservice:
     
     def __getvaluefromschema(self, emailschema, property):
         return emailschema.get(property) if property in emailschema  else None
-    
-    def _get_subjects_if_exist(self, correspondence):
-        result = {}
-        if correspondence:
-            if getattr(correspondence, "emailsubject", ''):
-                result["emailsubject"] = correspondence.emailsubject
-            if getattr(correspondence, "correspondencesubject", ''):
-                result["correspondencesubject"] = correspondence.correspondencesubject
-            if getattr(correspondence, "sentby", ''):
-                result["sentby"] = correspondence.sentby
-        return result

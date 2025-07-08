@@ -173,7 +173,7 @@ class FOIApplicantCorrespondence(db.Model):
         _correspondence = dbquery.filter_by(applicantcorrespondenceid=applicantcorrespondenceid)
         if(_correspondence.count() > 0) :
             #_correspondence.update({FOIApplicantCorrespondence.sentcorrespondencemessage:content, FOIApplicantCorrespondence.sent_at:datetime.now(), FOIApplicantCorrespondence.sentby:"System Generated Email"}, synchronize_session = False)
-            _correspondence.update({FOIApplicantCorrespondence.sentcorrespondencemessage:content.get("message"), FOIApplicantCorrespondence.sent_at:datetime.now()}, synchronize_session = False)
+            _correspondence.update({FOIApplicantCorrespondence.sentcorrespondencemessage:content, FOIApplicantCorrespondence.sent_at:datetime.now()}, synchronize_session = False)
             db.session.commit()
             return DefaultMethodResult(True,'Applicant correspondence updated for Id',applicantcorrespondenceid)
         else:
