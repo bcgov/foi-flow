@@ -254,7 +254,7 @@ export const ContactApplicant = ({
     let element = headerDiv.outerHTML
     if (correspondence?.text) element = element + correspondence?.text
     // No drafts being downloaded as part of export all
-    let emailFilename = correspondence?.correspondencesubject ? `${correspondence?.correspondencesubject.replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf` : `Correspondence Letter - ${requestNumber}.pdf`
+    let emailFilename = correspondence?.correspondencesubject ? `${correspondence?.correspondencesubject.replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf` : `${getCorrespondenceSubject(correspondence, templateList, requestNumber).replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf`
     const pdfEmailBlob = await html2pdf().set({margin: 20}).from(element).outputPdf('blob')
     blobs.push({name: folderName + '/' + emailFilename, lastModified: new Date(), input: pdfEmailBlob})
     if (correspondence.attachments.length == 0) return {folder: folderName, status: 'success'}
