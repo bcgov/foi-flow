@@ -321,6 +321,7 @@ class FOIRequestsById(Resource):
         except ValidationError as err:
             return {'status': False, 'message': str(err)}, 400
         except KeyError as error:
+            traceback.print_exc()
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 
