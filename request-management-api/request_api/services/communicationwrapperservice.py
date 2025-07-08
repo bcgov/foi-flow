@@ -22,10 +22,12 @@ class communicationwrapperservice:
 
     def send_email(self, requestid, rawrequestid, ministryrequestid, applicantcorrespondencelog):
         # Get the correct email subject
+        print("============send_email================")
         data = json.loads(applicantcorrespondencelog['correspondencemessagejson'])
         attributes = applicantcorrespondencelog["attributes"][0]
         emailsubject = ""
         customizedsubject = applicantcorrespondencelog['correspondencesubject'] if 'correspondencesubject' in applicantcorrespondencelog else ""
+        print("customizedsubject: ", customizedsubject)
         if applicantcorrespondencelog["templatename"] is None:
             template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
         else:
@@ -33,11 +35,16 @@ class communicationwrapperservice:
         if customizedsubject and len(customizedsubject) > 0:
             emailsubject = customizedsubject
         elif template is None:
+            print("============template is None================")
+            print("============templatename: ", applicantcorrespondencelog['templatename'])
             if 'templatename' in applicantcorrespondencelog and applicantcorrespondencelog['templatename'] is not None:
                 emailsubject = templateconfig().getsubject(applicantcorrespondencelog['templatename'], attributes)
+                print("============emailsubject: ", emailsubject)
             else:
                 emailsubject = templateconfig().getsubject("", attributes)
+                print("============emailsubject: ", emailsubject)
         else:
+            print("============template is not None================")
             emailsubject = templateconfig().getsubject(template.name, attributes)
         applicantcorrespondencelog['emailsubject'] = emailsubject
         print('applicantcorrespondencelog: ', applicantcorrespondencelog)
