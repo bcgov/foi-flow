@@ -144,6 +144,11 @@ class applicantcorrespondenceservice:
         correspondence = FOIApplicantCorrespondence.getapplicantcorrespondencebyid(data['correspondenceid'])
         oldcorrespondenceid = correspondence['applicantcorrespondenceid']
         oldcorrespondenceversion = correspondence['version']
+        if 'sentcorrespondencemessage' in correspondence and correspondence['sentcorrespondencemessage'] is not None:
+            try:
+                correspondence['sentcorrespondencemessage'] = json.loads(correspondence['sentcorrespondencemessage'])
+            except json.JSONDecodeError:
+                pass
         updt_correspondence = FOIApplicantCorrespondence()
         updt_correspondence.__dict__.update(correspondence)
         updt_correspondence.version = correspondence['version']+1
