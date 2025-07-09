@@ -28,26 +28,20 @@ class emailservice:
         subject = None
         savedcorrespondence = None
         try:
-            print("============send function================")
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
             _templatename = self.__getvaluefromschema(emailschema, "templatename")
             servicename = _templatename  if servicename == ServiceName.correspondence.value.upper() else servicename            
             _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
-            print("_applicantcorrespondenceid : ", _applicantcorrespondenceid)
             _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson, ministryrequestid, _applicantcorrespondenceid)
             if (_applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
                 servicename = _templatename.upper() if _templatename else ""
             _messageattachmentlist = self.__get_attachments(ministryrequestid, emailschema, servicename)
             savedcorrespondence = self.__pre_send_correspondence_audit(requestid, ministryrequestid,emailschema, content, templateconfig().isnotreceipt(servicename), _messageattachmentlist, recipient_email=requestjson.get("email"))
-            print("savedcorrespondence : ",savedcorrespondence)
             if savedcorrespondence and _applicantcorrespondenceid:
-                print("Debug 1")
                 _applicantcorrespondence = applicantcorrespondenceservice().fetch_applicant_correspondence_log_by_id(ministryrequestid, _applicantcorrespondenceid)
-                subject = _applicantcorrespondence["emailsubject"] if _applicantcorrespondence and "emailsubject" in _applicantcorrespondence else subject
-                print("Debug subject : ",subject)                
+                subject = _applicantcorrespondence["emailsubject"] if _applicantcorrespondence and "emailsubject" in _applicantcorrespondence else subject               
             if subject is None:
                 subject = templateconfig().getsubject(servicename, requestjson)
-            print("inside send func subject : ",subject)
             emailresult = senderservice().send(subject, _messagepart, _messageattachmentlist, requestjson.get("email"))
             return {"success": emailresult["success"], "message": emailresult["message"], "identifier": savedcorrespondence.identifier, "subject": subject}
         except Exception as ex:
@@ -81,16 +75,8 @@ class emailservice:
 
 
     def __pre_send_correspondence_audit(self, requestid, ministryrequestid, emailschema, content, isnotreceipt, attachmentlist=None, recipient_email=None):
-        print("============__pre_send_correspondence_audit================")
         _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
-        print(" _applicantcorrespondenceid :",_applicantcorrespondenceid)
         if _applicantcorrespondenceid and isnotreceipt:
-            print("_applicantcorrespondenceid and isnotreceipt")
-            # _applicantcorrespondence = applicantcorrespondenceservice().getapplicantcorrespondencelogbyid(_applicantcorrespondenceid)
-            # print("fetch from _applicantcorrespondence : ",_applicantcorrespondence)
-            # content_to_update = {"message" : content }
-            # content_to_update.update(self._get_subjects_if_exist(_applicantcorrespondence))
-            # print("content_to_update : ",content_to_update)
             return applicantcorrespondenceservice().updateapplicantcorrespondencelog(_applicantcorrespondenceid, {"message" : content })
         else:
             data = {
@@ -99,7 +85,6 @@ class emailservice:
                 "attachments": attachmentlist,
                 "emails": [recipient_email] if recipient_email else []
             }
-            print("check data : ",data)
             return applicantcorrespondenceservice().saveapplicantcorrespondencelog(requestid, ministryrequestid, data, 'system')
         
 

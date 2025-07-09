@@ -47,11 +47,8 @@ class FOISendEmail(Resource):
     @auth.require
     def post(requestid, ministryrequestid, servicename):      
         try:
-            print("============/foiemail/<requestid>/ministryrequest/<ministryrequestid>/<servicename>================")
             requestjson = request.get_json()
-            print("requestjson: ", requestjson)
             emailschema = FOIEmailSchema().load(requestjson)
-            print("emailschema: ", emailschema)
             result = emailservice().send(servicename.upper(), requestid, ministryrequestid, emailschema)
             is_sent_successfully = True if result["success"] == True else False
             if result['identifier'] > 0: applicantcorrespondenceservice().updateissentsuccessfullyforministryrequest(ministryrequestid, result['identifier'], is_sent_successfully, result['subject'])

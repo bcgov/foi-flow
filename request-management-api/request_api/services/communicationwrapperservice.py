@@ -22,37 +22,24 @@ class communicationwrapperservice:
 
     def send_email(self, requestid, rawrequestid, ministryrequestid, applicantcorrespondencelog):
         # Get the correct email subject
-        print("============send_email================")
         data = json.loads(applicantcorrespondencelog['correspondencemessagejson'])
         attributes = applicantcorrespondencelog["attributes"][0]
         emailsubject = ""
         customizedsubject = applicantcorrespondencelog['correspondencesubject'] if 'correspondencesubject' in applicantcorrespondencelog else ""
-        print("customizedsubject: ", customizedsubject)
         if applicantcorrespondencelog["templatename"] is None:
-            print("============applicantcorrespondencelog['templatename'] is None================")
             template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
-            print("============template: ", template)
         else:
             template = None
         if customizedsubject and len(customizedsubject) > 0:
             emailsubject = customizedsubject
-            print("============inside len(customizedsubject) > 0 emailsubject: ", emailsubject)
         elif template is None:
-            print("============template is None================")
-            print("============templatename: ", applicantcorrespondencelog['templatename'])
             if 'templatename' in applicantcorrespondencelog and applicantcorrespondencelog['templatename'] is not None:
                 emailsubject = templateconfig().getsubject(applicantcorrespondencelog['templatename'], attributes)
-                print("============emailsubject: ", emailsubject)
             else:
                 emailsubject = templateconfig().getsubject("", attributes)
-                print("============emailsubject: ", emailsubject)
         else:
-            print("============template is not None================")
             emailsubject = templateconfig().getsubject(template.name, attributes)
         applicantcorrespondencelog['emailsubject'] = emailsubject
-        print('applicantcorrespondencelog: ', applicantcorrespondencelog)
-        print("applicantcorrespondencelog['emailsubject']: ", applicantcorrespondencelog['emailsubject'])
-        print("applicantcorrespondencelog['customizedsubject']", applicantcorrespondencelog['correspondencesubject'])
         # Save correspondence log based on request type
         if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
