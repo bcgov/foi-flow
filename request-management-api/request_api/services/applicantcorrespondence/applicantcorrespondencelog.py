@@ -377,6 +377,13 @@ class applicantcorrespondenceservice:
     def __getvaluefromschema(self, schema, property):
         return schema.get(property) if property in schema  else None
     
-    def fetch_applicant_correspondence_log_by_id(self, applicantcorrespondenceid):
-        applicantcorrespondence =  FOIApplicantCorrespondence.getapplicantcorrespondencebyid(applicantcorrespondenceid)
-        return applicantcorrespondence
+    def fetch_applicant_correspondence_log_by_id(self, ministryrequestid, applicantcorrespondenceid):
+        correspondencelog = None
+        
+        if ministryrequestid is not None:
+            correspondencelog = FOIApplicantCorrespondence.getapplicantcorrespondencebyid(applicantcorrespondenceid)
+            print("Fetched applicant correspondence: ", correspondencelog)
+        else:
+            correspondencelog = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencebyid(applicantcorrespondenceid)
+            print("Fetched from FOIApplicantCorrespondenceRawRequest: ", correspondencelog)
+        return correspondencelog
