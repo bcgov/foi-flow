@@ -56,6 +56,7 @@ class senderservice:
             msg['Cc'] = ", ".join(ccemails)
         msg['Subject'] = subject
         formattedContent, embeddedImages = embeddedimagehandler().formatembeddedimage(content)
+        print('formattedContent: \n', formattedContent)
         part = MIMEText(formattedContent, "html")
         msg.attach(part)
         #Add Attachment and Set mail headers
@@ -89,7 +90,8 @@ class senderservice:
                 smtpobj.starttls()
                 smtpobj.ehlo()
                 #smtpobj.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
-                smtpobj.sendmail(msg['From'], all_recipients, msg.as_string())
+                smtpresponse = smtpobj.sendmail(msg['From'], all_recipients, msg.as_string())
+                print('*SMTP Response: ', smtpresponse)
                 smtpobj.quit()
                 logging.debug("End: Send email for request")
                 return {"success" : True, "message": "Sent successfully", "identifier": -1}   
