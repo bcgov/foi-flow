@@ -42,7 +42,8 @@ class emailservice:
             print("savedcorrespondence : ",savedcorrespondence)
             if savedcorrespondence and _applicantcorrespondenceid:
                 print("Debug 1")
-                subject = getattr(applicantcorrespondenceservice().fetch_applicant_correspondence_log_by_id(ministryrequestid, _applicantcorrespondenceid), "emailsubject", subject)
+                _applicantcorrespondence = applicantcorrespondenceservice().fetch_applicant_correspondence_log_by_id(ministryrequestid, _applicantcorrespondenceid)
+                subject = _applicantcorrespondence["emailsubject"] if _applicantcorrespondence and "emailsubject" in _applicantcorrespondence else subject
                 print("Debug subject : ",subject)                
             if subject is None:
                 subject = templateconfig().getsubject(servicename, requestjson)
