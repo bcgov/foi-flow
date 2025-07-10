@@ -1027,8 +1027,8 @@ export const RecordsLog = ({
       // ? (file.originalfilename? file.originalfilename : file.filename)
       // : file.filename;
     //if (isPDF && !downloadReplacedOriginal) {
-    if (!["png", "jpg", "jpeg", "pdf"].includes(extension)) {
-      if (isPDF){
+    if (!["png", "jpg", "jpeg", "pdf"].includes(extension.toLowerCase())) {
+      if (isPDF || (file.selectedfileprocessversion == 1 && !originalfile && !downloadReplacedOriginal )){
         s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
         filename = filename + ".pdf";
       }
@@ -1975,10 +1975,10 @@ export const RecordsLog = ({
       if (selectedRecords?.length <=0)
         return true
       for (let record of selectedRecords) {
-        if (record.selectedfileprocessversion || record.attributes?.incompatible) return true;
+        if (record.selectedfileprocessversion || record.attributes?.incompatible || !record.isdedupecomplete) return true;
         if (record.attachments) {
           for (let attachment of record.attachments) {
-            if (record.selectedfileprocessversion || record.attributes?.incompatible) return true;
+            if (record.selectedfileprocessversion || record.attributes?.incompatible || !record.isdedupecomplete) return true;
           }
         }
       }
@@ -3124,7 +3124,7 @@ export const RecordsLog = ({
                       lockRecords || !checkIsAnySelected() ? { pointerEvents: "none" } : {}
                     }
                   >
-                    <FontAwesomeIcon icon={faMinimize} size="lg" color="#38598A" />
+                    <FontAwesomeIcon icon={faMaximize} size="lg" color="#38598A" />
                   </button>
                 </span>
               </Tooltip>
@@ -4117,7 +4117,7 @@ const AttachmentPopup = React.memo(
               ""
             )}
             {!isHistoricalRequest && !record.selectedfileprocessversion && 
-              !record.attributes?.incompatible && (
+              !record.attributes?.incompatible && record.isdedupecomplete && (
               <MenuItem
                 disabled={lockRecords || disableMinistryUser}
                 onClick={() => {
