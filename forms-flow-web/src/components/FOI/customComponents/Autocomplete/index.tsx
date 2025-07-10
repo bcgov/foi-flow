@@ -19,14 +19,13 @@ const CustomAutocomplete = ({
     setSelectedOption(value);
     onChange(event, value);
   };
-const emailTemplatesGroup = ['A - Applicant Cover Email', 'Fee Estimate', 'Outstanding Fee']
 
   return (
     <Autocomplete
         size = "small"
         sx = {{ marginTop: '8px !important' }}
-        options={list.sort((a: Template, b: Template) => emailTemplatesGroup.includes(a.label) ? -1 : 0)}
-        groupBy={(option) => emailTemplatesGroup.includes(option.label) ? 'Email Templates' : 'Letter Templates'}
+        options={list.sort((a: Template, b: Template) => a.templatetype === 'email' ? -1 : 1)}
+        groupBy={(option) => option.templatetype == 'email' ? 'Email Templates' : 'Letter Templates'}
         getOptionDisabled={(option:any) => disabledValues.includes(option.value)}
         getOptionLabel={(option:any) => option.label}
         value={selectedOption}
