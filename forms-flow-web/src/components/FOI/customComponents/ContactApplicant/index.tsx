@@ -1443,6 +1443,7 @@ export const ContactApplicant = ({
         templateVariableInfo={{requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData}}
         correspondenceSubject={correspondenceSubject}
         showRenameCorrespondenceSubjectModal={showRenameCorrespondenceSubjectModal}
+        clearcorrespondence={clearcorrespondence}
       />
     </div>
   ))
