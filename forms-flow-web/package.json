@@ -51,19 +51,23 @@
     "@testing-library/react": "^12.0.0",
     "@testing-library/user-event": "^12.1.10",
     "@wojtekmaj/react-daterange-picker": "^3.1.0",
-    "axios": "^0.21.1",
+    "axios": "^0.30.0",
+    "body-parser": "1.20.3",
     "bootstrap": "^4.6.0",
+    "braces": "3.0.3",
     "browserslist": "^4.16.6",
     "client-zip": "^2.2.0",
     "clsx": "^1.1.1",
     "connected-react-router": "^6.9.3",
     "create-react-class": "^15.7.0",
+    "cross-spawn": "7.0.5",
     "crypto-js": "^4.2.0",
     "date-fns": "^2.23.0",
     "date-fns-tz": "^1.1.6",
     "date-holidays": "^3.15.1",
     "dayjs": "1.10.6",
     "dayjs-business-days": "1.0.4",
+    "dompurify": "2.5.4",
     "draft-js": "^0.11.7",
     "draftjs-to-html": "0.9.1",
     "email-validator": "^2.0.4",
@@ -71,6 +75,7 @@
     "font-awesome": "^4.7.0",
     "html-to-draftjs": "1.5.0",
     "html-to-pdf-js": "^0.9.3",
+    "http-proxy-middleware": "2.0.7",
     "jquery": "^3.5.1",
     "keycloak-js": "^26.2.0",
     "popper.js": "^1.16.1",
@@ -96,18 +101,20 @@
     "redux": "^4.1.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
+    "rollup": "2.79.2",
     "sass": "^1.32.13",
     "semantic-ui-css": "^2.4.1",
     "socket.io-client": "^4.4.1",
     "source-map-explorer": "^2.5.2",
-    "typescript": "^4.7.2"
+    "typescript": "^4.7.2",
+    "ws": "8.17.1"
   },
   "overrides": {
     "nth-check": {
       "version": "2.1.1"
     },
     "html-to-pdf-js": {
-      "jspdf": "2.5.1"
+      "jspdf": "3.0.1"
     },
     "react-scripts": {
       "css-select": "5.1.0",

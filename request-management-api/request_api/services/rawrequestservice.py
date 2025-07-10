@@ -34,7 +34,8 @@ class rawrequestservice:
         assigneelastname = requestdatajson["assignedToLastName"] if requestdatajson.get("assignedToLastName") != None else None
         ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False        
         axisrequestid = requestdatajson["axisRequestId"] if 'axisRequestId' in requestdatajson  else None
-        isaxisrequestidpresent = False
+        isconsultflag = requestdatajson["isconsultflag"] if 'isconsultflag' in requestdatajson  else False
+        
         if axisrequestid is not None:
             isaxisrequestidpresent = self.isaxisrequestidpresent(axisrequestid)
         axissyncdate = requestdatajson["axisSyncDate"] if 'axisSyncDate' in requestdatajson  else None
@@ -55,7 +56,8 @@ class rawrequestservice:
                                                     assigneelastname=assigneelastname,
                                                     axisrequestid=axisrequestid,
                                                     axissyncdate=axissyncdate,
-                                                    linkedrequests=linkedrequests                                                    
+                                                    linkedrequests=linkedrequests,
+                                                    isconsultflag=isconsultflag                                                     
                                                 )
         else:            
             raise ValueError("Duplicate AXIS Request ID")
@@ -70,7 +72,8 @@ class rawrequestservice:
                 workflowservice().createinstance(redispubservice.foirequestqueueredischannel, json_data)
             except Exception as ex:
                 logging.error(ex)
-                asyncio.ensure_future(redispubservice.publishrequest(json_data))
+                event_loop = asyncio.get_running_loop()
+                asyncio.run_coroutine_threadsafe(redispubservice.publishrequest(json_data), event_loop)
         return result
 
     @staticmethod

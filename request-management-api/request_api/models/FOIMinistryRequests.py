@@ -16,6 +16,7 @@ from .ApplicantCategories import ApplicantCategory
 from .FOIRequestWatchers import FOIRequestWatcher
 from .FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from .ProgramAreas import ProgramArea
+from .CloseReasons import CloseReason
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 from .FOIAssignees import FOIAssignee
 from .FOIRequestExtensions import FOIRequestExtension
@@ -75,6 +76,7 @@ class FOIMinistryRequest(db.Model):
     ministrysignoffapproval = db.Column(JSON, unique=False, nullable=True)
     requeststatuslabel = db.Column(db.String(50), nullable=False)
     userrecordslockstatus = db.Column(db.Boolean, nullable=True)
+    isconsultflag = db.Column(db.Boolean, nullable=True)
 
     #ForeignKey References
     
@@ -110,6 +112,7 @@ class FOIMinistryRequest(db.Model):
     isofflinepayment = db.Column(db.Boolean, unique=False, nullable=True,default=False)
 
     isoipcreview = db.Column(db.Boolean, unique=False, nullable=True,default=False)
+    isphasedrelease = db.Column(db.Boolean, unique=False, nullable=True,default=False)
 
     @classmethod
     def getrequest(cls,ministryrequestid):
@@ -449,6 +452,8 @@ class FOIMinistryRequest(db.Model):
                         onekeywordfiltercondition.append(ministry_restricted_requests.isrestricted == True)
                 if (_keyword == "oipc"):
                     onekeywordfiltercondition.append(FOIMinistryRequest.isoipcreview == True)
+                if (_keyword == "phased"):
+                    onekeywordfiltercondition.append(FOIMinistryRequest.isphasedrelease == True)
             
                 filtercondition.append(or_(*onekeywordfiltercondition))
 
@@ -592,6 +597,7 @@ class FOIMinistryRequest(db.Model):
             ministry_restricted_requests.isrestricted.label('isministryrestricted'),
             SubjectCode.name.label('subjectcode'),
             FOIMinistryRequest.isoipcreview.label('isoipcreview'),
+            FOIMinistryRequest.isphasedrelease.label('isphasedrelease'),
             literal(None).label('oipc_number'),
         ]
 
@@ -818,7 +824,8 @@ class FOIMinistryRequest(db.Model):
             'recordspagecount': recordspagecount,
             'closedate': FOIMinistryRequest.closedate,
             'subjectcode': SubjectCode.name,
-            'isoipcreview': FOIMinistryRequest.isoipcreview
+            'isoipcreview': FOIMinistryRequest.isoipcreview,
+            'isphasedrelease': FOIMinistryRequest.isphasedrelease
         }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
@@ -1212,7 +1219,9 @@ class FOIMinistryRequest(db.Model):
             ministry_restricted_requests.isrestricted.label('isministryrestricted'),
             SubjectCode.name.label('subjectcode'),
             FOIMinistryRequest.isoipcreview.label('isoipcreview'),
-            literal(None).label('oipc_number')
+            FOIMinistryRequest.isphasedrelease.label('isphasedrelease'),
+            literal(None).label('oipc_number'),
+            CloseReason.name.label('closereason')
         ]
 
         basequery = _session.query(
@@ -1282,6 +1291,10 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 SubjectCode,
                                 SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
+                                isouter=True
+                            ).join(
+                                CloseReason,
+                                CloseReason.closereasonid == FOIMinistryRequest.closereasonid,
                                 isouter=True
                             )
                             
@@ -1442,7 +1455,7 @@ class FOIMinistryRequest(db.Model):
             if (flag.lower() == 'oipc'):
                 requestflagscondition.append(FOIMinistryRequest.findfield('isoipcreview', iaoassignee, ministryassignee) == True)
             if (flag.lower() == 'phased'):
-                # requestflagscondition.append(FOIMinistryRequest.findfield('isphasedrelease', iaoassignee, ministryassignee) == True)
+                requestflagscondition.append(FOIMinistryRequest.findfield('isphasedrelease', iaoassignee, ministryassignee) == True)
                 continue
         return or_(*requestflagscondition)
 
@@ -1667,5 +1680,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
                 'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 
                 'axissyncdate', 'axispagecount', 'axislanpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd',
-                'isoipcreview', 'recordspagecount', 'estimatedpagecount', 'estimatedtaggedpagecount', 'userrecordslockstatus')
+                'isoipcreview', 'isphasedrelease', 'recordspagecount', 'estimatedpagecount', 'estimatedtaggedpagecount', 'userrecordslockstatus', 'isconsultflag')
     

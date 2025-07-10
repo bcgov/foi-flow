@@ -64,7 +64,6 @@ class FOIRawRequest(Resource):
             requestidisinteger = int(requestid)
             if requestidisinteger :                
                 baserequestinfo = rawrequestservice().getrawrequest(requestid)
-
                 assignee = baserequestinfo['assignedTo']
                 isiaorestricted = baserequestinfo['isiaorestricted']
                 # print('Request # {0} Assigned to {1} and is restricted {2} '.format(requestid,assignee,isiaorestricted))
@@ -103,7 +102,8 @@ class FOIRawRequest(Resource):
                 assignee = ''
                 if(actiontype == 'assignee'):
                     assignee = getassignee(assigneefirstname,assigneelastname,assigneegroup)                  
-                asyncio.ensure_future(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember(),assignee))
+                event_loop = asyncio.get_running_loop()
+                asyncio.run_coroutine_threadsafe(eventservice().postevent(requestid,"rawrequest",AuthHelper.getuserid(), AuthHelper.getusername(), AuthHelper.isministrymember(),assignee), event_loop)
                 if result.success == True:
                     rawrequestservice().posteventtoworkflow(result.identifier, updaterequest, status)
                     return {'status': result.success, 'message':result.message}, 200
@@ -111,7 +111,8 @@ class FOIRawRequest(Resource):
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",AuthHelper.getuserid(),notes="Request submitted from FOI Flow")
                 if result.success == True:
                     assignee = getassignee(assigneefirstname,assigneelastname,assigneegroup)
-                    asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember(),assignee))
+                    event_loop = asyncio.get_running_loop()
+                    asyncio.run_coroutine_threadsafe(eventservice().postevent(result.identifier,"rawrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember(),assignee), event_loop)
                     return {'status': result.success, 'message':result.message,'id':result.identifier} , 200                
         except ValueError as valuexception:
             return {'status': 500, 'message':str(valuexception)}, 500
@@ -168,7 +169,8 @@ class FOIRawRequestLoadTest(Resource):
             username = 'Super Tester'
             if int(requestid) and str(requestid) == "-1":
                 result = rawrequestservice().saverawrequest(updaterequest,"intake",userid,notes="Request submitted from FOI Flow")               
-                asyncio.ensure_future(eventservice().postevent(result.identifier,"rawrequest",userid,username,False,''))
+                event_loop = asyncio.get_running_loop()
+                asyncio.run_coroutine_threadsafe(eventservice().postevent(result.identifier,"rawrequest",userid,username,False,''), event_loop)
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except ValueError:
             return {'status': 400, 'message':INVALID_REQUEST_ID}, 400    
@@ -338,7 +340,8 @@ class FOIRawRequestReport(Resource):
     @auth.require
     def post():
         try:
-            asyncio.ensure_future(unopenedreportservice().generateunopenedreport())
+            event_loop = asyncio.get_running_loop()
+            asyncio.run_coroutine_threadsafe(unopenedreportservice().generateunopenedreport(), event_loop)
             return {'status': True, 'message': 'async report function called'} , 200
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500

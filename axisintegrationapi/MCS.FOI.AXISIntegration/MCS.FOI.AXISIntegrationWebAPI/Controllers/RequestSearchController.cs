@@ -101,8 +101,9 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(LogLevel.Error, string.Format($"Exception happened while GET operations of request - {requestNumber}, Error Message : {ex.Message} , Stack Trace :{ex.StackTrace}"));
-                return string.Format($"Exception happened while GET operations of request - {requestNumber}, Error Message : {ex.Message}");
+                var sanitizedReqNumber = requestNumber?.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                _logger.Log(LogLevel.Error, $"Exception happened while GET operations of request - {sanitizedReqNumber}, Error Message : {ex.Message} , Stack Trace :{ex.StackTrace}");
+                return $"Exception happened while GET operations of request - {requestNumber}, Error Message : {ex.Message}";
             }
 
         }

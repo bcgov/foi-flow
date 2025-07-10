@@ -14,6 +14,7 @@ on:
       - "request-management-api/**"
       - "!request-management-api/request_api/email_templates/**"
       - "!request-management-api/request_api/models/samplequeries/**"
+  workflow_dispatch:
 
 defaults:
   run:
@@ -25,10 +26,15 @@ env:
 
 jobs:
   request-management-api-cd-by-push:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'
     steps:
+      - name: Install oc
+        uses: redhat-actions/oc-installer@v1
+        with:
+          oc_version: '4.6'
+
       - uses: actions/checkout@v2
       - name: Set ENV variables
         id: set-variable
@@ -98,3 +104,9 @@ jobs:
         shell: bash
         run: |
           oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:${{ env.TAG_NAME }}
+
+      - name: Rollout Restart Deployment
+        shell: bash
+        run: |
+          oc project d7abee-dev
+          oc rollout restart deployment/request-management-api

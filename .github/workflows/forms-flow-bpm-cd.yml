@@ -24,10 +24,15 @@ env:
 
 jobs:
   forms-flow-bpm-cd-by-push:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'
     steps:
+      - name: Install oc
+        uses: redhat-actions/oc-installer@v1
+        with:
+          oc_version: '4.6'
+
       - uses: actions/checkout@v2
       - name: Set ENV variables for dev branch
         if: ${{ github.ref_name == 'dev' }}
@@ -116,7 +121,8 @@ jobs:
         run: |
           oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:${{ env.TAG_NAME }}
 
-      - name: Watch new rollout (trigger by image change in Openshift)
+      - name: Rollout Restart Deployment
         shell: bash
         run: |
-          oc rollout status dc/${{ env.APP_NAME }} -n ${{ env.TOOLS_NAME }}-${{ env.ENV_NAME }} -w
+          oc project d7abee-dev
+          oc rollout restart deployment/forms-flow-bpm
