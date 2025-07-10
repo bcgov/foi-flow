@@ -32,6 +32,7 @@ import { toast } from 'react-toastify';
 import { getTemplateVariables } from './util';
 import { DownloadCorrespondenceModal } from './DownloadCorrespondenceModal';
 import { getCorrespondenceSubject, getFullEmailListText, getFullCCEmailListText } from './helper';
+import { exportPDF } from '../../../../apiManager/services/FOI/foiCorrespondenceServices';
 
 const CommunicationStructure = ({
   correspondence, 
@@ -51,7 +52,8 @@ const CommunicationStructure = ({
   applicantCorrespondenceTemplates, 
   templateVariableInfo,
   correspondenceSubject,
-  showRenameCorrespondenceSubjectModal
+  showRenameCorrespondenceSubjectModal,
+  clearcorrespondence
 }) => {
 
   const templateList = useSelector((state) => state.foiRequests.foiEmailTemplates);
@@ -138,6 +140,7 @@ const CommunicationStructure = ({
           onClick={(e) => {
             e.stopPropagation();
             setModalFor("downloadcorrespondence")
+            setSelectedCorrespondence(correspondence);
             setDownloadCorrespondenceModalOpen(true);
             setPopoverOpen(false);
           }}
@@ -157,6 +160,7 @@ const CommunicationStructure = ({
           onClick={(e) => {
             e.stopPropagation();
             setModalFor("downloaddraft")
+            setSelectedCorrespondence(correspondence);
             setDownloadCorrespondenceModalOpen(true);
             setPopoverOpen(false);
         }}>Download</MenuItem>
@@ -386,11 +390,27 @@ const CommunicationStructure = ({
     //   element = element.replaceAll(lastName, 'APPLICANT')
     // }
     let emailFilename = correspondence?.correspondencesubject ? `${correspondence?.correspondencesubject.replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf` : `${getCorrespondenceSubject(correspondence, templateList, requestNumber).replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf`
-    html2pdf().set({margin: 20}).from(element).outputPdf('blob').then(async (blob) => {
-      blobs.push({name: emailFilename, lastModified: new Date(), input: blob})
-      const zipfile = await downloadZip(blobs).blob()
-      saveAs(zipfile, fullName + " " + correspondence.date.replace(/\|/g, "") + ".zip");
-    });
+    if (correspondence.category == "draft" && correspondence.draft) {
+      let newData = {
+        "FileName": `${emailFilename}.pdf`,
+        "Content": correspondence.draft
+      };
+      const saveBlobToPdf = async (pdf) => {
+        const blob = new Blob([pdf], { type: 'application/pdf' });
+        blobs.push({name: emailFilename, lastModified: new Date(), input: blob})
+        const zipfile = await downloadZip(blobs).blob()
+        saveAs(zipfile, fullName + " " + correspondence.date.replace(/\|/g, "") + ".zip");
+        clearcorrespondence();
+      }
+      exportPDF(dispatch, newData, saveBlobToPdf);
+    } else {
+      html2pdf().set({margin: 20}).from(element).outputPdf('blob').then(async (blob) => {
+        blobs.push({name: emailFilename, lastModified: new Date(), input: blob})
+        const zipfile = await downloadZip(blobs).blob()
+        saveAs(zipfile, fullName + " " + correspondence.date.replace(/\|/g, "") + ".zip");
+        clearcorrespondence();
+      });
+    }
   }
 
   const DeleteAction = () => {
