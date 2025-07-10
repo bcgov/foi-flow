@@ -604,7 +604,8 @@ export const ContactApplicant = ({
           label: template.templateName,
           value: template.fileName,
           disabled: !template.isActive || !isEnabledTemplate(template),
-          created_at: template.createdAt
+          created_at: template.createdAt,
+          templatetype: template.templateType
       }));
     }
 
