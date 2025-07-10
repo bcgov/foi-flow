@@ -139,10 +139,6 @@ const OpenInfo = ({
       ...oiPublicationData,
       publicationdate: publicationdate
     };
-    if (formattedData.oiexemptionapproved === false && isOITeam) {
-      formattedData.oipublicationstatus_id = findOIPublicationState("Publish")?.oipublicationstatusid || OIPublicationStatuses.Publish;
-      formattedData.oiexemption_id = null;
-    }
     dispatch(
       saveFOIOpenInfoRequest(
         foiministryrequestid,
@@ -165,11 +161,11 @@ const OpenInfo = ({
               draggable: true,
               progress: undefined,
             });
-            const isValidExemptionRequest = !isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
-            const isValidExemptionDenial = isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && formattedData.oiexemptionapproved === false;
-            const isValidExemptionApproved = isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && formattedData.oiexemptionapproved === true;
-            const manualPublicationStatusChange = requestDetails.oistatusid === OIStates.ExemptionRequest && formattedData.oipublicationstatus_id === OIPublicationStatuses.Publish;
-            const isUnpublish = isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest;
+            const isValidExemptionRequest = !isOITeam && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && oiPublicationData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
+            const isValidExemptionDenial = isOITeam && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && oiPublicationData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && oiPublicationData.oiexemptionapproved === false;
+            const isValidExemptionApproved = isOITeam && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && oiPublicationData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && oiPublicationData.oiexemptionapproved === true;
+            const manualPublicationStatusChange = requestDetails.oistatusid === OIStates.ExemptionRequest && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.Publish;
+            const isUnpublish = isOITeam && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest;
             if (isValidExemptionRequest) {
               requestDetails.oistatusid = OIStates.ExemptionRequest;
             }

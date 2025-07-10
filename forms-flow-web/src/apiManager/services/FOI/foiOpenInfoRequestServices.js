@@ -61,6 +61,10 @@ export const saveFOIOpenInfoRequest = (
   const isValidExemptionApproved = isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && data.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && data.oiexemptionapproved === true;
   const manualPublicationStatusChange = requetsinfo.oistatusid === OIStates.ExemptionRequest && data.oipublicationstatus_id === OIPublicationStatuses.Publish;  
   const isUnpublish = isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest;
+  if (isValidExemptionDenial) {
+    data.oipublicationstatus_id = 2;
+    data.oiexemption_id = null;
+  }
   return (dispatch) => {
     updateFOIMinistryRequestOIStatus(foiministryrequestid, foirequestId, isValidExemptionRequest, isValidExemptionDenial, manualPublicationStatusChange, isUnpublish, isValidExemptionApproved)
       .then((res) => {
