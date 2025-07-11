@@ -9,6 +9,7 @@
         public string Extension { get; set; } = default!;
         public bool IsActive { get; set; }
         public string RequestType { get; set; } = default!;
+        public string TemplateType { get; set; } = default!;
         public string DocumentPath { get; set; } = default!;
         public string EncodedContent { get; set; } = default!;
         public string? CreatedBy { get; set; }

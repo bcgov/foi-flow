@@ -604,7 +604,8 @@ export const ContactApplicant = ({
           label: template.templateName,
           value: template.fileName,
           disabled: !template.isActive || !isEnabledTemplate(template),
-          created_at: template.createdAt
+          created_at: template.createdAt,
+          templatetype: template.templateType
       }));
     }
 
@@ -1443,6 +1444,7 @@ export const ContactApplicant = ({
         templateVariableInfo={{requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData}}
         correspondenceSubject={correspondenceSubject}
         showRenameCorrespondenceSubjectModal={showRenameCorrespondenceSubjectModal}
+        clearcorrespondence={clearcorrespondence}
       />
     </div>
   ))
