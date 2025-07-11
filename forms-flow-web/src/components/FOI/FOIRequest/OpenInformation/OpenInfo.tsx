@@ -83,16 +83,19 @@ const OpenInfo = ({
         oiexemption_id: null
       }));
     } else if (oiDataKey === "publicationdate" && requestDetails.closedate 
-      && typeof(value) === "string" && calculateBusinessDaysBetween(value, requestDetails.closedate) >=0 && calculateBusinessDaysBetween(value, requestDetails.closedate) <= 10) {
-      setConfirmationModal((prev : any) => ({
-        ...prev, 
-        show: true,
-        title: "Change Publication Date",
-        description: "The date you have chosen falls within 10 business days of the closed date. Are you sure you want to continue?",
-        message: "",
-        confirmButtonTitle: "Continue",
-        confirmationData: value,
-      }));
+      && typeof(value) === "string") {
+      const daysBetween = calculateBusinessDaysBetween(requestDetails.closedate, value);
+      if (daysBetween >= 0 && daysBetween < 10) {
+        setConfirmationModal((prev : any) => ({
+          ...prev, 
+          show: true,
+          title: "Change Publication Date",
+          description: "The date you have chosen falls within 10 business days of the closed date. Are you sure you want to continue?",
+          message: "",
+          confirmButtonTitle: "Continue",
+          confirmationData: value,
+        }));
+      }
     } else {
       setOiPublicationData((prev: any) => ({
         ...prev,
@@ -139,10 +142,6 @@ const OpenInfo = ({
       ...oiPublicationData,
       publicationdate: publicationdate
     };
-    if (formattedData.oiexemptionapproved === false && isOITeam) {
-      formattedData.oipublicationstatus_id = findOIPublicationState("Publish")?.oipublicationstatusid || OIPublicationStatuses.Publish;
-      formattedData.oiexemption_id = null;
-    }
     dispatch(
       saveFOIOpenInfoRequest(
         foiministryrequestid,
@@ -165,11 +164,11 @@ const OpenInfo = ({
               draggable: true,
               progress: undefined,
             });
-            const isValidExemptionRequest = !isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
-            const isValidExemptionDenial = isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && formattedData.oiexemptionapproved === false;
-            const isValidExemptionApproved = isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && formattedData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && formattedData.oiexemptionapproved === true;
-            const manualPublicationStatusChange = requestDetails.oistatusid === OIStates.ExemptionRequest && formattedData.oipublicationstatus_id === OIPublicationStatuses.Publish;
-            const isUnpublish = isOITeam && formattedData.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest;
+            const isValidExemptionRequest = !isOITeam && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && oiPublicationData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
+            const isValidExemptionDenial = isOITeam && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && oiPublicationData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && oiPublicationData.oiexemptionapproved === false;
+            const isValidExemptionApproved = isOITeam && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && oiPublicationData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && oiPublicationData.oiexemptionapproved === true;
+            const manualPublicationStatusChange = requestDetails.oistatusid === OIStates.ExemptionRequest && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.Publish;
+            const isUnpublish = isOITeam && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest;
             if (isValidExemptionRequest) {
               requestDetails.oistatusid = OIStates.ExemptionRequest;
             }
@@ -292,7 +291,7 @@ const OpenInfo = ({
             bcgovcode={bcgovcode}
             requestNumber={requestNumber}
             handlePublishNow={handlePublishNow}
-            earliestPublicationDate={addBusinessDaysToDate(requestDetails.closedate, 10)}
+            earliestPublicationDate={addBusinessDays(requestDetails.closedate, 10)}
           />
         )}
       </div>
