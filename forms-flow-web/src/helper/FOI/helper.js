@@ -163,7 +163,6 @@ const calculateBusinessDaysBetween = (date1, date2) => {
   const isForward = startDate <= endDate;
   let currentDate = new Date(isForward ? startDate : endDate);
   const targetDate = new Date(isForward ? endDate : startDate);
-  
   let businessDays = 0;
   while (currentDate < targetDate) {
     currentDate.setDate(currentDate.getDate() + 1);
