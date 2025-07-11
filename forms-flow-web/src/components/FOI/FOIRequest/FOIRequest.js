@@ -176,7 +176,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let applicantCorrespondence = useSelector(
     (state) => state.foiRequests.foiRequestApplicantCorrespondence
   );
-  // console.log("applicantCorrespondence: ", applicantCorrespondence);
   let applicantCorrespondenceTemplates = useSelector(
     (state) => state.foiRequests.foiRequestApplicantCorrespondenceTemplates
   );
@@ -1129,7 +1128,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   }
 
   const getHistoryCount = () => {
-    let historyCount= applicantCorrespondence.length + requestNotes.filter(
+    let historyCount= visibleCorrespondence.length + requestNotes.filter(
             c => c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
                 c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review")
         ).length;
@@ -1141,7 +1140,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       ...(applicantCorrespondence || []).map((message) => ({
         ...message,
         type: 'message',
-        created_at: message.created_at ? convertSTRToDate(message.created_at) : message.created_at 
+        created_at: message.date ? convertSTRToDate(message.date) : message.date
       })),
       ...(requestNotes || []).map((comment) => ({
         ...comment,
@@ -1161,6 +1160,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     return '('+commentsCount+')'
 
 }
+  const visibleCorrespondence = applicantCorrespondence?.filter(
+    (c) => c.category !== 'draft'
+  ) || [];
 
   return (!isLoading &&
     requestDetails &&
@@ -1261,8 +1263,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     onClick={() => tabclick("ContactApplicant")}
                   >
                     Communications{" "}
-                    {applicantCorrespondence?.length > 0
-                      ? `(${applicantCorrespondence.length})`
+                    {visibleCorrespondence?.length > 0
+                      ? `(${visibleCorrespondence.length})`
                       : ""}
                   </div>
                 }
@@ -1845,7 +1847,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
             {!isLoading && (requestNotes || applicantCorrespondence) ? (
               <>
                 <RequestHistorySection
-                  requestHistoryArray={getMergedHistory(applicantCorrespondence, requestNotes)}
+                  requestHistoryArray={getMergedHistory(visibleCorrespondence, requestNotes)}
                   currentUser={
                     userId && {
                       userId: userId,
