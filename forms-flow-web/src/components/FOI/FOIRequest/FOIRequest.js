@@ -1141,7 +1141,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       ...(applicantCorrespondence || []).map((message) => ({
         ...message,
         type: 'message',
-        created_at: message.created_at ? convertSTRToDate(message.created_at) : message.created_at 
+        created_at: message.date ? convertSTRToDate(message.date) : message.date
       })),
       ...(requestNotes || []).map((comment) => ({
         ...comment,
