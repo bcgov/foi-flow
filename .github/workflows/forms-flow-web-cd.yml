@@ -107,4 +107,4 @@ jobs:
       - name: Watch new rollout (trigger by image change in Openshift)
         shell: bash
         run: |
-          oc rollout-restart deploymentconfig/forms-flow-web-rook -n d7abee-dev
+          oc rollout restart deploymentconfig/forms-flow-web-rook -n d7abee-dev
