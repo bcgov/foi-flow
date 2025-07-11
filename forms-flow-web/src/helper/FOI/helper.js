@@ -151,22 +151,31 @@ const calculateDaysRemaining = (endDate, startDate) => {
   }
 };
 const calculateBusinessDaysBetween = (date1, date2) => {
-  date1 = new Date((dayjs(date1).tz('America/Los_Angeles')));
-  date2 = new Date((dayjs(date2).tz('America/Los_Angeles')));
-  let currentDate = date1 <= date2 ? date1 : date2;
-  let days = (date1.getTime() - date2.getTime()) / (1000 * 3600 *24);
-  let daysBetween = 0;
-  while(days > 0) {
+  // Parse dates as simple date strings without timezone conversion
+  const startDate = new Date(date1);
+  const endDate = new Date(date2);
+  // Reset time to avoid timezone issues
+  startDate.setHours(0, 0, 0, 0);
+  endDate.setHours(0, 0, 0, 0);
+  if (startDate.getTime() === endDate.getTime()) return 0;
+  
+  // Determine direction and set up iteration
+  const isForward = startDate <= endDate;
+  let currentDate = new Date(isForward ? startDate : endDate);
+  const targetDate = new Date(isForward ? endDate : startDate);
+  
+  let businessDays = 0;
+  while (currentDate < targetDate) {
     currentDate.setDate(currentDate.getDate() + 1);
     const isHoliday = hd.isHoliday(currentDate);
-    // isHoliday = false;
     const isWeekend = currentDate.getDay() === 6 || currentDate.getDay() === 0;
     if (!isHoliday && !isWeekend) {
-      daysBetween++;
+      businessDays++;
     }
-    days--;
   }
-  return daysBetween;
+  const result = isForward ? businessDays : -businessDays;
+  // Return negative if date1 is after date2 (maintains directional information)
+  return result;
 };
 const addBusinessDaysToDate = (date, days) => {
   if (!date) {
