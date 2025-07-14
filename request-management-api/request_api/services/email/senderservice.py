@@ -56,7 +56,6 @@ class senderservice:
             msg['Cc'] = ", ".join(ccemails)
         msg['Subject'] = subject
         formattedContent, embeddedImages = embeddedimagehandler().formatembeddedimage(content)
-        print('formattedContent: \n', formattedContent)
         part = MIMEText(formattedContent, "html")
         msg.attach(part)
         #Add Attachment and Set mail headers
