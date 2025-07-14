@@ -391,6 +391,7 @@ export const ContactApplicant = ({
     await exportPDF(dispatch, newData, attachBlobPdf);
     const aplicantCoverEmailTemplate = templates.find((template: any) => template.label === 'A - Applicant Cover Email');
     selectTemplateFromDropdown(null, aplicantCoverEmailTemplate)
+    setSelectedTemplate(aplicantCoverEmailTemplate);
   }
 
   

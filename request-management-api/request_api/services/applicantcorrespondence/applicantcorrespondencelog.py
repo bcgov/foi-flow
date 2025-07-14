@@ -390,3 +390,13 @@ class applicantcorrespondenceservice:
         else:
             correspondencelog = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencebyid(applicantcorrespondenceid)
         return correspondencelog
+
+    def get_all_correspondence_emails(self, requestid, ministryrequestid, applicantcorrespondenceid):
+        # This is used for fee emails, fee emails aren't available for raw requests. If needed elsewhere, uncomment below
+        # rawrequestid = FOIRequest().getrawrequestidbyfoirequestid(requestid)
+        # _correspondenceemails = FOIApplicantCorrespondenceEmailRawRequest.getapplicantcorrespondenceemails(rawrequestid)
+        _correspondenceemails = FOIApplicantCorrespondenceEmail.getapplicantcorrespondenceemails(ministryrequestid)
+        correspondence = self.fetch_applicant_correspondence_log_by_id(ministryrequestid, applicantcorrespondenceid)
+        emails = self.__getcorrespondenceemailbyid(_correspondenceemails,  applicantcorrespondenceid, correspondence['version'])
+        ccemails = self.__getcorrespondenceCCemailbyid(_correspondenceemails,  applicantcorrespondenceid, correspondence['version'])
+        return emails, ccemails

@@ -37,12 +37,17 @@ class emailservice:
                 servicename = _templatename.upper() if _templatename else ""
             _messageattachmentlist = self.__get_attachments(ministryrequestid, emailschema, servicename)
             savedcorrespondence = self.__pre_send_correspondence_audit(requestid, ministryrequestid,emailschema, content, templateconfig().isnotreceipt(servicename), _messageattachmentlist, recipient_email=requestjson.get("email"))
+            emails = []
+            ccemails = []
             if savedcorrespondence and _applicantcorrespondenceid:
                 _applicantcorrespondence = applicantcorrespondenceservice().fetch_applicant_correspondence_log_by_id(ministryrequestid, _applicantcorrespondenceid)
+                emails, ccemails = applicantcorrespondenceservice().get_all_correspondence_emails(requestid, ministryrequestid, _applicantcorrespondenceid)
                 subject = _applicantcorrespondence["emailsubject"] if _applicantcorrespondence and "emailsubject" in _applicantcorrespondence else subject               
             if subject is None:
                 subject = templateconfig().getsubject(servicename, requestjson)
-            emailresult = senderservice().send(subject, _messagepart, _messageattachmentlist, requestjson.get("email"))
+            if len(emails) == 0 and len(ccemails) == 0:
+                emails = requestjson.get("email")
+            emailresult = senderservice().send(subject, _messagepart, _messageattachmentlist, emails, ccemails)
             return {"success": emailresult["success"], "message": emailresult["message"], "identifier": savedcorrespondence.identifier, "subject": subject}
         except Exception as ex:
             logging.exception(ex)
