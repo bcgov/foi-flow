@@ -250,17 +250,19 @@ export const ContactApplicant = ({
 
     let folderName = convertDateStringToNumeric(correspondence?.date).replaceAll(":", "_") + ' - ' + getCorrespondenceSubject(correspondence, templateList, requestNumber)
     folderName = folderName.replaceAll(/[^a-z A-Z0-9_\-]/g, "");
-    const headerDiv = document.createElement("div");
-    headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`;
-    headerDiv.style.fontSize = "12px";
-    headerDiv.style.fontFamily = "BCSans"
-    headerDiv.style.marginBottom = "20px";
-    let element = headerDiv.outerHTML
-    if (correspondence?.text) element = element + correspondence?.text
     // No drafts being downloaded as part of export all
-    let emailFilename = correspondence?.correspondencesubject ? `${correspondence?.correspondencesubject.replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf` : `${getCorrespondenceSubject(correspondence, templateList, requestNumber).replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf`
-    const pdfEmailBlob = await html2pdf().set({margin: 20}).from(element).outputPdf('blob')
-    blobs.push({name: folderName + '/' + emailFilename, lastModified: new Date(), input: pdfEmailBlob})
+    if (correspondence?.category != 'response') {
+      const headerDiv = document.createElement("div");
+      headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`;
+      headerDiv.style.fontSize = "12px";
+      headerDiv.style.fontFamily = "BCSans"
+      headerDiv.style.marginBottom = "20px";
+      let element = headerDiv.outerHTML
+      if (correspondence?.text) element = element + correspondence?.text
+      let emailFilename = correspondence?.correspondencesubject ? `${correspondence?.correspondencesubject.replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf` : `${getCorrespondenceSubject(correspondence, templateList, requestNumber).replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf`
+      const pdfEmailBlob = await html2pdf().set({margin: 20}).from(element).outputPdf('blob')
+      blobs.push({name: folderName + '/' + emailFilename, lastModified: new Date(), input: pdfEmailBlob})
+    }
     if (correspondence.attachments.length == 0) return {folder: folderName, status: 'success'}
 
     try {
