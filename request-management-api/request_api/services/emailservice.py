@@ -41,7 +41,7 @@ class emailservice:
             ccemails = []
             if savedcorrespondence and _applicantcorrespondenceid:
                 _applicantcorrespondence = applicantcorrespondenceservice().fetch_applicant_correspondence_log_by_id(ministryrequestid, _applicantcorrespondenceid)
-                emails, ccemails = applicantcorrespondenceservice().get_all_correspondence_emails(requestid, ministryrequestid, _applicantcorrespondenceid, None)
+                emails, ccemails = applicantcorrespondenceservice().get_all_correspondence_emails(requestid, ministryrequestid, _applicantcorrespondenceid)
                 subject = _applicantcorrespondence["emailsubject"] if _applicantcorrespondence and "emailsubject" in _applicantcorrespondence else subject               
             if subject is None:
                 subject = templateconfig().getsubject(servicename, requestjson)
