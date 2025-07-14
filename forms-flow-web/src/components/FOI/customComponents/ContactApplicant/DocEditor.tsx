@@ -36,6 +36,7 @@ export const DocEditor = ({
     selectedEmails,
     selectedCCEmails
 }: any) => {
+    console.log('selectedTemplate: ', selectedTemplate);
     const EMAILLISTTEMPLATEVARIABLE = '[SELECTEDEMAILSLIST-NONESELECTED]'
     // These are the phrases from the templates the precede email and file, to ensure that emails and numbers in other locations aren't replaced
     const EMAILPREFIXES = [`Sent via email:  `, `Sent via email: `, `Sent by email to: `, `Sent by email to:  `, `Applicant email address:  `]
@@ -148,7 +149,7 @@ export const DocEditor = ({
     };
 
     const insertHeader = () => {
-        if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label)) {
+        if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label) && selectedTemplate.templatetype !== 'email') {
             container.documentEditor.selection.sectionFormat.differentFirstPage = true;
             container.documentEditor.selection.goToPage(1);
             container.documentEditor.selection.goToHeader();
@@ -168,7 +169,7 @@ export const DocEditor = ({
     }
 
     const insertFooter = () => {
-        if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label)) {
+        if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label) && selectedTemplate.templatetype !== 'email') {
             container.documentEditor.selection.sectionFormat.differentFirstPage = true;
             container.documentEditor.selection.goToPage(1);
             container.documentEditor.selection.goToFooter();
