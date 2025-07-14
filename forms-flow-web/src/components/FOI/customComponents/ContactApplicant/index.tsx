@@ -83,6 +83,10 @@ export const ContactApplicant = ({
     if (selectedCorrespondence?.correspondencesubject) setCorrespondenceSubject(selectedCorrespondence?.correspondencesubject)
   }, [selectedCorrespondence])
 
+  useEffect(() => {
+    setAttachAsPdfFilename(correspondenceSubject);
+  }, [correspondenceSubject])
+
   const showAttachAsPdfModal = () => {
     setOpenConfirmationModal(true);
     setConfirmationFor("attach-as-pdf")
