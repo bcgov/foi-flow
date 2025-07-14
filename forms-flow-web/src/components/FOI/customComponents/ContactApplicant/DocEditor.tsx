@@ -148,7 +148,7 @@ export const DocEditor = ({
     };
 
     const insertHeader = () => {
-        if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label)) {
+        if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label) && selectedTemplate?.templatetype !== 'email') {
             container.documentEditor.selection.sectionFormat.differentFirstPage = true;
             container.documentEditor.selection.goToPage(1);
             container.documentEditor.selection.goToHeader();
@@ -168,7 +168,7 @@ export const DocEditor = ({
     }
 
     const insertFooter = () => {
-        if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label)) {
+        if (container && !SKIPHEADERFOOTERINSERT.includes(selectedTemplate?.label) && selectedTemplate?.templatetype !== 'email') {
             container.documentEditor.selection.sectionFormat.differentFirstPage = true;
             container.documentEditor.selection.goToPage(1);
             container.documentEditor.selection.goToFooter();

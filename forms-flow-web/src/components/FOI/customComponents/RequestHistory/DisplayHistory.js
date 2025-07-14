@@ -9,7 +9,8 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CommentHistory from './CommentHistory';
 import { useSelector } from 'react-redux';
-import { getCorrespondenceSubject } from '../ContactApplicant/helper';
+import { getCorrespondenceSubject, getFullCCEmailListText, getFullEmailListText } from '../ContactApplicant/helper';
+import Tooltip from "@mui/material/Tooltip";
 
 const DisplayHistory = ({
   requesthistory,
@@ -187,7 +188,7 @@ const DisplayHistory = ({
   
   const getemailtext = (item) => {
     if (item.type === 'comment') return '';
-    const emailCount = item.emails.length;
+    const emailCount = item.emails.length + item.ccemails.length;
     return emailCount === 1 ? item.emails[0] : emailCount > 1 ? `${item.emails[0]} +${emailCount - 1}` : '';
   };
   
@@ -229,14 +230,19 @@ const DisplayHistory = ({
     </div>
   );
   
-  const rendertemplateinfo = (item, fullName, emailText, dateText) => (
+  const rendertemplateinfo = (item, fullName, emailText, dateText) => {
+    const emailCount = item.emails.length + item.ccemails.length;
+    const fullEmailListText = getFullEmailListText(item);
+    const fullCCEmailListText = getFullCCEmailListText(item);
+    let popoverEmailList = fullEmailListText + '\n' + fullCCEmailListText;
+    return (
     <>
       <div className="templateUser"> {getCorrespondenceSubject(item, templateList, requestNumber) + " - " + fullName}</div> |
-      {item.emails.length > 0 && <div className="templateUser"> {emailText} |</div>}
+      {emailCount > 1 ? <><div className="templateUser"><Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{popoverEmailList}</span>} disableInteractive placement="top">{emailText}</Tooltip></div> |</>: emailCount == 1 ? <><div className="templateUser"> {emailText} </div>|</> : ''}
       <div className="templateTime">{dateText.toUpperCase()}</div>
       <div className="templateTime">{item.edited ? "Edited" : ""}</div>
     </>
-  );
+  )};
   
   const rendercategorychip = (item) => (
     <div className="templateUser">
