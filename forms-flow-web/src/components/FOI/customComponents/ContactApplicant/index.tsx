@@ -56,7 +56,6 @@ export const ContactApplicant = ({
   ministryId,
   ministryCode,
   applicantCorrespondence,
-  applicantCorrespondenceTemplates,
   requestId,
 }: any) => {
   const [curTemplate, setCurTemplate] = useState<string>('');
@@ -1448,7 +1447,6 @@ export const ContactApplicant = ({
         setSelectedCorrespondence={setSelectedCorrespondence}
         setCurrentResponseDate={setCurrentResponseDate}
         setUpdateAttachment={setUpdateAttachment}
-        applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
         templateVariableInfo={{requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData}}
         correspondenceSubject={correspondenceSubject}
         showRenameCorrespondenceSubjectModal={showRenameCorrespondenceSubjectModal}
