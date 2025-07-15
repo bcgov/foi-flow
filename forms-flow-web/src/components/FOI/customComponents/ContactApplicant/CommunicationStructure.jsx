@@ -49,7 +49,6 @@ const CommunicationStructure = ({
   setUpdateAttachment, 
   setSelectedCorrespondence, 
   setCurrentResponseDate, 
-  applicantCorrespondenceTemplates, 
   templateVariableInfo,
   correspondenceSubject,
   showRenameCorrespondenceSubjectModal,
