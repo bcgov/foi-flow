@@ -38,7 +38,8 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
                 }
                 foreach (var requestId in axisRequestIds)
                 {
-                    _logger.Log(LogLevel.Information, string.Format($"axisRequestId for syncing requestPageCount and LANPages: {requestId}"));
+                    var sanitizedReqId =  requestId?.Replace(Environment.NewLine, "").Replace("\n", "").Replace("\r", "");
+                    _logger.Log(LogLevel.Information, $"axisRequestId for syncing requestPageCount and LANPages: {sanitizedReqId}");
                     if (!IsValidRequestId(requestId))
                     {
                         return BadRequest($"Invalid axisRequestId: {requestId}");
@@ -54,8 +55,8 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
             }
             catch (Exception ex)
             {
-                _logger.Log(LogLevel.Error, string.Format($"Exception happened on RequestspageCount POST operations, Error Message : {ex.Message} , Stack Trace :{ex.StackTrace}"));
-                return string.Format($"Exception happened on RequestspageCount POST operations, Error Message : {ex.Message}");
+                _logger.Log(LogLevel.Error, $"Exception happened on RequestspageCount POST operations, Error Message : {ex.Message} , Stack Trace :{ex.StackTrace}");
+                return $"Exception happened on RequestspageCount POST operations, Error Message : {ex.Message}";
             }
 
         }
