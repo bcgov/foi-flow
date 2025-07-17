@@ -219,6 +219,9 @@ services:
         - REACT_APP_SESSION_SECURITY_KEY=${REACT_APP_SESSION_SECURITY_KEY}
         - REACT_APP_FOI_TEMPLATE_API_URL=${REACT_APP_FOI_TEMPLATE_API_URL}
         - REACT_APP_SF_KEY=${REACT_APP_SF_KEY}
+    volumes:
+      - ".:/app"
+      - "/app/node_modules"
     ports:
       - "3000:8080"
     tty: true
