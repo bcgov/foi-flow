@@ -10,7 +10,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 // import MultiMinistrySelector from '../../customComponents/MultiMinistrySelector';
 import { MinistriesList } from "../../customComponents";
 import CustomSwitch from "./CustomSwitch";
-import './InternalConsultation.scss';
+import './internalConsultation.scss';
 import { useSelector } from "react-redux";
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import {isValidMinistryCode, countOfMinistrySelected} from '../utils';

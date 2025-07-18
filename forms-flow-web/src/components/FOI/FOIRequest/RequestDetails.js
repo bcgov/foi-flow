@@ -170,8 +170,10 @@ const RequestDetails = React.memo(
         requestState: findRequestState(requestDetails?.requeststatuslabel)
       }
       //event bubble up - sets the initial value to validate the required fields
-      // handleRequestDetailsInitialValue(requestDetailsObject);
-      // createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES, requestDetailsObject);
+      if (!isAddConsultRequest) {
+        handleRequestDetailsInitialValue(requestDetailsObject);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES, requestDetailsObject);
+      }
     },[requestDetails, handleRequestDetailsInitialValue])
     
     const prevConsultFlag = React.useRef(requestDetails?.isconsultflag);
@@ -180,8 +182,10 @@ const RequestDetails = React.memo(
       if (prevConsultFlag.current === true && !requestDetails?.isconsultflag) {
         const calculatedDueDate = startDateText ? dueDateCalculation(startDateText) : "";
         setDueDate(calculatedDueDate);
-        // handleRequestDetailsValue(calculatedDueDate, FOI_COMPONENT_CONSTANTS.DUE_DATE);
-        // createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DUE_DATE, calculatedDueDate);
+        if (!isAddConsultRequest) {
+        handleRequestDetailsValue(calculatedDueDate, FOI_COMPONENT_CONSTANTS.DUE_DATE);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DUE_DATE, calculatedDueDate);
+        }
       }
 
       prevConsultFlag.current = requestDetails?.isconsultflag;
@@ -238,7 +242,7 @@ const RequestDetails = React.memo(
       setReceivedDate(receivedDate);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(receivedDate, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE);
-      handleConsultRequestDetailsValue(receivedDate, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE);
+      if (isAddConsultRequest) { handleConsultRequestDetailsValue(receivedDate, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE); }
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_DATE, receivedDate);
     }
     const handleStartDateChange = (e) => {
@@ -247,28 +251,28 @@ const RequestDetails = React.memo(
       setDueDate(dueDate);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, dueDate);
-      handleConsultRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, dueDate);
+      if (isAddConsultRequest) { handleConsultRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, dueDate); }
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, e.target.value, dueDate);
     }
     const handleRequestTypeChange = (e) => {
       setSelectedRequestType(e.target.value);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE);
-      handleConsultRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE);
+      if (isAddConsultRequest) { handleConsultRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE); }
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.REQUEST_TYPE, e.target.value);
     }
     const handleReceivedModeChange = (e) => {
       setSelectedReceivedMode(e.target.value);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE);
-      handleConsultRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE);
+      if (isAddConsultRequest) { handleConsultRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE); }
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_MODE, e.target.value);
     }
     const handleDeliveryModeChange = (e) => {
       setSelectedDeliveryMode(e.target.value);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
-      handleConsultRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
+      if (isAddConsultRequest) { handleConsultRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE); }
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, e.target.value);
     }
 
@@ -277,7 +281,7 @@ const RequestDetails = React.memo(
       setDueDate(newDueDate);
       handleRequestDetailsValue(newDueDate, FOI_COMPONENT_CONSTANTS.DUE_DATE);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DUE_DATE, newDueDate);
-      handleConsultDueDateValidation(newDueDate);
+      if (isAddConsultRequest) { handleConsultDueDateValidation(newDueDate); }
     }
 
     const handleConsultDueDateChange = (event) => {
