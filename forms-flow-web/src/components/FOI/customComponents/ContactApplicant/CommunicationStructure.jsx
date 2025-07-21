@@ -402,13 +402,20 @@ const CommunicationStructure = ({
         clearcorrespondence();
       }
       exportPDF(dispatch, newData, saveBlobToPdf);
-    } else {
+    } else if (correspondence?.category != 'response') {
       html2pdf().set({margin: 20}).from(element).outputPdf('blob').then(async (blob) => {
         blobs.push({name: emailFilename, lastModified: new Date(), input: blob})
         const zipfile = await downloadZip(blobs).blob()
         saveAs(zipfile, fullName + " " + correspondence.date.replace(/\|/g, "") + ".zip");
         clearcorrespondence();
       });
+    } else if (correspondence?.category == 'response') {
+      if (blobs.length == 1) {
+        blobs[0].name = fullName + " " + correspondence.date.replace(/\|/g, "").replace(/:/g, "_") + "/" + blobs[0].name
+      }
+      const zipfile = await downloadZip(blobs).blob()
+      saveAs(zipfile, fullName + " " + correspondence.date.replace(/\|/g, "") + ".zip");
+      clearcorrespondence();
     }
   }
 
