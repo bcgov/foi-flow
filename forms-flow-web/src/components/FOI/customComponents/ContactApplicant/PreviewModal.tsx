@@ -33,7 +33,7 @@ export const PreviewModal = React.memo(({
 
   const dispatch = useDispatch();
 
-  // //gets the request detail from the store
+  //gets the request detail from the store
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
   const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
   const responsePackagePdfStitchStatus = useSelector((state: any) => state.foiRequests.foiPDFStitchStatusForResponsePackage);
