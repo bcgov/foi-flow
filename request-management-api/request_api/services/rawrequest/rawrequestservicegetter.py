@@ -4,6 +4,8 @@ from typing import Counter
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.OperatingTeamEmails import OperatingTeamEmail
+from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from dateutil.parser import parse
 import maya
 from request_api.models.FOIAssignees import FOIAssignee
@@ -78,6 +80,7 @@ class rawrequestservicegetter:
 
             request['requestrawdata']['additionalPersonalInfo'] = additionalpersonalinfo              
             
+            assignedgroup = request['requestrawdata']['assignedGroup'] if 'assignedGroup' in request['requestrawdata'] else None
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
             request['requestrawdata']['currentState'] = request['status']
             requeststatus = FOIRequestStatus().getrequeststatus(request['status'])
@@ -86,6 +89,7 @@ class rawrequestservicegetter:
             request['requestrawdata']['stateTransition']= FOIRawRequest.getstatesummary(requestid)
             request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
             request['requestrawdata']['isiaorestricted']= request['isiaorestricted'] if request['isiaorestricted'] is not None else False
+            request['requestrawdata']['assignedGroupEmail'] = self.__getassignedgroupemail(assignedgroup)
             return request['requestrawdata']
         else:
             return None
@@ -124,6 +128,8 @@ class rawrequestservicegetter:
         assignee = None
         if ("assignedto" in request and request["assignedto"] not in (None,'')):
             assignee = FOIAssignee.getassignee(request["assignedto"])
+        assignedgroup = request["assignedGroup"] if "assignedGroup" in request else "Unassigned"
+        assignedgroupemail = self.__getassignedgroupemail(assignedgroup)
         return {'id': request['requestid'],
                                'wfinstanceid': request['wfinstanceid'],
                                'ispiiredacted': request['ispiiredacted'],
@@ -137,7 +143,8 @@ class rawrequestservicegetter:
                                'currentState': request['status'],
                                'receivedDate': _createddate.strftime('%Y %b, %d'),
                                'receivedDateUF': _createddate.strftime('%Y-%m-%d %H:%M:%S.%f'),
-                               'assignedGroup': request["assignedgroup"] if "assignedgroup" in request else "Unassigned",
+                               'assignedGroup': assignedgroup,
+                               'assignedGroupEmail': assignedgroupemail,
                                'assignedTo': request["assignedto"] if "assignedto" in request else "Unassigned",
                                'assignedToFirstName': assignee["firstname"] if assignee is not None and "firstname" in assignee else None,
                                'assignedToLastName': assignee["lastname"] if assignee is not None and "lastname" in assignee else None,
@@ -215,6 +222,12 @@ class rawrequestservicegetter:
                         'birthDate': _childandanotherpersoninfo['birthDate'] if _childandanotherpersoninfo.get('birthDate') is not None else ''
                     }                 
         return additionalpersonalinfo    
+
+    def __getassignedgroupemail(self, assignedgroup):
+        assignedgroupemail = OperatingTeamEmail.getoperatingteamemail(assignedgroup)
+        if assignedgroupemail is None:
+            assignedgroupemail = KeycloakAdminService().processgroupEmail(assignedgroup)
+        return assignedgroupemail
 
     def __getpropertyvalue(self, inputschema, property, criteria):
         return inputschema[property] if inputschema is not None and criteria  else ''

@@ -20,12 +20,15 @@ export const PreviewModal = React.memo(({
   modalOpen,
   handleClose,
   handleSave,
+  handleExportAsPdfButton,
   innerhtml,
   handleExport,
   attachments,
   templateInfo,
   enableSend,
-  selectedEmails
+  selectedEmails,
+  selectedCCEmails,
+  correspondenceSubject
 }: previewParams) => {
 
   const dispatch = useDispatch();
@@ -68,9 +71,11 @@ export const PreviewModal = React.memo(({
     const callback = (templateVariables: any) => {
       handleSave( applyVariables(innerhtml, templateVariables ) );
     };
-    getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback)
+    getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback);
+    // handleSave(innerhtml);
   };
   const emailTemplate = renderTemplate(template, innerhtml, templateVariables);
+  // const emailTemplate = renderTemplateNoParams(template, innerhtml);
 
   return (
     <div className="state-change-dialog">        
@@ -91,8 +96,12 @@ export const PreviewModal = React.memo(({
       <DialogContent>
         <DialogContentText id="state-change-dialog-description" component={'span'}>
           <div className="state-change-email-note">
-          {enableSend && selectedEmails.length > 0 && (<p>Email to: {selectedEmails.join(', ')}</p>)}
-          {!enableSend && (<p>No email address has been selected to send this correspondence to. Instead, you can export this correspondence as a PDF.</p>)}
+            <>
+            <p><span style={{fontWeight: 'bold'}}>Email from: </span>{requestDetails.assignedGroupEmail}</p>
+            <p><span style={{fontWeight: 'bold'}}>Email to: </span>{selectedEmails?.join(', ')}</p>
+            <p><span style={{fontWeight: 'bold'}}>CC to: </span>{selectedCCEmails?.join(', ')}</p>
+            <p><span style={{fontWeight: 'bold'}}>Email subject: </span>{correspondenceSubject}</p>
+            </>
           </div>
           <div className="preview-container">
             <iframe srcDoc={ emailTemplate } className="preview-frame" sandbox="allow-same-origin" />
@@ -111,6 +120,7 @@ export const PreviewModal = React.memo(({
         <EmailExport 
           handleExport={handleExport}
           content={emailTemplate}
+          handleExportAsPdfButton={handleExportAsPdfButton}
         />
       }
       { enableSend && 

@@ -717,4 +717,26 @@ import {
         });
     };
   };
+
+  export const fetchFOIEmailTemplates = () => {
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_EMAIL_TEMPLATES, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const foiEmailTemplates = res.data;
+            dispatch(setFOIEmailTemplates(foiEmailTemplates));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching email templates master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching email templates master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  };
   

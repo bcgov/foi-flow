@@ -81,6 +81,7 @@ export default function AttachmentModal({
     personaltag: "TBD"
   },
   currentResponseDate = "",
+  handleChangeResponseTitle,
   retrieveSelectedRecords,
 }) {
   let tagList = [];
@@ -187,6 +188,7 @@ export default function AttachmentModal({
     MinistryNeedsScanning.includes(bcgovcode) &&
       requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
   );
+  const [responseTitle, setResponseTitle] = useState("")
 
   useEffect(() => {
     setNewResponseDate(formatDate(currentResponseDate))
@@ -283,6 +285,11 @@ export default function AttachmentModal({
   const saveNewResponseDate = () => {
     handleChangeResponseDate(newResponseDate);
   };
+
+  const saveResponseTitle = (_responeTitleValue) => {
+    setResponseTitle(_responeTitleValue);
+    handleChangeResponseTitle(_responeTitleValue);
+  }
 
   const updateFilesCb = (_files, _errorMessage) => {
     setFiles(_files);
@@ -446,7 +453,7 @@ export default function AttachmentModal({
         if (isMCFMSDPersonal && !isMinistryCoordinator) {
           return { title: "Add Scanned Records", body: "" };
         } else if (uploadFor === "response") {
-          return { title: "Add Response", body: "" };
+          return { title: "Add Correspondence", body: "" };
         } else {
           return { title: "Add Attachment", body: "" };
         }
@@ -629,9 +636,9 @@ export default function AttachmentModal({
   const isSaveDisabled = () => {
     if (modalFor === "delete" || modalFor === "retrieve_uncompressed") {
       return false;
-    } else if (files.length === 0 && existingDocuments.length === 0) {
+    } else if (files.length === 0 && existingDocuments?.length === 0) {
       return true;
-    } else if (uploadFor === "response" && (files.length > 1 ||  existingDocuments.length > 1)) {
+    } else if (uploadFor === "response" && (files.length > maxNoFiles ||  existingDocuments?.length > maxNoFiles || responseTitle.trim() === "")) {
       return true;
     } else if (modalFor === "add") {
       if(requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && bcgovcode == "MCF") {
@@ -706,6 +713,30 @@ export default function AttachmentModal({
                 </div>
               </div>
             )}
+            {modalFor === "add" && uploadFor === "response" && (
+              <div className="row">
+              <div className="col-sm-1"></div>
+              <div className="col-sm-9">
+              <TextField
+                //id="firstName"
+                label="Subject/Title"
+                name="responsetitle"
+                inputProps={{ "aria-labelledby": "response-title-label"}}
+                InputLabelProps={{ shrink: true }}
+                variant="outlined"
+                className={"response-title-field"}
+                value={responseTitle}
+                fullWidth
+                onChange={(e) => saveResponseTitle(e.target.value)}
+                required={true}
+                //disabled={disableInput}
+                //error={responseTitle === ""}
+              />
+              </div>
+              
+              </div>
+            )}
+            
             {["replaceattachment", "replace", "add"].includes(modalFor) ? (
               requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ? (
                 bcgovcode == "MCF" ? (
@@ -941,7 +972,7 @@ const ModalForChangeResponseDate = ({
         <TextField
           id="changeresponsedate"
           label="Change Response Date"
-          type="date"
+          type="datetime-local"
           inputProps={{ "aria-labelledby": "changeResponseDate-label" }}
           InputLabelProps={{ shrink: true }}
           variant="outlined"

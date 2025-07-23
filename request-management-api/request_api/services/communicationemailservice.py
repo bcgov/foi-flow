@@ -27,21 +27,27 @@ class communicationemailservice:
         try:
             messagepart = self.__getbody(correspondencelog)
             to = self.__getsenders(correspondencelog)
+            ccemails = self.__getccemails(correspondencelog)
             attributes =  self.__getattributes(correspondencelog)
-            subject = templateconfig().getsubject(template.name,attributes)
+            subject = correspondencelog['emailsubject']
             messageattachmentlist = self.__getattachments(correspondencelog)
-            _messagepart = templateservice().decorate_template(template, messagepart, attributes)
-            return senderservice().send(subject, _messagepart, messageattachmentlist, to, correspondencelog.get('from_email', None))
+            _messagepart = templateservice().decorate_template(template, messagepart, attributes, correspondencelog)
+            return senderservice().send(subject, _messagepart, messageattachmentlist, to, ccemails, correspondencelog.get('from_email', None))
         except Exception as ex:
             logging.exception(ex)
 
-    
     def __getbody(self,correspondencelog):
         data = json.loads(correspondencelog['correspondencemessagejson'])
         return data['emailhtml']
         
     def __getsenders(self,correspondencelog):
         return correspondencelog['emails']
+
+    def __getccemails(self,correspondencelog):
+        if 'ccemails' in correspondencelog:
+            return correspondencelog['ccemails']
+        else:
+            return None
         
     def __getattachments(self, correspondencelog):
         return correspondencelog['attachments']
