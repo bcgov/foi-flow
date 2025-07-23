@@ -113,9 +113,9 @@ jobs:
       - name: Tag+Deploy for ${{ env.TAG_NAME }}
         shell: bash
         run: |
-          oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:${{ env.TAG_NAME }}
+          oc tag template-api:latest template-api:dev
 
-      # - name: Watch new rollout (trigger by image change in Openshift)
-      #   shell: bash
-      #   run: |
-      #     oc rollout status dc/${{ env.APP_NAME }}-{{ env.ENV_TAG_NAME }} -n ${{ env.TOOLS_NAME }}-${{ env.ENV_NAME }} -w
+      - name: Rollout Restart of Deployment in Dev
+        shell: bash
+        run: |
+          oc rollout restart deployment/template-api -n d7abee-dev
