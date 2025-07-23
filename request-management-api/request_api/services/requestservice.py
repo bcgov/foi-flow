@@ -243,11 +243,14 @@ class requestservice:
         requestid,
         ministryrequestid,
         applicantcorrespondenceid,
-        attributes,
-        templateid,
+        applicantcorrespondencelog
     ):
         foirequestschema = self.getrequestdetails(requestid, ministryrequestid)
-        templatedetails = applicantcorrespondenceservice().gettemplatebyid(templateid)
+        if applicantcorrespondencelog['templateid'] is None:
+            templatename = applicantcorrespondencelog['templatename']
+        else:
+            templatedetails = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog['templateid'])
+            templatename = templatedetails.name
         wfinstanceid = workflowservice().syncwfinstance(
             "ministryrequest", ministryrequestid, True
         )
@@ -256,8 +259,8 @@ class requestservice:
             ministryrequestid,
             foirequestschema,
             applicantcorrespondenceid,
-            templatedetails.name,
-            attributes,
+            templatename,
+            applicantcorrespondencelog['attributes'],
         )
 
     

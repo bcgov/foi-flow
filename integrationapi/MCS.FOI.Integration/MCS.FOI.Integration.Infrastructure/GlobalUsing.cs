@@ -1,0 +1,10 @@
+﻿global using Dapper;
+global using MCS.FOI.Integration.Core.Repositories.Base;
+global using MCS.FOI.Integration.Infrastructure.Data;
+global using MCS.FOI.Integration.Infrastructure.Repositories.Base;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Newtonsoft.Json;
+global using StackExchange.Redis;
+global using System.Data;

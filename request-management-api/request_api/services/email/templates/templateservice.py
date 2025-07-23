@@ -44,7 +44,13 @@ class templateservice:
         dynamictemplatevalues= {}
         dynamictemplatevalues["ffaurl"] = current_app.config['FOI_FFA_URL']
         dynamictemplatevalues["content"] = emailtemplatehtml
-        dynamictemplatevalues['title'] = template.description
+        templatename = ''
+        if template is not None:
+            dynamictemplatevalues['title'] = template.description
+            templatename = template.name
+        else:
+            dynamictemplatevalues['title'] = correspondencelog['templatename']
+            templatename = correspondencelog['templatename']
         dynamictemplatevalues.update(attributes)
         headerfooterhtml = storageservice().downloadtemplate(self.__getheaderfootertemplate(template))
         finaltemplate = Template(headerfooterhtml)

@@ -1,5 +1,5 @@
 
-import { formatDateInPst, convertDate } from "../../../../helper/FOI/helper";
+import { formatDateInPst } from "../../../../helper/FOI/helper";
 import { any, instanceOf, number } from "prop-types";
 import { fetchDocumentPage, fetchDocumentPageFlags } from "../../../../apiManager/services/FOI/foiRecordServices";
 
@@ -84,8 +84,10 @@ export const getTemplateVariables = (requestDetails: any, requestExtensions: any
     {name: "{{description}}", value: requestDetails.description},
     {name: "{{selectedMinistry}}", value: requestDetails?.selectedMinistries[0].name},
     {name: "{{address}}", value: requestDetails.address},
-    {name: "{{dueDate}}", value: convertDate(requestDetails.dueDate)},
-    {name: "{{receivedDate}}", value: convertDate(requestDetails.receivedDate)},
+    {name: "{{addressSecondary}}", value: requestDetails.addressSecondary},
+    {name: "{{postal}}", value: requestDetails.postal},
+    // {name: "{{dueDate}}", value: convertDate(requestDetails.dueDate)},
+    // {name: "{{receivedDate}}", value: convertDate(requestDetails.receivedDate)},
     {name: "{{pbExtensionDueDays}}", value: pbExtension[0]},
     {name: "{{pbExtensionDueDate}}", value: pbExtension[1]},
     {name: "{{pbExtensionReason}}", value: getMappedValue("pbextensionreason", pbExtension[2])}, 
@@ -94,12 +96,12 @@ export const getTemplateVariables = (requestDetails: any, requestExtensions: any
     {name: "{{currentDate}}", value: formatDateInPst(new Date(),"MMM dd yyyy")},
     {name: "{{arcsNumber}}", value: requestDetails.requestType === "general" ? 30 : 40},
     {name: "{{oipcExtensionDueDays}}", value: oipcExtension[6] || ""}, 
-    {name: "{{oipcExtensionDueDates}}", value:  convertDate(oipcExtension[1])}, 
+    // {name: "{{oipcExtensionDueDates}}", value:  convertDate(oipcExtension[1])}, 
     {name: "{{oipcExtensionReason}}", value: oipcExtension[2] || ""}, 
     {name: "{{oipcExtensionNotiDate}}", value: oipcExtension[5] || ""},
-    {name: "{{oipcOriginalReceivedDate}}", value: convertDate(requestDetails.receivedDate)},
-    {name: "{{oipcOriginalDueDate}}", value: convertDate(requestDetails.originalDueDate)},
-    {name: "{{oipcCurrentDueDate}}", value: convertDate(requestDetails.dueDate)},
+    // {name: "{{oipcOriginalReceivedDate}}", value: convertDate(requestDetails.receivedDate)},
+    // {name: "{{oipcOriginalDueDate}}", value: convertDate(requestDetails.originalDueDate)},
+    // {name: "{{oipcCurrentDueDate}}", value: convertDate(requestDetails.dueDate)},
     {name: "{{sectionID}}", value: mapSectionWithExtensionReasonId(oipcExtension[4])},
     {name: "{{takenExtensionStatus}}", value: isAlreadyTakenTimeExtension(filteredOutLatestExtensions)},
     {name: "{{filteredExtensionDate}}", value: filteredOutLatestExtensions ? filteredOutLatestExtensions.extendedduedate : ""},
@@ -134,10 +136,10 @@ export const isRequestInfoVisible = (templateInfo: any) => {
   return "block";
 }
 
-export const isFeeTemplateDisabled = (currentCFRForm: any, template: any) => {
-  if (template.name === 'PAYONLINE') {
+export const isFeeTemplateDisabled = (currentCFRForm: any, templateName: string) => {
+  if (templateName === 'PAYONLINE') {
     return currentCFRForm.status !== 'approved' || ("estimatepaymentmethod" in currentCFRForm.feedata && currentCFRForm.feedata.actualtotaldue > 0)
-  } else if (template.name === 'PAYOUTSTANDING') {
+  } else if (templateName === 'PAYOUTSTANDING') {
     return currentCFRForm.status !== 'approved' || !("estimatepaymentmethod" in currentCFRForm.feedata) || currentCFRForm.feedata.balanceremaining <= 0 || currentCFRForm.feedata.actualtotaldue <= 0
   }
   return false
@@ -307,14 +309,14 @@ const displayPBExtension = (requestExtensions:any): string => {
       } = recentPBExtension;
     
       // Build the HTML template for "Yes" case
-      const htmlTemplate = `
-        <p><strong><span style="font-size: 13px;">Public Body Extension:&nbsp;</span></strong><span style="font-size: 13px;">Yes</span></p>
-        <p><strong><span style="font-size: 13px;">Date of time extension:&nbsp;</span></strong><span style="font-size: 13px;">${convertDate(extendedduedate)}</span></p>
-        <p><strong><span style="font-size: 13px;">Number of days extended:&nbsp;</span></strong><span style="font-size: 13px;">${extendedduedays}</span></p>
-        <p><strong><span style="font-size: 13px;">Reason for Extension:section:&nbsp;</span></strong><span style="font-size: 13px;">${mapSectionWithExtensionReasonId(extensionreasonid)}</span></p>
-        <p><strong><span style="font-size: 13px;">Date applicant was notified:&nbsp;</span></strong><span style="font-size: 13px;">${convertDate(created_at)}</span></p>
-        <p><strong><span style="font-size: 13px;">Applicant complaint about time extension:&nbsp;</span></strong><span style="font-size: 13px;">No</span></p>
-      `;
+      const htmlTemplate = ``;
+        // <p><strong><span style="font-size: 13px;">Public Body Extension:&nbsp;</span></strong><span style="font-size: 13px;">Yes</span></p>
+        // <p><strong><span style="font-size: 13px;">Date of time extension:&nbsp;</span></strong><span style="font-size: 13px;">${convertDate(extendedduedate)}</span></p>
+        // <p><strong><span style="font-size: 13px;">Number of days extended:&nbsp;</span></strong><span style="font-size: 13px;">${extendedduedays}</span></p>
+        // <p><strong><span style="font-size: 13px;">Reason for Extension:section:&nbsp;</span></strong><span style="font-size: 13px;">${mapSectionWithExtensionReasonId(extensionreasonid)}</span></p>
+        // <p><strong><span style="font-size: 13px;">Date applicant was notified:&nbsp;</span></strong><span style="font-size: 13px;">${convertDate(created_at)}</span></p>
+        // <p><strong><span style="font-size: 13px;">Applicant complaint about time extension:&nbsp;</span></strong><span style="font-size: 13px;">No</span></p>
+      
 
       return htmlTemplate;
     }
@@ -413,37 +415,37 @@ const displayApplicantConsentSection = (requestExtensions:any, requestDetails:an
 };
 
 
-const fetchTotalPageCount = (ministryId : number) => {
-  const dispatch = () => {};
+// const fetchTotalPageCount = (ministryId : number) => {
+//   const dispatch = () => {};
 
-  return new Promise((resolve, reject) => {
-    fetchDocumentPage(ministryId, (err : any, res : any) => {
-      if (!err) {
-        // Sum the page counts
-        const totalPageCount = res.data.reduce((sum : any, item : any) => sum + (item.pagecount || 0), 0);
+//   return new Promise((resolve, reject) => {
+//     fetchDocumentPage(ministryId, (err : any, res : any) => {
+//       if (!err) {
+//         // Sum the page counts
+//         const totalPageCount = res.data.reduce((sum : any, item : any) => sum + (item.pagecount || 0), 0);
         
-        resolve(totalPageCount || null);
+//         resolve(totalPageCount || null);
 
-      } else {
-        reject(err);
-      }
-    })(dispatch);
-  });
-};
+//       } else {
+//         reject(err);
+//       }
+//     })(dispatch);
+//   });
+// };
 
-const fetchConsultPageFlag = (ministryId : number) : Promise<any> => {
-  const dispatch = () => {};
+// const fetchConsultPageFlag = (ministryId : number) : Promise<any> => {
+//   const dispatch = () => {};
 
-  return new Promise((resolve, reject) => {
-    fetchDocumentPageFlags(ministryId, (err : any, res : any) => {
-      if (!err) {
-        resolve(res.data || null);
-      } else {
-        reject(err);
-      }
-    })(dispatch);
-  });
-};
+//   return new Promise((resolve, reject) => {
+//     fetchDocumentPageFlags(ministryId, (err : any, res : any) => {
+//       if (!err) {
+//         resolve(res.data || null);
+//       } else {
+//         reject(err);
+//       }
+//     })(dispatch);
+//   });
+// };
 
 const displayOIPCExtensionSection = async (extensionId: number, requestDetails: any) => {
   switch (mapSectionWithExtensionReasonId(extensionId)) {
@@ -456,60 +458,59 @@ const displayOIPCExtensionSection = async (extensionId: number, requestDetails: 
 `;
     case "10(1)(b)":
 
-    let totalPageCount = await fetchTotalPageCount(requestDetails.id);
+    //let totalPageCount = await fetchTotalPageCount(requestDetails.id);
     
-    return `
-    <p><strong><span style="font-size: 13px;">10(1)(b) Volume of records </span></strong></p>
-    <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
-    <p><strong><span style="font-size: 13px;">Approximate page count:&nbsp;</span></strong><span style="font-size: 13px;">${totalPageCount}</span></p>
-    <p><strong><span style="font-size: 13px;">Number of pages searched:&nbsp;</span></strong><span style="font-size: 13px;"> </span></p>
-    <p><strong><span style="font-size: 13px;">Number of program areas searched: &nbsp;</span></strong><span style="font-size: 13px;"> </span></p>
-    <p><strong><span style="font-size: 13px;">Total search time:&nbsp;</span></strong><span style="font-size: 13px;"> </span></p>
-    <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
-    <p><strong><span style="font-size: 13px;">UNREASONABLE INTERFERENCE WITH THE OPERATIONS OF THE PUBLIC BODY</span></strong></p>
-    <p><span style="font-size: 13px;">Meeting the current legislated due date would unreasonably interfere with the public body's operations. <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> </span></p>
-    <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
-    <p><strong><span style="font-size: 13px;">Current status</span></strong></p> 
-    <p><span style="font-size: 13px;">Please describe the current status of processing this request and any other relevant information:<strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> </span></p>`;
+    // return `
+    // <p><strong><span style="font-size: 13px;">10(1)(b) Volume of records </span></strong></p>
+    // <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
+    // <p><strong><span style="font-size: 13px;">Approximate page count:&nbsp;</span></strong><span style="font-size: 13px;">${totalPageCount}</span></p>
+    // <p><strong><span style="font-size: 13px;">Number of pages searched:&nbsp;</span></strong><span style="font-size: 13px;"> </span></p>
+    // <p><strong><span style="font-size: 13px;">Number of program areas searched: &nbsp;</span></strong><span style="font-size: 13px;"> </span></p>
+    // <p><strong><span style="font-size: 13px;">Total search time:&nbsp;</span></strong><span style="font-size: 13px;"> </span></p>
+    // <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
+    // <p><strong><span style="font-size: 13px;">UNREASONABLE INTERFERENCE WITH THE OPERATIONS OF THE PUBLIC BODY</span></strong></p>
+    // <p><span style="font-size: 13px;">Meeting the current legislated due date would unreasonably interfere with the public body's operations. <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> </span></p>
+    // <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
+    // <p><strong><span style="font-size: 13px;">Current status</span></strong></p> 
+    // <p><span style="font-size: 13px;">Please describe the current status of processing this request and any other relevant information:<strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> </span></p>`;
 
     case "10(1)(c)":
 
-    const consultPageFlag = await fetchConsultPageFlag(requestDetails.id);
+    // const consultPageFlag = await fetchConsultPageFlag(requestDetails.id);
+    // const htmlConsultContent = consultPageFlag && Array.isArray(consultPageFlag)
+    //   ? consultPageFlag.map((item: any) => `
+    //     <p><strong><span style="font-size: 13px;">Consultee: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_name}</span></p>
+    //     <p><strong><span style="font-size: 13px;">Consultation page count: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_page_count}</span></p>
+    //     <p><strong><span style="font-size: 13px;">Consultation Date: &nbsp;</span></strong><span style="font-size: 13px;">${convertDate(item.consultation_date)}</span></p><p><span>&nbsp;</span></p>
+    //   `).join('')
+    //   : "";
 
-    const htmlConsultContent = consultPageFlag && Array.isArray(consultPageFlag)
-      ? consultPageFlag.map((item: any) => `
-        <p><strong><span style="font-size: 13px;">Consultee: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_name}</span></p>
-        <p><strong><span style="font-size: 13px;">Consultation page count: &nbsp;</span></strong><span style="font-size: 13px;">${item.consultation_page_count}</span></p>
-        <p><strong><span style="font-size: 13px;">Consultation Date: &nbsp;</span></strong><span style="font-size: 13px;">${convertDate(item.consultation_date)}</span></p><p><span>&nbsp;</span></p>
-      `).join('')
-      : "";
-
-      return `
-      <p><strong><span style="font-size: 13px;">10(1)(c) Time for consultation</span></strong></p>
-      <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
-      ${htmlConsultContent}
-      <p><strong><span style="font-size: 13px;">Why is consultation necessary to decide access?</span></strong></p>
-      <p>
-          <span>
-          <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> 
-          </span>
-      </p><p><span>&nbsp;</span></p>
-      <p><strong><span style="font-size: 13px;">What is the third party or public body’s interest in the record?</span></strong></p>
-      <p>
-          <span>
-          <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> 
-          </span>
-      </p><p><span>&nbsp;</span></p>
-      <p><strong><span style="font-size: 13px;">Current status of the consultation, including efforts made to obtain a response to the consultation and expected return date:</span></strong></p>
-      <p>
-          <span>
-          <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> 
-          </span>
-      </p><p><span>&nbsp;</span></p>
-      <p><span style="font-size: 13px;">10(2)(b)</span></p>
-      <p><strong><span style="font-size: 13px;">Explain why it would be fair and reasonable for the Commissioner to grant a time extension. Include a chronology of the processing of the request and an explanation for any delays: </span></strong></p>
-      <p><strong><span style="font-size: 13px;">&lt;insert some indication the analyst needs to populate this area&gt;</span></strong></p>
-      `;
+      // return `
+      // <p><strong><span style="font-size: 13px;">10(1)(c) Time for consultation</span></strong></p>
+      // <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
+      // ${htmlConsultContent}
+      // <p><strong><span style="font-size: 13px;">Why is consultation necessary to decide access?</span></strong></p>
+      // <p>
+      //     <span>
+      //     <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> 
+      //     </span>
+      // </p><p><span>&nbsp;</span></p>
+      // <p><strong><span style="font-size: 13px;">What is the third party or public body’s interest in the record?</span></strong></p>
+      // <p>
+      //     <span>
+      //     <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> 
+      //     </span>
+      // </p><p><span>&nbsp;</span></p>
+      // <p><strong><span style="font-size: 13px;">Current status of the consultation, including efforts made to obtain a response to the consultation and expected return date:</span></strong></p>
+      // <p>
+      //     <span>
+      //     <strong>&lt;insert some indication the analyst needs to populate this area&gt;</strong> 
+      //     </span>
+      // </p><p><span>&nbsp;</span></p>
+      // <p><span style="font-size: 13px;">10(2)(b)</span></p>
+      // <p><strong><span style="font-size: 13px;">Explain why it would be fair and reasonable for the Commissioner to grant a time extension. Include a chronology of the processing of the request and an explanation for any delays: </span></strong></p>
+      // <p><strong><span style="font-size: 13px;">&lt;insert some indication the analyst needs to populate this area&gt;</span></strong></p>
+      // `;
 
     default:
       return "";

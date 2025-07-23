@@ -198,7 +198,7 @@ export const RequestHistorySection = ({
           </div>
           <DisplayHistory requesthistory={requesthistory} bcgovcode={bcgovcode} currentUser={currentUser}
             iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
-            commentTypes={commentTypes} ministryId={ministryId} applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
+            commentTypes={commentTypes} ministryId={ministryId} applicantCorrespondenceTemplates={applicantCorrespondenceTemplates} requestNumber={requestNumber}
           />
         </div>
         {isGeneratingPDF ? 
