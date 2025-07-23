@@ -2,7 +2,7 @@
 # FROM python:3.8
 
 # Necessary to pull images from bcgov and not hit Dockerhub quotas.
-FROM artifacts.developer.gov.bc.ca/docker-remote/python:3.8-bullseye
+FROM artifacts.developer.gov.bc.ca/docker-remote/python:3.8.5-bullseye
 EXPOSE 6402
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl netbase wget && rm -rf /var/lib/apt/lists/*
 
