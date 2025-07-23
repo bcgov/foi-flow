@@ -67,7 +67,7 @@ export default function AttachmentModal({
   uploadFor = "attachment",
   maxNoFiles,
   bcgovcode,
-  existingDocuments,
+  existingDocuments = [],
   divisions = [],
   replacementfiletypes = [],
   totalUploadedRecordSize = 0,

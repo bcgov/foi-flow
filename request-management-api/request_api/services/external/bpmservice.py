@@ -147,9 +147,6 @@ class bpmservice(camundaservice):
         return self.unopenedcomplete(processinstanceid, data, messagetype, token)
 
     def __post_message(self, messagetype, messageschema, token=None):
-        # print("url: ", self._getUrl_(messagetype))
-        # print("data: ", json.dumps(messageschema))
-        # print("headers: ", self._getHeaders_(token))
         return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
 
     def _getUrl_(self, messagetype, definitionkey=None):
