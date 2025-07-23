@@ -1,7 +1,6 @@
 import {
     httpGETRequest,
-    httpPOSTRequest,
-    httpOpenGETRequest
+    httpPOSTRequest
   } from "../../httpRequestHandler";
   import API from "../../endpoints";
   import {
@@ -30,8 +29,7 @@ import {
     setOIPCStatuses,
     setOIPCReviewtypes,
     setOIPCInquiryoutcomes,
-    setFOICommentTypes,
-    setFOIEmailTemplates
+    setFOICommentTypes
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone, catchError } from "./foiServicesUtil";
   import UserService from "../../../services/UserService";
@@ -94,8 +92,9 @@ import {
   };
   
   
-  export const fetchFOIAssignedToList = (requestType, status, bcgovcode) => {
+  export const fetchFOIAssignedToList = (requestType, status, bcgovcode, isagbcpsteam = false) => {
     let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API;
+    if (isagbcpsteam) apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_BCPSWITHINTAKEGROUP_LIST_API
     if (requestType && status) {
       if (bcgovcode) {
       apiUrlGETAssignedToList = replaceUrl(replaceUrl(replaceUrl(
@@ -591,25 +590,6 @@ import {
     const done = fnDone(rest);
     return (dispatch) => {
       httpPOSTRequest(API.FOI_REFRESH_REDIS_CACHE,{}, UserService.getToken())
-        .then((res) => {
-          if (res.data) {
-            done(null, res.data);
-          } else {
-            dispatch(serviceActionError(res));
-            throw new Error("Error Refreshing Cache");
-          }
-        })
-        .catch((error) => {
-          done(error);
-          catchError(error, dispatch);
-        });
-    };
-  };
-
-  export const refreshRedisCacheForTemplate = (...rest) => {
-    const done = fnDone(rest);
-    return (dispatch) => {
-      httpPOSTRequest(API.FOI_REFRESH_REDIS_CACHE_TEMPLATE,{}, UserService.getToken())
         .then((res) => {
           if (res.data) {
             done(null, res.data);

@@ -212,7 +212,7 @@ export const ContactApplicant = ({
   //   // Replace \n (newlines) that are NOT inside <p> with <br>
   //   // tempDiv.querySelectorAll("p").forEach((p) => {
   //   //   const textContent = p.textContent?.trim();
-  //   //   if (!textContent || textContent === " " || textContent === "&nbsp;") return;
+  //   //   if (!textContent || textContent === " " || textContent === "&nbsp;") return;
     
   //   //   const nextNode = p.nextSibling;
   //   //   if (nextNode?.nodeType === Node.TEXT_NODE && /^[ \t\r]*\n[ \t\r]*$/.test(nextNode.nodeValue ?? "")) {
@@ -616,7 +616,6 @@ export const ContactApplicant = ({
     }
 
     // Add templates being used in drafts to the list
-    // console.log("applicantCorrespondence: ", applicantCorrespondence);
     const listOfDraftTemplates: number[] = [];
     applicantCorrespondence.forEach((draftCorrespondence: any) => {
       if (draftCorrespondence.templateid && !listOfDraftTemplates.includes(draftCorrespondence.templateid)) {
@@ -1926,7 +1925,7 @@ export const ContactApplicant = ({
       requestNumber={requestNumber}
       requestId={requestId}
       attachmentsArray={files}
-      existingDocuments={files}
+      existingDocuments={files as unknown as never[]}
       attachment={updateAttachment}//{{}}
       handleRename= {handleRename} //{undefined}
       handleReclassify={undefined}
@@ -1936,6 +1935,7 @@ export const ContactApplicant = ({
       maxNoFiles={uploadFor === "response" ? 10 : 10}
       bcgovcode={undefined}
       currentResponseDate={currentResponseDate}
+      retrieveSelectedRecords={() => {}}
       handleChangeResponseTitle={handleChangeResponseTitle}
     /> 
     <div className="email-change-dialog">

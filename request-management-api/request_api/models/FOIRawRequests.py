@@ -609,6 +609,7 @@ class FOIRawRequest(db.Model):
             literal(None).label('isministryrestricted'),
             subjectcode,
             literal(None).label('isoipcreview'),
+            literal(None).label('isphasedrelease'),
             literal(None).label('oipc_number')
         ]
 
@@ -666,10 +667,11 @@ class FOIRawRequest(db.Model):
                         and_(
                             FOIRawRequest.status.notin_(['Archived']),
                             or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup.in_(ProcessingTeamWithKeycloackGroup.list()), FOIRawRequest.assignedgroup.in_(tuple(groups))), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
-                basequery = basequery.filter(
-                    and_(
-                        FOIRawRequest.status.notin_(['Archived']),
-                        or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup == "Intake Team"), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
+                else:
+                    basequery = basequery.filter(
+                        and_(
+                            FOIRawRequest.status.notin_(['Archived']),
+                            or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup == "Intake Team"), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
             return basequery.filter(FOIRawRequest.assignedto != None)
         else:
             if(isiaorestrictedfilemanager == True):
@@ -821,6 +823,7 @@ class FOIRawRequest(db.Model):
     @classmethod
     def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
         basequery = FOIRawRequest.getbasequery(None, userid, isiaorestrictedfilemanager)
+        basequery = basequery.add_columns(literal(None).label('closereason'))
 
         #filter/search
         filtercondition = FOIRawRequest.getfilterforadvancedsearch(params)
@@ -960,7 +963,7 @@ class FOIRawRequest(db.Model):
             if (flag.lower() == 'oipc'): # no results for raw oipc
                 requestflagscondition.append(FOIRawRequest.findfield('axisRequestId') == 'thisismeanttoreturnafilterconditionwith0results')
             if (flag.lower() == 'phased'):
-                # requestflagscondition.append(FOIMinistryRequest.findfield('isphasedrelease', iaoassignee, ministryassignee) == True)
+                requestflagscondition.append(FOIRawRequest.findfield('axisRequestId') == 'thisismeanttoreturnafilterconditionwith0results')
                 continue
         return requestflagscondition
 

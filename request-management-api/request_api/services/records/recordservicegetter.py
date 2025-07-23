@@ -25,19 +25,25 @@ class recordservicegetter(recordservicebase):
             resultrecords = []
             if len(uploadedrecords) > 0:
                 computingresponses, err = self.getdatafromdocreviewer(uploadedrecords, ministryrequestid)
+                #print("computingresponses:",computingresponses)
                 if err is None:
                     (
                         _convertedfiles,
                         _dedupedfiles,
+                        _compressedfiles,
                         _removedfiles,
                     ) = self.__getcomputingsummary(computingresponses)
                     for record in uploadedrecords:
                         _computingresponse = self.__getcomputingresponse(
                             computingresponses, "recordid", record
                         )
+                        #print("\n_computingresponse:",_computingresponse)
+
                         _record = self.__preparerecord(
                             record, _computingresponse, computingresponses, divisions
                         )
+                        #print("\n__record:",_record)
+
                         if not _record["attributes"].get("isportfolio", False):
                             resultrecords.append(_record)
                         if record["batchid"] not in batchids:
@@ -49,6 +55,7 @@ class recordservicegetter(recordservicebase):
                         resultrecords = self.__handleduplicate(resultrecords)
                     result["convertedfiles"] = _convertedfiles
                     result["dedupedfiles"] = _dedupedfiles
+                    result["compressedfiles"] = _compressedfiles
                     result["removedfiles"] = _removedfiles
             result["batchcount"] = len(batchids)
             result["records"] = resultrecords
@@ -79,8 +86,16 @@ class recordservicegetter(recordservicebase):
             _record["trigger"] = _computingresponse["trigger"]
             _record["documentmasterid"] = _computingresponse["documentmasterid"]
             _record["outputdocumentmasterid"] = documentmasterid
+            if "converteddocmasterid" in _computingresponse:
+                _record["converteddocmasterid"] = _computingresponse["converteddocmasterid"]
             _record["isselected"] = False
             _record["isconverted"] = self.__getisconverted(_computingresponse)
+            _record["iscompressed"] = self.__getiscompressed(_computingresponse)
+            _record["isdedupecomplete"]= self.__getisdedupecomplete(_computingresponse)
+            #_record["isocrcompleted"] = self.__getisocrcompleted(_computingresponse)
+            if "selectedfileprocessversion" in _computingresponse:
+                _record["selectedfileprocessversion"] = _computingresponse["selectedfileprocessversion"]
+            #_record["needs_ocr"] = _computingresponse["needs_ocr"]
             _computingresponse_err = self.__getcomputingerror(_computingresponse)
             if _computingresponse_err is not None:
                 _record["failed"] = _computingresponse_err
@@ -88,10 +103,19 @@ class recordservicegetter(recordservicebase):
             if _computingresponse["isduplicate"]:
                 _record["duplicatemasterid"] = _computingresponse["duplicatemasterid"]
                 _record["duplicateof"] = _computingresponse["duplicateof"]
+            _record["s3uripath"] = _computingresponse["filepath"]
+            if _record["iscompressed"] and "compressedfilepath" in _computingresponse:
+                _record["compresseds3uripath"] = _computingresponse["compressedfilepath"]
+            if "ocrfilepath" in _computingresponse:
+                _record["ocrfilepath"] = _computingresponse["ocrfilepath"]
             for attachment in _computingresponse["attachments"]:
                 _attachement = self.__pstformat(attachment)
                 _attachement["isattachment"] = True
                 _attachement["s3uripath"] = attachment["filepath"]
+                if "compressedfilepath" in attachment:
+                    _attachement["compresseds3uripath"] = attachment["compressedfilepath"]
+                if "ocrfilepath" in _attachement:
+                    _attachement["ocrfilepath"] = attachment["ocrfilepath"]
                 _attachement["rootparentid"] = record["recordid"]
                 _attachement["rootdocumentmasterid"] = record["documentmasterid"]
                 _attachement["createdby"] = record["createdby"]
@@ -100,6 +124,7 @@ class recordservicegetter(recordservicebase):
                     attachment["attributes"], divisions
                 )
                 _attachement["isconverted"] = self.__getisconverted(attachment)
+                _attachement["iscompressed"] = self.__getiscompressed(_attachement)
                 _computingresponse_err = self.__getcomputingerror(attachment)
                 if _computingresponse_err is not None:
                     _attachement["failed"] = _computingresponse_err
@@ -232,21 +257,45 @@ class recordservicegetter(recordservicebase):
         if _computingresponse["conversionstatus"] == "completed":
             return True
         return False
+    
+    def __getiscompressed(self, _computingresponse):
+        if "compressionstatus" in _computingresponse and _computingresponse["compressionstatus"] == "completed":
+            return True
+        return False
+    
+    def __getisdedupecomplete(self, _computingresponse):
+        if _computingresponse["deduplicationstatus"] == "completed":
+            return True
+        return False
+    
+    # def __getisocrcompleted(self, _computingresponse):
+    #     if _computingresponse["compressionstatus"] == "completed":
+    #         return True
+    #     return False
+    
 
     def __getcomputingerror(self, computingresponse):
         if computingresponse["conversionstatus"] == "error":
             return "conversion"
         elif computingresponse["deduplicationstatus"] == "error":
-            return "deduplication. " + computingresponse["message"] if "message" in computingresponse else "deduplication"
+            return "deduplication. " + computingresponse["message"] if "message" in computingresponse and computingresponse["message"] is not None else "deduplication"
+        elif "compressionstatus" in computingresponse and computingresponse["compressionstatus"] == "error":
+            return "compression. " + computingresponse["message"] if "message" in computingresponse and computingresponse["message"] is not None else "compression"
+        elif "ocractivemqstatus" in computingresponse and computingresponse["ocractivemqstatus"] == "error":
+            return "ocr-queue. " + computingresponse["message"] if "message" in computingresponse and computingresponse["message"] is not None else "ocr-queue"
+        elif "azureocrjobstatus" in computingresponse and computingresponse["azureocrjobstatus"] == "error":
+            return "ocr. " + computingresponse["message"] if "message" in computingresponse and computingresponse["message"] is not None else "ocr"
         return None
 
     def __getcomputingsummary(self, computingresponse):
-        _convertedfiles = _dedupedfiles = _removedfiles = 0
+        _convertedfiles = _dedupedfiles = _compressedfiles = _removedfiles = 0
         for entry in computingresponse:
             if entry["conversionstatus"] == "completed":
                 _convertedfiles += 1
             if entry["deduplicationstatus"] == "completed":
                 _dedupedfiles += 1
+            if "compressionstatus" in entry and entry["compressionstatus"] == "completed":
+                _compressedfiles += 1
             if entry["isduplicate"] == True:
                 _removedfiles += 1
             if entry["isredactionready"] == False and (
@@ -254,7 +303,8 @@ class recordservicegetter(recordservicebase):
                 or entry["deduplicationstatus"] != "completed"
             ):
                 _dedupedfiles += 1
-        return _convertedfiles, _dedupedfiles, _removedfiles
+                _compressedfiles +=1
+        return _convertedfiles, _dedupedfiles, _compressedfiles, _removedfiles
 
     def __pstformat(self, record):
         if type(record["created_at"]) is str and "|" in record["created_at"]:

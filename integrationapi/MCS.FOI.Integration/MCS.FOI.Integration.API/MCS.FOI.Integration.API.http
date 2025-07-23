@@ -1,6 +1,0 @@
-@MCS.FOI.Integration.API_HostAddress = http://localhost:5267
-
-GET {{MCS.FOI.Integration.API_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

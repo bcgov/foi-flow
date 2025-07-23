@@ -25,6 +25,10 @@ import {
   setFOIAttachmentListLoader,
   setFOIPDFStitchStatusForConsults,
   setFOIPDFStitchedRecordForConsults,
+  setFOIPDFStitchStatusesForPhasedRedlines,
+  setFOIPDFStitchedRecordsForPhasedRedlines,
+  setFOIPDFStitchStatusesForPhasedResponsePackages,
+  setFOIPDFStitchedRecordsForPhasedResponsePackages,
 } from "../../../actions/FOI/foiRequestActions";
 import { fnDone } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
@@ -488,6 +492,40 @@ export const fetchPDFStitchedRecordForRedlines = (
   };
 };
 
+export const fetchPDFStitchStatusesForPhasedRedlines = (
+  requestId,
+  ministryId,
+  ...rest
+) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    replaceUrl(
+      API.FOI_PDF_STITCH_STATUSES_FOR_PHASEDREDLINES,
+      "<ministryrequestid>",
+      ministryId
+    ),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIPDFStitchStatusesForPhasedRedlines(res.data));
+          done(null, res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching pdfstitch job status", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+}
+
 export const fetchPDFStitchStatusForResponsePackage = (
   requestId,
   ministryId,
@@ -521,6 +559,40 @@ export const fetchPDFStitchStatusForResponsePackage = (
       });
   };
 };
+
+export const fetchPDFStitchStatusesForPhasedResponsePackages = (
+  requestId,
+  ministryId,
+  ...rest
+) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    replaceUrl(
+      API.FOI_PDF_STITCH_STATUSES_FOR_PHASEDRESPONSEPACKAGES,
+      "<ministryrequestid>",
+      ministryId
+    ),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIPDFStitchStatusesForPhasedResponsePackages(res.data));
+          done(null, res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching pdfstitch job status", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+}
 
 export const fetchPDFStitchedRecordForResponsePackage = (
   requestId,
@@ -558,6 +630,40 @@ export const fetchPDFStitchedRecordForResponsePackage = (
       });
   };
 };
+
+export const fetchPDFStitchedRecordsForPhasedResponsePackages = (
+  requestId,
+  ministryId,
+  ...rest
+) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    replaceUrl(
+      API.FOI_DOWNLOAD_RECORDS_FOR_PHASEDRESPONSEPACKAGES,
+      "<ministryrequestid>",
+      ministryId
+    ),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIPDFStitchedRecordsForPhasedResponsePackages(res.data));
+          done(null, res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching pdfstitch job status", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+}
 
 export const fetchPDFStitchedStatusForOIPCRedline = (
   requestId,
@@ -797,6 +903,40 @@ export const fetchPDFStitchedRecordForConsults = (
   };
 }
 
+export const fetchPDFStitchedRecordsForPhasedRedlines = (
+  requestId,
+  ministryId,
+  ...rest
+) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    replaceUrl(
+      API.FOI_DOWNLOAD_RECORDS_FOR_PHASEDREDLINES,
+      "<ministryrequestid>",
+      ministryId
+    ),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setFOIPDFStitchedRecordsForPhasedRedlines(res.data));
+          done(null, res.data);
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching pdfstitch job status", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+}
+
 export const updateUserLockedRecords = (data, requestId, ministryId, ...rest) => {
   const done = fnDone(rest);
   let apiUrl= replaceUrl(replaceUrl(
@@ -820,3 +960,34 @@ export const updateUserLockedRecords = (data, requestId, ministryId, ...rest) =>
       });
   };
 }
+
+export const retrieveSelectedRecordVersion = (
+  requestId,
+  ministryId,
+  data,
+  ...rest
+) => {
+  let apiUrl = replaceUrl(
+    replaceUrl(API.FOI_RETRIEVE_RECORDS, "<ministryrequestid>", ministryId),
+    "<requestid>",
+    requestId
+  );
+  return (dispatch) => {
+    const done = fnDone(rest);
+    httpPOSTRequest(apiUrl, data)
+      .then((res) => {
+        if (res.data && res.data.status) {
+          dispatch(setFOIPDFStitchStatusForHarms("not started"));
+          dispatch(fetchFOIRecords(requestId, ministryId));
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error("Error in retrieving uncompressed files");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+      });
+  };
+};
