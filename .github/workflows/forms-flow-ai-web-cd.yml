@@ -104,11 +104,9 @@ jobs:
         run: |
           oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:${{ env.TAG_NAME }}
 
-      - name: Rollout Restart Deployment
-        shell: bash
-        run: |
-          oc project 04d1a3-dev
-          oc rollout restart deployment/forms-flow-ai-web   
-          oc project d106d6-dev
-          oc rollout restart deployment/forms-flow-ai-web
+      # This needs to be tested once the new env is ready
+      # - name: Watch new rollout (trigger by image change in Openshift)
+      #   shell: bash
+      #   run: |
+      #     oc rollout status dc/${{ env.APP_NAME }} -n ${{ env.TOOLS_NAME }}-${{ env.ENV_NAME }} -w
 

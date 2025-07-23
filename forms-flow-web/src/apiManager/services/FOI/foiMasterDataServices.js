@@ -94,9 +94,8 @@ import {
   };
   
   
-  export const fetchFOIAssignedToList = (requestType, status, bcgovcode, isagbcpsteam = false) => {
+  export const fetchFOIAssignedToList = (requestType, status, bcgovcode) => {
     let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API;
-    if (isagbcpsteam) apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_BCPSWITHINTAKEGROUP_LIST_API
     if (requestType && status) {
       if (bcgovcode) {
       apiUrlGETAssignedToList = replaceUrl(replaceUrl(replaceUrl(

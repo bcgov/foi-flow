@@ -53,7 +53,7 @@
     "@testing-library/react": "^12.0.0",
     "@testing-library/user-event": "^12.1.10",
     "@wojtekmaj/react-daterange-picker": "^3.1.0",
-    "axios": "^0.30.0",
+    "axios": "^0.21.1",
     "body-parser": "1.20.3",
     "bootstrap": "^4.6.0",
     "braces": "3.0.3",
@@ -116,7 +116,7 @@
       "version": "2.1.1"
     },
     "html-to-pdf-js": {
-      "jspdf": "3.0.1"
+      "jspdf": "2.5.1"
     },
     "react-scripts": {
       "css-select": "5.1.0",
