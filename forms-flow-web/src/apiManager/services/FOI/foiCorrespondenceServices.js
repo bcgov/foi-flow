@@ -1,4 +1,4 @@
-import { httpGETRequest, httpPOSTRequest } from "../../httpRequestHandler";
+import { httpGETRequest, httpPOSTRequest, httpPOSTRequestBlobResponse } from "../../httpRequestHandler";
   import UserService from "../../../services/UserService";
 import API from "../../endpoints";
   import {

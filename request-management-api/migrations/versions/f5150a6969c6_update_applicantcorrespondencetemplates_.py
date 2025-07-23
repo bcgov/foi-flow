@@ -28,6 +28,7 @@ def upgrade():
     op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/extension_pb_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/extension_pb.html\';commit;')
     op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/generic_cover_email_template_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/generic_cover_email_template.html\';commit;')
     op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/acknowledgement_letter_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/acknowledgement_letter.html\';commit;')
+    op.execute('UPDATE public."ProgramAreas" SET name = \'Ministry of Jobs and Economic Growth\' WHERE name = \'Ministry of Jobs, Economic Development and Innovation\';commit;')
 
 def downgrade():
     op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/fee_estimate_notification.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_estimate_notification_sf.html\';commit;')
@@ -41,3 +42,4 @@ def downgrade():
     op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/extension_pb.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/extension_pb_sf.html\';commit;')
     op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/generic_cover_email_template.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/generic_cover_email_template_sf.html\';commit;')
     op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/acknowledgement_letter.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/acknowledgement_letter_sf.html\';commit;')
+    op.execute('UPDATE public."ProgramAreas" SET name = \'Ministry of Jobs, Economic Development and Innovation\' WHERE name = \'Ministry of Jobs and Economic Growth\';commit;')

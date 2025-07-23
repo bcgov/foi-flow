@@ -10,7 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import type { previewParams } from './types';
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
-import { renderTemplate, applyVariables, getTemplateVariables, getTemplateVariablesAsync } from './util';
+import { renderTemplate, applyVariables, getTemplateVariables, getTemplateVariablesAsync, renderTemplateNoParams } from './util';
 import { OSS_S3_BUCKET_FULL_PATH, FOI_FFA_URL } from "../../../../constants/constants";
 import { EmailExport } from '../../../FOI/customComponents';
 import logo from "../../../../assets/FOI/images/logo-banner.png";

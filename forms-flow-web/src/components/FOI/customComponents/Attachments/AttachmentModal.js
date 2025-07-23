@@ -67,7 +67,7 @@ export default function AttachmentModal({
   uploadFor = "attachment",
   maxNoFiles,
   bcgovcode,
-  existingDocuments,
+  existingDocuments = [],
   divisions = [],
   replacementfiletypes = [],
   totalUploadedRecordSize = 0,
@@ -82,6 +82,7 @@ export default function AttachmentModal({
   },
   currentResponseDate = "",
   handleChangeResponseTitle,
+  retrieveSelectedRecords,
 }) {
   let tagList = [];
   if (uploadFor === "attachment") {
