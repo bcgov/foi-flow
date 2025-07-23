@@ -66,6 +66,7 @@ const generateSolrQueryParams = (queryData) => {
       queryParts.push(booleanKeywords.join(" "));
     }
     //queryParts.push(keywords);
+    console.log("\nqueryParts::",queryParts);
   }
   // Handle received date range
   if (queryData.fromDate || queryData.toDate) {

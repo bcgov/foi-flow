@@ -616,6 +616,7 @@ export const ContactApplicant = ({
     }
 
     // Add templates being used in drafts to the list
+    // console.log("applicantCorrespondence: ", applicantCorrespondence);
     const listOfDraftTemplates: number[] = [];
     applicantCorrespondence.forEach((draftCorrespondence: any) => {
       if (draftCorrespondence.templateid && !listOfDraftTemplates.includes(draftCorrespondence.templateid)) {
