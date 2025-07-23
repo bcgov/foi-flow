@@ -1,7 +1,7 @@
 """add templatename to FOIApplicantCorrespondences
 
 Revision ID: 04e0d5e5c51a
-Revises: 3afc864e6815
+Revises: 7a554bfa243d
 Create Date: 2025-02-28 11:29:04.522380
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '04e0d5e5c51a'
-down_revision = '3afc864e6815'
+down_revision = '7a554bfa243d'
 branch_labels = None
 depends_on = None
 
