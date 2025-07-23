@@ -27,6 +27,7 @@ class FOISolr(Resource):
     def get():      
         try:                        
             usernamepassword ="%s:%s" % (os.getenv("FOI_SOLR_USERNAME"),os.getenv("FOI_SOLR_PASSWORD"))     
+            print("usernamepassword:",usernamepassword)       
             unamepassword_bytes = usernamepassword.encode("utf-8")
             # Encode the bytes to Base64
             base64_encoded = base64.b64encode(unamepassword_bytes)
@@ -50,7 +51,9 @@ class FOISolrSearch(Resource):
         try:
             #print("\nArgs:",request.args)
             payload = request.get_json()
+            print("payload:",payload)
             if 'requestnumbers' in payload:
+                print("payload:",payload["requestnumbers"])
                 requestnumbers = payload["requestnumbers"]                      
                 requestdetails = requestservice().getrequestsdetailsforsearch(requestnumbers)
                 return requestdetails, 200

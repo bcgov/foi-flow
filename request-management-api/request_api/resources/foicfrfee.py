@@ -54,8 +54,7 @@ class CreateFOICFRFee(Resource):
             requestjson = request.get_json() 
             foicfrfeeschema = FOICFRFeeSchema().load(requestjson)
             result = cfrfeeservice().createcfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
-            event_loop = asyncio.get_running_loop()
-            asyncio.run_coroutine_threadsafe(eventservice().posteventforsanctioncfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()), event_loop)
+            asyncio.ensure_future(eventservice().posteventforsanctioncfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except ValidationError as verr:
             logging.error(verr)
@@ -82,9 +81,8 @@ class SanctionFOICFRFee(Resource):
             requestjson = request.get_json() 
             foicfrfeeschema = FOICFRFeeSanctionSchema().load(requestjson)
             result = cfrfeeservice().sanctioncfrfee(ministryrequestid, foicfrfeeschema,AuthHelper.getuserid())
-            event_loop = asyncio.get_running_loop()
-            asyncio.run_coroutine_threadsafe(eventservice().posteventforsanctioncfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()), event_loop)
-            asyncio.run_coroutine_threadsafe(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()), event_loop)
+            asyncio.ensure_future(eventservice().posteventforsanctioncfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
+            asyncio.ensure_future(eventservice().posteventforcfrfeeform(ministryrequestid, AuthHelper.getuserid(), AuthHelper.getusername()))
             if (foicfrfeeschema["status"] == "approved") and cfrfeeservice().getactivepayment(requestid, ministryrequestid) != None:
                 requestservice().postfeeeventtoworkflow(requestid, ministryrequestid, "CANCELLED")
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 

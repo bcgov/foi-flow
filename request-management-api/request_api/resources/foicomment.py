@@ -54,8 +54,7 @@ class CreateFOIRequestComment(Resource):
             minrquescommentschema = FOIMinistryRequestCommentSchema().load(requestjson) 
             result = commentservice().createministryrequestcomment(minrquescommentschema, AuthHelper.getuserid(), minrquescommentschema["commenttypeid"])
             if result.success == True:
-                event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(eventservice().postcommentevent(result.identifier, "ministryrequest", AuthHelper.getuserid()), event_loop)
+                asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "ministryrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
@@ -78,8 +77,7 @@ class CreateFOIRawRequestComment(Resource):
             rawrqcommentschema = FOIRawRequestCommentSchema().load(requestjson)  
             result = commentservice().createrawrequestcomment(rawrqcommentschema, AuthHelper.getuserid(), rawrqcommentschema["commenttypeid"])
             if result.success == True:
-                event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()), event_loop)
+                asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
@@ -104,8 +102,7 @@ class CreateFOIRequestHistoryComment(Resource):
                 result = commentservice().createMinistryRequestHistorycomments(rawrqcommentschema, AuthHelper.getuserid())
             else: result = commentservice().createRequestHistorycomments(rawrqcommentschema, AuthHelper.getuserid())
             if result.success == True:
-                event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()), event_loop)
+                asyncio.ensure_future(eventservice().postcommentevent(result.identifier, "rawrequest", AuthHelper.getuserid()))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
@@ -164,8 +161,7 @@ class FOIDisableComment(Resource):
             else:
                 result = commentservice().disablerawrequestcomment(commentid, AuthHelper.getuserid())
             if result.success == True:
-                event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(eventservice().postcommentevent(result.identifier, requesttype, AuthHelper.getuserid(), True), event_loop)
+                asyncio.ensure_future(eventservice().postcommentevent(result.identifier, requesttype, AuthHelper.getuserid(), True))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
@@ -195,8 +191,7 @@ class FOIUpdateComment(Resource):
                 commentschema = EditFOIRawRequestCommentSchema().load(requestjson)
                 result = commentservice().updaterawrequestcomment(commentid, commentschema, AuthHelper.getuserid())
             if result.success == True:
-                event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(eventservice().postcommentevent(commentid, requesttype, AuthHelper.getuserid(), existingtaggedusers=result.args[0]), event_loop)
+                asyncio.ensure_future(eventservice().postcommentevent(commentid, requesttype, AuthHelper.getuserid(), existingtaggedusers=result.args[0]))
             return {'status': result.success, 'message':result.message,'id':result.identifier} , 200 
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        

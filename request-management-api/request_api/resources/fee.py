@@ -106,11 +106,10 @@ class Payment(Resource):
                 cfrfeeservice().updatepaymentmethod(ministry_request_id, paymenteventtype)
                 # automated state transition and due date calculation
                 requestservice().postpaymentstatetransition(request_id, ministry_request_id, nextstatename, parsed_args.get('trnDate'))
-                event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(eventservice().postpaymentevent(ministry_request_id, paymenteventtype), event_loop)
+                asyncio.ensure_future(eventservice().postpaymentevent(ministry_request_id, paymenteventtype))
                 requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID", nextstatename)
                 
-                asyncio.run_coroutine_threadsafe(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False), event_loop)
+                asyncio.ensure_future(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False))
             return response, 201
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code

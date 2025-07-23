@@ -153,7 +153,6 @@ const KCProcessingTeams = [
   "Children and Family Team",
   "Children and Education Team",
   "Coordinated Response Unit",
-  "BCPS Team"
 ];
 
 const KCScanningTeam = "Scanning Team"
