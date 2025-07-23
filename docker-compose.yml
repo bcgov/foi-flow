@@ -229,6 +229,28 @@ services:
     networks:
       - forms-flow-bpm-network
       
+  foi-template-api:
+    container_name: foi-template
+    build:
+      context: ./integrationapi/MCS.FOI.Integration/
+      dockerfile: Dockerfile
+    ports:
+      - "3002:8080"
+    environment:
+      - ConnectionStrings__DBConnection=${FOI_TEMPLATE_DB_CONNECTIONSTRING}
+      - ConnectionStrings__Redis=${FOI_TEMPLATE_REDIS_CONNECTIONSTRING}
+      - AWSS3__OSS_S3_HOST=https://${OSS_S3_HOST}
+      - AWSS3__OSS_S3_FORMS_BUCKET=${OSS_S3_FORMS_BUCKET}
+      - ApiSettings__CorrespondenceUrl=${FOI_TEMPLATE_CORRESPONDENCE_URL}
+
+      - JWTAuth__JWT_OIDC_AUDIENCE=${JWT_OIDC_AUDIENCE}
+      - JWTAuth__CORS_ORIGIN=${FOI_TEMPLATE_CORS_ORIGIN}
+      - JWTAuth__JWT_OIDC_ISSUER=${KEYCLOAK_URL}/auth/realms/${KEYCLOAK_URL_REALM}
+      - JWTAuth__IAOGroups=${FOI_TEMPLATE_IAOGROUPS}
+      - SPELLCHECK_DICTIONARY_PATH=${SPELLCHECK_DICTIONARY_PATH}
+      - SPELLCHECK_JSON_FILENAME=${FOI_TEMPLATE_SPELLCHECK_DICTIONARY_PATH}
+      - SyncfusionLicense=${FOI_TEMPLATE_SPELLCHECK_JSON_FILENAME}
+      
   foi-web:
     container_name: foi-web
     build:
@@ -268,6 +290,8 @@ services:
         - REACT_APP_FOI_SOLR_API_BASE=${FOI_SOLR_API_BASE}
         - REACT_APP_SEARCH_KEYWORD_LIMIT=${SEARCH_KEYWORD_LIMIT}
         - REACT_APP_SOLR_DOC_SEARCH_LIMIT=${SOLR_DOC_SEARCH_LIMIT}
+        - REACT_APP_FOI_TEMPLATE_API_URL=${REACT_APP_FOI_TEMPLATE_API_URL}
+        - REACT_APP_SF_KEY=${REACT_APP_SF_KEY}
     volumes:
       - ".:/app"
       - "/app/node_modules"
