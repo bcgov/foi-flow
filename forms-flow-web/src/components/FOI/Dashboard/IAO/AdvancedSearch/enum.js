@@ -15,18 +15,7 @@ const DateRangeTypes = Object.freeze([
   {name: "closedate", value: "Closed Date"},
 ]);
 
-const MappedMinistries = Object.freeze({
-  'ECC': ['ECC', 'EDU'],
-  'ECS': ['ECS', 'EMLI'],
-  'PSE': ['PSE', 'AEST'],
-  'HSG': ['HSG', 'MUNI'],
-  'CAS': ['BRD', 'CAS'],
-  'JED': ['JED', 'JERI'],
-  'HTH': ['MMHA', 'HTH'],
-})
-
 export {
   SearchFilter,
-  DateRangeTypes,
-  MappedMinistries
+  DateRangeTypes
 };

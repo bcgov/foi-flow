@@ -35,8 +35,6 @@ import {
   fetchPDFStitchStatusForResponsePackage,
   fetchPDFStitchedStatusForOIPCRedlineReview,
   fetchPDFStitchedStatusForOIPCRedline,
-  fetchPDFStitchStatusesForPhasedRedlines,
-  fetchPDFStitchStatusesForPhasedResponsePackages,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 
 import { fetchCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
@@ -232,13 +230,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
     }
   }, [requestId, ministryId, comment, attachments]);
 
-  useEffect(() => {
-    if (requestDetails?.isphasedrelease) {
-      dispatch(fetchPDFStitchStatusesForPhasedRedlines(requestId, ministryId));
-      dispatch(fetchPDFStitchStatusesForPhasedResponsePackages(requestId, ministryId));
-    }
-  }, [requestId, ministryId, requestDetails])
-
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] =
     React.useState("Unassigned");
@@ -396,8 +387,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
       dispatch(fetchPDFStitchedStatusForOIPCRedline(requestId, ministryId));
       dispatch(fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId));
-      dispatch(fetchPDFStitchStatusesForPhasedRedlines(requestId, ministryId));
-      dispatch(fetchPDFStitchStatusesForPhasedResponsePackages(requestId, ministryId));
       fetchCFRForm(ministryId, dispatch);
       setStateChanged(false);
       setcurrentrequestStatus(_state);
@@ -1125,7 +1114,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   lockRecords={lockRecordsTab}
                   validLockRecordsState={validLockRecordsState}
                   handleSaveRequest={handleSaveRequest}
-                  isPhasedRelease={requestDetails.isphasedrelease}
                 />
               </>
             ) : (

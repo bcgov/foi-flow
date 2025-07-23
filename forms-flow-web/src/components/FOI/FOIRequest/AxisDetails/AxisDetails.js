@@ -73,8 +73,6 @@ const AxisDetails = React.memo(({
           updateValidation(helperText);
           if (isValid) {
             checkDuplicatedAxisID(inputValue);
-          }else {
-            handleAxisDetailsValue("", FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID); 
           }
       } else {
         updateValidation("");
@@ -92,7 +90,6 @@ const AxisDetails = React.memo(({
         if (!err) {
           if (data && data.indexOf("Axis Id exists") >= 0) {
             updateValidation("Request already exists");
-            handleAxisDetailsValue("", FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID);
           } else {
             updateValidation("");
             handleAxisDetailsValue(inputValue, FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID);
@@ -103,7 +100,7 @@ const AxisDetails = React.memo(({
           updateValidation("Error checking request ID");
         }
       }));
-    }, 300);
+    }, 500);
 
     const syncWithAxis = () => {
         dispatch(checkDuplicateAndFetchRequestDataFromAxis(axisRequestId, false, saveRequestObject,(err, data) => {

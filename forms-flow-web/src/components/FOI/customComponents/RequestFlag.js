@@ -114,16 +114,16 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled 
       id = "phased-release-flag";
       iconClass = "phased-release-icon";
       isSelectedBgClass =
-        "linear-gradient(to right, #EFFFFD 80%, #027E6F 0%)";
-      bgClass = "linear-gradient(to right, #fff 80%, #027E6F 0%)";
-      borderStyle = "1px solid #027E6F";
+        "linear-gradient(to right, rgba(146, 7, 183, 0.32) 80%, #9207b7 0%)";
+      bgClass = "linear-gradient(to right, #fff 80%, #9207b7 0%)";
+      borderStyle = "1px solid #9207b7";
 
       //when setting to active
       modalHeadingActive = "Phased Release";
       modalMessageActive =
-        "Are you sure you want to change this request to Phased Release?";
+        "Are you sure you want to flag this request as a Phased Release?";
       modalDescriptionActive = (
-        <span>This will flag the request as a Phased Release.</span>
+        <span>This will tag the request as Phased Release.</span>
       );
 
       //when setting to inactive
@@ -131,7 +131,7 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled 
       modalMessageInactive =
         "Are you sure you want to change this request to Single Release?";
       modalDescriptionInactive = (
-        <span>This will flag the request as a Single Release.</span>
+        <span>This will tag the request as Single Release.</span>
       );
       break;
 
@@ -182,7 +182,6 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled 
     if (type == "oipcreview" && !isActive) {
         handleSelect(e.target.value)
     } else {
-        setIsSelected(e.target.value);
         setModalOpen(true);
     }
 

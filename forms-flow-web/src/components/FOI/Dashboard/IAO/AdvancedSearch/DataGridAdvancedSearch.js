@@ -450,13 +450,12 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   
 
   const getTableInfo = (userGroups) => {
-    var tableInfo = defaultTableInfo;
     if (!userGroups || isIntakeTeam(userGroups)) {
-      tableInfo = defaultTableInfo;
+      return defaultTableInfo;
     }
   
     if (isProcessingTeam(userGroups)) {
-      tableInfo =  {
+      return {
         columns: ProcessingTeamColumns,
         sort: [
           { field: "currentState", sort: "desc" },
@@ -466,7 +465,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     }
   
     if (isFlexTeam(userGroups)) {
-      tableInfo =  {
+      return {
         columns: FlexTeamColumns,
         sort: [
           { field: "currentState", sort: "desc" },
@@ -477,20 +476,8 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
         },
       };
     }
-
-    if (searchResults?.data.filter(r => r.currentState === 'Closed').length > 0) {
-      return {...tableInfo, columns: [...tableInfo.columns, {
-          field: "closereason",
-          headerName: "CLOSE REASON",
-          headerAlign: "left",
-          renderCell: hyperlinkRenderCell,
-          cellClassName: 'foi-advanced-search-result-cell',
-          flex: 1,
-        }]
-      }
-    }
   
-    return tableInfo;
+    return defaultTableInfo;
   };
   const tableInfo = getTableInfo(user.groups);
   
@@ -553,7 +540,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     
   }, [rowsState,historicrowsState, sortModel,sortHistoricsearchSortModel]);
 
-  const columnsRef = tableInfo?.columns || [];
+  const columnsRef = React.useRef(tableInfo?.columns || []);
   const historiccolumnsRef = React.useRef(defaultHistoricalResultsTableInfo?.columns || []);
 
   if (advancedSearchComponentLoading && queryData) {
@@ -607,7 +594,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
             className="foi-data-grid"
             getRowId={(row) => row.idNumber}
             rows={searchResults?.data || []}
-            columns={columnsRef}
+            columns={columnsRef?.current}
             rowHeight={30}
             headerHeight={50}
             rowCount={searchResults?.meta?.total || 0}
