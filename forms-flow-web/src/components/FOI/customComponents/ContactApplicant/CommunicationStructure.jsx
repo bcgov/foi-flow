@@ -21,28 +21,50 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
+import Tooltip from "@mui/material/Tooltip";
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as html2pdf from 'html-to-pdf-js';
-import CommunicationUploadModal from '../Comments/CommunicationUploadModal';
 import { ClickableChip } from '../../Dashboard/utils';
 import { toast } from 'react-toastify';
 import { getTemplateVariables } from './util';
 import { DownloadCorrespondenceModal } from './DownloadCorrespondenceModal';
+import { getCorrespondenceSubject, getFullEmailListText, getFullCCEmailListText } from './helper';
+import { exportPDF } from '../../../../apiManager/services/FOI/foiCorrespondenceServices';
 
+const CommunicationStructure = ({
+  correspondence, 
+  requestNumber, 
+  currentIndex,
+  fullName, 
+  ministryId=null, 
+  editDraft, 
+  deleteDraft, 
+  deleteResponse, 
+  modalFor, 
+  setModalFor,
+  setModal,
+  setUpdateAttachment, 
+  setSelectedCorrespondence, 
+  setCurrentResponseDate, 
+  templateVariableInfo,
+  correspondenceSubject,
+  showRenameCorrespondenceSubjectModal,
+  clearcorrespondence
+}) => {
 
-const CommunicationStructure = ({correspondence, currentIndex,
-  fullName, ministryId=null, editDraft, deleteDraft, deleteResponse, modalFor, setModalFor,setModal,setUpdateAttachment, 
-  setSelectedCorrespondence, setCurrentResponseDate, applicantCorrespondenceTemplates, templateVariableInfo}) => {
-
-
+  const templateList = useSelector((state) => state.foiRequests.foiEmailTemplates);
+  const requestDetails = useSelector((state) => state.foiRequests.foiRequestDetail);
   const dispatch = useDispatch();
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [communicationUploadModalOpen, setCommunicationUploadModalOpen] = useState(false);
   const [downloadCorrespondenceModalOpen, setDownloadCorrespondenceModalOpen] = useState(false);
   const [anchorPosition, setAnchorPosition] = useState(null);
+  const [attachmentAnchorPosition, setAttachmentAnchorPosition] = useState(null);
+  const [attachmentPopoverOpen, setAttachmentPopoverOpen] = useState(false)
+  const [attachmentDownloadLink, setAttachmentDownloadLink] = useState('')
   const [deletePopoverOpen, setDeletePopoverOpen] = useState(false);
   const ref = useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close() : {};
@@ -90,17 +112,41 @@ const CommunicationStructure = ({correspondence, currentIndex,
 
   const ActionsPopover = () => {
 
-    const renderDownloadMenuItem = () => (
-      <MenuItem
-        onClick={(e) => {
-          e.stopPropagation();
-          setModalFor("downloadcorrespondence")
-          setDownloadCorrespondenceModalOpen(true);
-          setPopoverOpen(false);
-        }}
-      >
-        Download
-      </MenuItem>
+    const renderCorrespondenceMenuItems = () => (
+      <>
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedCorrespondence(correspondence);
+            showRenameCorrespondenceSubjectModal();
+            setPopoverOpen(false);
+          }}
+        >
+          Rename Subject
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            setModalFor("changeresponsedate");
+            setCurrentResponseDate(correspondence.date);
+            setModal(true);
+            setSelectedCorrespondence(correspondence);
+            setPopoverOpen(false);
+          }}
+        >
+          Change Date
+        </MenuItem>
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            setModalFor("downloadcorrespondence")
+            setSelectedCorrespondence(correspondence);
+            setDownloadCorrespondenceModalOpen(true);
+            setPopoverOpen(false);
+          }}
+        >
+          Download
+        </MenuItem>
+      </>
     );
   
     const renderDraftMenuItems = () => (
@@ -113,6 +159,7 @@ const CommunicationStructure = ({correspondence, currentIndex,
           onClick={(e) => {
             e.stopPropagation();
             setModalFor("downloaddraft")
+            setSelectedCorrespondence(correspondence);
             setDownloadCorrespondenceModalOpen(true);
             setPopoverOpen(false);
         }}>Download</MenuItem>
@@ -137,17 +184,25 @@ const CommunicationStructure = ({correspondence, currentIndex,
           Change Date
         </MenuItem>
         <MenuItem
-          onClick={() => {
-            setUpdateAttachment(correspondence.attachments[0]);
-            setModalFor("rename");
-            setModal(true);
+          onClick={(e) => {
+            e.stopPropagation();
             setSelectedCorrespondence(correspondence);
+            showRenameCorrespondenceSubjectModal();
             setPopoverOpen(false);
           }}
         >
-          Rename
+          Rename Subject
         </MenuItem>
-        {renderDownloadMenuItem()}
+        <MenuItem
+          onClick={(e) => {
+            e.stopPropagation();
+            setModalFor("downloadcorrespondence")
+            setDownloadCorrespondenceModalOpen(true);
+            setPopoverOpen(false);
+          }}
+        >
+          Download
+        </MenuItem>
         <MenuItem onClick={() => deleteResponse(correspondence)}>Delete</MenuItem>
       </>
     );
@@ -175,23 +230,70 @@ const CommunicationStructure = ({correspondence, currentIndex,
         >
           {correspondence && (
             <MenuList>
-              {correspondence.category === "correspondence" && renderDownloadMenuItem()}
+              {correspondence.category === "correspondence" && renderCorrespondenceMenuItems()}
               {correspondence.category === "draft" && renderDraftMenuItems()}
               {correspondence.category === "response" && renderResponseMenuItems()}
             </MenuList>
           )}
         </Popover>
         {/* <DeleteAction /> */}
-        <CommunicationUploadModal 
-          openModal={communicationUploadModalOpen} 
-          setOpenModal={setCommunicationUploadModalOpen}
-          message={{ body: "", title: "Add Response" }}
-          ministryId={ministryId}
-        />
         <DownloadCorrespondenceModal modalOpen={downloadCorrespondenceModalOpen} setModalOpen={setDownloadCorrespondenceModalOpen} handleSave={download} modalFor={modalFor} />
       </div>
     );
   };
+
+  const renderAttachmentMenuItems = () => (
+    <>
+      <MenuItem
+        onClick={(e) => {
+          e.stopPropagation();
+          setModalFor("rename");
+          setModal(true);
+          setSelectedCorrespondence(correspondence);
+          setPopoverOpen(false);
+        }}
+      >
+        Rename Attachment
+      </MenuItem>
+      <MenuItem
+        onClick={(e) => {
+          e.stopPropagation();
+          setPopoverOpen(false);
+        }}
+      >
+        <a style={{color: "black", textDecoration: "none"}} href={attachmentDownloadLink} target="_blank">
+          Download</a>
+      </MenuItem>
+    </>
+  )
+
+  const AttachmentActionsPopover = () => {
+    return (<Popover
+    anchorReference="anchorPosition"
+    anchorPosition={
+      attachmentAnchorPosition && {
+        top: attachmentAnchorPosition.top,
+        left: attachmentAnchorPosition.left,
+      }
+    }
+    open={attachmentPopoverOpen}
+    anchorOrigin={{
+      vertical: "top",
+      horizontal: "left",
+    }}
+    transformOrigin={{
+      vertical: "top",
+      horizontal: "left",
+    }}
+    onClose={() => setAttachmentPopoverOpen(false)}
+  >
+    {correspondence && (
+      <MenuList>
+        {renderAttachmentMenuItems()}
+      </MenuList>
+    )}
+  </Popover>)
+  }
 
   const handleDialogClose = () => {
     closeTooltip()
@@ -200,9 +302,6 @@ const CommunicationStructure = ({correspondence, currentIndex,
 
   const download = async () => {
     setDownloadCorrespondenceModalOpen(false);
-    const elementToClickForExpand = document.querySelector(`#communication-accordion-${currentIndex}`);
-    let isAriaExpanded = elementToClickForExpand.ariaExpanded
-    if (isAriaExpanded == 'false') elementToClickForExpand.click();
     let fileInfoList = correspondence.attachments.map(attachment => {
       return  {
         filename: attachment.filename,
@@ -246,33 +345,79 @@ const CommunicationStructure = ({correspondence, currentIndex,
         closeButton: true
       });
     }
-    const element = document.querySelector(`[data-communication-div-id="${currentIndex}"]`).cloneNode(true);
+    const headerDiv = document.createElement("div");
+
+    let innerTextString = '';
+    if (correspondence.category == "draft") {
+      innerTextString = ''
+    } else {
+      innerTextString = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`
+    }
+    headerDiv.innerText = innerTextString;
+    headerDiv.style.fontSize = "12px";
+    headerDiv.style.fontFamily = "BCSans"
+    headerDiv.style.marginBottom = "20px";
+    let element = headerDiv.outerHTML
+    if (correspondence?.text) element = element + correspondence?.text
 
     // For drafts, remove the relevant variables that have been filled in
-    if (correspondence.category == "draft") {
-      const template = applicantCorrespondenceTemplates.find(template => template.templateid == correspondence.templateid)
-      const { requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData } = templateVariableInfo
-      let variables = getTemplateVariables(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, template)
-      variables = variables.filter(variable => {
-        const includedVariables = ["{{firstName}}", "{{lastName}}", "{{address}}"]
-        return includedVariables.includes(variable.name)
-      })
-      for (let variable of variables) {
-        element.innerHTML = element.innerHTML.replaceAll(variable.value, 'APPLICANT')
+    // if (correspondence.category == "draft") {
+    //   const template = applicantCorrespondenceTemplates.find(template => template.templateid == correspondence.templateid)
+    //   const { requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData } = templateVariableInfo
+    //   let variables = getTemplateVariables(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, template)
+    //   let firstName, lastName, address, secondaryAddress, postal;
+    //   variables.forEach((variable) => {
+    //     if (variable.name == "{{firstName}}") firstName = variable.value
+    //     if (variable.name == "{{lastName}}") lastName = variable.value
+    //     if (variable.name == "{{address}}") address = variable.value
+    //     if (variable.name == "{{secondaryAddress}}") secondaryAddress = variable.value
+    //     if (variable.name == "{{postal}}") postal = variable.value
+    //   })
+    //   let addressStartIndex = element.indexOf(address) // -1 if undefined
+    //   let secondaryAddressStartIndex = element.indexOf(secondaryAddress)
+    //   let postalStartIndex = element.indexOf(postal)
+    //   let endIndex;
+    //   if (postalStartIndex != -1 && postal) endIndex = postalStartIndex + postal.length // if postal code exists, it is end of address string
+    //   if (secondaryAddressStartIndex != -1 && secondaryAddress) endIndex = secondaryAddressStartIndex + secondaryAddress.length // if secondary address
+    //   if (postalStartIndex == -1 && secondaryAddressStartIndex == -1 && addressStartIndex != -1 && address) endIndex = addressStartIndex + address.length // if only primary
+    //   // slice must be done first so indexes don't change
+    //   if (addressStartIndex && addressStartIndex != -1 && endIndex && endIndex != -1) {
+    //     element = element.slice(0, addressStartIndex) + 'ADDRESS REDACTED' + element.slice(endIndex)
+    //   }
+    //   // then replace first and last name
+    //   element = element.replaceAll(firstName, 'APPLICANT')
+    //   element = element.replaceAll(lastName, 'APPLICANT')
+    // }
+    let emailFilename = correspondence?.correspondencesubject ? `${correspondence?.correspondencesubject.replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf` : `${getCorrespondenceSubject(correspondence, templateList, requestNumber).replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf`
+    if (correspondence.category == "draft" && correspondence.draft) {
+      let newData = {
+        "FileName": `${emailFilename}.pdf`,
+        "Content": correspondence.draft
+      };
+      const saveBlobToPdf = async (pdf) => {
+        const blob = new Blob([pdf], { type: 'application/pdf' });
+        blobs.push({name: emailFilename, lastModified: new Date(), input: blob})
+        const zipfile = await downloadZip(blobs).blob()
+        saveAs(zipfile, fullName + " " + correspondence.date.replace(/\|/g, "") + ".zip");
+        clearcorrespondence();
       }
-    }
-    html2pdf().from(element).outputPdf('blob').then(async (blob) => {
-      blobs.push({name: "Email Body.pdf", lastModified: new Date(), input: blob})
+      exportPDF(dispatch, newData, saveBlobToPdf);
+    } else if (correspondence?.category != 'response') {
+      html2pdf().set({margin: 20}).from(element).outputPdf('blob').then(async (blob) => {
+        blobs.push({name: emailFilename, lastModified: new Date(), input: blob})
+        const zipfile = await downloadZip(blobs).blob()
+        saveAs(zipfile, fullName + " " + correspondence.date.replace(/\|/g, "") + ".zip");
+        clearcorrespondence();
+      });
+    } else if (correspondence?.category == 'response') {
+      if (blobs.length == 1) {
+        blobs[0].name = fullName + " " + correspondence.date.replace(/\|/g, "").replace(/:/g, "_") + "/" + blobs[0].name
+      }
       const zipfile = await downloadZip(blobs).blob()
       saveAs(zipfile, fullName + " " + correspondence.date.replace(/\|/g, "") + ".zip");
-    });
+      clearcorrespondence();
+    }
   }
-
-
-  const getTemplateName = (templateId) => {
-    return applicantCorrespondenceTemplates.find((obj)=> obj.templateid == templateId)?.description
-  }
-  
 
   const DeleteAction = () => {
     return (
@@ -306,8 +451,20 @@ const CommunicationStructure = ({correspondence, currentIndex,
       </Dialog>
     )
   };
-const emailText = correspondence?.emails.length == 1 ? correspondence.emails[0] : correspondence.emails.length > 1 ? correspondence.emails[0] + ' +' + (correspondence.emails.length - 1) : ''
-const dateText = correspondence.date == correspondence.created_at ? correspondence.date.toUpperCase() : correspondence.date.split('|')[0].trim()
+
+const fullEmailListText = getFullEmailListText(correspondence);
+const fullCCEmailListText = getFullCCEmailListText(correspondence);
+let popoverEmailList = fullEmailListText + '\n' + fullCCEmailListText;
+const totalNumberOfEmails = correspondence?.emails?.length + correspondence?.ccemails?.length
+let emailText = '';
+if (correspondence?.emails?.length > 0) {
+  emailText = correspondence.emails[0];
+} else if (correspondence?.ccemails?.length > 0) {
+  emailText = correspondence.ccemails[0]
+}
+if (totalNumberOfEmails > 1) emailText = emailText + ` +${totalNumberOfEmails - 1}`
+let labelText = correspondence.sentby ? 'emailed' : 'printed'
+if (correspondence?.is_sent_successfully == false) labelText = 'failed to send email' 
   return (
     <>
       <div className="communication-accordion" {...(correspondence ? {"data-communication-div-id":`${currentIndex}`} : {})}>
@@ -322,9 +479,9 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
                   <div className="templateInfo">
                     {correspondence && (
                       <>
-                      <div className="templateUser">{correspondence.category === "response" ? "Applicant Response": getTemplateName(correspondence.templateid)} - {fullName} </div> |  
-                        {correspondence?.emails.length > 0 ? <div className="templateUser"> {emailText} |</div> : ''} 
-                        <div className="templateTime">{dateText.toUpperCase()} </div>  
+                      <div className="templateUser">{getCorrespondenceSubject(correspondence, templateList, requestNumber)} - {fullName} </div> |  
+                        {totalNumberOfEmails > 1 ? <><div className="templateUser"><Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{popoverEmailList}</span>} disableInteractive placement="top">{emailText}</Tooltip></div> |</>: totalNumberOfEmails == 1 ? <><div className="templateUser"> {emailText} </div>|</> : ''} 
+                        <div className="templateTime">{correspondence?.date?.toUpperCase()} </div>
                         <div className="templateTime">{correspondence.edited ? "Edited": ""} </div>
                       </>
                     )
@@ -335,7 +492,7 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
                     </>
                     )
                     }
-                    {correspondence. category != 'response' && <div className="templateUser">{correspondence.category !== "draft" && <ClickableChip clicked={true} color={'primary'} label={correspondence.sentby ? 'emailed' : 'printed'} size="small" />}</div>}
+                    {correspondence. category != 'response' && <div className="templateUser">{correspondence.category !== "draft" && <ClickableChip clicked={true} color={correspondence?.is_sent_successfully == false ? 'red' : 'primary'} label={labelText} size="small" />}</div>}
                     </div>
                 </div>
               </div>
@@ -363,9 +520,29 @@ const dateText = correspondence.date == correspondence.created_at ? corresponden
           <AccordionDetails>
             <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} >
             </div>
-            {correspondence && correspondence.attachments?.map((attachment) => (
-            <div className="email-attachment-item" key={attachment.filename}>
+            {correspondence && correspondence.attachments?.map((attachment, index) => (
+            <div className="email-attachment-item" key={attachment.applicantcorrespondenceattachmentid + attachment.filename}>
               <a href={`/foidocument?id=${ministryId}&filepath=${attachment.documenturipath.split('/').slice(4).join('/')}`} target="_blank">{attachment.filename}</a>
+              <IconButton
+                aria-label= "actions"
+                id={`ellipse-icon-${currentIndex}`}
+                key={`ellipse-icon-${currentIndex}`}
+                // color="inherit"
+                className="attachment-actions"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setAttachmentPopoverOpen(true)
+                    setUpdateAttachment(correspondence.attachments[index]);
+                    setSelectedCorrespondence(correspondence);
+                    setAttachmentDownloadLink(`/foidocument?id=${ministryId}&filepath=${attachment.documenturipath.split('/').slice(4).join('/')}`)
+                    setAttachmentAnchorPosition(
+                      e.currentTarget.getBoundingClientRect()
+                      );
+                }}
+              >
+                <MoreHorizIcon />
+              </IconButton>
+              <AttachmentActionsPopover />
             </div>
             ))}
           </AccordionDetails>
