@@ -351,7 +351,7 @@ const CommunicationStructure = ({
     if (correspondence.category == "draft") {
       innerTextString = ''
     } else {
-      innerTextString = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`
+      innerTextString = `Email from: ${correspondence.sent_from_email}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`
     }
     headerDiv.innerText = innerTextString;
     headerDiv.style.fontSize = "12px";
