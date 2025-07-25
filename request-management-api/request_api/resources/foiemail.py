@@ -51,7 +51,7 @@ class FOISendEmail(Resource):
             emailschema = FOIEmailSchema().load(requestjson)
             result = emailservice().send(servicename.upper(), requestid, ministryrequestid, emailschema)
             is_sent_successfully = True if result["success"] == True else False
-            if result['identifier'] > 0: applicantcorrespondenceservice().updateissentsuccessfullyforministryrequest(ministryrequestid, result['identifier'], is_sent_successfully, result['subject'])
+            if result['identifier'] > 0: applicantcorrespondenceservice().updateappcorrespondenceaftersendforministryrequest(ministryrequestid, result['identifier'], is_sent_successfully, result['from_email'], result['subject'])
             return json.dumps(result), 200 if result["success"] == True else 500
         except ValueError as err:
             return {'status': 500, 'message': str(err)}, 500

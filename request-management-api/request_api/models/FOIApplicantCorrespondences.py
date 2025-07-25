@@ -45,6 +45,7 @@ class FOIApplicantCorrespondence(db.Model):
     emailsubject = db.Column(db.String(255), unique=False, nullable=True)
     correspondencesubject = db.Column(db.String(255), unique=False, nullable=True)
     is_sent_successfully = db.Column(db.Boolean, nullable=True)
+    sent_from_email = db.Column(db.String(255), nullable=True)
     
     #ForeignKey References       
     foiministryrequest_id =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
@@ -57,7 +58,7 @@ class FOIApplicantCorrespondence(db.Model):
         try:
             sql = """select distinct on (applicantcorrespondenceid) applicantcorrespondenceid, templateid , correspondencemessagejson , version, 
                         created_at, createdby, sentcorrespondencemessage, parentapplicantcorrespondenceid, sentby, sent_at,
-                         isdraft, isdeleted, isresponse, response_at, templatename, templatetype, emailsubject, correspondencesubject, is_sent_successfully
+                         isdraft, isdeleted, isresponse, response_at, templatename, templatetype, emailsubject, correspondencesubject, is_sent_successfully, sent_from_email
                          from "FOIApplicantCorrespondences" fpa 
                         where foiministryrequest_id = :ministryrequestid
                     order by applicantcorrespondenceid desc, version desc""" 
@@ -71,7 +72,7 @@ class FOIApplicantCorrespondence(db.Model):
                                             "sent_at": row["sent_at"], "sentby": row["sentby"],
                                             "isdraft": row["isdraft"], "isresponse": row["isresponse"], "response_at": row["response_at"],
                                             "templatename": row["templatename"], "templatetype": row["templatetype"], "emailsubject": row["emailsubject"], "correspondencesubject": row["correspondencesubject"],
-                                            "is_sent_successfully": row["is_sent_successfully"]})
+                                            "is_sent_successfully": row["is_sent_successfully"], "sent_from_email": row["sent_from_email"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -179,7 +180,7 @@ class FOIApplicantCorrespondence(db.Model):
             return DefaultMethodResult(False,'Applicant correspondence not exists',-1)        
 
     @classmethod
-    def updateissentsuccessfullyforministryrequest(cls, ministryrequestid, correspondenceid, is_sent_successfully, subject)->DefaultMethodResult: 
+    def updateappcorrespondenceaftersendforministryrequest(cls, ministryrequestid, correspondenceid, is_sent_successfully, from_email, subject)->DefaultMethodResult: 
         try:
             correspondence = (
                 db.session.query(FOIApplicantCorrespondence)
@@ -190,6 +191,7 @@ class FOIApplicantCorrespondence(db.Model):
             if not correspondence:
                 return DefaultMethodResult(False, 'Correspondence not found', correspondenceid)
             correspondence.is_sent_successfully = is_sent_successfully
+            correspondence.sent_from_email = from_email
             if subject is not None: 
                 correspondence.emailsubject = subject
                 correspondence.correspondencesubject = subject
@@ -206,4 +208,4 @@ class FOIApplicantCorrespondence(db.Model):
 
 class FOIApplicantCorrespondenceSchema(ma.Schema):
     class Meta:
-        fields = ('applicantcorrespondenceid', 'version', 'parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby', 'isdraft', 'isdeleted', 'isresponse', 'response_at', 'templatename', 'templatetype', 'emailsubject', 'correspondencesubject', 'is_sent_successfully')
+        fields = ('applicantcorrespondenceid', 'version', 'parentapplicantcorrespondenceid', 'templateid','correspondencemessagejson','foiministryrequest_id','foiministryrequestversion_id','created_at','createdby','attachments','sentcorrespondencemessage','sent_at','sentby', 'isdraft', 'isdeleted', 'isresponse', 'response_at', 'templatename', 'templatetype', 'emailsubject', 'correspondencesubject', 'is_sent_successfully', 'sent_from_email')

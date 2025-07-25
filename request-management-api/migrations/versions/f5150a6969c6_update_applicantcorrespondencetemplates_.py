@@ -17,6 +17,8 @@ depends_on = None
 
 
 def upgrade():
+    op.add_column('FOIApplicantCorrespondences', sa.Column('sent_from_email', sa.String(length=255), nullable=True))
+    op.add_column('FOIApplicantCorrespondencesRawRequests', sa.Column('sent_from_email', sa.String(length=255), nullable=True))
     op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_estimate_notification_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/fee_estimate_notification.html\';commit;')
     op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_estimate_notification_outstanding_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/fee_estimate_notification_outstanding.html\';commit;')
     op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_payment_confirmation_full_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/fee_payment_confirmation_full.html\';commit;')
@@ -31,6 +33,8 @@ def upgrade():
     op.execute('UPDATE public."ProgramAreas" SET name = \'Ministry of Jobs and Economic Growth\' WHERE name = \'Ministry of Jobs, Economic Development and Innovation\';commit;')
 
 def downgrade():
+    op.drop_column('FOIApplicantCorrespondences', 'sent_from_email')
+    op.drop_column('FOIApplicantCorrespondencesRawRequests', 'sent_from_email')
     op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/fee_estimate_notification.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_estimate_notification_sf.html\';commit;')
     op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/fee_estimate_notification_outstanding.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_estimate_notification_outstanding_sf.html\';commit;')
     op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/fee_payment_confirmation_full.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_payment_confirmation_full_sf.html\';commit;')

@@ -252,7 +252,7 @@ export const ContactApplicant = ({
     // No drafts being downloaded as part of export all
     if (correspondence?.category != 'response') {
       const headerDiv = document.createElement("div");
-      headerDiv.innerText = `Email from: ${requestDetails?.assignedGroupEmail}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`;
+      headerDiv.innerText = `Email from: ${correspondence.sent_from_email}\n${getFullEmailListText(correspondence) || 'Email to: None selected'}\n ${getFullCCEmailListText(correspondence) || 'CC to: None selected'}\nEmail Subject: ${correspondence?.emailsubject}\nSent: ${correspondence?.date}\n`;
       headerDiv.style.fontSize = "12px";
       headerDiv.style.fontFamily = "BCSans"
       headerDiv.style.marginBottom = "20px";
