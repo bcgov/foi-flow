@@ -48,7 +48,7 @@ class emailservice:
             if len(emails) == 0 and len(ccemails) == 0:
                 emails = requestjson.get("email")
             emailresult = senderservice().send(subject, _messagepart, _messageattachmentlist, emails, ccemails)
-            return {"success": emailresult["success"], "message": emailresult["message"], "identifier": savedcorrespondence.identifier, "subject": subject}
+            return {"success": emailresult["success"], "message": emailresult["message"], "identifier": savedcorrespondence.identifier, "subject": subject, "from_email": emailresult.get("from_email")}
         except Exception as ex:
             logging.exception(ex)
             return {"success": False, "message": "Failed to send email", "identifier": savedcorrespondence.identifier if savedcorrespondence else -1, "subject": subject}
