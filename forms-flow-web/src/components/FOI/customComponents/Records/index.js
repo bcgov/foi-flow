@@ -797,7 +797,7 @@ export const RecordsLog = ({
                     dispatch,
                     (_err, _res) => {
                       if (_err) {
-                        failed.push(header.filename);
+                        // failed.push(header.filename);
                       }
                     }
                   );
@@ -807,7 +807,11 @@ export const RecordsLog = ({
                       ETag: response.headers.etag,
                     });
                   } else {
-                    failed.push(header.filename);
+                    if (!failed.includes(header.filename)) {
+                      failed.push(header.filename);
+                      chunk--;
+                      continue;
+                    }
                   }
                 }
                 await completeMultiPartUpload(
