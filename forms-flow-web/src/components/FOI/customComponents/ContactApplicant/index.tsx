@@ -77,6 +77,8 @@ export const ContactApplicant = ({
   const [attachPdfTrigger, setAttachPdfTrigger] = useState(false);
   const [exportPdfTrigger, setExportPdfTrigger] = useState(false);
   const [attachAsPdfFilename, setAttachAsPdfFilename] = useState(requestNumber || "");
+  const [clearEditorTrigger, setClearEditorTrigger] = useState(false)
+  const [resetTemplateDropdownValue, setResetTemplateDropdownValue] = useState(false);
 
   useEffect(() => {
     if (selectedCorrespondence?.correspondencesubject) setCorrespondenceSubject(selectedCorrespondence?.correspondencesubject)
@@ -388,9 +390,13 @@ export const ContactApplicant = ({
       setFiles((prev) => [...prev, emailAttachment])
     }
     await exportPDF(dispatch, newData, attachBlobPdf);
-    const aplicantCoverEmailTemplate = templates.find((template: any) => template.label === 'A - Applicant Cover Email');
-    selectTemplateFromDropdown(null, aplicantCoverEmailTemplate)
-    setSelectedTemplate(aplicantCoverEmailTemplate);
+    selectTemplateFromDropdown(null, null);
+    setSelectedTemplate(null);
+    setEditorValue("")
+    setCurTemplate('');
+    setCurTemplateName('');
+    setClearEditorTrigger(true)
+    setResetTemplateDropdownValue(true);
   }
 
   
@@ -1730,6 +1736,8 @@ export const ContactApplicant = ({
                 disabledValues={disabledOptions}
                 onChange={showSelectTemplateModal}
                 label="Select Template"
+                resetTemplateDropdownValue={resetTemplateDropdownValue}
+                setResetTemplateDropdownValue={setResetTemplateDropdownValue}
               />
             </Grid>
             {/* <Grid item xs={3}>
@@ -1803,6 +1811,8 @@ export const ContactApplicant = ({
                 setExportPdfTrigger={setExportPdfTrigger}
                 editDraftTrigger = {editDraftTrigger}
                 setEditDraftTrigger = {setEditDraftTrigger}
+                clearEditorTrigger={clearEditorTrigger}
+                setClearEditorTrigger={setClearEditorTrigger}
                 editSfdtDraft = {editSfdtDraft}
                 enableAutoFocus = {enableAutoFocus}
                 selectedEmails={selectedEmails}

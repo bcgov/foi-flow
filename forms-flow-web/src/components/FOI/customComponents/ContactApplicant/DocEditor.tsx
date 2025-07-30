@@ -31,6 +31,8 @@ export const DocEditor = ({
     setExportPdfTrigger,
     editDraftTrigger,
     setEditDraftTrigger,
+    clearEditorTrigger,
+    setClearEditorTrigger,
     editSfdtDraft,
     enableAutoFocus,
     selectedEmails,
@@ -384,6 +386,13 @@ export const DocEditor = ({
             setExportPdfTrigger(false);
         }
     }, [exportPdfTrigger]);
+
+    React.useEffect(() => {
+        if (clearEditorTrigger && container) {
+            container.documentEditor.openBlank();
+            setClearEditorTrigger(false);
+        }
+    }, [clearEditorTrigger]);
 
     return (
         <DocumentEditorContainerComponent
