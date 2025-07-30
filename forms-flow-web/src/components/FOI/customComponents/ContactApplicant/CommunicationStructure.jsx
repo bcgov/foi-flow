@@ -301,6 +301,7 @@ const CommunicationStructure = ({
   }
 
   const download = async () => {
+    console.log('correspondence: ', correspondence)
     setDownloadCorrespondenceModalOpen(false);
     let fileInfoList = correspondence.attachments.map(attachment => {
       return  {
