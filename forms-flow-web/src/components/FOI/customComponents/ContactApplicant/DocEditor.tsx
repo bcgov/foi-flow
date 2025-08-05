@@ -190,7 +190,7 @@ export const DocEditor = ({
             container.documentEditor.selection.cellFormat.leftMargin = 0;
             container.documentEditor.selection.cellFormat.topMargin = 8;
             container.documentEditor.selection.cellFormat.preferredWidthType = 'Point';
-            container.documentEditor.selection.cellFormat.preferredWidth = 115;
+            container.documentEditor.selection.cellFormat.preferredWidth = 110;
             container.documentEditor.selection.characterFormat.bold = true;
             container.documentEditor.selection.paragraphFormat.textAlignment = 'Left';
             container.documentEditor.editor.insertText("Ministry of Citizens' Services");
@@ -202,7 +202,7 @@ export const DocEditor = ({
             container.documentEditor.selection.characterFormat.fontSize = 7;
             container.documentEditor.editor.toggleTextAlignment('Left');
             container.documentEditor.selection.cellFormat.preferredWidthType = 'Point';
-            container.documentEditor.selection.cellFormat.preferredWidth = 75;
+            container.documentEditor.selection.cellFormat.preferredWidth = 70;
             container.documentEditor.editor.insertText("FOI Operations");
 
             container.documentEditor.selection.moveNextPosition();
@@ -221,7 +221,7 @@ export const DocEditor = ({
             container.documentEditor.editor.toggleTextAlignment('Left');
             container.documentEditor.selection.cellFormat.rightMargin = 0;
             container.documentEditor.selection.cellFormat.preferredWidthType = 'Point';
-            container.documentEditor.selection.cellFormat.preferredWidth = 170;
+            container.documentEditor.selection.cellFormat.preferredWidth = 180;
             container.documentEditor.editor.insertText("Website: \t");
             container.documentEditor.editor.insertHyperlink('https://www.gov.bc.ca/freedomofinformation', 'www.gov.bc.ca/freedomofinformation');
             container.documentEditor.editor.insertText("\n");
