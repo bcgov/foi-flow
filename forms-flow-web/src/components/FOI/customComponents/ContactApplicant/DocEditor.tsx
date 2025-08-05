@@ -182,19 +182,19 @@ export const DocEditor = ({
             container.documentEditor.selection.characterFormat.fontSize = 7;
             container.documentEditor.selection.paragraphFormat.afterSpacing = 0;
             container.documentEditor.selection.characterFormat.fontFamily = 'BC Sans';
-            container.documentEditor.editor.insertTable(1,3)
+            container.documentEditor.editor.insertTable(1,4)
             container.documentEditor.editor.applyBorders({type: 'NoBorder'});
             container.documentEditor.editor.applyBorders({type: 'TopBorder'});
             container.documentEditor.selection.characterFormat.fontSize = 7;
             container.documentEditor.editor.toggleTextAlignment('Left');
             container.documentEditor.selection.cellFormat.leftMargin = 0;
+            container.documentEditor.selection.cellFormat.topMargin = 8;
             container.documentEditor.selection.cellFormat.preferredWidthType = 'Point';
-            container.documentEditor.selection.cellFormat.preferredWidth = 190;
+            container.documentEditor.selection.cellFormat.preferredWidth = 115;
             container.documentEditor.selection.characterFormat.bold = true;
             container.documentEditor.selection.paragraphFormat.textAlignment = 'Left';
             container.documentEditor.editor.insertText("Ministry of Citizens' Services");
             container.documentEditor.selection.characterFormat.bold = false;
-            container.documentEditor.editor.insertText(" FOI Operations");
 
             container.documentEditor.selection.moveNextPosition();
             container.documentEditor.editor.applyBorders({type: 'NoBorder'});
@@ -202,7 +202,16 @@ export const DocEditor = ({
             container.documentEditor.selection.characterFormat.fontSize = 7;
             container.documentEditor.editor.toggleTextAlignment('Left');
             container.documentEditor.selection.cellFormat.preferredWidthType = 'Point';
-            container.documentEditor.selection.cellFormat.preferredWidth = 115;
+            container.documentEditor.selection.cellFormat.preferredWidth = 75;
+            container.documentEditor.editor.insertText("FOI Operations");
+
+            container.documentEditor.selection.moveNextPosition();
+            container.documentEditor.editor.applyBorders({type: 'NoBorder'});
+            container.documentEditor.editor.applyBorders({type: 'TopBorder'});
+            container.documentEditor.selection.characterFormat.fontSize = 7;
+            container.documentEditor.editor.toggleTextAlignment('Left');
+            container.documentEditor.selection.cellFormat.preferredWidthType = 'Point';
+            container.documentEditor.selection.cellFormat.preferredWidth = 105;
             container.documentEditor.editor.insertText("Mailing Address:\nPO Box 9569 Stn Prov Govt\nVictoria, BC V8W 9K1");
 
             container.documentEditor.selection.moveNextPosition();
@@ -212,8 +221,8 @@ export const DocEditor = ({
             container.documentEditor.editor.toggleTextAlignment('Left');
             container.documentEditor.selection.cellFormat.rightMargin = 0;
             container.documentEditor.selection.cellFormat.preferredWidthType = 'Point';
-            container.documentEditor.selection.cellFormat.preferredWidth = 160;
-            container.documentEditor.editor.insertText("Website: ");
+            container.documentEditor.selection.cellFormat.preferredWidth = 170;
+            container.documentEditor.editor.insertText("Website: \t");
             container.documentEditor.editor.insertHyperlink('https://www.gov.bc.ca/freedomofinformation', 'www.gov.bc.ca/freedomofinformation');
             container.documentEditor.editor.insertText("\n");
             container.documentEditor.selection.characterFormat.fontSize = 7;
