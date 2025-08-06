@@ -16,6 +16,19 @@
   }
 }
 
+.exportAllButton {
+  margin-right: 4px;
+  margin-left: 4px;
+  width: 100%;
+  max-width: 200px;
+  background-color: #FFFFFF;
+  color: #38598A !important;
+  outline-color: #38598A;
+  outline-style: solid;
+  outline-offset: -1px;
+  font-family: BCSans-Bold, sans-serif !important;
+}
+
 .addCorrespondence-menuitem {
   li.MuiMenuItem-root {
     background-color: #FFF !important; 
@@ -84,6 +97,11 @@
   }
 }
 
+.correspondence-subject-field {
+  justify-content: flex-start !important;
+  margin-top: 8px !important;
+}
+
 .template-list-item {
   border: ridge;
   border-right: ridge;
@@ -99,10 +117,29 @@
   color: white;
   margin: 10px 15px;
   padding: 5px 10px;
+  display: flex;
   i {
     float: right;
     font-size: 20px;
     margin-top: 2px;
+    cursor: pointer;
+  }
+  u {
+    cursor: pointer;
+  }
+  a {
+    color: white;
+    text-decoration: underline;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+  a:hover{
+    color: inherit;
+  }
+  .attachment-actions {
+    max-height: 20px;
+    color: white;
+    margin-left: auto;
   }
 }
 
@@ -299,5 +336,9 @@
 .state-change-email-note { 
   margin-left: 25px;
   margin-bottom: 20px;
-  font-style: italic;
+  // font-style: italic;
+}
+
+.select-template-bottom-margin {
+  margin-bottom: 5px !important;
 }

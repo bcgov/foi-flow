@@ -12,7 +12,7 @@ import * as html2pdf from 'html-to-pdf-js';
 import { toast } from "react-toastify";
 import {useSelector } from "react-redux";
 import {formatDate, formatDateInPst } from "../../../helper/FOI/helper";
-const EmailExport = ({handleExport, content}) => {
+const EmailExport = ({handleExport, content, handleExportAsPdfButton}) => {
 
   const dispatch = useDispatch();
   const user = useSelector((reduxState) => reduxState.user.userDetail);
@@ -62,7 +62,7 @@ const EmailExport = ({handleExport, content}) => {
     <button 
         className="btn-bottom btn-save" 
         onClick={() => {
-          download();
+          handleExportAsPdfButton();
       }}
         >
           Export as PDF
