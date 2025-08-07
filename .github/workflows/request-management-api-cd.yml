@@ -114,4 +114,4 @@ jobs:
         shell: bash
         run: |
           oc project d7abee-dev
-          oc rollout restart deployment/request-management-api
+          oc rollout latest dc/request-management-api-rook
