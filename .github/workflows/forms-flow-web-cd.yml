@@ -108,4 +108,4 @@ jobs:
         shell: bash
         run: |
           oc project d7abee-dev
-          oc rollout latest dc/forms-flow-web-rook
+          oc rollout status dc/forms-flow-web-rook --watch
