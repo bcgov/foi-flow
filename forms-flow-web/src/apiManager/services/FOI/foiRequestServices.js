@@ -159,15 +159,15 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
   };
 };
 
-export const fetchFOIRequestDetailsWrapper = (requestId, ministryId) => {
+export const fetchFOIRequestDetailsWrapper = (requestId, ministryId, userGroups) => {
   if (ministryId) {
     return fetchFOIRequestDetails(requestId, ministryId);
   } else {
-    return fetchFOIRawRequestDetails(requestId);
+    return fetchFOIRawRequestDetails(requestId, userGroups);
   }
 };
 
-export const fetchFOIRawRequestDetails = (requestId) => {
+export const fetchFOIRawRequestDetails = (requestId, userGroups) => {
   const apiUrlgetRequestDetails = replaceUrl(
     API.FOI_RAW_REQUEST_API,
     "<requestid>",
@@ -181,7 +181,9 @@ export const fetchFOIRawRequestDetails = (requestId) => {
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
           const ministryCode = (foiRequest.currentState !== StateEnum.redirect.name && foiRequest.requestType === 'personal') ? foiRequest.selectedMinistries[0].code.toLowerCase() : "";
-          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ministryCode));
+          let isagbcpsteam = false;
+          if (!ministryCode && foiRequest.selectedMinistries[0].code.toLowerCase() == 'ag' && userGroups.includes('BCPS Team')) isagbcpsteam = true;
+          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ministryCode, isagbcpsteam));
           dispatch(fetchFOIProcessingTeamList(foiRequest.requestType.toLowerCase()));
           dispatch(setFOILoader(false));
         } else {
@@ -619,3 +621,27 @@ export const fetchHistoricalExtensions = (
     });
   }
 };
+
+export const updateSpecificRequestSection = (data, field, requestId, ministryId, ...rest) => {
+  const done = fnDone(rest);
+  let apiUrl= replaceUrl(replaceUrl(
+    API.FOI_REQUEST_SECTION_API,
+    "<ministryid>",
+    ministryId),"<requestid>",requestId
+  );
+  return (dispatch) => {
+    httpPOSTRequest(`${apiUrl}/${field}`, data)
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error while updating ${field} for the (request# ${requestId}, ministry# ${ministryId})`);            
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+}

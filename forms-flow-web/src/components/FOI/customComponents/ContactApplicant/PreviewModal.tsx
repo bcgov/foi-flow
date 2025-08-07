@@ -10,23 +10,35 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import type { previewParams } from './types';
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
-import { renderTemplate, applyVariables, getTemplateVariables } from './util';
-import { OSS_S3_BUCKET_FULL_PATH, FOI_FFA_URL } from "../../../../constants/constants"
+import { renderTemplate, applyVariables, getTemplateVariables, getTemplateVariablesAsync, renderTemplateNoParams } from './util';
+import { OSS_S3_BUCKET_FULL_PATH, FOI_FFA_URL } from "../../../../constants/constants";
+import { EmailExport } from '../../../FOI/customComponents';
+import logo from "../../../../assets/FOI/images/logo-banner.png";
+
 
 export const PreviewModal = React.memo(({
   modalOpen,
   handleClose,
   handleSave,
+  handleExportAsPdfButton,
   innerhtml,
+  handleExport,
   attachments,
-  templateInfo
+  templateInfo,
+  enableSend,
+  selectedEmails,
+  selectedCCEmails,
+  correspondenceSubject
 }: previewParams) => {
 
   const dispatch = useDispatch();
 
   //gets the request detail from the store
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
-
+  const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
+  const responsePackagePdfStitchStatus = useSelector((state: any) => state.foiRequests.foiPDFStitchStatusForResponsePackage);
+  const cfrFeeData = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
+  
   //get template
   const rootpath = OSS_S3_BUCKET_FULL_PATH
   const templatePath = "/TEMPLATES/EMAILS/header_footer_template.html";
@@ -35,26 +47,37 @@ export const PreviewModal = React.memo(({
     filename: "header_footer_template.html",
     s3sourceuri: rootpath+templatePath
   }]
+  const replaceFFAUrlLogo = (template: string, logo: string) => {
+    return template.replace(/{{ffaurl}}\/logobanner\.jpg/g, logo);
+  };
   React.useEffect(() => {
     getOSSHeaderDetails(fileInfoList, dispatch, (err: any, res: any) => {
       if (!err) {
         res.map(async (header: any, _index: any) => {
           getFileFromS3(header, async (_err: any, response: any) => {
             let html = await new Response(response.data).text();
+            html = replaceFFAUrlLogo(html, logo);
             setTemplate( `${html}` );
           });
         });
       }
     });
   }, []);
+  
   requestDetails["ffaurl"] = FOI_FFA_URL;
-  const templateVariables = getTemplateVariables(requestDetails, templateInfo);
+
+  const templateVariables = getTemplateVariables(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo);
   const handleSend = () => {
-    handleSave( applyVariables(innerhtml, templateVariables) );
+    const callback = (templateVariables: any) => {
+      handleSave( applyVariables(innerhtml, templateVariables ) );
+    };
+    getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback);
+    // handleSave(innerhtml);
   };
+  const emailTemplate = renderTemplate(template, innerhtml, templateVariables);
+  // const emailTemplate = renderTemplateNoParams(template, innerhtml);
 
   return (
-
     <div className="state-change-dialog">        
     <Dialog
       open={modalOpen}
@@ -69,11 +92,19 @@ export const PreviewModal = React.memo(({
           <IconButton aria-label= "close" onClick={handleClose}>
             <CloseIcon />
           </IconButton>
-        </DialogTitle>
+      </DialogTitle>
       <DialogContent>
         <DialogContentText id="state-change-dialog-description" component={'span'}>
+          <div className="state-change-email-note">
+            <>
+            <p><span style={{fontWeight: 'bold'}}>Email from: </span>{requestDetails.assignedGroupEmail}</p>
+            <p><span style={{fontWeight: 'bold'}}>Email to: </span>{selectedEmails?.join(', ')}</p>
+            <p><span style={{fontWeight: 'bold'}}>CC to: </span>{selectedCCEmails?.join(', ')}</p>
+            <p><span style={{fontWeight: 'bold'}}>Email subject: </span>{correspondenceSubject}</p>
+            </>
+          </div>
           <div className="preview-container">
-            <iframe srcDoc={ renderTemplate(template, innerhtml, templateVariables) } className="preview-frame" sandbox="allow-same-origin" />
+            <iframe srcDoc={ emailTemplate } className="preview-frame" sandbox="allow-same-origin" />
           </div>
           <div className="preview-container">
             {attachments.map((file: any, index: number) => (
@@ -85,14 +116,23 @@ export const PreviewModal = React.memo(({
         </DialogContentText>
       </DialogContent>
       <DialogActions>
+      { !enableSend && 
+        <EmailExport 
+          handleExport={handleExport}
+          content={emailTemplate}
+          handleExportAsPdfButton={handleExportAsPdfButton}
+        />
+      }
+      { enableSend && 
         <button 
         className="btn-bottom btn-save" 
-        disabled={(attachments?.length <= 0)}
+        disabled={!enableSend}
         onClick={handleSend}
         >
           Send Email
         </button>
-        <button className="btn-bottom btn-cancel" onClick={handleClose}>
+      }
+        <button className="btn-cancel" onClick={handleClose}>
           Cancel
         </button>
       </DialogActions>

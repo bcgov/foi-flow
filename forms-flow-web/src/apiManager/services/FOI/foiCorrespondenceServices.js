@@ -1,4 +1,4 @@
-import { httpGETRequest, httpPOSTRequest } from "../../httpRequestHandler";
+import { httpGETRequest, httpPOSTRequest, httpPOSTRequestBlobResponse } from "../../httpRequestHandler";
   import UserService from "../../../services/UserService";
 import API from "../../endpoints";
   import {
@@ -16,9 +16,9 @@ export const fetchApplicantCorrespondence = (
   ministryId,
   errorCallback = null
 ) => {
-  
+
   if (ministryId == null) {
-    return () => {};
+    ministryId = 'None'
   }
   const apiUrl = replaceUrl(replaceUrl(
     API.FOI_GET_EMAIL_CORRESPONDENCE,
@@ -55,7 +55,7 @@ export const saveEmailCorrespondence = (
   errorCallback,
 ) => {
   if (!ministryId) {
-    dispatch(serviceActionError("No request id"));
+    ministryId = 'None';
   }
   dispatch(setFOICorrespondenceLoader(true));
   const apiUrl = replaceUrl(replaceUrl(
@@ -79,6 +79,236 @@ export const saveEmailCorrespondence = (
       catchError(error, dispatch);
       if (errorCallback) {
         errorCallback("An error occured while trying to send email to applicant");
+      }
+    });
+};
+
+export const saveDraftCorrespondence = (
+  data,
+  requestId,
+  ministryId,
+  dispatch,
+  callback,
+  errorCallback,
+) => {
+  if (!ministryId) {
+    ministryId = 'None';
+  }
+  dispatch(setFOICorrespondenceLoader(true));
+  const apiUrl = replaceUrl(replaceUrl(
+    API.FOI_POST_DRAFT_EMAIL_CORRESPONDENCE,
+    "<ministryrequestid>",
+    ministryId),"<requestid>",requestId
+  );
+  httpPOSTRequest(apiUrl, data)
+    .then((res) => {
+      if (res.data) {
+        if (callback) {
+          callback(res.data);
+        }
+      } else {
+        dispatch(serviceActionError(res));
+        throw new Error();
+      }
+    })
+    .catch((error) => {
+      console.log("An error occured while trying to send email to applicant", error);
+      catchError(error, dispatch);
+      if (errorCallback) {
+        errorCallback("An error occured while trying to send email to applicant");
+      }
+    });
+};
+
+
+export const editDraftCorrespondence = (
+  data,
+  requestId,
+  ministryId,
+  dispatch,
+  callback,
+  errorCallback,
+) => {
+  if (!ministryId) {
+    ministryId = 'None';
+  }
+  dispatch(setFOICorrespondenceLoader(true));
+  const apiUrl = replaceUrl(replaceUrl(
+    API.FOI_EDIT_DRAFT_EMAIL_CORRESPONDENCE,
+    "<ministryrequestid>",
+    ministryId),"<requestid>",requestId
+  );
+  httpPOSTRequest(apiUrl, data)
+    .then((res) => {
+      if (res.data) {
+        if (callback) {
+          callback(res.data);
+        }
+      } else {
+        dispatch(serviceActionError(res));
+        throw new Error();
+      }
+    })
+    .catch((error) => {
+      console.log("An error occured while trying to send email to applicant", error);
+      catchError(error, dispatch);
+      if (errorCallback) {
+        errorCallback("An error occured while trying to send email to applicant");
+      }
+    });
+};
+
+export const deleteDraftCorrespondence = (
+  correspondenceid,
+  israwrequest,
+  ministryId,
+  requestId,
+  dispatch,
+  callback,
+  errorCallback,
+) => {
+  if (!ministryId) {
+    ministryId = 'None';
+  }
+  dispatch(setFOICorrespondenceLoader(true));
+  let apiUrl = replaceUrl(replaceUrl(
+    API.FOI_DELETE_DRAFT_EMAIL_CORRESPONDENCE,
+    "<ministryrequestid>",
+    ministryId),"<correspondenceid>", correspondenceid,
+
+  );
+  apiUrl = replaceUrl(apiUrl,"<rawrequestid>",requestId);
+  httpPOSTRequest(apiUrl,{israwrequest: israwrequest})
+    .then((res) => {
+      if (res.data) {
+        if (callback) {
+          callback(res.data);
+        }
+      } else {
+        dispatch(serviceActionError(res));
+        throw new Error();
+      }
+    })
+    .catch((error) => {
+      console.log("An error occured while trying to send email to applicant", error);
+      catchError(error, dispatch);
+      if (errorCallback) {
+        errorCallback("An error occured while trying to send email to applicant");
+      }
+    });
+};
+
+export const deleteResponseCorrespondence = (
+  correspondenceid,
+  israwrequest,
+  ministryId,
+  requestId,
+  dispatch,
+  callback,
+  errorCallback,
+) => {
+  if (!ministryId) {
+    ministryId = 'None';
+  }
+  dispatch(setFOICorrespondenceLoader(true));
+  let apiUrl = replaceUrl(replaceUrl(
+    API.FOI_DELETE_RESPONSE_EMAIL_CORRESPONDENCE,
+    "<ministryrequestid>",
+    ministryId),"<correspondenceid>", correspondenceid,
+
+  );
+  apiUrl = replaceUrl(apiUrl,"<rawrequestid>",requestId);
+  httpPOSTRequest(apiUrl,{israwrequest: israwrequest})
+    .then((res) => {
+      if (res.data) {
+        if (callback) {
+          callback(res.data);
+        }
+      } else {
+        dispatch(serviceActionError(res));
+        throw new Error();
+      }
+    })
+    .catch((error) => {
+      console.log("An error occured while trying to delete the response correspondence", error);
+      catchError(error, dispatch);
+      if (errorCallback) {
+        errorCallback("An error occured while trying to delete the response correspondence");
+      }
+    });
+};
+
+export const saveCorrespondenceResponse = (
+  data,
+  ministryId,
+  requestId,
+  dispatch,
+  callback,
+  errorCallback,
+) => {
+  if (!ministryId) {
+    ministryId = 'None';
+  }
+  dispatch(setFOICorrespondenceLoader(true));
+  const apiUrl = replaceUrl(replaceUrl(
+    API.FOI_POST_RESPONSE_EMAIL_CORRESPONDENCE,
+    "<ministryrequestid>",
+    ministryId), 
+    "<rawrequestid>", requestId);
+  httpPOSTRequest(apiUrl, data)
+    .then((res) => {
+      if (res.data) {
+        if (callback) {
+          callback(res.data);
+        }
+      } else {
+        dispatch(serviceActionError(res));
+        throw new Error();
+      }
+    })
+    .catch((error) => {
+      console.log("An error occured while trying to save response from applicant", error);
+      catchError(error, dispatch);
+      if (errorCallback) {
+        errorCallback("An error occured while trying to save response from applicant");
+      }
+    });
+};
+
+export const updateApplicantCorrespondence = (
+  data,
+  ministryId,
+  requestId,
+  dispatch,
+  callback,
+  errorCallback,
+) => {
+  if (!ministryId) {
+    ministryId = 'None';
+  }
+  dispatch(setFOICorrespondenceLoader(true));
+  const apiUrl = replaceUrl(replaceUrl(
+    API.FOI_UPDATE_APPLICANT_CORRESPONDENCE,
+    "<ministryrequestid>",
+    ministryId), 
+    "<requestid>", requestId
+  );
+  httpPOSTRequest(apiUrl, data)
+    .then((res) => {
+      if (res.data) {
+        if (callback) {
+          callback(res.data);
+        }
+      } else {
+        dispatch(serviceActionError(res));
+        throw new Error();
+      }
+    })
+    .catch((error) => {
+      console.log("An error occured while trying to update the correspondence", error);
+      catchError(error, dispatch);
+      if (errorCallback) {
+        errorCallback("An error occured while trying to update the correspondence");
       }
     });
 };
@@ -107,4 +337,87 @@ export const fetchApplicantCorrespondenceTemplates = (
         }
       });
     };
+};
+
+export const fetchEmailTemplate = (
+  dispatch,
+  data,
+  callback,
+  errorCallback = null,
+) => {
+  const apiUrl = API.FOI_GET_EMAIL_TEMPLATE;
+  httpPOSTRequest(apiUrl, data, UserService.getToken())
+  .then((res) => {
+    if (res.data) {
+      callback(res.data);
+    } else {
+      console.log("empty response for fetching an email template")
+      dispatch(serviceActionError(res));
+      throw new Error();
+    }
+  })
+  .catch((error) => {
+    console.log("An error occured while trying to load a sfdt template", error);
+    catchError(error, dispatch);
+    if (errorCallback) {
+      errorCallback("An error occured while trying to load a sfdt template");
+    }
+  });
+};
+
+export const exportSFDT = (
+  dispatch,
+  data,
+  callback,
+  errorCallback = null,
+) => {
+  // console.log("data: ", data);
+  const apiUrl = API.FOI_EXPORT_SFDT;
+  // console.log("apiUrl: ", apiUrl);
+  httpPOSTRequest(apiUrl, data, UserService.getToken())
+  .then((res) => {
+    // console.log("res: ", res);
+    if (res.data) {
+      callback(res.data);
+    } else {
+      console.log("empty response for fetching a file")
+      dispatch(serviceActionError(res));
+      throw new Error();
+    }
+  })
+  .catch((error) => {
+    console.log("An error occured while trying to load a file", error);
+    catchError(error, dispatch);
+    if (errorCallback) {
+      errorCallback("An error occured while trying to load a file");
+    }
+  });
+};
+
+export const exportPDF = (
+  dispatch,
+  data,
+  callback,
+  errorCallback = null,
+) => {
+  // console.log("data: ", data);
+  const apiUrl = API.FOI_EXPORT_PDF;
+  // console.log("apiUrl: ", apiUrl);
+  httpPOSTRequestBlobResponse(apiUrl, data, UserService.getToken())
+  .then((res) => {
+    if (res.data) {
+      callback(res.data);
+    } else {
+      console.log("empty response for fetching a pdf file")
+      dispatch(serviceActionError(res));
+      throw new Error();
+    }
+  })
+  .catch((error) => {
+    console.log("An error occured while trying to load a pdf file", error);
+    catchError(error, dispatch);
+    if (errorCallback) {
+      errorCallback("An error occured while trying to load a pdf file");
+    }
+  });
 };

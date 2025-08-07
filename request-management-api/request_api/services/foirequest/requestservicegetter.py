@@ -18,6 +18,7 @@ from request_api.services.programareaservice import programareaservice
 from request_api.utils.commons.datetimehandler import datetimehandler
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.utils.enums import StateName
+from request_api.models.OperatingTeamEmails import OperatingTeamEmail
 
 class requestservicegetter:
     """ This class consolidates retrival of FOI request for actors: iao and ministry. 
@@ -119,7 +120,15 @@ class requestservicegetter:
         payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
         if approvedcfrfee is not None and approvedcfrfee != {}:
             requestdetails['cfrfee'] = approvedcfrfee
-            _totaldue = float(approvedcfrfee['feedata']['actualtotaldue']) if 'actualtotaldue' in approvedcfrfee['feedata'] and float(approvedcfrfee['feedata']['actualtotaldue']) > 0 else float(approvedcfrfee['feedata']['estimatedtotaldue'])
+
+            #_totaldue = float(approvedcfrfee['feedata']['actualtotaldue']) if 'actualtotaldue' in approvedcfrfee['feedata'] and float(approvedcfrfee['feedata']['actualtotaldue']) > 0 else float(approvedcfrfee['feedata']['estimatedtotaldue'])
+            if 'actualtotaldue' in approvedcfrfee['feedata'] and float(approvedcfrfee['feedata']['actualtotaldue']) > 0:
+                _totaldue = float(approvedcfrfee['feedata']['actualtotaldue'])
+            elif 'estimatedtotaldue' in approvedcfrfee['feedata']:
+                _totaldue = float(approvedcfrfee['feedata']['estimatedtotaldue'])
+            else:
+                _totaldue = 0
+                
             _balancedue = _totaldue - (float(cfrfee['feedata']['amountpaid']) + float(approvedcfrfee['feedata']['feewaiveramount']))
             requestdetails['cfrfee']['feedata']['amountpaid'] = cfrfee['feedata']['amountpaid']
             requestdetails['cfrfee']['feedata']["balanceDue"] = '{:.2f}'.format(_balancedue)
@@ -137,12 +146,18 @@ class requestservicegetter:
                 requestdetails['cfrfee']['feedata']['paymentdate'] = payment['created_at'][:10]
         return requestdetails
 
+    def getrawrequestidbyfoirequestid(self, foirequestid):
+        return FOIRequest.getrawrequestidbyfoirequestid(foirequestid)
+
     def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
         _receiveddate = parse(request['receiveddate'])
         axissyncdatenoneorempty =  self.__noneorempty(requestministry["axissyncdate"]) 
         linkedministryrequests= []
         if "linkedrequests" in requestministry and requestministry["linkedrequests"] is not None:
             linkedministryrequests = self.__assignministrynames(requestministry["linkedrequests"])
+        assignedgroupemail = OperatingTeamEmail.getoperatingteamemail(requestministry["assignedgroup"])
+        if assignedgroupemail is None:
+            assignedgroupemail = KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"])
         baserequestinfo = {
             'id': request['foirequestid'],
             'requestType': request['requesttype'],
@@ -153,7 +168,7 @@ class requestservicegetter:
             'receivedmodeid':request['receivedmode.receivedmodeid'],
             'receivedMode':request['receivedmode.name'],
             'assignedGroup': requestministry["assignedgroup"],
-            'assignedGroupEmail': KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"]),
+            'assignedGroupEmail': assignedgroupemail,
             'assignedTo': requestministry["assignedto"],
             'idNumber':requestministry["filenumber"],
             'axisRequestId': requestministry["axisrequestid"],
@@ -178,6 +193,7 @@ class requestservicegetter:
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'id':requestministry['foiministryrequestid'],'name':requestministry['programarea.name'],'selected':'true'}],
             'divisions': self.getdivisions(requestministrydivisions),
             'isoipcreview': requestministry['isoipcreview'] if (requestministry['isoipcreview'] not in (None, '') and requestministry['isoipcreview'] in (True, False)) else False,
+            'isphasedrelease': requestministry['isphasedrelease'] if (requestministry['isphasedrelease'] not in (None, '') and requestministry['isphasedrelease'] in (True, False)) else False,
             'isreopened': self.hasreopened(foiministryrequestid),
             'oipcdetails': self.getoipcdetails(foiministryrequestid, requestministry['version']),
             'onholdTransitionDate': self.getonholdtransition(foiministryrequestid),            
@@ -195,6 +211,7 @@ class requestservicegetter:
             'estimatedpagecount':requestministry['estimatedpagecount'],
             'estimatedtaggedpagecount':requestministry['estimatedtaggedpagecount'],
             'userrecordslockstatus': requestministry['userrecordslockstatus'],
+            'isconsultflag': requestministry['isconsultflag']
             
         }
         if requestministry['cfrduedate'] is not None:

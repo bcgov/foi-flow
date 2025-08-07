@@ -1,0 +1,40 @@
+#RequestDetails{
+    padding-bottom: 2%;
+    margin-bottom: 2%;
+    width: 100%;
+    .foi-request-description-history {
+        display: none;
+    }
+    .btn-description-history {
+        display: none !important;
+    }
+    .request-details-assignee {
+        font-weight: bold;
+        color: #003366;
+    }
+    #restrict-dropdown {
+        margin-top: 8px;
+    }
+    #request-flag-dropdown {
+        margin-top: 8px;
+    }
+}
+#CfrFormExport {
+    padding-bottom: 2%;
+    margin-bottom: 2%;
+    width: 100%;
+    .historyLabel{
+        font-weight: 600;
+        padding: 2px !important;
+    }
+    .foi-details-row{
+        page-break-inside: 'avoid';
+    }
+    .cfrAttributeValue{
+        font-size: 15px;
+        padding: 15px 2px;
+    }
+    .formLabel{
+        padding: 15px 2px !important;
+    }
+}

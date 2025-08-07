@@ -43,6 +43,7 @@ from .fee import API as FEE_API
 from .foinotification import API as FOINOTIFICATION_API
 from .foirecord import API as FOIRECORD_API
 from .foicfrfee import API as FOICFRFEE_API
+from .foiapplicationfee import API as FOIAPPLICATIONFEE_API
 from .foiemail import API as FOIEMAIL_API
 from .foipayment import API as FOIPAYMENT_API
 from .applicantcorrespondence import API as APPLICANTCORRESPONDENCE_API
@@ -52,6 +53,7 @@ from .foiuser import API as FOIUSER_API
 from .foiapplicant import API as APPLICANT_API
 from .foiaxissync import API as FOIAXISSYNC_API
 from .foiopeninfo import API as FOIOPENINFO_API
+from .solrauth import API as FOISolr
 
 __all__ = ('API_BLUEPRINT')
 
@@ -89,6 +91,7 @@ API.add_namespace(FEE_API,'/api')
 API.add_namespace(FOINOTIFICATION_API,'/api')
 API.add_namespace(FOIRECORD_API,'/api')
 API.add_namespace(FOICFRFEE_API, '/api')
+API.add_namespace(FOIAPPLICATIONFEE_API, '/api')
 API.add_namespace(FOIEMAIL_API, '/api')
 API.add_namespace(FOIPAYMENT_API, '/api')
 API.add_namespace(APPLICANTCORRESPONDENCE_API, '/api')
@@ -98,3 +101,4 @@ API.add_namespace(FOIUSER_API, '/api')
 API.add_namespace(APPLICANT_API, '/api')
 API.add_namespace(FOIAXISSYNC_API, '/api')
 API.add_namespace(FOIOPENINFO_API, '/api')
+API.add_namespace(FOISolr, '/api')

@@ -34,7 +34,8 @@ import {
   fetchOpenInfoPublicationStatuses,
   fetchOpenInfoStatuses,
   fetchOpenInfoExemptions,
-  fetchFOICommentTypes
+  fetchFOICommentTypes,
+  fetchFOIEmailTemplates
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
@@ -64,7 +65,9 @@ import {
   fetchHistoricalRecords,
   fetchPDFStitchStatusForConsults,
   fetchPDFStitchedPackage,
-  fetchPDFStitchedStatus
+  fetchPDFStitchedStatus,
+  fetchPDFStitchStatusesForPhasedRedlines,
+  fetchPDFStitchStatusesForPhasedResponsePackages,
 } from "../../../apiManager/services/FOI/foiRecordServices";
 import {
   fetchFOIOpenInfoAdditionalFiles,
@@ -78,7 +81,6 @@ import "./TabbedContainer.scss";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { CommentSection } from "../customComponents/Comments";
 import { AttachmentSection } from "../customComponents/Attachments";
-import { CFRForm } from "../customComponents/CFRForm";
 import { ContactApplicant } from "../customComponents/ContactApplicant";
 import Loading from "../../../containers/Loading";
 import clsx from "clsx";
@@ -106,7 +108,9 @@ import {
   ConditionalComponent,
   formatDate,
   isRequestRestricted,
-  getCommentTypeIdByName
+  convertSTRToDate,
+  getCommentTypeIdByName,
+  isMinistryLogin
 } from "../../../helper/FOI/helper";
 import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
@@ -124,6 +128,8 @@ import { setFOIRequestDetail, setFOIPDFStitchedOIPackage, setFOIPDFStitchStatusF
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
+import RequestHistorySection from "../customComponents/RequestHistory";
+import { Fees } from "../customComponents/Fees";
 import OpenInfo from "./OpenInformation/OpenInfo";
 
 const useStyles = makeStyles((theme) => ({
@@ -161,6 +167,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
   );
+
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   let requestExtensions = useSelector(
     (state) => state.foiRequests.foiRequestExtesions
@@ -188,6 +195,12 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let CFRFormHistoryLength = useSelector(
     (state) => state.foiRequests.foiRequestCFRFormHistory.length
   );
+  let foiRequestCFRFormHistory = useSelector(
+    (state) => state.foiRequests.foiRequestCFRFormHistory
+  );
+  let foiRequestCFRForm = useSelector(
+    (state) => state.foiRequests.foiRequestCFRForm
+  );
   // let requestRecords = useSelector(
   //   (state) => state.foiRequests.foiRequestRecords
   // );
@@ -209,8 +222,14 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [unsavedPrompt, setUnsavedPrompt] = useState(false);
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
   const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes);
-
-  const activePublicationRequest = !SKIP_OPENINFO_MINISTRIES.split(",").includes(requestDetails?.bcgovcode?.toUpperCase()) && requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL;
+  const activePublicationRequest = !SKIP_OPENINFO_MINISTRIES.split(",").includes(requestDetails?.bcgovcode?.toUpperCase()) && 
+                                      requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL;
+  
+  let isMinistry = false;
+  const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
+  if (Object.entries(userDetail).length !== 0) {
+    isMinistry = isMinistryLogin(userGroups);
+  }
 
   const handleUnsavedContinue = () => {
     window.removeEventListener("popstate", handleOnHashChange);
@@ -257,7 +276,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       display: false,
       active: false,
     },
-    CFRForm: {
+    Fees: {
       display: false,
       active: false,
     },
@@ -270,6 +289,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       active: false,
     },
     OpenInformation: {
+      display: false,
+      active: false,
+    },
+    RequestHistory: {
       display: false,
       active: false,
     },
@@ -336,7 +359,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   useEffect(async () => {
     if (isAddRequest) {
-      dispatch(fetchFOIAssignedToList("", "", ""));
+      let isbcpsteam = false;
+      if (userGroups.includes('BCPS Team')) isbcpsteam = true;
+      dispatch(fetchFOIAssignedToList("", "", "", isbcpsteam));
       dispatch(fetchFOIProgramAreaList());
     } else if (isHistoricalRequest) {
       dispatch(fetchHistoricalRequestDetails(requestId));
@@ -346,7 +371,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     } else {
       await Promise.all([
         dispatch(fetchFOIProgramAreaList()),
-        dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId)),
+        dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId, userGroups)),
         dispatch(fetchFOIRequestDescriptionList(requestId, ministryId)),
       ]);
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
@@ -368,6 +393,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           }
         })
       );
+      dispatch(fetchFOIEmailTemplates());
     }
 
     dispatch(fetchFOICategoryList());
@@ -399,6 +425,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   useEffect(() => {
     if (activePublicationRequest) {
       dispatch(fetchFOIOpenInfoRequest(ministryId));
+    }
+    if (requestDetails?.isphasedrelease) {
+      dispatch(fetchPDFStitchStatusesForPhasedRedlines(requestId, ministryId));
+      dispatch(fetchPDFStitchStatusesForPhasedResponsePackages(requestId, ministryId));
     }
   }, [requestId, ministryId, requestDetails])
 
@@ -479,6 +509,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       setIsOIPCReview(false);
     }
   }, [oipcData])
+
+  
 
   
   useEffect(() => {
@@ -866,6 +898,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     }
   }
 
+  const handleConsultFlagChange = (isSelected) => {
+    requestDetails.isconsultflag = isSelected;
+    createSaveRequestObject('isconsultflag', isSelected);
+  }
+
   //handle email validation
   const [validation, setValidation] = React.useState({});
   const handleEmailValidation = (validationObj) => {
@@ -898,6 +935,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     _currentrequestStatus,
     oipcData,
     requestDetails.isoipcreview,
+    requestDetails.isconsultflag
   );
 
   const classes = useStyles();
@@ -915,7 +953,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const createSaveRequestObject = (name, value, value2) => {
     let requestObject = { ...saveRequestObject };
-    if (name !== "assignedTo") {
+    if (name !== "assignedTo" && name !== "isphasedrelease") {
       setUnSavedRequest(
         name !== FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES
       );
@@ -934,6 +972,12 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
+
+    if (_state?.toLowerCase() === StateEnum.unopened.name.toLowerCase() && 
+      (saveRequestObject.isconsultflag === null || saveRequestObject.isconsultflag === undefined)) {
+      saveRequestObject.isconsultflag = false;
+    }
+
     if (!_unSaved) {
       setUnSavedRequest(_unSaved);
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
@@ -1115,14 +1159,18 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     return false;
   };
 
-  const showCFRTab = () => {
-    return (
-      requestState !== StateEnum.intakeinprogress.name &&
-      requestState !== StateEnum.unopened.name &&
-      requestState !== StateEnum.open.name &&
-      requestDetails?.requestType ===
-        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
-    );
+  const showFeesTab = () => {
+    if (isMinistry) {
+      return (
+        requestState !== StateEnum.intakeinprogress.name &&
+        requestState !== StateEnum.unopened.name &&
+        requestState !== StateEnum.open.name &&
+        requestDetails?.requestType ===
+          FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
+      );
+    } else {
+      return (requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL);
+    }
   };
 
   const showContactApplicantTab = () => {
@@ -1133,6 +1181,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestState !== StateEnum.appfeeowing.name &&
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
+  
   const showOpenInformationTab = () => {
     return (
       activePublicationRequest &&
@@ -1140,13 +1189,43 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestState !== StateEnum.unopened.name
     );
   } 
-  const getCommentsCount = () => {
-    
-      let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
-            c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
-      return '('+commentsCount+')'
 
-  }
+  const getHistoryCount = () => {
+    let historyCount= visibleCorrespondence.length + requestNotes.filter(
+            c => c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
+                c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review")
+        ).length;
+    return '('+historyCount+')'
+  } 
+
+  const getMergedHistory = (applicantCorrespondence, requestNotes) => {
+    const mergedHistory = [
+      ...(applicantCorrespondence || []).map((message) => ({
+        ...message,
+        type: 'message',
+        created_at: message.date ? convertSTRToDate(message.date) : message.date
+      })),
+      ...(requestNotes || []).map((comment) => ({
+        ...comment,
+        type: 'comment'
+      }))
+    ];
+
+    return mergedHistory.sort((a, b) => {
+      const dateA = new Date(a.created_at || a.dateUF);
+      const dateB = new Date(b.created_at || b.dateUF);
+      return dateA - dateB || (a.commentId || a.applicantcorrespondenceid || 0) - (b.commentId || b.applicantcorrespondenceid || 0);
+    });
+  };
+  const getCommentsCount = () => {
+    let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
+          c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
+    return '('+commentsCount+')'
+
+}
+  const visibleCorrespondence = applicantCorrespondence?.filter(
+    (c) => c.category !== 'draft'
+  ) || [];
 
   const getOIRequestState = () => {
     if (requestDetails?.oistatusid) {
@@ -1181,6 +1260,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               isValidationError={isValidationError}
               requestType={requestDetails?.requestType}
               isOITeam={isOITeam}
+              isDivisionalCoordinator={false}
+              isHistoricalRequest={isHistoricalRequest}
+              consultflag={requestDetails?.isconsultflag}
             />
           </div>
 
@@ -1196,15 +1278,15 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
             </div>
             {!isAddRequest && (
               <>
-                {showCFRTab() && (
+                {showFeesTab() && (
                   <div
                     className={clsx("tablinks", {
-                      active: tabLinksStatuses.CFRForm.active,
+                      active: tabLinksStatuses.Fees.active,
                     })}
-                    name="CFRForm"
-                    onClick={() => tabclick("CFRForm")}
+                    name="Fees"
+                    onClick={() => tabclick("Fees")}
                   >
-                    CFR Form
+                    Fees
                     {CFRFormHistoryLength > 0
                       ? ` (${CFRFormHistoryLength})`
                       : ""}
@@ -1255,7 +1337,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     Publication
                   </div>
                 )}
-                {showContactApplicantTab() && (
+                {
                   <div
                     className={clsx("tablinks", {
                       active: tabLinksStatuses.ContactApplicant.active,
@@ -1263,14 +1345,24 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     name="ContactApplicant"
                     onClick={() => tabclick("ContactApplicant")}
                   >
-                    Contact Applicant{" "}
-                    {applicantCorrespondence?.length > 0
-                      ? `(${applicantCorrespondence.length})`
+                    Communications{" "}
+                    {visibleCorrespondence?.length > 0
+                      ? `(${visibleCorrespondence.length})`
                       : ""}
                   </div>
-                )}
+                }
               </>
             )}
+            <div
+              className={clsx("tablinks", {
+                active: tabLinksStatuses.RequestHistory.active,
+              })}
+              name="RequestHistory"
+              onClick={() => tabclick("RequestHistory")}
+            >
+              Request History{" "}
+              {getHistoryCount()}
+            </div>
           </div>
 
           <div className="foileftpanelstatus">
@@ -1385,7 +1477,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         isMinistry={false}
                         isAddRequest={isAddRequest}
                         handleOipcReviewFlagChange={handleOipcReviewFlagChange}
-                        showOipcReviewFlag={requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()}
+                        showFlags={requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()}
+                        showConsultFlag={requestState.toLowerCase() == StateEnum.unopened.name.toLowerCase() || (requestDetails.isconsultflag === true)}
+                        handleConsultFlagChange={handleConsultFlagChange}
                       />
                       {(isAddRequest ||
                         requestState === StateEnum.unopened.name) && (
@@ -1573,22 +1667,24 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               <Loading />
             )}
           </div>
-          {showCFRTab() && (
+          {showFeesTab() && (
             <div
-              id="CFRForm"
+              id="Fees"
               className={clsx("tabcontent", {
-                active: tabLinksStatuses.CFRForm.active,
-                [classes.displayed]: tabLinksStatuses.CFRForm?.display,
-                [classes.hidden]: !tabLinksStatuses.CFRForm?.display,
+                active: tabLinksStatuses.Fees.active,
+                [classes.displayed]: tabLinksStatuses.Fees?.display,
+                [classes.hidden]: !tabLinksStatuses.Fees?.display,
               })}
             >
-              <CFRForm
+              <Fees
                 requestNumber={requestNumber}
                 requestState={requestState}
+                requestDetails={requestDetails}
                 userDetail={userDetail}
                 ministryId={ministryId}
                 requestId={requestId}
                 setCFRUnsaved={setCFRUnsaved}
+                handleStateChange={handleStateChange}
               />
             </div>
           )}
@@ -1791,6 +1887,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   setLockRecordsTab={setLockRecordsTab}
                   validLockRecordsState={validLockRecordsState}
                   setSaveRequestObject={setSaveRequestObject}
+                  isPhasedRelease={requestDetails.isphasedrelease}
                 />
               </>
             )}
@@ -1816,7 +1913,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               />
             </div>
           )}
-          {showContactApplicantTab() && (
+          {
             <div
               id="ContactApplicant"
               className={clsx("tabcontent", {
@@ -1830,13 +1927,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   <ContactApplicant
                     requestNumber={requestNumber}
                     requestState={requestState}
-                    userDetail={userDetail}
                     ministryId={ministryId}
                     ministryCode={requestDetails.bcgovcode}
                     applicantCorrespondence={applicantCorrespondence}
-                    applicantCorrespondenceTemplates={
-                      applicantCorrespondenceTemplates
-                    }
                     requestId={requestId}
                   />
                 </>
@@ -1844,7 +1937,49 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 <Loading />
               )}
             </div>
-          )}
+          }
+          <div
+            id="RequestHistory"
+            className={clsx("tabcontent", {
+              active: tabLinksStatuses.RequestHistory.active,
+              [classes.displayed]: tabLinksStatuses.RequestHistory?.display,
+              [classes.hidden]: !tabLinksStatuses.RequestHistory?.display,
+            })}
+          >
+            {!isLoading && (requestNotes || applicantCorrespondence) ? (
+              <>
+                <RequestHistorySection
+                  requestHistoryArray={getMergedHistory(visibleCorrespondence, requestNotes)}
+                  currentUser={
+                    userId && {
+                      userId: userId,
+                      avatarUrl: avatarUrl,
+                      name: fullName,
+                    }
+                  }
+                  bcgovcode={bcgovcode}
+                  requestid={requestId}
+                  iaoassignedToList={iaoassignedToList}
+                  ministryAssignedToList={ministryAssignedToList}
+                  requestNumber={requestNumber}
+                  isRestricted={isRequestRestricted(requestDetails, ministryId)}
+                  isMinistry={false}
+                  commentTypes={commentTypes}
+                  ministryId={ministryId}
+                  applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
+                  setComment={setComment}
+                  requestDetails={requestDetails}
+                  requestState={requestState}
+                  foiRequestCFRFormHistory={foiRequestCFRFormHistory}
+                  foiRequestCFRForm={foiRequestCFRForm}
+                  applicantCorrespondence={applicantCorrespondence}
+                  requestNotes={requestNotes}
+                />
+              </>
+            ) : (
+              <Loading />
+            )}
+          </div>
           <UnsavedModal
             modalOpen={unsavedPrompt}
             handleClose={() => setUnsavedPrompt(false)}

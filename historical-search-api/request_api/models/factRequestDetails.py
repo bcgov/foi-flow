@@ -191,8 +191,10 @@ class factRequestDetails(db.Model):
                     if (requesttype == 'oipc'): requesttype = 'review' 
                     requesttypecondition.append("LOWER(requesttypename) like '%{0}%'".format(requesttype))
                 basequery+= (' (' +' OR '.join(requesttypecondition) + ')')
+                if (len(filterbysearchcondition) > 0):
+                    basequery+= ' AND '
 
-            conditioncount = len(filterbysearchcondition + requesttypecondition) 
+            conditioncount = len(filterbysearchcondition) 
 
             for idx,searchcondition in enumerate(filterbysearchcondition):                                
                 basequery+= ' {0} '.format(searchcondition)
@@ -200,9 +202,24 @@ class factRequestDetails(db.Model):
                 if(idx!=(conditioncount-1)):
                     basequery+= ' AND '
 
+            datefilter = params.get('daterangetype')
+            if (datefilter):
+                query = ''
+                if len(filterbysearchcondition + requesttypecondition) > 0:
+                   query += ' AND '
+                if params.get('fromdate'):
+                    query += (''' {0} >= \'''' + params.get('fromdate') + '\' AND') 
+                if params.get('todate'):
+                    query += (''' {0} <= \'''' + params.get('todate') + '\'') 
+                if (datefilter == 'receivedDate'):
+                    query = query.format('receiveddate')
+                if (datefilter == 'duedate'):
+                    query = query.format('targetdate')
+                if (datefilter == 'closedate'):
+                    query = query.format('closeddate')
+                basequery += query
             
-            
-            if(conditioncount == 0): # if no conditions have been set so far, then any other conditions do not apply to historical search, so return empty array
+            if(len(filterbysearchcondition + requesttypecondition) == 0 and not datefilter): # if no conditions have been set so far, then any other conditions do not apply to historical search, so return empty array
                 return {'results': [], 'count': 0}
 
             if(isiaorestictedmanager == False):

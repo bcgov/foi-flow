@@ -1,6 +1,7 @@
 import {
     httpGETRequest,
-    httpPOSTRequest
+    httpPOSTRequest,
+    httpOpenGETRequest
   } from "../../httpRequestHandler";
   import API from "../../endpoints";
   import {
@@ -32,7 +33,8 @@ import {
     setOIExemptions,
     setOIPublicationStatuses,
     setOIStatuses,
-    setFOICommentTypes
+    setFOICommentTypes,
+    setFOIEmailTemplates
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone, catchError } from "./foiServicesUtil";
   import UserService from "../../../services/UserService";
@@ -95,8 +97,9 @@ import {
   };
   
   
-  export const fetchFOIAssignedToList = (requestType, status, bcgovcode) => {
+  export const fetchFOIAssignedToList = (requestType, status, bcgovcode, isagbcpsteam = false) => {
     let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API;
+    if (isagbcpsteam) apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_BCPSWITHINTAKEGROUP_LIST_API
     if (requestType && status) {
       if (bcgovcode) {
       apiUrlGETAssignedToList = replaceUrl(replaceUrl(replaceUrl(
@@ -607,6 +610,25 @@ import {
     };
   };
 
+  export const refreshRedisCacheForTemplate = (...rest) => {
+    const done = fnDone(rest);
+    return (dispatch) => {
+      httpPOSTRequest(API.FOI_REFRESH_REDIS_CACHE_TEMPLATE,{}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            throw new Error("Error Refreshing Cache");
+          }
+        })
+        .catch((error) => {
+          done(error);
+          catchError(error, dispatch);
+        });
+    };
+  };
+
   export const fetchOIPCOutcomes = () => {    
     return (dispatch) => {
       httpGETRequest(API.FOI_GET_OIPC_OUTCOMES, {}, UserService.getToken())
@@ -785,6 +807,26 @@ import {
         });
     };
   };
-
-
+  
+  export const fetchFOIEmailTemplates = () => {
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_EMAIL_TEMPLATES, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const foiEmailTemplates = res.data;
+            dispatch(setFOIEmailTemplates(foiEmailTemplates));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching email templates master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching email templates master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  };
   

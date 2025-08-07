@@ -408,6 +408,13 @@ export const setRequestCFRFormHistory = (data) => (dispatch) => {
   });
 };
 
+export const setRequestApplicationFeeForm = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICATION_FEE_FORM,
+    payload: data,
+  });
+};
+
 export const setApplicantCorrespondence = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_CORRESPONDENCE,
@@ -575,6 +582,48 @@ export const setFOICommentTypes = (data) => (dispatch) => {
     payload: data,
   });
 };
+
+export const setFOIEmailTemplates = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_EMAIL_TEMPLATES,
+    payload: data,
+  });
+};
+
+export const setFOIPDFStitchStatusesForPhasedRedlines = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUSES_FOR_PHASEDREDLINES,
+    payload: data
+  });
+}
+
+export const setFOIPDFStitchedRecordsForPhasedRedlines = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORDS_FOR_PHASEDREDLINES,
+    payload: data
+  });
+}
+
+export const setShowKeywordSearch = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.SHOW_KEYWORD_SEARCH,
+    payload: data,
+  });
+};
+
+export const setFOIPDFStitchStatusesForPhasedResponsePackages = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUSES_FOR_PHASEDRESPONSEPACKAGES,
+    payload: data
+  });
+}
+
+export const setFOIPDFStitchedRecordsForPhasedResponsePackages = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORDS_FOR_PHASEDRESPONSEPACKAGES,
+    payload: data
+  });
+}
 
 export const setFOIOpenInfoAdditionalFiles = (data) => (dispatch) => {
   dispatch({

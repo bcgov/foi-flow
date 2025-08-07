@@ -65,6 +65,7 @@ class dashboardservice:
         baserequestinfo.update({'bcgovcode': request.bcgovcode})
         isoipcreview = request.isoipcreview if request.isoipcreview == True else False
         baserequestinfo.update({'isoipcreview': isoipcreview})
+        baserequestinfo.update({'isphasedrelease': request.isphasedrelease if request.isphasedrelease == True else False})
         return baserequestinfo
         
     def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, axisrequestid, version, description, fromdate, todate):
@@ -170,6 +171,7 @@ class dashboardservice:
             _openrequest.update({'isministryrestricted': isministryrestricted})
             isoipcreview = request.isoipcreview if request.isoipcreview == True else False
             _openrequest.update({'isoipcreview': isoipcreview})
+            _openrequest.update({'isphasedrelease': request.isphasedrelease if request.isphasedrelease == True else False})
             requestqueue.append(_openrequest)
 
         meta = {
@@ -204,6 +206,7 @@ class dashboardservice:
                 unopenrequest.update({'description':request.description})
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 unopenrequest.update({'isiaorestricted': request.isiaorestricted})
+                unopenrequest.update({'closereason': request.closereason})
 
                 requestqueue.append(unopenrequest)
             else:
@@ -216,6 +219,7 @@ class dashboardservice:
 
                 isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
                 _openrequest.update({'isiaorestricted': isiaorestricted})
+                _openrequest.update({'closereason': request.closereason})
 
                 requestqueue.append(_openrequest)
 
