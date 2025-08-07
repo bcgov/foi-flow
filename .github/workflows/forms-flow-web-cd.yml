@@ -107,4 +107,5 @@ jobs:
       - name: Rollout Restart Deployment
         shell: bash
         run: |
-          oc rollout latest deploymentconfig/forms-flow-web-rook
+          oc project d7abee-dev
+          oc rollout latest dc/forms-flow-web-rook
