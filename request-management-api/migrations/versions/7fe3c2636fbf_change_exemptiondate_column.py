@@ -20,4 +20,4 @@ def upgrade():
     op.execute('ALTER TABLE public."FOIOpenInformationRequests" RENAME COLUMN oiexemptiondate TO receiveddate;')
 
 def downgrade():
-    op.execute('ALTER TABLE public."FOIOpenInformationRequests" RENAME COLUMN oiexemptiondate TO receiveddate;')
+    op.execute('ALTER TABLE public."FOIOpenInformationRequests" RENAME COLUMN receiveddate TO oiexemptiondate;')
