@@ -44,6 +44,7 @@ class FOIRawRequest(db.Model):
     ispiiredacted = db.Column(db.Boolean, unique=False, nullable=False,default=False)    
     closedate = db.Column(db.DateTime, nullable=True)    
     requirespayment = db.Column(db.Boolean, unique=False, nullable=True, default=False)
+    isconsultflag = db.Column(db.Boolean, unique=False, nullable=False, default=False)
     
     axissyncdate = db.Column(db.DateTime, nullable=True)    
     axisrequestid = db.Column(db.String(120), nullable=True)
@@ -58,9 +59,9 @@ class FOIRawRequest(db.Model):
     assignee = relationship('FOIAssignee', foreign_keys="[FOIRawRequest.assignedto]")
 
     @classmethod
-    def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, axisrequestid, axissyncdate, linkedrequests, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None)->DefaultMethodResult:        
+    def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, axisrequestid, axissyncdate, linkedrequests, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None, isconsultflag=False)->DefaultMethodResult:
         version = 1
-        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = StateName.unopened.value if sourceofsubmission != "intake" else StateName.intakeinprogress.value, requeststatuslabel = StateName.unopened.name if sourceofsubmission != "intake" else StateName.intakeinprogress.name, createdby=userid, version=version, sourceofsubmission=sourceofsubmission, assignedgroup=assigneegroup, assignedto=assignee, ispiiredacted=ispiiredacted, notes=notes, requirespayment=requirespayment, axisrequestid=axisrequestid, axissyncdate=axissyncdate, linkedrequests=linkedrequests)
+        newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = StateName.unopened.value if sourceofsubmission != "intake" else StateName.intakeinprogress.value, requeststatuslabel = StateName.unopened.name if sourceofsubmission != "intake" else StateName.intakeinprogress.name, createdby=userid, version=version, sourceofsubmission=sourceofsubmission, assignedgroup=assigneegroup, assignedto=assignee, ispiiredacted=ispiiredacted, notes=notes, requirespayment=requirespayment, axisrequestid=axisrequestid, axissyncdate=axissyncdate, linkedrequests=linkedrequests, isconsultflag=isconsultflag)
         if assignee is not None:
             FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
 
@@ -88,7 +89,9 @@ class FOIRawRequest(db.Model):
             closereasonid = _requestrawdata["closereasonid"] if 'closereasonid' in _requestrawdata  else None
             axisrequestid = _requestrawdata["axisRequestId"] if 'axisRequestId' in _requestrawdata  else None
             axissyncdate = _requestrawdata["axisSyncDate"] if 'axisSyncDate' in _requestrawdata  else None   
-            linkedrequests = _requestrawdata["linkedRequests"] if 'linkedRequests' in _requestrawdata  else None     
+            linkedrequests = _requestrawdata["linkedRequests"] if 'linkedRequests' in _requestrawdata  else None 
+            isconsultflag = _requestrawdata["isconsultflag"] if 'isconsultflag' in _requestrawdata  else False
+
             _version = request.version+1           
             insertstmt =(
                 insert(FOIRawRequest).
@@ -111,7 +114,8 @@ class FOIRawRequest(db.Model):
                     axisrequestid= axisrequestid,
                     axissyncdate=axissyncdate,
                     linkedrequests=linkedrequests,
-                    isiaorestricted = request.isiaorestricted
+                    isiaorestricted = request.isiaorestricted,
+                    isconsultflag = isconsultflag
                    
                 )
             )
@@ -606,6 +610,7 @@ class FOIRawRequest(db.Model):
             literal(None).label('isministryrestricted'),
             subjectcode,
             literal(None).label('isoipcreview'),
+            literal(None).label('isphasedrelease'),
             literal(None).label('oipc_number')
         ]
 
@@ -663,10 +668,11 @@ class FOIRawRequest(db.Model):
                         and_(
                             FOIRawRequest.status.notin_(['Archived']),
                             or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup.in_(ProcessingTeamWithKeycloackGroup.list()), FOIRawRequest.assignedgroup.in_(tuple(groups))), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
-                basequery = basequery.filter(
-                    and_(
-                        FOIRawRequest.status.notin_(['Archived']),
-                        or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup == "Intake Team"), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
+                else:
+                    basequery = basequery.filter(
+                        and_(
+                            FOIRawRequest.status.notin_(['Archived']),
+                            or_(and_(FOIRawRequest.isiaorestricted == False, FOIRawRequest.assignedgroup == "Intake Team"), and_(FOIRawRequest.isiaorestricted == True, FOIRawRequest.assignedto == userid))))
             return basequery.filter(FOIRawRequest.assignedto != None)
         else:
             if(isiaorestrictedfilemanager == True):
@@ -829,6 +835,7 @@ class FOIRawRequest(db.Model):
     @classmethod
     def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
         basequery = FOIRawRequest.getbasequery(None, userid, isiaorestrictedfilemanager)
+        basequery = basequery.add_columns(literal(None).label('closereason'))
 
         #filter/search
         filtercondition = FOIRawRequest.getfilterforadvancedsearch(params)
@@ -968,7 +975,7 @@ class FOIRawRequest(db.Model):
             if (flag.lower() == 'oipc'): # no results for raw oipc
                 requestflagscondition.append(FOIRawRequest.findfield('axisRequestId') == 'thisismeanttoreturnafilterconditionwith0results')
             if (flag.lower() == 'phased'):
-                # requestflagscondition.append(FOIMinistryRequest.findfield('isphasedrelease', iaoassignee, ministryassignee) == True)
+                requestflagscondition.append(FOIRawRequest.findfield('axisRequestId') == 'thisismeanttoreturnafilterconditionwith0results')
                 continue
         return requestflagscondition
 
@@ -991,9 +998,7 @@ class FOIRawRequest(db.Model):
             return FOIRawRequest.__getfilterforapplicantname(params)
         elif(params['search'] == 'assigneename'):
             return FOIRawRequest.__getfilterforassigneename(params)
-        elif(params['search'] == 'idnumber'):
-            return FOIRawRequest.__getfilterforidnumber(params)
-        elif(params['search'] == 'axisrequest_number'):
+        elif(params['search'] == 'idnumber' or params['search'] == 'axisrequest_number'):
             return FOIRawRequest.__getfilterforaxisnumber(params)
         else:
             searchcondition = []
@@ -1033,15 +1038,6 @@ class FOIRawRequest(db.Model):
             searchcondition2.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
             searchcondition3.append(FOIRawRequest.assignedgroup.ilike('%'+keyword+'%'))
         return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3))
-
-    @classmethod
-    def __getfilterforidnumber(cls,params):
-        searchcondition = []
-        for keyword in params['keywords']:
-            keyword = keyword.lower()
-            keyword = keyword.replace('u-00', '')
-            searchcondition.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))
-        return and_(*searchcondition)
     
     @classmethod
     def __getfilterforaxisnumber(cls,params):
@@ -1201,4 +1197,4 @@ class FOIRawRequest(db.Model):
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:
-        fields = ('requestid', 'requestrawdata', 'status', 'requeststatuslabel', 'notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'linkedrequests', 'closedate','isiaorestricted')
+        fields = ('requestid', 'requestrawdata', 'status', 'requeststatuslabel', 'notes','created_at','wfinstanceid','version','updated_at','assignedgroup','assignedto','updatedby','createdby','sourceofsubmission','ispiiredacted','assignee.firstname','assignee.lastname', 'axisrequestid', 'axissyncdate', 'linkedrequests', 'closedate','isiaorestricted','isconsultflag')

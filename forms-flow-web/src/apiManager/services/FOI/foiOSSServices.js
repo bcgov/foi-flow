@@ -164,4 +164,34 @@ import {
       });
     return response;
   };
+
+  export const downloadFileFromS3 = (headerDetails, ...rest) => {
+    const done = fnDone(rest);
+
+    const requestOptions = {
+      headers: {
+        "X-Amz-Date": headerDetails.amzdate,
+        Authorization: headerDetails.authheader,
+      },
+      responseType: "blob",
+      onDownloadProgress: rest[1],
+      validateStatus: () => true, // allows 404, 403 etc. without throwing
+    };
+
+    return httpOSSGETRequest(headerDetails.filepath, requestOptions)
+      .then((res) => {
+        if (res && res.status === 200) {
+          done(null, res);
+        } else {
+          // surface the error response, not just a string
+          done({ message: "File not found", status: res.status }, res);
+        }
+      })
+      .catch((error) => {
+        // Still catch actual network issues
+        console.error("S3 fetch failed:", error);
+        done(error, null);
+      });
+  };
+
   

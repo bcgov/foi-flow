@@ -62,6 +62,7 @@ export default function AttachmentModal({
   attachmentsArray,
   handleRename,
   handleReclassify,
+  handleChangeResponseDate,
   isMinistryCoordinator,
   uploadFor = "attachment",
   maxNoFiles,
@@ -78,7 +79,10 @@ export default function AttachmentModal({
     volume: "",
     trackingid: "",
     personaltag: "TBD"
-  }
+  },
+  currentResponseDate = "",
+  handleChangeResponseTitle,
+  retrieveSelectedRecords,
 }) {
   let tagList = [];
   if (uploadFor === "attachment") {
@@ -144,9 +148,28 @@ export default function AttachmentModal({
   const totalFileSize = multipleFiles
     ? MaxFileSizeInMB.totalFileSize
     : MaxFileSizeInMB.stateTransition;
+
+  // Formats the input date string with format "YYYY Mon DD | 00:00 AM" to "YYYY-MM-DD" for MUI datepicker
+  function formatDate(dateStr) {
+    if (!dateStr) return dateStr;
+    const parts = dateStr.split(' | ');
+    if (parts.length !== 2) return dateStr;
+    const datePart = parts[0];
+    const timePart = parts[1];
+    const date = new Date(`${datePart} ${timePart}`);
+    if (isNaN(date.getTime())) return dateStr; // ensure valid Date object created
+  
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const day = String(date.getDate()).padStart(2, '0');
+  
+    return `${year}-${month}-${day}`;
+  }
+
   const classes = useStyles();
   const [files, setFiles] = useState([]);
   const [newFilename, setNewFilename] = useState("");
+  const [newResponseDate, setNewResponseDate] = useState(formatDate(currentResponseDate));
   const [extension, setExtension] = useState("");
   const [errorMessage, setErrorMessage] = useState();
   const [tagValue, setTagValue] = useState(
@@ -165,6 +188,11 @@ export default function AttachmentModal({
     MinistryNeedsScanning.includes(bcgovcode) &&
       requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
   );
+  const [responseTitle, setResponseTitle] = useState("")
+
+  useEffect(() => {
+    setNewResponseDate(formatDate(currentResponseDate))
+  }, [currentResponseDate])
 
   useEffect(() => {
     parseFileName(attachment);
@@ -254,6 +282,14 @@ export default function AttachmentModal({
       );
     }
   };
+  const saveNewResponseDate = () => {
+    handleChangeResponseDate(newResponseDate);
+  };
+
+  const saveResponseTitle = (_responeTitleValue) => {
+    setResponseTitle(_responeTitleValue);
+    handleChangeResponseTitle(_responeTitleValue);
+  }
 
   const updateFilesCb = (_files, _errorMessage) => {
     setFiles(_files);
@@ -314,7 +350,10 @@ export default function AttachmentModal({
   const handleSave = () => {
     if (modalFor.toLowerCase() === "delete") {
       handleModal(true, null, null);
-    } else {
+    } else if(modalFor.toLowerCase() === "retrieve_uncompressed"){
+      handleModal(true, null, retrieveSelectedRecords);
+    } 
+    else {
       let _tagValue = tagValue;
       let fileInfoList = [];
 
@@ -413,6 +452,8 @@ export default function AttachmentModal({
       case "add":
         if (isMCFMSDPersonal && !isMinistryCoordinator) {
           return { title: "Add Scanned Records", body: "" };
+        } else if (uploadFor === "response") {
+          return { title: "Add Correspondence", body: "" };
         } else {
           return { title: "Add Attachment", body: "" };
         }
@@ -545,6 +586,8 @@ export default function AttachmentModal({
         return _message;
       case "rename":
         return { title: "Rename Attachment", body: "" };
+      case "changeresponsedate":
+        return { title: "Change Response Date", body: "" };
       case "reclassify":
         return { title: "Reclassify Attachment", body: "" };
       case "delete":
@@ -567,6 +610,23 @@ export default function AttachmentModal({
             body: "Are you sure you want to delete the attachment?",
           };
         }
+      case "retrieve_uncompressed":
+          return {
+            title: "Retrieve Uncompressed",
+            body: (
+              <>
+                Are you sure you want to retrieve the uncompressed file?<br></br>
+                <br></br>
+                <i>
+                  The file will not be compressed, and may not have OCR. Work completed on this specific record in the Redaction App will be preserved, 
+                  but please review and ensure it is accurate.
+                </i>
+                <br></br><br></br>
+                <i>After retrieving the uncompressed file, you will be unable to compress the file again. 
+                  If you wish to have the file compressed again, please use the 'Replace Manually' feature to reupload the file.</i>
+              </>
+            ),
+          };
       default:
         return { title: "", body: "" };
     }
@@ -574,9 +634,11 @@ export default function AttachmentModal({
   let message = getMessage();
 
   const isSaveDisabled = () => {
-    if (modalFor === "delete") {
+    if (modalFor === "delete" || modalFor === "retrieve_uncompressed") {
       return false;
-    } else if (files.length === 0 && existingDocuments.length === 0) {
+    } else if (files.length === 0 && existingDocuments?.length === 0) {
+      return true;
+    } else if (uploadFor === "response" && (files.length > maxNoFiles ||  existingDocuments?.length > maxNoFiles || responseTitle.trim() === "")) {
       return true;
     } else if (modalFor === "add") {
       if(requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && bcgovcode == "MCF") {
@@ -586,6 +648,10 @@ export default function AttachmentModal({
       }
     } else if (modalFor === "replace" || modalFor === "replaceattachment") {
       return false;
+    } else if (modalFor === "changeresponsedate") {
+      if (newResponseDate !== formatDate(currentResponseDate)) {
+        return false;
+      }
     }
   };
 
@@ -647,6 +713,30 @@ export default function AttachmentModal({
                 </div>
               </div>
             )}
+            {modalFor === "add" && uploadFor === "response" && (
+              <div className="row">
+              <div className="col-sm-1"></div>
+              <div className="col-sm-9">
+              <TextField
+                //id="firstName"
+                label="Subject/Title"
+                name="responsetitle"
+                inputProps={{ "aria-labelledby": "response-title-label"}}
+                InputLabelProps={{ shrink: true }}
+                variant="outlined"
+                className={"response-title-field"}
+                value={responseTitle}
+                fullWidth
+                onChange={(e) => saveResponseTitle(e.target.value)}
+                required={true}
+                //disabled={disableInput}
+                //error={responseTitle === ""}
+              />
+              </div>
+              
+              </div>
+            )}
+            
             {["replaceattachment", "replace", "add"].includes(modalFor) ? (
               requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ? (
                 bcgovcode == "MCF" ? (
@@ -772,13 +862,23 @@ export default function AttachmentModal({
                   totalRecordUploadLimit={totalRecordUploadLimit}
                 />
               )
-            ) : (
+            ) : null}
+            {modalFor === "rename" && (
               <ModalForRename
                 modalFor={modalFor}
                 newFilename={newFilename}
                 updateFilename={updateFilename}
                 errorMessage={errorMessage}
                 extension={extension}
+              />
+            )}
+            {modalFor === "changeresponsedate" && (
+              <ModalForChangeResponseDate
+                modalFor={modalFor}
+                newResponseDate={newResponseDate}
+                updateResponseDate={setNewResponseDate}
+                errorMessage={errorMessage}
+                currentResponseDate={formatDate(currentResponseDate)}
               />
             )}
           </DialogContentText>
@@ -800,7 +900,16 @@ export default function AttachmentModal({
               Save
             </button>
           )}
-          {modalFor !== "rename" && modalFor !== "reclassify" && (
+          {modalFor === "changeresponsedate" && (
+            <button
+              className={`btn-bottom btn-save ${classes.btnenabled}`}
+              onClick={saveNewResponseDate}
+              disabled={newResponseDate == formatDate(currentResponseDate) ? true : false}
+            >
+              Save
+            </button>
+          )}
+          {modalFor !== "rename" && modalFor !== "reclassify" && modalFor !== "changeresponsedate" && (
             <button
               className={`btn-bottom btn-save ${
                 isSaveDisabled() ? classes.btndisabled : classes.btnenabled
@@ -808,7 +917,7 @@ export default function AttachmentModal({
               disabled={isSaveDisabled()}
               onClick={handleSave}
             >
-              {uploadFor === "email" ? "Save Changes" : "Continue"}
+              Continue
             </button>
           )}
           <button className="btn-bottom btn-cancel" onClick={handleClose}>
@@ -845,6 +954,36 @@ const ModalForRename = ({
         />
       </div>
       <div className="col-sm-1 extension-name">.{extension}</div>
+      <div className="col-sm-1"></div>
+    </div>
+  ) : null;
+};
+
+const ModalForChangeResponseDate = ({
+  modalFor,
+  newResponseDate,
+  updateResponseDate,
+  errorMessage,
+}) => {
+  return modalFor === "changeresponsedate" ? (
+    <div className="row">
+      <div className="col-sm-1"></div>
+      <div className="col-sm-9">
+        <TextField
+          id="changeresponsedate"
+          label="Change Response Date"
+          type="datetime-local"
+          inputProps={{ "aria-labelledby": "changeResponseDate-label" }}
+          InputLabelProps={{ shrink: true }}
+          variant="outlined"
+          fullWidth
+          value={newResponseDate}
+          onChange={(e) => {updateResponseDate(e.target.value)}}
+          error={errorMessage !== undefined && errorMessage !== ""}
+          helperText={errorMessage}
+        />
+      </div>
+      {/* <div className="col-sm-1 extension-name">.{extension}</div> */}
       <div className="col-sm-1"></div>
     </div>
   ) : null;

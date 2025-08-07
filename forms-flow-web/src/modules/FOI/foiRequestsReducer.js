@@ -16,6 +16,7 @@ const initialState = {
     keyword: null,
   },
   showAdvancedSearch: false,
+  showKeywordSearch: false,
   showEventQueue: false,
   foiAdvancedSearchParams: {},
   foiHistoricalSearchParams:{},
@@ -62,12 +63,16 @@ const initialState = {
   foiPDFStitchedRecordForOipcRedline: {},
   foiPDFStitchedRecordForResponsePackage: {},
   foiPDFStitchedRecordForConsultPackage: {},
+  foiPDFStitchedRecordsForPhasedRedlines: [],
+  foiPDFStitchedRecordsForPhasedResponsePackages: [],
   foiPDFStitchStatusForHarms: "not started",
   foiPDFStitchStatusForRedlines: "not started",
   foiPDFStitchStatusForResponsePackage: "not started",
   foiPDFStitchStatusForOipcRedlineReview: "not started",
   foiPDFStitchStatusForOipcRedline: "not started",
   foiPDFStitchStatusForConsults: "not started",
+  foiPDFStitchStatusesForPhasedRedlines: [],
+  foiPDFStitchStatusesForPhasedResponsePackages: [],
   foiRequestCFRForm: {
     overallsuggestions: "",
     status: "init",
@@ -90,6 +95,19 @@ const initialState = {
       actualministrypreparinghrs: 0,
       actualiaopreparinghrs: 0,
     },
+  },
+  foiRequestApplicationFeeForm: {
+    applicationfeestatus: "init",
+    amountpaid: 0,
+    paymentsource: "init",
+    paymentdate: null,
+    orderid: null,
+    transactionnumber: null,
+    receipts: [],
+    refundamount: 0,
+    refunddate: null,
+    reasonForRefund: "",
+    paymentid: null
   },
   foiRequestCFRFormHistory: [],
   foiRequestApplicantCorrespondence: [],
@@ -163,6 +181,8 @@ const initialState = {
   foiOpenInfoAdditionalFiles: [],
   foiPDFStitchedOIPackage: {},
   foiPDFStitchStatusForOIPackage: "not started",
+  foiCommentTypes:[],
+  foiEmailTemplates: [],
   foiadvancedsearchfilter:"foimod",
   foiCommentTypes:[]
 };
@@ -185,6 +205,8 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, eventQueueParams: action.payload };
     case FOI_ACTION_CONSTANTS.SHOW_ADVANCED_SEARCH:
       return { ...state, showAdvancedSearch: action.payload };
+    case FOI_ACTION_CONSTANTS.SHOW_KEYWORD_SEARCH:
+      return { ...state, showKeywordSearch: action.payload };
     case FOI_ACTION_CONSTANTS.SHOW_EVENT_QUEUE:
       return { ...state, showEventQueue: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_PARAMS:
@@ -312,6 +334,10 @@ const foiRequests = (state = initialState, action) => {
       };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_CONSULTS:
       return { ...state, foiPDFStitchedRecordForConsultPackage: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORDS_FOR_PHASEDREDLINES:
+      return {...state, foiPDFStitchedRecordsForPhasedRedlines: action.payload};
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORDS_FOR_PHASEDRESPONSEPACKAGES:
+      return {...state, foiPDFStitchedRecordsForPhasedResponsePackages: action.payload}
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_HARMS:
       return { ...state, foiPDFStitchStatusForHarms: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_REDLINES:
@@ -324,6 +350,10 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, foiPDFStitchStatusForOipcRedline: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_CONSULTS:
       return { ...state, foiPDFStitchStatusForConsults: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUSES_FOR_PHASEDREDLINES:
+      return {...state, foiPDFStitchStatusesForPhasedRedlines: action.payload};
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUSES_FOR_PHASEDRESPONSEPACKAGES:
+      return {...state, foiPDFStitchStatusesForPhasedResponsePackages: action.payload};
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_CFR_FORM:
       return {
         ...state,
@@ -331,6 +361,16 @@ const foiRequests = (state = initialState, action) => {
           ? initialState.foiRequestCFRForm
           : {
               ...state.foiRequestCFRForm,
+              ...action.payload,
+            },
+      };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICATION_FEE_FORM:
+      return {
+        ...state,
+        foiRequestApplicationFeeForm: (_.isEmpty(action.payload))
+          ? initialState.foiRequestApplicationFeeForm
+          : {
+              ...state.foiRequestApplicationFeeForm,
               ...action.payload,
             },
       };
@@ -387,6 +427,8 @@ const foiRequests = (state = initialState, action) => {
       return {...state, foiPDFStitchedOIPackage: action.payload}
     case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OI_PACKAGE:
       return {...state, foiPDFStitchStatusForOIPackage: action.payload}
+    case FOI_ACTION_CONSTANTS.FOI_EMAIL_TEMPLATES:
+      return { ...state, foiEmailTemplates: action.payload };
     default:
       return state;
   }

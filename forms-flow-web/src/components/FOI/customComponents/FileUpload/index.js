@@ -184,6 +184,19 @@ const FileUpload = ({
         return "Drag and drop attachments, or click Add Files"
     }
 
+    const getTagMessage = (uploadFor) => {
+      if (uploadFor === "email") return null;
+      if (uploadFor === "response") {
+        // return <p>Only one response may be added at a time.</p>;
+        return <></>
+      }
+      return (
+        <p>
+          When uploading more than one {uploadFor}, all {uploadFor}s will have the same selected tag.
+        </p>
+      );
+    };
+
   return (
     <>
       {(modalFor === "add" && (uploadFor === "attachment" || uploadFor === 'record')) && (<div>
@@ -249,9 +262,9 @@ const FileUpload = ({
           </div>
         </div>
       </section>
-      {modalFor === "add" && uploadFor !== "additionalFiles" && (<div className="tag-message-container">
-        <p>When uploading more than one {uploadFor}, all {uploadFor}s will have the same selected tag.</p>
-      </div>)}
+      {modalFor === "add" && uploadFor !== "additionalFiles" && (
+        <div className="tag-message-container">{getTagMessage(uploadFor)}</div>
+      )}
       <ul className="error-message-ul">
         {errorMessage
           ? errorMessage.map((error) => (

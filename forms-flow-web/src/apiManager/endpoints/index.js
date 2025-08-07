@@ -2,7 +2,8 @@ import {
   FOI_BASE_API_URL,
   AXIS_API_URL,
   DOC_REVIEWER_BASE_API_URL,
-  FOI_HISTORICAL_API_URL
+  FOI_HISTORICAL_API_URL,
+  FOI_TEMPLATE_API_URL,
 } from "./config";
 
 const API = {
@@ -18,6 +19,7 @@ const API = {
   FOI_POST_REQUEST_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>`,
   FOI_GET_ASSIGNEDTO_ALLGROUP_LIST_API: `${FOI_BASE_API_URL}/api/foiassignees`,
   FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API: `${FOI_BASE_API_URL}/api/foiassignees/group/intaketeam`,
+  FOI_GET_ASSIGNEDTO_BCPSWITHINTAKEGROUP_LIST_API: `${FOI_BASE_API_URL}/api/foiassignees/group/bcpswithintaketeam`,
   FOI_GET_ASSIGNEDTO_REQUESTTYPELIST_API: `${FOI_BASE_API_URL}/api/foiassignees/<requesttype>`,
   FOI_GET_ASSIGNEDTOGROUPLIST_API: `${FOI_BASE_API_URL}/api/foiassignees/<requesttype>/<curentstate>`,
   FOI_GET_ASSIGNEDTOGROUPLIST_WITHGOVCODE_API: `${FOI_BASE_API_URL}/api/foiassignees/<requesttype>/<curentstate>/<bcgovcode>`,
@@ -63,6 +65,8 @@ const API = {
   FOI_PUT_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/division/<divisionid>`,
   FOI_DELETE_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/division/<divisionid>/disable`,
 
+  FOI_POST_COMMENT_REQUESTHISTORY: `${FOI_BASE_API_URL}/api/foicomment/requesthistory`,
+
   FOI_POST_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest`,
   FOI_GET_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
   FOI_PUT_COMMENT_RAWREQUEST: `${FOI_BASE_API_URL}/api/foicomment/rawrequest/<requestid>`,
@@ -102,7 +106,23 @@ const API = {
   FOI_POST_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
   FOI_POST_CFR_FORM_IAO: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>/sanction`,
 
+  FOI_GET_APPLICATION_FEES_FORM: `${FOI_BASE_API_URL}/api/foiapplicationfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
+  FOI_POST_APPLICATION_FEES_FORM: `${FOI_BASE_API_URL}/api/foiapplicationfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
+
+  FOI_GET_RAWREQUEST_PAYMENT_DETAILS: `${FOI_BASE_API_URL}/api/foirawrequests/<request_id>/payments`,
+  FOI_POST_RAWREQUEST_PAYMENT_RECEIPT: `${FOI_BASE_API_URL}/api/foirawrequests/<request_id>/payments/<payment_id>/receipt`,
+
+  FOI_POST_REQUEST_CORRESPONDENCE_EMAIL: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/email/<ministryid>/<rawrequestid>`,
+  FOI_GET_REQUEST_CORRESPONDENCE_EMAILS: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/email/<ministryid>/<rawrequestid>`,
+
   FOI_POST_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>`,
+  FOI_POST_DRAFT_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/draft/<requestid>/<ministryrequestid>`,
+  FOI_EDIT_DRAFT_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/draft/edit/<requestid>/<ministryrequestid>`,
+  FOI_DELETE_DRAFT_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/draft/delete/<ministryrequestid>/<rawrequestid>/<correspondenceid>`,
+  FOI_POST_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/<ministryrequestid>/<rawrequestid>`,
+  FOI_UPDATE_APPLICANT_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/update/<requestid>/<ministryrequestid>`,
+  FOI_DELETE_RESPONSE_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/response/delete/<ministryrequestid>/<rawrequestid>/<correspondenceid>`,
+
   FOI_GET_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>`,
   FOI_GET_EMAIL_CORRESPONDENCE_TEMPLATES: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/templates`,
 
@@ -128,7 +148,13 @@ const API = {
   FOI_UPDATE_RECORDS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/update`,
   FOI_UPDATE_PERSONAL_ATTRIBUTES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/updatepersonalattributes`,
   DOC_REVIEWER_DELETE_RECORDS: `${DOC_REVIEWER_BASE_API_URL}/api/document/delete`,
+  FOI_RETRIEVE_RECORDS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/retrieve`,
+
   DOC_REVIEWER_REDACTED_SECTIONS: `${DOC_REVIEWER_BASE_API_URL}/api/redactedsections/ministryrequest/<ministryrequestid>`,
+  
+  DOC_REVIEWER_REDACTED_DOCUMENT_RECORDS: `${DOC_REVIEWER_BASE_API_URL}/api/documentpage/ministryrequest/<ministryrequestid>`,
+  
+  DOC_REVIEWER_REDACTED_PAGEFLAG_RECORDS: `${DOC_REVIEWER_BASE_API_URL}/api/documentpageflags/ministryrequest/<ministryrequestid>`,
 
   FOI_TRIGGER_DOWNLOAD_RECORDS_FOR_HARMS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/triggerdownload/harms`,
 
@@ -165,6 +191,12 @@ const API = {
   FOI_DOWNLOAD_RECORDS_FOR_CONSULTPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/consultpackage`,
   FOI_PDF_STITCH_STATUS_FOR_CONSULTPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/consultpackage/pdfstitchjobstatus`,
 
+  FOI_DOWNLOAD_RECORDS_FOR_PHASEDREDLINES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/redlinephase`,
+  FOI_PDF_STITCH_STATUSES_FOR_PHASEDREDLINES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/redlinephase/pdfstitchjobstatus`,
+
+  FOI_DOWNLOAD_RECORDS_FOR_PHASEDRESPONSEPACKAGES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/responsepackagephase`,
+  FOI_PDF_STITCH_STATUSES_FOR_PHASEDRESPONSEPACKAGES: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/responsepackagephase/pdfstitchjobstatus`,
+
   FOI_GET_OIPC_OUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/outcomes`,
   FOI_GET_OIPC_STATUSES: `${FOI_BASE_API_URL}/api/foiflow/oipc/statuses`,
   FOI_GET_OIPC_REVIEWTYPES: `${FOI_BASE_API_URL}/api/foiflow/oipc/reviewtypes`,
@@ -177,6 +209,14 @@ const API = {
   FOI_POST_OPENINFO_REQUEST: `${FOI_BASE_API_URL}/api/foiopeninfo/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>`,
   FOI_GET_COMMENT_TYPES: `${FOI_BASE_API_URL}/api/foiflow/commenttypes`,
   FOI_OPENINFO_ADDITIONAL_FILES: `${FOI_BASE_API_URL}/api/foiopeninfoadditionalfiles/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>`,
-  FOI_DELETE_OPENINFO_ADDITIONAL_FILES: `${FOI_BASE_API_URL}/api/foiopeninfoadditionalfiles/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>/delete`
+  FOI_DELETE_OPENINFO_ADDITIONAL_FILES: `${FOI_BASE_API_URL}/api/foiopeninfoadditionalfiles/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>/delete`,
+
+  FOI_GET_CROSSTEXTSEARCH_AUTH: `${FOI_BASE_API_URL}/api/foicrosstextsearch/authstring`,
+  FOI_GET_CROSSTEXTSEARCH_REQUEST_DETAILS: `${FOI_BASE_API_URL}/api/foicrosstextsearch/requests`,
+  FOI_GET_EMAIL_TEMPLATES: `${FOI_TEMPLATE_API_URL}/api/Template/GetTemplates`,
+  FOI_GET_EMAIL_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/GetCorrespondenceByName`,
+  FOI_EXPORT_SFDT: `${FOI_TEMPLATE_API_URL}/api/documenteditor/ExportSFDT`,
+  FOI_EXPORT_PDF: `${FOI_TEMPLATE_API_URL}/api/documenteditor/ExportPdf`,
+  FOI_REFRESH_REDIS_CACHE_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/UpdateTemplateCache`
 };
 export default API;

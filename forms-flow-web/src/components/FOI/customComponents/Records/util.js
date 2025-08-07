@@ -25,15 +25,18 @@ const sortAttachmentsByLastModified = (attachments) =>
   );
 
 export const getPDFFilePath = (item) => {
-  let pdffilepath = item.s3uripath;
+
+  let pdffilepath = getS3Uri(item); //item.s3uripath;
   let pdffilename = item.filename;
+  const ext = pdffilepath.split('.').pop();
 
   if (
     (item.isredactionready && item.isconverted) ||
     (item.attributes?.isattachment &&
       item.attributes?.trigger === "recordreplace")
   ) {
-    pdffilepath = pdffilepath.substr(0, pdffilepath.lastIndexOf(".")) + ".pdf";
+    if (ext != "pdf")
+      pdffilepath = pdffilepath.substr(0, pdffilepath.lastIndexOf(".")) + ".pdf";
     pdffilename += ".pdf";
   }
   return [pdffilepath, pdffilename];
@@ -83,8 +86,7 @@ export const getUpdatedRecords = (_records, isattachment = false) => {
       recordid: _record.recordid,
       filename: filename,
       s3uripath: filepath,
-      filesize:
-        _record.attributes.convertedfilesize || _record.attributes.filesize,
+      filesize: getFileSize(_record),
       lastmodified: _record.attributes.lastmodified,
       isduplicate: _record.isduplicate,
       divisions: _record.attributes.divisions,
@@ -110,6 +112,28 @@ export const getFiles = (_records, _divisionid) => {
         lastmodified: r.lastmodified,
       };
     });
+};
+
+export const getS3Uri = (record) => {
+  if(record.selectedfileprocessversion == 1)
+    return record.s3uripath
+  else if(record.ocrfilepath)
+    return record.ocrfilepath
+  else if(record.compresseds3uripath)
+    return record.compresseds3uripath
+  return record.s3uripath
+};
+
+export const getFileSize = (record) => {
+  if(record.selectedfileprocessversion == 1)
+    return record.attributes.convertedfilesize || record.attributes.filesize
+  else if(record.attributes.ocrfilesize)
+    return record.attributes.ocrfilesize
+  else if(record.attributes.compressedfilesize)
+    return record.attributes.compressedfilesize
+  else if(record.attributes.convertedfilesize)
+    return record.attributes.convertedfilesize
+  return record.attributes.filesize
 };
 
 // calculate divisional total file size
@@ -151,7 +175,17 @@ export const sortDivisionalFiles = (divisionMap) => {
 
 export const calculateTotalUploadedFileSizeInKB = (records) => {
   return records?.reduce((total, record) => {
-    return (total + record.attributes.filesize);
+    const size =
+        record?.selectedfileprocessversion == 1 ? 
+          record?.attributes?.filesize :
+        record?.attributes?.ocrfilesize ??
+       (record?.selectedfileversion !== 1 &&
+        record?.attributes?.compressedfilesize != null
+          ? record?.attributes?.compressedfilesize
+          : record?.attributes?.filesize
+        )  ??
+        0;
+    return (total + size);
   }, 0);
 };
 

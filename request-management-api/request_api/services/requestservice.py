@@ -156,6 +156,12 @@ class requestservice:
     def getrequest(self, foirequestid, foiministryrequestid):
         return requestservicegetter().getrequest(foirequestid, foiministryrequestid)
 
+    def getrawrequestidbyfoirequestid(self, foirequestid):
+        if foirequestid == 'undefined' or foirequestid is None:
+            return None
+        rawrequestid = requestservicegetter().getrawrequestidbyfoirequestid(foirequestid)
+        return rawrequestid
+
     def getrequestdetailsforministry(
         self, foirequestid, foiministryrequestid, authmembershipgroups
     ):
@@ -237,11 +243,14 @@ class requestservice:
         requestid,
         ministryrequestid,
         applicantcorrespondenceid,
-        attributes,
-        templateid,
+        applicantcorrespondencelog
     ):
         foirequestschema = self.getrequestdetails(requestid, ministryrequestid)
-        templatedetails = applicantcorrespondenceservice().gettemplatebyid(templateid)
+        if applicantcorrespondencelog['templateid'] is None:
+            templatename = applicantcorrespondencelog['templatename']
+        else:
+            templatedetails = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog['templateid'])
+            templatename = templatedetails.name
         wfinstanceid = workflowservice().syncwfinstance(
             "ministryrequest", ministryrequestid, True
         )
@@ -250,8 +259,8 @@ class requestservice:
             ministryrequestid,
             foirequestschema,
             applicantcorrespondenceid,
-            templatedetails.name,
-            attributes,
+            templatename,
+            applicantcorrespondencelog['attributes'],
         )
 
     
@@ -333,3 +342,7 @@ class requestservice:
             if current_state != "Closed" and any(state['status'] == "Closed" for state in states):
                 return True
         return False
+    
+    def getrequestsdetailsforsearch(self,requestnumbers):
+        requestdetails = FOIMinistryRequest().getrequestsdetailsforsearch(requestnumbers)
+        return requestdetails

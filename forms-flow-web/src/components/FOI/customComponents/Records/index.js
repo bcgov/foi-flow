@@ -11,6 +11,7 @@ import {
   postFOIS3DocumentPreSignedUrl,
   getFOIS3DocumentPreSignedUrl,
   completeMultiPartUpload,
+  downloadFileFromS3,
 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import {
   saveFOIRequestAttachmentsList,
@@ -36,10 +37,14 @@ import {
   fetchPDFStitchedRecordForConsults,
   editPersonalAttributes,
   updateUserLockedRecords,
+  fetchPDFStitchedRecordsForPhasedRedlines,
+  fetchPDFStitchedRecordsForPhasedResponsePackages,
+  retrieveSelectedRecordVersion
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
   saveRequestDetails,
-  openRequestDetails
+  openRequestDetails,
+  updateSpecificRequestSection,
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import {
   StateTransitionCategories,
@@ -92,6 +97,10 @@ import {
   faPenToSquare,
   faLinkSlash,
   faDownload,
+  faMinimize,
+  faMaximize,
+  faMagnifyingGlass,
+  faRotate,
 } from "@fortawesome/free-solid-svg-icons";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
@@ -126,6 +135,7 @@ import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import MCFPersonal from "./MCFPersonal";
 import MSDPersonal from "./MSDPersonal";
+import PhaseMenu from "./PhaseMenu";
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -233,6 +243,7 @@ export const RecordsLog = ({
   setLockRecordsTab,
   validLockRecordsState,
   setSaveRequestObject,
+  isPhasedRelease
 }) => {
   const user = useSelector((state) => state.user.userDetail);
   const userGroups = user?.groups?.map((group) => group.slice(1));
@@ -257,6 +268,12 @@ export const RecordsLog = ({
   let consultPDFStitchedStatus = useSelector(
     (state) => state.foiRequests.foiPDFStitchStatusForConsults
   );
+  let phasedRedlinesStitchedStatuses = useSelector(
+    (state) => state.foiRequests.foiPDFStitchStatusesForPhasedRedlines
+  );
+  let phasedResponsePackageStitchedStatuses = useSelector(
+    (state) => state.foiRequests.foiPDFStitchStatusesForPhasedResponsePackages
+  );
 
   let pdfStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForHarms
@@ -275,6 +292,12 @@ export const RecordsLog = ({
   );
   let consultPDFStitchedRecord = useSelector(
     (state) => state.foiRequests.foiPDFStitchedRecordForConsultPackage
+  );
+  let phasedRedlinesStitchedRecords = useSelector(
+    (state) => state.foiRequests.foiPDFStitchedRecordsForPhasedRedlines
+  );
+  let phasedResponsePackageStitchedRecords = useSelector(
+    (state) => state.foiRequests.foiPDFStitchedRecordsForPhasedResponsePackages
   );
 
   let isRecordsfetching = useSelector(
@@ -308,7 +331,7 @@ export const RecordsLog = ({
     ministryCode == "MCF" &&
       requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
   );
-
+  const [retrieveSelectedRecords, setRetrieveSelectedRecords] = useState({});
   useEffect(() => {
     setRecords(recordsObj?.records);
     let nonDuplicateRecords = recordsObj?.records?.filter(
@@ -320,6 +343,7 @@ export const RecordsLog = ({
     dispatch(checkForRecordsChange(requestId, ministryId));
     //To manage enabling and disabling of download for harms package
     recordsDownloadList[1].disabled = enableHarmsDonwnload();
+    // isDisableRedactRecords(recordsObj?.records)
   }, [recordsObj]);
 
   useEffect(() => {
@@ -331,6 +355,29 @@ export const RecordsLog = ({
       setRecordsDownloadList(recordsDownloadList.filter((record) => record.id !== 6));
     }
   }, []);
+
+  const isDisableRedactRecords = (allRecords) => {
+
+    const isInvalid = (record) =>
+      !record.isredactionready &&
+      !record.attributes?.incompatible &&
+      !record.selectedfileprocessversion &&
+      !record.ocrfilepath;
+
+    const isInvalidAttachment = (record) =>
+      !record.isredactionready &&
+      !record.attributes?.incompatible
+
+    return allRecords.some(record =>{
+      if(isInvalid(record)) return true;
+
+      if (Array.isArray(record.attachments)) {
+        return record.attachments.some(isInvalidAttachment);
+      }
+      return false;
+    });
+  }
+  
 
   const [currentEditRecord, setCurrentEditRecord] = useState();
   const [editTagModalOpen, setEditTagModalOpen] = useState(false);
@@ -387,7 +434,7 @@ export const RecordsLog = ({
           }
         }
         if(record.attributes?.personalattributes?.personaltag && MCFSections?.sections) {
-          if(_personalTagFilters.filter((pt)=>{return pt.divisionname === record.attributes.personalattributes.personaltag}).length === 0) {
+          if(_personalTagFilters.filter((pt)=>{return pt.name === record.attributes.personalattributes.personaltag}).length === 0) {
             _personalTagFilters = _personalTagFilters.concat(MCFSections.sections.filter((d)=>{return d.name === record.attributes.personalattributes.personaltag}));
           }
         }
@@ -505,6 +552,9 @@ export const RecordsLog = ({
   const [isConsultDownloadReady, setIsConsultDownloadReady] = useState(false);
   const [isConsultDownloadFailed, setIsConsultDownloadFailed] = useState(false);
 
+  const [phasedRedlineDownloadStatuses, setPhasedRedlineDownloadStatuses] = useState([]);
+  const [phasedResponsePackageDownloadStatuses, setPhasedResponsePackageDownloadStatuses] = useState([]);
+
   const [isAllSelected, setIsAllSelected] = useState(false);
 
   useEffect(() => {
@@ -544,6 +594,43 @@ export const RecordsLog = ({
           break;
       }
     };
+
+    const updatePhasePackageStatus = (statuses, setStatuses, dispatchAction) => {
+      if (statuses?.length > 0) {
+        let newArr = [...statuses];
+        for (let phaseObj of newArr) {
+          switch (phaseObj.status) {
+            case RecordDownloadStatus.started:
+            case RecordDownloadStatus.pushedtostream:
+            case RecordDownloadStatus.redactionsummarystarted:
+            case RecordDownloadStatus.redactionsummaryuploaded:
+            case RecordDownloadStatus.zippingstarted:
+            case RecordDownloadStatus.zippingcompleted:
+              phaseObj.downloadReady = false;
+              phaseObj.downloadWIP = true;
+              phaseObj.downloadFailed = false;
+              break;
+            case RecordDownloadStatus.completed:
+              dispatch(dispatchAction(requestId, ministryId));
+              phaseObj.downloadReady = true;
+              phaseObj.downloadWIP = false;
+              phaseObj.downloadFailed = false;
+              break;
+            case RecordDownloadStatus.error:
+              phaseObj.downloadReady = false;
+              phaseObj.downloadWIP = false;
+              phaseObj.downloadFailed = true;
+              break;
+            default:
+              phaseObj.downloadReady = false;
+              phaseObj.downloadWIP = false;
+              phaseObj.downloadFailed = false;
+              break;
+          }
+        }
+        setStatuses(newArr)
+      }
+    }
 
     // Update PDF Stitch Status
     updateStatus(
@@ -595,6 +682,16 @@ export const RecordsLog = ({
       setIsConsultDownloadFailed,
       fetchPDFStitchedRecordForConsults
     );
+    updatePhasePackageStatus(
+      phasedRedlinesStitchedStatuses,
+      setPhasedRedlineDownloadStatuses,
+      fetchPDFStitchedRecordsForPhasedRedlines,
+    )
+    updatePhasePackageStatus(
+      phasedResponsePackageStitchedStatuses,
+      setPhasedResponsePackageDownloadStatuses,
+      fetchPDFStitchedRecordsForPhasedResponsePackages
+    )
   }, [
     pdfStitchStatus,
     redlinePdfStitchStatus,
@@ -604,6 +701,8 @@ export const RecordsLog = ({
     consultPDFStitchedStatus,
     requestId,
     ministryId,
+    phasedRedlinesStitchedStatuses,
+    phasedResponsePackageStitchedStatuses,
   ]);
 
   useEffect(() => {
@@ -696,8 +795,10 @@ export const RecordsLog = ({
           )
         );
       }
+    } else if(modalFor.toLowerCase() === "retrieve_uncompressed" && value){
+        retrieveRecordVersion("retrieve_uncompressed", retrieveSelectedRecords)
     } else if (files) {
-      saveDocument(value, fileInfoList, files);
+        saveDocument(value, fileInfoList, files);
     }
   };
 
@@ -909,38 +1010,85 @@ export const RecordsLog = ({
     }
   };
 
-  const downloadDocument = (file, isPDF = false, originalfile = false) => {
+  const downloadDocument = (file, isPDF = false, originalfile = false, downloadReplacedOriginal = false) => {
+    
+    const extension = file?.filename?.split('.')?.pop()
+    var filePath = downloadReplacedOriginal ? file.s3uripath : (file.selectedfileprocessversion != 1  && 'ocrfilepath' in file && file.ocrfilepath != null)? file.ocrfilepath
+                    : ( file.selectedfileprocessversion != 1  && 'compresseds3uripath' in file && file.compresseds3uripath != null)? 
+                    file.compresseds3uripath : file.s3uripath
     var s3filepath = !originalfile
-      ? file.s3uripath
-      : !file.isattachment
-      ? file.originalfile
-      : file.s3uripath;
+      ? filePath : getOriginalFileS3Path((file.originalfile && !downloadReplacedOriginal) ? file.originalfile : file.s3uripath , file?.attributes?.incompatible)
+      // : !file.isattachment
+      // ? getOriginalFileS3Path(file.originalfile ? file.originalfile : file.s3uripath , file?.attributes?.incompatible)
+      // : filePath;
     var filename = !originalfile
-      ? file.filename
-      : !file.isattachment
-      ? file.originalfilename
-      : file.filename;
-    if (isPDF) {
-      s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
-      filename = filename + ".pdf";
+      ? file.filename :((file.originalfilename && !downloadReplacedOriginal)? file.originalfilename : file.filename)
+      // : !file.isattachment
+      // ? (file.originalfilename? file.originalfilename : file.filename)
+      // : file.filename;
+    //if (isPDF && !downloadReplacedOriginal) {
+    if (!["png", "jpg", "jpeg", "pdf"].includes(extension.toLowerCase())) {
+      if (isPDF || (file.selectedfileprocessversion == 1 && !originalfile && !downloadReplacedOriginal )){
+        s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
+        filename = filename + ".pdf";
+      }
+      else if (!originalfile && !downloadReplacedOriginal){
+        filename = filename + ".pdf";
+      }
     }
-    const toastID = toast.loading("Downloading file (0%)");
-    getFOIS3DocumentPreSignedUrl(
+    if (originalfile)
+      attemptDownload(s3filepath, filename,(file.originalfile ? file.originalfile : file.s3uripath));
+    else
+      attemptDownload(s3filepath, filename);
+  };
+
+  const attemptDownload = (s3filepath, filename, fallbackPath = null) =>{
+      const toastID = toast.loading("Downloading file (0%)");
+      getFOIS3DocumentPreSignedUrl(
       s3filepath.split("/").slice(4).join("/"),
       ministryId,
       dispatch,
       (err, res) => {
         if (!err) {
-          getFileFromS3(
+          downloadFileFromS3(
             { filepath: res },
             (_err, response) => {
+              const is404 = (_err && _err.status === 404) ||
+                (response && response.status === 404);
+              if (_err || !response || !response.data || is404) {
+                const hasOriginalKeyword = s3filepath.split("/").pop().replace(/\.[^/.]+$/, "").endsWith("ORIGINAL");
+                if (fallbackPath && hasOriginalKeyword) {
+                  toast.dismiss(toastID);
+                  // Retry with the fallback path
+                  attemptDownload(fallbackPath, filename); // No further fallback
+                }
+                else{
+                  // let blob = new Blob([response.data], {
+                  //   type: "application/octet-stream",
+                  // });
+                  // saveAs(blob, filename);
+                  toast.update(toastID, {
+                    render: "File download failed",
+                    type: "error",
+                    className: "file-upload-toast",
+                    isLoading: false,
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    closeButton: true,
+                  });
+                }
+                return;
+              }
               let blob = new Blob([response.data], {
-                type: "application/octet-stream",
+                  type: "application/octet-stream",
               });
               saveAs(blob, filename);
               toast.update(toastID, {
-                render: _err ? "File download failed" : "Download complete",
-                type: _err ? "error" : "success",
+                render: "Download complete",
+                type: "success",
                 className: "file-upload-toast",
                 isLoading: false,
                 autoClose: 3000,
@@ -952,25 +1100,64 @@ export const RecordsLog = ({
               });
             },
             (progressEvent) => {
-              toast.update(toastID, {
-                render:
-                  "Downloading file (" +
-                  Math.floor(
-                    (progressEvent.loaded / progressEvent.total) * 100
-                  ) +
-                  "%)",
-                isLoading: true,
-              });
+              if(progressEvent.total > 0){
+                toast.update(toastID, {
+                  render:
+                    "Downloading file (" +
+                    Math.floor(
+                      (progressEvent.loaded / progressEvent.total) * 100
+                    ) +
+                    "%)",
+                  isLoading: true,
+                });
+              }
             }
           );
+        }
+        else{
+          toast.update(toastID, {
+            render: "File download failed",
+            type: "error",
+            className: "file-upload-toast",
+            isLoading: false,
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            closeButton: true,
+          });
+          return;
         }
       },
       isHistoricalRequest ? "historical" : "records",      
       isHistoricalRequest ? undefined : bcgovcode
     );
-  };
+  }
 
-  const handleDownloadChange = (e) => {
+  const getOriginalFileS3Path = (path, isIncompatible) => {
+    const extIndex = path.lastIndexOf(".");
+    if (extIndex === -1) 
+      return path;
+    let extension=path.slice(extIndex)
+    if (extension?.toLowerCase() != ".pdf" || isIncompatible)
+      return path;
+    console.log("ORIGINAL path:",path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex))
+    return path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex);
+  }
+
+
+    const handlePhasePackageDownload = (packageObj, itemid) => {
+      const phasedDownloadStatuses = itemid === 2 ? phasedRedlineDownloadStatuses : phasedResponsePackageDownloadStatuses;
+      const phasedStichedRecords = itemid === 2 ? phasedRedlinesStitchedRecords : phasedResponsePackageStitchedRecords;
+      const packageName = `${packageObj.category}phase${packageObj.phase}`;
+      const isDownloadReady = phasedDownloadStatuses?.find(phasedPackage => phasedPackage.phase === packageObj.phase).downloadReady;
+      if (isDownloadReady) {
+        const s3filepath = phasedStichedRecords?.find(phasedPackage => packageName === phasedPackage.category).finalpackagepath;
+        handleDownloadZipFile(s3filepath, packageObj);
+      }
+    }
+    const handleDownloadChange = (e) => {
     //if clicked on harms
     if (
       e.target.value === 1 &&
@@ -1017,13 +1204,18 @@ export const RecordsLog = ({
     setCurrentDownload(e.target.value);
   };
 
-  const handleDownloadZipFile = (s3filepath, itemid) => {
+  const handleDownloadZipFile = (s3filepath, packageid) => {
     const filename = requestNumber + ".zip";
     try {
       downloadZipFile(s3filepath, filename);
     } catch (error) {
       console.log(error);
-      toastError(itemid);
+      if (isPhasedRelease) {
+        phasedReleaseToastError(packageid)
+      }
+      else {
+        toastError(packageid);
+      }
     }
   };
 
@@ -1200,6 +1392,29 @@ export const RecordsLog = ({
       setIsConsultDownloadFailed(true);
     }
   };
+  const phasedReleaseToastError = (packageObj) => {
+    toast.error(
+      "Temporarily unable to process your request. Please try again in a few minutes.",
+      {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      }
+    );
+    if (packageObj.category === "redline") {
+      setPhasedRedlineDownloadStatuses((prev) => {
+        prev.map(item => item.phase === packageObj.phase ? {...item, downloadReady: false, downloadWIP: false, downloadFailed: true} : item)
+      });
+    } else if (packageObj.category === "responsepackage") {
+      setPhasedResponsePackageDownloadStatuses((prev) => {
+        prev.map(item => item.phase === packageObj.phase ? {...item, downloadReady: false, downloadWIP: false, downloadFailed: true} : item)
+      })
+    }
+  }
 
   const isReady = (itemid) => {
     return (
@@ -1243,6 +1458,13 @@ export const RecordsLog = ({
       (itemid === 5 && oipcRedlineReviewPdfStitchedRecord?.createdat_datetime) ||
       (itemid === 6 && consultPDFStitchedRecord?.createdat_datetime)
     );
+  }
+  
+  const getPhasePackageDatetime = (phasePackage, itemid) => {
+    const packageName = `${phasePackage.category}phase${phasePackage.phase}`;
+    if (itemid === 2) return phasedRedlinesStitchedRecords.find(phaseRecord => phaseRecord.category === packageName)?.createdat_datetime;
+    if (itemid === 3) return phasedResponsePackageStitchedRecords.find(phaseRecord => phaseRecord.category === packageName)?.createdat_datetime;
+   
   }
 
   const downloadSelectedDocuments = async () => {
@@ -1351,31 +1573,43 @@ export const RecordsLog = ({
   };
 
   const retryDocument = (record) => {
-    record.trigger = "recordretry";
-    record.service = record.failed ? record.failed : "all";
-    if (record.isattachment) {
-      var parentRecord = recordsObj?.records?.find(
-        (r) => (r.recordid = record.rootparentid)
-      );
-      record.attributes.divisions = parentRecord.attributes.divisions;
-      record.attributes.batch = parentRecord.attributes.batch;
-      record.attributes.extension = record["s3uripath"].substr(
-        record["s3uripath"].lastIndexOf("."),
-        record["s3uripath"].length
-      );
-      record.attributes.incompatible = false;
-      record.attributes.isattachment = true;
-    }
-    if (record.service === "deduplication") {
-      record["s3uripath"] =
-        record["s3uripath"].substr(0, record["s3uripath"].lastIndexOf(".")) +
-        ".pdf";
+    let selectedRecords =[]
+    if (Object.keys(record).length === 0)
+      selectedRecords = records.filter((record) => record.isselected);
+    else
+      selectedRecords = [record]
+    for (let record of selectedRecords) {
+      record.trigger = "recordretry";
+      let retryServiceName = record.failed ? record.failed.split('.')[0] : "all" ;
+      if (retryServiceName == 'ocr-queue')
+        retryServiceName='ocr'
+      console.log(retryServiceName);
+      record.service = retryServiceName
+      //record.failed ? record.failed : "all";
+      if (record.isattachment) {
+        var parentRecord = recordsObj?.records?.find(
+          (r) => (r.recordid = record.rootparentid)
+        );
+        record.attributes.divisions = parentRecord.attributes.divisions;
+        record.attributes.batch = parentRecord.attributes.batch;
+        record.attributes.extension = record["s3uripath"].substr(
+          record["s3uripath"].lastIndexOf("."),
+          record["s3uripath"].length
+        );
+        record.attributes.incompatible = false;
+        record.attributes.isattachment = true;
+      }
+      if (record.service === "deduplication") {
+        record["s3uripath"] =
+          record["s3uripath"].substr(0, record["s3uripath"].lastIndexOf(".")) +
+          ".pdf";
+      }
     }
     dispatch(
       retryFOIRecordProcessing(
         requestId,
         ministryId,
-        { records: [record] },
+        { records: selectedRecords },
         (err, _res) => {
           dispatchRequestAttachment(err);
         }
@@ -1400,6 +1634,27 @@ export const RecordsLog = ({
     );
   };
 
+  const retrieveRecordVersion = (action, record) => {
+    console.log("-->",Object.keys(record).length)
+    let selectedRecords=[]
+    if(Object.keys(record).length === 0)
+      selectedRecords = records.filter((record) => record.isselected);
+    else
+      selectedRecords = [record]
+    const documentMasterIds = selectedRecords?.map(record => record.converteddocmasterid ?? record.documentmasterid);
+    dispatch(
+      retrieveSelectedRecordVersion(
+        requestId,
+        ministryId,
+        { documentmasterids: documentMasterIds,
+          recordretrieveversion: action
+         }));
+    //     (err, _res) => {
+    //     }
+    //   )
+    // );
+  }
+
   const hasDocumentsToExport =
     records?.filter(
       (record) => !(isMinistryCoordinator && record.category == "personal")
@@ -1411,6 +1666,11 @@ export const RecordsLog = ({
     setUpdateAttachment(_record);
     setMultipleFiles(false);
     switch (action) {
+      case "retrieve_uncompressed":
+        setModalFor("retrieve_uncompressed");
+        setModal(true);
+        setRetrieveSelectedRecords(_record);
+        break;
       case "replace":
         setreplaceRecord(_record);
         setModalFor("replace");
@@ -1431,12 +1691,17 @@ export const RecordsLog = ({
         setModal(false);
         break;
       case "downloadPDF":
-        downloadDocument(_record, true);
+        downloadDocument(_record, true, true, true);
         setModalFor("download");
         setModal(false);
         break;
       case "downloadoriginal":
         downloadDocument(_record, false, true);
+        setModalFor("download");
+        setModal(false);
+        break;
+      case "downloadreplaced":
+        downloadDocument(_record, false, true, true);
         setModalFor("download");
         setModal(false);
         break;
@@ -1705,6 +1970,42 @@ export const RecordsLog = ({
     return false;
   };
 
+  const disableMultiRetrieve = () => {
+      let selectedRecords = records.filter((record) => record.isselected);
+      if (selectedRecords?.length <=0)
+        return true
+      for (let record of selectedRecords) {
+        if (record.selectedfileprocessversion || record.attributes?.incompatible || !record.isdedupecomplete) return true;
+        if (record.attachments) {
+          for (let attachment of record.attachments) {
+            if (record.selectedfileprocessversion || record.attributes?.incompatible || !record.isdedupecomplete) return true;
+          }
+        }
+      }
+      return false;
+  }
+
+  const disableMultiRetry = () => {
+      let selectedRecords = records.filter((record) => record.isselected);
+      if (selectedRecords?.length <=0)
+        return true
+      for (let record of selectedRecords) {
+        if (record.isredactionready || record.selectedfileprocessversion ||
+              (!record.failed && !isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
+                  true)) return true;
+        if (record.attachments) {
+          for (let attachment of record.attachments) {
+            if (record.isredactionready || record.selectedfileprocessversion ||
+              !record.failed || !isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
+                  true) return true;
+          }
+        }
+      }
+      return false;
+  }
+
+  
+
   const displaySizeLimit = () => {
     if(RECORD_DOWNLOAD_SIZE_LIMIT >= (1024*1024*1024))
       return (RECORD_DOWNLOAD_SIZE_LIMIT/(1024*1024*1024)).toFixed(1) + "GB";
@@ -1888,7 +2189,23 @@ export const RecordsLog = ({
               && a?.trackingid === b?.trackingid;
   };
 
+  const [isBulkEdit, setIsBulkEdit] = React.useState(false);
+
+  useEffect(() => {
+    let selectedRecords = records.filter((record) => record.isselected);
+    setIsBulkEdit(selectedRecords.length > 1);
+  }, [records])
+
+  const isBulkEditDisabled = () => {
+    if (isBulkEdit) {
+    return false;
+    } else {
+      return true;
+    }
+  }
+
   const updatePersonalAttributes = (_all = false) => {
+    const selectedRecords = records.filter((record) => record.isselected);
     setEditTagModalOpen(false);
     var updateRecords = [];
     var updateDivisionForRecords = [];
@@ -1927,7 +2244,17 @@ export const RecordsLog = ({
             }
           }
         }
-      } else {
+      } else if (selectedRecords.length > 1 && !currentEditRecord) {
+        for (let selectedRecord of selectedRecords) {
+          updateRecords.push(
+            {
+              recordid: selectedRecord.recordid,
+              documentmasterid: selectedRecord.documentmasterid,
+              filepath: selectedRecord.s3uripath
+            }
+          );
+        }
+      } else if (currentEditRecord) {
         updateRecords.push(
           {
             recordid: currentEditRecord.recordid,
@@ -1939,6 +2266,7 @@ export const RecordsLog = ({
     }
 
     if(isMinistryCoordinator
+      && currentEditRecord
       && currentEditRecord.attributes.divisions[0].divisionname != "TBD"
       && currentEditRecord.attributes.divisions[0].divisionid != divisionModalTagValue) {
       updateDivisionForRecords.push(
@@ -1950,7 +2278,21 @@ export const RecordsLog = ({
       );
     }
 
-    if(currentEditRecord) {
+    if(isMinistryCoordinator
+      && selectedRecords.length > 1
+      && divisionModalTagValue !== -1
+    )
+      for (let selectedRecord of selectedRecords) {
+        updateDivisionForRecords.push(
+          {
+            recordid: selectedRecord.recordid,
+            documentmasterid: selectedRecord.documentmasterid,
+            filepath: selectedRecord.s3uripath
+          }
+        );
+      }
+
+    if(currentEditRecord || selectedRecords.length > 1) {
       if(updateRecords.length > 0 && !comparePersonalAttributes(newPersonalAttributes, curPersonalAttributes)) {
         dispatch(
           editPersonalAttributes(
@@ -2028,8 +2370,9 @@ export const RecordsLog = ({
     const toastID = toast.loading("Updating records lock status for request...");
     const data = {userrecordslockstatus: !lockRecords};
     dispatch(
-      updateUserLockedRecords(
+      updateSpecificRequestSection(
         data,
+        'userrecordslockstatus',
         requestId,
         ministryId, 
         (err, _res) => {
@@ -2128,7 +2471,7 @@ export const RecordsLog = ({
               </h1>
             </Grid>
             {validLockRecordsState() ?
-            <Grid item xs={isScanningTeamMember ? 1 : 2}>
+            <Grid item xs={isScanningTeamMember ? 1 : 1}>
               <Tooltip 
                 enterDelay={1000} 
                 title={isMinistryCoordinator ? "Only the IAO analyst can manually lock or unlock the records log, please contact the assigned analyst for assistance" : "Manually unlock or lock the records log"}
@@ -2155,31 +2498,58 @@ export const RecordsLog = ({
                 </span>
                 }
               </Tooltip>
-            </Grid> :  <Grid item xs={isScanningTeamMember ? 1 : 2}></Grid>
+            </Grid> :  <Grid item xs={isScanningTeamMember ? 1 : 1}></Grid>
             }
-            {(isMinistryCoordinator == false &&
+            {isMinistryCoordinator == false &&
               records?.length > 0 &&
               DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
-                <Grid item xs={isScanningTeamMember ? 1 : 2}>
-                <a
-                  href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
-                  target="_blank"
-                >
-                  <button
-                    className={clsx(
-                      "btn",
-                      "addAttachment",
-                      classes.createButton
-                    )}
-                    variant="contained"
-                    // onClick={}
-                    color="primary"
-                  >
-                    Redact Records
-                  </button>
-                </a>
+                // <Tooltip title={<div style={{ fontSize: "11px" }}>Some files are still processing or have errors. 
+                //   Please ensure that all files are successfully processed.</div>}>
+                  <Grid item xs={1}>
+                    {isDisableRedactRecords(records) ? (
+                      <Tooltip
+                        title={
+                          <div style={{ fontSize: "11px" }}>
+                            Some files are still processing or have errors.
+                            Please ensure that all files are successfully processed.
+                          </div>
+                        }>
+                      <span>
+                        <a
+                          href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
+                          target="_blank"
+                        >
+                          <button
+                            className={clsx(
+                              "btn",
+                              "addAttachment",
+                              classes.createButton
+                            )}
+                            variant="contained"
+                            // onClick={}
+                            disabled={isDisableRedactRecords(records)}
+                            color="primary"
+                          >
+                            Redact Records
+                          </button>
+                        </a>
+                        </span>
+                      </Tooltip>
+                    ): (
+                    <a
+                      href={DOC_REVIEWER_WEB_URL + "/foi/" + ministryId}
+                      target="_blank"
+                    >
+                      <button
+                        className={clsx("btn", "addAttachment", classes.createButton)}
+                        variant="contained"
+                        color="primary"
+                      >
+                        Redact Records
+                      </button>
+                    </a>
+                  )}
                 </Grid>
-              )
             )}
             <Grid item xs={3}>
               {hasDocumentsToDownload && !isHistoricalRequest && (
@@ -2199,7 +2569,16 @@ export const RecordsLog = ({
                   fullWidth
                 >
                   {recordsDownloadList.map((item, index) => {
-                    if (item.id != 0) {
+                    if (item.id !== 0) {
+                      if ((item.id === 2 || item.id === 3) && isPhasedRelease) {
+                        return <PhaseMenu 
+                        handlePhasePackageDownload={handlePhasePackageDownload} 
+                        item={item} 
+                        index={index} 
+                        phasedPackageDownloadStatuses={item.id === 2 ? phasedRedlineDownloadStatuses : phasedResponsePackageDownloadStatuses}
+                        getPhasePackageDatetime={getPhasePackageDatetime} 
+                        />
+                      } else {
                       return (
                         <MenuItem
                           className="download-menu-item"
@@ -2234,7 +2613,7 @@ export const RecordsLog = ({
                             <span>{item.label}</span>
                           </Tooltip>
                         </MenuItem>
-                      );
+                      )};
                     }
                   })}
                 </TextField>
@@ -2242,10 +2621,7 @@ export const RecordsLog = ({
             </Grid> 
             <Grid item xs={2}>
               {
-              (!isHistoricalRequest && (isMinistryCoordinator || (isScanningTeamMember &&
-                MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', "")) &&
-                requestType ===
-                  FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL))) && (
+              (!isHistoricalRequest) && (
                 <button
                   className={clsx("btn", "addAttachment", classes.createButton)}
                   variant="contained"
@@ -2634,6 +3010,49 @@ export const RecordsLog = ({
                 </span>
               </Tooltip>
               )}
+              {(isMCFPersonal) && (
+              <Tooltip
+                title={
+                  isBulkEditDisabled() ? (
+                    <div style={{ fontSize: "11px" }}>
+                      To bulk edit tags, please select two or more files, otherwise please use the 'Edit Tags' option from the ellipses dropdown next to the individual file
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: "11px" }}>Edit Tags</div>
+                  )
+                }
+                sx={{ fontSize: "11px" }}
+              >
+                <span>
+                  <button
+                    className={` btn`}
+                    onClick={() => {
+                      setCurPersonalAttributes({
+                        person: "",
+                        filetype: "",
+                        volume: "",
+                        trackingid: "",
+                        personaltag: ""
+                      });
+                      setDivisionModalTagValue(-1);
+                      setEditTagModalOpen(true);
+                    }}
+                    disabled={lockRecords || isBulkEditDisabled()}
+                    style={
+                      lockRecords || isBulkEditDisabled()
+                        ? { pointerEvents: "none" }
+                        : {}
+                    }
+                  >
+                    <FontAwesomeIcon
+                      icon={faPenToSquare}
+                      size="lg"
+                      color="#38598A"
+                    />
+                  </button>
+                </span>
+              </Tooltip>
+              )}
               <Tooltip title={<div style={{ fontSize: "11px" }}>Delete</div>}>
                 <span>
                   <button
@@ -2677,6 +3096,64 @@ export const RecordsLog = ({
                     }
                   >
                     <FontAwesomeIcon icon={faDownload} size="lg" color="#38598A" />
+                  </button>
+                </span>
+              </Tooltip>
+              <Tooltip
+                title={
+                  disableMultiRetrieve() ? (
+                    <div style={{ fontSize: "11px" }}>
+                      To retrieve uncompressed files:{" "}
+                      <ul>
+                        <li>at least one record must be selected</li>
+                        <li>selected records must not have been retrieved already.</li>
+                      </ul>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: "11px" }}>Retrieve Uncompressed files</div>
+                  )
+                }
+                sx={{ fontSize: "11px" }}
+              >
+                <span>
+                  <button
+                    className={` btn`}
+                    onClick={() => handlePopupButtonClick("retrieve_uncompressed", {})}
+                    disabled={lockRecords || disableMultiRetrieve() || isHistoricalRequest}
+                    style={
+                      lockRecords || !checkIsAnySelected() ? { pointerEvents: "none" } : {}
+                    }
+                  >
+                    <FontAwesomeIcon icon={faMaximize} size="lg" color="#38598A" />
+                  </button>
+                </span>
+              </Tooltip>
+              <Tooltip
+                title={
+                  disableMultiRetry() ? (
+                    <div style={{ fontSize: "11px" }}>
+                      To retry failed files:{" "}
+                      <ul>
+                        <li>at least one record must be selected</li>
+                        <li>only records with a failed status should be selected</li>
+                      </ul>
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: "11px" }}>Retry Failed files</div>
+                  )
+                }
+                sx={{ fontSize: "11px" }}
+              >
+                <span>
+                  <button
+                    className={` btn`}
+                    onClick={() => handlePopupButtonClick("retry", {})}
+                    disabled={lockRecords || disableMultiRetry() || isHistoricalRequest}
+                    style={
+                      lockRecords || disableMultiRetry() ? { pointerEvents: "none" } : {}
+                    }
+                  >
+                    <FontAwesomeIcon icon={faRotate} size="lg" color="#38598A" />
                   </button>
                 </span>
               </Tooltip>
@@ -2748,6 +3225,7 @@ export const RecordsLog = ({
             requestType={requestType}
             isScanningTeamMember={isScanningTeamMember}
             curPersonalAttributes={curPersonalAttributes}
+            retrieveSelectedRecords={retrieveSelectedRecords}
           />}
           <div className="state-change-dialog">
             <Dialog
@@ -2826,6 +3304,7 @@ export const RecordsLog = ({
               divisions={divisions}
               isMinistryCoordinator={isMinistryCoordinator}
               currentEditRecord={currentEditRecord}
+              isBulkEdit={isBulkEdit}
             />
           ):(
             <div className="state-change-dialog">
@@ -3038,7 +3517,7 @@ const Attachment = React.memo(
     setEditTagModalOpen,
     setCurrentEditRecord,
     isHistoricalRequest,
-    lockRecords
+    lockRecords,
   }) => {
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
@@ -3047,7 +3526,7 @@ const Attachment = React.memo(
       (division) => {
         return !record.attributes?.personalattributes?.personaltag || (record.attributes?.personalattributes?.personaltag && division.divisionname != record.attributes?.personalattributes?.personaltag);
       }) || [];
-    const removeInValidTagsFromDivisions = record.attributes?.divisions.filter(
+    const removeInValidTagsFromDivisions = record.attributes?.divisions?.filter(
       (division) => {
         return division.divisionname != "TBD";
       });
@@ -3102,6 +3581,21 @@ const Attachment = React.memo(
       }
     };
 
+    const showCompressedTag= (record)=> {
+      /**TODO: Create ENUM for document processes */
+      if (record.iscompressed && (!record.selectedfileprocessversion 
+        || record.selectedfileprocessversion != 1 ))
+        return true;
+      return false;
+    }
+
+    // const showOCRTag= (record)=> {
+    //   if (record.ocrfilepath != null && (!record.selectedfileprocessversion 
+    //     || record.selectedfileprocessversion != 2 ))
+    //     return true;
+    //   return false;
+    // }
+
     return (
       <>
         <Grid
@@ -3147,22 +3641,26 @@ const Attachment = React.memo(
                 color="#FAA915"
                 className={classes.statusIcons}
               />
-            ) : record.isredactionready ? (
+            ) : record.isredactionready || record.selectedfileprocessversion? (
               <FontAwesomeIcon
                 icon={faCheckCircle}
                 size="2x"
                 color="#1B8103"
                 className={classes.statusIcons}
               />
-            ) : record.failed ? (
+            ) : record.failed && !record.selectedfileprocessversion && record.attributes.trigger != "recordreplace"? (
               <FontAwesomeIcon
                 icon={faExclamationCircle}
                 size="2x"
                 color="#A0192F"
                 className={classes.statusIcons}
               />
-            ) : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
-                true && isRetry == false ? (
+            ) : ((record.updated_at != null && record.updated_at != undefined) 
+                    ? isrecordtimeout(record.updated_at, RECORD_PROCESSING_HRS) == true 
+                    : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) && 
+                  isRetry == false && !record.selectedfileprocessversion && record.attributes.trigger != "recordreplace" ?(
+                // isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
+                // true && isRetry == false && !record.selectedfileprocessversion? (
               <FontAwesomeIcon
                 icon={faExclamationCircle}
                 size="2x"
@@ -3180,12 +3678,20 @@ const Attachment = React.memo(
             <span title={record.filename} className={classes.filename}>
               {record.filename}{" "}
             </span>
-            <span className={classes.fileSize}>
+            {/* <span className={classes.fileSize}>
               {record?.attributes?.filesize > 0
                 ? (record?.attributes?.filesize / 1024).toFixed(2)
                 : 0}{" "}
-              KB
-            </span>
+              KB -orginal
+            </span> */}
+            <span className={classes.fileSize}>
+            {(
+              (record?.selectedfileprocessversion == 1 ? record?.attributes?.filesize :
+                record?.attributes?.ocrfilesize ? record?.attributes?.ocrfilesize 
+                : record?.attributes?.compressedfilesize 
+                ?? record?.attributes?.filesize ?? 0) / 1024
+            ).toFixed(2)} KB
+          </span>
           </Grid>
           <Grid
             item
@@ -3212,19 +3718,23 @@ const Attachment = React.memo(
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
                 }}
-                title={record.failed ? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
+                title={record.failed && !record.selectedfileprocessversion? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
               >
-                {record.failed ? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
+                {record.failed && !record.selectedfileprocessversion? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
               </span>
-            ) : record.isredactionready ? (
+            ) : record.isredactionready || record.selectedfileprocessversion ? (
               <span>Ready for Redaction</span>
-            ) : record.failed ? (
+            ) : record.failed && !record.selectedfileprocessversion? (
               <span>Error during {record.failed}</span>
             ) : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
-                true && isRetry == false ? (
+                true && isRetry == false && !record.selectedfileprocessversion ? (
               <span>Error due to timeout</span>
-            ) : (
+            ) : !record.isdedupecomplete?(
               <span>Deduplication & file conversion in progress</span>
+            ): !record.iscompressed ? (
+              <span>Compression in progress</span>
+            ) : (
+              <span>OCR in progress</span>
             )}
             <AttachmentPopup
               indexValue={indexValue}
@@ -3251,7 +3761,7 @@ const Attachment = React.memo(
           alignItems="flex-start"
         >
           <Grid item xs={6}>
-            {removeInValidTagsFromDivisions.length > 0 && removeInValidTagsFromDivisions.map((division, i) => (
+            {removeInValidTagsFromDivisions?.length > 0 && removeInValidTagsFromDivisions?.map((division, i) => (
               <Chip
                 item
                 key={i}
@@ -3279,9 +3789,9 @@ const Attachment = React.memo(
                 style={{
                   backgroundColor: "#003366",
                   margin:
-                    record.isattachment && removeInValidTagsFromDivisions.length === 0
+                    record.isattachment && removeInValidTagsFromDivisions?.length === 0
                       ? "4px 4px 4px 95px"
-                      : removeInValidTagsFromDivisions.length === 0
+                      : removeInValidTagsFromDivisions?.length === 0
                       ? "4px 4px 4px 35px"
                       : "4px",
                 }}
@@ -3339,7 +3849,29 @@ const Attachment = React.memo(
                 }}
               />
             }
+              <Chip
+                key={record.recordid}
+                icon={
+                  <FontAwesomeIcon
+                    icon={showCompressedTag(record) ? faMinimize : faMaximize}
+                    size="sm"
+                    style={{
+                      color:"#38598A",
+                    }}
+                  />
+                }
+                label={showCompressedTag(record) ? "Compressed" : "Uncompressed"}
+                size="small"
+                className={clsx(classes.chip, classes.chipPrimary)}
+                style={{
+                  color: "#003366",
+                  backgroundColor:"#fff",
+                  border: "1px solid #38598A",
+                  margin: "4px 10px",
+                }}
+              />
           </Grid>
+
           <Grid
             item
             xs={2}
@@ -3428,6 +3960,11 @@ const AttachmentPopup = React.memo(
       handlePopupButtonClick("rename", record);
     };
 
+    const handleRetrieveFileVersion = (retrieveVersion, record) => {
+      closeTooltip();
+      handlePopupButtonClick(retrieveVersion, record);
+    };
+
     const handleReplace = () => {
       closeTooltip();
       handlePopupButtonClick("replace", record);
@@ -3453,6 +3990,11 @@ const AttachmentPopup = React.memo(
       handlePopupButtonClick("downloadoriginal", record);
     };
 
+    const handleDownloadReplaced = () => {
+      closeTooltip();
+      handlePopupButtonClick("downloadreplaced", record);
+    };
+
     const handleView = () => {
       closeTooltip();
       opendocumentintab(record, ministryId);
@@ -3463,7 +4005,7 @@ const AttachmentPopup = React.memo(
       handlePopupButtonClick("delete", record);
     };
 
-    const handleRetry = () => {
+    const handleRetry = (record) => {
       setRetry(true);
       closeTooltip();
       handlePopupButtonClick("retry", record);
@@ -3574,6 +4116,18 @@ const AttachmentPopup = React.memo(
             ) : (
               ""
             )}
+            {!isHistoricalRequest && !record.selectedfileprocessversion && 
+              !record.attributes?.incompatible && record.isdedupecomplete && (
+              <MenuItem
+                disabled={lockRecords || disableMinistryUser}
+                onClick={() => {
+                  handleRetrieveFileVersion("retrieve_uncompressed", record);
+                  setPopoverOpen(false);
+                }}
+              >
+                Retrieve Uncompressed
+              </MenuItem>
+            )}
             {(!record.attributes?.isattachment ||
               record.attributes?.isattachment === undefined) && !isHistoricalRequest && (
               <MenuItem
@@ -3597,51 +4151,57 @@ const AttachmentPopup = React.memo(
                 Replace Attachment
               </MenuItem>
             )}
-            {record.originalfile != "" && record.originalfile != undefined && (
-              <MenuItem
-                onClick={() => {
-                  handleDownloadoriginal();
-                  setPopoverOpen(false);
-                }}
-              >
-                Download Original
-              </MenuItem>
-            )}
-            {((record.isredactionready && record.isconverted) ||
-              (record.attributes?.isattachment &&
-                record.attributes?.trigger === "recordreplace")) && (
+            {/* {record.originalfile != "" && record.originalfile != undefined && ( */}
+            <MenuItem
+              onClick={() => {
+                handleDownloadoriginal();
+                setPopoverOpen(false);
+              }}
+            >
+              Download Original
+            </MenuItem>
+            {/* )} */}
+            {(record.attributes?.isattachment &&
+                record.attributes?.trigger === "recordreplace") && (
               <MenuItem
                 onClick={() => {
                   handleDownloadPDF();
                   setPopoverOpen(false);
                 }}
               >
-                {record.attributes?.isattachment &&
-                record.attributes?.trigger === "recordreplace"
-                  ? "Download Replaced"
-                  : "Download Converted"}
+                Download Replaced
               </MenuItem>
             )}
-            <MenuItem
-              onClick={() => {
-                handleDownload();
-                setPopoverOpen(false);
-              }}
-            >
-              {record.originalfile != "" && record.originalfile != undefined
-                ? "Download Replaced"
-                : record.attributes?.isattachment
-                ? "Download Original"
-                : "Download"}
-            </MenuItem>
+            {(record.isredactionready && (record.isconverted || record.iscompressed ||
+                 record.ocrfilepath) && !record.attributes.incompatible) && (
+              <MenuItem
+                onClick={() => {
+                  handleDownload()
+                  setPopoverOpen(false);
+                }}
+              >
+                Download Converted
+              </MenuItem>
+            )}
+            {record.originalfile != "" && record.originalfile != undefined &&
+              <MenuItem
+                onClick={() => {
+                  handleDownloadReplaced();
+                  setPopoverOpen(false);
+                }}
+              >
+                Download Replaced
+              </MenuItem>
+            }
+
             {!record.isattachment && !isHistoricalRequest && <DeleteMenu />}
-            {!record.isredactionready &&
+            {!record.isredactionready && !record.selectedfileprocessversion &&
               (record.failed ||
                 isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
                   true) && (
                 <MenuItem
                   onClick={() => {
-                    handleRetry();
+                    handleRetry(record);
                     setPopoverOpen(false);
                   }}
                 >

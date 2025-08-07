@@ -104,7 +104,7 @@ jobs:
         run: |
           oc tag ${{ env.APP_NAME }}:latest ${{ env.APP_NAME }}:${{ env.TAG_NAME }}
 
-      - name: Watch new rollout (trigger by image change in Openshift)
+      - name: Rollout Restart Deployment
         shell: bash
         run: |
           oc rollout latest deploymentconfig/forms-flow-web-rook
