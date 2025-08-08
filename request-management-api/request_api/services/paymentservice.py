@@ -153,4 +153,6 @@ class paymentservice:
         _latesttemplateid = latestcorrespondence['templateid'] if 'templateid' in latestcorrespondence else None
         if _latesttemplateid:
             return applicantcorrespondenceservice().gettemplatebyid(_latesttemplateid).name
+        if 'templatename' in latestcorrespondence:
+            return latestcorrespondence['templatename']
         return None

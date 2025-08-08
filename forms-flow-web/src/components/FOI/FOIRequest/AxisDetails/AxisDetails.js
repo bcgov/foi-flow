@@ -101,7 +101,7 @@ const AxisDetails = React.memo(({
     
     const validateAxisId = (inputValue) => {
       let helperText = "";
-      const axisIDPattern = /^[A-Za-z]+-\d{4}-\d{5}$/;
+      const axisIDPattern = /^[A-Za-z]+-\d+\-\d+(?:-\d+)?$/;
       const consultAxisIDPattern = /^[A-Za-z]+-\d{4}-\d{5}-CON$/;
       const pattern = requestDetails.isconsultflag ? consultAxisIDPattern : axisIDPattern;
 

@@ -1,0 +1,97 @@
+"""Update ApplicantCorrespondenceTemplates uripath
+
+Revision ID: f5150a6969c6
+Revises: b37c4c21e1ab
+Create Date: 2025-07-15 10:31:55.948739
+
+"""
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+
+# revision identifiers, used by Alembic.
+revision = 'f5150a6969c6'
+down_revision = 'b37c4c21e1ab'
+branch_labels = None
+depends_on = None
+
+
+def upgrade():
+    op.add_column('FOIApplicantCorrespondences', sa.Column('sent_from_email', sa.String(length=255), nullable=True))
+    op.add_column('FOIApplicantCorrespondencesRawRequests', sa.Column('sent_from_email', sa.String(length=255), nullable=True))
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_estimate_notification_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/fee_estimate_notification.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_estimate_notification_outstanding_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/fee_estimate_notification_outstanding.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_payment_confirmation_full_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/fee_payment_confirmation_full.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_payment_confirmation_half_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/fee_payment_confirmation_half.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_payment_confirmation_outstanding_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/fee_payment_confirmation_outstanding.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/oipc_applicant_consent_time_extension_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/oipc_applicant_consent_time_extension.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/oipc_first_time_extension_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/oipc_first_time_extension.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/oipc_subsequent_time_extension_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/oipc_subsequent_time_extension.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/extension_pb_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/extension_pb.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/generic_cover_email_template_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/generic_cover_email_template.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/acknowledgement_letter_sf.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/acknowledgement_letter.html\';commit;')
+    op.execute('UPDATE public."ProgramAreas" SET name = \'Ministry of Jobs and Economic Growth\' WHERE name = \'Ministry of Jobs, Economic Development and Innovation\';commit;')
+
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'PRequestforLocationunders27and33\', \'P - Request for Location under s27(1)(e) and s33 2(d)\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/P - Request for Location under s27(1)(e) and s33 2(d).docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'PReleasePackagePrepRequest\', \'P - Release Package Prep Request\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/P - Release Package Prep Request.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'PQACompleteCFD\', \'P - QA Complete (CFD)\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/P - QA Complete (CFD).docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'PMVANarrowingTimeline\', \'P - MVA Narrowing Timeline\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/P - MVA Narrowing Timeline.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'GSignOffCoverEmail\', \'G - Sign Off Cover Email\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/G - Sign Off Cover Email.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'GSignEmailResourceTeam\', \'G - Sign Email - Resource Team\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/G - Sign Email - Resource Team.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'GFeesRevisedFeeEstimate\', \'G - Fees - Revised Fee Estimate\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/G - Fees - Revised Fee Estimate.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'GFeesRefundRequest\', \'G - Fees - Refund Request\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/G - Fees - Refund Request.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'GFeesEstimateCoverEmail\', \'G - Fees - Estimate Cover Email\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/G - Fees - Estimate Cover Email.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'GFeesEstimateandWaiverEmail\', \'G - Fees - Estimate and Waiver Email\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/G - Fees - Estimate and Waiver Email.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'GFeesBalanceDueEmail\', \'G - Fees - Balance Due Email\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/G - Fees - Balance Due Email.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'ATransferRequesttoOtherPB\', \'A - Transfer Request to Other PB\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/A - Transfer Request to Other PB.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'ATransferEmailtoOtherPublicBody\', \'A - Transfer Email to Other Public Body\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/A - Transfer Email to Other Public Body.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'ATransferEmailtoIntake\', \'A - Transfer Email to Intake\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/A - Transfer Email to Intake.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'ASignOffRestrictedSocialEducationTeam\', \'A - Sign Off Restricted - Social Education Team\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/A - Sign Off Restricted - Social Education Team.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'ASignOffReminderSocialEducationTeam\', \'A - Sign Off Reminder - Social Education Team\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/A - Sign Off Reminder - Social Education Team.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'AOOPNRRApproval\', \'A - OOP - NRR Approval\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/A - OOP - NRR Approval.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'AOIPCProductionofRecords\', \'A - OIPC - Production of Records\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/A - OIPC - Production of Records.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'AOIPCNotificationtoPB\', \'A - OIPC - Notification to PB\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/A - OIPC - Notification to PB.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'AOIPCBlankEmailTemplate\', \'A - OIPC - Blank Email Template\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/A - OIPC - Blank Email Template.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'AExtRequestforApplicantConsent\', \'A - Ext - Request for Applicant Consent\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/A - Ext - Request for Applicant Consent.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'AExtNotificationtoApplicant\', \'A - Ext - Notification to Applicant\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/A - Ext - Notification to Applicant.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+    op.execute('INSERT INTO "public"."Template" ("filename", "templatename", "extension", "isactive", "requesttype", "templatetype", "documentpath", "encodedcontent", "createdby", "createdat", "updatedby", "updatedat") VALUES (\'AConsultSenttoPB\', \'A - Consult - Sent to PB\', \'.docx\', TRUE, \'Both\', \'email\', \'/TEMPLATES/EMAILS/SYNCFUSION/A - Consult - Sent to PB.docx\', \'\', -1, NOW(), NULL, NULL);commit;')
+
+def downgrade():
+    op.drop_column('FOIApplicantCorrespondences', 'sent_from_email')
+    op.drop_column('FOIApplicantCorrespondencesRawRequests', 'sent_from_email')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/fee_estimate_notification.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_estimate_notification_sf.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/fee_estimate_notification_outstanding.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_estimate_notification_outstanding_sf.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/fee_payment_confirmation_full.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_payment_confirmation_full_sf.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/fee_payment_confirmation_half.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_payment_confirmation_half_sf.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/fee_payment_confirmation_outstanding.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/fee_payment_confirmation_outstanding_sf.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/oipc_applicant_consent_time_extension.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/oipc_applicant_consent_time_extension_sf.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/oipc_first_time_extension.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/oipc_first_time_extension_sf.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/oipc_subsequent_time_extension.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/oipc_subsequent_time_extension_sf.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/extension_pb.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/extension_pb_sf.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/generic_cover_email_template.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/generic_cover_email_template_sf.html\';commit;')
+    op.execute('UPDATE public."ApplicantCorrespondenceTemplates" SET documenturipath = \'/TEMPLATES/EMAILS/acknowledgement_letter.html\' WHERE documenturipath = \'/TEMPLATES/EMAILS/SYNCFUSION/acknowledgement_letter_sf.html\';commit;')
+    op.execute('UPDATE public."ProgramAreas" SET name = \'Ministry of Jobs, Economic Development and Innovation\' WHERE name = \'Ministry of Jobs and Economic Growth\';commit;')
+
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'P - Request for Location under s27(1)(e) and s33 2(d)\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'P - Release Package Prep Request\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'P - QA Complete (CFD)\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'P - MVA Narrowing Timeline\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'G - Sign Off Cover Email\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'G - Sign Email - Resource Team\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'G - Fees - Revised Fee Estimate\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'G - Fees - Refund Request\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'G - Fees - Estimate Cover Email\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'G - Fees - Estimate and Waiver Email\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'G - Fees - Balance Due Email\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'A - Transfer Request to Other PB\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'A - Transfer Email to Other Public Body\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'A - Transfer Email to Intake\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'A - Sign Off Restricted - Social Education Team\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'A - Sign Off Reminder - Social Education Team\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'A - OOP - NRR Approval\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'A - OIPC - Production of Records\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'A - OIPC - Notification to PB\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'A - OIPC - Blank Email Template\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'A - Ext - Request for Applicant Consent\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'A - Ext - Notification to Applicant\'')
+    op.execute('DELETE FROM "public"."Template" WHERE templatename = \'A - Consult - Sent to PB\'')

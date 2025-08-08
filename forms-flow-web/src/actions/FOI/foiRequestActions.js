@@ -542,6 +542,13 @@ export const setFOICommentTypes = (data) => (dispatch) => {
   });
 };
 
+export const setFOIEmailTemplates = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_EMAIL_TEMPLATES,
+    payload: data,
+  });
+};
+
 export const setFOIPDFStitchStatusesForPhasedRedlines = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUSES_FOR_PHASEDREDLINES,
@@ -555,6 +562,7 @@ export const setFOIPDFStitchedRecordsForPhasedRedlines = (data) => (dispatch) =>
     payload: data
   });
 }
+
 export const setShowKeywordSearch = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.SHOW_KEYWORD_SEARCH,

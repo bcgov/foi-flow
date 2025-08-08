@@ -187,7 +187,8 @@ const FileUpload = ({
     const getTagMessage = (uploadFor) => {
       if (uploadFor === "email") return null;
       if (uploadFor === "response") {
-        return <p>Only one response may be added at a time.</p>;
+        // return <p>Only one response may be added at a time.</p>;
+        return <></>
       }
       return (
         <p>
