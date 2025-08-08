@@ -316,7 +316,7 @@ const CommunicationStructure = ({
       for (let header of response.data) {
         await getFileFromS3(header, (_err, res) => {
           let blob = new Blob([res.data], {type: "application/octet-stream"});
-          blobs.push({name: header.filename, lastModified: res.headers['last-modified'], input: blob})
+          blobs.push({name: `attachment - ${header.filename}`, lastModified: res.headers['last-modified'], input: blob})
         });
       }
       toast.update(toastID, {
