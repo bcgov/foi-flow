@@ -3,12 +3,14 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
 from request_api.models.FOIRequestWatchers import FOIRequestWatcher
+from request_api.models.FOIMinistryRequestConsults import FOIMinistryRequestConsults
 from dateutil import tz, parser
 import datetime as dt
 from pytz import timezone
 import pytz
 import maya
 from request_api.auth import AuthHelper
+from collections import defaultdict
 
 from flask import jsonify
 
@@ -78,7 +80,17 @@ class dashboardservice:
 
     def getrequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):        
         requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.getusertype())
-        requestqueue = []                
+        requestqueue = []            
+        
+        ministry_ids = [getattr(request, 'ministryrequestid', None) for request in requests.items if getattr(request, 'ministryrequestid', None) is not None]
+    
+        sub_consults = FOIMinistryRequestConsults.get_sub_consults_by_ministry_ids(ministry_ids)
+
+        consult_map = defaultdict(list)
+        for consult in sub_consults:
+            key = str(consult["foiministryrequestid"])
+            consult_map[key].append(consult)
+
         for request in requests.items:
             
             if(request.receivedDateUF is None): #request from online form has no received date in json
@@ -96,6 +108,7 @@ class dashboardservice:
                     unopenrequest.update({'lastName': 'Restricted'})
                     unopenrequest.update({'firstName': 'Request'})
                 
+                unopenrequest['subConsults'] = []
                 requestqueue.append(unopenrequest) 
 
             else:
@@ -111,7 +124,10 @@ class dashboardservice:
                 if isiaorestricted == True:
                     _openrequest.update({'lastName': 'Restricted'})
                     _openrequest.update({'firstName': 'Request'})
-
+                
+                
+                key = str(request.ministryrequestid)
+                _openrequest['subConsults'] = consult_map.get(key, [])
                 requestqueue.append(_openrequest)   
                    
 
@@ -127,7 +143,7 @@ class dashboardservice:
 
 
 
-
+        print("requestqueue : ",requestqueue)
         return jsonify({'data': requestqueue, 'meta': meta})
 
     def getministryrequestqueuepagination (self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):

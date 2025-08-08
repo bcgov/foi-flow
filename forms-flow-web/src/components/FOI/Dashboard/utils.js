@@ -5,8 +5,10 @@ import {
   calculateDaysRemaining,
 } from "../../../helper/FOI/helper";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
-import { MinistryNeedsLANPages, RequestTypes } from "../../../constants/FOI/enum";
+import { MinistryNeedsLANPages, RequestTypes, ConsultTypes } from "../../../constants/FOI/enum";
 import Chip from "@mui/material/Chip";
+import Box from "@mui/material/Box";
+import LabelIcon from '@mui/icons-material/Label';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFlag } from '@fortawesome/free-solid-svg-icons'; 
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
@@ -310,13 +312,28 @@ export const cellTooltipRender = (params) => {
   if (params.row.fromdate && params.row.todate) {
     description += "\n(" + (new Date(params.row.fromdate)).toLocaleDateString() + " to " + (new Date(params.row.todate)).toLocaleDateString() + ")"
   }
-  return <LightTooltip placement="bottom-start" title={
-    <div style={{whiteSpace: "pre-line"}}>
-      {description}
-    </div>
-  }>
-    <span className="table-cell-truncate">{params.row.axisRequestId}</span>
-  </LightTooltip>
+
+  const hasSubConsults = Array.isArray(params.row.subConsults) && params.row.subConsults.length > 0;
+
+  return (
+    <Box display="flex" alignItems="center" gap={0.5} sx={{ minWidth: 0, flex: 1 }}>
+      {hasSubConsults && (
+        <LightTooltip placement="top" title="This request has internal consultations">
+          <div className="subconsult-flag-container" style={{ flexShrink: 0 }}>
+            <LabelIcon className="subconsult-label-bg" />
+            <FontAwesomeIcon icon={faFlag} className="subconsult-flag-icon" />
+          </div>
+        </LightTooltip>
+      )}
+      <LightTooltip placement="bottom-start" title={
+        <div style={{whiteSpace: "pre-line"}}>
+          {description}
+        </div>
+      }>
+        <span className="table-cell-truncate" style={{ minWidth: 0, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis' }}>{params.row.axisRequestId}</span>
+      </LightTooltip>
+    </Box>
+  );
 };
 
 export const pagecountcellTooltipRender = (params) => {
@@ -354,4 +371,61 @@ export const eventCellTooltipRender = (params) => {
     </LightTooltip>
   );
   }
+};
+
+export const getConsultType = (params) => {
+  const typeId = params;
+  return ConsultTypes[typeId] || '';
+}
+
+export const getConsultReceivedDate = (params) => {
+  let createdAtString = params.row.receivedDate;
+  console.log("createdAtString : ",createdAtString)
+  const dateString = createdAtString
+    ? createdAtString.substring(0, 10)
+    : "";
+  let createdAt = createdAtString ? new Date(createdAtString) : "";
+
+  if (
+    createdAt !== "" &&
+    (createdAt.getHours() > 16 ||
+      (createdAt.getHours() === 16 && createdAt.getMinutes() > 30) ||
+      !businessDay(dateString))
+  ) {
+    createdAt = addBusinessDays(createdAt, 1);
+  }
+
+  return formatDate(createdAt, "MMM dd yyyy").toUpperCase();
+};
+
+export const getConsultDueDaysLeft = (params) => {
+  const receivedDateString = params.row.consultduedate;
+
+  if (
+    [StateEnum.onhold.name.toLowerCase(), StateEnum.closed.name.toLowerCase(), StateEnum.onholdother.name.toLowerCase()].includes(params.row.currentState.toLowerCase())
+  ) {
+    return "N/A";
+  } else if(!receivedDateString) {
+    return "";
+  } else {
+    return `${calculateDaysRemaining(receivedDateString)}`;
+  }
+};
+
+export const mergeSubConsultsWithRow = (row) => {
+  if (!Array.isArray(row?.subConsults)) return [];
+
+  return row.subConsults.map((consult) => ({
+    ...consult,
+    firstName: row.firstName,
+    lastName: row.lastName,
+    onBehalfFormatted: row.onBehalfFormatted,
+    extensions: row.extensions,
+    applicantcategory: row.applicantcategory,
+    idnumber: row.idnumber,
+    duedate: row.duedate,
+    cfrduedate: row.cfrduedate,
+    requestpagecount: row.requestpagecount,
+    applicantcategory: row.applicantcategory,
+  }));
 };

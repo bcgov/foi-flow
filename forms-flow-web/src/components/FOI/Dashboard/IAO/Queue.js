@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import "../dashboard.scss";
 import useStyles from "../CustomStyle";
@@ -22,6 +22,7 @@ import Paper from "@mui/material/Paper";
 import clsx from "clsx";
 import { CustomFooter } from "../CustomFooter"
 
+import CustomExpandableTable from "../CustomExpandableTable";
 const Queue = ({ userDetail, tableInfo }) => {
   const dispatch = useDispatch();
 
@@ -70,6 +71,7 @@ const Queue = ({ userDetail, tableInfo }) => {
   }, [rowsState, sortModel, keyword, requestFilter]);
 
   const columnsRef = React.useRef(tableInfo?.columns || []);
+  const subConsultsColumnsRef = React.useRef(tableInfo?.subConsultsColumns || []);
 
   const requestFilterChange = (filter) => {
     if (filter === requestFilter) {
@@ -103,6 +105,21 @@ const Queue = ({ userDetail, tableInfo }) => {
     }
   };
 
+  const renderConsultReviewRequest = (e) => {
+
+    // The consult data should have these fields from the backend
+    const consultId = e.row.consultid || e.row.id;
+    const ministryRequestId = e.row.foiministryrequestid || e.row.ministryrequestid;
+    const requestId = e.row.requestid || e.row.requestId || e.row.id;
+    
+    if (ministryRequestId && consultId && requestId) {
+      const url = `/foi/foirequests/${requestId}/ministryrequest/${ministryRequestId}/consult/${consultId}`;
+      dispatch(
+        push(url)
+      );
+    } 
+  };
+
   if (requestQueue === null) {
     return (
       <Grid item xs={12} container alignItems="center">
@@ -117,7 +134,6 @@ const Queue = ({ userDetail, tableInfo }) => {
     }
     dispatch(setQueueParams({...queueParams, sortModel: model}));
   };
-
   return (
     <>
       <Grid item container alignItems="center" xs={12}>
@@ -217,13 +233,14 @@ const Queue = ({ userDetail, tableInfo }) => {
           </Grid>
         </Paper>
       </Grid>
-      <Grid item xs={12} style={{ minHeight: 300 }} className={classes.root}>
-        <DataGrid
+      <Grid item xs={12} style={{ minHeight: 300, width: '100%', overflow: 'hidden' }} className={classes.root}>
+        {/* <DataGrid
           autoHeight
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
-          rows={rows}
-          columns={columnsRef.current}
+          rows={displayRows}
+          columns={displayColumns}
+          getRowHeight={getRowHeight}
           rowHeight={30}
           headerHeight={50}
           rowCount={requestQueue?.meta?.total || 0}
@@ -261,9 +278,49 @@ const Queue = ({ userDetail, tableInfo }) => {
               && tableInfo?.noAssignedClassName
             )
           }
-          onRowClick={renderReviewRequest}
+          //onRowClick={renderReviewRequest}
+          onRowClick={(params, event) => {
+            if (!params.row.isExpanded) renderReviewRequest(params);
+          }}
           loading={isLoading}
-        />
+        /> */}
+        {/* <ExpandedSubConsultTable
+          rows={rows}
+          columnsRef={columnsRef}
+        /> */}
+       <CustomExpandableTable
+        columns={columnsRef.current}
+        subConsultsColumns={subConsultsColumnsRef}
+        rows={rows}
+        getRowId={row => row.idNumber}
+        rowCount={requestQueue?.meta?.total || 0}
+        page={rowsState?.page}
+        pageSize={rowsState?.pageSize}
+        onPageChange={newPage => dispatch(setQueueParams({ ...queueParams, rowsState: { ...rowsState, page: newPage } }))}
+        onPageSizeChange={newPageSize => dispatch(setQueueParams({ ...queueParams, rowsState: { ...rowsState, pageSize: newPageSize } }))}
+        sortModel={sortModel[0]}
+        onSortModelChange={model => handleSortChange([model])}
+        //filterModel={}
+        //onFilterChange={}
+        getRowClassName={({ row }) =>
+          clsx(
+            `super-app-theme--${row.currentState?.toLowerCase().replace(/ +/g, "")}`,
+            tableInfo?.stateClassName?.[
+              row.currentState?.toLowerCase().replace(/ +/g, "")
+            ],
+            (row.assignedTo == null && userDetail?.groups?.indexOf("/" + row.assignedGroup) > -1)
+            && tableInfo?.noAssignedClassName
+          )
+        }
+        onRowClick={({ row }) => renderReviewRequest({ row })}
+        onConsultRowClick={({ row }) => {
+          console.log("onConsultRowClick callback triggered with:", { row });
+          renderConsultReviewRequest({ row });
+        }}
+        loading={isLoading}
+        //FooterComponent={<CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={tableInfo.sort} footerFor={"queue"} />}
+      /> 
+       
       </Grid>
     </>
   );

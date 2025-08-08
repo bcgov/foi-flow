@@ -174,6 +174,11 @@ const RequestTypes = Object.freeze({
   personal: "personal"
 });
 
+const ConsultTypes = Object.freeze({
+  1: "Internal Consult",
+  2: "External Consult"
+});
+
 const MCFPopularSections = 21
 const MSDPopularSections = 11
 
@@ -220,5 +225,6 @@ RecordsDownloadList,
 RecordDownloadCategory,
 RecordDownloadStatus,
 MinistryNeedsLANPages,
-RequestTypes
+RequestTypes,
+ConsultTypes
 };
