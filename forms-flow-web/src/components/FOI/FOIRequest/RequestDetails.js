@@ -15,6 +15,12 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MinistriesCanvassed from '../customComponents/MinistriesCanvassed/MinistriesCanvassed';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import InputAdornment from "@material-ui/core/InputAdornment";
+import SvgIcon from "./InternalConsultation/SvgIcon";
+import { Chip } from '@mui/material';
+import clsx from "clsx";
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 
 
 const RequestDetails = React.memo(
@@ -23,9 +29,17 @@ const RequestDetails = React.memo(
     requestStatus,
     handleRequestDetailsValue,
     handleRequestDetailsInitialValue,
+    handleConsultRequestDetailsValue,
+    handleConsultRequestDetailsInitialValue,
     createSaveRequestObject,
     disableInput,
-    isHistoricalRequest
+    isHistoricalRequest, 
+    isAddConsultRequest,
+    isDataSynced,
+    requestConsults,
+    setUnSavedRequest,
+    createSaveConsultRequestObject,
+    handleConsultDueDateValidation,
   }) => {    /**
      *  Request details box in the UI
      *  All fields are mandatory here
@@ -39,7 +53,31 @@ const RequestDetails = React.memo(
       },
       accordionSummary: {
         flexDirection: 'row-reverse'
-      }
+      },
+      showConsultDueDateFieldValidation: {
+        color: "#CE3E39",
+        fontStyle: 'italic',
+        fontSize: '13px !important',
+      },
+      hideConsultDueDateFieldValidation: {
+        visibility: 'hidden',
+      },
+      warningAmberIcon:{
+        color: "#CE3E39 !important",
+        width: "20px",
+        transform: 'translateY(-1%)',
+        fontSize: "medium !important",
+      },
+      showDueDateIcon: {
+        color: "#CE3E39 !important",
+        backgroundColor: "#fff !important",
+        position: 'absolute',
+        right: 37,
+        pointerEvents: 'none',
+      },
+      hideDueDateIcon: {
+        visibility: 'hidden',
+      },
     });
     const classes = useStyles();
     const disableFieldForMinistryRequest = shouldDisableFieldForMinistryRequests(requestStatus)
@@ -98,6 +136,8 @@ const RequestDetails = React.memo(
     const receivedMode = useSelector(state=> state.foiRequests.foiReceivedModeList);
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
     const [openModal, setModal] = useState(false);
+    const [consultDueDate, setConsultDueDate] = useState(requestConsults?.dueDate ? requestConsults?.dueDate : '')
+    const [isConsultDueDateValid, setIsConsultDueDateValid] = React.useState(false);
     const calculateReceivedDate = (receivedDateString) => {
       const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
       receivedDateString = receivedDateString ? new Date(receivedDateString): "";
@@ -130,8 +170,10 @@ const RequestDetails = React.memo(
         requestState: findRequestState(requestDetails?.requeststatuslabel)
       }
       //event bubble up - sets the initial value to validate the required fields
-      handleRequestDetailsInitialValue(requestDetailsObject);
-      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES, requestDetailsObject);
+      if (!isAddConsultRequest) {
+        handleRequestDetailsInitialValue(requestDetailsObject);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES, requestDetailsObject);
+      }
     },[requestDetails, handleRequestDetailsInitialValue])
     
     const prevConsultFlag = React.useRef(requestDetails?.isconsultflag);
@@ -140,8 +182,10 @@ const RequestDetails = React.memo(
       if (prevConsultFlag.current === true && !requestDetails?.isconsultflag) {
         const calculatedDueDate = startDateText ? dueDateCalculation(startDateText) : "";
         setDueDate(calculatedDueDate);
+        if (!isAddConsultRequest) {
         handleRequestDetailsValue(calculatedDueDate, FOI_COMPONENT_CONSTANTS.DUE_DATE);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DUE_DATE, calculatedDueDate);
+        }
       }
 
       prevConsultFlag.current = requestDetails?.isconsultflag;
@@ -198,6 +242,7 @@ const RequestDetails = React.memo(
       setReceivedDate(receivedDate);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(receivedDate, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE);
+      if (isAddConsultRequest) { handleConsultRequestDetailsValue(receivedDate, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE); }
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_DATE, receivedDate);
     }
     const handleStartDateChange = (e) => {
@@ -206,24 +251,28 @@ const RequestDetails = React.memo(
       setDueDate(dueDate);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, dueDate);
+      if (isAddConsultRequest) { handleConsultRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, dueDate); }
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, e.target.value, dueDate);
     }
     const handleRequestTypeChange = (e) => {
       setSelectedRequestType(e.target.value);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE);
+      if (isAddConsultRequest) { handleConsultRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE); }
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.REQUEST_TYPE, e.target.value);
     }
     const handleReceivedModeChange = (e) => {
       setSelectedReceivedMode(e.target.value);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE);
+      if (isAddConsultRequest) { handleConsultRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE); }
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECEIVED_MODE, e.target.value);
     }
     const handleDeliveryModeChange = (e) => {
       setSelectedDeliveryMode(e.target.value);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
+      if (isAddConsultRequest) { handleConsultRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE); }
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, e.target.value);
     }
 
@@ -232,7 +281,20 @@ const RequestDetails = React.memo(
       setDueDate(newDueDate);
       handleRequestDetailsValue(newDueDate, FOI_COMPONENT_CONSTANTS.DUE_DATE);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DUE_DATE, newDueDate);
+      if (isAddConsultRequest) { handleConsultDueDateValidation(newDueDate); }
     }
+
+    const handleConsultDueDateChange = (event) => {
+      const newDueDate = event.target.value;
+      setConsultDueDate(newDueDate);
+
+      // Validate the due date
+      const isValid = newDueDate && new Date(newDueDate) >= new Date(requestDetails.receivedDate);
+      setIsConsultDueDateValid(isValid);
+      handleConsultRequestDetailsValue(event.target.value, FOI_COMPONENT_CONSTANTS.CONSULT_DUE_DATE);
+      setUnSavedRequest(true);
+      createSaveConsultRequestObject(FOI_COMPONENT_CONSTANTS.CONSULT_DUE_DATE, newDueDate);
+    };
     
      return (
 
@@ -240,6 +302,13 @@ const RequestDetails = React.memo(
       <Accordion defaultExpanded={true}>
         <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} id="requestDetails-header">
           <Typography className={classes.heading}>REQUEST DETAILS</Typography>
+          {isDataSynced && (
+              <Chip
+                  icon={<CheckCircleOutlineIcon className="synced-data-icon"/>}
+                  label={"Synchronized data"}
+                  className="synced-data-chip"
+              />
+            )}
         </AccordionSummary>
         <AccordionDetails>
           <div>
@@ -267,7 +336,7 @@ const RequestDetails = React.memo(
                   required
                   error={receivedDateText === undefined || receivedDateText === ""}
                   fullWidth
-                  disabled={!!ministryId || disableInput}
+                  disabled={!!ministryId || disableInput || isDataSynced}
                 />
                 <TextField
                   id="originalDueDate"
@@ -295,7 +364,7 @@ const RequestDetails = React.memo(
                   }}
                   variant="outlined"
                   required
-                  disabled={!requestDetails?.isconsultflag || requestDetails?.currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase()}
+                  disabled={!requestDetails?.isconsultflag || requestDetails?.currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() || isDataSynced}
                   fullWidth
                 />
             </div>
@@ -315,7 +384,7 @@ const RequestDetails = React.memo(
                     required
                     error={startDateText === undefined || startDateText === ""}
                     fullWidth
-                    disabled={!!ministryId || disableInput}
+                    disabled={!!ministryId || disableInput || isDataSynced}
                 />
                 <TextField
                     id="recordsDueDate"
@@ -332,7 +401,49 @@ const RequestDetails = React.memo(
                     fullWidth
                     disabled
                 />
-                <TextField
+                {isAddConsultRequest? (
+                  <>
+                  <TextField
+                  id="consultDueDate"
+                  label="Consult(s) due date*"
+                  type="date"
+                  value={consultDueDate}
+                  onChange={handleConsultDueDateChange}
+                  inputProps={{ "aria-labelledby": "startDate-label"}}
+                  InputLabelProps={{
+                  shrink: true,
+                  }}
+                  InputProps={{
+                    endAdornment: (
+                    <InputAdornment position="start">
+                      <Chip
+                          icon={
+                              <WarningAmberIcon
+                              className={clsx(classes.warningAmberIcon)} 
+                              />
+                          }
+                          className={clsx({
+                              [classes.showDueDateIcon]: !isConsultDueDateValid,
+                              [classes.hideDueDateIcon]: isConsultDueDateValid,
+                          })}
+                      />
+                    </InputAdornment>
+                  ),inputProps: { min: receivedDateText } 
+                  }}
+                  variant="outlined"
+                  required
+                  error={consultDueDate === undefined || consultDueDate === ""}
+                  fullWidth
+              />
+                <h5
+                    className={clsx({
+                      [classes.showConsultDueDateFieldValidation]: !isConsultDueDateValid,
+                      [classes.hideConsultDueDateFieldValidation]: isConsultDueDateValid,
+                    })}
+                >This field is required</h5>
+                  </>
+                ):(
+                    <TextField
                     id="closedDate"
                     label="Closed Date"
                     value={requestDetails?.currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase() ?
@@ -347,7 +458,10 @@ const RequestDetails = React.memo(
                     error={startDateText === undefined || startDateText === ""}
                     fullWidth
                     disabled
-                />
+                    />
+                )}
+                
+                
             </div>
           </div>
 
@@ -366,7 +480,7 @@ const RequestDetails = React.memo(
                         variant="outlined"
                         fullWidth
                         required
-                        disabled={disableInput || disableFieldForMinistryRequest}
+                        disabled={disableInput || disableFieldForMinistryRequest || isDataSynced}
                         error={selectedRequestType.toLowerCase().includes("select")}
                     >
                     {requestTypes}

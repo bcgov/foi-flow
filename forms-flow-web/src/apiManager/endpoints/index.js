@@ -199,6 +199,12 @@ const API = {
   FOI_GET_OIPC_INQUIRYOUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/inquiryoutcomes`,
   FOI_GET_COMMENT_TYPES: `${FOI_BASE_API_URL}/api/foiflow/commenttypes`,
 
+  FOI_POST_REQUEST_CONSULTS: `${FOI_BASE_API_URL}/api/foiconsult/<foirequestid>/ministryrequest/<foiministryrequestid>`,
+  FOI_GET_REQUEST_CONSULTS: `${FOI_BASE_API_URL}/api/foiconsult/ministryrequest/<ministryrequestid>`,
+  FOI_GET_ORIGINAL_REQUEST_DETAILS: `${FOI_BASE_API_URL}/api/foiconsult/axisrequestid/<axisrequestid>`,
+  FOI_POST_RAW_CONSULT_REQUEST_ASSIGNEE_API: `${FOI_BASE_API_URL}/api/foiconsult/<foirequestid>/ministryrequest/<foiministryrequestid>/assignee`,
+  FOI_POST_MINISTRY_CONSULT_REQUEST_ASSIGNEE_API: `${FOI_BASE_API_URL}/api/foiconsult/<foirequestid>/ministryrequest/<foiministryrequestid>/<usertype>/assignee`,
+
   FOI_GET_CROSSTEXTSEARCH_AUTH: `${FOI_BASE_API_URL}/api/foicrosstextsearch/authstring`,
   FOI_GET_CROSSTEXTSEARCH_REQUEST_DETAILS: `${FOI_BASE_API_URL}/api/foicrosstextsearch/requests`,
   FOI_GET_EMAIL_TEMPLATES: `${FOI_TEMPLATE_API_URL}/api/Template/GetTemplates`,

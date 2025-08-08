@@ -7,7 +7,10 @@ import {
   displayHeaderIcon,
   displayQueueFlagIcons,
   cellTooltipRender,
-  pagecountcellTooltipRender
+  pagecountcellTooltipRender,
+  getConsultType, 
+  getConsultReceivedDate, 
+  getConsultDueDaysLeft
 } from "../utils";
 import {
   isProcessingTeam,
@@ -111,7 +114,7 @@ const IntakeTeamColumns = [
     field: "axisRequestId",
     headerName: "ID NUMBER",
     headerAlign: "left",
-    width: 160,
+    width: 120,
     renderCell: cellTooltipRender
   },
   {
@@ -120,7 +123,7 @@ const IntakeTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       getFullName(params.row.firstName, params.row.lastName),
-    width: 180,
+    width: 140,
   },
   {
     field: "onBehalfFormatted",
@@ -128,36 +131,36 @@ const IntakeTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       params.row.onBehalfFormatted === undefined || params.row.onBehalfFormatted === null ? "N/A" : params.row.onBehalfFormatted,
-    width: 120,
+    width: 80,
   },
   {
     field: "applicantcategory",
     headerName: "CATEGORY",
     headerAlign: "left",
-    flex: 1,
+    flex: 0.6,
   },
   {
     field: "requestType",
     headerName: "TYPE",
     headerAlign: "left",
-    flex: 1,
+    flex: 0.6,
   },
   {
     field: "currentState",
     headerName: "CURRENT STATE",
     headerAlign: "left",
-    flex: 1,
+    flex: 0.6,
   },
   {
     field: "assignedToFormatted",
     headerName: "ASSIGNEE",
     headerAlign: "left",
-    flex: 1,
+    flex: 0.6,
   },
   {
     field: "cfrduedate",
     headerName: "CFR DUE",
-    flex: 1,
+    flex: 0.6,
     headerAlign: "left",
     valueGetter: (params) => formatDate(params.row.cfrduedate, "MMM dd yyyy").toUpperCase(),
   },
@@ -166,14 +169,14 @@ const IntakeTeamColumns = [
     headerName: "DAYS LEFT",
     headerAlign: "left",
     valueGetter: getDaysLeft,
-    flex: 0.75,
+    flex: 0.5,
     // sortable: false,
   },
   {
     field: "extensions",
     headerName: "EXT.",
     headerAlign: "left",
-    flex: 0.5,
+    flex: 0.3,
     valueGetter: (params) =>
       params.row.extensions === undefined ? 0 : params.row.extensions,
   },
@@ -182,13 +185,13 @@ const IntakeTeamColumns = [
     headerName: "RECEIVED DATE",
     headerAlign: "left",
     valueGetter: getReceivedDate,
-    flex: 1,
+    flex: 0.6,
   },
   {
     field: "requestpagecount",
     headerName: "PAGES",
     headerAlign: "left",
-    flex: 0.5,
+    width: 80,
     valueGetter: (params) => parseInt(params.row.requestpagecount),
     renderCell: pagecountcellTooltipRender
   }
@@ -264,6 +267,108 @@ const FlexTeamColumns = [
   }
 ];
 
+const SubConsultsColumns = [
+  {
+    field: "flags",
+    headerName: "FLAGS",
+    headerAlign: "left",
+    renderCell: displayQueueFlagIcons,
+  },
+  {
+    field: "filenumber",
+    headerName: "ID NUMBER",
+    headerAlign: "left",
+    width: 160,
+    renderCell: (params) => {
+    return params.row.filenumber || '';
+  }
+  },
+  {
+    field: "applicantName",
+    headerName: "APPLICANT NAME",
+    headerAlign: "left",
+    valueGetter: (params) =>
+      getFullName(params.row.firstName, params.row.lastName),
+    width: 180,
+  },
+  {
+    field: "onBehalfFormatted",
+    headerName: "ON BEHALF",
+    headerAlign: "left",
+    valueGetter: (params) =>
+      params.row.onBehalfFormatted === undefined || params.row.onBehalfFormatted === null ? "N/A" : params.row.onBehalfFormatted,
+    width: 120,
+  },
+  {
+    field: "applicantcategory",
+    headerName: "CATEGORY",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "requestType",
+    headerName: "TYPE",
+    headerAlign: "left",
+    valueGetter: (params) =>
+      getConsultType(params.row.consulttypeid),
+    flex: 1,
+  },
+  {
+    field: "currentState",
+    headerName: "CURRENT STATE",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
+    field: "assignedToFormatted",
+    headerName: "ASSIGNEE",
+    headerAlign: "left",
+    valueGetter: (params) => {
+      if (params.row.consultassignedto) return params.row.consultassignedto;
+      return "N/A";
+    },
+    flex: 1
+  },
+  {
+    field: "cfrduedate",
+    headerName: "CFR DUE",
+    flex: 1,
+    headerAlign: "left",
+    valueGetter: (params) => formatDate(params.row.cfrduedate, "MMM dd yyyy").toUpperCase(),
+  },
+  {
+    field: "DaysLeftValue",
+    headerName: "DAYS LEFT",
+    headerAlign: "left",
+    valueGetter: getConsultDueDaysLeft,
+    flex: 0.75,
+    // sortable: false,
+  },
+  {
+    field: "extensions",
+    headerName: "EXT.",
+    headerAlign: "left",
+    flex: 0.5,
+    valueGetter: (params) =>
+      params.row.extensions === undefined ? 0 : params.row.extensions,
+  },
+  {
+    field: "receivedDate",
+    headerName: "RECEIVED DATE",
+    headerAlign: "left",
+    valueGetter: getConsultReceivedDate,
+    flex: 1,
+  },
+  {
+    field: "requestpagecount",
+    headerName: "PAGES",
+    headerAlign: "left",
+    flex: 0.5,
+    valueGetter: (params) => parseInt(params.row.requestpagecount),
+    renderCell: pagecountcellTooltipRender
+  }
+];
+
 const defaultTableInfo = {
   sort: [
     { field: "defaultSorting", sort: "asc" },
@@ -279,6 +384,7 @@ const getTableInfo = (userGroups) => {
       { field: "intakeSorting", sort: "asc" },
       // { field: "duedate", sort: "asc" }
     ];
+    defaultTableInfo.subConsultsColumns = SubConsultsColumns;
   }
 
   if (isProcessingTeam(userGroups)) {

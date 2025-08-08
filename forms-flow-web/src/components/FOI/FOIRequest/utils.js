@@ -303,6 +303,127 @@ export const createRequestDetailsObjectFunc = (
   return requestObject;
 };
 
+export const createConsultRequestDetailsObjectFunc = (
+  requestObject,
+  requiredRequestDetailsValues,
+  requestId,
+  name,
+  value,
+  value2
+) => {
+  let _requestObject = { ...requestObject };
+
+  switch (name) {
+    case FOI_COMPONENT_CONSTANTS.CONSULT_PROGRAM_AREA_LIST:
+      const filteredData = value
+        .filter((programArea) => programArea.isChecked)
+        .map((filteredProgramArea) => {
+          return {
+            code: filteredProgramArea.bcgovcode,
+            name: filteredProgramArea.name,
+            isSelected: filteredProgramArea.isChecked,
+            isChecked: filteredProgramArea.isChecked,
+            programareaid: filteredProgramArea.programareaid,
+            iaocode: filteredProgramArea.iaocode,
+            bcgovcode: filteredProgramArea.bcgovcode
+          };
+        });
+      _requestObject.consultProgramAreaList = filteredData;
+      break;
+    case FOI_COMPONENT_CONSTANTS.CONSULT_SUBJECT_CODE:
+      _requestObject.consultSubjectCode= value;
+      break;
+    case FOI_COMPONENT_CONSTANTS.CONSULT_DUE_DATE:
+      _requestObject.consultDueDate = value;
+      break;
+    case FOI_COMPONENT_CONSTANTS.CONSULT_ASSIGNED_TO:
+      const assigneeDetails = createAssigneeDetails(value, value2);
+      _requestObject.assignedGroup = assigneeDetails.assignedGroup;
+      _requestObject.assignedTo = assigneeDetails.assignedTo;
+      _requestObject.assignedToFirstName = assigneeDetails.assignedToFirstName;
+      _requestObject.assignedToLastName = assigneeDetails.assignedToLastName;
+      _requestObject.assignedToName = assigneeDetails.assignedToName
+      _requestObject.consultAssigneeVal = assigneeDetails;
+      break;
+    case FOI_COMPONENT_CONSTANTS.CONSULT_TYPE:
+      _requestObject[FOI_COMPONENT_CONSTANTS.CONSULT_TYPE] = value;
+      break;
+    case FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES:
+      _requestObject.receivedDate = value.receivedDate ? formatDate(value.receivedDate, "yyyy MMM, dd") : "";
+      _requestObject.receivedDateUF = value.receivedDate
+        ? new Date(value.receivedDate)?.toISOString()
+        : "";
+      _requestObject.requestProcessStart = value.requestStartDate;
+      _requestObject.consultDueDate = value.consultDueDate;
+      _requestObject.receivedMode = value.receivedMode;
+      _requestObject.deliveryMode = value.deliveryMode;
+      break;
+    case FOI_COMPONENT_CONSTANTS.RECEIVED_DATE:
+      if(!!value){
+        _requestObject.receivedDate = formatDate(value, "yyyy MMM, dd");
+        const receivedDateUTC = new Date(value)?.toISOString();
+        _requestObject.receivedDateUF = receivedDateUTC;
+      }
+      break;
+    case FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE:
+      _requestObject.requestProcessStart = value;
+      _requestObject.consultDueDate = value2;
+      break;
+    default:
+      _requestObject[name] = value;
+      break;
+  }
+  return _requestObject;
+};
+
+export const validateConsultData = (consultData, requestDetails) => {
+  if (!consultData) return false;
+
+  const consultFields = [
+      consultData.consultType,  
+      consultData.consultProgramAreaList?.some(area => area.isSelected),  
+      consultData.consultDueDate,  
+      consultData.consultAssigneeVal,
+  ];
+
+  if (requestDetails) {
+      const requestDetailFields = [
+          requestDetails.axisRequestId,
+          requestDetails.firstName,
+          requestDetails.lastName,
+          requestDetails.businessName,
+          requestDetails.category,
+          requestDetails.email,
+          requestDetails.address,
+          requestDetails.city,
+          requestDetails.province,
+          requestDetails.country,
+          requestDetails.postal,
+          requestDetails.description,
+          requestDetails.requestType,         
+          requestDetails.receivedDate,      
+          requestDetails.dueDate,             
+          requestDetails.originalDueDate,         
+          requestDetails.deliveryMode,          
+          requestDetails.receivedMode,            
+      ];
+      
+      consultFields.push(...requestDetailFields);
+  }
+
+  const isValid = consultFields.every(field => {
+      if (Array.isArray(field)) {
+          return field.length > 0;
+      }
+      if (typeof field === 'boolean') {
+          return field;
+      }
+      return Boolean(field);
+  });
+
+  return isValid;
+};
+
 export const checkContactGiven = (requiredContactDetails) => {
   return (
     (requiredContactDetails.address === "" ||
@@ -370,6 +491,35 @@ export const checkValidationError = (
     }))
   );
 };
+
+export const checkConsultValidationError = (
+  requiredApplicantDetails,
+  contactDetailsNotGiven,
+  requiredConsultRequestDescriptionValues,
+  validation,
+  consultAssignedToValue,
+  consultType,
+  requiredOriginalRequestID,
+  requiredConsultRequestDetailsValues
+) => {
+  return (
+    (requiredConsultRequestDescriptionValues.description === "") ||
+    (!requiredConsultRequestDescriptionValues.isProgramAreaSelected ) ||
+    (!requiredConsultRequestDescriptionValues.ispiiredacted) ||
+    (!requiredConsultRequestDescriptionValues.isConsultProgramAreaSelected) ||
+    (consultAssignedToValue.toLowerCase().includes("unassigned")) ||
+    (consultType === "" || consultType === null) ||
+    (requiredOriginalRequestID.axisRequestId === "" || requiredOriginalRequestID.axisRequestId === null) ||
+    (requiredConsultRequestDetailsValues.requestType === "" || requiredConsultRequestDetailsValues.requestType === null) ||
+    (requiredConsultRequestDetailsValues.receivedMode === "" || requiredConsultRequestDetailsValues.receivedMode === null) ||
+    (requiredConsultRequestDetailsValues.deliveryMode === "" || requiredConsultRequestDetailsValues.deliveryMode === null) ||
+    (requiredConsultRequestDetailsValues.receivedDate === "" || requiredConsultRequestDetailsValues.receivedDate === null) ||
+    (requiredConsultRequestDetailsValues.requestStartDate === "" || requiredConsultRequestDetailsValues.requestStartDate === null) ||
+    (requiredConsultRequestDetailsValues.consultDueDate === "" || requiredConsultRequestDetailsValues.consultDueDate === null)
+    
+  )
+}
+
 
 /*******
  * alertUser(), handleOnHashChange() and useEffect() are used to handle the Navigate away from Comments tabs

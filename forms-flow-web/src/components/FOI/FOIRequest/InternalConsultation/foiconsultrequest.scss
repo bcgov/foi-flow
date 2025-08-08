@@ -127,6 +127,30 @@ height: fit-content;
     font-weight: bold;
 }
 
+.btn-original-request-sync{
+    background-color: #FFFFFF;
+    border: 2px solid #38598A;
+    border-radius: 4px;
+    color: #38598A;
+    margin-top: 10px;
+    height: 51px;
+    width: 179px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.btn-original-request-sync:disabled{
+    color: var(--typography-color-disabled, #9F9D9C);
+    margin-top: 10px;
+    height: 51px;
+    width: 179px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: var(--layout-borderRadius-medium, 4px);
+    border: 1px solid #D8D8D8;
+    background: #EDEBE9;
+}
+
 .dialog-close-button {
     display: none;
 }
@@ -226,7 +250,29 @@ height: fit-content;
     }
 }
 
-.ministries-program-area-list{
+.warning-amber-icon{
+    color: '#CE3E39' !important;
+}
+
+// .showDueDateIcon{
+//     position: 'absolute';
+//     right: 40;
+//     transform: 'translateY(-1%)';
+//     color: '#CE3E39' !important;
+//     pointer-events: 'none',
+// }
+
+// .hideDueDateIcon {
+//     visibility: 'hidden'
+//   }
+
+.hideConsultDueDateFieldValidation{
+    visibility: 'hidden'
+}
+
+.consult-ministries-program-area-list {
+    margin-top: -50px;
     margin-left: 24px;
     margin-right: -47px;
+    margin-bottom: 13px;
 }

@@ -181,3 +181,9 @@ class CacheUrls(Enum):
     extensionreasons= "/api/foiflow/extensionreasons"
     applicantcategories= "/api/foiflow/applicantcategories"
     subjectcodes= "/api/foiflow/subjectcodes"
+
+class ConsultType(Enum):
+    """Authorization header types."""
+
+    internal = 1
+    external = 2

@@ -2,9 +2,6 @@
 .foi-ministries-container {
   margin-top: 50px;
  
-  &.multi-select-mode {
-    margin-top: 7px;
-  } 
 }
 
 
@@ -64,16 +61,9 @@
     transform:rotate(45deg);
   }
 
-  .checkmark.multi-select-mode {
-    background-color: #ffffff; 
-  }
-
-  .heading-bold {
-    font-weight: 700; 
-    font-size: 16px;
-    color: #2D2D2D !important;
-  }
-  
-  .heading-normal {
-    font-weight: normal; 
+  .foi-multi-ministries-container{
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    margin-left: 20px;
   }

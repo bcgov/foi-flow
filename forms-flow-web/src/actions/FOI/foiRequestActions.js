@@ -583,3 +583,10 @@ export const setFOIPDFStitchedRecordsForPhasedResponsePackages = (data) => (disp
     payload: data
   });
 }
+
+export const setFOIRequestConsults = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_REQUEST_CONSULTS,
+    payload: data
+  });
+}

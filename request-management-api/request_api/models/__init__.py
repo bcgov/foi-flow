@@ -58,4 +58,7 @@ from .FOIApplicantCorrespondenceResponses import FOIApplicantCorrespondenceRespo
 
 from .FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 
+from .FOIMinistryRequestConsults import FOIMinistryRequestConsults
+from .ConsultTypes import ConsultType
+
 #event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)
