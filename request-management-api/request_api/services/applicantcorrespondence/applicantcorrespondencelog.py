@@ -219,11 +219,11 @@ class applicantcorrespondenceservice:
             return response
         return response
 
-    def updateissentsuccessfullyforrawrequest(self, rawrequestid, correspondenceid, is_sent_succesfully):
-        return FOIApplicantCorrespondenceRawRequest.updateissentsuccessfullyforrawrequest(rawrequestid, correspondenceid, is_sent_succesfully)
+    def updateappcorrespondenceaftersendforrawrequest(self, rawrequestid, correspondenceid, is_sent_succesfully, from_email):
+        return FOIApplicantCorrespondenceRawRequest.updateappcorrespondenceaftersendforrawrequest(rawrequestid, correspondenceid, is_sent_succesfully, from_email)
     
-    def updateissentsuccessfullyforministryrequest(self, ministryrequestid, correspondenceid, is_sent_succesfully, subject = None):
-        return FOIApplicantCorrespondence.updateissentsuccessfullyforministryrequest(ministryrequestid, correspondenceid, is_sent_succesfully, subject)
+    def updateappcorrespondenceaftersendforministryrequest(self, ministryrequestid, correspondenceid, is_sent_succesfully, from_email, subject = None):
+        return FOIApplicantCorrespondence.updateappcorrespondenceaftersendforministryrequest(ministryrequestid, correspondenceid, is_sent_succesfully, from_email, subject)
 
     def deleteapplicantcorrespondencelogministry(self, ministryrequestid, correpondenceid, userid):
         return FOIApplicantCorrespondence.deleteapplicantcorrespondence(ministryrequestid,correpondenceid,userid)        
@@ -356,7 +356,8 @@ class applicantcorrespondenceservice:
             "templatetype": _correpondencelog['templatetype'],
             "emailsubject": _correpondencelog['emailsubject'],
             "correspondencesubject": _correpondencelog['correspondencesubject'],
-            "is_sent_successfully": _correpondencelog['is_sent_successfully'] if 'is_sent_successfully' in _correpondencelog else None
+            "is_sent_successfully": _correpondencelog['is_sent_successfully'] if 'is_sent_successfully' in _correpondencelog else None,
+            "sent_from_email": _correpondencelog['sent_from_email'] if 'sent_from_email' in _correpondencelog else None
         }        
         return correpondencelog
     

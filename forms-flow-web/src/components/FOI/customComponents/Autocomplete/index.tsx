@@ -6,7 +6,9 @@ const CustomAutocomplete = ({
     list,
     disabledValues,
     onChange,
-    label
+    label,
+    resetTemplateDropdownValue,
+    setResetTemplateDropdownValue,
 }: any) => {
   const [inputValue, setInputValue] = useState<string>('');
   const [selectedOption, setSelectedOption] = useState<Template | null>(null);
@@ -19,6 +21,15 @@ const CustomAutocomplete = ({
     setSelectedOption(value);
     onChange(event, value);
   };
+
+  React.useEffect(() => {
+    if (resetTemplateDropdownValue) {
+      setInputValue('');
+      setSelectedOption(null);
+      setResetTemplateDropdownValue(false);
+    }
+  }, [resetTemplateDropdownValue]);
+
 
   return (
     <Autocomplete

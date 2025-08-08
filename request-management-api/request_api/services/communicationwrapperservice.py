@@ -66,10 +66,11 @@ class communicationwrapperservice:
                     sendemailresult = communicationemailservice().send(template, applicantcorrespondencelog)
                     # Update the sent status in the correspondence log after sending the email
                     is_sent_succesfully = sendemailresult["success"]
+                    from_email = sendemailresult["from_email"] if "from_email" in sendemailresult else None
                     if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
-                        applicantcorrespondenceservice().updateissentsuccessfullyforrawrequest(rawrequestid, result.identifier, is_sent_succesfully)
+                        applicantcorrespondenceservice().updateappcorrespondenceaftersendforrawrequest(rawrequestid, result.identifier, is_sent_succesfully, from_email)
                     else:
-                        applicantcorrespondenceservice().updateissentsuccessfullyforministryrequest(ministryrequestid, result.identifier, is_sent_succesfully)
+                        applicantcorrespondenceservice().updateappcorrespondenceaftersendforministryrequest(ministryrequestid, result.identifier, is_sent_succesfully, from_email)
                     return sendemailresult
                 else:
                     return {"success" : False, "message": "No Email", "identifier": -1}

@@ -44,7 +44,7 @@ class senderservice:
         content = content.replace('src=\\\"', 'src="')
         content = content.replace('\\\">','">')
         msg = MIMEMultipart('related')
-        if from_email is None:
+        if from_email is None or len(from_email) == 0:
             from_email = MAIL_FROM_ADDRESS
 
         msg['From'] = from_email
@@ -93,7 +93,7 @@ class senderservice:
                 print('*SMTP Response: ', smtpresponse)
                 smtpobj.quit()
                 logging.debug("End: Send email for request")
-                return {"success" : True, "message": "Sent successfully", "identifier": -1}   
+                return {"success" : True, "message": "Sent successfully", "identifier": -1, "from_email": msg['From']}
         except Exception as e:
             logging.exception(e)
         return {"success" : False, "message": "Unable to send", "identifier": -1}    
