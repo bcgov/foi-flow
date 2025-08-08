@@ -309,7 +309,6 @@ class FOIMinistryRequestConsults(db.Model):
                 }
             }
             results.append(consult)
-        print("consult안에 : ",results)
         return results
         
 class FOIMinistryRequestConsultsSchema(ma.Schema):

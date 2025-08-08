@@ -380,7 +380,6 @@ export const getConsultType = (params) => {
 
 export const getConsultReceivedDate = (params) => {
   let createdAtString = params.row.receivedDate;
-  console.log("createdAtString : ",createdAtString)
   const dateString = createdAtString
     ? createdAtString.substring(0, 10)
     : "";

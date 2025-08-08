@@ -314,7 +314,6 @@ const Queue = ({ userDetail, tableInfo }) => {
         }
         onRowClick={({ row }) => renderReviewRequest({ row })}
         onConsultRowClick={({ row }) => {
-          console.log("onConsultRowClick callback triggered with:", { row });
           renderConsultReviewRequest({ row });
         }}
         loading={isLoading}

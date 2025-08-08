@@ -262,9 +262,7 @@ const CustomExpandableTable = ({
                  
                                       if (onConsultRowClick) {
                                         onConsultRowClick({ row: consultData });
-                                      } else {
-                                        console.log("onConsultRowClick is not defined!");
-                                      }
+                                      } 
                                     }}
                                   >
                                     {/* {col.renderCell ? col.renderCell({ row: consult }) : consult[col.field] ?? ""} */}

@@ -742,38 +742,6 @@ class FOIRawRequest(db.Model):
         else:
             return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
             # paginated_result = subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
-        
-        #print("paginated_result : ",paginated_result)
-         # Step 4. 현재 페이지에 해당하는 요청 목록 추출
-        # requests = paginated_result.items
-        # print("requests : ",requests)
-        # Step 5. 요청들로부터 foiministryrequestid 목록 추출
-        # ministry_ids = [r.ministryrequestid for r in requests if hasattr(r, 'ministryrequestid')]
-        # print("ministry_ids : ",ministry_ids)
-        # Step 6. 관련된 sub consult 요청들 조회
-        #sub_consults = FOIMinistryRequestConsults.get_sub_consults_by_ministry_ids(ministry_ids)  # ✅ 너가 만든 함수 (쿼리)
-
-        #print("sub_consults : ",sub_consults)
-        # Step 7. sub consult들을 foiministryrequestid 기준으로 그룹핑
-        # consult_map = defaultdict(list)
-        # for consult in sub_consults:
-        #     consult_map[consult["foiministryrequestid"]].append(consult)
-        # print("consult_map : ",consult_map)
-        # Step 8. 각 요청에 subConsults 항목 붙이기
-        # final_results = []
-        # for row in requests:
-        #     row_dict = dict(row._mapping) if hasattr(row, "_mapping") else dict(row)
-        #     row_dict["subConsults"] = consult_map.get(row.ministryrequestid, [])
-        #     final_results.append(row_dict)
-
-        #return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
-        # return {
-        #     "items": final_results,
-        #     "page": paginated_result.page,
-        #     "per_page": paginated_result.per_page,
-        #     "total": paginated_result.total,
-        #     "pages": paginated_result.pages
-        # }
 
     @classmethod
     def findfield(cls, x):
