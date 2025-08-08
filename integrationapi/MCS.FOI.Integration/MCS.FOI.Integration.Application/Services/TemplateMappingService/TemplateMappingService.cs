@@ -40,7 +40,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
         {
             var request = await _templateDataService.GetRequest(foiRequestId);
             var requestMinistry = await _templateDataService.GetRequestByMinistryRequestId(foiMinistryRequestId);
-            bool isRawRequest = request.FOIRequestId.Equals(0) && requestMinistry.FOIMinistryRequestId.Equals(0);
+            bool isRawRequest = foiMinistryRequestId.Equals(0);
 
             var templateData = new Dictionary<string, string?>();
 
