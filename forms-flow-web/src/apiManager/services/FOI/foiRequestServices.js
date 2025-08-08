@@ -636,7 +636,7 @@ export const updateSpecificRequestSection = (data, field, requestId, ministryId,
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
-          throw new Error(`Error while updating ${field} for the (request# ${requestId}, ministry# ${ministryId})`);
+          throw new Error(`Error while updating ${field} for the (request# ${requestId}, ministry# ${ministryId})`);           
         }
       })
       .catch((error) => {
