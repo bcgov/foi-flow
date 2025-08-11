@@ -66,6 +66,27 @@ class FOIFlowApplicantCorrespondenceTemplates(Resource):
             return "Error happened while accessing  applicant correspondence templates" , 500  
 
 @cors_preflight('POST,OPTIONS')
+@API.route('/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>/sendpreview')
+class FOIFlowApplicantCorrespondence(Resource):
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.hasusertype('iao')
+    def post(requestid, ministryrequestid):
+        try:
+            requestjson = request.get_json()
+            applicantcorrespondencelog = FOIApplicantCorrespondenceLogSchema().load(data=requestjson)
+            if ministryrequestid == 'None':
+                rawrequestid = requestid
+            else:
+                rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
+            result = communicationwrapperservice().send_preview_email(requestid, rawrequestid, ministryrequestid, applicantcorrespondencelog)
+            return {'status': result['success'], 'message': result['message']}, 200
+        except BusinessException:
+            return "Error happened while saving applicant correspondence log", 500
+
+@cors_preflight('POST,OPTIONS')
 @API.route('/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>')
 class FOIFlowApplicantCorrespondence(Resource):
 
