@@ -143,7 +143,6 @@ class dashboardservice:
 
 
 
-        print("requestqueue : ",requestqueue)
         return jsonify({'data': requestqueue, 'meta': meta})
 
     def getministryrequestqueuepagination (self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):

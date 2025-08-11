@@ -50,8 +50,6 @@ class consultservice:
         for consult in created_consults:
             programarea = ProgramArea.getprogramareabyId(consult.programareaid)
             status = FOIRequestStatus.getrequeststatusbyId(consult.requeststatusid)
-            print("programarea :", programarea)
-            print("status :", status)
             enriched_consults.append({
                 "id": consult.foiministryrequestconsultid,
                 "fileNumber": consult.filenumber,

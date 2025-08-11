@@ -51,7 +51,6 @@ class FOIConsultRequestById(Resource):
         try:
             request_json = request.get_json()
             userid = AuthHelper.getuserid()
-            print("request_json? : ",request_json)
             assigneedata = getassigneeparams(request_json)
             
             # Initialize variables with None
@@ -63,7 +62,6 @@ class FOIConsultRequestById(Resource):
 
             # Only set values if assigneedata exists
             if assigneedata:
-                print("assigneedata : ",assigneedata)
                 assigneegroup = assigneedata.get('assigneegroup')
                 assigneeEmail = assigneedata.get('assignee')
                 assigneefirstname = assigneedata.get('assigneefirstname')
