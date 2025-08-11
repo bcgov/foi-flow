@@ -113,7 +113,7 @@ jobs:
       - name: Tag+Deploy for ${{ env.TAG_NAME }}
         shell: bash
         run: |
-          oc tag template-api:latest template-api:dev
+          oc tag template-api:latest template-api:test
 
       - name: Rollout Restart of Deployment in Dev
         shell: bash
