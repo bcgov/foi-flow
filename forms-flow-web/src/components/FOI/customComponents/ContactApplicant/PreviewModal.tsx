@@ -119,9 +119,9 @@ export const PreviewModal = React.memo(({
                   value={previewEmailAddress}
                   onChange={(e) => setPreviewEmailAddress(e.target.value)}
                   variant="outlined"
-                  id="sendPreviewEmail"
-                  label="Send Preview Email"
-                  inputProps={{ "aria-labelledby": "sendPreviewEmail-label" }}
+                  id="previewEmailAddress"
+                  label="Email Address"
+                  inputProps={{ "aria-labelledby": "previewEmailAddress-label" }}
                   InputLabelProps={{ shrink: true }}
                   fullWidth
                 ></TextField>
