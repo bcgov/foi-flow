@@ -20,6 +20,9 @@ export const DocEditor = ({
     preview,
     previewTrigger,
     setPreviewTrigger,
+    setPreviewEmailEditorValue,
+    sendPreviewEmailTrigger,
+    setSendPreviewEmailTrigger,
     addAttachment,
     savepdf,
     correspondenceSubject,
@@ -368,6 +371,13 @@ export const DocEditor = ({
             setEditDraftTrigger(false);
         }
     }, [editDraftTrigger]);
+
+    React.useEffect(() => {
+        if (sendPreviewEmailTrigger) {
+            setPreviewEmailEditorValue( getSfdtString() );
+            setSendPreviewEmailTrigger(false);
+        }
+    }, [sendPreviewEmailTrigger]);
 
     React.useEffect(() => {
         if (previewTrigger) {

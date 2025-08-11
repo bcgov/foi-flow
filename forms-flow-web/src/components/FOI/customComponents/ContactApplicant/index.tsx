@@ -950,6 +950,17 @@ export const ContactApplicant = ({
   };
 
   const [isSendPreviewEmail, setIsSendPreviewEmail] = useState(false)
+  const [sendPreviewEmailTrigger, setSendPreviewEmailTrigger] = useState(false)
+  const setPreviewEmailEditorValue = async (sfdtString: string) => {
+    let newDataHtml = {
+      "FileName": `${correspondenceSubject}.html`,
+      "Content": sfdtString
+    };
+    const loadPreview = async (html: string) => {
+      setEditorValue( html );
+    }
+    await exportSFDT(dispatch, newDataHtml, loadPreview);
+  }
   const handleSendPreviewEmail = async (emailContent: string, emailAddress: string) => {
     const toastId = toast.loading("Sending preview email...")
     let callback = (_res: string) => {
@@ -1866,6 +1877,9 @@ export const ContactApplicant = ({
                 preview = {preview}
                 previewTrigger = {previewTrigger}
                 setPreviewTrigger = {setPreviewTrigger}
+                setPreviewEmailEditorValue={setPreviewEmailEditorValue}
+                sendPreviewEmailTrigger={sendPreviewEmailTrigger}
+                setSendPreviewEmailTrigger={setSendPreviewEmailTrigger}
                 addAttachment={openAttachmentModal}
                 savepdf = {savePdf}
                 correspondenceSubject={correspondenceSubject || `Your FOI Request ${requestNumber || requestId}`}
@@ -1943,7 +1957,11 @@ export const ContactApplicant = ({
         <button
           className="btn addCorrespondence"
           data-variant="contained"
-          onClick={() => {setPreviewModal(true); setIsSendPreviewEmail(true)}}
+          onClick={() => {
+            setPreviewModal(true);
+            setIsSendPreviewEmail(true);
+            setSendPreviewEmailTrigger(true);
+          }}
           color="primary"
         >
           Send Preview Email
