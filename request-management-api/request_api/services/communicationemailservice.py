@@ -36,6 +36,19 @@ class communicationemailservice:
         except Exception as ex:
             logging.exception(ex)
 
+    def send_preview_email(self, template, correspondencelog):
+        try:
+            messagepart = self.__getbody(correspondencelog)
+            to = self.__getsenders(correspondencelog)
+            ccemails = self.__getccemails(correspondencelog)
+            attributes =  self.__getattributes(correspondencelog)
+            subject = correspondencelog['emailsubject']
+            messageattachmentlist = self.__getattachments(correspondencelog)
+            _messagepart = templateservice().decorate_template(template, messagepart, attributes, correspondencelog)
+            return senderservice().send(subject, _messagepart, messageattachmentlist, to, ccemails, correspondencelog.get('from_email', None))
+        except Exception as ex:
+            logging.exception(ex)
+
     def __getbody(self,correspondencelog):
         data = json.loads(correspondencelog['correspondencemessagejson'])
         return data['emailhtml']
