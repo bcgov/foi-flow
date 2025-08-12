@@ -50,16 +50,74 @@ const TablePaginationWrapper = ({
             onClick={() => onPageChange(Math.max(0, page - 1))}
             disabled={page === 0}
             size="small"
+            sx={{ color: '#666' }}
         >
-            <KeyboardArrowLeft fontSize="small" />
+            &lt;
         </IconButton>
-        <Typography variant="body2">{page + 1}</Typography>
+
+        {Array.from({ length: totalPages }, (_, i) => {
+          const pageNum = i + 1;
+          const isCurrentPage = page === i;
+          
+          return (
+            <Box
+              key={pageNum}
+              onClick={() => onPageChange(i)}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: isCurrentPage ? '32px' : '24px',
+                height: isCurrentPage ? '32px' : '24px',
+                borderRadius: isCurrentPage ? '50%' : '0',
+                backgroundColor: isCurrentPage ? '#e0e0e0' : 'transparent',
+                color: isCurrentPage ? '#424242' : '#666',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: isCurrentPage ? 'bold' : 'normal',
+                '&:hover': {
+                  backgroundColor: isCurrentPage ? '#d0d0d0' : '#f5f5f5',
+                }
+              }}
+            >
+              {pageNum}
+            </Box>
+          );
+        })}
+        
+        {totalPages > 5 && (
+          <>
+            <Typography variant="body2" sx={{ color: '#666', mx: 1 }}>
+              ...
+            </Typography>
+            <Box
+              onClick={() => onPageChange(totalPages - 1)}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '24px',
+                height: '24px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                color: '#666',
+                '&:hover': {
+                  backgroundColor: '#f5f5f5',
+                }
+              }}
+            >
+              {totalPages}
+            </Box>
+          </>
+        )}
+        
         <IconButton
             onClick={() => onPageChange(Math.min(totalPages - 1, page + 1))}
             disabled={page >= totalPages - 1}
             size="small"
+            sx={{ color: '#666' }}
         >
-            <KeyboardArrowRight fontSize="small" />
+            &gt;
         </IconButton>
         </Box>
       

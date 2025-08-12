@@ -414,13 +414,7 @@ export const getConsultDueDaysLeft = (params) => {
 export const mergeSubConsultsWithRow = (row) => {
   if (!Array.isArray(row?.subConsults)) return [];
 
-  // Remove duplicates based on consultid or id
-  const uniqueSubConsults = row.subConsults.filter((consult, index, self) => {
-    const consultId = consult.consultid || consult.id || consult.requestId;
-    return self.findIndex(c => (c.consultid || c.id || c.requestId) === consultId) === index;
-  });
-
-  return uniqueSubConsults.map((consult) => ({
+  return row.subConsults.map((consult) => ({
     ...consult,
     firstName: row.firstName,
     lastName: row.lastName,
@@ -431,5 +425,6 @@ export const mergeSubConsultsWithRow = (row) => {
     duedate: row.duedate,
     cfrduedate: row.cfrduedate,
     requestpagecount: row.requestpagecount,
+    applicantcategory: row.applicantcategory,
   }));
 };
