@@ -174,7 +174,6 @@ export default function CorrespondenceEmail({
       menuItems.push(
         <MenuItem className={`${classes.item} foi-watcher-menuitem`}  
           key={`add-email`}
-          value={`add-email`}
           onClick={() => setShowAddEmail(true)}>
           <span style={{padding: '0.3em'}}
           ><FontAwesomeIcon

@@ -54,7 +54,6 @@ class emailservice:
             return {"success": False, "message": "Failed to send email", "identifier": savedcorrespondence.identifier if savedcorrespondence else -1, "subject": subject}
 
     def send_preview_email(self, servicename, requestid, ministryrequestid, emailschema, subject, emails):
-        subject = None
         savedcorrespondence = None
         try:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)

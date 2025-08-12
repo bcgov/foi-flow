@@ -108,9 +108,9 @@ export const PreviewModal = React.memo(({
           <DialogContentText id="state-change-dialog-description" component={'span'}>
             <div className="state-change-email-note">
               <p>
-                Please enter an email address you would like to send an email preview to. This will allow you to preview
-                the email before sending it to the applicant and/or other intended recipients. Note that the preview email
-                <b>will not</b> include attachments.
+                Please enter an email address you would like to send an email preview to. This will 
+                allow you to preview the email before sending it to the applicant and/or other intended 
+                recipients. Note that the preview email <span style={{ fontWeight: '900' }}>will not</span> include attachments.
               </p>
             </div>
               <Grid container direction="row" justifyContent="center" alignItems="center" xs={12}>
@@ -156,7 +156,7 @@ export const PreviewModal = React.memo(({
       fullWidth={true}
     >
       <DialogTitle disableTypography id="state-change-dialog-title">
-          <h2 className="state-change-header">Preview Applicant Email</h2>
+          <h2 className="state-change-header">Preview Email</h2>
           <IconButton aria-label= "close" onClick={handleClose}>
             <CloseIcon />
           </IconButton>

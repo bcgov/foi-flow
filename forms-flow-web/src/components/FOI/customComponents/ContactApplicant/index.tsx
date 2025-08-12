@@ -561,7 +561,7 @@ export const ContactApplicant = ({
   const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
   const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
   //const previewButtonValue = existingCorrespondence ? "Preview & Resend" : "Preview & Send";
-  const previewButtonValue = "Preview & Send";
+  const previewButtonValue = "Send Email";
   const [editMode, setEditMode] = useState(false);
   const draftButtonValue = editMode ? "Save Draft Edits" : "Save Draft";
 
