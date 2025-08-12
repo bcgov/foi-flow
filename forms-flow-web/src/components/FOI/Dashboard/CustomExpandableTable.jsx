@@ -74,7 +74,7 @@ const CustomExpandableTable = ({
   
 
   return (
-         <Box className="MuiDataGrid-root" sx={{ height: 400, width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+    <Box className="MuiDataGrid-root" sx={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
       <TableContainer 
         component={Paper} 
         className="MuiDataGrid-virtualScroller"
@@ -83,19 +83,20 @@ const CustomExpandableTable = ({
           borderRadius: "4px",
           borderLeft: 'none',
           borderRight: 'none',
+          maxHeight: 'calc(100vh - 300px)',
         }}
       >
-                 <Table 
-           size="small" 
-           className="MuiDataGrid-virtualScrollerContent"
-           sx={{
-             borderCollapse: 'collapse',
-             '& .MuiTableCell-root': {
-               borderLeft: 'none',
-               borderRight: 'none',
-             }
-           }}
-         >
+        <Table 
+          size="small" 
+          className="MuiDataGrid-virtualScrollerContent"
+          sx={{
+            borderCollapse: 'collapse',
+            '& .MuiTableCell-root': {
+              borderLeft: 'none',
+              borderRight: 'none',
+            }
+          }}
+        >
           <TableHead className="MuiDataGrid-columnHeaders">
             <TableRow className="MuiDataGrid-row">
               {columns.map((col) => (
@@ -134,7 +135,7 @@ const CustomExpandableTable = ({
               ))}
             </TableRow>
           </TableHead>
-          <TableBody className="MuiDataGrid-virtualScrollerRenderZone">
+                    <TableBody className="MuiDataGrid-virtualScrollerRenderZone">
             {loading ? (
               <TableRow>
                 <TableCell colSpan={columns.length} align="center">
@@ -142,12 +143,13 @@ const CustomExpandableTable = ({
                 </TableCell>
               </TableRow>
             ) : (
-              rows.map((row) => {
+              rows.slice(page * pageSize, (page + 1) * pageSize).map((row, rowIndex) => {
                 const id = getRowId(row);
                 const isExpandable = row.subConsults?.length > 0;
                 const isExpanded = id === expandedId;
                 const rowClass = getRowClassName ? getRowClassName({ row }) : "";
                 const displaySubConsults = mergeSubConsultsWithRow(row);
+                const actualRowIndex = page * pageSize + rowIndex; 
                 return (
                   <React.Fragment key={id}>
                     <TableRow
@@ -172,7 +174,7 @@ const CustomExpandableTable = ({
                           sx={{
                             borderLeft: 'none',
                             borderRight: 'none',
-                            borderBottom: rows.indexOf(row) === rows.length - 1 ? 'none' : "1px solid #e0e0e0",
+                            borderBottom: rowIndex === Math.min(pageSize - 1, rows.length - page * pageSize - 1) ? 'none' : "1px solid #e0e0e0",
                             padding: "8px 16px",
                             maxWidth: col.width | 200 ,
                             fontSize: "0.875rem",
@@ -225,7 +227,7 @@ const CustomExpandableTable = ({
                             backgroundColor: "#fafafa"
                           }}
                         >
-                                                     <Box sx={{ padding: "8px 16px" }}>
+                          <Box sx={{ padding: "8px 16px" }}>
                             {Array.isArray(subConsultsColumns.current) && displaySubConsults.map((consult, idx) => {
                               return (
                               <Box 
@@ -248,23 +250,23 @@ const CustomExpandableTable = ({
                                     key={col.field} 
                                     className="MuiDataGrid-cell"
                                     align={col.align || "left"}
-                                                                         sx={{
-                                       borderLeft: 'none',
-                                       borderRight: 'none',
-                                       borderBottom: displaySubConsults.indexOf(consult) === displaySubConsults.length - 1 ? 'none' : "1px solid #e0e0e0",
-                                       padding: "8px 16px",
-                                       fontSize: "0.875rem",
-                                       cursor: "pointer",
-                                       width: col.width || 'auto',
-                                       minWidth: col.width || 100,
-                                       maxWidth: col.width || 200,
-                                       whiteSpace: "nowrap",
-                                       overflow: "hidden",  
-                                       textOverflow: "ellipsis"
-                                     }}
+                                    sx={{
+                                      borderLeft: 'none',
+                                      borderRight: 'none',
+                                      borderBottom: displaySubConsults.indexOf(consult) === displaySubConsults.length - 1 ? 'none' : "1px solid #e0e0e0",
+                                      padding: "8px 16px",
+                                      fontSize: "0.875rem",
+                                      cursor: "pointer",
+                                      width: col.width || 'auto',
+                                      minWidth: col.width || 100,
+                                      maxWidth: col.width || 200,
+                                      whiteSpace: "nowrap",
+                                      overflow: "hidden",  
+                                      textOverflow: "ellipsis"
+                                    }}
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      
+                                       
                                       // Pass the consult data with proper ID and parent row information
                                       const consultData = {
                                         ...consult,
