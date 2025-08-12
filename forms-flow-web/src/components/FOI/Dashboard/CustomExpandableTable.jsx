@@ -4,6 +4,8 @@ import {
   } from "@mui/material";
 import ExpandCircleDownRoundedIcon from "@mui/icons-material/ExpandCircleDownRounded";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import "./customExpandableTable.scss";
 import { mergeSubConsultsWithRow } from "./utils";
 import TablePaginationWrapper from './TablePaginationWrapper'
@@ -33,14 +35,20 @@ const CustomExpandableTable = ({
 }) => {
   const [expandedId, setExpandedId] = useState(null);
   const [localFilters, setLocalFilters] = useState({});
+  const [localSortModel, setLocalSortModel] = useState(sortModel || null);
 
   const handleSort = (col) => {
-    if (!col.sortable) return;
+    // Remove the sortable check to allow all columns to be sortable
     let direction = "asc";
-    if (sortModel && sortModel.field === col.field && sortModel.sort === "asc") {
+    if (localSortModel && localSortModel.field === col.field && localSortModel.sort === "asc") {
       direction = "desc";
     }
-    onSortModelChange && onSortModelChange({ field: col.field, sort: direction });
+    
+    const newSortModel = { field: col.field, sort: direction };
+    setLocalSortModel(newSortModel);
+    
+    // Call parent callback if provided
+    onSortModelChange && onSortModelChange(newSortModel);
   };
 
   const handleFilter = (col, value) => {
@@ -66,7 +74,7 @@ const CustomExpandableTable = ({
   
 
   return (
-    <Box className="MuiDataGrid-root" sx={{ height: 400, width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+         <Box className="MuiDataGrid-root" sx={{ height: 400, width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
       <TableContainer 
         component={Paper} 
         className="MuiDataGrid-virtualScroller"
@@ -77,17 +85,17 @@ const CustomExpandableTable = ({
           borderRight: 'none',
         }}
       >
-        <Table 
-          size="small" 
-          className="MuiDataGrid-virtualScrollerContent"
-          sx={{
-            borderCollapse: 'collapse',
-            '& .MuiTableCell-root': {
-              borderLeft: 'none',
-              borderRight: 'none',
-            }
-          }}
-        >
+                 <Table 
+           size="small" 
+           className="MuiDataGrid-virtualScrollerContent"
+           sx={{
+             borderCollapse: 'collapse',
+             '& .MuiTableCell-root': {
+               borderLeft: 'none',
+               borderRight: 'none',
+             }
+           }}
+         >
           <TableHead className="MuiDataGrid-columnHeaders">
             <TableRow className="MuiDataGrid-row">
               {columns.map((col) => (
@@ -96,24 +104,29 @@ const CustomExpandableTable = ({
                   className="MuiDataGrid-columnHeader"
                   align={col.align || "left"}
                   onClick={() => handleSort(col)}
-                  sx={{
-                    cursor: col.sortable ? "pointer" : "default",
-                    width: col.width,
-                    borderBottom: "2px solid #212529",
-                    backgroundColor: "#fff",
-                    fontWeight: 400,
-                    fontSize: "0.875rem",
-                    padding: "8px 16px",
-                    // "&:hover": {
-                    //   backgroundColor: "#e0e0e0"
-                    // }
-                  }}
+                                      sx={{
+                      cursor: "pointer", // Always show pointer cursor for sorting
+                      width: col.width,
+                      borderBottom: "2px solid #212529",
+                      backgroundColor: "#fff",
+                      fontWeight: 400,
+                      fontSize: "0.875rem",
+                      padding: "8px 16px",
+                      "&:hover": {
+                        backgroundColor: "#f5f5f5" // Always show hover effect
+                      }
+                    }}
                 >
                   <Box className="MuiDataGrid-columnHeaderTitleContainer">
                     <span className="MuiDataGrid-columnHeaderTitle">
                       {col.headerName || col.field}
-                      {sortModel && sortModel.field === col.field && (
-                        <span>{sortModel.sort === "asc" ? " ▲" : " ▼"}</span>
+                      {localSortModel && localSortModel.field === col.field && (
+                        <span style={{ marginLeft: '4px', display: 'inline-flex', alignItems: 'center' }}>
+                          {localSortModel.sort === "asc" ? 
+                            <ArrowUpwardIcon sx={{ fontSize: 16, color: '#666' }} /> : 
+                            <ArrowDownwardIcon sx={{ fontSize: 16, color: '#666' }} />
+                          }
+                        </span>
                       )}
                     </span>
                   </Box>
@@ -212,7 +225,7 @@ const CustomExpandableTable = ({
                             backgroundColor: "#fafafa"
                           }}
                         >
-                          <Box sx={{ padding: "8px 16px" }}>
+                                                     <Box sx={{ padding: "8px 16px" }}>
                             {Array.isArray(subConsultsColumns.current) && displaySubConsults.map((consult, idx) => {
                               return (
                               <Box 
@@ -235,20 +248,20 @@ const CustomExpandableTable = ({
                                     key={col.field} 
                                     className="MuiDataGrid-cell"
                                     align={col.align || "left"}
-                                    sx={{
-                                      borderLeft: 'none',
-                                      borderRight: 'none',
-                                      borderBottom: displaySubConsults.indexOf(consult) === displaySubConsults.length - 1 ? 'none' : "1px solid #e0e0e0",
-                                      padding: "8px 16px",
-                                      fontSize: "0.875rem",
-                                      cursor: "pointer",
-                                      width: col.width || 'auto',
-                                      minWidth: col.width || 100,
-                                      maxWidth: col.width || 200,
-                                      whiteSpace: "nowrap",
-                                      overflow: "hidden",  
-                                      textOverflow: "ellipsis"
-                                    }}
+                                                                         sx={{
+                                       borderLeft: 'none',
+                                       borderRight: 'none',
+                                       borderBottom: displaySubConsults.indexOf(consult) === displaySubConsults.length - 1 ? 'none' : "1px solid #e0e0e0",
+                                       padding: "8px 16px",
+                                       fontSize: "0.875rem",
+                                       cursor: "pointer",
+                                       width: col.width || 'auto',
+                                       minWidth: col.width || 100,
+                                       maxWidth: col.width || 200,
+                                       whiteSpace: "nowrap",
+                                       overflow: "hidden",  
+                                       textOverflow: "ellipsis"
+                                     }}
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       
