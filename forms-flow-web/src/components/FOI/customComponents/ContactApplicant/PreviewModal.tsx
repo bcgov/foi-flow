@@ -156,7 +156,7 @@ export const PreviewModal = React.memo(({
       fullWidth={true}
     >
       <DialogTitle disableTypography id="state-change-dialog-title">
-          <h2 className="state-change-header">Preview Applicant Email</h2>
+          <h2 className="state-change-header">Preview Email</h2>
           <IconButton aria-label= "close" onClick={handleClose}>
             <CloseIcon />
           </IconButton>
