@@ -72,3 +72,22 @@
      padding-left: 4% !important;
 
   }
+
+.synced-data-icon{
+    color: #FFF !important; 
+    font-size: 1rem !important;
+}
+
+.synced-data-chip{
+    border-radius: var(--layout-margin-medium, 16px) !important;
+    border: 1px solid var(--surface-color-background-white, #FFF) !important;
+    background: var(--surface-color-primary-default, #013366) !important;
+    color: #FFF !important;
+    height: 25px !important;
+    margin-left: auto !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    pointer-events: none !important;
+}

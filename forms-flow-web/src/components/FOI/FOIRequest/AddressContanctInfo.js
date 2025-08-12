@@ -10,6 +10,8 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { isBeforeOpen } from "./utils";
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
+import { Chip } from '@mui/material';
 
 const useStyles = makeStyles((_theme) => ({
   row: {
@@ -45,7 +47,8 @@ const AddressContactDetails = memo(
     disableInput,
     defaultExpanded,
     moreInfoAction,
-    warning
+    warning,
+    isDataSynced,
   }) => {
     const classes = useStyles();
     /**
@@ -311,6 +314,13 @@ const AddressContactDetails = memo(
       <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
           id="addressContactInfo-header">
           <Typography className={classes.heading}>ADDRESS AND CONTACT INFORMATION</Typography>
+          {isDataSynced && (
+              <Chip
+                  icon={<CheckCircleOutlineIcon className="synced-data-icon"/>}
+                  label={"Synchronized data"}
+                  className="synced-data-chip"
+              />
+            )}
       </AccordionSummary>
       <AccordionDetails>        
           <div>
@@ -336,7 +346,7 @@ const AddressContactDetails = memo(
                 className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL) && classes.warning}
                 fullWidth
                 required={true}
-                disabled={disableInput}
+                disabled={ disableInput || isDataSynced }
                 onChange={handleEmailChange}
                 error={
                   (validation.helperTextValue !== undefined &&
@@ -359,7 +369,7 @@ const AddressContactDetails = memo(
                 value={homePhoneText}
                 onChange={handleHomePhoneChange}
                 fullWidth
-                disabled={disableInput}
+                disabled={ disableInput || isDataSynced}
               />
             </div>
 
@@ -373,7 +383,7 @@ const AddressContactDetails = memo(
                 value={mobilePhoneText}
                 onChange={handleMobilePhoneChange}
                 fullWidth
-                disabled={disableInput}
+                disabled={ disableInput || isDataSynced}
               />
             </div>
 
@@ -387,7 +397,7 @@ const AddressContactDetails = memo(
                 value={workPhonePrimaryText}
                 onChange={handleWorkPhonePrimaryChange}
                 fullWidth
-                disabled={disableInput}
+                disabled={ disableInput || isDataSynced }
               />
             </div>
 
@@ -401,7 +411,7 @@ const AddressContactDetails = memo(
                 value={workPhoneSecondaryText}
                 onChange={handleWorkPhoneSecondarChange}
                 fullWidth
-                disabled={disableInput}
+                disabled={ disableInput || isDataSynced }
               />
             </div>
           </div>
@@ -418,7 +428,7 @@ const AddressContactDetails = memo(
                 onChange={handleStreetAddressChange}
                 fullWidth
                 required={true}
-                disabled={disableInput}
+                disabled={ disableInput || isDataSynced }
                 error={streetAddressText === "" && contactDetailsNotGiven}
               />
             </div>
@@ -433,7 +443,7 @@ const AddressContactDetails = memo(
                 value={secondaryStreetAddressText}
                 onChange={handleScondaryStreetAddressChange}
                 fullWidth
-                disabled={disableInput}
+                disabled={ disableInput || isDataSynced }
               />
             </div>
 
@@ -448,7 +458,7 @@ const AddressContactDetails = memo(
                 onChange={handleCityChange}
                 fullWidth
                 required={true}
-                disabled={disableInput}
+                disabled={ disableInput || isDataSynced }
                 error={CityText === "" && contactDetailsNotGiven}
               />
             </div>
@@ -464,7 +474,7 @@ const AddressContactDetails = memo(
                 onChange={handleProvinceChange}
                 fullWidth
                 required={true}
-                disabled={disableInput}
+                disabled={ disableInput || isDataSynced }
                 error={ProvinceText === "" && contactDetailsNotGiven}
               />
             </div>
@@ -480,7 +490,7 @@ const AddressContactDetails = memo(
                 onChange={handleCountryChange}
                 fullWidth
                 required={true}
-                disabled={disableInput}
+                disabled={ disableInput || isDataSynced }
                 error={CountryText === "" && contactDetailsNotGiven}
               />
             </div>
@@ -497,7 +507,7 @@ const AddressContactDetails = memo(
                 inputProps={{ maxLength: 6 }}
                 fullWidth
                 required={true}
-                disabled={disableInput}
+                disabled={ disableInput || isDataSynced }
                 error={PostalText === "" && contactDetailsNotGiven}
               />
             </div>

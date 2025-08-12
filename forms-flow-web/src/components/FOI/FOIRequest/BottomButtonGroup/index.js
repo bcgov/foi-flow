@@ -27,7 +27,7 @@ import { handleBeforeUnload } from "../utils";
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import clsx from "clsx";
 import AxisSyncModal from "../AxisDetails/AxisSyncModal";
-
+import InternalConsultConfirmationModal from "../InternalConsultation/InternalConsultConfirmationModal";
 import { PAYMENT_EXPIRY_DAYS} from "../../../../constants/FOI/constants";
 
 const useStyles = makeStyles((theme) => ({
@@ -60,8 +60,10 @@ const useStyles = makeStyles((theme) => ({
 const BottomButtonGroup = React.memo(
   ({
     isValidationError,
+    isConsultValidationError,
     urlIndexCreateRequest,
     saveRequestObject,
+    saveConsultRequestObject,
     unSavedRequest,
     recordsUploading,
     CFRUnsaved,
@@ -78,12 +80,26 @@ const BottomButtonGroup = React.memo(
     attachmentsArray,
     oipcData,
     validLockRecordsState,
+    isAddConsultRequest,
+    requestDetails,
+    requestConsults,
+    setUnSavedRequest,
+    createSaveConsultRequestObject,
+    //handleUpdatedProgramAreaList,
   }) => {
     /**
      * Bottom Button Group of Review request Page
      * Button enable/disable is handled here based on the validation
      */
     const { requestId, ministryId } = useParams();
+    const [saveModal, setSaveModal] = useState({
+      show: false,
+      title: "",
+      description: "",
+      descriptionDetail: "",
+      message: "",
+      confirmButtonTitle: ""
+    });
 
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -187,7 +203,7 @@ const BottomButtonGroup = React.memo(
     };
 
     React.useEffect(() => {
-      if (isValidationError || !stateChanged) {
+      if (isConsultValidationError || !stateChanged) {
         return;
       }
 
@@ -383,6 +399,51 @@ const BottomButtonGroup = React.memo(
       }
     };
 
+    const handleUpdatedMasterProgramAreaList = (updatedProgramAreaList) => {
+      createSaveConsultRequestObject('consultProgramAreaList', updatedProgramAreaList);
+      setUnSavedRequest(true);
+      //handleUpdatedProgramAreaList(updatedProgramAreaList);
+    }
+
+    const handleInternalConsultSaveRequest = () => {
+      if (isConsultValidationError) {
+        return;
+      }
+
+      const selectedMinistries = saveConsultRequestObject?.consultProgramAreaList?.filter((programArea) => programArea.isChecked);
+      const finalSubjectCode = saveConsultRequestObject?.consultSubjectCode;
+      const dueDate = saveConsultRequestObject?.consultDueDate;
+      const consultAssignedTo = saveConsultRequestObject?.assignedTo;
+      const assignedGroup = saveConsultRequestObject?.assignedGroup;
+      const consultAssigneeVal = saveConsultRequestObject?.consultAssigneeVal;
+      const consultTypeId = saveConsultRequestObject?.consultType;
+
+      setUnSavedRequest(true);
+      setSaveModal((prev) => ({
+        ...prev,
+        show: true,
+        title: "Internal Consultation",
+        description: "Are you sure you want to add an internal consultation for this request?",
+        descriptionDetail: "Please confirm your recipients selection to create your internal consultation.",
+        message: "",
+        confirmButtonTitle: "Confirm your selection",
+        confirmationData: {
+          selectedMinistries,
+          subjectCode: finalSubjectCode,
+          dueDate: dueDate,
+          consultAssignedTo: consultAssignedTo,
+          assignedGroup: assignedGroup,
+          consultTypeId: consultTypeId,
+          consultAssigneeVal: consultAssigneeVal
+        },
+      }));
+    };
+  
+    const saveData = () => {
+      // actually save the data
+      setSaveModal((prev) => ({ ...prev, show: false }));
+    };
+
     React.useEffect(() => {
       if (successCount === fileCount && successCount !== 0) {
         setsaveModal(false);
@@ -402,7 +463,7 @@ const BottomButtonGroup = React.memo(
         return;
       }
 
-      if (isValidationError) {
+      if (isConsultValidationError) {
         return;
       }
 
@@ -463,7 +524,7 @@ const BottomButtonGroup = React.memo(
         </ConditionalComponent>
 
         <div className="foi-bottom-button-group">
-          {urlIndexCreateRequest < 0 &&
+          {/* {urlIndexCreateRequest < 0 &&
             (requestState?.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() &&
             requestState?.toLowerCase() !== StateEnum.unopened.name.toLowerCase()) &&
               <button
@@ -476,8 +537,23 @@ const BottomButtonGroup = React.memo(
               >
                 Sync with AXIS
               </button>
-            }
-          <button
+            } */}
+
+          {isAddConsultRequest? (
+            <button
+              type="button"
+              className={clsx("btn", "btn-bottom", {
+                 [classes.btndisabled]: isConsultValidationError,
+                 [classes.btnenabled]: !isConsultValidationError,
+              })}
+              disabled={isConsultValidationError}
+              onClick={handleInternalConsultSaveRequest}
+            >
+              Save new consultation
+            </button>
+          ) : (
+            <>
+            <button
             type="button"
             className={clsx("btn", "btn-bottom", {
               [classes.btndisabled]: isValidationError,
@@ -488,13 +564,27 @@ const BottomButtonGroup = React.memo(
           >
             Save
           </button>
-          <button
+          </>
+          )}
+          
+          {isAddConsultRequest? (
+            <button
+            type="button"
+            className={`btn btn-bottom ${classes.btnsecondaryenabled}`}
+            onClick={(e) => returnToQueue(e, unSavedRequest || recordsUploading)}
+          >
+            Close
+          </button>
+          ):(
+            <button
             type="button"
             className={`btn btn-bottom ${classes.btnsecondaryenabled}`}
             onClick={(e) => returnToQueue(e, unSavedRequest || recordsUploading)}
           >
             Return to Queue
           </button>
+          )}
+          
         </div>
         {axisSyncModalOpen && (
           <AxisSyncModal
@@ -512,6 +602,20 @@ const BottomButtonGroup = React.memo(
             axisSyncedData={axisSyncedData}
           />
         )}
+        {saveModal.show && (
+      <InternalConsultConfirmationModal
+        requestId={requestDetails.id}
+        ministryId={requestDetails.id}
+        modal={saveModal}
+        confirm={saveData}
+        setModal={setSaveModal}
+        masterProgramAreaList={saveConsultRequestObject.consultProgramAreaList}
+        handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList}
+        requestDetails={requestDetails}
+        requestConsults={requestConsults}
+        setUnSavedRequest={setUnSavedRequest}
+      />
+      )}
       </div>
     );
   }

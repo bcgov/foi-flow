@@ -10,6 +10,7 @@ import FOIHeader from "./Header";
 import FOIFooter from "./Footer";
 import { Dashboard, MinistryDashboard } from "./Dashboard";
 import FOIRequest  from "./FOIRequest";
+import FOIConsultRequest from "./FOIRequest/InternalConsultation/FOIConsultRequest";
 import MinistryReview from "./FOIRequest/MinistryReview/MinistryReview";
 import { isMinistryLogin } from '../../helper/FOI/helper';
 import UnAuthorized from "./UnAuthorized";
@@ -67,6 +68,12 @@ const FOIAuthenticateRouting = React.memo((props) => {
               </Route>
               <Route path="/foi/foirequests/:requestId/ministryrequest/:ministryId">
                 <FOIRequest userDetail={userDetail} openApplicantProfileModal={openApplicantProfileModal}/>
+              </Route>
+              <Route path="/foi/foirequests/:requestId/ministryrequest/:ministryId/consult/:consultId">
+                <FOIConsultRequest userDetail={userDetail} openApplicantProfileModal={openApplicantProfileModal} />
+              </Route>
+              <Route path="/foi/addconsultrequest">
+                <FOIConsultRequest  userDetail={userDetail} openApplicantProfileModal={openApplicantProfileModal}/>
               </Route>
               <Route path="/foi/historicalrequest/:requestId">
                 <FOIRequest userDetail={userDetail} />
