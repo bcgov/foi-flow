@@ -60,7 +60,7 @@ class emailservice:
             _templatename = self.__getvaluefromschema(emailschema, "templatename")
             servicename = _templatename  if servicename == ServiceName.correspondence.value.upper() else servicename
             _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
-            _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson, ministryrequestid, correspondencemessagejson, _applicantcorrespondenceid)
+            _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson, ministryrequestid, _applicantcorrespondenceid, correspondencemessagejson)
             if (_applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
                 servicename = _templatename.upper() if _templatename else ""
             if subject is None:
