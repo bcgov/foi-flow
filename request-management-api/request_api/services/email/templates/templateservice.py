@@ -25,7 +25,7 @@ class templateservice:
             logging.exception(ex)
         return None
 
-    def generate_by_servicename_and_schema(self, servicename, requestjson, ministryrequestid, correspondencemessagejson, applicantcorrespondenceid = None):
+    def generate_by_servicename_and_schema(self, servicename, requestjson, ministryrequestid, applicantcorrespondenceid = None, correspondencemessagejson = None):
         try:
             _template = self.__gettemplate(servicename)
             if _template is None:
