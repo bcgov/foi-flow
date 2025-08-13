@@ -81,7 +81,7 @@ class FOIFlowApplicantCorrespondence(Resource):
                 rawrequestid = requestid
             else:
                 rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
-            result = communicationwrapperservice().send_preview_email(requestid, rawrequestid, ministryrequestid, applicantcorrespondencelog)
+            result = communicationwrapperservice().send_preview_email(requestid, rawrequestid, ministryrequestid, applicantcorrespondencelog, requestjson['correspondencemessagejson'])
             return {'status': result['success'], 'message': result['message']}, 200
         except BusinessException:
             return "Error happened while saving applicant correspondence log", 500

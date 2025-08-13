@@ -4,7 +4,7 @@ from request_api.services.email.templates.templateconfig import templateconfig
 from request_api.services.requestservice import requestservice
 from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice
 from request_api.models.ApplicationCorrespondenceTemplates import ApplicationCorrespondenceTemplate
-import json
+import json, html
 import logging
 from flask import current_app
 from request_api.services.email.templates.templatefilters import init_filters
@@ -25,7 +25,7 @@ class templateservice:
             logging.exception(ex)
         return None
 
-    def generate_by_servicename_and_schema(self, servicename, requestjson, ministryrequestid, applicantcorrespondenceid = None):
+    def generate_by_servicename_and_schema(self, servicename, requestjson, ministryrequestid, correspondencemessagejson, applicantcorrespondenceid = None):
         try:
             _template = self.__gettemplate(servicename)
             if _template is None:
@@ -33,6 +33,10 @@ class templateservice:
                 _template = self.__gettemplate(_templatename)
             if (applicantcorrespondenceid and applicantcorrespondenceid != 0 and templateconfig().isnotreceipt(servicename)):
                 emailtemplatehtml = self.__generatecorrespondencetetemplate(applicantcorrespondenceid)
+            elif (correspondencemessagejson):
+                loaded_json = json.loads(correspondencemessagejson)
+                emailhtml_decoded_string = html.unescape(loaded_json['emailhtml'])
+                emailtemplatehtml = emailhtml_decoded_string
             else:
                 emailtemplatehtml= storageservice().downloadtemplate(_template.documenturipath)
             return self.__generatetemplate(requestjson, emailtemplatehtml, _template.description)
