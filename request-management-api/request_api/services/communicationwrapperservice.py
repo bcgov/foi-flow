@@ -109,7 +109,7 @@ class communicationwrapperservice:
 
         if self.__is_fee_processing(templatename):
             emailschema = { "templatename": templatename }
-            result = emailservice().send_preview_email(templatename.upper(), requestid, ministryrequestid, emailschema, applicantcorrespondencelog['emailsubject'], applicantcorrespondencelog['emails'])
+            result = emailservice().send_preview_email(templatename.upper(), requestid, ministryrequestid, emailschema, emailsubject, applicantcorrespondencelog['emails'])
             return result
         else:
             sendemailresult = communicationemailservice().send(template, applicantcorrespondencelog)

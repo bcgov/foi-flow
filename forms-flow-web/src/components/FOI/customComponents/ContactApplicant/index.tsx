@@ -1221,12 +1221,14 @@ export const ContactApplicant = ({
       setEnableAutoFocus(true);
       setShowLagacyEditor(false);
       setCurTemplate(i.draft);
+      setCurTemplateName(i.templatename);
     } else {
       setShowLagacyEditor(true);
       setEditorValue(i.text);
       for(let j = 0; j < templates.length; j++) {
         if (templates[j].templateid === i.templateid) {
           setCurrentTemplate(+j);
+          setCurTemplateName(i?.templatename);
         } 
       }
     }
