@@ -12,6 +12,7 @@ on:
       - test-rook
     paths:
       - "integrationapi/MCS.FOI.Integration/**"
+  workflow_dispatch:
 
 defaults:
   run:
