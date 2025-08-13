@@ -575,6 +575,7 @@ export const ContactApplicant = ({
   const isEnabledTemplate = (item: any) => {
     var name:string = item?.name ? item.name : item?.fileName ? item.fileName : "";
    if (['PAYONLINE', 'PAYOUTSTANDING'].includes(name)) { 
+    return true;
       return !isFeeTemplateDisabled(currentCFRForm, name); 
    } else if (['EXTENSIONS-PB'].includes(name)) {
       return getExtensionType(requestDetails, requestExtensions) === "PB";
@@ -1221,12 +1222,14 @@ export const ContactApplicant = ({
       setEnableAutoFocus(true);
       setShowLagacyEditor(false);
       setCurTemplate(i.draft);
+      setCurTemplateName(i.templatename);
     } else {
       setShowLagacyEditor(true);
       setEditorValue(i.text);
       for(let j = 0; j < templates.length; j++) {
         if (templates[j].templateid === i.templateid) {
           setCurrentTemplate(+j);
+          setCurTemplateName(i?.templatename);
         } 
       }
     }
