@@ -80,7 +80,7 @@ class communicationwrapperservice:
             sendemailresult = {"success" : False, "message": result.message, "identifier": -1}
         return sendemailresult
 
-    def send_preview_email(self, requestid, rawrequestid, ministryrequestid, applicantcorrespondencelog):
+    def send_preview_email(self, requestid, rawrequestid, ministryrequestid, applicantcorrespondencelog, correspondencemessagejson):
         data = json.loads(applicantcorrespondencelog['correspondencemessagejson'])
         attributes = applicantcorrespondencelog["attributes"][0]
         emailsubject = ""
@@ -109,7 +109,7 @@ class communicationwrapperservice:
 
         if self.__is_fee_processing(templatename):
             emailschema = { "templatename": templatename }
-            result = emailservice().send_preview_email(templatename.upper(), requestid, ministryrequestid, emailschema, emailsubject, applicantcorrespondencelog['emails'])
+            result = emailservice().send_preview_email(templatename.upper(), requestid, ministryrequestid, emailschema, emailsubject, applicantcorrespondencelog['emails'], correspondencemessagejson)
             return result
         else:
             sendemailresult = communicationemailservice().send(template, applicantcorrespondencelog)
