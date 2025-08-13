@@ -63,10 +63,9 @@ class emailservice:
             _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson, ministryrequestid, _applicantcorrespondenceid)
             if (_applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
                 servicename = _templatename.upper() if _templatename else ""
-            _messageattachmentlist = self.__get_attachments(ministryrequestid, emailschema, servicename)
             if subject is None:
                 subject = templateconfig().getsubject(servicename, requestjson)
-            emailresult = senderservice().send(subject, _messagepart, _messageattachmentlist, emails)
+            emailresult = senderservice().send(subject, _messagepart, [], emails)
             return {"success": emailresult["success"], "message": emailresult["message"], "subject": subject, "from_email": emailresult.get("from_email")}
         except Exception as ex:
             logging.exception(ex)
