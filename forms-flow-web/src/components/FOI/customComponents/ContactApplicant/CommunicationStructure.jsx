@@ -1,6 +1,4 @@
 import React, { useContext, useState, useRef, useEffect } from 'react'
-//import '../Comments/comments.scss'
-import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
 import {
   modal,
   modalActions,
@@ -33,6 +31,7 @@ import { getTemplateVariables } from './util';
 import { DownloadCorrespondenceModal } from './DownloadCorrespondenceModal';
 import { getCorrespondenceSubject, getFullEmailListText, getFullCCEmailListText } from './helper';
 import { exportPDF } from '../../../../apiManager/services/FOI/foiCorrespondenceServices';
+import DOMPurify from 'dompurify'; 
 
 const CommunicationStructure = ({
   correspondence, 
@@ -97,7 +96,13 @@ const CommunicationStructure = ({
     // }
     // else {
       if (correspondence.text) {
-        markup = `<p>${correspondence.text}</p>`
+        // Sanitize HTML to remove style tags and attributes that could change CSS
+        const sanitizedText = DOMPurify.sanitize(correspondence.text, {
+          FORBID_TAGS: ['style'],
+          FORBID_ATTR: ['style'],
+          ALLOW_DATA_ATTR: false
+        });
+        markup = `<p>${sanitizedText}</p>`
       } else {
         markup = `<p></p>`
       }
