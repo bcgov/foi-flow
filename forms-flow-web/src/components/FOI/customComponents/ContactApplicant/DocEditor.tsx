@@ -45,7 +45,7 @@ export const DocEditor = ({
     // These are the phrases from the templates the precede email and file, to ensure that emails and numbers in other locations aren't replaced
     const EMAILPREFIXES = [`Sent via email:  `, `Sent via email: `, `Sent by email to: `, `Sent by email to:  `, `Applicant email address:  `]
     const FILEPREFIXES = ['File:  292-40/', 'File:  292-30/', 'File:  292-30\\', 'File:  292- 30/', 'File:  292- 40/']
-    const SKIPHEADERFOOTERINSERT = ['A - Applicant Cover Email', 'Fee Estimate', 'Outstanding Fee']
+    const SKIPHEADERFOOTERINSERT = ['A - Applicant Cover Email', 'Fee Estimate', 'Outstanding Fee', 'G - Sign Form', 'G - Call For Records form']
     const [container, setContainer] = React.useState<DocumentEditorContainerComponent | null>(null);
     const userDetail: any|null = useSelector((state: any)=> state.user.userDetail);
     let requestDetails: any|null = useSelector((state: any) => state.foiRequests.foiRequestDetail);
