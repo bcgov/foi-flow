@@ -694,7 +694,6 @@ export {
   getCommentLabelFromId,
   getIAOAssignToList,
   setTeamTagList,
-  getCommentTypeFromId,
   calculateBusinessDaysBetween,
   addBusinessDaysToDate,
   getIAOTagList
