@@ -30,8 +30,7 @@ import { toast } from 'react-toastify';
 import { getTemplateVariables } from './util';
 import { DownloadCorrespondenceModal } from './DownloadCorrespondenceModal';
 import { getCorrespondenceSubject, getFullEmailListText, getFullCCEmailListText } from './helper';
-import { exportPDF } from '../../../../apiManager/services/FOI/foiCorrespondenceServices';
-import DOMPurify from 'dompurify'; 
+import { exportPDF } from '../../../../apiManager/services/FOI/foiCorrespondenceServices'; 
 
 const CommunicationStructure = ({
   correspondence, 
@@ -68,48 +67,21 @@ const CommunicationStructure = ({
   const ref = useRef();
   const closeTooltip = () => ref.current && ref ? ref.current.close() : {};
 
-
-  const getHtmlfromRawContent = () => {
-    let markup = null
-    // if (correspondence.commentTypeId === 1) {
-    //   const rawContentFromStore = convertFromRaw(JSON.parse(correspondence.text))
-    //   let initialEditorState = EditorState.createWithContent(rawContentFromStore);
-    //   const rawContentState = convertToRaw(initialEditorState.getCurrentContent());
-    //   const entityMap = rawContentState.entityMap;
-    //   markup = draftToHtml(
-    //     rawContentState
-    //   );
-    //   let commentmentions = []
-    //   let updatedMarkup = ''
-
-    //   Object.values(entityMap).forEach(entity => {
-    //     if (entity.type === 'mention') {
-    //       commentmentions.push(entity.data.mention.name);
-    //     }
-
-    //   });
-    //   const distinctMentions = [... new Set(commentmentions)]
-    //   distinctMentions.forEach(_mention => {
-    //     updatedMarkup = markup.replaceAll(_mention, `<span class='taggeduser'>${_mention}</span>`)
-    //     markup = updatedMarkup
-    //   })
-    // }
-    // else {
-      if (correspondence.text) {
-        // Sanitize HTML to remove style tags and attributes that could change CSS
-        const sanitizedText = DOMPurify.sanitize(correspondence.text, {
-          FORBID_TAGS: ['style'],
-          FORBID_ATTR: ['style'],
-          ALLOW_DATA_ATTR: false
-        });
-        markup = `<p>${sanitizedText}</p>`
-      } else {
-        markup = `<p></p>`
-      }
-      
-    //}
-    return markup
-  }
+  // Clean HTML content by removing problematic CSS while preserving structure
+  const cleanEmailHTML = React.useCallback((htmlContent) => {
+    if (!htmlContent) return '';
+    // Extract body content from XHTML
+    const bodyMatch = htmlContent.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+    const bodyContent = bodyMatch ? bodyMatch[1] : htmlContent;
+    // Strip all styling attributes that could interfere with app CSS
+    const withoutStyles = bodyContent.replace(/\s(style|class|lang)\s*=\s*["'][^"']*["']/gi, '');
+    
+    return `<div class="email-preview">${withoutStyles}</div>`;
+  }, []);
+  const safeHtml = React.useMemo(() => 
+    cleanEmailHTML(correspondence?.text), 
+    [correspondence?.text, cleanEmailHTML]
+  );
 
   useEffect(() => {
     if (downloadCorrespondenceModalOpen == false) setModalFor("add")
@@ -524,7 +496,7 @@ if (correspondence?.is_sent_successfully == false) labelText = 'failed to send e
               </div>
           </AccordionSummary>
           <AccordionDetails>
-            <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} >
+            <div className="commenttext email-content" dangerouslySetInnerHTML={{ __html: safeHtml}} >
             </div>
             {correspondence && correspondence.attachments?.map((attachment, index) => (
             <div className="email-attachment-item" key={attachment.applicantcorrespondenceattachmentid + attachment.filename}>
