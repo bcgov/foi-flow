@@ -538,6 +538,9 @@ const OpenInfoPublicationMain = ({
         uploadFor={"additionalFiles"}
         maxNoFiles={10}
         bcgovcode={bcgovcode}
+        handleChangeResponseDate={() => {}}
+        handleChangeResponseTitle={() => {}}
+        retrieveSelectedRecords={() => {}}
       />
     </div>
   );
