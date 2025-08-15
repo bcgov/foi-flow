@@ -2,7 +2,6 @@ name: Request Management API CD
 
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - dev
@@ -37,10 +36,6 @@ jobs:
           oc_version: '4.6'
 
       - uses: actions/checkout@v2
-      - name: Install oc
-        uses: redhat-actions/oc-installer@v1
-        with:
-          oc_version: '4.6'
       - name: Set ENV variables
         id: set-variable
         run: |
