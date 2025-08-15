@@ -23,6 +23,7 @@ class DocumentPathMapper(db.Model):
 
     @classmethod
     def getdocumentpath(cls, category, programarea=None):
+        category = "records" if category == "additionalfiles" else category
         documentpath_schema = DocumentPathMapperSchema()
         query = db.session.query(DocumentPathMapper).filter(DocumentPathMapper.isactive == True, func.lower(DocumentPathMapper.category) == category.lower())
         if category.lower() == DocumentPathMapperCategory.Records.value.lower():

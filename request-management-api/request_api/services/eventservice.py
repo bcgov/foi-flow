@@ -16,6 +16,7 @@ from request_api.services.events.cfrfeeform import cfrfeeformevent
 from request_api.services.events.attachment import attachmentevent
 from request_api.services.events.payment import paymentevent
 from request_api.services.events.email import emailevent
+from request_api.services.events.openinfo import openinfoevent
 from request_api.services.events.section5pending import section5pendingevent
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
@@ -113,6 +114,22 @@ class eventservice:
             paymeneteventresponse = paymentevent().createpaymentevent(requestid, paymenteventtype)
             if paymeneteventresponse.success == False:
                 current_app.logger.error("FOI Notification failed for payment event for request= %s ; event response=%s" % (requestid, paymeneteventresponse.message))
+        except BusinessException as exception:
+            self.__logbusinessexception(exception)
+
+    def postopeninfostateevent(self, requestid, ministryrequestid, userid, username):
+        try:
+            openinfoeventresponse = openinfoevent().createopeninfostateevent(ministryrequestid, requestid, userid, username)
+            if openinfoeventresponse.success == False:
+                current_app.logger.error("FOI Notification failed for openinfo event for request= %s ; event response=%s" % (requestid, openinfoeventresponse.message))
+        except BusinessException as exception:
+            self.__logbusinessexception(exception)
+
+    def postopeninfoexemptionevent(self, ministryrequestid, requestid, userid, username, event_type, exemption_id):
+        try:
+            openinfoeventresponse = openinfoevent().handle_exemption_request(ministryrequestid, requestid, userid, username, event_type, exemption_id)
+            if openinfoeventresponse.success == False:
+                current_app.logger.error("FOI Notification failed for openinfo event for request= %s ; event response=%s" % (requestid, openinfoeventresponse.message))
         except BusinessException as exception:
             self.__logbusinessexception(exception)
 

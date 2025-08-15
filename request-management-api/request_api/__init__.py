@@ -96,6 +96,7 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
         setup_jwt_manager(app, jwt)
 
     #ExceptionHandler(app)
+    #print("Hello, world!")
 
 
     register_shellcontext(app)

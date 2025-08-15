@@ -3,17 +3,25 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
 from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
 from request_api.models.FOIRequestWatchers import FOIRequestWatcher
+from request_api.models.FOIOpenInformationRequests import FOIOpenInformationRequests
 from dateutil import tz, parser
 import datetime as dt
 from pytz import timezone
 import pytz
 import maya
 from request_api.auth import AuthHelper
+import holidays
 
 from flask import jsonify
 
 SHORT_DATEFORMAT = '%Y %b, %d'
 LONG_DATEFORMAT = '%Y-%m-%d %H:%M:%S.%f'
+
+REQUEST_TYPE_MAPPING = {
+    'general': 'G',
+    'personal': 'P',
+    'proactivedisclosure': 'PD'
+}
 
 class dashboardservice:
     """ FOI dashboard management service
@@ -78,41 +86,49 @@ class dashboardservice:
 
     def getrequestqueuepagination(self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):        
         requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.getusertype())
-        requestqueue = []                
+        requestqueue = []           
+
+        # Check if user is in OI Team
+        is_oi_team = AuthHelper.getusertype() == "iao" and groups and 'OI Team' in groups     
+
         for request in requests.items:
-            
-            if(request.receivedDateUF is None): #request from online form has no received date in json
-                _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+            if is_oi_team:
+                # Handle OI requests format
+                requestqueue.append(self.__handle_oi_request(request))
             else:
-                _receiveddate = parser.parse(request.receivedDateUF)
+                # Handle Raw requests format
+                if(request.receivedDateUF is None): #request from online form has no received date in json
+                    _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+                else:
+                    _receiveddate = parser.parse(request.receivedDateUF)
 
-            if(request.ministryrequestid == None):                
-                unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
-                unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
-                unopenrequest.update({'isiaorestricted': request.isiaorestricted}) 
+                if(request.ministryrequestid == None):                
+                    unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
+                    unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
+                    unopenrequest.update({'isiaorestricted': request.isiaorestricted}) 
 
-                # isawatcher = FOIRawRequestWatcher.isawatcher(request.id,userid)                                
-                if request.isiaorestricted == True:
-                    unopenrequest.update({'lastName': 'Restricted'})
-                    unopenrequest.update({'firstName': 'Request'})
-                
-                requestqueue.append(unopenrequest) 
+                    # isawatcher = FOIRawRequestWatcher.isawatcher(request.id,userid)                                
+                    if request.isiaorestricted == True:
+                        unopenrequest.update({'lastName': 'Restricted'})
+                        unopenrequest.update({'firstName': 'Request'})
+                    
+                    requestqueue.append(unopenrequest) 
 
-            else:
-                _openrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
-                _openrequest.update({'ministryrequestid': request.ministryrequestid})
-                _openrequest.update({'extensions': request.extensions})
-                _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
-                _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
+                else:
+                    _openrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
+                    _openrequest.update({'ministryrequestid': request.ministryrequestid})
+                    _openrequest.update({'extensions': request.extensions})
+                    _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
+                    _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
 
-                isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
-                _openrequest.update({'isiaorestricted': isiaorestricted})
+                    isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
+                    _openrequest.update({'isiaorestricted': isiaorestricted})
 
-                if isiaorestricted == True:
-                    _openrequest.update({'lastName': 'Restricted'})
-                    _openrequest.update({'firstName': 'Request'})
+                    if isiaorestricted == True:
+                        _openrequest.update({'lastName': 'Restricted'})
+                        _openrequest.update({'firstName': 'Request'})
 
-                requestqueue.append(_openrequest)   
+                    requestqueue.append(_openrequest)   
                    
 
         meta = {
@@ -124,9 +140,6 @@ class dashboardservice:
             'has_next': requests.has_next,
             'has_prev': requests.has_prev,
         }
-
-
-
 
         return jsonify({'data': requestqueue, 'meta': meta})
 
@@ -228,3 +241,117 @@ class dashboardservice:
         elif idprefix:
             return idprefix + filenumber
         return ""
+    
+    def oiadvancedsearch(self, params={'usertype': 'iao', 'groups':[], 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'requestflags':[], 'publicbody':[], 'daterangetype':None, 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
+        userid = AuthHelper.getuserid()
+
+        is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
+        
+        if is_oi_team:
+            requests = FOIOpenInformationRequests.advancedsearch(params, userid, AuthHelper.isiaorestrictedfilemanager())
+        elif (params['usertype'] == "iao"):
+            requests = FOIRawRequest.advancedsearch(params, userid, AuthHelper.isiaorestrictedfilemanager())
+        else:
+            requests = FOIMinistryRequest.advancedsearch(params, userid, AuthHelper.isministryrestrictedfilemanager())
+        
+        requestqueue = []
+        for request in requests.items:
+            if is_oi_team:
+                requestqueue.append(self.__handle_oi_request(request))
+            else:    
+                if(request.receivedDateUF is None): #request from online form has no received date in json
+                    _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+                else:
+                    _receiveddate = parser.parse(request.receivedDateUF)
+
+                if(request.ministryrequestid == None):
+                    unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
+                    unopenrequest.update({'description':request.description})
+                    unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
+                    unopenrequest.update({'isiaorestricted': request.isiaorestricted})
+
+                    requestqueue.append(unopenrequest)
+                else:
+                    _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
+                    _openrequest.update({'ministryrequestid':request.ministryrequestid})
+                    _openrequest.update({'extensions': request.extensions})
+                    _openrequest.update({'description':request.description})
+                    _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
+                    _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
+
+                    isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
+                    _openrequest.update({'isiaorestricted': isiaorestricted})
+
+                    requestqueue.append(_openrequest)
+
+        meta = {
+            'page': requests.page,
+            'pages': requests.pages,
+            'total': requests.total,
+            'prev_num': requests.prev_num,
+            'next_num': requests.next_num,
+            'has_next': requests.has_next,
+            'has_prev': requests.has_prev,
+        }
+
+        return jsonify({'data': requestqueue, 'meta': meta})
+
+    def __preparefoioirequestinfo(self, request, receivedDate, publicationDate, fromClosed):
+        return {
+            'id': request.id,
+            'idNumber': request.idNumber,
+            'ministryrequestid': request.ministryrequestid,
+            'receivedDate': receivedDate,
+            'axisRequestId': request.axisRequestId,
+            'requestType': REQUEST_TYPE_MAPPING.get(request.requestType, ''),
+            'recordspagecount': request.recordspagecount,
+            'publicationStatus': request.oiStatusName,
+            'publicationDate': publicationDate,
+            'assignedTo': request.assignedToFormatted,
+            'applicantType': request.applicantcategory,
+            'version': request.version,
+            'foiopeninforequestid': request.foiopeninforequestid,
+            'currentState': request.currentState,
+            'closedDate': fromClosed
+        }
+
+    def __calculate_from_closed(self, closedate):
+        """Calculate business days from close date to today"""
+
+        if not closedate:
+            return "N/A"
+        try:
+            today = dt.datetime.now(tz=pytz.timezone('America/Vancouver')).date()
+            closed_date = closedate.date() if isinstance(closedate, dt.datetime) else closedate
+            business_days = 0
+            canada_holidays = holidays.Canada(prov='BC', years=range(closed_date.year, today.year + 1))  
+            holidays_set = set(canada_holidays)
+
+            while closed_date <= today:
+                if closed_date != closedate.date() and closed_date.weekday() < 5 and closed_date not in holidays_set:
+                    business_days += 1
+                closed_date += dt.timedelta(days=1)
+
+            return str(business_days) if business_days > 0 else "N/A"
+        except Exception as e:
+            print("Error in calculate_from_closed: ", e)
+            return "N/A"
+
+    def __handle_oi_request(self, request):
+        """Formats request data for OI team view with received date, publication date, and days since closure"""
+
+        _receiveddate = None
+        _publicationdate = 'N/A'
+
+        # Handle received date
+        if request.receivedDate:
+            _receiveddate = request.receivedDate.strftime("%b %d %Y") if request.receivedDate else None
+        
+        # Handle publication date
+        if request.publicationdate:
+            _publicationdate = request.publicationdate.strftime("%b %d %Y") if request.publicationdate else None
+        
+        # Calculate business days
+        _from_closed = self.__calculate_from_closed(request.closedate)
+            
+        return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed)

@@ -31,6 +31,9 @@ import {
   fetchOIPCStatuses,
   fetchOIPCReviewtypes,
   fetchOIPCInquiryoutcomes,
+  fetchOpenInfoPublicationStatuses,
+  fetchOpenInfoStatuses,
+  fetchOpenInfoExemptions,
   fetchFOICommentTypes,
   fetchFOIEmailTemplates
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
@@ -61,9 +64,15 @@ import {
   fetchPDFStitchedStatusForOIPCRedline,
   fetchHistoricalRecords,
   fetchPDFStitchStatusForConsults,
+  fetchPDFStitchedPackage,
+  fetchPDFStitchedStatus,
   fetchPDFStitchStatusesForPhasedRedlines,
   fetchPDFStitchStatusesForPhasedResponsePackages,
 } from "../../../apiManager/services/FOI/foiRecordServices";
+import {
+  fetchFOIOpenInfoAdditionalFiles,
+  fetchFOIOpenInfoRequest,
+} from "../../../apiManager/services/FOI/foiOpenInfoRequestServices";
 import { makeStyles } from "@material-ui/core/styles";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
 import { push } from "connected-react-router";
@@ -81,6 +90,7 @@ import {
   confirmChangesLost,
   getRedirectAfterSaveUrl,
   getTabBG,
+  getOITabBG,
   assignValue,
   createRequestDetailsObjectFunc,
   checkContactGiven,
@@ -110,15 +120,17 @@ import { toast } from "react-toastify";
 import HomeIcon from "@mui/icons-material/Home";
 import { RecordsLog } from "../customComponents/Records";
 import { UnsavedModal } from "../customComponents";
-import { DISABLE_GATHERINGRECORDS_TAB } from "../../../constants/constants";
+import { DISABLE_GATHERINGRECORDS_TAB, SKIP_OPENINFO_MINISTRIES } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
-import { setFOIRequestDetail } from "../../../actions/FOI/foiRequestActions";
+import ApplicantProfileModal from "./ApplicantProfileModal";
+import { setFOIRequestDetail, setFOIPDFStitchedOIPackage, setFOIPDFStitchStatusForOIPackage } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
 import RequestHistorySection from "../customComponents/RequestHistory";
 import { Fees } from "../customComponents/Fees";
+import OpenInfo from "./OpenInformation/OpenInfo";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -199,13 +211,20 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
   const [disableInput, setDisableInput] = useState(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !requestDetails?.isoipcreview);
-  const [_tabStatus, settabStatus] = React.useState(requestState);
-  let foitabheaderBG = getTabBG(_tabStatus, requestState);
+  const [_tabStatus, settabStatus] = React.useState(requestState);  
+  const isOITeam = userDetail.groups.includes("/OI Team");
+  const openInfoStates = useSelector(
+    (state) => state.foiRequests.oiStatuses
+  );
+  let foitabheaderBG = isOITeam ? getOITabBG(requestDetails?.oistatusid, openInfoStates) : getTabBG(_tabStatus, requestState);
+  
 
   const [unsavedPrompt, setUnsavedPrompt] = useState(false);
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
-  const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes); 
-
+  const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes);
+  const activePublicationRequest = !SKIP_OPENINFO_MINISTRIES.split(",").includes(requestDetails?.bcgovcode?.toUpperCase()) && 
+                                      requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL;
+  
   let isMinistry = false;
   const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
   if (Object.entries(userDetail).length !== 0) {
@@ -266,6 +285,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       active: false,
     },
     Records: {
+      display: false,
+      active: false,
+    },
+    OpenInformation: {
       display: false,
       active: false,
     },
@@ -374,6 +397,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     }
 
     dispatch(fetchFOICategoryList());
+    dispatch(fetchOpenInfoExemptions());
+    dispatch(fetchOpenInfoPublicationStatuses());
     dispatch(fetchFOIReceivedModeList());
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchFOISubjectCodeList());
@@ -383,11 +408,24 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     dispatch(fetchOIPCStatuses());
     dispatch(fetchOIPCReviewtypes());
     dispatch(fetchOIPCInquiryoutcomes());
+    if (isOITeam) {
+      dispatch(fetchOpenInfoStatuses());
+      dispatch(fetchFOIOpenInfoAdditionalFiles(requestId, ministryId));
+      dispatch(fetchPDFStitchedStatus(requestId, ministryId, "openinfo", (err, res) => {
+        dispatch(setFOIPDFStitchStatusForOIPackage(res))
+      }));
+      dispatch(fetchPDFStitchedPackage(requestId, ministryId, "openinfo", (err, res) => {
+        dispatch(setFOIPDFStitchedOIPackage(res))
+      }));
+    }
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
   }, [requestId, ministryId, comment, attachments]);
 
   useEffect(() => {
+    if (activePublicationRequest) {
+      dispatch(fetchFOIOpenInfoRequest(ministryId));
+    }
     if (requestDetails?.isphasedrelease) {
       dispatch(fetchPDFStitchStatusesForPhasedRedlines(requestId, ministryId));
       dispatch(fetchPDFStitchStatusesForPhasedResponsePackages(requestId, ministryId));
@@ -446,6 +484,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
         setIsMCFPersonal(true);
       }
     }
+    
     if(requestDetails.isoipcreview) {
       setIsOIPCReview(true);
     } else {
@@ -976,7 +1015,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   };
 
   const handleStateChange = (currentStatus) => {
-    setcurrentrequestStatus(currentStatus);
+    if (isOITeam) {
+      setOIStatus(currentStatus)
+    } else {
+      setcurrentrequestStatus(currentStatus);
+    }
     setStateChanged(true);
   };
 
@@ -1063,6 +1106,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const signinUrl = "/signin";
   const signupUrl = "/signup";
 
+  const [OIStatus, setOIStatus] = useState("");
+
   const requestNumber = requestDetails?.axisRequestId
     ? requestDetails.axisRequestId
     : requestDetails?.idNumber;
@@ -1136,6 +1181,14 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestState !== StateEnum.appfeeowing.name &&
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
+  
+  const showOpenInformationTab = () => {
+    return (
+      activePublicationRequest &&
+      requestState !== StateEnum.intakeinprogress.name &&
+      requestState !== StateEnum.unopened.name
+    );
+  } 
 
   const getHistoryCount = () => {
     let historyCount= visibleCorrespondence.length + requestNotes.filter(
@@ -1174,6 +1227,14 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     (c) => c.category !== 'draft'
   ) || [];
 
+  const getOIRequestState = () => {
+    if (requestDetails?.oistatusid) {
+      return openInfoStates?.find(s => s.oistatusid === requestDetails?.oistatusid)?.name;
+    } else {
+      return StateEnum.unopened.name
+    }
+  }
+
   return (!isLoading &&
     requestDetails &&
     Object.keys(requestDetails).length !== 0) ||
@@ -1190,7 +1251,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           <h4 className="foileftpanelrequestno">{headerText}</h4>
           <div className="foileftpaneldropdown">
             <StateDropDown
-              requestState={requestState}
+              requestState={isOITeam ? getOIRequestState() : requestState}
               updateStateDropDown={updateStateDropDown}
               stateTransition={stateTransition}
               requestStatus={_requestStatus}
@@ -1198,6 +1259,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               isMinistryCoordinator={false}
               isValidationError={isValidationError}
               requestType={requestDetails?.requestType}
+              isOITeam={isOITeam}
               isDivisionalCoordinator={false}
               isHistoricalRequest={isHistoricalRequest}
               consultflag={requestDetails?.isconsultflag}
@@ -1262,6 +1324,17 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     onClick={() => tabclick("Records")}
                   >
                     Records
+                  </div>
+                )}
+                {showOpenInformationTab() && (
+                  <div
+                    className={clsx("tablinks", {
+                      active: tabLinksStatuses.OpenInformation.active,
+                    })}
+                    name="Open Information"
+                    onClick={() => tabclick("OpenInformation")}
+                  >
+                    Publication
                   </div>
                 )}
                 {
@@ -1548,7 +1621,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         CFRUnsaved={CFRUnsaved}
                         handleSaveRequest={handleSaveRequest}
                         handleOpenRequest={handleOpenRequest}
-                        currentSelectedStatus={_currentrequestStatus}
+                        currentSelectedStatus={isOITeam ? OIStatus : _currentrequestStatus}
                         hasStatusRequestSaved={hasStatusRequestSaved}
                         disableInput={disableInput}
                         requestState={requestState}
@@ -1819,6 +1892,27 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               </>
             )}
           </div>
+          {showOpenInformationTab() && (
+            <div
+              id="OpenInformation"
+              className={clsx("tabcontent", {
+                active: tabLinksStatuses.OpenInformation.active,
+                [classes.displayed]: tabLinksStatuses.OpenInformation.display,
+                [classes.hidden]: !tabLinksStatuses.OpenInformation.display,
+              })}
+            >
+              <OpenInfo
+                toast={toast}
+                requestNumber={requestNumber}
+                requestDetails={requestDetails}
+                currentOIRequestState={getOIRequestState()}
+                foirequestid={requestId}
+                isOITeam={isOITeam}
+                foiministryrequestid={ministryId}
+                bcgovcode={JSON.parse(bcgovcode)}
+              />
+            </div>
+          )}
           {
             <div
               id="ContactApplicant"

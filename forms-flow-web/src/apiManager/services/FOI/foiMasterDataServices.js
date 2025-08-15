@@ -30,6 +30,9 @@ import {
     setOIPCStatuses,
     setOIPCReviewtypes,
     setOIPCInquiryoutcomes,
+    setOIExemptions,
+    setOIPublicationStatuses,
+    setOIStatuses,
     setFOICommentTypes,
     setFOIEmailTemplates
   } from "../../../actions/FOI/foiRequestActions";
@@ -714,6 +717,72 @@ import {
     };
   };
 
+  export const fetchOpenInfoPublicationStatuses = () => {
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_OI_PUBLICATIONSTATUSES, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const oiPublicationStatuses = res.data;
+            dispatch(setOIPublicationStatuses(oiPublicationStatuses));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching OI publication statuses master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching OI publication statuses master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  }
+
+  export const fetchOpenInfoExemptions = () => {
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_OI_EXEMPTIONS, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const oiExemptions = res.data;
+            oiExemptions.unshift({name: "Select Reason", oiexemptionid: 0, isactive: true})
+            dispatch(setOIExemptions(oiExemptions));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching OI exemptions master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching OI exemptions master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  }
+
+  export const fetchOpenInfoStatuses = () => {
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_OI_STATUSES, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const oiStatuses = res.data;
+            dispatch(setOIStatuses(oiStatuses));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching OI statuses master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching OI statuses master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  }
   export const fetchFOICommentTypes = () => {
     return (dispatch) => {
       httpGETRequest(API.FOI_GET_COMMENT_TYPES, {}, UserService.getToken())
@@ -738,7 +807,7 @@ import {
         });
     };
   };
-
+  
   export const fetchFOIEmailTemplates = () => {
     return (dispatch) => {
       httpGETRequest(API.FOI_GET_EMAIL_TEMPLATES, {}, UserService.getToken())

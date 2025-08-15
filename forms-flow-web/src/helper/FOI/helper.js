@@ -185,6 +185,51 @@ const calculateDaysRemaining = (endDate, startDate) => {
     );
   }
 };
+const calculateBusinessDaysBetween = (date1, date2) => {
+  // Parse dates as simple date strings without timezone conversion
+  const startDate = new Date(date1);
+  const endDate = new Date(date2);
+  // Reset time to avoid timezone issues
+  startDate.setHours(0, 0, 0, 0);
+  endDate.setHours(0, 0, 0, 0);
+  if (startDate.getTime() === endDate.getTime()) return 0;
+  
+  // Determine direction and set up iteration
+  const isForward = startDate <= endDate;
+  let currentDate = new Date(isForward ? startDate : endDate);
+  const targetDate = new Date(isForward ? endDate : startDate);
+  let businessDays = 0;
+  while (currentDate < targetDate) {
+    currentDate.setDate(currentDate.getDate() + 1);
+    const isHoliday = hd.isHoliday(currentDate);
+    const isWeekend = currentDate.getDay() === 6 || currentDate.getDay() === 0;
+    if (!isHoliday && !isWeekend) {
+      businessDays++;
+    }
+  }
+  const result = isForward ? businessDays : -businessDays;
+  // Return negative if date1 is after date2 (maintains directional information)
+  return result;
+};
+const addBusinessDaysToDate = (date, days) => {
+  if (!date) {
+    return null;
+  }
+  let holidays = 0;
+  let date2 = new Date(dayjs(date).businessDaysAdd(days));
+  date = new Date(date);
+  let currentDate = date;
+  while(days > 0) {
+    const isHoliday = hd.isHoliday(currentDate);
+    const isWeekend = currentDate.getDay() === 6 || currentDate.getDay() === 0;
+    if (isHoliday && !isWeekend) {
+      holidays++;
+    }
+    currentDate.setDate(currentDate.getDate() + 1);
+    days--;
+  }
+  return dayjs(date2).add(holidays, 'day').format('YYYY/MM/DD')
+}
 
 const isMinistryCoordinator = (userdetail, ministryteam) => {
   if (
@@ -247,6 +292,12 @@ const isIntakeTeam = (userGroups) => {
     userGroups?.map((userGroup) => userGroup.replace("/", "")).indexOf("Intake Team") !== -1
   );
 };
+
+const isOITeam = (userGroups) => {
+  return (
+    userGroups?.map((userGroup) => userGroup.replace("/", "")).indexOf("OI Team") !== -1
+  );
+}
 
 const getMinistryByValue = (userGroups) => {
   const ministryGroup = Object.values(MINISTRYGROUPS).filter((element) =>
@@ -625,6 +676,7 @@ export {
   isScanningTeam,
   isFlexTeam,
   isIntakeTeam,
+  isOITeam,
   encrypt,
   decrypt,
   addToRestrictedRequestTagList,
@@ -642,5 +694,7 @@ export {
   getCommentLabelFromId,
   getIAOAssignToList,
   setTeamTagList,
+  calculateBusinessDaysBetween,
+  addBusinessDaysToDate,
   getIAOTagList
 };

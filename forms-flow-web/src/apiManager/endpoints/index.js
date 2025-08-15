@@ -11,6 +11,7 @@ const API = {
   FOI_GET_MINISTRY_REQUESTS_API: `${FOI_BASE_API_URL}/api/dashboard/ministry`,
   FOI_GET_REQUESTS_PAGE_API: `${FOI_BASE_API_URL}/api/dashboardpagination`,
   FOI_GET_MINISTRY_REQUESTS_PAGE_API: `${FOI_BASE_API_URL}/api/dashboardpagination/ministry`,
+  // FOI_GET_OI_REQUESTS_PAGE_API: `${FOI_BASE_API_URL}/api/dashboardpagination/oi`,
   FOI_GET_CATEGORIES_API: `${FOI_BASE_API_URL}/api/foiflow/applicantcategories`,
   FOI_GET_PROGRAMAREAS_API: `${FOI_BASE_API_URL}/api/foiflow/programareas`,
   FOI_GET_PROGRAMAREAS_FORUSER_API: `${FOI_BASE_API_URL}/api/foiflow/programareasforuser`,
@@ -179,6 +180,9 @@ const API = {
   FOI_DOWNLOAD_RECORDS_FOR_RESPONSEPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/responsepackage`,
   FOI_PDF_STITCH_STATUS_FOR_RESPONSEPACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/responsepackage/pdfstitchjobstatus`,
 
+  FOI_PDF_STITCH_STATUS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/<packagename>/pdfstitchjobstatus`,
+  FOI_DOWNLOAD_ZIPPED_PACKAGE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download`,
+
   FOI_DOWNLOAD_RECORDS_FOR_OIPCREDLINEREVIEW: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/oipcreviewredline`,
   FOI_PDF_STITCH_STATUS_FOR_OIPCREDLINEREVIEW: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/oipcreviewredline/pdfstitchjobstatus`,
   FOI_DOWNLOAD_RECORDS_FOR_OIPCREDLINE: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/download/oipcredline`,
@@ -197,7 +201,15 @@ const API = {
   FOI_GET_OIPC_STATUSES: `${FOI_BASE_API_URL}/api/foiflow/oipc/statuses`,
   FOI_GET_OIPC_REVIEWTYPES: `${FOI_BASE_API_URL}/api/foiflow/oipc/reviewtypes`,
   FOI_GET_OIPC_INQUIRYOUTCOMES: `${FOI_BASE_API_URL}/api/foiflow/oipc/inquiryoutcomes`,
+
+  FOI_GET_OI_PUBLICATIONSTATUSES: `${FOI_BASE_API_URL}/api/foiflow/openinfo/publicationstatuses`,
+  FOI_GET_OI_EXEMPTIONS: `${FOI_BASE_API_URL}/api/foiflow/openinfo/exemptions`,
+  FOI_GET_OI_STATUSES: `${FOI_BASE_API_URL}/api/foiflow/openinfo/statuses`,
+  FOI_GET_OPENINFO_REQUEST: `${FOI_BASE_API_URL}/api/foiopeninfo/ministryrequest/<ministryrequestid>`,
+  FOI_POST_OPENINFO_REQUEST: `${FOI_BASE_API_URL}/api/foiopeninfo/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>`,
   FOI_GET_COMMENT_TYPES: `${FOI_BASE_API_URL}/api/foiflow/commenttypes`,
+  FOI_OPENINFO_ADDITIONAL_FILES: `${FOI_BASE_API_URL}/api/foiopeninfoadditionalfiles/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>`,
+  FOI_DELETE_OPENINFO_ADDITIONAL_FILES: `${FOI_BASE_API_URL}/api/foiopeninfoadditionalfiles/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>/delete`,
 
   FOI_GET_CROSSTEXTSEARCH_AUTH: `${FOI_BASE_API_URL}/api/foicrosstextsearch/authstring`,
   FOI_GET_CROSSTEXTSEARCH_REQUEST_DETAILS: `${FOI_BASE_API_URL}/api/foicrosstextsearch/requests`,

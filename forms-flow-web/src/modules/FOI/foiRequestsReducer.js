@@ -174,6 +174,13 @@ const initialState = {
   oipcStatuses: [],
   oipcReviewtypes: [],
   oipcInquiryoutcomes: [],
+  oiExemptions: [],
+  oiPublicationStatuses: [],
+  oiStatuses: [],
+  foiOpenInfoRequest: {},
+  foiOpenInfoAdditionalFiles: [],
+  foiPDFStitchedOIPackage: {},
+  foiPDFStitchStatusForOIPackage: "not started",
   foiCommentTypes:[],
   foiEmailTemplates: [],
   foiadvancedsearchfilter:"foimod",
@@ -402,10 +409,24 @@ const foiRequests = (state = initialState, action) => {
       return { ...state, oipcReviewtypes: action.payload };
     case FOI_ACTION_CONSTANTS.OIPC_INQUIRYOUTCOMES:
         return { ...state, oipcInquiryoutcomes: action.payload };
+    case FOI_ACTION_CONSTANTS.OI_EXEMPTIONS:
+      return { ...state, oiExemptions: action.payload };
+    case FOI_ACTION_CONSTANTS.OI_PUBLICATIONSTATUSES:
+      return { ...state, oiPublicationStatuses: action.payload };
+    case FOI_ACTION_CONSTANTS.OI_STATUSES:
+      return { ...state, oiStatuses: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_OPENINFO_REQUEST:
+      return {...state, foiOpenInfoRequest: action.payload}
+    case FOI_ACTION_CONSTANTS.FOI_OPENINFO_ADDITIONAL_FILES:
+      return {...state, foiOpenInfoAdditionalFiles: action.payload}
     case FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_FILTER:
       return { ...state, foiadvancedsearchfilter: action.payload };    
     case FOI_ACTION_CONSTANTS.FOI_COMMENT_TYPES:
       return { ...state, foiCommentTypes: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_OI_PACKAGE:
+      return {...state, foiPDFStitchedOIPackage: action.payload}
+    case FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OI_PACKAGE:
+      return {...state, foiPDFStitchStatusForOIPackage: action.payload}
     case FOI_ACTION_CONSTANTS.FOI_EMAIL_TEMPLATES:
       return { ...state, foiEmailTemplates: action.payload };
     default:

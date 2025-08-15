@@ -153,6 +153,13 @@ export const setFOIPDFStitchedRecordForResponsePackage =
       payload: data,
     });
   };
+export const setFOIPDFStitchedOIPackage =
+  (data) => (dispatch) => {
+    dispatch({
+      type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_OI_PACKAGE,
+      payload: data,
+    });
+  };
 export const setFOIPDFStitchedRecordForOipcRedlineReview = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_RECORD_FOR_OIPCREDLINEREVIEW,
@@ -187,6 +194,12 @@ export const setFOIPDFStitchStatusForRedlines = (data) => (dispatch) => {
 export const setFOIPDFStitchStatusForResponsePackage = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_RESPONSEPACKAGE,
+    payload: data,
+  });
+};
+export const setFOIPDFStitchStatusForOIPackage = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PDF_STITCHED_STATUS_FOR_OI_PACKAGE,
     payload: data,
   });
 };
@@ -521,6 +534,34 @@ export const setOIPCInquiryoutcomes = (data) => (dispatch) => {
   });
 };
 
+export const setOIExemptions = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.OI_EXEMPTIONS,
+    payload: data,
+  });
+};
+
+export const setOIPublicationStatuses = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.OI_PUBLICATIONSTATUSES,
+    payload: data,
+  });
+};
+
+export const setOIStatuses = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.OI_STATUSES,
+    payload: data,
+  });
+};
+
+export const setFOIOpenInfoRequest = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_OPENINFO_REQUEST,
+    payload: data,
+  });
+};
+
 export const setAdvancedSearchFilter = (data) => (dispatch) => {
   dispatch({
     type: FOI_ACTION_CONSTANTS.FOI_ADVANCED_SEARCH_FILTER,
@@ -583,3 +624,10 @@ export const setFOIPDFStitchedRecordsForPhasedResponsePackages = (data) => (disp
     payload: data
   });
 }
+
+export const setFOIOpenInfoAdditionalFiles = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_OPENINFO_ADDITIONAL_FILES,
+    payload: data,
+  });
+};

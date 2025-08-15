@@ -341,7 +341,7 @@ class requestservice:
             current_state = states[0]
             if current_state != "Closed" and any(state['status'] == "Closed" for state in states):
                 return True
-        return False 
+        return False
     
     def getrequestsdetailsforsearch(self,requestnumbers):
         requestdetails = FOIMinistryRequest().getrequestsdetailsforsearch(requestnumbers)

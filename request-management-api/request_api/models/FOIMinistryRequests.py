@@ -112,6 +112,7 @@ class FOIMinistryRequest(db.Model):
     isofflinepayment = db.Column(db.Boolean, unique=False, nullable=True,default=False)
 
     isoipcreview = db.Column(db.Boolean, unique=False, nullable=True,default=False)
+    oistatus_id = db.Column(db.Integer, ForeignKey('OpenInformationStatuses.oistatusid'), unique=False, nullable=True)
     isphasedrelease = db.Column(db.Boolean, unique=False, nullable=True,default=False)
 
     @classmethod
@@ -1680,5 +1681,5 @@ class FOIMinistryRequestSchema(ma.Schema):
                 'assignedministrygroup','cfrduedate','closedate','closereasonid','closereason.name',
                 'assignee.firstname','assignee.lastname','ministryassignee.firstname','ministryassignee.lastname', 'axisrequestid', 
                 'axissyncdate', 'axispagecount', 'axislanpagecount', 'linkedrequests', 'ministrysignoffapproval', 'identityverified','originalldd',
-                'isoipcreview', 'isphasedrelease', 'recordspagecount', 'estimatedpagecount', 'estimatedtaggedpagecount', 'userrecordslockstatus', 'isconsultflag')
+                'isoipcreview', 'isphasedrelease', 'recordspagecount', 'estimatedpagecount', 'estimatedtaggedpagecount', 'userrecordslockstatus', 'isconsultflag', 'oistatus_id')
     
