@@ -116,6 +116,7 @@ const API = {
   FOI_GET_REQUEST_CORRESPONDENCE_EMAILS: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/email/<ministryid>/<rawrequestid>`,
 
   FOI_POST_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>`,
+  FOI_POST_EMAIL_CORRESPONDENCE_PREVIEW: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/<requestid>/<ministryrequestid>/sendpreview`,
   FOI_POST_DRAFT_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/draft/<requestid>/<ministryrequestid>`,
   FOI_EDIT_DRAFT_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/draft/edit/<requestid>/<ministryrequestid>`,
   FOI_DELETE_DRAFT_EMAIL_CORRESPONDENCE: `${FOI_BASE_API_URL}/api/foiflow/applicantcorrespondence/draft/delete/<ministryrequestid>/<rawrequestid>/<correspondenceid>`,

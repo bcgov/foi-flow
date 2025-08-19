@@ -27,6 +27,8 @@ export type previewParams = {
   modalOpen: boolean;
   handleClose: () => void;
   handleSave: (emailContent: string) => void;
+  handleSendPreviewEmail: (emailContent: string, emailAddress: string) => void;
+  isSendPreviewEmail: boolean;
   handleExportAsPdfButton: (sfdtString: string) => void;
   innerhtml: string;
   handleExport: () => void;

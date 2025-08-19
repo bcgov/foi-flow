@@ -53,6 +53,24 @@ class emailservice:
             logging.exception(ex)
             return {"success": False, "message": "Failed to send email", "identifier": savedcorrespondence.identifier if savedcorrespondence else -1, "subject": subject}
 
+    def send_preview_email(self, servicename, requestid, ministryrequestid, emailschema, subject, emails, correspondencemessagejson):
+        savedcorrespondence = None
+        try:
+            requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)
+            _templatename = self.__getvaluefromschema(emailschema, "templatename")
+            servicename = _templatename  if servicename == ServiceName.correspondence.value.upper() else servicename
+            _applicantcorrespondenceid = self.__getvaluefromschema(emailschema, "applicantcorrespondenceid")
+            _messagepart, content = templateservice().generate_by_servicename_and_schema(servicename, requestjson, ministryrequestid, _applicantcorrespondenceid, correspondencemessagejson)
+            if (_applicantcorrespondenceid and templateconfig().isnotreceipt(servicename)):
+                servicename = _templatename.upper() if _templatename else ""
+            if subject is None:
+                subject = templateconfig().getsubject(servicename, requestjson)
+            emailresult = senderservice().send(subject, _messagepart, [], emails)
+            return {"success": emailresult["success"], "message": emailresult["message"], "subject": subject, "from_email": emailresult.get("from_email")}
+        except Exception as ex:
+            logging.exception(ex)
+            return {"success": False, "message": "Failed to send email", "identifier": savedcorrespondence.identifier if savedcorrespondence else -1, "subject": subject}
+
     def acknowledge(self, servicename, requestid, ministryrequestid):
         try:
             requestjson = requestservice().getrequestdetails(requestid,ministryrequestid)

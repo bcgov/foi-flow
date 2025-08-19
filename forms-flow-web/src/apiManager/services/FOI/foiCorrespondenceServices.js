@@ -83,6 +83,42 @@ export const saveEmailCorrespondence = (
     });
 };
 
+export const sendPreviewEmail = (
+  data,
+  requestId,
+  ministryId,
+  dispatch,
+  callback,
+  errorCallback,
+) => {
+  if (!ministryId) {
+    ministryId = 'None';
+  }
+  const apiUrl = replaceUrl(replaceUrl(
+    API.FOI_POST_EMAIL_CORRESPONDENCE_PREVIEW,
+    "<ministryrequestid>",
+    ministryId),"<requestid>",requestId
+  );
+  httpPOSTRequest(apiUrl, data)
+    .then((res) => {
+      if (res.data) {
+        if (callback) {
+          callback(res.data);
+        }
+      } else {
+        dispatch(serviceActionError(res));
+        throw new Error();
+      }
+    })
+    .catch((error) => {
+      console.log("An error occured while trying to send the preview email", error);
+      catchError(error, dispatch);
+      if (errorCallback) {
+        errorCallback("An error occured while trying to send the preview email");
+      }
+    });
+};
+
 export const saveDraftCorrespondence = (
   data,
   requestId,
