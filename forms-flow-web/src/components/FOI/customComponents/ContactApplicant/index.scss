@@ -342,3 +342,38 @@
 .select-template-bottom-margin {
   margin-bottom: 5px !important;
 }
+
+// Add CSS containment to prevent correspondence content from affecting global styles
+.commenttext {
+  // CSS containment to isolate styles
+  contain: style layout;
+  isolation: isolate;
+
+  // Reset any global styles that might leak out
+  * {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    font-style: normal !important;
+    font-weight: inherit !important;
+    line-height: inherit !important;
+    color: inherit !important;
+    background: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-decoration: none !important;
+  }
+
+  // Allow basic text formatting but prevent global style override
+  p, div, span {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    margin: 0.5em 0 !important;
+    padding: 0 !important;
+  }
+
+  // Remove any potential global style tags that might have been missed
+  style {
+    display: none !important;
+  }
+}

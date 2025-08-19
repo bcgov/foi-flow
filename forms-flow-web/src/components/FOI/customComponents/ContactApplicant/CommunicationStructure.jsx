@@ -1,6 +1,4 @@
 import React, { useContext, useState, useRef, useEffect } from 'react'
-//import '../Comments/comments.scss'
-import { faCaretDown } from '@fortawesome/free-solid-svg-icons'
 import {
   modal,
   modalActions,
@@ -33,6 +31,7 @@ import { getTemplateVariables } from './util';
 import { DownloadCorrespondenceModal } from './DownloadCorrespondenceModal';
 import { getCorrespondenceSubject, getFullEmailListText, getFullCCEmailListText } from './helper';
 import { exportPDF } from '../../../../apiManager/services/FOI/foiCorrespondenceServices';
+import DOMPurify from 'dompurify'; 
 
 const CommunicationStructure = ({
   correspondence, 
@@ -97,7 +96,13 @@ const CommunicationStructure = ({
     // }
     // else {
       if (correspondence.text) {
-        markup = `<p>${correspondence.text}</p>`
+        // Sanitize HTML to remove style tags and attributes that could change CSS
+        const sanitizedText = DOMPurify.sanitize(correspondence.text, {
+          FORBID_TAGS: ['style'],
+          FORBID_ATTR: ['style'],
+          ALLOW_DATA_ATTR: false
+        });
+        markup = `<p>${sanitizedText}</p>`
       } else {
         markup = `<p></p>`
       }
@@ -316,7 +321,7 @@ const CommunicationStructure = ({
       for (let header of response.data) {
         await getFileFromS3(header, (_err, res) => {
           let blob = new Blob([res.data], {type: "application/octet-stream"});
-          blobs.push({name: header.filename, lastModified: res.headers['last-modified'], input: blob})
+          blobs.push({name: `attachment - ${header.filename}`, lastModified: res.headers['last-modified'], input: blob})
         });
       }
       toast.update(toastID, {

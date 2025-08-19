@@ -15,6 +15,8 @@ from request_api.services.paymentservice import paymentservice
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.services.communicationemailservice import communicationemailservice
 from request_api.services.email.templates.templateconfig import templateconfig
+from request_api.services.emailservice import emailservice
+from request_api.schemas.foiemail import  FOIEmailSchema
 
 class communicationwrapperservice:
     """ FOI communication wrapper service
@@ -78,6 +80,40 @@ class communicationwrapperservice:
             sendemailresult = {"success" : False, "message": result.message, "identifier": -1}
         return sendemailresult
 
+    def send_preview_email(self, requestid, rawrequestid, ministryrequestid, applicantcorrespondencelog, correspondencemessagejson):
+        data = json.loads(applicantcorrespondencelog['correspondencemessagejson'])
+        attributes = applicantcorrespondencelog["attributes"][0]
+        emailsubject = ""
+        customizedsubject = applicantcorrespondencelog['correspondencesubject'] if 'correspondencesubject' in applicantcorrespondencelog else ""
+        if applicantcorrespondencelog["templatename"] is None:
+            template = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"])
+        else:
+            template = None
+        if customizedsubject and len(customizedsubject) > 0:
+            emailsubject = customizedsubject
+        elif template is None:
+            if 'templatename' in applicantcorrespondencelog and applicantcorrespondencelog['templatename'] is not None:
+                emailsubject = templateconfig().getsubject(applicantcorrespondencelog['templatename'], attributes)
+            else:
+                emailsubject = templateconfig().getsubject("", attributes)
+        else:
+            emailsubject = templateconfig().getsubject(template.name, attributes)
+        applicantcorrespondencelog['emailsubject'] = emailsubject
+
+        sendemailresult = {"success" : False, "message": "Email has not been sent", "identifier": -1}
+        templatename = ""
+        if applicantcorrespondencelog["templateid"] is not None:
+            templatename = applicantcorrespondenceservice().gettemplatebyid(applicantcorrespondencelog["templateid"]).name
+        else:
+            templatename = applicantcorrespondencelog["templatename"]
+
+        if self.__is_fee_processing(templatename):
+            emailschema = { "templatename": templatename }
+            result = emailservice().send_preview_email(templatename.upper(), requestid, ministryrequestid, emailschema, emailsubject, applicantcorrespondencelog['emails'], correspondencemessagejson)
+            return result
+        else:
+            sendemailresult = communicationemailservice().send(template, applicantcorrespondencelog)
+            return sendemailresult
 
     def __handle_fee_email(self, requestid, ministryrequestid, result, applicantcorrespondencelog):
         if cfrfeeservice().getactivepayment(requestid, ministryrequestid) is not None:

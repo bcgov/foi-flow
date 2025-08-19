@@ -12,6 +12,7 @@ on:
       - test-rook
     paths:
       - "integrationapi/MCS.FOI.Integration/**"
+  workflow_dispatch:
 
 defaults:
   run:
@@ -23,7 +24,7 @@ env:
   TOOLS_NAME: "${{secrets.OPENSHIFT4_FRONTEND_REPOSITORY}}"
 
 jobs:
-  openinfoservice-cd-by-push:
+  template-api-cd-by-push:
     runs-on: ubuntu-24.04
 
     if: github.event_name == 'push' && github.repository == 'bcgov/foi-flow'

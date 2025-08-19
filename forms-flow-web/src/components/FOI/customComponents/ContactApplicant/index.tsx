@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import type { Template } from './types';
 import { fetchApplicantCorrespondence, saveEmailCorrespondence, saveDraftCorrespondence, 
   editDraftCorrespondence, deleteDraftCorrespondence, deleteResponseCorrespondence, saveCorrespondenceResponse, 
-  fetchEmailTemplate, exportSFDT, exportPDF, updateApplicantCorrespondence} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+  fetchEmailTemplate, exportSFDT, exportPDF, updateApplicantCorrespondence, sendPreviewEmail} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
@@ -561,7 +561,7 @@ export const ContactApplicant = ({
   const approvedForm = formHistory?.find(form => form?.status?.toLowerCase() === 'approved');
   const existingCorrespondence = applicantCorrespondence?.find((correspondence: any) => correspondence?.id === approvedForm?.cfrfeeid)
   //const previewButtonValue = existingCorrespondence ? "Preview & Resend" : "Preview & Send";
-  const previewButtonValue = "Preview & Send";
+  const previewButtonValue = "Send Email";
   const [editMode, setEditMode] = useState(false);
   const draftButtonValue = editMode ? "Save Draft Edits" : "Save Draft";
 
@@ -949,6 +949,82 @@ export const ContactApplicant = ({
     setDisablePreview(false);
   };
 
+  const [isSendPreviewEmail, setIsSendPreviewEmail] = useState(false)
+  const [sendPreviewEmailTrigger, setSendPreviewEmailTrigger] = useState(false)
+  const setPreviewEmailEditorValue = async (sfdtString: string) => {
+    let newDataHtml = {
+      "FileName": `${correspondenceSubject}.html`,
+      "Content": sfdtString
+    };
+    const loadPreview = async (html: string) => {
+      setEditorValue( html );
+    }
+    await exportSFDT(dispatch, newDataHtml, loadPreview);
+  }
+  const handleSendPreviewEmail = async (emailContent: string, emailAddress: string) => {
+    const toastId = toast.loading("Sending preview email...")
+    let callback = (_res: string) => {
+      toast.update(toastId, {
+        render: "Preview email successfully sent",
+        isLoading: false,
+        type: 'success',
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
+      setIsSendPreviewEmail(false);
+      setPreviewModal(false);
+    }
+    const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
+    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName)) ) ? "CFRFee" : "";
+    let data = {
+      templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
+      correspondenceid:correspondenceId,
+      correspondencemessagejson: JSON.stringify({
+        "emailhtml": emailContent,
+        "subject": correspondenceSubject,
+        "id": approvedForm?.cfrfeeid,
+        "type": type
+      }),
+      emails: [emailAddress],
+      foiministryrequest_id: ministryId,
+      attachments: [],
+      attributes: [{ 
+        "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS),
+        "axisRequestId": requestNumber
+      }],
+      from_email: requestDetails.assignedGroupEmail,
+      templatename: curTemplateName,
+      templatetype: templateId?"":"sfdt",
+      correspondencesubject: correspondenceSubject
+    };
+    sendPreviewEmail(
+      data,
+      requestId,
+      ministryId,
+      dispatch,
+      callback,
+      () => {
+        toast.update(toastId, {
+        render: "Preview email failed to send",
+        isLoading: false,
+        type: 'error',
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
+      },
+    )
+  };
+
   
   // trigger saving draft - get sfdt, export html, and save to db
   const saveDraft = async () => {
@@ -1145,12 +1221,14 @@ export const ContactApplicant = ({
       setEnableAutoFocus(true);
       setShowLagacyEditor(false);
       setCurTemplate(i.draft);
+      setCurTemplateName(i.templatename);
     } else {
       setShowLagacyEditor(true);
       setEditorValue(i.text);
       for(let j = 0; j < templates.length; j++) {
         if (templates[j].templateid === i.templateid) {
           setCurrentTemplate(+j);
+          setCurTemplateName(i?.templatename);
         } 
       }
     }
@@ -1419,6 +1497,7 @@ export const ContactApplicant = ({
       })
     }
     setPreviewModal(false);
+    setIsSendPreviewEmail(false)
   }
 
   const tooltipPreview = {
@@ -1800,6 +1879,9 @@ export const ContactApplicant = ({
                 preview = {preview}
                 previewTrigger = {previewTrigger}
                 setPreviewTrigger = {setPreviewTrigger}
+                setPreviewEmailEditorValue={setPreviewEmailEditorValue}
+                sendPreviewEmailTrigger={sendPreviewEmailTrigger}
+                setSendPreviewEmailTrigger={setSendPreviewEmailTrigger}
                 addAttachment={openAttachmentModal}
                 savepdf = {savePdf}
                 correspondenceSubject={correspondenceSubject || `Your FOI Request ${requestNumber || requestId}`}
@@ -1852,6 +1934,8 @@ export const ContactApplicant = ({
               modalOpen={previewModal}
               handleClose={handlePreviewClose}
               handleSave={save}
+              handleSendPreviewEmail={handleSendPreviewEmail}
+              isSendPreviewEmail={isSendPreviewEmail}
               handleExportAsPdfButton={handleExportAsPdfButton}
               innerhtml={editorValue}
               handleExport={saveExport}
@@ -1872,6 +1956,18 @@ export const ContactApplicant = ({
             Cancel
           </button>     
           */ }    
+        <button
+          className="btn addCorrespondence"
+          data-variant="contained"
+          onClick={() => {
+            setPreviewModal(true);
+            setIsSendPreviewEmail(true);
+            setSendPreviewEmailTrigger(true);
+          }}
+          color="primary"
+        >
+          Send Preview Email
+        </button>
         <button
           className="btn addCorrespondence"
           data-variant="contained"
