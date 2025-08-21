@@ -143,13 +143,13 @@ const CustomExpandableTable = ({
                 </TableCell>
               </TableRow>
             ) : (
-              rows.slice(page * pageSize, (page + 1) * pageSize).map((row, rowIndex) => {
+              rows.map((row, rowIndex) => {
                 const id = getRowId(row);
                 const isExpandable = row.subConsults?.length > 0;
                 const isExpanded = id === expandedId;
                 const rowClass = getRowClassName ? getRowClassName({ row }) : "";
                 const displaySubConsults = mergeSubConsultsWithRow(row);
-                const actualRowIndex = page * pageSize + rowIndex; 
+                const actualRowIndex = rowIndex; 
                 return (
                   <React.Fragment key={id}>
                     <TableRow
