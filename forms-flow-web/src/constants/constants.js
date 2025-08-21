@@ -77,3 +77,5 @@ process.env.REACT_APP_SEARCH_KEYWORD_LIMIT || 10;
 
 export const SOLR_DOC_SEARCH_LIMIT =  (window._env_ && window._env_.REACT_APP_SOLR_DOC_SEARCH_LIMIT) ||
 process.env.REACT_APP_SOLR_DOC_SEARCH_LIMIT || 1000; 
+
+export const SKIP_HEADERFOOTER_INSERT = `${(window._env_ && window._env_.REACT_APP_SKIP_HEADERFOOTER_INSERT) || process.env.REACT_APP_SKIP_HEADERFOOTER_INSERT || ''}`.split(',');
