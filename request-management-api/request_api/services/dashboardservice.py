@@ -82,14 +82,20 @@ class dashboardservice:
         requests = FOIRawRequest.getrequestspagination(groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, AuthHelper.isiaorestrictedfilemanager(), AuthHelper.getusertype())
         requestqueue = []            
         
-        ministry_ids = [getattr(request, 'ministryrequestid', None) for request in requests.items if getattr(request, 'ministryrequestid', None) is not None]
-    
-        sub_consults = FOIMinistryRequestConsults.get_sub_consults_by_ministry_ids(ministry_ids)
-
-        consult_map = defaultdict(list)
-        for consult in sub_consults:
-            key = str(consult["foiministryrequestid"])
-            consult_map[key].append(consult)
+        # Smart Lazy Loading: Only load subConsults for requests that have ministryrequestid
+        # ministry_requests = [request for request in requests.items if getattr(request, 'ministryrequestid', None) is not None]
+        
+        # if ministry_requests:
+        #     # Load subConsults only for requests with ministryrequestid
+        #     ministry_ids = [request.ministryrequestid for request in ministry_requests]
+        #     sub_consults = FOIMinistryRequestConsults.get_sub_consults_by_ministry_ids(ministry_ids)
+        #     print("ministry_ids ", ministry_ids)
+        #     consult_map = defaultdict(list)
+        #     for consult in sub_consults:
+        #         key = str(consult["foiministryrequestid"])
+        #         consult_map[key].append(consult)
+        # else:
+        #     consult_map = {}
 
         for request in requests.items:
             
@@ -108,7 +114,7 @@ class dashboardservice:
                     unopenrequest.update({'lastName': 'Restricted'})
                     unopenrequest.update({'firstName': 'Request'})
                 
-                unopenrequest['subConsults'] = []
+                #unopenrequest['subConsults'] = []
                 requestqueue.append(unopenrequest) 
 
             else:
@@ -127,7 +133,7 @@ class dashboardservice:
                 
                 
                 key = str(request.ministryrequestid)
-                _openrequest['subConsults'] = consult_map.get(key, [])
+                #_openrequest['subConsults'] = consult_map.get(key, [])
                 requestqueue.append(_openrequest)   
                    
 

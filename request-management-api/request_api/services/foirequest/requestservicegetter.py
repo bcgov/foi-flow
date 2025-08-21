@@ -129,8 +129,13 @@ class requestservicegetter:
             else:
                 _totaldue = 0
                 
-            _balancedue = _totaldue - (float(cfrfee['feedata']['amountpaid']) + float(approvedcfrfee['feedata']['feewaiveramount']))
-            requestdetails['cfrfee']['feedata']['amountpaid'] = cfrfee['feedata']['amountpaid']
+            # Use safe defaults when keys are missing
+            amount_paid_value = (cfrfee or {}).get('feedata', {}).get('amountpaid', 0)
+            amount_paid = float(amount_paid_value or 0)
+            fee_waiver = float(approvedcfrfee.get('feedata', {}).get('feewaiveramount', 0) or 0)
+            _balancedue = _totaldue - (amount_paid + fee_waiver)
+            # Preserve original amountpaid value type for downstream consumers
+            requestdetails['cfrfee']['feedata']['amountpaid'] = amount_paid_value
             requestdetails['cfrfee']['feedata']["balanceDue"] = '{:.2f}'.format(_balancedue)
             if 'actualtotaldue' in approvedcfrfee['feedata'] and approvedcfrfee['feedata']['actualtotaldue']:
                 requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["actualtotaldue"])
