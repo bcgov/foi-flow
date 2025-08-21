@@ -96,13 +96,7 @@ const CommunicationStructure = ({
     // }
     // else {
       if (correspondence.text) {
-        // Sanitize HTML to remove style tags and attributes that could change CSS
-        const sanitizedText = DOMPurify.sanitize(correspondence.text, {
-          FORBID_TAGS: ['style'],
-          FORBID_ATTR: ['style'],
-          ALLOW_DATA_ATTR: false
-        });
-        markup = `<p>${sanitizedText}</p>`
+        markup = `<p>${correspondence.text}</p>`
       } else {
         markup = `<p></p>`
       }
