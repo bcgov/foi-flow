@@ -240,7 +240,7 @@ const Queue = ({ userDetail, tableInfo }) => {
         </Paper>
       </Grid>
       <Grid item xs={12} style={{ minHeight: 300, width: '100%', overflow: 'hidden' }} className={classes.root}>
-        {/* <DataGrid
+         <DataGrid
           autoHeight
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
@@ -289,12 +289,8 @@ const Queue = ({ userDetail, tableInfo }) => {
             if (!params.row.isExpanded) renderReviewRequest(params);
           }}
           loading={isLoading}
-        /> */}
-        {/* <ExpandedSubConsultTable
-          rows={rows}
-          columnsRef={columnsRef}
-        /> */}
-       <CustomExpandableTable
+        /> 
+       {/* <CustomExpandableTable
         columns={columnsRef.current}
         subConsultsColumns={subConsultsColumnsRef}
         rows={rows}
@@ -324,7 +320,7 @@ const Queue = ({ userDetail, tableInfo }) => {
         }}
         loading={isLoading}
         //FooterComponent={<CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={tableInfo.sort} footerFor={"queue"} />}
-      /> 
+      />  */}
        
       </Grid>
     </>
