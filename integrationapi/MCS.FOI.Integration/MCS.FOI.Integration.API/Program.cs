@@ -9,7 +9,6 @@ builder.Services
     .AddApiServices(builder);
 
 var app = builder.Build();
-Console.WriteLine("Hello, world");
 
 app.Configure();
 
