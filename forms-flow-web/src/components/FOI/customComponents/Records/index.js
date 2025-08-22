@@ -108,6 +108,7 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import CloseIcon from "@material-ui/icons/Close";
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import _ from "lodash";
 import {
   DOC_REVIEWER_WEB_URL,
@@ -331,6 +332,69 @@ export const RecordsLog = ({
     ministryCode == "MCF" &&
       requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
   );
+
+  // Sorting state and functions
+  const [sortBy, setSortBy] = useState('dateUploaded'); // 'dateUploaded' or 'redactionApp'
+  const [sortedRecords, setSortedRecords] = useState([]);
+
+  // Function to sort records based on current sort type
+  const sortRecords = (recordsToSort, sortType) => {
+    if (!recordsToSort || recordsToSort.length === 0) return [];
+    
+    const recordsCopy = [...recordsToSort];
+    
+    if (sortType === 'dateUploaded') {
+      // Sort by upload date (created_at) - newest to oldest
+      return recordsCopy.sort((a, b) => {
+        const dateA = new Date(a.created_at);
+        const dateB = new Date(b.created_at);
+        return dateB - dateA; // Newest first
+      });
+    } else if (sortType === 'redactionApp') {
+      // Sort by redaction app order (documentmasterid) - ascending
+      return recordsCopy.sort((a, b) => {
+        return a.documentmasterid - b.documentmasterid;
+      });
+    }
+    
+    return recordsCopy;
+  };
+
+  // Function to sort records with attachments
+  const sortRecordsWithAttachments = (recordsToSort, sortType) => {
+    if (!recordsToSort || recordsToSort.length === 0) return [];
+    
+    const sortedRecords = sortRecords(recordsToSort, sortType);
+    
+    // Sort attachments within each record
+    return sortedRecords.map(record => {
+      if (record.attachments && record.attachments.length > 0) {
+        const sortedAttachments = sortRecords(record.attachments, sortType);
+        return { ...record, attachments: sortedAttachments };
+      }
+      return record;
+    });
+  };
+
+  // Function to handle sort change
+  const handleSortChange = (newSortType) => {
+    setSortBy(newSortType);
+  };
+
+  // GitHub-like "Sort" dropdown state/handlers
+  const [sortAnchorEl, setSortAnchorEl] = useState(null);
+  const isSortMenuOpen = Boolean(sortAnchorEl);
+  const openSortMenu = (event) => setSortAnchorEl(event.currentTarget);
+  const closeSortMenu = () => setSortAnchorEl(null);
+
+  // Update sorted records when records or sort type changes
+  useEffect(() => {
+    if (records) {
+      const sorted = sortRecordsWithAttachments(records, sortBy);
+      setSortedRecords(sorted);
+    }
+  }, [records, sortBy]);
+
   const [retrieveSelectedRecords, setRetrieveSelectedRecords] = useState({});
   useEffect(() => {
     setRecords(recordsObj?.records);
@@ -3157,6 +3221,70 @@ export const RecordsLog = ({
                   </button>
                 </span>
               </Tooltip>
+              
+              <span style={{ marginLeft: 'auto' }}></span>
+              <button
+                className={`btn`}
+                aria-haspopup="true"
+                aria-controls={isSortMenuOpen ? 'sort-menu' : undefined}
+                aria-expanded={isSortMenuOpen ? 'true' : undefined}
+                onClick={openSortMenu}
+                style={{
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #38598A',
+                  color: '#38598A',
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                }}
+                title={`Sort by: ${sortBy === 'dateUploaded' ? 'Date Uploaded' : 'Redaction App'}`}
+              >
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  {sortBy === 'dateUploaded' ? 'Date Uploaded' : 'Redaction App'}
+                  <ArrowDropDownIcon fontSize="small" />
+                </span>
+              </button>
+              <Popover
+                id="sort-menu"
+                open={isSortMenuOpen}
+                anchorEl={sortAnchorEl}
+                onClose={closeSortMenu}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                PaperProps={{ style: { minWidth: 220 } }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px', borderBottom: '1px solid #eee' }}>
+                  <span style={{ fontWeight: 600, color: '#38598A' }}>Sort by</span>
+                  <IconButton size="small" onClick={closeSortMenu}>
+                    <CloseIcon fontSize="small" />
+                  </IconButton>
+                </div>
+                <MenuList>
+                  <MenuItem
+                    selected={sortBy === 'dateUploaded'}
+                    onClick={() => { handleSortChange('dateUploaded'); closeSortMenu(); }}
+                  >
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                      {sortBy === 'dateUploaded' && (
+                        <FontAwesomeIcon icon={faCheckCircle} style={{ color: '#38598A', fontSize: 12 }} />
+                      )}
+                      <span>Date Uploaded</span>
+                    </span>
+                  </MenuItem>
+                  <MenuItem
+                    selected={sortBy === 'redactionApp'}
+                    onClick={() => { handleSortChange('redactionApp'); closeSortMenu(); }}
+                  >
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                      {sortBy === 'redactionApp' && (
+                        <FontAwesomeIcon icon={faCheckCircle} style={{ color: '#38598A', fontSize: 12 }} />
+                      )}
+                      <span>Redaction App</span>
+                    </span>
+                  </MenuItem>
+                </MenuList>
+              </Popover>
             </Grid>
             <Grid
               container
@@ -3167,8 +3295,8 @@ export const RecordsLog = ({
               alignItems="flex-start"
               className={classes.recordLog}
             >
-              {isRecordsfetching === "completed" && records?.length > 0 ? (
-                records?.map((record, i) => (
+              {isRecordsfetching === "completed" && sortedRecords?.length > 0 ? (
+                sortedRecords?.map((record, i) => (
                   <Attachment
                     key={i}
                     indexValue={i}
@@ -3191,13 +3319,13 @@ export const RecordsLog = ({
                 <div className="recordsstatus">
                   {isRecordsfetching === "inprogress"
                     ? "Records loading is in progress, please wait!"
-                    : isRecordsfetching === "completed" &&
-                      (records?.length === 0 ||
-                        records === null ||
-                        records === undefined)
-                    ? "No records are available to list, please confirm whether records are uploaded or not"
                     : isRecordsfetching === "error"
                     ? "Error fetching records, please try again."
+                    : isRecordsfetching === "completed" &&
+                      (sortedRecords?.length === 0 ||
+                        sortedRecords === null ||
+                        sortedRecords === undefined)
+                    ? "No records are available to list, please confirm whether records are uploaded or not"
                     : { isRecordsfetching }}
                 </div>
               )}
