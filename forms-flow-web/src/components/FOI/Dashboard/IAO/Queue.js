@@ -240,13 +240,12 @@ const Queue = ({ userDetail, tableInfo }) => {
         </Paper>
       </Grid>
       <Grid item xs={12} style={{ minHeight: 300, width: '100%', overflow: 'hidden' }} className={classes.root}>
-         <DataGrid
+      <DataGrid
           autoHeight
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
-          rows={displayRows}
-          columns={displayColumns}
-          getRowHeight={getRowHeight}
+          rows={rows}
+          columns={columnsRef.current}
           rowHeight={30}
           headerHeight={50}
           rowCount={requestQueue?.meta?.total || 0}
@@ -284,12 +283,9 @@ const Queue = ({ userDetail, tableInfo }) => {
               && tableInfo?.noAssignedClassName
             )
           }
-          //onRowClick={renderReviewRequest}
-          onRowClick={(params, event) => {
-            if (!params.row.isExpanded) renderReviewRequest(params);
-          }}
+          onRowClick={renderReviewRequest}
           loading={isLoading}
-        /> 
+        />
        {/* <CustomExpandableTable
         columns={columnsRef.current}
         subConsultsColumns={subConsultsColumnsRef}
