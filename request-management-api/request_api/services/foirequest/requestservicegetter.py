@@ -102,10 +102,11 @@ class requestservicegetter:
                 requestortypeid = applicant['requestortypeid']
                 businessname = None
                 axisapplicantid = applicant['axisapplicantid']
+                alsoknownas = applicant['alsoknownas']
 
                 if requestortypeid == 1:
                     baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, axisapplicantid))
-                additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob))
+                additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob, alsoknownas))
             baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
             baserequestinfo.update(baserequestdetails)
             additionalpersonalinfo.update(additionalpersonalinfodetails)

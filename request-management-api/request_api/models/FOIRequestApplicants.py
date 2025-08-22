@@ -23,7 +23,7 @@ class FOIRequestApplicant(db.Model):
     middlename = db.Column(db.String(50), unique=False, nullable=True)
     lastname = db.Column(db.String(50), unique=False, nullable=True)
 
-    alsoknownas = db.Column(db.String(50), unique=False, nullable=True)
+    alsoknownas = db.Column(db.String(255), unique=False, nullable=True)
     dob = db.Column(db.DateTime, unique=False, nullable=True)
     businessname = db.Column(db.String(255), unique=False, nullable=True)
 
