@@ -38,20 +38,22 @@ class senderservice:
     def send_by_request(self, subject, content, _messageattachmentlist, requestjson):
         return self.send(subject, content, _messageattachmentlist, requestjson["email"])
 
-    def send(self, subject, content, _messageattachmentlist, emails, from_email = None):
+    def send(self, subject, content, _messageattachmentlist, emails, ccemails = None, from_email = None):
         logging.debug("Begin: Send email for request ")
 
         content = content.replace('src=\\\"', 'src="')
         content = content.replace('\\\">','">')
         msg = MIMEMultipart('related')
-        if from_email is None:
+        if from_email is None or len(from_email) == 0:
             from_email = MAIL_FROM_ADDRESS
 
         msg['From'] = from_email
         if isinstance(emails, list):
-            msg['To'] = ",".join(emails)
+            msg['To'] = ", ".join(emails)
         else:
             msg['To'] = emails
+        if isinstance(ccemails, list):
+            msg['Cc'] = ", ".join(ccemails)
         msg['Subject'] = subject
         formattedContent, embeddedImages = embeddedimagehandler().formatembeddedimage(content)
         part = MIMEText(formattedContent, "html")
@@ -74,15 +76,24 @@ class senderservice:
             msg.attach(msgImg)
         
         try:
+            if ccemails is None:
+                ccemails = []
+            if isinstance(emails, str):
+                emails = [emails]
+            if not isinstance(ccemails, list):
+                ccemails = [ccemails]
+
+            all_recipients = emails + ccemails
             with smtplib.SMTP(MAIL_SERVER_SMTP,  MAIL_SERVER_SMTP_PORT) as smtpobj:
                 smtpobj.ehlo()
                 smtpobj.starttls()
                 smtpobj.ehlo()
                 #smtpobj.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
-                smtpobj.sendmail(msg['From'],  msg['To'], msg.as_string())
+                smtpresponse = smtpobj.sendmail(msg['From'], all_recipients, msg.as_string())
+                print('*SMTP Response: ', smtpresponse)
                 smtpobj.quit()
                 logging.debug("End: Send email for request")
-                return {"success" : True, "message": "Sent successfully", "identifier": -1}   
+                return {"success" : True, "message": "Sent successfully", "identifier": -1, "from_email": msg['From']}
         except Exception as e:
             logging.exception(e)
         return {"success" : False, "message": "Unable to send", "identifier": -1}    

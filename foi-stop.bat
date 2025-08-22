@@ -12,7 +12,7 @@ docker-compose -f %FFA_DIRECTORY%/docker-compose.yml stop forms-flow-forms forms
 docker-compose -f %NOTIFICATION_DIRECTORY%/docker-compose.yml down
 ) 
 if /I '%stopall%'=='N' (
-set /P servicenames="Enter services(s) here (ex: web, api, bpm, redis, ffa) separated by space?"
+set /P servicenames="Enter services(s) here (ex: web, api, bpm, redis, ffa, template) separated by space?"
 (for %%a in (!servicenames!) do ( 
    if /I %%a == bpm ( 
 	echo "Stopping BPM..."
@@ -33,6 +33,10 @@ set /P servicenames="Enter services(s) here (ex: web, api, bpm, redis, ffa) sepa
    if /I %%a == redis ( 
 	echo "Stopping Redis..."
 	docker-compose -f docker-compose.yml stop foiredis 
+   )
+   if /I %%a == template ( 
+	echo "Stopping Template API..."
+	docker-compose -f docker-compose.yml stop foi-template-api 
    )
    
 ))
