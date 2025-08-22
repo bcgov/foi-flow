@@ -80,7 +80,9 @@ export default function AttachmentModal({
     trackingid: "",
     personaltag: "TBD"
   },
-  currentResponseDate = ""
+  currentResponseDate = "",
+  handleChangeResponseTitle,
+  retrieveSelectedRecords,
 }) {
   let tagList = [];
   if (uploadFor === "attachment") {
@@ -186,6 +188,7 @@ export default function AttachmentModal({
     MinistryNeedsScanning.includes(bcgovcode) &&
       requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
   );
+  const [responseTitle, setResponseTitle] = useState("")
 
   useEffect(() => {
     setNewResponseDate(formatDate(currentResponseDate))
@@ -283,6 +286,11 @@ export default function AttachmentModal({
     handleChangeResponseDate(newResponseDate);
   };
 
+  const saveResponseTitle = (_responeTitleValue) => {
+    setResponseTitle(_responeTitleValue);
+    handleChangeResponseTitle(_responeTitleValue);
+  }
+
   const updateFilesCb = (_files, _errorMessage) => {
     setFiles(_files);
   };
@@ -342,7 +350,10 @@ export default function AttachmentModal({
   const handleSave = () => {
     if (modalFor.toLowerCase() === "delete") {
       handleModal(true, null, null);
-    } else {
+    } else if(modalFor.toLowerCase() === "retrieve_uncompressed"){
+      handleModal(true, null, retrieveSelectedRecords);
+    } 
+    else {
       let _tagValue = tagValue;
       let fileInfoList = [];
 
@@ -442,7 +453,7 @@ export default function AttachmentModal({
         if (isMCFMSDPersonal && !isMinistryCoordinator) {
           return { title: "Add Scanned Records", body: "" };
         } else if (uploadFor === "response") {
-          return { title: "Add Response", body: "" };
+          return { title: "Add Correspondence", body: "" };
         } else {
           return { title: "Add Attachment", body: "" };
         }
@@ -599,6 +610,23 @@ export default function AttachmentModal({
             body: "Are you sure you want to delete the attachment?",
           };
         }
+      case "retrieve_uncompressed":
+          return {
+            title: "Retrieve Uncompressed",
+            body: (
+              <>
+                Are you sure you want to retrieve the uncompressed file?<br></br>
+                <br></br>
+                <i>
+                  The file will not be compressed, and may not have OCR. Work completed on this specific record in the Redaction App will be preserved, 
+                  but please review and ensure it is accurate.
+                </i>
+                <br></br><br></br>
+                <i>After retrieving the uncompressed file, you will be unable to compress the file again. 
+                  If you wish to have the file compressed again, please use the 'Replace Manually' feature to reupload the file.</i>
+              </>
+            ),
+          };
       default:
         return { title: "", body: "" };
     }
@@ -606,11 +634,11 @@ export default function AttachmentModal({
   let message = getMessage();
 
   const isSaveDisabled = () => {
-    if (modalFor === "delete") {
+    if (modalFor === "delete" || modalFor === "retrieve_uncompressed") {
       return false;
-    } else if (files.length === 0 && existingDocuments.length === 0) {
+    } else if (files.length === 0 && existingDocuments?.length === 0) {
       return true;
-    } else if (uploadFor === "response" && (files.length > 1 ||  existingDocuments.length > 1)) {
+    } else if (uploadFor === "response" && (files.length > maxNoFiles ||  existingDocuments?.length > maxNoFiles || responseTitle.trim() === "")) {
       return true;
     } else if (modalFor === "add") {
       if(requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && bcgovcode == "MCF") {
@@ -685,6 +713,30 @@ export default function AttachmentModal({
                 </div>
               </div>
             )}
+            {modalFor === "add" && uploadFor === "response" && (
+              <div className="row">
+              <div className="col-sm-1"></div>
+              <div className="col-sm-9">
+              <TextField
+                //id="firstName"
+                label="Subject/Title"
+                name="responsetitle"
+                inputProps={{ "aria-labelledby": "response-title-label"}}
+                InputLabelProps={{ shrink: true }}
+                variant="outlined"
+                className={"response-title-field"}
+                value={responseTitle}
+                fullWidth
+                onChange={(e) => saveResponseTitle(e.target.value)}
+                required={true}
+                //disabled={disableInput}
+                //error={responseTitle === ""}
+              />
+              </div>
+              
+              </div>
+            )}
+            
             {["replaceattachment", "replace", "add"].includes(modalFor) ? (
               requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ? (
                 bcgovcode == "MCF" ? (
@@ -920,7 +972,7 @@ const ModalForChangeResponseDate = ({
         <TextField
           id="changeresponsedate"
           label="Change Response Date"
-          type="date"
+          type="datetime-local"
           inputProps={{ "aria-labelledby": "changeResponseDate-label" }}
           InputLabelProps={{ shrink: true }}
           variant="outlined"

@@ -8,6 +8,10 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import CommentHistory from './CommentHistory';
+import { useSelector } from 'react-redux';
+import { getCorrespondenceSubject, getFullCCEmailListText, getFullEmailListText } from '../ContactApplicant/helper';
+import Tooltip from "@mui/material/Tooltip";
+import { ShadowHtmlComponent } from '../ContactApplicant/ShadowHtmlComponent';
 
 const DisplayHistory = ({
   requesthistory,
@@ -18,10 +22,11 @@ const DisplayHistory = ({
   commentTypes,
   ministryId,
   applicantCorrespondenceTemplates,
+  requestNumber,
 }) => {
   const [fullnameList, setFullnameList] = useState(getFullnameList);
   const [showmorehidden, setshowmorehidden] = useState(false);
-
+  const templateList = useSelector(state => state.foiRequests.foiEmailTemplates);
   const finduserbyuserid = (userId) => {
     let user = fullnameList.find((u) => u.username === userId);
     return user && user.fullname ? user.fullname : userId;
@@ -184,7 +189,7 @@ const DisplayHistory = ({
   
   const getemailtext = (item) => {
     if (item.type === 'comment') return '';
-    const emailCount = item.emails.length;
+    const emailCount = item.emails.length + item.ccemails.length;
     return emailCount === 1 ? item.emails[0] : emailCount > 1 ? `${item.emails[0]} +${emailCount - 1}` : '';
   };
   
@@ -219,21 +224,26 @@ const DisplayHistory = ({
           </div>
         </AccordionSummary>
         <AccordionDetails>
-          <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent(item) }}></div>
+          <ShadowHtmlComponent html={getHtmlfromRawContent(item)} />
           {renderattachments(item)}
         </AccordionDetails>
       </Accordion>
     </div>
   );
   
-  const rendertemplateinfo = (item, fullName, emailText, dateText) => (
+  const rendertemplateinfo = (item, fullName, emailText, dateText) => {
+    const emailCount = item.emails.length + item.ccemails.length;
+    const fullEmailListText = getFullEmailListText(item);
+    const fullCCEmailListText = getFullCCEmailListText(item);
+    let popoverEmailList = fullEmailListText + '\n' + fullCCEmailListText;
+    return (
     <>
-      <div className="templateUser"> {item.category === "response" ? "Applicant Response" : getTemplateName(item.templateid)} - {fullName}</div> |
-      {item.emails.length > 0 && <div className="templateUser"> {emailText} |</div>}
+      <div className="templateUser"> {getCorrespondenceSubject(item, templateList, requestNumber) + " - " + fullName}</div> |
+      {emailCount > 1 ? <><div className="templateUser"><Tooltip title={<span style={{ whiteSpace: 'pre-line' }}>{popoverEmailList}</span>} disableInteractive placement="top">{emailText}</Tooltip></div> |</>: emailCount == 1 ? <><div className="templateUser"> {emailText} </div>|</> : ''}
       <div className="templateTime">{dateText.toUpperCase()}</div>
       <div className="templateTime">{item.edited ? "Edited" : ""}</div>
     </>
-  );
+  )};
   
   const rendercategorychip = (item) => (
     <div className="templateUser">

@@ -1,6 +1,7 @@
 import {
     httpGETRequest,
-    httpPOSTRequest
+    httpPOSTRequest,
+    httpOpenGETRequest
   } from "../../httpRequestHandler";
   import API from "../../endpoints";
   import {
@@ -29,7 +30,8 @@ import {
     setOIPCStatuses,
     setOIPCReviewtypes,
     setOIPCInquiryoutcomes,
-    setFOICommentTypes
+    setFOICommentTypes,
+    setFOIEmailTemplates
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone, catchError } from "./foiServicesUtil";
   import UserService from "../../../services/UserService";
@@ -605,6 +607,25 @@ import {
     };
   };
 
+  export const refreshRedisCacheForTemplate = (...rest) => {
+    const done = fnDone(rest);
+    return (dispatch) => {
+      httpPOSTRequest(API.FOI_REFRESH_REDIS_CACHE_TEMPLATE,{}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            done(null, res.data);
+          } else {
+            dispatch(serviceActionError(res));
+            throw new Error("Error Refreshing Cache");
+          }
+        })
+        .catch((error) => {
+          done(error);
+          catchError(error, dispatch);
+        });
+    };
+  };
+
   export const fetchOIPCOutcomes = () => {    
     return (dispatch) => {
       httpGETRequest(API.FOI_GET_OIPC_OUTCOMES, {}, UserService.getToken())
@@ -712,6 +733,28 @@ import {
         })
         .catch((error) => {
           console.log("Error while fetching comment types master data", error);
+          dispatch(serviceActionError(error));
+          dispatch(setFOILoader(false));
+        });
+    };
+  };
+
+  export const fetchFOIEmailTemplates = () => {
+    return (dispatch) => {
+      httpGETRequest(API.FOI_GET_EMAIL_TEMPLATES, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            const foiEmailTemplates = res.data;
+            dispatch(setFOIEmailTemplates(foiEmailTemplates));
+            dispatch(setFOILoader(false));
+          } else {
+            console.log("Error while fetching email templates master data", res);
+            dispatch(serviceActionError(res));
+            dispatch(setFOILoader(false));
+          }
+        })
+        .catch((error) => {
+          console.log("Error while fetching email templates master data", error);
           dispatch(serviceActionError(error));
           dispatch(setFOILoader(false));
         });

@@ -36,6 +36,7 @@ services:
         - REACT_APP_AXIS_API_URL=${AXIS_API_URL}
         - REACT_APP_SOCKETIO_CONNECT_NONCE=${SOCKETIO_CONNECT_NONCE}
         - REACT_APP_SESSION_SECURITY_KEY=${REACT_APP_SESSION_SECURITY_KEY}
+        - REACT_APP_SF_KEY=${REACT_APP_SF_KEY}
     volumes:
       - ".:/app"
       - "/app/node_modules"

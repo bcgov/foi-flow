@@ -10,22 +10,28 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import type { previewParams } from './types';
 import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
-import { renderTemplate, applyVariables, getTemplateVariables, getTemplateVariablesAsync } from './util';
+import { renderTemplate, applyVariables, getTemplateVariables, getTemplateVariablesAsync, renderTemplateNoParams } from './util';
 import { OSS_S3_BUCKET_FULL_PATH, FOI_FFA_URL } from "../../../../constants/constants";
 import { EmailExport } from '../../../FOI/customComponents';
 import logo from "../../../../assets/FOI/images/logo-banner.png";
+import { TextField } from '@mui/material';
 
 
 export const PreviewModal = React.memo(({
   modalOpen,
   handleClose,
   handleSave,
+  handleSendPreviewEmail,
+  isSendPreviewEmail = false,
+  handleExportAsPdfButton,
   innerhtml,
   handleExport,
   attachments,
   templateInfo,
   enableSend,
-  selectedEmails
+  selectedEmails,
+  selectedCCEmails,
+  correspondenceSubject
 }: previewParams) => {
 
   const dispatch = useDispatch();
@@ -35,6 +41,7 @@ export const PreviewModal = React.memo(({
   const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
   const responsePackagePdfStitchStatus = useSelector((state: any) => state.foiRequests.foiPDFStitchStatusForResponsePackage);
   const cfrFeeData = useSelector((state: any) => state.foiRequests.foiRequestCFRFormHistory);
+  const [previewEmailAddress, setPreviewEmailAddress] = useState("")
   
   //get template
   const rootpath = OSS_S3_BUCKET_FULL_PATH
@@ -68,10 +75,76 @@ export const PreviewModal = React.memo(({
     const callback = (templateVariables: any) => {
       handleSave( applyVariables(innerhtml, templateVariables ) );
     };
-    getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback)
+    getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback);
+    // handleSave(innerhtml);
+  };
+  const handleSendPreviewEmailButton = (emailAddress: string) => {
+    const callback = (templateVariables: any) => {
+      handleSendPreviewEmail( applyVariables(innerhtml, templateVariables ) , emailAddress);
+    };
+    getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templateInfo, callback);
   };
   const emailTemplate = renderTemplate(template, innerhtml, templateVariables);
+  // const emailTemplate = renderTemplateNoParams(template, innerhtml);
 
+  if (isSendPreviewEmail) {
+    return (
+      <div className="state-change-dialog">        
+      <Dialog
+        open={modalOpen}
+        onClose={handleClose}
+        aria-labelledby="state-change-dialog-title"
+        aria-describedby="state-change-dialog-description"
+        maxWidth={'md'}
+        fullWidth={true}
+      >
+        <DialogTitle disableTypography id="state-change-dialog-title">
+            <h2 className="state-change-header">Send Preview Email</h2>
+            <IconButton aria-label= "close" onClick={handleClose}>
+              <CloseIcon />
+            </IconButton>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="state-change-dialog-description" component={'span'}>
+            <div className="state-change-email-note">
+              <p>
+                Please enter an email address you would like to send an email preview to. This will 
+                allow you to preview the email before sending it to the applicant and/or other intended 
+                recipients. Note that the preview email <span style={{ fontWeight: '900' }}>will not</span> include attachments.
+              </p>
+            </div>
+              <Grid container direction="row" justifyContent="center" alignItems="center" xs={12}>
+                <Grid item xs={8}>
+                <TextField 
+                  value={previewEmailAddress}
+                  onChange={(e) => setPreviewEmailAddress(e.target.value)}
+                  variant="outlined"
+                  id="previewEmailAddress"
+                  label="Email Address"
+                  inputProps={{ "aria-labelledby": "previewEmailAddress-label" }}
+                  InputLabelProps={{ shrink: true }}
+                  fullWidth
+                ></TextField>
+                </Grid>
+              </Grid>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <button 
+          className="btn-bottom btn-save" 
+          onClick={() => handleSendPreviewEmailButton(previewEmailAddress)}
+          >
+            Send Preview Email
+          </button>
+          <button className="btn-cancel" onClick={handleClose}>
+            Cancel
+          </button>
+        </DialogActions>
+      </Dialog>
+    </div>
+
+    )
+  }
   return (
     <div className="state-change-dialog">        
     <Dialog
@@ -83,7 +156,7 @@ export const PreviewModal = React.memo(({
       fullWidth={true}
     >
       <DialogTitle disableTypography id="state-change-dialog-title">
-          <h2 className="state-change-header">Preview Applicant Email</h2>
+          <h2 className="state-change-header">Preview Email</h2>
           <IconButton aria-label= "close" onClick={handleClose}>
             <CloseIcon />
           </IconButton>
@@ -91,8 +164,12 @@ export const PreviewModal = React.memo(({
       <DialogContent>
         <DialogContentText id="state-change-dialog-description" component={'span'}>
           <div className="state-change-email-note">
-          {enableSend && selectedEmails.length > 0 && (<p>Email to: {selectedEmails.join(', ')}</p>)}
-          {!enableSend && (<p>No email address has been selected to send this correspondence to. Instead, you can export this correspondence as a PDF.</p>)}
+            <>
+            <p><span style={{fontWeight: 'bold'}}>Email from: </span>{requestDetails.assignedGroupEmail}</p>
+            <p><span style={{fontWeight: 'bold'}}>Email to: </span>{selectedEmails?.join(', ')}</p>
+            <p><span style={{fontWeight: 'bold'}}>CC to: </span>{selectedCCEmails?.join(', ')}</p>
+            <p><span style={{fontWeight: 'bold'}}>Email subject: </span>{correspondenceSubject}</p>
+            </>
           </div>
           <div className="preview-container">
             <iframe srcDoc={ emailTemplate } className="preview-frame" sandbox="allow-same-origin" />
@@ -111,6 +188,7 @@ export const PreviewModal = React.memo(({
         <EmailExport 
           handleExport={handleExport}
           content={emailTemplate}
+          handleExportAsPdfButton={handleExportAsPdfButton}
         />
       }
       { enableSend && 
