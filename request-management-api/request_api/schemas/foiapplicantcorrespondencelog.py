@@ -9,9 +9,10 @@ class AttachmentSchema(Schema):
         unknown = EXCLUDE    
     filename = fields.Str(data_key="filename",required=True,allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     url = fields.Str(data_key="url",required=True,allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
+    applicantcorrespondenceattachmentid = fields.Integer(data_key="applicantcorrespondenceattachmentid", required=False, allow_none=False)
    
 
-class FOIApplicantCorrespondenceSchema(Schema):
+class FOIApplicantCorrespondenceLogSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
         """Exclude unknown fields in the deserialized output."""
 
@@ -21,14 +22,29 @@ class FOIApplicantCorrespondenceSchema(Schema):
     correspondencemessagejson = fields.Str(data_key="correspondencemessagejson",allow_none=False)
     attachments = fields.Nested(AttachmentSchema, many=True, required=False,allow_none=True)
     emails = fields.List(fields.Str(),data_key="emails", required=False,allow_none=True)
-    from_email = fields.Str(data_key="assignedGroupEmail", required=False,allow_none=True)
+    ccemails = fields.List(fields.Str(),data_key="ccemails", required=False,allow_none=True)
+    from_email = fields.Str(data_key="from_email", required=False,allow_none=True)
     attributes = fields.List(
         fields.Dict(fields.Str(), fields.Str()),
         data_key="attributes",
         required=False,
     )
     israwrequest = fields.Bool(data_key="israwrequest",required=False,allow_none=True)
+    templatename = fields.Str(data_key="templatename",allow_none=True)
+    templatetype = fields.Str(data_key="templatetype",allow_none=True)
+    correspondencesubject = fields.Str(data_key="correspondencesubject",allow_none=True)
 
+class FOIApplicantCorrespondenceLogUpdateSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+        unknown = EXCLUDE    
+    correspondenceid = fields.Int(data_key="correspondenceid",required=False, allow_none=True)
+    subject = fields.Str(data_key="subject", required=False)
+    israwrequest = fields.Bool(data_key="israwrequest",required=False,allow_none=True)
+    responsedate = fields.Str(data_key="responsedate",required=False, allow_none=True)
+    correspondenceattachmentid = fields.Int(data_key="correspondenceattachmentid",required=False,allow_none=True)
+    filename = fields.Str(data_key="filename",required=False,allow_none=True)
+    correspondencesubject = fields.Str(data_key="correspondencesubject",allow_none=True)
 
 class FOIApplicantCorrespondenceEmailSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -45,14 +61,5 @@ class FOIApplicantCorrespondenceResponseSchema(Schema):
         unknown = EXCLUDE    
     attachments = fields.Nested(AttachmentSchema, many=True, required=False,allow_none=True)
     responsedate = fields.Str(data_key="responsedate",required=False, allow_none=True)
-
-class FOIApplicantCorrespondenceEditResponseSchema(Schema):
-    class Meta:  # pylint: disable=too-few-public-methods
-        """Exclude unknown fields in the deserialized output."""
-
-        unknown = EXCLUDE    
-    correspondenceid = fields.Int(data_key="correspondenceid",required=False,allow_none=True)
-    responsedate = fields.Str(data_key="responsedate",required=False, allow_none=True)
-    correspondenceattachmentid = fields.Int(data_key="correspondenceattachmentid",required=False,allow_none=True)
-    filename = fields.Str(data_key="filename",required=False,allow_none=True)
+    correspondencesubject = fields.Str(data_key="correspondencesubject",required=False, allow_none=True)
 

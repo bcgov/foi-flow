@@ -47,7 +47,7 @@ echo "Starting Notification Manager..."
 
 if /I '%choice%'=='N' (
    
-set /P servicenames="Enter services(s) here (ex: web, api, bpm, ffa) separated by space?"
+set /P servicenames="Enter services(s) here (ex: web, api, bpm, ffa, template) separated by space?"
 (for %%a in (!servicenames!) do ( 
    if /I %%a == bpm ( 
 	echo "Starting BPM..."
@@ -71,6 +71,10 @@ set /P servicenames="Enter services(s) here (ex: web, api, bpm, ffa) separated b
 			echo "Starting forms-flow-ai..."
 			docker-compose -f %FFA_DIRECTORY%/../docker-compose.yml up --build -d forms-flow-webapi forms-flow-web
 		)
+   )
+   if /I %%a == template ( 
+	echo "Starting Template API..."
+	docker-compose -f docker-compose.yml up --build -d foi-template-api
    )
 
    if !START_REDIS! == Y ( 

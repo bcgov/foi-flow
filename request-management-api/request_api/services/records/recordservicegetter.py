@@ -37,7 +37,7 @@ class recordservicegetter(recordservicebase):
                         _computingresponse = self.__getcomputingresponse(
                             computingresponses, "recordid", record
                         )
-                        print("\n_computingresponse:",_computingresponse)
+                        #print("\n_computingresponse:",_computingresponse)
 
                         _record = self.__preparerecord(
                             record, _computingresponse, computingresponses, divisions
@@ -86,13 +86,15 @@ class recordservicegetter(recordservicebase):
             _record["trigger"] = _computingresponse["trigger"]
             _record["documentmasterid"] = _computingresponse["documentmasterid"]
             _record["outputdocumentmasterid"] = documentmasterid
-            _record["converteddocmasterid"] = _computingresponse["converteddocmasterid"]
+            if "converteddocmasterid" in _computingresponse:
+                _record["converteddocmasterid"] = _computingresponse["converteddocmasterid"]
             _record["isselected"] = False
             _record["isconverted"] = self.__getisconverted(_computingresponse)
             _record["iscompressed"] = self.__getiscompressed(_computingresponse)
             _record["isdedupecomplete"]= self.__getisdedupecomplete(_computingresponse)
             #_record["isocrcompleted"] = self.__getisocrcompleted(_computingresponse)
-            _record["selectedfileprocessversion"] = _computingresponse["selectedfileprocessversion"]
+            if "selectedfileprocessversion" in _computingresponse:
+                _record["selectedfileprocessversion"] = _computingresponse["selectedfileprocessversion"]
             #_record["needs_ocr"] = _computingresponse["needs_ocr"]
             _computingresponse_err = self.__getcomputingerror(_computingresponse)
             if _computingresponse_err is not None:
@@ -257,7 +259,7 @@ class recordservicegetter(recordservicebase):
         return False
     
     def __getiscompressed(self, _computingresponse):
-        if _computingresponse["compressionstatus"] == "completed":
+        if "compressionstatus" in _computingresponse and _computingresponse["compressionstatus"] == "completed":
             return True
         return False
     
@@ -292,7 +294,7 @@ class recordservicegetter(recordservicebase):
                 _convertedfiles += 1
             if entry["deduplicationstatus"] == "completed":
                 _dedupedfiles += 1
-            if entry["compressionstatus"] == "completed":
+            if "compressionstatus" in entry and entry["compressionstatus"] == "completed":
                 _compressedfiles += 1
             if entry["isduplicate"] == True:
                 _removedfiles += 1
