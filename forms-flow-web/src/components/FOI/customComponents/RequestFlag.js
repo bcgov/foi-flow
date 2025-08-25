@@ -13,6 +13,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import CloseIcon from "@material-ui/icons/Close";
 import IconButton from "@material-ui/core/IconButton";
 import TextField from "@mui/material/TextField";
+import { ConsultTypes } from '../../../helper/consult-helper';
 
 //Types are:
 //oipcreview
@@ -24,16 +25,30 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled 
   const [modalHeading, setModalHeading] = useState("");
   const [modalMessage, setModalMessage] = useState("");
   const [modalDescription, setModalDescription] = useState("");
+  const [consultType, setConsultType] = useState(null);
+
   
   useEffect(() => {
-    if (isActive == null) {
+    if (isActive == null && type !== "consulttype") {
       setIsSelected(false);
       if(type=="consult" && !isDisabled && handleSelect) {
         handleSelect(false);
       }
     } else {
-    setIsSelected(isActive);
+
+    if(type == "consulttype" && isActive == null) {
+      setIsSelected(false);
+    }else{
+      setIsSelected(isActive);
     }
+    }
+
+    if(type == "consulttype" && isActive == true) {
+      setConsultType(ConsultTypes.Internal);
+    }else if(type == "consulttype" && isActive == false) {
+      setConsultType(ConsultTypes.External);
+    }
+
   }, [isActive])
 
   // These need to be set for each type
@@ -175,6 +190,53 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled 
       </span>
       );
       break;
+
+      case "consulttype":
+      options = [  
+        {
+          value: false,
+          label: "External Consultation",
+          disabled: false,
+        },
+        {
+          value: true,
+          label: "Internal Consultation",
+          disabled: false,
+        },
+        {
+          value: false,
+          label: "Select consultation type",
+          disabled: true,
+        },
+      ];
+
+
+      //options = options.filter(option => option.label !== "Select consultation type");
+
+      id = "consultation-type-flag";
+      iconClass = "consultation-type-icon";
+      isSelectedBgClass =
+        "linear-gradient(to right, rgba(153, 84, 187, 0.32) 80%, #9448BC 0%)";
+      bgClass = "linear-gradient(to right, #fff 80%, #9448BC 0%)";
+      borderStyle = "1px solid #9448BC";
+
+      modalSaveButtonText = "Continue";
+      //when setting to active
+      modalHeadingActive = "Internal Consultation";
+      modalMessageActive =
+        "Are you sure you want to flag this request as an internal consultation?";
+      modalDescriptionActive = (
+        <span>This will tag the request as Internal Consultation.</span>
+      );
+
+      //when setting to inactive
+      modalHeadingInactive = "External Consultation";
+      modalMessageInactive =
+        "Are you sure you want to flag this request as an external consultation?";
+      modalDescriptionInactive = (
+        <span>This will tag the request as External Consultation.</span>
+      );
+      break;
   }
 
   const handleValueChange = (e) => {
@@ -184,6 +246,14 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled 
     } else {
         setIsSelected(e.target.value);
         setModalOpen(true);
+    }
+
+    if(type == "consulttype") {
+      if(e.target.value == true) {
+        setConsultType(ConsultTypes.Internal);
+      }else if(e.target.value == false){
+        setConsultType(ConsultTypes.External);
+      }
     }
 
     if (e.target.value == true) {
@@ -209,23 +279,33 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled 
 
   const handleSave = (e) => {
     setModalOpen(false);
-    handleSelect(isSelected);
+
+    if(type == "consulttype") {
+       handleSelect(isSelected, consultType);
+    }else{
+       handleSelect(isSelected);
+    }
+
   };
 
   const getDropdownClassName = (type, isSelected) => {
     const baseClass = 'request-flag-dropdown';
     const inactiveConsultClass = type === 'consult' && !isSelected ? 'consultation-inactive-dropdown' : '';
-    
-    return `${baseClass} ${inactiveConsultClass}`.trim();
+    const consultationTypeClass = type === 'consulttype' ? 'consultation-type-dropdown' : '';
+    return `${baseClass} ${inactiveConsultClass} ${consultationTypeClass}`.trim();
   };
 
   if (!showFlag) return <></>;
+
+  const isConsultType = type === 'consulttype';
+  const consultSelected = (type === "consulttype" && consultType);
+  const flagTextFieldClass = `request-flag-select ${isConsultType ? 'consultation-type-select' : ''} ${consultSelected ? 'consult-selected' : ''}`;
   return (
     <>
       <div className="request-flag">
         <div className="request-flag-dropdown-all">
           <div
-            className="request-flag-select"
+            className={flagTextFieldClass}
             style={{ 
               background: isSelected ? isSelectedBgClass : bgClass,
               border: borderStyle 
@@ -243,26 +323,49 @@ const RequestFlag = ({ isActive, type, handleSelect, showFlag= true, isDisabled 
             {/* <InputLabel id="restrict-dropdown-label">
                     Unrestricted
                     </InputLabel> */}
-            <TextField
-              id="request-flag-dropdown"
-              className={getDropdownClassName(type, isSelected)}
-              select
-              value={isSelected}
-              onChange={handleValueChange}
-              inputProps={{ "aria-labelledby": "restrict-dropdown-label" }}
-              input={<OutlinedInput label="Tag" />}
-              disabled={isDisabled}
-            >
-              {options.map((option) => (
-                <MenuItem
-                  key={option.value}
-                  value={option.value}
-                  disabled={option.disabled}
-                >
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
+                    
+            {/* {(type == "consulttype") && consultType ? (
+              <>
+               <div
+                style={{
+                  border: '1px solid #9448BC', 
+                  borderRadius: '20px',
+                  padding: '4px 12px',
+                  display: 'inline-block',
+                  fontSize: '16px',
+                  color: '#474543',
+                  backgroundColor: '#FFFFFF',
+                  fontWeight: 400
+                }}
+              >
+                {options.find(opt => opt.value === consultType)?.label || consultType}
+              </div>
+              </>
+            ): (
+                <> */}
+                <TextField
+                id="request-flag-dropdown"
+                className={getDropdownClassName(type, isSelected)}
+                select
+                value={isSelected}
+                onChange={handleValueChange}
+                inputProps={{ "aria-labelledby": "restrict-dropdown-label" }}
+                input={<OutlinedInput label="Tag" />}
+                disabled={isDisabled}
+              >
+                {options.map((option) => (
+                  <MenuItem
+                    key={option.value}
+                    value={option.value}
+                    disabled={option.disabled}
+                  >
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+              {/* </>
+            )} */}
+            
           </div>
         </div>
       </div>

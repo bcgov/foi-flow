@@ -1,0 +1,69 @@
+.custom-switch {
+    position: relative;
+    display: inline-block;
+    width: 43px;
+    height: 20px;
+    padding-left: 0 !important;
+    margin-bottom: -5px;
+  }
+  
+.custom-switch input {
+opacity: 0;
+width: 0;
+height: 0;
+position: absolute;
+}
+
+.slider {
+display: flex;
+align-items: center;
+justify-content: flex-start;
+padding: 2px 8px;
+background-color: #eae9e7;
+border-radius: 36px;
+width: 100%;
+height: 100%;
+box-sizing: border-box;
+position: relative;
+transition: background-color 0.3s ease;
+left:15px
+}
+
+.switch-handle {
+position: absolute;
+top: 50%;
+left: 2px;
+transform: translateY(-50%);
+transition: left 0.3s ease;
+pointer-events: none;
+}
+
+.custom-switch input:checked + .slider {
+background-color: #003366;
+}
+
+.custom-switch input:checked + .slider .switch-handle {
+left: calc(100% - 20px);
+}
+
+.handle-circle {
+fill: #fff;
+stroke: #898785;
+stroke-width: 2px;
+}
+
+.custom-switch input:checked + .slider .handle-circle {
+stroke: #003366; 
+}
+
+.visually-hidden {
+position: absolute;
+width: 1px;
+height: 1px;
+padding: 0;
+margin: -1px;
+overflow: hidden;
+clip: rect(0, 0, 0, 0);
+border: 0;
+}
+  

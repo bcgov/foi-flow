@@ -54,6 +54,7 @@ from .foiapplicant import API as APPLICANT_API
 from .foiaxissync import API as FOIAXISSYNC_API
 from .foiopeninfo import API as FOIOPENINFO_API
 from .solrauth import API as FOISolr
+from .foiconsult import API as FOICONSULT_API
 
 __all__ = ('API_BLUEPRINT')
 
@@ -102,3 +103,4 @@ API.add_namespace(APPLICANT_API, '/api')
 API.add_namespace(FOIAXISSYNC_API, '/api')
 API.add_namespace(FOIOPENINFO_API, '/api')
 API.add_namespace(FOISolr, '/api')
+API.add_namespace(FOICONSULT_API, '/api')

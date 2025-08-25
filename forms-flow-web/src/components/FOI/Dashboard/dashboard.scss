@@ -187,11 +187,24 @@ div.MuiDataGrid-columnHeaderWrapper >  div:last-child {
     display: flex;
 }
 .foi-btn-create {
-    width: 50% !important;
+    //width: 50% !important;
+    min-width: 160px !important;
+    height: 41px !important;
     font-family: "BCSans-Bold", sans-serif!important;
     border: none !important;
     background-color: #38598A !important;
     color: #FFFFFF !important;
+}
+
+.foi-btn-create-consult {
+    //width: 50% !important;
+    min-width: 160px !important;
+    height: 41px !important;
+    font-family: "BCSans-Bold", sans-serif!important;
+    border-radius: 4px !important;
+    border: 1px solid #353433 !important;
+    background: #FFF !important;
+    color: #353433 !important;
 }
 
 .form-control-label {

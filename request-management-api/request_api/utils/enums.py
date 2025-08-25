@@ -231,3 +231,8 @@ class OpenInfoNotificationType(Enum):
     @staticmethod
     def list():
         return [notification.value for notification in OpenInfoNotificationType]
+class ConsultType(Enum):
+    """Authorization header types."""
+
+    internal = 1
+    external = 2

@@ -1,0 +1,124 @@
+.foi-internal-consultation-step1-text-h5 {
+    font-family: "BCSans-Bold", sans-serif !important;
+    margin-left: 8px;
+    padding: 20px 0;
+    font-size: 16px!important;
+    margin-bottom: 0;
+}
+
+.switch-text-row{
+    margin-left:-3px;
+}
+
+.internal-consultation-subject-code-label{
+    color: var(--typography-color-secondary, #474543) !important;
+    font-family: "BC Sans" !important;
+    font-size: 16px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: 2px !important;
+    margin-left: -3px !important;
+  }
+
+  .internal-consultation-due-date-label{
+    color: var(--typography-color-secondary, #474543) !important;
+    font-family: "BC Sans" !important;
+    font-size: 16px !important;
+    font-style: normal !important;
+    font-weight: 700 !important;
+    line-height: 2px !important;
+    margin-left: -6px !important;
+  }
+
+.consult-save-button{
+    border-radius: var(--layout-borderRadius-medium, 4px);
+    background: var(--surface-color-primary-button-default, #013366);
+    display: flex;
+    height: 40px;
+    width: 195px !important;
+    padding: var(--layout-margin-small, 8px) var(--layout-margin-medium, 16px);
+    justify-content: center;
+    align-items: center;
+    gap: var(--layout-margin-small, 8px);
+}
+
+.intel-consultation-ministries-list{
+  margin-left: 7px;
+}
+
+.consult-tracking-title {
+  color: var(--typography-color-primary, #2D2D2D);
+  font-family: "BC Sans";
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 30.608px;
+  margin-bottom: 10px !important;
+  margin-left: 14px;
+}
+
+.consult-tracking-details {
+  color: var(--typography-color-primary, #2D2D2D);
+  font-family: "BC Sans";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 27.008px;
+  margin-bottom: 6px;
+  width: 100% !important;
+  display: inline-flex;
+  align-items: center;  
+  gap: 8px;
+  overflow: hidden;
+}
+
+.consult-tracking-arrow {
+  display: flex;
+  width: 600px;
+  align-items: center;
+  height: 0;
+  align-self: stretch;
+  stroke-width: 2px;
+  stroke: var(--theme-gray-70, #9F9D9C);
+}
+
+.consult-row-600 {
+  width: 100%;
+}
+
+.consult-tracking-row{
+  margin-top:6px;
+  margin-bottom:8px;
+  width: 600px;
+}
+
+.program-area-name{
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-right: 8px;
+  background-color: white; 
+  z-index: 2;
+  position: relative;
+  font-family: "BC Sans"
+}
+
+.consult-tracking-left {
+  overflow: hidden;
+  padding-right: 0;
+}
+
+.program-arrow{
+  flex-grow: 1;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+  fill: #9f9d9c;
+  display: block;
+}
+
+.arrow-flex-fill {
+  flex-grow: 1;
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+}

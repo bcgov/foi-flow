@@ -17,6 +17,8 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {isValidMinistryCode, countOfMinistrySelected} from '../FOIRequest/utils';
+import { Chip } from '@mui/material';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 const useStyles = makeStyles((_theme) => ({
       headingError: {
@@ -43,10 +45,16 @@ const RequestDescription = React.memo(({
     requestDetails,  
     requiredRequestDetailsValues,     
     handleOnChangeRequiredRequestDescriptionValues,
+    handleOnChangeRequiredConsultRequestDescriptionValues,
     handleInitialRequiredRequestDescriptionValues,
     handleUpdatedProgramAreaList,
     createSaveRequestObject,
-    disableInput
+    createSaveConsultRequestObject,
+    disableInput,
+    isAddConsultRequest,
+    isDataSynced,
+    requestConsults,
+    setUnSavedRequest,
 }) => {
     
     
@@ -60,8 +68,26 @@ const RequestDescription = React.memo(({
     const subjectCodeList = useSelector(state=> state.foiRequests.foiSubjectCodeList);
 
     const [localProgramAreaList, setLocalProgramAreaList] = React.useState([])
+    const [consultLocalProgramAreaList, setConsultLocalProgramAreaList] = React.useState([])
+    const [isConsultMinistryValid, setIsConsultMinistryValid] = React.useState(false);
+
+
+    const updatedSubjectCodeList = subjectCodeList.map(item => {
+      if (item.subjectcodeid === 0) {
+          return { ...item, name: isAddConsultRequest ? "Subject Code" : item.name, disabled: isAddConsultRequest }; 
+      }
+      return item; 
+    });
 
     const getSubjectCode = () => {
+      if (isAddConsultRequest) {
+        return "Subject Code";
+      }
+
+      if (requestConsults?.subjectCode) {
+        return requestConsults.subjectCode;
+      }
+
       if (requestDetails?.subjectCode)
         return requestDetails.subjectCode;
       return "Select Subject Code (if required)"
@@ -73,9 +99,20 @@ const RequestDescription = React.memo(({
       setEndDate(!!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "");
       setRequestDescription(!!requestDetails.description ? requestDetails.description : "");
       setSelectedSubjectCode(getSubjectCode())
-      setPIIRedacted(ministryId ? true : !!requestDetails.ispiiredacted);
+
+      if (isAddConsultRequest && requestDetails.id) {
+        setPIIRedacted(true);
+      } else {
+          setPIIRedacted(!!ministryId || !!requestDetails.ispiiredacted);
+      }
+
       if(Object.entries(requestDetails).length !== 0){
         setSelectedMinistries();
+
+        if(isAddConsultRequest){
+          setSelectedConsultSubjectCode(getSubjectCode())
+          setSelectedConsultMinistries();
+        }
       }
         const descriptionObject = {
             startDate: !!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "",
@@ -92,9 +129,12 @@ const RequestDescription = React.memo(({
     useEffect(() => {
 
       setSelectedMinistries();
-      
+      if(isAddConsultRequest){
+        setSelectedConsultMinistries();
+      }
 
     }, [programAreaList, masterProgramAreaList]);
+
 
     const setSelectedMinistries = () => {
             //if updated program area list not exists then, update the master list with selected ministries
@@ -126,16 +166,50 @@ const RequestDescription = React.memo(({
             setLocalProgramAreaList(masterProgramAreaList);
     }
 
+    const setSelectedConsultMinistries = () => {
+      //if updated program area list not exists then, update the master list with selected ministries
+      if (Object.entries(programAreaList).length === 0) {
+        const selectedMinistries = !!requestConsults?.selectedMinistries? requestConsults.selectedMinistries : "";
+        if (selectedMinistries !== "" && Object.entries(masterProgramAreaList).length !== 0) {
+          const selectedList = selectedMinistries.map((element) => element.code);
+          
+          masterProgramAreaList = masterProgramAreaList?.map((programArea) => {
+            programArea.isChecked = !!selectedList.find(
+              (selectedMinistry) => selectedMinistry === programArea.bcgovcode
+            );
+            return programArea;
+          });
+         
+        } else {
+          //if it is add request then keep all check boxes unchecked
+          masterProgramAreaList = masterProgramAreaList?.map((programArea) => {
+            programArea.isChecked = false;
+            return programArea;
+          });
+        }
+      }
+      //if updated program area list exists then use that list instead of master data
+      else {
+        masterProgramAreaList = programAreaList;
+      }
+      setConsultLocalProgramAreaList(masterProgramAreaList);
+  }
+
     //component state management for startDate, endDate and Description
     const [startDate, setStartDate] = React.useState(!!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "");
     const [endDate, setEndDate] = React.useState(!!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "");
     const [requestDescriptionText, setRequestDescription] = React.useState(!!requestDetails.description ? requestDetails.description : "");
     const [isPIIRedacted, setPIIRedacted] = React.useState(ministryId ? true : !!requestDetails.ispiiredacted);
     const [selectedSubjectCode, setSelectedSubjectCode] = React.useState(getSubjectCode());
+    const [selectedConsultSubjectCode, setSelectedConsultSubjectCode] = React.useState(getSubjectCode());
 
     const handlePIIRedacted = (event) => {
+      console.log("handlePIIRedacted called : " ,event.target.checked);
         setPIIRedacted(event.target.checked);
         handleOnChangeRequiredRequestDescriptionValues(event.target.checked, FOI_COMPONENT_CONSTANTS.ISPIIREDACTED)
+        if(isAddConsultRequest){
+          handleOnChangeRequiredConsultRequestDescriptionValues(event.target.checked, FOI_COMPONENT_CONSTANTS.ISPIIREDACTED)
+        }
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ISPIIREDACTED, event.target.checked);
     }
     //handle onchange of start date and set state with latest value
@@ -156,21 +230,27 @@ const RequestDescription = React.memo(({
     };
     //handle onchange of description and set state with latest value
     const handleRequestDescriptionChange = (event) => {
-        setRequestDescription(event.target.value);
+        const newValue = event.target.value;
+        setRequestDescription(newValue);
         //event bubble up- update the required fields to validate later
-        handleOnChangeRequiredRequestDescriptionValues(event.target.value, FOI_COMPONENT_CONSTANTS.DESCRIPTION);
-        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DESCRIPTION, event.target.value);
+        handleOnChangeRequiredRequestDescriptionValues(newValue, FOI_COMPONENT_CONSTANTS.DESCRIPTION);
+        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DESCRIPTION, newValue);
     };  
     //handle onchange of Program Area List and bubble up the latest data to ReviewRequest
-    const handleUpdatedMasterProgramAreaList = (updatedProgramAreaList) => {
+    const handleUpdatedMasterProgramAreaList = (updatedProgramAreaList) => {      
         handleOnChangeRequiredRequestDescriptionValues(countOfMinistrySelected(updatedProgramAreaList) === 1 && updatedProgramAreaList.some(programArea =>
           (programArea.isChecked && isValidMinistryCode(programArea.bcgovcode, masterProgramAreaList))), 
-          FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED);     //event bubble up- update the required fields to validate later
-        handleUpdatedProgramAreaList(updatedProgramAreaList);    //event bubble up - Updated program area list
+          FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED);     
+        handleUpdatedProgramAreaList(updatedProgramAreaList);    
+        if(isAddConsultRequest){
+          const isValid = countOfMinistrySelected(updatedProgramAreaList) >= 1 && updatedProgramAreaList.some(programArea =>
+            (programArea.isChecked && isValidMinistryCode(programArea.bcgovcode, masterProgramAreaList)));
+          handleOnChangeRequiredRequestDescriptionValues(isValid, FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED);
+        }
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST, updatedProgramAreaList);
     }
 
-    const subjectCodes = subjectCodeList.map((item) => {
+    const subjectCodes = updatedSubjectCodeList.map((item) => {
       return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
     });
 
@@ -178,6 +258,20 @@ const RequestDescription = React.memo(({
       setSelectedSubjectCode(e.target.value);
       handleOnChangeRequiredRequestDescriptionValues(e.target.checked, FOI_COMPONENT_CONSTANTS.SUBJECT_CODE)
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.SUBJECT_CODE, e.target.value);
+    }
+
+    const handleConsultSubjectCodeChange = (e) => {
+      setSelectedConsultSubjectCode(e.target.value);
+      setUnSavedRequest(true);
+      createSaveConsultRequestObject(FOI_COMPONENT_CONSTANTS.CONSULT_SUBJECT_CODE, e.target.value);
+    }
+
+    const handleUpdatedConsultMasterProgramAreaList = (updatedProgramAreaList) => {
+      //validate the program area list
+      const isMinistrySelected = updatedProgramAreaList.some((programArea) => programArea.isChecked);
+      setIsConsultMinistryValid(isMinistrySelected);
+      setUnSavedRequest(true);
+      createSaveConsultRequestObject(FOI_COMPONENT_CONSTANTS.CONSULT_PROGRAM_AREA_LIST, updatedProgramAreaList);
     }
 
     const [openModal, setOpenModal] = React.useState(false);
@@ -204,12 +298,19 @@ const RequestDescription = React.memo(({
       StateEnum.peerreview.name.toLowerCase(),
     ];
 
-     return (
+    return (
         
       <div className='request-accordian' >
       <Accordion defaultExpanded={true}>
       <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} id="requestDescription-header">
       <Typography className={classes.heading}>REQUEST DESCRIPTION</Typography>
+      {isDataSynced && (
+        <Chip
+            icon={<CheckCircleOutlineIcon className="synced-data-icon"/>}
+            label={"Synchronized data"}
+            className="synced-data-chip"
+        />
+      )}
       </AccordionSummary>
       <AccordionDetails>    
         <div>
@@ -240,7 +341,7 @@ const RequestDescription = React.memo(({
                   InputProps={{inputProps: { max: formatDate(new Date())} }}   
                   variant="outlined"
                   fullWidth
-                  disabled={disableInput}
+                  disabled={ disableInput || isDataSynced }
               />  
             </div>
             <div className="col-lg-3 foi-details-col foi-request-dates">                     
@@ -257,7 +358,7 @@ const RequestDescription = React.memo(({
                     InputProps={{inputProps: { min: startDate , max: formatDate(new Date())} }}
                   variant="outlined" 
                   fullWidth
-                  disabled={disableInput}
+                  disabled={ disableInput || isDataSynced }
               />  
             </div>                                                              
         </div>
@@ -276,7 +377,7 @@ const RequestDescription = React.memo(({
                 onChange={handleRequestDescriptionChange}
                 error={requestDescriptionText===""}
                 fullWidth
-                disabled={disableInput}
+                disabled={ disableInput || isDataSynced }
             />
             </div>
           </div>
@@ -292,7 +393,7 @@ const RequestDescription = React.memo(({
                   className="checkmark"
                   checked={isPIIRedacted}
                   onChange={handlePIIRedacted}
-                  disabled={disableInput || (isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()))}
+                  disabled={disableInput || (isPIIRedacted && (requestDetails.currentState && requestDetails.currentState.toLowerCase() !== StateEnum.unopened.name.toLowerCase())) || (isDataSynced && requestDetails.id)}
                 />
                 <span className="checkmark"></span>
                   Description contains NO Personal Information
@@ -300,10 +401,37 @@ const RequestDescription = React.memo(({
             </div>    
           </div>
         )}
-        <div className="row foi-details-row foi-request-description-row">
+       <div className="row foi-details-row foi-request-description-row">
+        <div className="col-lg-6 foi-details-col">
+            <h5 className="foi-date-range-h5">Request Subject Code (if required)</h5>
+        </div>
+        {isAddConsultRequest? (
+          <>
             <div className="col-lg-6 foi-details-col">
-                <h5 className="foi-date-range-h5">Request Subject Code (if required)</h5>
-            </div>
+              <TextField
+                      id="consultSubjectCode"
+                      label="Select Subject Code"
+                      inputProps={{ "aria-labelledby": "subjectCode-label"}}
+                      InputLabelProps={{ shrink: true, }}
+                      select
+                      value={selectedConsultSubjectCode}
+                      onChange={handleConsultSubjectCodeChange}
+                      input={<Input />}
+                      variant="outlined"
+                      fullWidth
+                      disabled={disableInput}
+                  >
+                  {subjectCodes}
+                </TextField> 
+            </div>                                                                        
+        { (Object.entries(consultLocalProgramAreaList).length !== 0) &&
+        <div className="consult-ministries-program-area-list"> 
+        <MinistriesList masterProgramAreaList={consultLocalProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedConsultMasterProgramAreaList} disableInput={false} isMultiSelectMode={true} showOnlySelected={false} isInternalConsultValidationError={!isConsultMinistryValid}/>
+        </div>
+        }
+        </>
+        ) : (
+          <>
             <div className="col-lg-6 foi-details-col">
               <TextField
                       id="subjectCode"
@@ -320,11 +448,15 @@ const RequestDescription = React.memo(({
                   >
                   {subjectCodes}
                 </TextField> 
-            </div>                                                                        
-        </div>
+            </div>     
+        <div className="ministries-program-area-list">                                                                    
         { (Object.entries(localProgramAreaList).length !== 0 && (!requestDetails.currentState || statesBeforeOpen.includes(requestDetails.currentState?.toLowerCase()))) &&
         <MinistriesList masterProgramAreaList={localProgramAreaList} handleUpdatedMasterProgramAreaList={handleUpdatedMasterProgramAreaList} disableInput={disableInput} />
         }
+        </div>
+        </>
+        )}
+        </div>
         </AccordionDetails>
     </Accordion>
   </div>

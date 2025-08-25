@@ -429,6 +429,8 @@ const foiRequests = (state = initialState, action) => {
       return {...state, foiPDFStitchStatusForOIPackage: action.payload}
     case FOI_ACTION_CONSTANTS.FOI_EMAIL_TEMPLATES:
       return { ...state, foiEmailTemplates: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_REQUEST_CONSULTS:
+      return { ...state, foiRequestConsults: action.payload };
     default:
       return state;
   }

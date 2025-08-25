@@ -8,7 +8,7 @@ import AdvancedSearch from "./AdvancedSearch";
 import clsx from "clsx";
 import { makeStyles } from "@material-ui/core/styles";
 import Divider from "@mui/material/Divider";
-import { ButtonBase } from "@mui/material";
+import { ButtonBase, Box } from "@mui/material";
 import { getTableInfo } from "./columns";
 import { getIAOEventQueueTableInfo } from "../EventQueueSearch/EventQueueColumns"
 import { setShowAdvancedSearch, setResumeDefaultSorting, setShowEventQueue, setShowKeywordSearch } from "../../../../actions/FOI/foiRequestActions";
@@ -43,6 +43,10 @@ const Dashboard = ({ userDetail }) => {
 
   const addRequest = (_e) => {
     dispatch(push(`/foi/addrequest`));
+  };
+
+  const addConsultRequest = (_e) => {
+    dispatch(push(`/foi/addconsultrequest`));
   };
 
   React.useEffect(() => {
@@ -184,8 +188,16 @@ const Dashboard = ({ userDetail }) => {
               </h3>
             </ButtonBase>
           </Grid>
-          <Grid item container lg={4} xs={6} justifyContent="flex-end">
-          {!isOITeam && (
+          <Grid item container lg={4} xs={12} justifyContent="flex-end">
+            {!isOITeam && (
+            <Box sx={{ display: "flex", gap: 1 }}>
+            <button
+              type="button"
+              className="btn foi-btn-create-consult"
+              onClick={addConsultRequest}
+            >
+              {FOI_COMPONENT_CONSTANTS.ADD_CONSULT_REQUEST}
+            </button>
             <button
               type="button"
               className="btn foi-btn-create"
@@ -193,7 +205,8 @@ const Dashboard = ({ userDetail }) => {
             >
               {FOI_COMPONENT_CONSTANTS.ADD_REQUEST}
             </button>
-          )}
+            </Box>
+            )}
           </Grid>
         </Grid>
         { (!showAdvancedSearch && !showEventQueue && !showKeywordSearch) &&
