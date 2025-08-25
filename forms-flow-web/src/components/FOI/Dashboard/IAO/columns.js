@@ -340,7 +340,6 @@ const getTableInfo = (userGroups) => {
     defaultTableInfo.sort = [
       { field: "intakeSorting", sort: "asc" },
     ];
-    defaultTableInfo.subConsultsColumns = SubConsultsColumns;
   }
 
   if (isProcessingTeam(userGroups)) {
