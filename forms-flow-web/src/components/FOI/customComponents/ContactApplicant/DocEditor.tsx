@@ -148,8 +148,9 @@ export const DocEditor = ({
     ];
 
     // Add required font families to list it in font drop down
-    let fontFamilies = {
+    let documentEditorSettings = {
         fontFamilies: ['Algerian', 'Arial', 'Calibri', 'Cambria', 'BC Sans'],
+        colorPickerSettings: { mode: 'Palette'  as const, modeSwitcher: true, showButtons: true }
     };
 
     const insertHeader = () => {
@@ -420,7 +421,7 @@ export const DocEditor = ({
             enableSpellCheck={true}
             created={onCreated}
             enableAutoFocus={enableAutoFocus}
-            documentEditorSettings={fontFamilies}
+            documentEditorSettings={documentEditorSettings}
         />
     );
 }
