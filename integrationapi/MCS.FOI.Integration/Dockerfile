@@ -48,9 +48,9 @@ WORKDIR /app
 COPY --from=build /src/MCS.FOI.Integration.API/out ./
 
 # copy app data to the image.
-# To enable the AddNewWord feature, remove copy to App_Data, instead manually copy files over then restart pod
+# requires a manual copy from /app/app-data to the PVC /app/App_Data
 COPY MCS.FOI.Integration.API/App_Data/. /app/app-data/
-COPY MCS.FOI.Integration.API/App_Data/. /app/App_Data/
+# COPY MCS.FOI.Integration.API/App_Data/. /app/App_Data/
 
 # Expose the port that the application listens on.
 EXPOSE 8080
