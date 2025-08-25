@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import "../dashboard.scss";
 import useStyles from "../CustomStyle";
@@ -64,6 +64,12 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
   useEffect(() => {
     serverSortModel = updateSortModel(sortModel);
     // page+1 here, because initial page value is 0 for mui-data-grid
+
+    console.log('=== QUEUE DEBUG ===');
+    console.log('Page:', rowsState?.page);
+    console.log('Page Size:', rowsState?.pageSize);
+    console.log('Total Rows:', requestQueue?.meta?.total);
+    console.log('Current Rows:', rows?.length);
     dispatch(
       fetchFOIRequestListByPage(
         rowsState.page + 1,
@@ -78,6 +84,7 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
   }, [rowsState, sortModel, keyword, requestFilter]);
 
   const columnsRef = React.useRef(tableInfo?.columns || []);
+  const subConsultsColumnsRef = React.useRef(tableInfo?.subConsultsColumns || []);
 
   const requestFilterChange = (filter) => {
     if (filter === requestFilter) {
@@ -111,6 +118,21 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
     }
   };
 
+  const renderConsultReviewRequest = (e) => {
+
+    // The consult data should have these fields from the backend
+    const consultId = e.row.consultid || e.row.id;
+    const ministryRequestId = e.row.foiministryrequestid || e.row.ministryrequestid;
+    const requestId = e.row.requestid || e.row.requestId || e.row.id;
+    
+    if (ministryRequestId && consultId && requestId) {
+      const url = `/foi/foirequests/${requestId}/ministryrequest/${ministryRequestId}/consult/${consultId}`;
+      dispatch(
+        push(url)
+      );
+    } 
+  };
+
   if (requestQueue === null) {
     return (
       <Grid item xs={12} container alignItems="center">
@@ -125,7 +147,6 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
     }
     dispatch(setQueueParams({...queueParams, sortModel: model}));
   };
-
   return (
     <>
       <Grid item container alignItems="center" xs={12}>
@@ -225,8 +246,8 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
           </Grid>
         </Paper>
       </Grid>
-      <Grid item xs={12} style={{ minHeight: 300 }} className={classes.root}>
-        <DataGrid
+      <Grid item xs={12} style={{ minHeight: 300, width: '100%', overflow: 'hidden' }} className={classes.root}>
+      <DataGrid
           autoHeight
           className="foi-data-grid"
           getRowId={(row) => row.idNumber}
@@ -272,6 +293,38 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
           onRowClick={renderReviewRequest}
           loading={isLoading}
         />
+       {/* <CustomExpandableTable
+        columns={columnsRef.current}
+        subConsultsColumns={subConsultsColumnsRef}
+        rows={rows}
+        getRowId={row => row.idNumber}
+        rowCount={requestQueue?.meta?.total || 0}
+        page={rowsState?.page}
+        pageSize={rowsState?.pageSize}
+        onPageChange={newPage => dispatch(setQueueParams({ ...queueParams, rowsState: { ...rowsState, page: newPage } }))}
+        onPageSizeChange={newPageSize => dispatch(setQueueParams({ ...queueParams, rowsState: { ...rowsState, pageSize: newPageSize } }))}
+        sortModel={sortModel[0]}
+        onSortModelChange={model => handleSortChange([model])}
+        //filterModel={}
+        //onFilterChange={}
+        getRowClassName={({ row }) =>
+          clsx(
+            `super-app-theme--${row.currentState?.toLowerCase().replace(/ +/g, "")}`,
+            tableInfo?.stateClassName?.[
+              row.currentState?.toLowerCase().replace(/ +/g, "")
+            ],
+            (row.assignedTo == null && userDetail?.groups?.indexOf("/" + row.assignedGroup) > -1)
+            && tableInfo?.noAssignedClassName
+          )
+        }
+        onRowClick={({ row }) => renderReviewRequest({ row })}
+        onConsultRowClick={({ row }) => {
+          renderConsultReviewRequest({ row });
+        }}
+        loading={isLoading}
+        //FooterComponent={<CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={tableInfo.sort} footerFor={"queue"} />}
+      />  */}
+       
       </Grid>
     </>
   );

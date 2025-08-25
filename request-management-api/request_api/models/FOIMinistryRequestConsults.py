@@ -3,7 +3,9 @@ from sqlalchemy.orm import relationship
 from .db import db, ma
 from datetime import datetime as datetime2
 from request_api.models.default_method_result import DefaultMethodResult
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc
+from sqlalchemy.orm import relationship, backref, aliased
+from sqlalchemy.sql.sqltypes import Date, Integer, String
 import logging
 from request_api.models.ProgramAreas import ProgramArea
 from request_api.models.FOIRequestStatus import FOIRequestStatus
@@ -195,6 +197,119 @@ class FOIMinistryRequestConsults(db.Model):
         request_schema = FOIMinistryRequestSchema(many=False)
         query = db.session.query(FOIMinistryRequest).filter_by(axisrequestid=axisrequestid).order_by(FOIMinistryRequest.version.desc()).first()
         return request_schema.dump(query)
+    
+    @classmethod
+    def get_sub_consults_by_ministry_ids(cls, ministry_ids: list[int]):
+        _session = db.session
+
+        iaoassignee = aliased(FOIAssignee)
+        ministryassignee = aliased(FOIAssignee)
+
+        subquery_max_version = (
+        _session.query(
+            FOIMinistryRequest.foiministryrequestid,
+            func.max(FOIMinistryRequest.version).label("max_version")
+        )
+        .filter(FOIMinistryRequest.foiministryrequestid.in_(ministry_ids))
+        .group_by(FOIMinistryRequest.foiministryrequestid)
+        .subquery()
+        )
+
+        MinistryRequestLatest = aliased(FOIMinistryRequest)
+        MinistryRequest = aliased(FOIMinistryRequest)
+
+        axispagecount = case ([
+            (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
+            ],
+            else_= literal("0").label("axispagecount")
+        )
+        recordspagecount = case ([
+            (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
+            ],
+            else_= literal("0").label("recordspagecount")
+        )
+        requestpagecount = case([
+                (and_(axispagecount.isnot(None), recordspagecount.isnot(None), cast(axispagecount, Integer) > cast(recordspagecount, Integer)),
+                    axispagecount),
+                (and_(recordspagecount.isnot(None)),
+                    recordspagecount),
+                (and_(axispagecount.isnot(None)),
+                    axispagecount),
+                ],
+                else_= literal("0")).label('requestpagecount')
+        
+        consultAssignedToFormatted = case([
+                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
+                             func.concat(iaoassignee.lastname, ', ', iaoassignee.firstname)),
+                            (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.is_(None)),
+                             iaoassignee.lastname),
+                            (and_(iaoassignee.lastname.is_(None), iaoassignee.firstname.isnot(None)),
+                             iaoassignee.firstname),
+                           ],
+                           else_ = FOIMinistryRequest.assignedgroup).label('consultAssignedToFormatted')
+
+        query = (
+        _session.query(
+            FOIMinistryRequestConsults.foiministryrequestconsultid.label("consultid"),
+            FOIMinistryRequestConsults.foiministryrequest_id.label("foiministryrequestid"),
+            FOIMinistryRequestConsults.foiministryrequestversion_id.label("foiministryrequestversionid"),
+            FOIMinistryRequestConsults.requeststatusid.label("requeststatusid"),
+            FOIMinistryRequestConsults.filenumber.label("filenumber"),
+            cast(FOIMinistryRequestConsults.filenumber, String).label('axisRequestId'),
+            FOIMinistryRequestConsults.consulttypeid,
+            FOIMinistryRequestConsults.consultassignedto,
+            FOIMinistryRequestConsults.consultduedate,
+            FOIMinistryRequestConsults.isactive,
+            FOIMinistryRequestConsults.created_at.label("receivedDate"),
+            FOIRequestStatus.statuslabel.label('currentState'),
+            MinistryRequest.foiministryrequestid.label("sub_foiministryrequestid"),
+            MinistryRequest.description.label("sub_description"),
+            MinistryRequest.duedate.label("sub_duedate"),
+            MinistryRequest.axispagecount.label("sub_axispagecount"),
+            MinistryRequest.filenumber.label("sub_idnumber"),
+            requestpagecount.label("recordspagecount"),
+            consultAssignedToFormatted,
+        )
+        .join(MinistryRequest, MinistryRequest.foiministryrequestid == FOIMinistryRequestConsults.foiministryrequestversion_id)
+        .join(
+            MinistryRequestLatest,
+            (MinistryRequest.foiministryrequestid == MinistryRequestLatest.foiministryrequestid) &
+            (MinistryRequest.version == MinistryRequestLatest.version)
+        )
+        .join(
+            subquery_max_version,
+            (MinistryRequestLatest.foiministryrequestid == subquery_max_version.c.foiministryrequestid) &
+            (MinistryRequestLatest.version == subquery_max_version.c.max_version)
+        )
+        .join(FOIRequestStatus, FOIRequestStatus.requeststatusid == FOIMinistryRequestConsults.requeststatusid, isouter=True)
+        .join(iaoassignee, iaoassignee.username == FOIMinistryRequestConsults.consultassignedto, isouter=True)
+        .filter(FOIMinistryRequestConsults.foiministryrequestversion_id.in_(ministry_ids))
+        .filter(FOIMinistryRequestConsults.isactive == True)
+        )
+
+        results = []
+        for row in query.all():
+            consult = {
+                "consultid": row.consultid,
+                "requeststatusid": row.requeststatusid,
+                "filenumber": row.filenumber,
+                "consulttypeid": row.consulttypeid,
+                "consultassignedto": row.consultassignedto,
+                "consultduedate": row.consultduedate,
+                "foiministryrequestid": row.foiministryrequestid,
+                "currentState": row.currentState,
+                "consultAssignedToFormatted": row.consultAssignedToFormatted,
+                "receivedDate": row.receivedDate,
+                "foiministryrequest": {
+                    "foiministryrequestid": row.sub_foiministryrequestid,
+                    "description": row.sub_description,
+                    "duedate": row.sub_duedate,
+                    "axispagecount": row.sub_axispagecount,
+                    "idnumber": row.sub_idnumber
+                }
+            }
+            results.append(consult)
+        return results
         
 class FOIMinistryRequestConsultsSchema(ma.Schema):
     class Meta:

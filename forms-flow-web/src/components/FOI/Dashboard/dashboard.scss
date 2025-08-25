@@ -158,8 +158,9 @@ input[type='radio'] {
 }
 
 .MuiDataGrid-columnHeaderTitle {
-    overflow: visible !important;
-    text-overflow: unset !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
     font-family: 'BCSans-Bold', sans-serif!important;  
 }
 
@@ -299,4 +300,38 @@ div.MuiDataGrid-columnHeader[data-field="isiaorestricted"] {
 .keywordLabel{
     font-size: 14px;
     margin: 0px 0px 0px 10px;
+}
+
+// Subconsult flag styles with Label background
+.subconsult-flag-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    
+    .subconsult-label-bg {
+        color: #F9EEFF !important; // Light purple background
+        font-size: 22px !important;
+        position: relative;
+    }
+    
+    .subconsult-flag-icon {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        color: #9448BC !important; // Purple flag color
+        font-size: 8px !important;
+        z-index: 2;
+    }
+    
+    // &:hover {
+    //     .subconsult-label-bg {
+    //         color: #F0E6FF !important; // Slightly darker background on hover
+    //     }
+        
+    //     .subconsult-flag-icon {
+    //         color: #7A3A9C !important; // Darker purple flag on hover
+    //     }
+    // }
 }

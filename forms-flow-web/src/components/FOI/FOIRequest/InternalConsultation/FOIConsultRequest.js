@@ -153,11 +153,12 @@ const FOIConsultRequest = React.memo(({ userDetail, openApplicantProfileModal })
   const [_requestStatus, setRequestStatus] = React.useState(
     StateEnum.unopened.name
   );
-  const { requestId, ministryId } = useParams();
+  const { requestId, ministryId, consultId } = useParams();
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
   const isHistoricalRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.HISTORICAL_REQUEST) > -1;
   const isConsultRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDCONSULTREQUEST);
+  const isConsultDetail = url.indexOf(FOI_COMPONENT_CONSTANTS.CONSULT_REQUEST) > -1;
   const [isAddRequest, setIsAddRequest] = useState(urlIndexCreateRequest > -1);
   const [isAddConsultRequest, setIsAddConsultRequest] = useState(isConsultRequest > -1);
   //gets the request detail from the store

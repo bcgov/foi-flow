@@ -76,6 +76,7 @@ const FOI_COMPONENT_CONSTANTS = {
     ADD_REQUEST: "Add Request",
     ADD_CONSULT_REQUEST: "Add Consult",
     ADD_CONSULTATION_REQUEST: "Add Consultation",
+    CONSULT_REQUEST: "Consult Request",
     REVIEW_REQUEST: "Review Request",
     ISPIIREDACTED:"ispiiredacted",
     DIVISION:"division",

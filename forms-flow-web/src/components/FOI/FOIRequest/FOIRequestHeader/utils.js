@@ -129,6 +129,10 @@ export const getHeaderText = ({requestDetails, ministryId, status}) => {
   if (window.location.href.includes(FOI_COMPONENT_CONSTANTS.ADDCONSULTREQUEST)) {
     return FOI_COMPONENT_CONSTANTS.ADD_CONSULTATION_REQUEST;
   }
+
+  if (window.location.href.includes(FOI_COMPONENT_CONSTANTS.CONSULT_REQUEST)) {
+    return requestDetails.axisRequestId;
+  }
   
   if(status?.toLowerCase() === StateEnum.unopened.name.toLowerCase()){
     return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;

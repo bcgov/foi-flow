@@ -22,6 +22,7 @@ from dateutil import parser
 import json
 from request_api.utils.enums import StateName
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
+from collections import defaultdict
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -751,6 +752,7 @@ class FOIRawRequest(db.Model):
                 return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:
             return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
+            # paginated_result = subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
 
     @classmethod
     def findfield(cls, x):
