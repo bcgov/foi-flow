@@ -270,11 +270,11 @@ class FOIMinistryRequestConsults(db.Model):
             requestpagecount.label("recordspagecount"),
             consultAssignedToFormatted,
         )
-        .join(MinistryRequest, MinistryRequest.foiministryrequestid == FOIMinistryRequestConsults.foiministryrequestversion_id)
+        .join(MinistryRequest, MinistryRequest.version == FOIMinistryRequestConsults.foiministryrequestversion_id)
         .join(
             MinistryRequestLatest,
-            (MinistryRequest.foiministryrequestid == MinistryRequestLatest.foiministryrequestid) &
-            (MinistryRequest.version == MinistryRequestLatest.version)
+            (MinistryRequestLatest.foiministryrequestid == FOIMinistryRequestConsults.foiministryrequest_id) &
+            (MinistryRequestLatest.version == FOIMinistryRequestConsults.foiministryrequestversion_id)
         )
         .join(
             subquery_max_version,
@@ -283,9 +283,11 @@ class FOIMinistryRequestConsults(db.Model):
         )
         .join(FOIRequestStatus, FOIRequestStatus.requeststatusid == FOIMinistryRequestConsults.requeststatusid, isouter=True)
         .join(iaoassignee, iaoassignee.username == FOIMinistryRequestConsults.consultassignedto, isouter=True)
-        .filter(FOIMinistryRequestConsults.foiministryrequestversion_id.in_(ministry_ids))
+        .filter(FOIMinistryRequestConsults.foiministryrequest_id.in_(ministry_ids))
         .filter(FOIMinistryRequestConsults.isactive == True)
         )
+
+        query = query.distinct()
 
         results = []
         for row in query.all():
@@ -309,6 +311,7 @@ class FOIMinistryRequestConsults(db.Model):
                 }
             }
             results.append(consult)
+        print(f"1. get_sub_consults_by_ministry_ids returning results: {results}")
         return results
         
 class FOIMinistryRequestConsultsSchema(ma.Schema):
