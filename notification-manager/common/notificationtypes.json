@@ -23,6 +23,10 @@
         "name": "Ministry Assignment",
         "notificationtypelabel": "ministryassignment"    
     },
+    "oiassignee": {
+        "name": "OI Assignee",
+        "notificationtypelabel": "oiassignee"   
+    },
     "cfrduereminder": {
         "name": "CFR Due Reminder",
         "notificationtypelabel": "cfrduereminder"    
@@ -90,5 +94,17 @@
     "attachmentuploadevent": {
         "name": "Attachment Upload Event",
         "notificationtypelabel": "attachmentuploadevent"
-    }
+    },
+    "exemptionrequest":{
+        "name": "Exemption Request",
+        "notificationtypelabel": "exemptionrequest"
+    },
+    "exemptionapproved":{
+        "name": "Exemption Approved",
+        "notificationtypelabel": "exemptionapproved"
+    },
+    "exemptiondenied":{
+        "name": "Exemption Denied",
+        "notificationtypelabel": "exemptiondenied"
+    }   
 }

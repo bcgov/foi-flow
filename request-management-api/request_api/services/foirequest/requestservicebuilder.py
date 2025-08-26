@@ -14,7 +14,8 @@ from request_api.models.FOIRequestOIPC import FOIRequestOIPC
 from datetime import datetime as datetime2
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, StateName
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
-from request_api.services.foirequest.requestserviceministrybuilder import requestserviceministrybuilder 
+from request_api.services.foirequest.requestserviceministrybuilder import requestserviceministrybuilder
+from request_api.services.openinfoservice import openinfoservice
 
 
 import json
@@ -82,8 +83,18 @@ class requestservicebuilder(requestserviceconfigurator):
             if 'subjectCode' in requestschema and requestschema['subjectCode'] is not None and requestschema['subjectCode'] != '':
                 foiministryrequest.subjectcode = requestserviceministrybuilder().createfoirequestsubjectcode(requestschema, ministryid, activeversion, userid)
         foiministryrequest.version = activeversion
+        oistatusid = self.getpropertyvaluefromschema(requestschema, 'oistatusid')
+        foiministryrequest.oistatus_id = oistatusid
+        
+        #Create new FOIOpenInfoRequest after FOIMinistryRequest has successfully been closed and if no other FOIOpenInfoRequest exists in DB (ie. through OI exemption flow)
+        if 'closereasonid' in requestschema and requestschema['closereasonid'] in (4,7):
+            openinfoservice().createopeninforequest(requestschema, userid, foiministryrequest)
+
         foiministryrequest.closedate = self.getpropertyvaluefromschema(requestschema, 'closedate')
-        foiministryrequest.closereasonid = self.getpropertyvaluefromschema(requestschema, 'closereasonid')
+        if requestschema.get('reopen'):
+            foiministryrequest.closereasonid = None
+        else:
+            foiministryrequest.closereasonid = requestschema.get('closereasonid', current_foiministryrequest.get('closereasonid'))
         if self.getpropertyvaluefromschema(requestschema, 'isofflinepayment') is not None:
             foiministryrequest.isofflinepayment =  self.getpropertyvaluefromschema(requestschema, 'isofflinepayment')    
         return foiministryrequest

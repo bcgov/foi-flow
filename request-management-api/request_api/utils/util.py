@@ -66,7 +66,7 @@ def getrequiredmemberships():
         membership+='{0},'.format(group.value)
     for procgroup in ProcessingTeamWithKeycloackGroup:
         membership+='{0},'.format(procgroup.value)
-    membership+='Intake Team,Flex Team'   
+    membership+='Intake Team,Flex Team,OI Team'   
     return membership
 
 def allowedorigins():

@@ -17,6 +17,7 @@ import {
   isProcessingTeam,
   isIntakeTeam,
   isFlexTeam,
+  isOITeam,
 } from "../helper/FOI/helper";
 
 const tokenRefreshInterval = 180000; // how often we should check for token expiry --> 180000 = 3 mins
@@ -69,6 +70,7 @@ const initKeycloak = (store, ...rest) => {
             isIntakeTeam(userGroups) ||
             isFlexTeam(userGroups) ||
             isProcessingTeam(userGroups) ||
+            isOITeam(userGroups) ||
             isMinistryLogin(userGroups);
           store.dispatch(setUserAuthorization(authorized));
         });

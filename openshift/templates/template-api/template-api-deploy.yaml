@@ -1,0 +1,214 @@
+---
+kind: Template
+apiVersion: template.openshift.io/v1
+metadata:
+  annotations:
+    description: Deployment template for a adjudication api service.
+    tags: "${API_NAME}"
+  name: "${API_NAME}-deploy"
+objects:
+- kind: DeploymentConfig
+  apiVersion: v1
+  metadata:
+    name: "${API_NAME}"
+    labels:
+      app: "${API_NAME}"
+      app-group: "${APP_GROUP}"
+      template: "${API_NAME}-deploy"
+  spec:
+    strategy:
+      type: Rolling
+      rollingParams:
+        updatePeriodSeconds: 1
+        intervalSeconds: 1
+        timeoutSeconds: 600
+        maxUnavailable: 25%
+        maxSurge: 25%
+    triggers:
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - "${API_NAME}"
+        from:
+          kind: ImageStreamTag
+          namespace: "${IMAGE_NAMESPACE}"
+          name: "${IMAGE_STREAM_NAME_FULL}"
+    - type: ConfigChange
+    replicas: 1
+    test: false
+    selector:
+      app: "${API_NAME}"
+      deploymentconfig: "${API_NAME}"
+    template:
+      metadata:
+        labels:
+          app: "${API_NAME}"
+          app-group: "${APP_GROUP}"
+          deploymentconfig: "${API_NAME}"
+          template: "${API_NAME}-deploy"
+          role: api
+      spec:
+        containers:
+        - name: "${API_NAME}"
+          image: "${API_NAME}"
+          imagePullPolicy: Always
+          env:
+            - name: ConnectionStrings__DBConnection
+              valueFrom:
+                secretKeyRef:
+                  name: "${TEMPLATE_API_SECRETS}"
+                  key: ConnectionStrings__DBConnection
+            - name: ConnectionStrings__Redis
+              valueFrom:
+                secretKeyRef:
+                  name: "${TEMPLATE_API_SECRETS}"
+                  key: ConnectionStrings__Redis
+            - name: AWSS3__OSS_S3_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: "${TEMPLATE_API_SECRETS}"
+                  key: AWSS3__OSS_S3_HOST
+            - name: AWSS3__OSS_S3_FORMS_BUCKET
+              valueFrom:
+                secretKeyRef:
+                  name: "${TEMPLATE_API_SECRETS}"
+                  key: AWSS3__OSS_S3_FORMS_BUCKET
+            - name: ApiSettings__CorrespondenceUrl
+              valueFrom:
+                secretKeyRef:
+                  name: "${TEMPLATE_API_SECRETS}"
+                  key: ApiSettings__CorrespondenceUrl
+            - name: JWTAuth__JWT_OIDC_AUDIENCE
+              valueFrom:
+                secretKeyRef:
+                  name: "${TEMPLATE_API_SECRETS}"
+                  key: JWTAuth__JWT_OIDC_AUDIENCE
+            - name: JWTAuth__CORS_ORIGIN
+              valueFrom:
+                secretKeyRef:
+                  name: "${TEMPLATE_API_SECRETS}"
+                  key: JWTAuth__CORS_ORIGIN
+            - name: JWTAuth__JWT_OIDC_ISSUER
+              valueFrom:
+                secretKeyRef:
+                  name: "${TEMPLATE_API_SECRETS}"
+                  key: JWTAuth__JWT_OIDC_ISSUER
+            - name: JWTAuth__IAOGroups
+              valueFrom:
+                secretKeyRef:
+                  name: "${TEMPLATE_API_SECRETS}"
+                  key: JWTAuth__IAOGroups
+            - name: SPELLCHECK_DICTIONARY_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: "${TEMPLATE_API_SECRETS}"
+                  key: SPELLCHECK_DICTIONARY_PATH
+            - name: SPELLCHECK_JSON_FILENAME
+              valueFrom:
+                secretKeyRef:
+                  name: "${TEMPLATE_API_SECRETS}"
+                  key: SPELLCHECK_JSON_FILENAME
+            - name: SyncfusionLicense
+              valueFrom:
+                secretKeyRef:
+                  name: "${TEMPLATE_API_SECRETS}"
+                  key: SyncfusionLicense
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "250Mi"
+            limits:
+              cpu: "150m"
+              memory: "500Mi"
+          terminationMessagePath: "/dev/termination-log"
+          terminationMessagePolicy: File
+          imagePullPolicy: Always
+          volumeMounts:
+          - name: app-data
+            mountPath: /app/App_Data
+        volumes:
+        - name: app-data
+          persistentVolumeClaim:
+            claimName: app-data-pvc
+        restartPolicy: Always
+        terminationGracePeriodSeconds: 30
+        dnsPolicy: ClusterFirst
+        securityContext: {}
+        schedulerName: default-scheduler
+- kind: Service
+  apiVersion: v1
+  metadata:
+    name: "${API_NAME}"
+    creationTimestamp: 
+    labels:
+      app: "${API_NAME}"
+      app-group: "${APP_GROUP}"
+      template: "${API_NAME}-deploy"
+  spec:
+    ports:
+    - name: 5000-tcp
+      protocol: TCP
+      port: 5000
+      targetPort: 8080
+    selector:
+      deploymentconfig: "${API_NAME}"
+    type: ClusterIP
+    sessionAffinity: None
+  # status:
+  #   loadBalancer: {}
+- kind: Route
+  apiVersion: v1
+  metadata:
+    name: "${API_NAME}"
+    labels:
+      app: "${API_NAME}"
+      app-group: "${APP_GROUP}"
+      template: "${API_NAME}-deploy"
+  spec:
+    to:
+      kind: Service
+      name: "${API_NAME}"
+      weight: 100
+    port:
+      targetPort: 5000-tcp
+    tls:
+      termination: edge
+    wildcardPolicy: None
+    host: "${API_NAME}-${TAG_NAME}.apps.silver.devops.gov.bc.ca"
+parameters:
+- name: API_NAME
+  displayName: Name
+  description: The name assigned to all of the OpenShift resources associated to the
+    server instance.
+  required: true
+  value: template-api
+- name: APP_GROUP
+  displayName: App Group
+  description: The name assigned to all of the deployments in this project.
+  required: true
+  value: foi-requests
+- name: IMAGE_NAMESPACE
+  displayName: Image Namespace
+  required: true
+  description: The namespace of the OpenShift project containing the imagestream for
+    the application.
+  value: d7abee-tools
+- name: TAG_NAME
+  displayName: Environment TAG name
+  description: The TAG name for this environment, e.g., dev, test, prod
+  required: true
+  value: dev-marshal
+- name: TEMPLATE_API_SECRETS
+  displayName: correspondence Secrets
+  description: Name of secret for all template-api values
+  required: true
+  value: correspondence-secret-marshal
+- name: IMAGE_STREAM_NAME_FULL
+  displayName: Full image stream name (eg "template-api:dev")
+  description: Includes ImageStream name and tag
+  required: true
+  value: template-api:dev-marshal

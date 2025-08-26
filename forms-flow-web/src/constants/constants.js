@@ -67,6 +67,7 @@ export const DISABLE_GATHERINGRECORDS_TAB = (window._env_ && window._env_.REACT_
 
 export const RECORD_DOWNLOAD_LIMIT = (window._env_ && window._env_.REACT_APP_RECORD_DOWNLOAD_LIMIT) || process.env.REACT_APP_RECORD_DOWNLOAD_LIMIT || 500;
 export const RECORD_DOWNLOAD_SIZE_LIMIT = (window._env_ && window._env_.REACT_APP_RECORD_DOWNLOAD_SIZE_LIMIT) || process.env.REACT_APP_RECORD_DOWNLOAD_SIZE_LIMIT || 1073741824;
+export const SKIP_OPENINFO_MINISTRIES = `${(window._env_ && window._env_.REACT_APP_SKIP_OPENINFO_MINISTRIES) || process.env.REACT_APP_SKIP_OPENINFO_MINISTRIES || 'CLB,HSA,IIO,MGC,OBC,TIC'}`;
 
 export const SF_KEY = (window._env_ && window._env_.REACT_APP_SF_KEY) || process.env.REACT_APP_SF_KEY || '';
 export const FOI_SOLR_API_BASE =  (window._env_ && window._env_.REACT_APP_FOI_SOLR_API_BASE) ||

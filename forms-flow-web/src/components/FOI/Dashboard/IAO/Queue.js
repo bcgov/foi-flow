@@ -22,7 +22,7 @@ import Paper from "@mui/material/Paper";
 import clsx from "clsx";
 import { CustomFooter } from "../CustomFooter"
 
-const Queue = ({ userDetail, tableInfo }) => {
+const Queue = ({ userDetail, tableInfo, isOITeam }) => {
   const dispatch = useDispatch();
 
   const requestQueue = useSelector(
@@ -32,7 +32,7 @@ const Queue = ({ userDetail, tableInfo }) => {
 
   const classes = useStyles();
 
-  const filterFields = [
+  let filterFields = [
     "firstName",
     "lastName",
     "requestType",
@@ -42,6 +42,14 @@ const Queue = ({ userDetail, tableInfo }) => {
     "assignedToLastName",
     "assignedToFirstName",
   ];
+  if (isOITeam) {
+    filterFields = [
+      "publicationStatus",
+      "axisRequestId",
+      "assignedToFirstName",
+      "assignedToLastName"
+    ];
+  } 
 
   const queueParams = useSelector((state) => state.foiRequests.queueParams);
   const rowsState = useSelector((state) => state.foiRequests.queueParams?.rowsState);
@@ -190,8 +198,8 @@ const Queue = ({ userDetail, tableInfo }) => {
                 label={"MY TEAM'S REQUESTS"}
                 color="primary"
                 size="small"
-                onClick={() => requestFilterChange("All")}
-                clicked={requestFilter === "All"}
+                onClick={() => requestFilterChange("teamRequests")}
+                clicked={requestFilter === "teamRequests"}
               />
               <ClickableChip
                 id="watchingRequests"

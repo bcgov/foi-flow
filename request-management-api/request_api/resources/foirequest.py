@@ -28,9 +28,12 @@ from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema
 from request_api.schemas.foiassignee import FOIRequestAssigneeSchema
-from request_api.utils.enums import StateName
+from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup
 from marshmallow import Schema, fields, validate, ValidationError
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
+from request_api.utils.enums import OIStatusEnum
+from request_api.services.events.openinfo import openinfoevent
+from request_api.utils.enums import OpenInfoNotificationType
 import json
 import asyncio
 import traceback
@@ -141,9 +144,11 @@ class FOIRequestsById(Resource):
             request_json = request.get_json()
             foirequestschema = FOIRequestWrapperSchema().load(request_json)  
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
-            if result.success == True:
+            if result.success == True:                             
                 event_loop = asyncio.get_running_loop()
                 asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()), event_loop)
+                if IAOTeamWithKeycloackGroup.oi.value in AuthHelper.getusergroups():
+                    eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
@@ -296,6 +301,12 @@ class FOIRequestsById(Resource):
             if (section == "oipc"):
                 foirequest['isoipcreview'] = request_json['isoipcreview']
                 foirequest['oipcdetails'] = request_json['oipcdetails']
+            # if (section == "userrecordslockstatus"):
+            #     foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
+            #     foirequest['userrecordslockstatus'] = request_json['userrecordslockstatus']
+            if (section == "oistatusid"):
+                foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
+                foirequest['oistatusid'] = request_json['oistatusid']
             else:
                 foirequest[section] = request_json[section]
             foirequestschema = FOIRequestWrapperSchema().load(foirequest)
@@ -303,14 +314,19 @@ class FOIRequestsById(Resource):
             if result.success == True:
                 event_loop = asyncio.get_running_loop()
                 asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()), event_loop)
+                if (section == 'oistatusid'):
+                    eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
+                    if(request_json['oistatusid'] == OIStatusEnum.EXEMPTION_REQUEST.value):
+                        eventservice().postopeninfoexemptionevent(foiministryrequestid, foirequestid, AuthHelper.getuserid(),AuthHelper.getusername(), OpenInfoNotificationType.EXEMPTION_REQUEST.value, None)
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
-                return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
+                return {'success': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
         except ValidationError as err:
             return {'status': False, 'message': str(err)}, 400
         except KeyError as error:
+            traceback.print_exc()
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500 

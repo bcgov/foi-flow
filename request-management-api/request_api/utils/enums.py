@@ -106,6 +106,7 @@ class ProcessingTeamWithKeycloackGroup(Enum):
 class IAOTeamWithKeycloackGroup(Enum):
     intake = "Intake Team"
     flex = "Flex Team"
+    oi = "OI Team"
 
     @staticmethod
     def list():
@@ -116,6 +117,7 @@ class UserGroup(Enum):
     flex = "Flex Team"
     processing = "@processing"
     ministry = "@bcgovcode Ministry Team"
+    oi = "OI Team"
 
 class RequestorType(Enum):
     applicant = 1
@@ -143,6 +145,7 @@ class DocumentPathMapperCategory(Enum):
     Attachments = "Attachments"
     Records = "Records"
     Historical = "Historical"
+    AdditionalFiles = "AdditionalFiles"
 
 class ServiceName(Enum):
     payonline = "payonline"
@@ -181,3 +184,50 @@ class CacheUrls(Enum):
     extensionreasons= "/api/foiflow/extensionreasons"
     applicantcategories= "/api/foiflow/applicantcategories"
     subjectcodes= "/api/foiflow/subjectcodes"
+
+
+class ExcludedProgramArea(Enum):
+    """Program areas to exclude from OI requests."""
+    CLB = 24
+    IIO = 29
+    TIC = 32
+    OBC = 33
+    MGC = 34
+
+    @staticmethod
+    def list():
+        return [area.value for area in ExcludedProgramArea]
+
+class OICloseReason(Enum):
+    """Open Information eligible close reasons."""
+    FULL_DISCLOSURE = 4
+    PARTIAL_DISCLOSURE = 7
+
+    @staticmethod
+    def list():
+        return [reason.value for reason in OICloseReason]
+
+class OIStatusEnum(Enum):
+    FIRST_REVIEW = 1
+    PEER_REVIEW = 2
+    READY_TO_PUBLISH = 3
+    PUBLISHED = 4
+    HOLD_PUBLICATION = 5
+    UNPUBLISHED = 6
+    DO_NOT_PUBLISH = 7
+    EXEMPTION_REQUEST = 8
+
+    @classmethod
+    def list(cls):
+        return [status.value for status in cls]
+
+class OpenInfoNotificationType(Enum):
+    EXEMPTION_REQUEST = "Exemption Request"
+    EXEMPTION_APPROVED = "Exemption Approved"
+    EXEMPTION_DENIED = "Exemption Denied"
+    OI_STATE = "OI State"
+    OI_ASSIGNEE = "OI Assignee"
+
+    @staticmethod
+    def list():
+        return [notification.value for notification in OpenInfoNotificationType]

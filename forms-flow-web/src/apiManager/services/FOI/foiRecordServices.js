@@ -631,6 +631,76 @@ export const fetchPDFStitchedRecordForResponsePackage = (
   };
 };
 
+export const fetchPDFStitchedStatus = (
+  requestId,
+  ministryId,
+  packagename,
+  ...rest) => {
+    if (!ministryId) {
+      return () => {};
+    }
+    const done = fnDone(rest);
+    let apiUrl = replaceUrl(replaceUrl(
+      replaceUrl(
+        API.FOI_PDF_STITCH_STATUS,
+        "<ministryrequestid>",
+        ministryId
+      ),
+      "<requestid>",
+      requestId
+    ), '<packagename>', packagename);
+    return (dispatch) => {
+      httpGETRequest(apiUrl, {}, UserService.getToken())
+        .then((res) => {
+          if (res.data) {
+            done(null, res.data);
+          }
+        })
+        .catch((error) => {
+          console.log("Error in fetching pdfstitch job status", error);
+          dispatch(serviceActionError(error));
+          done(error);
+        });
+    };
+  }
+
+export const fetchPDFStitchedPackage = (
+  requestId,
+  ministryId,
+  packagename,
+  ...rest
+) => {
+  if (!ministryId) {
+    return () => {};
+  }
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    replaceUrl(
+      API.FOI_DOWNLOAD_ZIPPED_PACKAGE,
+      "<ministryrequestid>",
+      ministryId
+    ),
+    "<requestid>",
+    requestId
+  ) + "/" + packagename;
+  return (dispatch) => {
+    httpGETRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          console.log("Error in fetching records for response package", res);
+          dispatch(serviceActionError(res));
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching records for response package", error);
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
+
 export const fetchPDFStitchedRecordsForPhasedResponsePackages = (
   requestId,
   ministryId,

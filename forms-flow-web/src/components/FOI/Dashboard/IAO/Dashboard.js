@@ -39,6 +39,8 @@ const Dashboard = ({ userDetail }) => {
   const showEventQueue = useSelector((state) => state.foiRequests.showEventQueue);
   const showKeywordSearch = useSelector((state) => state.foiRequests.showKeywordSearch);
 
+  const isOITeam = user.groups.some(group => group.includes('OI Team'));
+
   const addRequest = (_e) => {
     dispatch(push(`/foi/addrequest`));
   };
@@ -183,6 +185,7 @@ const Dashboard = ({ userDetail }) => {
             </ButtonBase>
           </Grid>
           <Grid item container lg={4} xs={6} justifyContent="flex-end">
+          {!isOITeam && (
             <button
               type="button"
               className="btn foi-btn-create"
@@ -190,6 +193,7 @@ const Dashboard = ({ userDetail }) => {
             >
               {FOI_COMPONENT_CONSTANTS.ADD_REQUEST}
             </button>
+          )}
           </Grid>
         </Grid>
         { (!showAdvancedSearch && !showEventQueue && !showKeywordSearch) &&
@@ -204,7 +208,7 @@ const Dashboard = ({ userDetail }) => {
             marginTop: "2em",
           }}
         >
-          <Queue userDetail={userDetail} tableInfo={tableInfo} />
+          <Queue userDetail={userDetail} tableInfo={tableInfo} isOITeam={isOITeam} />
         </Grid>
         }
         { showEventQueue &&

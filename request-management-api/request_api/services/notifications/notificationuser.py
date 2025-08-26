@@ -5,10 +5,12 @@ import json
 from request_api.services.watcherservice import watcherservice
 from request_api.models.FOIRawRequestComments import FOIRawRequestComment
 from request_api.models.FOIRequestComments import FOIRequestComment
+from request_api.models.FOIOpenInformationRequests import FOIOpenInformationRequests
 from request_api.services.notifications.notificationconfig import notificationconfig
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.services.commentservice import commentservice
-
+from request_api.auth import AuthHelper
+from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup
 class notificationuser:
     """ notification user service
 
@@ -16,7 +18,6 @@ class notificationuser:
     
     def getnotificationusers(self, notificationtype, requesttype, userid, foirequest, requestjson=None):
         notificationusers = []
-        print("Inside getnotificationusers - notificationtype:", notificationtype)
         if 'User Assignment Removal' == notificationtype:
             _users = self.__getassignees(foirequest, requesttype, notificationtype, requestjson)
         elif 'Assignment' in notificationtype:
@@ -31,6 +32,14 @@ class notificationuser:
             _users = self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)
         elif 'Attachment Upload Event' in notificationtype:
             _users = self.__getgroupmembers('scanningteam') + self.__getassignees(foirequest, requesttype, notificationtype) + self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)
+        elif 'Exemption Request' in notificationtype:   
+            _users = self.__getgroupmembers('OI Team')
+        elif 'OI State' in notificationtype or 'OI Assignee' in notificationtype:
+            _users = self.__getoiassignees(requestjson)
+        elif 'Exemption Approved' in notificationtype:
+            _users = self.__getassignees(foirequest, requesttype, notificationtype)
+        elif 'Exemption Denied' in notificationtype:
+            _users = self.__getassignees(foirequest, requesttype, notificationtype)
         else:
             _users = self.__getassignees(foirequest, requesttype, notificationtype, requestjson) + self.__getwatchers(notificationtype, foirequest, requesttype, requestjson)
         for user in _users:
@@ -70,15 +79,17 @@ class notificationuser:
             else:
                 if isministryinternalcommenttype == False:
                     watchers =  watcherservice().getrawrequestwatchers(foirequest['requestid'])
-            print("*****watchers:",watchers)
             for watcher in watchers:
                     notificationusers.append({"userid":watcher["watchedby"], "usertype":notificationconfig().getnotificationusertypelabel("Watcher")})
         return notificationusers         
     
-    def __getassignees(self, foirequest, requesttype, notificationtype, requestjson=None):
+    def __getassignees(self, foirequest, requesttype, notificationtype, requestjson=None):        
         notificationusers = []
         notificationusertypelabel = notificationconfig().getnotificationusertypelabel("Assignee")
-        if notificationtype == 'User Assignment Removal':
+        if foirequest['requeststatuslabel'].lower() == StateName.closed.value.lower() and IAOTeamWithKeycloackGroup.oi.value in AuthHelper.getusergroups():
+            _openinfo = FOIOpenInformationRequests().getcurrentfoiopeninforequest(foirequest['foiministryrequestid'])
+            notificationusers.append({"userid":_openinfo["oiassignedto"], "usertype":notificationusertypelabel}) 
+        elif notificationtype == 'User Assignment Removal':
             notificationusers.append({"userid": requestjson['userid'], "usertype":notificationusertypelabel})
         else:
             if self.__isministryassigneeneeded(requesttype, foirequest, notificationtype, requestjson):
@@ -86,6 +97,13 @@ class notificationuser:
             if self.__isfoiassigneeneeded(foirequest, notificationtype, requestjson):
                 notificationusers.append({"userid":foirequest["assignedto"], "usertype":notificationusertypelabel})
         return notificationusers  
+    
+    def __getoiassignees(self, requestjson):
+        notificationusertypelabel = notificationconfig().getnotificationusertypelabel("Assignee")
+        notificationusers = []
+        if requestjson.get('oiassignedto'):
+            notificationusers.append({"userid": requestjson['oiassignedto'], "usertype":notificationusertypelabel})
+        return notificationusers
     
 
     def __isiaointernalcomment(self, notificationtype, requestjson):
