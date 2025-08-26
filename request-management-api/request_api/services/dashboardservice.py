@@ -141,9 +141,6 @@ class dashboardservice:
             'has_prev': requests.has_prev,
         }
 
-        print(f"6. Final requestqueue length: {len(requestqueue)}")
-        print(f"6. Requests with subConsults: {len([r for r in requestqueue if r.get('subConsults') and len(r['subConsults']) > 0])}")
-
         return jsonify({'data': requestqueue, 'meta': meta})
 
     def getministryrequestqueuepagination (self, groups=None, page=1, size=10, sortingitems=[], sortingorders=[], filterfields=[], keyword=None, additionalfilter='All', userid=None):
