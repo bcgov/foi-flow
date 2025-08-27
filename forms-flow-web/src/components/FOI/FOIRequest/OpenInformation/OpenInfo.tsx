@@ -125,7 +125,7 @@ const OpenInfo = ({
           show: true,
           title: "Exemption Request",
           description: "Are you sure you want to create an exemption request?",
-          message: "This request will be assigned to the Open Information team queue.",
+          message: "An exemption request will be sent to the Open Information team for review. You will receive a notification when it has been reviewed. If you are editing or updating the exemption request, this will update the existing request.",
           confirmButtonTitle: "Save Changes"
         }));
       }
