@@ -79,7 +79,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
 
             string GetAddress()
             {
-                var addressParts = new[] { applicantFullName, rawRequest?.Address, rawRequest?.AddressSecondary, rawRequest?.City + ' ' + rawRequest?.Province + ' ' + rawRequest?.Postal };
+                var addressParts = new[] { applicantFullName, rawRequest?.BusinessName, rawRequest?.Address, rawRequest?.AddressSecondary, rawRequest?.City + ' ' + rawRequest?.Province + ' ' + rawRequest?.Postal };
                 return string.Join("\n", addressParts.Where(adrs => !string.IsNullOrWhiteSpace(adrs)));
             }
 
@@ -173,6 +173,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
                 var addressParts = new[]
                 {
                     string.Join(" ", new[] { applicant?.FirstName, applicant?.MiddleName, applicant?.LastName }.Where(name => !string.IsNullOrWhiteSpace(name))),
+                    applicant?.BusinessName,
                     GetContactInfo("address"),
                     GetContactInfo("addressSecondary"),
                     string.Join(" ", new[] { GetContactInfo("city"), GetContactInfo("province"), GetContactInfo("postal") }.Where(location => !string.IsNullOrWhiteSpace(location)))
