@@ -17,7 +17,6 @@ TRACER = Tracer.get_instance()
 EXCEPTION_MESSAGE_NOTFOUND_REQUEST='Record not found'
 CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 
-#RESTRICT ACESS TO ONLY IAO AND OI USERS FOR ALL ROUTES. EXCLUDE MINISTRY USERS
 # GET CALL for oi data -> ALLOWABLE = IAO, OI. RESTRCIT = Ministry
 # POST CALL (Create + update oi data) -> ALLOWABLE = IAO (exemption speicifc data), OI (exemption + publicaiton data). RESTRCIT = Ministry. Specific data (exemption or pulibcation) done in FE
 # POST, GET, DELETE for additional files -> Allowable = ONLY OI

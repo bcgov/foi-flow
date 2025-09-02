@@ -1909,7 +1909,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 foirequestid={requestId}
                 isOITeam={isOITeam}
                 foiministryrequestid={ministryId}
-                bcgovcode={JSON.parse(bcgovcode)}
+                bcgovcode={bcgovcode ? JSON.parse(bcgovcode) : bcgovcode}
               />
             </div>
           )}

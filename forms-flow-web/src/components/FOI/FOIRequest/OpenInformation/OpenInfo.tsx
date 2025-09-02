@@ -116,7 +116,7 @@ const OpenInfo = ({
           description: oiPublicationData.oiexemptionapproved 
             ? "Are you sure you want to approve this exemption?"
             : "Are you sure you want to deny this exemption? ",
-          message: oiPublicationData.oiexemptionapproved ? "The request will not be eligible for publication and will be removed from the OI Queue." : "The request will still be eligible for publication and will remain in the OI Queue.",
+          message: oiPublicationData.oiexemptionapproved ? "The request will not be eligible for publication and will be removed from the OI queue." : "The request will still be eligible for publication. The request will temporarily be removed from the OI queue. When the request is closed, the request will reappear in the OI queue for publication review.",
           confirmButtonTitle: "Save Change"
         }));
       } else {
@@ -203,8 +203,8 @@ const OpenInfo = ({
   const disableSave = (oiPublicationData: OITransactionObject): boolean => {
     const isDoNotPublish = oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish;
     const hasExemption = oiPublicationData?.oiexemption_id;
-    const isMissingRequiredFields =
-      !oiPublicationData?.iaorationale || !oiPublicationData?.pagereference;
+    const isMissingApproval = isOITeam && oiPublicationData?.oiexemptionapproved === null;
+    const isMissingRequiredFields = !oiPublicationData?.iaorationale || !oiPublicationData?.pagereference || isMissingApproval;
     const hasOutOfScopeExemption = oiPublicationData?.oiexemption_id === OIExemptions.OutsideScopeOfPublication;
     if (isDoNotPublish && hasOutOfScopeExemption) {
       return false;
