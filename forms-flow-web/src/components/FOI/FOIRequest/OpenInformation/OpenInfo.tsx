@@ -96,6 +96,12 @@ const OpenInfo = ({
           confirmationData: value,
         }));
       }
+      else {
+        setOiPublicationData((prev: any) => ({
+          ...prev,
+          [oiDataKey]: value,
+        }));
+      }
     } else {
       setOiPublicationData((prev: any) => ({
         ...prev,
