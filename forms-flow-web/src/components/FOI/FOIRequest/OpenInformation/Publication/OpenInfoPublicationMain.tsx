@@ -410,7 +410,7 @@ const OpenInfoPublicationMain = ({
                 value={(oiPublicationData?.publicationdate ? formatDate(new Date(oiPublicationData?.publicationdate)) : "") || ""}
                 type="date"
               ></TextField>
-              {earliestPublicationDate > 0 && <span style={{fontStyle: "italic", fontSize: "12px"}}>Earliest Eligible Publication Date: {earliestPublicationDate}</span>}
+              {earliestPublicationDate !== 0 && <span style={{fontStyle: "italic", fontSize: "12px"}}>Earliest Eligible Publication Date: {earliestPublicationDate}</span>}
             </Grid>
             <Grid item md={6}>
               <RadioGroup
