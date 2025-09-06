@@ -77,11 +77,9 @@ const IAOOpenInfoMain = ({
                 }
               >
                 {oiPublicationStatuses.map((status) => {
-                  if (status.oipublicationstatusid === OIPublicationStatuses.UnpublishRequest) {
-                    return null;
-                  }
                   return (
                     <MenuItem
+                      disabled={oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest}
                       key={status.oipublicationstatusid}
                       value={status.oipublicationstatusid}
                     >
@@ -108,7 +106,7 @@ const IAOOpenInfoMain = ({
                   oiPublicationData?.oipublicationstatus_id !== OIPublicationStatuses.Publish &&
                   !oiPublicationData?.oiexemption_id
                 }
-                disabled={disableIAOField}
+                disabled={oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish}
               >
                 {oiExemptions.map((reason) => {
                   return (
@@ -139,7 +137,7 @@ const IAOOpenInfoMain = ({
                   oiPublicationData?.oiexemption_id !== OIExemptions.OutsideScopeOfPublication &&
                   !oiPublicationData?.pagereference
                 }
-                disabled={disableIAOField}
+                disabled={oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish }
                 multiline
                 maxRows={2}
               ></TextField>

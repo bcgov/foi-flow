@@ -115,6 +115,7 @@ class FOIOpenInformationRequests(db.Model):
                     isactive=True,
                     created_at=createddate,
                     createdby=userid,
+                    sitemap_pages=openinfo["sitemap_pages"]
                 )
                 db.session.add(updated_foiopeninforequest)
                 db.session.commit()
