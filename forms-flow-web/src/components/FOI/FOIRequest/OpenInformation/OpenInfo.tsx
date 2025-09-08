@@ -9,6 +9,7 @@ import "./openinfo.scss";
 import { OIPublicationStatus, OITransactionObject } from "./types";
 import { OIStates, OIPublicationStatuses, OIExemptions } from "../../../../helper/openinfo-helper";
 import { calculateDaysRemaining, addBusinessDays, addBusinessDaysToDate, calculateBusinessDaysBetween } from "../../../../helper/FOI/helper";
+import Loading from "../../../../containers/Loading";
 
 const OpenInfo = ({
   requestNumber,

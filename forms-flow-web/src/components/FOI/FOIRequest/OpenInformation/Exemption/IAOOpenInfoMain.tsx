@@ -72,16 +72,18 @@ const IAOOpenInfoMain = ({
                 select
                 required
                 InputLabelProps={{ shrink: true }}
-                onChange={(event) =>
+                onChange={((event) => {
+                  const selectedValue: number = parseInt(event.target.value);
+                  if (selectedValue === OIPublicationStatuses.UnpublishRequest) return;
                   handleOIDataChange(event.target.value, event.target.name)
-                }
+                })}
               >
                 {oiPublicationStatuses.map((status) => {
-                  if (status.oipublicationstatusid === OIPublicationStatuses.UnpublishRequest) {
-                    return null;
-                  }
                   return (
                     <MenuItem
+                      style={status.oipublicationstatusid === OIPublicationStatuses.UnpublishRequest ? {
+                        color: "grey", fontStyle: "italic", pointerEvents: "none" 
+                      } : {}}
                       key={status.oipublicationstatusid}
                       value={status.oipublicationstatusid}
                     >
@@ -108,7 +110,7 @@ const IAOOpenInfoMain = ({
                   oiPublicationData?.oipublicationstatus_id !== OIPublicationStatuses.Publish &&
                   !oiPublicationData?.oiexemption_id
                 }
-                disabled={disableIAOField}
+                disabled={oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish}
               >
                 {oiExemptions.map((reason) => {
                   return (
@@ -139,7 +141,7 @@ const IAOOpenInfoMain = ({
                   oiPublicationData?.oiexemption_id !== OIExemptions.OutsideScopeOfPublication &&
                   !oiPublicationData?.pagereference
                 }
-                disabled={disableIAOField}
+                disabled={oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish }
                 multiline
                 maxRows={2}
               ></TextField>
