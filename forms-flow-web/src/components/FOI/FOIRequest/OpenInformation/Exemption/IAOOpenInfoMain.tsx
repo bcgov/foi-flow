@@ -72,14 +72,18 @@ const IAOOpenInfoMain = ({
                 select
                 required
                 InputLabelProps={{ shrink: true }}
-                onChange={(event) =>
+                onChange={((event) => {
+                  const selectedValue: number = parseInt(event.target.value);
+                  if (selectedValue === OIPublicationStatuses.UnpublishRequest) return;
                   handleOIDataChange(event.target.value, event.target.name)
-                }
+                })}
               >
                 {oiPublicationStatuses.map((status) => {
                   return (
                     <MenuItem
-                      disabled={oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest}
+                      style={status.oipublicationstatusid === OIPublicationStatuses.UnpublishRequest ? {
+                        color: "grey", fontStyle: "italic", pointerEvents: "none" 
+                      } : {}}
                       key={status.oipublicationstatusid}
                       value={status.oipublicationstatusid}
                     >
