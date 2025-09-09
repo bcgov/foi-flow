@@ -29,9 +29,9 @@ const IAOOpenInfoMain = ({
   );
 
   const disableIAOField =
-    (oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish || oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest) || isOIUser;
+    oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish || isOIUser;
   const disableOIField =
-    (oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish || oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest) || !isOIUser;
+    oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish || !isOIUser;
 
   //Styling
   const useStyles = makeStyles({
@@ -110,7 +110,7 @@ const IAOOpenInfoMain = ({
                   oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish &&
                   !oiPublicationData?.oiexemption_id
                 }
-                disabled={oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish || oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest}
+                disabled={oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish}
               >
                 {oiExemptions.map((reason) => {
                   return (
