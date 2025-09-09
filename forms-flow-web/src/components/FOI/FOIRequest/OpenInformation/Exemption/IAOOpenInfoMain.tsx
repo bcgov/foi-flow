@@ -107,7 +107,7 @@ const IAOOpenInfoMain = ({
                   handleOIDataChange(event.target.value, event.target.name)
                 }
                 error={
-                  oiPublicationData?.oipublicationstatus_id !== OIPublicationStatuses.Publish &&
+                  oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish &&
                   !oiPublicationData?.oiexemption_id
                 }
                 disabled={oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.Publish}
