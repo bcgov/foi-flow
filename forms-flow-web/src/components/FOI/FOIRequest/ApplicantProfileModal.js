@@ -68,6 +68,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const [createConfirmation, setCreateConfirmation] = useState(false);
     const [isProfileDifferent, setIsProfileDifferent] = useState(false);
     const [applicantHistory, setApplicantHistory] = useState(false);
+    const [showApplicantHistory, setShowApplicantHistory] = useState(false);
     const [requestHistory, setRequestHistory] = useState(false);
 
     const columns = [
@@ -180,6 +181,9 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                 break;
             }
         }
+        dispatch(fetchApplicantContactHistory(selectedApplicant.foiRequestApplicantID, (err, res) => {
+            setApplicantHistory(res);
+        })) 
     }, [selectedApplicant])
 
     const createSaveApplicantObject = (name, value, value2) => {
@@ -327,15 +331,13 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         setIsProfileDifferent(false);
     }
 
-    const showApplicantHistory = () => {
-        dispatch(fetchApplicantContactHistory(selectedApplicant.foiRequestApplicantID, (err, res) => {
-            setApplicantHistory(res);
-        }))       
+    const toggleApplicantHistory = () => {
+        setShowApplicantHistory(true);
     }
-
+    
     const back = () => {
-        if (applicantHistory) {
-            setApplicantHistory(false);            
+        if (showApplicantHistory) {
+            setShowApplicantHistory(false);
         } else if (!isBeforeOpen(requestDetails)) {
             handleClose();
         } else {
@@ -395,7 +397,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                 <h3 className="request-history-header search-applicants-header applicant-profile-header">
                     {confirmationMessage ?
                     <>Saving Changes to Applicant Profile</> :                    
-                    applicantHistory ?
+                    showApplicantHistory ?
                     <>Applicant History</> :
                     <><ButtonBase
                         onClick={() => setShowRequestHistory(false)}
@@ -463,7 +465,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                             />
                             </Box>
                         </>:
-                        applicantHistory ? 
+                        showApplicantHistory ? 
                         <>
                         {applicantHistory.map((entry, index) => {
                         return (<Accordion defaultExpanded={index === 0}>
@@ -502,7 +504,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                             handleApplicantDetailsValue={() => {}}
                             disableInput={false}
                             defaultExpanded={true}
-                            showHistory={showApplicantHistory}
+                            showHistory={applicantHistory.length > 0 ? toggleApplicantHistory : false}
                             warning={warning}
                         />
                         <AddressContactDetails
@@ -635,12 +637,12 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                     <button className="btn-bottom btn-cancel" onClick={() => setConfirmationMessage(false)} >
                     Back
                     </button></>:                    
-                    <>{!applicantHistory && <button
+                    <>{!showApplicantHistory && <button
                     className={`btn-bottom btn-save btn`}
                       onClick={selectProfile}
                       disabled={isSaveDisabled()}
                     >
-                    Select & Save
+                    {isBeforeOpen(requestDetails) ? "Select & Save" : "Save"}
                     </button>}
                     <button className="btn-bottom btn-cancel" onClick={back} >
                     Back
