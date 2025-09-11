@@ -142,7 +142,7 @@ class applicantservice:
             for applicant in applicants:
                 cur = self.__prepareapplicantforcomparing(applicant)
                 if(cur != newer):
-                    applicantqueue.append({ "updatedat": updatedat, "createdby": createdby, "fields": dict(set(cur.items()) - set(newer.items()))})
+                    applicantqueue.append({ "updatedat": applicant['updatedat'], "createdby": applicant['createdby'], "fields": {k: v for k, v in cur.items() if v is not None}} )
                     newer = cur
                 updatedat = applicant['updatedat']
                 createdby = applicant['createdby']

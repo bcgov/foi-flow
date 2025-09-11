@@ -181,9 +181,11 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                 break;
             }
         }
-        dispatch(fetchApplicantContactHistory(selectedApplicant.foiRequestApplicantID, (err, res) => {
-            setApplicantHistory(res);
-        })) 
+        if (selectedApplicant) {
+            dispatch(fetchApplicantContactHistory(selectedApplicant.foiRequestApplicantID, (err, res) => {
+                setApplicantHistory(res);
+            })) 
+        }
     }, [selectedApplicant])
 
     const createSaveApplicantObject = (name, value, value2) => {
