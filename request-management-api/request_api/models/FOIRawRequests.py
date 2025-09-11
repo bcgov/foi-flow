@@ -646,7 +646,6 @@ class FOIRawRequest(db.Model):
     @classmethod    
     def addadditionalfilter(cls, basequery, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, groups=[]):
         isprocessingteam = False
-        
         if groups:
             isprocessingteam = any(item in ProcessingTeamWithKeycloackGroup.list() for item in groups)
 
@@ -659,7 +658,7 @@ class FOIRawRequest(db.Model):
             return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
         elif(additionalfilter == 'unassignedRequests'):
             return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == None, FOIRawRequest.assignedgroup.in_(tuple(groups))))
-        elif (additionalfilter.lower() == 'all'):
+        elif (additionalfilter == 'teamRequests'):
             if(isiaorestrictedfilemanager == True):
                 basequery = basequery.filter(FOIRawRequest.status.notin_(['Archived']))
             else:
