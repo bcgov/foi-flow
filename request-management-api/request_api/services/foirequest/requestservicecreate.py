@@ -133,6 +133,7 @@ class requestservicecreate:
             applicantinfo = foirequestschema.get("additionalPersonalInfo")
             selfdob = applicantinfo["birthDate"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"birthDate","additionalPersonalInfo") else None
             selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
+
         applicant = self.__getapplicant(foirequestschema.get('axisapplicantid'), foirequestschema.get('foiRequestApplicantID', 0))
         foirequestschema['foiRequestApplicantID'] = applicant.get('foirequestapplicantid', 0) # temporary for axis sync, remove after axis decommissioned
         # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
@@ -200,7 +201,7 @@ class requestservicecreate:
         if applicant == {}:
             applicant = FOIRequestApplicant().getlatestprofilebyapplicantid(foirequestapplicantid)
         return applicant
-    
+
     def __disablewatchers(self, ministryid, requestschema, userid):
         requeststatuslabel =  requestschema.get("requeststatuslabel") if 'requeststatuslabel' in requestschema  else None
         if requeststatuslabel is not None: 
