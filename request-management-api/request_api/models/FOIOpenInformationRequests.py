@@ -144,7 +144,6 @@ class FOIOpenInformationRequests(db.Model):
     @classmethod
     def getoibasequery(cls, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, groups=[], isadvancedsearch=False):
         _session = db.session
-        print("additionalfilter", additionalfilter)
 
         # subquery for getting the latest version of FOIOpenInformationRequests
         subquery_maxversion = (
