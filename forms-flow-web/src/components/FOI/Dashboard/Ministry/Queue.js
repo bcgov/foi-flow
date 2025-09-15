@@ -284,8 +284,8 @@ const Queue = ({ userDetail, tableInfo }) => {
                 label={"MY TEAM'S REQUESTS"}
                 color="primary"
                 size="small"
-                onClick={() => requestFilterChange("All")}
-                clicked={requestFilter === "All"}
+                onClick={() => requestFilterChange("teamRequests")}
+                clicked={requestFilter === "teamRequests"}
               />
               <ClickableChip
                 id="watchingRequests"
