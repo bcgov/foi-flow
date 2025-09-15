@@ -60,7 +60,6 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
 
   const keyword = useSelector((state) => state.foiRequests.queueParams?.keyword);
   const requestFilter = useSelector((state) => state.foiRequests.queueFilter);
-  console.log("QUEUE")
 
   useEffect(() => {
     serverSortModel = updateSortModel(sortModel);
