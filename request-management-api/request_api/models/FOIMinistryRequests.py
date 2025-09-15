@@ -700,7 +700,7 @@ class FOIMinistryRequest(db.Model):
         elif(additionalfilter == 'unassignedRequests'):
             if(requestby == 'IAO'):
                 dbquery = basequery.filter(FOIMinistryRequest.assignedto == None).filter(ministryfilter)
-        elif(additionalfilter == 'teamRequests'):           
+        elif(additionalfilter.lower() == 'all'):           
             if(requestby == 'IAO'):
                 dbquery = basequery.filter(ministryfilter).filter(FOIMinistryRequest.assignedto.isnot(None)).filter(or_(FOIRestrictedMinistryRequest.isrestricted == isiaorestrictedfilemanager, or_(FOIRestrictedMinistryRequest.isrestricted.is_(None), FOIRestrictedMinistryRequest.isrestricted == False)))
             else:               

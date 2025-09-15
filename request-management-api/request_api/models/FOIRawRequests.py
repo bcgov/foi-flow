@@ -658,7 +658,7 @@ class FOIRawRequest(db.Model):
             return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == userid))
         elif(additionalfilter == 'unassignedRequests'):
             return basequery.filter(and_(FOIRawRequest.status.notin_(['Archived']), FOIRawRequest.assignedto == None, FOIRawRequest.assignedgroup.in_(tuple(groups))))
-        elif (additionalfilter == 'teamRequests'):
+        elif (additionalfilter.lower() == 'all'):
             if(isiaorestrictedfilemanager == True):
                 basequery = basequery.filter(FOIRawRequest.status.notin_(['Archived']))
             else:
