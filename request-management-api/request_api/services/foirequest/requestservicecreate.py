@@ -134,7 +134,7 @@ class requestservicecreate:
             selfdob = applicantinfo["birthDate"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"birthDate","additionalPersonalInfo") else None
             selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
 
-        applicant = FOIRequestApplicant().getlatestprofilebyaxisapplicantid(foirequestschema.get('axisapplicantid', 0)) # temporary for axis sync, remove after axis decommissioned
+        applicant = FOIRequestApplicant().getlatestprofilebyaxisapplicantid(foirequestschema.get('axisapplicantid') or 0) # temporary for axis sync, remove after axis decommissioned
         foirequestschema['foiRequestApplicantID'] = applicant.get('foirequestapplicantid', 0) # temporary for axis sync, remove after axis decommissioned
         # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
         if foirequestschema.get('foiRequestApplicantID', 0) > 0:
