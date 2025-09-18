@@ -80,7 +80,7 @@ const FileUpload = ({
       return duplicateFileName;
     }
 
-    const addNewFiles = (newFiles) => {
+    const addNewFiles = (newFiles, uploadFor) => {
       let _totalFileSizeInMB = totalFileSizeCalculated;
       let _duplicateFiles = [];
       let _typeErrorFiles = [];
@@ -91,7 +91,8 @@ const FileUpload = ({
           file.filename = file.name;
           const sizeInMB = convertBytesToMB(file.size);
           _totalFileSizeInMB += parseFloat(sizeInMB);
-          if (allowedFileType(file, mimeTypes)) {
+          //Remove Check only for records
+          if (uploadFor != 'record' && allowedFileType(file, mimeTypes)) {
             if (allowedFileSize(_totalFileSizeInMB, multipleFiles, totalFileSize)) {
               if (sizeInMB <= maxFileSize) {
                 if (totalUploadedRecordSize > 0) {
@@ -115,7 +116,7 @@ const FileUpload = ({
               removeFileSize = convertBytesToMB(file.size);
             }
           }
-          else {
+          else if(uploadFor != 'record') {
             _typeErrorFiles.push(file.name);
           }
         }
@@ -130,14 +131,14 @@ const FileUpload = ({
         updateFilesCb(filesAsArray, errMsg);
     };
 
-    const validateFiles = (newFiles, totalFiles) => {
+    const validateFiles = (newFiles, totalFiles, uploadFor) => {
       
       if (multipleFiles && maxNumberOfFiles && (newFiles.length > maxNumberOfFiles  || totalFiles > maxNumberOfFiles)) {
         setErrorMessage([`A maximum of ${maxNumberOfFiles} files can be uploaded at one time. Only ${maxNumberOfFiles} files have been added on this upload window, please upload additional files separately`]);
       } else if (!multipleFiles && totalFiles > 1) {
         return
       } else if (newFiles.length) {
-        let updatedFilesDetails = addNewFiles(newFiles);
+        let updatedFilesDetails = addNewFiles(newFiles, uploadFor);
         if (multipleFiles && updatedFilesDetails[1] > totalFileSize) {
           setTotalFileSize(updatedFilesDetails[1] - parseFloat(updatedFilesDetails[2]))
           setErrorMessage([`The total size of all files uploaded can not exceed  ${totalFileSize}MB. Please upload additional files separately.`]);
@@ -147,10 +148,10 @@ const FileUpload = ({
       }
     }
    
-    const handleNewFileUpload = (e) => {
+    const handleNewFileUpload = (e, uploadFor) => {
         const { files: newFiles } = e.target;
         const totalFiles = Object.entries(files).length + newFiles.length;        
-        validateFiles(newFiles, totalFiles);
+        validateFiles(newFiles, totalFiles, uploadFor);
     };
     const fileDrop = (e) => {
       e.preventDefault();
@@ -248,7 +249,7 @@ const FileUpload = ({
             className={multipleFiles ? "file-upload-input-multiple" : "file-upload-input"}
             type="file"
             ref={fileInputField}
-            onChange={handleNewFileUpload}
+            onChange={handleNewFileUpload(uploadFor)}
             value=""
             multiple={multipleFiles}
             accept={mimeTypes}

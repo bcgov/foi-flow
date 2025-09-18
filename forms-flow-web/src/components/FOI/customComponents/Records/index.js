@@ -2679,14 +2679,14 @@ export const RecordsLog = ({
               </span>}
             </Grid>
                           
-            <Grid item xs={7}>
+            {/* <Grid item xs={7}>
               <span style={{ fontWeight: "bold" }}>
                 <div>
                   Total Upload Limit :{" "}
                   {getReadableFileSize(TOTAL_RECORDS_UPLOAD_LIMIT)}
                 </div>
               </span>
-            </Grid>
+            </Grid> */}
             <Grid item xs={3}>
               <span style={{ fontWeight: "bold" }}>
                 {isMCFPersonal && <div>
