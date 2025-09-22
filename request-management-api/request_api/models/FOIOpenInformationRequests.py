@@ -284,7 +284,7 @@ class FOIOpenInformationRequests(db.Model):
                     cls.oiassignedto.is_(None),                         
             )
 
-        elif additionalfilter.lower() == 'all':
+        elif additionalfilter is not None and additionalfilter.lower() == 'all':
             basequery = basequery.filter(cls.oiassignedto != None)
         
         return basequery
