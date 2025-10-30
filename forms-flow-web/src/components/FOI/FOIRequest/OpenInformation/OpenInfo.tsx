@@ -228,7 +228,8 @@ const OpenInfo = ({
     return true;
   };
   const disablePublish = (oiPublicationData: OITransactionObject) : boolean => {    
-    const isMissingRequiredInput = oiPublicationData?.copyrightsevered === null || oiPublicationData?.publicationdate === null || foiOpenInfoAdditionalFiles?.findIndex((f: any) => f.filename.includes("Response_Letter_" + requestNumber + ".pdf")) < 0;
+    const responseLetterRegex = /Response[_\-\s]*Letter/i;
+    const isMissingRequiredInput = oiPublicationData?.copyrightsevered === null || oiPublicationData?.publicationdate === null || !foiOpenInfoAdditionalFiles?.some((f: any) => responseLetterRegex.test(f.filename));
     const isOIReadyToPublish = currentOIRequestState === "Ready to Publish";
     if (!isOIReadyToPublish) {
       return true;
@@ -269,6 +270,7 @@ const OpenInfo = ({
           foiministryrequestid={foiministryrequestid}
           foirequestid={foirequestid}
           toast={toast}
+          handleOIDataChange={handleOIDataChange}
         />
         <OpenInfoTab tabValue={tabValue} handleTabSelect={handleTabSelect} isOIUser={isOITeam} />
         {tabValue === 1 ? (
