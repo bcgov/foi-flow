@@ -393,7 +393,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           }
         })
       );
-      dispatch(fetchFOIEmailTemplates());
+      if (!isOITeam) {
+        dispatch(fetchFOIEmailTemplates());
+      }
     }
 
     dispatch(fetchFOICategoryList());

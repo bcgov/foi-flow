@@ -283,9 +283,9 @@ class FOIOpenInformationRequests(db.Model):
             basequery = basequery.filter(
                     cls.oiassignedto.is_(None),                         
             )
-            
-        elif additionalfilter == 'teamRequests':
-            pass
+
+        elif additionalfilter is not None and additionalfilter.lower() == 'all':
+            basequery = basequery.filter(cls.oiassignedto != None)
         
         return basequery
 
