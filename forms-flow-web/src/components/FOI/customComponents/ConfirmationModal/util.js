@@ -142,6 +142,8 @@ import { isReadyForPublishing } from '../../FOIRequest/utils';
           return {title: "Change Request to On Hold - Other", 
                  body: <>Are you sure you want to change Request #{_requestNumber} to {StateEnum.onholdother.name}? This should be used for scenarios 
                  that are not fee related (such as Third Party notice).<b> This will stop the clock.</b></>};
+      case StateEnum.recordsintransit.name.toLowerCase():
+        return {title: "Changing the state", body: "Are you sure you want to change the state to Records in Transit?"};
       default:
           return {title: "", body: ""};
     }

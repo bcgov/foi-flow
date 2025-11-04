@@ -222,6 +222,10 @@ const BottomButtonGroup = React.memo(
             break;
           case StateEnum.recordsreadyforreview.name.toLowerCase():
             saveMinistryRequestObject.requeststatuslabel = StateEnum.recordsreadyforreview.label;
+            break;
+          case StateEnum.recordsintransit.name.toLowerCase():
+            saveMinistryRequestObject.requeststatuslabel = StateEnum.recordsintransit.label;
+            break;
         }
       }
     };
