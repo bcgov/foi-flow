@@ -818,6 +818,7 @@ export default function AttachmentModal({
                     attchmentFileNameList={attchmentFileNameList}
                     multipleFiles={multipleFiles}
                     mimeTypes={
+                      uploadFor === "record" ? ["*/*"] :
                       modalFor === "replaceattachment"
                         ? ["application/pdf", ".pdf"]
                         : mimeTypes
@@ -843,6 +844,7 @@ export default function AttachmentModal({
                   attchmentFileNameList={attchmentFileNameList}
                   multipleFiles={multipleFiles}
                   mimeTypes={
+                    uploadFor === "record" ? ["*/*"] :
                     modalFor === "replaceattachment"
                       ? ["application/pdf", ".pdf"]
                       : mimeTypes
