@@ -189,7 +189,7 @@ useEffect(() => {
       <div className="oi-assignment">
         <TextField
           id="assignedTo"
-          label={"IAO Assigned To"}
+          label={"FOI Ops Assigned To"}
           inputProps={{ "aria-labelledby": "assignedTo-label", readOnly: true }}
           InputLabelProps={{ shrink: true }}
           style={{ paddingBottom: "4%" }}

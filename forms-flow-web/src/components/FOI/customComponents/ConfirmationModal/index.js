@@ -269,7 +269,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
             <table className="table table-bordered table-assignedto" cellSpacing="0" cellPadding="0">
               <tbody>
                 <tr>
-                  <th scope="row">IAO Assigned To</th>
+                  <th scope="row">FOI Ops Assigned To</th>
                   <td>{assignedTo}</td>
                   {/* <td>{updatedAssignedTo}</td> */}
                 </tr>
