@@ -8,7 +8,7 @@ import { SF_KEY } from "../../../../constants/constants";
 import { registerLicense } from '@syncfusion/ej2-base';
 import { HeaderLogoBase64 } from '../../../../assets/FOI/images/HeaderLogoBase64';
 
-registerLicense(SF_KEY);
+registerLicense(SF_KEY); 
 DocumentEditorContainerComponent.Inject(Toolbar, SpellChecker);
 
 export const DocEditor = ({
