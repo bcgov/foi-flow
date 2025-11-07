@@ -166,7 +166,9 @@ useEffect(() => {
         classes, 
         assignedToList: iaoassignedToList?.filter((team: any) => team.name === 'OI Team'), 
         selectedAssignedTo: currentAssignee,
-        isIAORestrictedRequest: false 
+        isIAORestrictedRequest: false,
+        requestDetails,
+        isMinistry: false
       })
     );
   } else {

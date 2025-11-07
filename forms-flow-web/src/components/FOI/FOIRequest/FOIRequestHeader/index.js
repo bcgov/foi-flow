@@ -132,7 +132,7 @@ const FOIRequestHeader = React.memo(
 
     useEffect(() => {
       setMenuItems(
-        getMenuItems({ classes, assignedToList, selectedAssignedTo, isIAORestrictedRequest })
+        getMenuItems({ classes, assignedToList, selectedAssignedTo, isIAORestrictedRequest, requestDetails, isMinistry })
       );
     }, [selectedAssignedTo, assignedToList]);
 
