@@ -218,6 +218,7 @@ class requestservicegetter:
             'subjectCode': subjectcodeservice().getministrysubjectcodename(foiministryrequestid),
             'isofflinepayment': FOIMinistryRequest.getofflinepaymentflag(foiministryrequestid),
             'linkedRequests' : linkedministryrequests,
+            'linkedRequestsInfo' : FOIMinistryRequest.getlinkedrequestdetails(linkedministryrequests),
             'identityVerified':requestministry['identityverified'],
             'oistatusid':requestministry['oistatus_id'],
             'estimatedpagecount':requestministry['estimatedpagecount'],

@@ -132,6 +132,7 @@ import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIReq
 import RequestHistorySection from "../customComponents/RequestHistory";
 import { Fees } from "../customComponents/Fees";
 import OpenInfo from "./OpenInformation/OpenInfo";
+import LinkedRequests from "./LinkedRequests";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -1577,6 +1578,17 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         }
                         createSaveRequestObject={createSaveRequestObject}
                         disableInput={disableInput || isHistoricalRequest}
+                      />
+                      <LinkedRequests
+                        requestDetails={requestDetails}
+                        requestStatus={_requestStatus}
+                        handleRequestDetailsValue={handleRequestDetailsValue}
+                        handleRequestDetailsInitialValue={
+                          handleRequestDetailsInitialValue
+                        }
+                        createSaveRequestObject={createSaveRequestObject}
+                        disableInput={disableInput || isHistoricalRequest}
+                        isHistoricalRequest={isHistoricalRequest}
                       />
                       <RequestDetails
                         requestDetails={requestDetails}

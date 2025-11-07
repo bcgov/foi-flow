@@ -346,3 +346,7 @@ class requestservice:
     def getrequestsdetailsforsearch(self,requestnumbers):
         requestdetails = FOIMinistryRequest().getrequestsdetailsforsearch(requestnumbers)
         return requestdetails
+    
+    def findrequestids(self, search_text, axisrequestid, ministrycode):
+        raw_results = FOIRawRequest().getautofilllinkedrequestids(search_text, axisrequestid, ministrycode, 10)
+        return raw_results

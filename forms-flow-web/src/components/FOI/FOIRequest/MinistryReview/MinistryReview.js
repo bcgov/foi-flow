@@ -73,6 +73,7 @@ import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 import {isMinistryLogin} from "../../../../helper/FOI/helper";
 import OIPCDetails from "../OIPCDetails/Index";
 import { Fees } from "../../customComponents/Fees";
+import LinkedRequests from "./LinkedRequests";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -844,6 +845,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                         <ChildDetails requestDetails={requestDetails} />
                         <OnBehalfDetails requestDetails={requestDetails} />
                         <RequestDescription requestDetails={requestDetails} />
+                        <LinkedRequests requestDetails={requestDetails} />
                         <RequestDetails requestDetails={requestDetails} />
                         <AdditionalApplicantDetails
                           requestDetails={requestDetails}
