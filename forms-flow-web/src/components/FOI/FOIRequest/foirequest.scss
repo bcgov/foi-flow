@@ -225,3 +225,50 @@ height: fit-content;
         position: static
     }
 }
+
+// ul.linked-request-list {
+//   list-style-type: none;
+//   margin: 0;
+//   padding: 20px;
+// }
+
+.linked-request-list {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  max-height: calc(3 * 5.5rem); /* height for 3 vertical items, adjust 2.5rem if needed */
+  align-content: flex-start;
+  //gap: 0.5rem 1rem; /* vertical and horizontal spacing */
+  list-style: none;
+  padding: 20px;
+  margin: 0;
+}
+
+.linked-request-item {
+  display: flex;
+  align-items: center; /* vertically center icon & text */
+  justify-content: space-between;
+  //width: 10rem; /* width of each column */
+  box-sizing: border-box;
+}
+.linked-request-link {
+  color: #38598A;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.linked-request-link:hover {
+  text-decoration: underline;
+}
+
+.MuiAutocomplete-popper {
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.MuiAutocomplete-option {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+

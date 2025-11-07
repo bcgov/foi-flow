@@ -62,7 +62,7 @@ class rawrequestservicegetter:
             if self.__ispersonalrequest(requesttype):
                 baserequestinfo['additionalPersonalInfo'] = self.__prepareadditionalpersonalinfo(requestrawdata)
             return baserequestinfo
-        elif request != {} and request['version'] != 1 and  request['sourceofsubmission'] != "intake":       
+        elif request != {} and request['version'] != 1 and  request['sourceofsubmission'] != "intake":  
             request['requestrawdata']['currentState'] = request['status']
             request['requestrawdata']['requeststatuslabel'] =  request['requeststatuslabel']
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
@@ -70,6 +70,7 @@ class rawrequestservicegetter:
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
             request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
             request['requestrawdata']['isiaorestricted']= request['isiaorestricted'] if request['isiaorestricted'] is not None else False
+            request['requestrawdata']['linkedRequestsInfo'] = FOIRawRequest.getlinkedrawrequestdetails(request['linkedrequests'])
             return request['requestrawdata']
         elif request != {} and request['sourceofsubmission'] == "intake":
             requestrawdata = request['requestrawdata']
@@ -90,6 +91,7 @@ class rawrequestservicegetter:
             request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
             request['requestrawdata']['isiaorestricted']= request['isiaorestricted'] if request['isiaorestricted'] is not None else False
             request['requestrawdata']['assignedGroupEmail'] = self.__getassignedgroupemail(assignedgroup)
+            request['requestrawdata']['linkedRequestsInfo'] = FOIRawRequest.getlinkedrawrequestdetails(request['linkedrequests'])
             return request['requestrawdata']
         else:
             return None
@@ -153,6 +155,7 @@ class rawrequestservicegetter:
                                'axisRequestId': request['axisrequestid'],
                                'axisSyncDate': request['axissyncdate'],
                                'linkedRequests': request['linkedrequests'],
+                               'linkedRequestsInfo': FOIRawRequest.getlinkedrawrequestdetails(request['linkedrequests']),
                                'email': contactinfooptions['email'],
                                'phonePrimary': contactinfooptions['phonePrimary'],
                                'phoneSecondary': contactinfooptions['phoneSecondary'],

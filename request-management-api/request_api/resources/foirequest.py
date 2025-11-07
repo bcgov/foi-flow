@@ -372,3 +372,21 @@ class FOIRequestForDocReviewer(Resource):
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/linkrequests/<string:ministrycode>/axisrequestid/<string:axisrequestid>')
+class LinkedRequests(Resource):
+    
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(ministrycode, axisrequestid):
+        try:
+            search_text = request.args.get('q', '').strip()
+            print("search_text:",search_text)
+            results = requestservice().findrequestids(search_text, axisrequestid,ministrycode)
+            return results, 200
+        except Exception as ex:
+            print(ex)
+            return {'status': 500, 'message':"Invalid Request Id"}, 500

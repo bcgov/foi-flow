@@ -1193,6 +1193,73 @@ class FOIRawRequest(db.Model):
         return requests
 
 
+    @classmethod
+    def getautofilllinkedrequestids(cls, search_text, axisrequestid, ministrycode,limit):
+        try:
+            linked_request_data = (
+            db.session.query(FOIRawRequest.linkedrequests)
+            .filter_by(axisrequestid=axisrequestid)
+            .order_by(FOIRawRequest.version.desc())
+            .first()
+            )
+            linked_requests = []
+            if linked_request_data:
+                if isinstance(linked_request_data, str):
+                    linked_requests = json.loads(linked_request_data)
+                elif isinstance(linked_request_data, list):
+                    linked_requests = linked_request_data
+            axis_ids = [key for item in linked_requests for key in item.keys()]
+            axis_ids.append(axisrequestid)
+
+            results = (
+                db.session.query(FOIRawRequest.axisrequestid, FOIRawRequest.requestrawdata)
+                .distinct(FOIRawRequest.axisrequestid)
+                .filter(
+                    FOIRawRequest.axisrequestid.ilike(f"%{search_text}%"),
+                    ~FOIRawRequest.axisrequestid.in_(axis_ids)
+                )
+                .limit(limit)
+                .all()
+            )
+            result_list=[]
+            for axisrequestid, requestrawdata in results:
+                if "selectedMinistries" in requestrawdata and len(requestrawdata["selectedMinistries"]) > 0:
+                    ministry_code = requestrawdata["selectedMinistries"][0]["code"]
+                    formattedresult= {axisrequestid:ministry_code}
+                    result_list.append(formattedresult)
+
+            print("Results:", result_list)
+            return result_list
+        except Exception as ex:
+            logging.error(f"Error fetching linked request IDs: {ex}")
+            raise ex
+        finally:
+            db.session.close()   
+
+    @classmethod
+    def getlinkedrawrequestdetails(cls, linkedrequests):
+        linkedrequestsinfo = []
+        try:
+            if not linkedrequests:
+                return linkedrequestsinfo
+            axis_ids = [key for item in linkedrequests for key in item.keys()]
+            sql = """
+                SELECT DISTINCT ON (axisrequestid) requestid, axisrequestid
+                FROM public."FOIRawRequests"
+                WHERE axisrequestid IN :axis_ids
+                ORDER BY axisrequestid, version DESC;
+            """
+            params = {"axis_ids": tuple(axis_ids)}
+            rs = db.session.execute(text(sql), params)
+            for row in rs:
+                linkedrequestsinfo.append({"requestid": row["requestid"],  "axisrequestid": row["axisrequestid"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return linkedrequestsinfo
+
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:

@@ -1,0 +1,19 @@
+.linked-request-list {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  max-height: calc(3 * 5.5rem); /* height for 3 vertical items, adjust 2.5rem if needed */
+  align-content: flex-start;
+  gap: 0.5rem 2rem; /* vertical and horizontal spacing */
+  list-style: none;
+  padding: 20px;
+  margin: 0;
+}
+
+.linked-request-item {
+  display: flex;
+  align-items: center; /* vertically center icon & text */
+  justify-content: space-between;
+  //width: 10rem; /* width of each column */
+  box-sizing: border-box;
+}

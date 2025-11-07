@@ -1671,6 +1671,33 @@ class FOIMinistryRequest(db.Model):
         finally:
             db.session.close()
         return requestdetails
+
+    @classmethod
+    def getlinkedrequestdetails(cls, linkedrequests):
+        linkedrequestsinfo = []
+        try:
+            if not linkedrequests:
+                return linkedrequestsinfo
+            axis_ids = [key for item in linkedrequests for key in item.keys()]
+            sql = """
+                SELECT DISTINCT ON (axisrequestid) foirequest_id, foiministryrequestid, axisrequestid
+                FROM public."FOIMinistryRequests"
+                WHERE axisrequestid IN :axis_ids
+                ORDER BY axisrequestid, version DESC;
+            """
+            params = {"axis_ids": tuple(axis_ids)}
+            rs1 = db.session.execute(text(sql), params)
+            for row in rs1:
+                linkedrequestsinfo.append({"axisrequestid": row["axisrequestid"], "requestid": row["foirequest_id"], 
+                                           "ministryid":row["foiministryrequestid"] })
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return linkedrequestsinfo
+
+
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
         fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate',
