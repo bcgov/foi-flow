@@ -76,14 +76,13 @@ class ProcessingTeamWithKeycloackGroup(Enum):
     centralteam = "Central Team"
     justicehealthteam = "Justice Health Team"
     mcfdpersonalteam = "MCFD Personals Team"
-    resouceteam = "Resource Team"
     socialtechteam = "Social Education"
-    centraleconteam = "Central and Economy Team"
-    resourcejusticeteam = "Resource and Justice Team"
+    infrastructureteam = "Infrastructure Team"
+    resourceteam = "Resource Team"
     communityhealthteam = "Community and Health Team"
     childrenfamilyteam = "Children and Family Team"
     childreneducationteam = "Children and Education Team"
-    coordinatedresponseunit = "Coordinated Response Unit"
+    justiceteam = "Justice Team"
     bcpsteam = "BCPS Team"
 
     @staticmethod

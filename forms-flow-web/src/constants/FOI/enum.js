@@ -207,12 +207,11 @@ const KCProcessingTeams = [
   "MCFD Personals Team",
   "Resource Team",
   "Social Education",
-  "Central and Economy Team",
-  "Resource and Justice Team",
+  "Infrastructure Team",
   "Community and Health Team",
   "Children and Family Team",
   "Children and Education Team",
-  "Coordinated Response Unit",
+  "Justice Team",
   "BCPS Team"
 ];
 
