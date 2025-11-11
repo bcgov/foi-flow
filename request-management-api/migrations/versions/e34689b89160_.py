@@ -28,51 +28,51 @@ def upgrade():
     op.execute('''UPDATE public."OperatingTeams" SET isactive = true WHERE name = 'Resource Team';''') # Resource Team exists in DB, therefore reactivate
 
     # FOIRequestTeams Ministry Mapping
-    op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive)
-	select requesttype, requeststatusid, teamid, programareaid, isactive from
-	(select 'General' as requesttype, (select teamid from public."OperatingTeams" where name = 'Justice Team') as teamid, requeststatusid, true as isactive
+    op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
+	select requesttype, requeststatusid, teamid, programareaid, isactive, statuslabel from
+	(select 'General' as requesttype, (select teamid from public."OperatingTeams" where name = 'Justice Team') as teamid, requeststatusid, true as isactive, statuslabel
 	 from public."FOIRequestStatuses" where name in (
         'Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Harms Assessment','Response'
     )) sq,
 	(select programareaid from public."ProgramAreas" where iaocode in ('MAG', 'PSS', 'COR', 'IIO', 'OCC', 'CLB', 'GCP','FIN','TRA','TIC')) sq2
     ''')
-    op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive)
-	select requesttype, requeststatusid, teamid, programareaid, isactive from
-	(select 'Personal' as requesttype, (select teamid from public."OperatingTeams" where name = 'Justice Team') as teamid, requeststatusid, true as isactive
+    op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
+	select requesttype, requeststatusid, teamid, programareaid, isactive, statuslabel from
+	(select 'Personal' as requesttype, (select teamid from public."OperatingTeams" where name = 'Justice Team') as teamid, requeststatusid, true as isactive, statuslabel
 	 from public."FOIRequestStatuses" where name in (
         'Open','Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Deduplication','Harms Assessment','Response'
     )) sq,
 	(select programareaid from public."ProgramAreas" where iaocode in ('MAG', 'PSS', 'COR', 'IIO', 'OCC', 'CLB', 'GCP','FIN','TRA','TIC')) sq2
     ''')
 
-    op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive)
-	select requesttype, requeststatusid, teamid, programareaid, isactive from
-	(select 'General' as requesttype, (select teamid from public."OperatingTeams" where name = 'Infrastructure Team') as teamid, requeststatusid, true as isactive
+    op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
+	select requesttype, requeststatusid, teamid, programareaid, isactive, statuslabel from
+	(select 'General' as requesttype, (select teamid from public."OperatingTeams" where name = 'Infrastructure Team') as teamid, requeststatusid, true as isactive, statuslabel
 	 from public."FOIRequestStatuses" where name in (
         'Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Harms Assessment','Response'
     )) sq,
 	(select programareaid from public."ProgramAreas" where iaocode in ('OOP', 'LDB', 'PSA', 'JED', 'TAC', 'LBR', 'HSG','CTZ','AGR')) sq2
     ''')
-    op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive)
-	select requesttype, requeststatusid, teamid, programareaid, isactive from
-	(select 'Personal' as requesttype, (select teamid from public."OperatingTeams" where name = 'Infrastructure Team') as teamid, requeststatusid, true as isactive
+    op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
+	select requesttype, requeststatusid, teamid, programareaid, isactive, statuslabel from
+	(select 'Personal' as requesttype, (select teamid from public."OperatingTeams" where name = 'Infrastructure Team') as teamid, requeststatusid, true as isactive, statuslabel
 	 from public."FOIRequestStatuses" where name in (
         'Open','Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Deduplication','Harms Assessment','Response'
     )) sq,
 	(select programareaid from public."ProgramAreas" where iaocode in ('OOP', 'LDB', 'PSA', 'JED', 'TAC', 'LBR', 'HSG','CTZ','AGR')) sq2
     ''')
 
-    op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive)
-	select requesttype, requeststatusid, teamid, programareaid, isactive from
-	(select 'General' as requesttype, (select teamid from public."OperatingTeams" where name = 'Resource Team') as teamid, requeststatusid, true as isactive
+    op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
+	select requesttype, requeststatusid, teamid, programareaid, isactive, statuslabel from
+	(select 'General' as requesttype, (select teamid from public."OperatingTeams" where name = 'Resource Team') as teamid, requeststatusid, true as isactive, statuslabel
 	 from public."FOIRequestStatuses" where name in (
         'Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Harms Assessment','Response'
     )) sq,
 	(select programareaid from public."ProgramAreas" where iaocode in ('MCM', 'WLR', 'FOR', 'ECS', 'MOE', 'EAO', 'EMC','DAS','IRR')) sq2
     ''')
-    op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive)
-	select requesttype, requeststatusid, teamid, programareaid, isactive from
-	(select 'Personal' as requesttype, (select teamid from public."OperatingTeams" where name = 'Resource Team') as teamid, requeststatusid, true as isactive
+    op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
+	select requesttype, requeststatusid, teamid, programareaid, isactive, statuslabel from
+	(select 'Personal' as requesttype, (select teamid from public."OperatingTeams" where name = 'Resource Team') as teamid, requeststatusid, true as isactive, statuslabel
 	 from public."FOIRequestStatuses" where name in (
         'Open','Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Deduplication','Harms Assessment','Response'
     )) sq,
