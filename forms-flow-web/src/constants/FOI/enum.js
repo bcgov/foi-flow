@@ -207,10 +207,13 @@ const KCProcessingTeams = [
   "MCFD Personals Team",
   "Resource Team",
   "Social Education",
+  "Central and Economy Team", // To remove
+  "Resource and Justice Team", // To remove
   "Infrastructure Team",
   "Community and Health Team",
   "Children and Family Team",
   "Children and Education Team",
+  "Coordinated Response Unit", // To remove
   "Justice Team",
   "BCPS Team"
 ];

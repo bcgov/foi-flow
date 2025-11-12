@@ -18,9 +18,9 @@ depends_on = None
 
 def upgrade():
     # Deactivate old teams
-    op.execute('''UPDATE public."OperatingTeams" SET isactive = false WHERE name = 'Coordinated Response Unit';''')
-    op.execute('''UPDATE public."OperatingTeams" SET isactive = false WHERE name = 'Central and Economy Team';''')
-    op.execute('''UPDATE public."OperatingTeams" SET isactive = false WHERE name = 'Resource and Justice Team';''')
+    # op.execute('''UPDATE public."OperatingTeams" SET isactive = false WHERE name = 'Coordinated Response Unit';''')
+    # op.execute('''UPDATE public."OperatingTeams" SET isactive = false WHERE name = 'Central and Economy Team';''')
+    # op.execute('''UPDATE public."OperatingTeams" SET isactive = false WHERE name = 'Resource and Justice Team';''')
 
     # Create new teams
     op.execute('''INSERT INTO public."OperatingTeams" (name, description, type, isactive) VALUES ('Justice Team', 'Justice Team', 'iao', true);''')
@@ -80,9 +80,9 @@ def upgrade():
     ''')
 
     # Deactivate FOIRequestTeam mapping for old teams
-    op.execute('''UPDATE public."FOIRequestTeams" SET isactive = false WHERE teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Central and Economy Team');''')
-    op.execute('''UPDATE public."FOIRequestTeams" SET isactive = false WHERE teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Resource and Justice Team');''')
-    op.execute('''UPDATE public."FOIRequestTeams" SET isactive = false WHERE teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Coordinated Response Unit');''')
+    # op.execute('''UPDATE public."FOIRequestTeams" SET isactive = false WHERE teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Central and Economy Team');''')
+    # op.execute('''UPDATE public."FOIRequestTeams" SET isactive = false WHERE teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Resource and Justice Team');''')
+    # op.execute('''UPDATE public."FOIRequestTeams" SET isactive = false WHERE teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Coordinated Response Unit');''')
 
     # Template Operating Team Email adjustments
     op.execute('''UPDATE public."OperatingTeamEmails" SET teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Infrastructure Team') WHERE email_address = 'IAO.CentralAndEconomyTeam@gov.bc.ca';''')
@@ -101,9 +101,9 @@ def downgrade():
     op.execute('''UPDATE public."OperatingTeamEmails" SET teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Resource and Justice Team')  WHERE email_address = 'IAOResourceTeam@gov.bc.ca';''')
     op.execute('''UPDATE public."OperatingTeamEmails" SET teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Coordinated Response Unit') WHERE email_address = 'IAO.CoordinatedResponseUnit@gov.bc.ca';''')
 
-    op.execute('''UPDATE public."FOIRequestTeams" SET isactive = true WHERE teamid = (SELECT teamid from public."OperatingTeams" WHERE name = 'Central and Economy Team');''')
-    op.execute('''UPDATE public."FOIRequestTeams" SET isactive = true WHERE teamid = (SELECT teamid from public."OperatingTeams" WHERE name = 'Resource and Justice Team');''')
-    op.execute('''UPDATE public."FOIRequestTeams" SET isactive = true WHERE teamid = (SELECT teamid from public."OperatingTeams" WHERE name = 'Coordinated Response Unit');''')
+    # op.execute('''UPDATE public."FOIRequestTeams" SET isactive = true WHERE teamid = (SELECT teamid from public."OperatingTeams" WHERE name = 'Central and Economy Team');''')
+    # op.execute('''UPDATE public."FOIRequestTeams" SET isactive = true WHERE teamid = (SELECT teamid from public."OperatingTeams" WHERE name = 'Resource and Justice Team');''')
+    # op.execute('''UPDATE public."FOIRequestTeams" SET isactive = true WHERE teamid = (SELECT teamid from public."OperatingTeams" WHERE name = 'Coordinated Response Unit');''')
 
     op.execute('''DELETE FROM public."FOIRequestTeams" WHERE teamid in
     (SELECT teamid FROM public."OperatingTeams" WHERE name in ('Infrastructure Team', 'Justice Team'));''')
@@ -113,6 +113,6 @@ def downgrade():
     op.execute('''DELETE FROM public."OperatingTeams" WHERE name = 'Infrastructure Team';''')
     op.execute('''UPDATE public."OperatingTeams" SET isactive = false WHERE name = 'Resource Team';''')
 
-    op.execute('''UPDATE public."OperatingTeams" SET isactive = true WHERE name = 'Coordinated Response Unit';''')
-    op.execute('''UPDATE public."OperatingTeams" SET isactive = true WHERE name = 'Central and Economy Team';''')
-    op.execute('''UPDATE public."OperatingTeams" SET isactive = true WHERE name = 'Resource and Justice Team';''')
+    # op.execute('''UPDATE public."OperatingTeams" SET isactive = true WHERE name = 'Coordinated Response Unit';''')
+    # op.execute('''UPDATE public."OperatingTeams" SET isactive = true WHERE name = 'Central and Economy Team';''')
+    # op.execute('''UPDATE public."OperatingTeams" SET isactive = true WHERE name = 'Resource and Justice Team';''')
