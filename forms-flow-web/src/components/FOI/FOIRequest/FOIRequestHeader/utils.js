@@ -1,7 +1,7 @@
 import MenuItem from "@material-ui/core/MenuItem";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import { StateEnum } from "../../../../constants/FOI/statusEnum";
-import { COMMUNITY_AND_HEALTH_MINISTRIES, JUSTICE_TEAM_MINISTRIES, ECONOMY_TEAM_MINISTRIES } from "../../../../constants/constants";
+import { COMMUNITY_AND_HEALTH_MINISTRIES, JUSTICE_TEAM_MINISTRIES, INFRASTRUCTURE_TEAM_MINISTRIES, RESOURCE_TEAM_MINISTRIES } from "../../../../constants/constants";
 
 export const getFullName = (lastName, firstName, username) => {
   return firstName !== "" ? `${lastName}, ${firstName}` : username;
@@ -24,16 +24,19 @@ export const getMenuItems = ({
     if (ministry.code === "MCF") mcfSelected = true
   })
 
-  const listCommunityAndHealthTeamFirst = !isMinistry && COMMUNITY_AND_HEALTH_MINISTRIES.includes(bcgovcode)
-  const listJusticeTeamFirst = !isMinistry && JUSTICE_TEAM_MINISTRIES.includes(bcgovcode)
-  const listEconomyTeamFirst = !isMinistry && ECONOMY_TEAM_MINISTRIES.includes(bcgovcode)
-  const listChildrenAndFamilyTeamFirst = !isMinistry && requestType === 'personal' && mcfSelected
+  const listCommunityAndHealthTeamFirst = !isMinistry && COMMUNITY_AND_HEALTH_MINISTRIES.includes(bcgovcode);
+  const listJusticeTeamFirst = !isMinistry && JUSTICE_TEAM_MINISTRIES.includes(bcgovcode);
+  const listInfrastructureTeamFirst = !isMinistry && INFRASTRUCTURE_TEAM_MINISTRIES.includes(bcgovcode);
+  const listResourceTeamFirst = !isMinistry && RESOURCE_TEAM_MINISTRIES.includes(bcgovcode);
+  const listChildrenAndFamilyTeamFirst = !isMinistry && requestType === 'personal' && mcfSelected;
   if (listCommunityAndHealthTeamFirst) {
     assignedToList.sort((a, b) => a.name == "Community and Health Team" ? -1 : 0)
   } else if (listJusticeTeamFirst) {
     assignedToList.sort((a, b) => a.name == "Justice Team" ? -1 : 0)
-  } else if (listEconomyTeamFirst) {
-    assignedToList.sort((a, b) => a.name == "Economy Team" ? -1 : 0)
+  } else if (listInfrastructureTeamFirst) {
+    assignedToList.sort((a, b) => a.name == "Infrastructure Team" ? -1 : 0)
+  } else if (listResourceTeamFirst) {
+    assignedToList.sort((a, b) => a.name == "Resource Team" ? -1 : 0)
   } else if (listChildrenAndFamilyTeamFirst) {
     assignedToList.sort((a, b) => a.name == "Children and Family Team" ? -1 : 0)
   }
