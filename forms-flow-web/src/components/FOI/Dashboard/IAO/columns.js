@@ -84,6 +84,13 @@ const ProcessingTeamColumns = [
     // sortable: false,
   },
   {
+    field: "cfrduedate",
+    headerName: "CFR DUE",
+    flex: 1,
+    headerAlign: "left",
+    valueGetter: (params) => formatDate(params.row.cfrduedate, "MMM dd yyyy").toUpperCase(),
+  },
+  {
     field: "extensions",
     headerName: "EXT.",
     headerAlign: "left",
