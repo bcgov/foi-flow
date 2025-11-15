@@ -24,7 +24,7 @@ def upgrade():
 
     # Create new teams
     op.execute('''INSERT INTO public."OperatingTeams" (name, description, type, isactive) VALUES ('Justice Team', 'Justice Team', 'iao', true);''')
-    op.execute('''INSERT INTO public."OperatingTeams" (name, description, type, isactive) VALUES ('Infrastructure Team', 'Infrastructure Team', 'iao', true);''')
+    op.execute('''INSERT INTO public."OperatingTeams" (name, description, type, isactive) VALUES ('Industry Team', 'Industry Team', 'iao', true);''')
     op.execute('''UPDATE public."OperatingTeams" SET isactive = true WHERE name = 'Resource Team';''') # Resource Team exists in DB, therefore reactivate
 
     # FOIRequestTeams Ministry Mapping
@@ -47,7 +47,7 @@ def upgrade():
 
     op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
 	select requesttype, requeststatusid, teamid, programareaid, isactive, statuslabel from
-	(select 'General' as requesttype, (select teamid from public."OperatingTeams" where name = 'Infrastructure Team') as teamid, requeststatusid, true as isactive, statuslabel
+	(select 'General' as requesttype, (select teamid from public."OperatingTeams" where name = 'Industry Team') as teamid, requeststatusid, true as isactive, statuslabel
 	 from public."FOIRequestStatuses" where name in (
         'Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Harms Assessment','Response'
     )) sq,
@@ -55,7 +55,7 @@ def upgrade():
     ''')
     op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
 	select requesttype, requeststatusid, teamid, programareaid, isactive, statuslabel from
-	(select 'Personal' as requesttype, (select teamid from public."OperatingTeams" where name = 'Infrastructure Team') as teamid, requeststatusid, true as isactive, statuslabel
+	(select 'Personal' as requesttype, (select teamid from public."OperatingTeams" where name = 'Industry Team') as teamid, requeststatusid, true as isactive, statuslabel
 	 from public."FOIRequestStatuses" where name in (
         'Open','Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Deduplication','Harms Assessment','Response'
     )) sq,
@@ -85,7 +85,7 @@ def upgrade():
     # op.execute('''UPDATE public."FOIRequestTeams" SET isactive = false WHERE teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Coordinated Response Unit');''')
 
     # Template Operating Team Email adjustments
-    op.execute('''UPDATE public."OperatingTeamEmails" SET teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Infrastructure Team') WHERE email_address = 'IAO.CentralAndEconomyTeam@gov.bc.ca';''')
+    op.execute('''UPDATE public."OperatingTeamEmails" SET teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Industry Team') WHERE email_address = 'IAO.CentralAndEconomyTeam@gov.bc.ca';''')
     op.execute('''UPDATE public."OperatingTeamEmails" SET teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Resource Team') WHERE email_address = 'IAOResourceTeam@gov.bc.ca';''')
     op.execute('''UPDATE public."OperatingTeamEmails" SET teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Justice Team') WHERE email_address = 'IAO.CoordinatedResponseUnit@gov.bc.ca';''')
 
@@ -106,11 +106,11 @@ def downgrade():
     # op.execute('''UPDATE public."FOIRequestTeams" SET isactive = true WHERE teamid = (SELECT teamid from public."OperatingTeams" WHERE name = 'Coordinated Response Unit');''')
 
     op.execute('''DELETE FROM public."FOIRequestTeams" WHERE teamid in
-    (SELECT teamid FROM public."OperatingTeams" WHERE name in ('Infrastructure Team', 'Justice Team'));''')
+    (SELECT teamid FROM public."OperatingTeams" WHERE name in ('Industry Team', 'Justice Team'));''')
     op.execute('''DELETE FROM public."FOIRequestTeams" WHERE teamid = (SELECT teamid FROM public."OperatingTeams" WHERE name = 'Resource Team') AND isactive = true;''')
 
     op.execute('''DELETE FROM public."OperatingTeams" WHERE name = 'Justice Team';''')
-    op.execute('''DELETE FROM public."OperatingTeams" WHERE name = 'Infrastructure Team';''')
+    op.execute('''DELETE FROM public."OperatingTeams" WHERE name = 'Industry Team';''')
     op.execute('''UPDATE public."OperatingTeams" SET isactive = false WHERE name = 'Resource Team';''')
 
     # op.execute('''UPDATE public."OperatingTeams" SET isactive = true WHERE name = 'Coordinated Response Unit';''')

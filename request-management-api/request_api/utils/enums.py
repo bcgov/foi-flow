@@ -92,7 +92,7 @@ class ProcessingTeamWithKeycloackGroup(Enum):
     socialtechteam = "Social Education"
     centraleconteam = "Central and Economy Team" # To remove
     resourcejusticeteam = "Resource and Justice Team" # To remove
-    infrastructureteam = "Infrastructure Team"
+    industryteam = "Industry Team"
     resourceteam = "Resource Team"
     communityhealthteam = "Community and Health Team"
     childrenfamilyteam = "Children and Family Team"

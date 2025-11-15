@@ -209,7 +209,7 @@ const KCProcessingTeams = [
   "Social Education",
   "Central and Economy Team", // To remove
   "Resource and Justice Team", // To remove
-  "Infrastructure Team",
+  "Industry Team",
   "Community and Health Team",
   "Children and Family Team",
   "Children and Education Team",
