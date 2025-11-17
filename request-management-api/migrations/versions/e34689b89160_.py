@@ -34,7 +34,7 @@ def upgrade():
 	 from public."FOIRequestStatuses" where name in (
         'Open','Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Harms Assessment','Response'
     )) sq,
-	(select programareaid from public."ProgramAreas" where iaocode in ('AG', 'PSSG', 'COR', 'IIO', 'OCC', 'CLB', 'GCP','FIN','TRAN','TIC')) sq2
+	(select programareaid from public."ProgramAreas" where iaocode in ('MAG', 'PSS', 'COR', 'IIO', 'OCC', 'CLB', 'GCP','FIN','TRA','TIC')) sq2
     ''')
     op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
 	select requesttype, requeststatusid, teamid, programareaid, isactive, statuslabel from
@@ -42,7 +42,7 @@ def upgrade():
 	 from public."FOIRequestStatuses" where name in (
         'Open','Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Deduplication','Harms Assessment','Response'
     )) sq,
-	(select programareaid from public."ProgramAreas" where iaocode in ('AG', 'PSSG', 'COR', 'IIO', 'OCC', 'CLB', 'GCP','FIN','TRAN','TIC')) sq2
+	(select programareaid from public."ProgramAreas" where iaocode in ('MAG', 'PSS', 'COR', 'IIO', 'OCC', 'CLB', 'GCP','FIN','TRA','TIC')) sq2
     ''')
 
     op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
@@ -51,7 +51,7 @@ def upgrade():
 	 from public."FOIRequestStatuses" where name in (
         'Open','Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Harms Assessment','Response'
     )) sq,
-	(select programareaid from public."ProgramAreas" where iaocode in ('OOP', 'LDB', 'PSA', 'JED', 'TACS', 'LBR', 'HSG','CITZ','AGR')) sq2
+	(select programareaid from public."ProgramAreas" where iaocode in ('OOP', 'LDB', 'PSA', 'JED', 'TAC', 'LBR', 'HSG','CTZ','AGR')) sq2
     ''')
     op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
 	select requesttype, requeststatusid, teamid, programareaid, isactive, statuslabel from
@@ -59,7 +59,7 @@ def upgrade():
 	 from public."FOIRequestStatuses" where name in (
         'Open','Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Deduplication','Harms Assessment','Response'
     )) sq,
-	(select programareaid from public."ProgramAreas" where iaocode in ('OOP', 'LDB', 'PSA', 'JED', 'TACS', 'LBR', 'HSG','CITZ','AGR')) sq2
+	(select programareaid from public."ProgramAreas" where iaocode in ('OOP', 'LDB', 'PSA', 'JED', 'TAC', 'LBR', 'HSG','CTZ','AGR')) sq2
     ''')
 
     op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
@@ -68,7 +68,7 @@ def upgrade():
 	 from public."FOIRequestStatuses" where name in (
         'Open','Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Harms Assessment','Response'
     )) sq,
-	(select programareaid from public."ProgramAreas" where iaocode in ('MCM', 'WLR', 'FOR', 'ECS', 'ENV', 'EAO', 'EMC','DAS','IRR')) sq2
+	(select programareaid from public."ProgramAreas" where iaocode in ('MCM', 'WLR', 'FOR', 'ECS', 'MOE', 'EAO', 'EMC','DAS','IRR')) sq2
     ''')
     op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
 	select requesttype, requeststatusid, teamid, programareaid, isactive, statuslabel from
@@ -76,7 +76,7 @@ def upgrade():
 	 from public."FOIRequestStatuses" where name in (
         'Open','Call For Records','Closed','Records Review','Fee Estimate','Consult','Ministry Sign Off','On Hold','Deduplication','Harms Assessment','Response'
     )) sq,
-	(select programareaid from public."ProgramAreas" where iaocode in ('MCM', 'WLR', 'FOR', 'ECS', 'ENV', 'EAO', 'EMC','DAS','IRR')) sq2
+	(select programareaid from public."ProgramAreas" where iaocode in ('MCM', 'WLR', 'FOR', 'ECS', 'MOE', 'EAO', 'EMC','DAS','IRR')) sq2
     ''')
 
     # Deactivate FOIRequestTeam mapping for old teams
