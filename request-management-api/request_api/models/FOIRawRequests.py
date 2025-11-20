@@ -835,6 +835,7 @@ class FOIRawRequest(db.Model):
     def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
         basequery = FOIRawRequest.getbasequery(None, userid, isiaorestrictedfilemanager)
         basequery = basequery.add_columns(literal(None).label('closereason'))
+        basequery  = basequery.add_columns(literal(None).label('oistatusid'))
 
         #filter/search
         filtercondition = FOIRawRequest.getfilterforadvancedsearch(params)

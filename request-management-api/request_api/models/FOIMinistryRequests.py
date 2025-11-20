@@ -110,6 +110,9 @@ class FOIMinistryRequest(db.Model):
     subjectcode = relationship('FOIMinistryRequestSubjectCode', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIMinistryRequestSubjectCode.foiministryrequestid, "
                         "FOIMinistryRequest.version==FOIMinistryRequestSubjectCode.foiministryrequestversion)") 
     isofflinepayment = db.Column(db.Boolean, unique=False, nullable=True,default=False)
+    foiopeninforequest = relationship('FOIOpenInformationRequest', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIOpenInformationRequest.foiministryrequest_id, "
+                        "FOIMinistryRequest.version==FOIOpenInformationRequest.foiministryrequestversion_id)") 
+    
 
     isoipcreview = db.Column(db.Boolean, unique=False, nullable=True,default=False)
     oistatus_id = db.Column(db.Integer, ForeignKey('OpenInformationStatuses.oistatusid'), unique=False, nullable=True)
@@ -1225,7 +1228,8 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.isoipcreview.label('isoipcreview'),
             FOIMinistryRequest.isphasedrelease.label('isphasedrelease'),
             literal(None).label('oipc_number'),
-            CloseReason.name.label('closereason')
+            CloseReason.name.label('closereason'),
+            FOIMinistryRequest.oistatus_id.label('oistatusid'),
         ]
 
         basequery = _session.query(
