@@ -31,12 +31,11 @@ class openinfoservice:
     
     def createopeninforequest(self, foirequestschema, userid, foiministryrequest, publish=True):
         foiministryrequestid = foiministryrequest.foiministryrequestid
-        current_oirequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
-        if foirequestschema["requestType"] == 'general' and foirequestschema["selectedMinistries"][0]["code"].upper() not in SKIP_OPENINFO_MINISTRIES and current_oirequest == {}:
+        if foirequestschema["requestType"] == 'general' and foirequestschema["selectedMinistries"][0]["code"].upper() not in SKIP_OPENINFO_MINISTRIES:
             if publish:
                 default_foiopeninforequest = {
                     "oipublicationstatus_id": 2,
-                    "receiveddate": datetime.now(pytz.timezone('America/Vancouver')).strftime('%Y-%m-%d %H:%M:%S'),
+                    "receiveddate": foirequestschema["closedate"],
                 }
             else:
                 default_foiopeninforequest = {

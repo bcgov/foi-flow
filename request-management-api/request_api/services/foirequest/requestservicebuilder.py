@@ -86,18 +86,27 @@ class requestservicebuilder(requestserviceconfigurator):
         oistatusid = self.getpropertyvaluefromschema(requestschema, 'oistatusid')
         foiministryrequest.oistatus_id = oistatusid
         
-        # Create new FOIOpenInfoRequest after FOIMinistryRequest has successfully been closed and if no other FOIOpenInfoRequest exists in DB (ie. through OI exemption flow)
-        if 'closereasonid' in requestschema and requestschema['closereasonid'] in (4,7):
-            openinfoservice().createopeninforequest(requestschema, userid, foiministryrequest)
-        # If closed reason is not Full Disclosure or Partial Disclosure, and request is general request + not in excluded ministires => adjust foiopeninforequest to do not publish
-        if 'closereasonid' in requestschema and requestschema['closereasonid'] not in (4,7):
-            current_foiopeninforequest = openinfoservice().getcurrentfoiopeninforequest(ministryid)
-            if current_foiopeninforequest != {}:
-                foiopeninforequest = current_foiopeninforequest
+        # First instance of FOIOpeninformation data is created either when: A) An exemption request is created via "Publication Tab" B) A request is closed and no exemption request has been made previously
+        current_foiopeninforequest = openinfoservice().getcurrentfoiopeninforequest(ministryid)
+        foiopeninforequest = current_foiopeninforequest
+        request_closed_for_publishing = 'closereasonid' in requestschema and requestschema['closereasonid'] in (4,7)
+        request_closed_for_nonpublishing = 'closereasonid' in requestschema and requestschema['closereasonid'] not in (4,7)
+        if request_closed_for_publishing:
+            # Update FOIOpenInformation receivedate when request is closed with Full Disclosure or Partial Disclosure and current FoiOpenInfoRequest is set to Publish
+            if current_openinforequest != {} and current_foiopeninforequest["oipublicationstatus_id"] == 2:
+                foiopeninforequest["receiveddate"] = self.getpropertyvaluefromschema(requestschema, 'closedate')
+                openinfoservice().updateopeninforequest(foiopeninforequest, userid, ministryid, foiopeninforequest["oiassignedto"])
+            # Create new FOIOpenInfoRequest (as publish) after FOIMinistryRequest has successfully been closed and if no other FOIOpenInfoRequest exists in DB (ie. through OI exemption flow)
+            if current_openinforequest == {}:
+                openinfoservice().createopeninforequest(requestschema, userid, foiministryrequest)
+        if request_closed_for_nonpublishing:
+            # Update FOIOpenInformation request to do not publish when a request has been closed as not Full Disclosure or Partial Disclosure and current FoiOpenInfoRequest is set to Publish
+            if current_foiopeninforequest != {} and current_foiopeninforequest["oipublicationstatus_id"] == 2:
                 foiopeninforequest['oipublicationstatus_id'] = 1
                 foiopeninforequest['oiexemption_id'] = 5
                 openinfoservice().updateopeninforequest(foiopeninforequest, userid, ministryid, foiopeninforequest["oiassignedto"])
-            else: 
+            # Create new FOIOpenInfoRequest (as do not publish) after FOIMinistryRequest has successfully been closed as not Full Disclosure or Partial Disclosure and if no other FOIOpenInfoRequest exists in DB (ie. through OI exemption flow)
+            if current_openinforequest == {}:
                 openinfoservice().createopeninforequest(requestschema, userid, foiministryrequest, False)
 
         foiministryrequest.closedate = self.getpropertyvaluefromschema(requestschema, 'closedate')
