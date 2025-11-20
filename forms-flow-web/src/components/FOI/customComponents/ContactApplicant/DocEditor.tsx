@@ -9,7 +9,7 @@ import { registerLicense } from '@syncfusion/ej2-base';
 import { HeaderLogoBase64 } from '../../../../assets/FOI/images/HeaderLogoBase64';
 import { SKIP_HEADERFOOTER_INSERT } from '../../../../constants/constants'
 
-registerLicense(SF_KEY);
+registerLicense(SF_KEY); 
 DocumentEditorContainerComponent.Inject(Toolbar, SpellChecker);
 
 export const DocEditor = ({

@@ -140,7 +140,7 @@ const RequestHeader = React.memo(({
                 <div className="foi-assignee-dropdown">
                     <TextField
                         id="assignedTo"
-                        label="IAO Assigned To"
+                        label="FOI Ops Assigned To"
                         InputLabelProps={{ shrink: true, }}                              
                         value={assignedToValue}                    
                         input={<InputLabel />} 
