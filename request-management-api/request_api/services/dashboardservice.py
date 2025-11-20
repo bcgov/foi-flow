@@ -4,6 +4,7 @@ from request_api.models.FOIRestrictedMinistryRequests import FOIRestrictedMinist
 from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
 from request_api.models.FOIRequestWatchers import FOIRequestWatcher
 from request_api.models.FOIOpenInformationRequests import FOIOpenInformationRequests
+from request_api.utils.enums import OIStatusEnum
 from dateutil import tz, parser
 import datetime as dt
 from pytz import timezone
@@ -188,8 +189,10 @@ class dashboardservice:
 
     def advancedsearch(self, params={'usertype': 'iao', 'groups':None, 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'requestflags':[], 'publicbody':[], 'daterangetype':None, 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
         userid = AuthHelper.getuserid()
+        is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
 
         if (params['usertype'] == "iao"):
+            #HERE -> SEND IN IS OI TEAM to below fn AND GATHER oi received date, publicaiton date, oi assigned to from foioi table
             requests = FOIRawRequest.advancedsearch(params, userid, AuthHelper.isiaorestrictedfilemanager())
         else:
             requests = FOIMinistryRequest.advancedsearch(params, userid, AuthHelper.isministryrestrictedfilemanager())
@@ -207,7 +210,13 @@ class dashboardservice:
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 unopenrequest.update({'isiaorestricted': request.isiaorestricted})
                 unopenrequest.update({'closereason': request.closereason})
-
+                print("UNOPEN", unopenrequest)
+                print("reqeust_unopened", request)
+                if is_oi_team:
+                    unopenrequest.update({'receivedDate': None})
+                    unopenrequest.update({'applicantType': request.applicantcategory})
+                    unopenrequest.update({'fromClosed': "N/A"})
+                    unopenrequest.update({'assignedTo': None})
                 requestqueue.append(unopenrequest)
             else:
                 _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
@@ -220,7 +229,34 @@ class dashboardservice:
                 isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
                 _openrequest.update({'isiaorestricted': isiaorestricted})
                 _openrequest.update({'closereason': request.closereason})
-
+                print("OPEN_up", _openrequest)
+                print("reqeust_open", request)
+                if is_oi_team:
+                    oistatusid = request.oistatusid
+                    match oistatusid:
+                        case OIStatusEnum.FIRST_REVIEW.value:
+                            _openrequest.update({'publicationStatus': "First Review"})
+                        case OIStatusEnum.PEER_REVIEW.value:
+                            _openrequest.update({'publicationStatus': "Peer Review"})
+                        case OIStatusEnum.READY_TO_PUBLISH.value:
+                            _openrequest.update({'publicationStatus': "Ready to Publish"})
+                        case OIStatusEnum.PUBLISHED.value:
+                            _openrequest.update({'publicationStatus': "Published"})
+                        case OIStatusEnum.HOLD_PUBLICATION.value:
+                            _openrequest.update({'publicationStatus': "HOLD Publication"})
+                        case OIStatusEnum.UNPUBLISHED.value:
+                            _openrequest.update({'publicationStatus': "Unpublished"})
+                        case OIStatusEnum.DO_NOT_PUBLISH.value:
+                            _openrequest.update({'publicationStatus': "Do Not Publish"})
+                        case OIStatusEnum.EXEMPTION_REQUEST.value:
+                            _openrequest.update({'publicationStatus': "Exemption Request"})
+                        case _:
+                            _openrequest.update({'publicationStatus': "unopened"})
+                    _openrequest.update({'receivedDate': None})
+                    _openrequest.update({'fromClosed': self.__calculate_from_closed(request.closedate)})
+                    _openrequest.update({'applicantType': request.applicantcategory})
+                    # _openrequest.update({'publicationDate': request.publicationDate})
+                    # _openrequest.update({'assignedTo': request.oiassingedTo})
                 requestqueue.append(_openrequest)
 
         meta = {
@@ -244,7 +280,7 @@ class dashboardservice:
     
     def oiadvancedsearch(self, params={'usertype': 'iao', 'groups':[], 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'requestflags':[], 'publicbody':[], 'daterangetype':None, 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
         userid = AuthHelper.getuserid()
-
+        # HERE -> is_oi_team will always be true in this fn
         is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
         
         if is_oi_team:

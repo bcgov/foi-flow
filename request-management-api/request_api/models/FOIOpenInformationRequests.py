@@ -160,13 +160,6 @@ class FOIOpenInformationRequests(db.Model):
             FOIOpenInformationRequests.isactive == True
         ]
 
-        #aliase for onbehalf of applicant info
-        onbehalf_applicantmapping = aliased(FOIRequestApplicantMapping)
-        onbehalf_applicant = aliased(FOIRequestApplicant)
-
-        #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
-        ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
-
         recordspagecount = case ([
             (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
             ],
