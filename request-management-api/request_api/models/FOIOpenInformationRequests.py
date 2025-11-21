@@ -115,6 +115,7 @@ class FOIOpenInformationRequests(db.Model):
                     isactive=True,
                     created_at=createddate,
                     createdby=userid,
+                    sitemap_pages=openinfo["sitemap_pages"]
                 )
                 db.session.add(updated_foiopeninforequest)
                 db.session.commit()
@@ -282,9 +283,9 @@ class FOIOpenInformationRequests(db.Model):
             basequery = basequery.filter(
                     cls.oiassignedto.is_(None),                         
             )
-            
-        elif additionalfilter == 'teamRequests':
-            pass
+
+        elif additionalfilter is not None and additionalfilter.lower() == 'all':
+            basequery = basequery.filter(cls.oiassignedto != None)
         
         return basequery
 

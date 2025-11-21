@@ -31,7 +31,7 @@ import { getTemplateVariables } from './util';
 import { DownloadCorrespondenceModal } from './DownloadCorrespondenceModal';
 import { getCorrespondenceSubject, getFullEmailListText, getFullCCEmailListText } from './helper';
 import { exportPDF } from '../../../../apiManager/services/FOI/foiCorrespondenceServices';
-import DOMPurify from 'dompurify'; 
+import { ShadowHtmlComponent } from './ShadowHtmlComponent';
 
 const CommunicationStructure = ({
   correspondence, 
@@ -96,13 +96,7 @@ const CommunicationStructure = ({
     // }
     // else {
       if (correspondence.text) {
-        // Sanitize HTML to remove style tags and attributes that could change CSS
-        const sanitizedText = DOMPurify.sanitize(correspondence.text, {
-          FORBID_TAGS: ['style'],
-          FORBID_ATTR: ['style'],
-          ALLOW_DATA_ATTR: false
-        });
-        markup = `<p>${sanitizedText}</p>`
+        markup = `<p>${correspondence.text}</p>`
       } else {
         markup = `<p></p>`
       }
@@ -524,8 +518,7 @@ if (correspondence?.is_sent_successfully == false) labelText = 'failed to send e
               </div>
           </AccordionSummary>
           <AccordionDetails>
-            <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent() }} >
-            </div>
+            <ShadowHtmlComponent html={getHtmlfromRawContent()} />
             {correspondence && correspondence.attachments?.map((attachment, index) => (
             <div className="email-attachment-item" key={attachment.applicantcorrespondenceattachmentid + attachment.filename}>
               <a href={`/foidocument?id=${ministryId}&filepath=${attachment.documenturipath.split('/').slice(4).join('/')}`} target="_blank">{attachment.filename}</a>

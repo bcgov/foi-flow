@@ -9,6 +9,7 @@ import "./openinfo.scss";
 import { OIPublicationStatus, OITransactionObject } from "./types";
 import { OIStates, OIPublicationStatuses, OIExemptions } from "../../../../helper/openinfo-helper";
 import { calculateDaysRemaining, addBusinessDays, addBusinessDaysToDate, calculateBusinessDaysBetween } from "../../../../helper/FOI/helper";
+import Loading from "../../../../containers/Loading";
 
 const OpenInfo = ({
   requestNumber,
@@ -96,6 +97,12 @@ const OpenInfo = ({
           confirmationData: value,
         }));
       }
+      else {
+        setOiPublicationData((prev: any) => ({
+          ...prev,
+          [oiDataKey]: value,
+        }));
+      }
     } else {
       setOiPublicationData((prev: any) => ({
         ...prev,
@@ -116,7 +123,7 @@ const OpenInfo = ({
           description: oiPublicationData.oiexemptionapproved 
             ? "Are you sure you want to approve this exemption?"
             : "Are you sure you want to deny this exemption? ",
-          message: oiPublicationData.oiexemptionapproved ? "The request will not be eligible for publication and will be removed from the OI Queue." : "The request will still be eligible for publication and will remain in the OI Queue.",
+          message: oiPublicationData.oiexemptionapproved ? "The request will not be eligible for publication and will be removed from the OI queue." : "The request will still be eligible for publication. The request will temporarily be removed from the OI queue. When the request is closed, the request will reappear in the OI queue for publication review.",
           confirmButtonTitle: "Save Change"
         }));
       } else {
@@ -125,7 +132,7 @@ const OpenInfo = ({
           show: true,
           title: "Exemption Request",
           description: "Are you sure you want to create an exemption request?",
-          message: "This request will be assigned to the Open Information team queue.",
+          message: "An exemption request will be sent to the Open Information team for review. You will receive a notification when it has been reviewed. If you are editing or updating the exemption request, this will update the existing request.",
           confirmButtonTitle: "Save Changes"
         }));
       }
@@ -203,8 +210,8 @@ const OpenInfo = ({
   const disableSave = (oiPublicationData: OITransactionObject): boolean => {
     const isDoNotPublish = oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish;
     const hasExemption = oiPublicationData?.oiexemption_id;
-    const isMissingRequiredFields =
-      !oiPublicationData?.iaorationale || !oiPublicationData?.pagereference;
+    const isMissingApproval = isOITeam && oiPublicationData?.oiexemptionapproved === null;
+    const isMissingRequiredFields = !oiPublicationData?.iaorationale || !oiPublicationData?.pagereference || isMissingApproval;
     const hasOutOfScopeExemption = oiPublicationData?.oiexemption_id === OIExemptions.OutsideScopeOfPublication;
     if (isDoNotPublish && hasOutOfScopeExemption) {
       return false;
@@ -221,7 +228,8 @@ const OpenInfo = ({
     return true;
   };
   const disablePublish = (oiPublicationData: OITransactionObject) : boolean => {    
-    const isMissingRequiredInput = oiPublicationData?.copyrightsevered === null || oiPublicationData?.publicationdate === null || foiOpenInfoAdditionalFiles?.findIndex((f: any) => f.filename.includes("Response_Letter_" + requestNumber + ".pdf")) < 0;
+    const responseLetterRegex = /Response[_\-\s]*Letter/i;
+    const isMissingRequiredInput = oiPublicationData?.copyrightsevered === null || oiPublicationData?.publicationdate === null || !foiOpenInfoAdditionalFiles?.some((f: any) => responseLetterRegex.test(f.filename));
     const isOIReadyToPublish = currentOIRequestState === "Ready to Publish";
     if (!isOIReadyToPublish) {
       return true;
@@ -262,6 +270,7 @@ const OpenInfo = ({
           foiministryrequestid={foiministryrequestid}
           foirequestid={foirequestid}
           toast={toast}
+          handleOIDataChange={handleOIDataChange}
         />
         <OpenInfoTab tabValue={tabValue} handleTabSelect={handleTabSelect} isOIUser={isOITeam} />
         {tabValue === 1 ? (

@@ -15,6 +15,11 @@
                 // Create SpellChecker instance
                 SpellChecker spellCheck = new SpellChecker();
 
+                if (spellChecker.AddWord)
+                {
+                    return Newtonsoft.Json.JsonConvert.SerializeObject(spellCheck);
+                }
+
                 // Perform Spell Check
                 spellCheck.GetSuggestions(spellChecker.LanguageID, spellChecker.TexttoCheck,
                                           spellChecker.CheckSpelling, spellChecker.CheckSuggestion,

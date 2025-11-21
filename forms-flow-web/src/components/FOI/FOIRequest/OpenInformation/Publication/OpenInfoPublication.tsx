@@ -33,7 +33,7 @@ const OpenInfoPublication = ({
         show: true,
         title: "Unpublish Request",
         description: "Are you sure you want to unpublish this request?",
-        message: "This request will be removed from Open Information and marked for Review.",
+        message: "This request will be removed from the Open Information website, the request state will be changed to 'Unpublished', and the request will be available in the Open Information queue for further review and action.",
         confirmButtonTitle: "Unpublish Request"
       });
     } else {

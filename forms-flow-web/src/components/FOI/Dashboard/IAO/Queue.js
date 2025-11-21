@@ -198,8 +198,8 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
                 label={"MY TEAM'S REQUESTS"}
                 color="primary"
                 size="small"
-                onClick={() => requestFilterChange("teamRequests")}
-                clicked={requestFilter === "teamRequests"}
+                onClick={() => requestFilterChange("All")}
+                clicked={requestFilter === "All"}
               />
               <ClickableChip
                 id="watchingRequests"

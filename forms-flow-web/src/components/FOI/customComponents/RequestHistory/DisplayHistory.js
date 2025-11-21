@@ -11,6 +11,7 @@ import CommentHistory from './CommentHistory';
 import { useSelector } from 'react-redux';
 import { getCorrespondenceSubject, getFullCCEmailListText, getFullEmailListText } from '../ContactApplicant/helper';
 import Tooltip from "@mui/material/Tooltip";
+import { ShadowHtmlComponent } from '../ContactApplicant/ShadowHtmlComponent';
 
 const DisplayHistory = ({
   requesthistory,
@@ -223,7 +224,7 @@ const DisplayHistory = ({
           </div>
         </AccordionSummary>
         <AccordionDetails>
-          <div className="commenttext" dangerouslySetInnerHTML={{ __html: getHtmlfromRawContent(item) }}></div>
+          <ShadowHtmlComponent html={getHtmlfromRawContent(item)} />
           {renderattachments(item)}
         </AccordionDetails>
       </Accordion>
