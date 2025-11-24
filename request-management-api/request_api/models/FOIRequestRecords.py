@@ -165,8 +165,6 @@ class FOIRequestRecord(db.Model):
         if not recordids:
             return []
 
-        logging.info("getrecordsbyid",recordids)
-        print("getrecordsbyid")
         try:
             rows = (db.session.query(cls)
                 .filter(
