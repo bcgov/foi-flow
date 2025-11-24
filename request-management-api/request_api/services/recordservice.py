@@ -41,6 +41,8 @@ class recordservice(recordservicebase):
     
     s3host = getenv('OSS_S3_HOST')
 
+    DOC_REVIEWER_API_ERROR = 'Error in contacting Doc Reviewer API'
+
     def create(self, requestid, ministryrequestid, recordschema, userid):
         """Creates a record for a user with document details passed in for an opened request.
         """
@@ -123,7 +125,7 @@ class recordservice(recordservicebase):
 
         if err:
             doc_ids = [r['documentmasterid'] for r in records_data]
-            return DefaultMethodResult(False, 'Error in contacting Doc Reviewer API', -1, doc_ids)
+            return DefaultMethodResult(False, self.DOC_REVIEWER_API_ERROR, -1, doc_ids)
 
         success_msg = 'Record deleted in Doc Reviewer DB' if requestdata['isdelete'] else 'Record updated in Doc Reviewer DB'
 
@@ -193,7 +195,7 @@ class recordservice(recordservicebase):
         doc_ids = [r['documentmasterid'] for r in records_data]
 
         if err:
-            return DefaultMethodResult(False, 'Error in contacting Doc Reviewer API', -1, doc_ids)
+            return DefaultMethodResult(False, self.DOC_REVIEWER_API_ERROR, -1, doc_ids)
 
         return DefaultMethodResult(True, 'Record updated in Doc Reviewer DB', -1, doc_ids)
 
@@ -308,7 +310,7 @@ class recordservice(recordservicebase):
             print("\njobids:",jobids)
             #print("\nERROR:",err)
             if err and err is not None:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
+                return DefaultMethodResult(False,self.DOC_REVIEWER_API_ERROR, -1, ministryrequestid)
             streamobject = {
                 "s3filepath": record['s3uripath'],
                 "requestnumber": _ministryrequest['axisrequestid'],
@@ -339,7 +341,7 @@ class recordservice(recordservicebase):
             _delteeapiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [replacingrecord['s3uripath']]})
             
             if err:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
+                return DefaultMethodResult(False,self.DOC_REVIEWER_API_ERROR, -1, recordid)
             record = FOIRequestRecord(foirequestid=_requestid, replacementof = recordid if _record['replacementof'] is None else _record['replacementof'], ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
                                 version = 1, createdby = userid, created_at = datetime.now())
             batch = str(uuid.uuid4())
@@ -361,7 +363,7 @@ class recordservice(recordservicebase):
                 'ministryrequestid': ministryrequestid
             })
             if err:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
+                return DefaultMethodResult(False,self.DOC_REVIEWER_API_ERROR, -1, ministryrequestid)
             # send message to redis stream for each file
             for entry in processingrecords:
                 _filename, extension = path.splitext(entry['s3uripath'])
@@ -452,7 +454,7 @@ class recordservice(recordservicebase):
                     "category": message["category"]
                 })
             if err:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
+                return DefaultMethodResult(False,self.DOC_REVIEWER_API_ERROR, -1, ministryrequestid)
             streamobject = {
                 "jobid": job.get("id"),
                 "category": message["category"],
@@ -534,7 +536,7 @@ class recordservice(recordservicebase):
                 'ministryrequestid': ministryrequestid
             })
             if err:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
+                return DefaultMethodResult(False,self.DOC_REVIEWER_API_ERROR, -1, ministryrequestid)
             # send message to redis stream for each file
             for entry in processingrecords:
                 _filename, extension = path.splitext(entry['s3uripath'])
