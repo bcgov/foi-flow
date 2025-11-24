@@ -497,6 +497,8 @@ class recordservice(recordservicebase):
 
             # 3. Define all ORM parameters, overriding defaults with dynamic data
             full_data = {
+                # Dynamic data from 'entry' (filename, s3uripath, attributes, etc.)
+                **entry,
                 # Base metadata
                 'foirequestid': foirequestid,
                 'ministryrequestid': ministryrequestid,
@@ -505,9 +507,6 @@ class recordservice(recordservicebase):
                 'createdby': userid,
                 'created_at': now,
                 'isactive': True,  # Explicitly set status for new record
-
-                # Dynamic data from 'entry' (filename, s3uripath, attributes, etc.)
-                **entry
             }
 
             # 4. Instantiate the ORM object using safe keyword arguments
