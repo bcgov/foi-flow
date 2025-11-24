@@ -132,7 +132,7 @@ const FOIRequestHeader = React.memo(
 
     useEffect(() => {
       setMenuItems(
-        getMenuItems({ classes, assignedToList, selectedAssignedTo, isIAORestrictedRequest })
+        getMenuItems({ classes, assignedToList, selectedAssignedTo, isIAORestrictedRequest, requestDetails, isMinistry })
       );
     }, [selectedAssignedTo, assignedToList]);
 
@@ -296,7 +296,7 @@ const FOIRequestHeader = React.memo(
               {!isHistoricalRequest ? 
                 <TextField
                   id="assignedTo"
-                  label={showMinistryAssignedTo ? "IAO Assigned To" : "Assigned To"}
+                  label={showMinistryAssignedTo ? "FOI Ops Assigned To" : "Assigned To"}
                   inputProps={{ "aria-labelledby": "assignedTo-label"}}
                   InputLabelProps={{ shrink: true }}
                   select
@@ -314,7 +314,7 @@ const FOIRequestHeader = React.memo(
               :
                 <TextField
                   id="assignedTo"
-                  label={showMinistryAssignedTo ? "IAO Assigned To" : "Assigned To"}
+                  label={showMinistryAssignedTo ? "FOI Ops Assigned To" : "Assigned To"}
                   inputProps={{ "aria-labelledby": "assignedTo-label"}}
                   InputLabelProps={{ shrink: true }}
                   value={requestDetails.assignedTo}

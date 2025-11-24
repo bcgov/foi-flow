@@ -204,7 +204,7 @@ import {
               done(null, res.data);
             } else {
               console.log(
-                "Error while fetching IAO assigned to master data",
+                "Error while fetching FOI Ops assigned to master data",
                 res
               );
               dispatch(serviceActionError(res));
@@ -214,7 +214,7 @@ import {
           })
           .catch((error) => {
             console.log(
-              "Error while fetching IAO assigned to master data",
+              "Error while fetching FOI Ops assigned to master data",
               error
             );
             dispatch(serviceActionError(error));
