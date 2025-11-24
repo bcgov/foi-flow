@@ -55,6 +55,7 @@ const StateList = Object.freeze({
   ],
   recordsintransit: [
     { status: "Records in Transit", isSelected: false },
+    { status: "Call For Records", isSelected: false },
     { status: "Tagging", isSelected: false },
     { status: "Ready to Scan", isSelected: false },
     { status: "Records Ready for Review", isSelected: false },
@@ -296,7 +297,7 @@ const MinistryStateList = Object.freeze({
     { status: "Records in Transit", isSelected: false },
     { status: "Harms Assessment", isSelected: false },
     { status: "Deduplication", isSelected: false },
-    { status: "Records Ready for Review", isSelected: false },
+    { status: "Records Review", isSelected: false },
     { status: "Ministry Sign Off", isSelected: false },
     { status: "Response", isSelected: false },
   ],
