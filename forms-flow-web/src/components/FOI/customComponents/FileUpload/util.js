@@ -66,7 +66,7 @@ export const isEmailFileType = (_file) => {
 
 export const allowedFileType = (_file, mimeTypes) => {
   return ((mimeTypes.includes(_file.type?.toLowerCase()) || mimeTypes.includes('.' + _file.filename.split('.').pop()?.toLowerCase())) ||
-    mimeTypes.includes('.' + _file.name.split('.').pop()?.toLowerCase()) || mimeTypes.includes("*/*"));
+    mimeTypes.includes('.' + _file.name.split('.').pop()?.toLowerCase()));
 }
 
 export const allowedFileSize = (_totalFileSizeInMB, multipleFiles, totalFileSize) => {

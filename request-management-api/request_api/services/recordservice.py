@@ -206,7 +206,7 @@ class recordservice(recordservicebase):
             _filepath, extension = path.splitext(_record['filename'])
             _record['attributes']['extension'] = extension            
             # _record['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES 
-            _record['attributes']['incompatible'] =  extension.lower() not in DEDUPE_FILE_TYPES and extension.lower() not in FILE_CONVERSION_FILE_TYPES
+            _record['attributes']['incompatible'] = extension.lower() in NONREDACTABLE_FILE_TYPES
             record.__dict__.update(_record)
             recordlist.append(record)
         dbresponse = FOIRequestRecord.replace(recordid,recordlist)
@@ -241,7 +241,7 @@ class recordservice(recordservicebase):
                         "trigger": 'recordupload',
                         "createdby": userid,
                         # "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false',
-                        "incompatible": 'true' if extension.lower() not in DEDUPE_FILE_TYPES and extension.lower() not in FILE_CONVERSION_FILE_TYPES else 'false',
+                        "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false',
                         "usertoken": AuthHelper.getauthtoken()
                     }
                     if extension in FILE_CONVERSION_FILE_TYPES:
@@ -344,7 +344,7 @@ class recordservice(recordservicebase):
             _filepath, extension = path.splitext(entry['filename'])
             entry['attributes']['extension'] = extension
             # entry['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES
-            entry['attributes']['incompatible'] =  extension.lower() not in DEDUPE_FILE_TYPES and extension.lower() not in FILE_CONVERSION_FILE_TYPES
+            entry['attributes']['incompatible'] = extension.lower() in NONREDACTABLE_FILE_TYPES
             record = FOIRequestRecord(foirequestid=_ministryrequest['foirequest_id'], ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
                             version = 1, createdby = userid, created_at = datetime.now())
             record.__dict__.update(entry)
@@ -383,7 +383,7 @@ class recordservice(recordservicebase):
                         "trigger": 'recordupload',
                         "createdby": userid,
                         # "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false',
-                        "incompatible": 'true' if extension.lower() not in DEDUPE_FILE_TYPES and extension.lower() not in FILE_CONVERSION_FILE_TYPES else 'false',
+                        "incompatible": 'true' if extension in NONREDACTABLE_FILE_TYPES else 'false',
                         "usertoken": AuthHelper.getauthtoken(),
                     }
                     if extension in FILE_CONVERSION_FILE_TYPES:
