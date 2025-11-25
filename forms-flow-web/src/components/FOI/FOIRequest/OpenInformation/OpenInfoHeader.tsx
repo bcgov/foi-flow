@@ -32,6 +32,7 @@ const OpenInfoHeader = ({
   foiministryrequestid,
   foirequestid,
   toast,
+  handleOIDataChange,
 }: any) => {
   const dispatch = useDispatch();
   const classes = OIAssignedToStyles();
@@ -76,8 +77,9 @@ const handleOIAssigneeUpdate = async (event: any) => {
   const [groupName, username, firstName, lastName] = assigneeValue.split('|');
   const fullName = firstName !== "" ? `${lastName}, ${firstName}` : username;;
 
-  // Update the selected assignee in the dropdown
+  // Update the selected assignee in the dropdown and the oi state object
   setOIAssignedTo(assigneeValue);
+  handleOIDataChange(username, "oiassignedto");
 
   if(username != 'OI Team'){
     const assigneeDetails = {

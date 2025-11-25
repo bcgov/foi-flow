@@ -79,6 +79,7 @@ process.env.REACT_APP_SEARCH_KEYWORD_LIMIT || 10;
 export const SOLR_DOC_SEARCH_LIMIT =  (window._env_ && window._env_.REACT_APP_SOLR_DOC_SEARCH_LIMIT) ||
 process.env.REACT_APP_SOLR_DOC_SEARCH_LIMIT || 1000; 
 
+export const SKIP_HEADERFOOTER_INSERT = `${(window._env_ && window._env_.REACT_APP_SKIP_HEADERFOOTER_INSERT) || process.env.REACT_APP_SKIP_HEADERFOOTER_INSERT || ''}`.split(',');
 export const COMMUNITY_AND_HEALTH_MINISTRIES = (window._env_ && window._env_.REACT_APP_COMMUNITY_AND_HEALTH_MINISTRIES) ||
 process.env.COMMUNITY_AND_HEALTH_MINISTRIES || ["HTH", "MSD", "PSE", "CAS", "OBC", "MGC", "CAF", "ECC", "INF"]; 
 export const JUSTICE_TEAM_MINISTRIES = (window._env_ && window._env_.REACT_APP_JUSTICE_TEAM_MINISTRIES) ||

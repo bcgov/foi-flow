@@ -646,7 +646,6 @@ class FOIRawRequest(db.Model):
     @classmethod    
     def addadditionalfilter(cls, basequery, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, groups=[]):
         isprocessingteam = False
-        
         if groups:
             isprocessingteam = any(item in ProcessingTeamWithKeycloackGroup.list() for item in groups)
 

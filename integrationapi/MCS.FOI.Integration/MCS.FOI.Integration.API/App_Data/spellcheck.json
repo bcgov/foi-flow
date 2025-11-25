@@ -10,5 +10,11 @@
         "DictionaryPath": "en_US.dic",
         "AffixPath": "en_US.aff",
         "PersonalDictPath": "customDict.dic"
+    },
+    {
+        "LanguadeID": 4105,
+        "DictionaryPath": "en_CA.dic",
+        "AffixPath": "en_CA.aff",
+        "PersonalDictPath": "customDict.dic"
     }
 ]
