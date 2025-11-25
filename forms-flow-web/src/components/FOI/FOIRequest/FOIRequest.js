@@ -393,7 +393,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           }
         })
       );
-      dispatch(fetchFOIEmailTemplates());
+      if (!isOITeam) {
+        dispatch(fetchFOIEmailTemplates());
+      }
     }
 
     dispatch(fetchFOICategoryList());
@@ -1326,17 +1328,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                     Records
                   </div>
                 )}
-                {showOpenInformationTab() && (
-                  <div
-                    className={clsx("tablinks", {
-                      active: tabLinksStatuses.OpenInformation.active,
-                    })}
-                    name="Open Information"
-                    onClick={() => tabclick("OpenInformation")}
-                  >
-                    Publication
-                  </div>
-                )}
                 {
                   <div
                     className={clsx("tablinks", {
@@ -1351,6 +1342,17 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                       : ""}
                   </div>
                 }
+                {showOpenInformationTab() && (
+                  <div
+                    className={clsx("tablinks", {
+                      active: tabLinksStatuses.OpenInformation.active,
+                    })}
+                    name="Open Information"
+                    onClick={() => tabclick("OpenInformation")}
+                  >
+                    Publication
+                  </div>
+                )}
               </>
             )}
             <div
@@ -1909,7 +1911,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 foirequestid={requestId}
                 isOITeam={isOITeam}
                 foiministryrequestid={ministryId}
-                bcgovcode={JSON.parse(bcgovcode)}
+                bcgovcode={bcgovcode ? JSON.parse(bcgovcode) : bcgovcode}
               />
             </div>
           )}
