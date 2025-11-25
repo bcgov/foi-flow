@@ -266,7 +266,7 @@ const StateDropDown = ({
         } else {
           return _stateList.recordsintransit;
         }
-        default:
+      default:
         return [];
     }
   };
