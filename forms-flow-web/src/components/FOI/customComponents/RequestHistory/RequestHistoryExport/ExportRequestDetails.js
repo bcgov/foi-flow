@@ -70,7 +70,7 @@ const ExportRequestDetailsHistory = ({
                 <div className="col-lg-6">
                     <Grid container columns={16}>
                         <Grid>
-                            <span className='request-details-assignee'>IAO Assigned To -</span>
+                            <span className='request-details-assignee'>FOI Ops Assigned To -</span>
                         </Grid>
                         <Grid>
                             <span>{" " + getFullName()}</span>

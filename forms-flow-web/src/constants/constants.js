@@ -80,3 +80,11 @@ export const SOLR_DOC_SEARCH_LIMIT =  (window._env_ && window._env_.REACT_APP_SO
 process.env.REACT_APP_SOLR_DOC_SEARCH_LIMIT || 1000; 
 
 export const SKIP_HEADERFOOTER_INSERT = `${(window._env_ && window._env_.REACT_APP_SKIP_HEADERFOOTER_INSERT) || process.env.REACT_APP_SKIP_HEADERFOOTER_INSERT || ''}`.split(',');
+export const COMMUNITY_AND_HEALTH_MINISTRIES = (window._env_ && window._env_.REACT_APP_COMMUNITY_AND_HEALTH_MINISTRIES) ||
+process.env.COMMUNITY_AND_HEALTH_MINISTRIES || ["HTH", "MSD", "PSE", "CAS", "OBC", "MGC", "CAF", "ECC", "INF"]; 
+export const JUSTICE_TEAM_MINISTRIES = (window._env_ && window._env_.REACT_APP_JUSTICE_TEAM_MINISTRIES) ||
+process.env.JUSTICE_TEAM_MINISTRIES || ["AG", "PSSG", "COR", "IIO", "OCC", "CLB", "GCP", "FIN", "TRAN", "TIC"]; 
+export const INDUSTRY_TEAM_MINISTRIES = (window._env_ && window._env_.REACT_APP_ECONOMY_TEAM_MINISTRIES) ||
+process.env.INDUSTRY_TEAM_MINISTRIES || ["OOP", "LDB", "PSA", "JED", "TACS", "LBR", "HSG", "CITZ", "AGR"];
+export const RESOURCE_TEAM_MINISTRIES = (window._env_ && window._env_.REACT_APP_ECONOMY_TEAM_MINISTRIES) ||
+process.env.RESOURCE_TEAM_MINISTRIES || ["MCM", "WLR", "FOR", "ECS", "ENV", "EAO", "EMC", "DAS", "IRR"];
