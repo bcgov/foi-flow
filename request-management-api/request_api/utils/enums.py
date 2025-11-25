@@ -174,6 +174,7 @@ class StateName(Enum):
     peerreview = "Peer Review"
     tagging = "Tagging"
     readytoscan = "Ready to Scan"
+    recordsintransit = "Records in Transit"
     appfeeowing = "App Fee Owing"
     section5pending = "Section 5 Pending"
     onholdother = "On Hold - Other"
