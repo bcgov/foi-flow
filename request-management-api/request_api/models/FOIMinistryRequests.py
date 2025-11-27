@@ -110,8 +110,6 @@ class FOIMinistryRequest(db.Model):
     subjectcode = relationship('FOIMinistryRequestSubjectCode', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIMinistryRequestSubjectCode.foiministryrequestid, "
                         "FOIMinistryRequest.version==FOIMinistryRequestSubjectCode.foiministryrequestversion)") 
     isofflinepayment = db.Column(db.Boolean, unique=False, nullable=True,default=False)
-    foiopeninforequest = relationship('FOIOpenInformationRequest', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIOpenInformationRequest.foiministryrequest_id, "
-                        "FOIMinistryRequest.version==FOIOpenInformationRequest.foiministryrequestversion_id)") 
     
 
     isoipcreview = db.Column(db.Boolean, unique=False, nullable=True,default=False)
@@ -1060,10 +1058,15 @@ class FOIMinistryRequest(db.Model):
         return axisids 
 
     @classmethod
-    def getbasequery(cls, iaoassignee, ministryassignee, userid=None, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
+    def getbasequery(cls, iaoassignee, ministryassignee, params, userid=None, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
         #for advanced search
 
         _session = db.session
+        
+        #OI Advanced Search Implementation
+        is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
+        from .FOIOpenInformationRequests import FOIOpenInformationRequests
+        foiopeninfo=aliased(FOIOpenInformationRequests)
 
         #ministry filter for group/team
         ministryfilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
@@ -1226,8 +1229,12 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.isphasedrelease.label('isphasedrelease'),
             literal(None).label('oipc_number'),
             CloseReason.name.label('closereason'),
-            FOIMinistryRequest.oistatus_id.label('oistatusid'),
         ]
+        if is_oi_team:
+            selectedcolumns.append(FOIMinistryRequest.oistatus_id.label('oistatusid'))
+            selectedcolumns.append(foiopeninfo.oiassignedto.label('oiAssignedTo'))
+            selectedcolumns.append(cast(foiopeninfo.publicationdate, String).label('publicationDate'))
+            selectedcolumns.append(cast(foiopeninfo.receiveddate, String).label('oiReceivedDate'))
 
         basequery = _session.query(
                                 *selectedcolumns
@@ -1302,8 +1309,15 @@ class FOIMinistryRequest(db.Model):
                                 CloseReason.closereasonid == FOIMinistryRequest.closereasonid,
                                 isouter=True
                             )
-                            
-
+        
+        if is_oi_team:
+            basequery = basequery.join(
+                foiopeninfo, 
+                and_(
+                    foiopeninfo.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid, 
+                    foiopeninfo.foiministryrequestversion_id == FOIMinistryRequest.version, 
+                    foiopeninfo.isactive == True), 
+                isouter=True)
         if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
             dbquery = basequery.filter(ministryfilter)
         else:
@@ -1357,7 +1371,7 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def advancedsearchsubquery(cls, params, iaoassignee, ministryassignee, userid, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager=False):
-        basequery = FOIMinistryRequest.getbasequery(iaoassignee, ministryassignee, userid, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
+        basequery = FOIMinistryRequest.getbasequery(iaoassignee, ministryassignee, params, userid, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
 
         #filter/search
         filtercondition = FOIMinistryRequest.getfilterforadvancedsearch(params, iaoassignee, ministryassignee)

@@ -73,9 +73,7 @@ class DashboardPagination(Resource):
 
             statuscode = 200 
 
-            if (params['usertype'] == "iao" and 'OI Team' in params['groups']):    
-                requests = dashboardservice().advancedsearch(params)
-            elif (params['usertype'] == "iao" or params['usertype'] == "ministry"):
+            if (params['usertype'] == "iao" or params['usertype'] == "ministry"):
                 requests = dashboardservice().advancedsearch(params)
             else:
                 statuscode = 401   

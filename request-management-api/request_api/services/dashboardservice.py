@@ -192,7 +192,6 @@ class dashboardservice:
         is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
 
         if (params['usertype'] == "iao"):
-            #HERE -> SEND IN IS OI TEAM to below fn AND GATHER oi received date, publicaiton date, oi assigned to from foioi table
             requests = FOIRawRequest.advancedsearch(params, userid, AuthHelper.isiaorestrictedfilemanager())
         else:
             requests = FOIMinistryRequest.advancedsearch(params, userid, AuthHelper.isministryrestrictedfilemanager())
@@ -210,13 +209,12 @@ class dashboardservice:
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 unopenrequest.update({'isiaorestricted': request.isiaorestricted})
                 unopenrequest.update({'closereason': request.closereason})
-                print("UNOPEN", unopenrequest)
-                print("reqeust_unopened", request)
                 if is_oi_team:
                     unopenrequest.update({'receivedDate': None})
                     unopenrequest.update({'applicantType': request.applicantcategory})
-                    unopenrequest.update({'fromClosed': "N/A"})
+                    unopenrequest.update({'fromClosed': None})
                     unopenrequest.update({'assignedTo': None})
+
                 requestqueue.append(unopenrequest)
             else:
                 _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
@@ -229,8 +227,6 @@ class dashboardservice:
                 isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
                 _openrequest.update({'isiaorestricted': isiaorestricted})
                 _openrequest.update({'closereason': request.closereason})
-                print("OPEN_up", _openrequest)
-                print("reqeust_open", request)
                 if is_oi_team:
                     oistatusid = request.oistatusid
                     match oistatusid:
@@ -252,11 +248,12 @@ class dashboardservice:
                             _openrequest.update({'publicationStatus': "Exemption Request"})
                         case _:
                             _openrequest.update({'publicationStatus': "unopened"})
-                    _openrequest.update({'receivedDate': None})
+                    _openrequest.update({'receivedDate': request.oiReceivedDate})
+                    _openrequest.update({'publicationDate': request.publicationDate})
+                    _openrequest.update({'oiAssignedTo': request.oiAssignedTo})
                     _openrequest.update({'fromClosed': self.__calculate_from_closed(request.closedate)})
                     _openrequest.update({'applicantType': request.applicantcategory})
-                    # _openrequest.update({'publicationDate': request.publicationDate})
-                    # _openrequest.update({'assignedTo': request.oiassingedTo})
+
                 requestqueue.append(_openrequest)
 
         meta = {
@@ -278,59 +275,59 @@ class dashboardservice:
             return idprefix + filenumber
         return ""
     
-    def oiadvancedsearch(self, params={'usertype': 'iao', 'groups':[], 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'requestflags':[], 'publicbody':[], 'daterangetype':None, 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
-        userid = AuthHelper.getuserid()
-        # HERE -> is_oi_team will always be true in this fn
-        is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
+    # NO LONGER IN USE (OI ADVANCED SEARCH IS DONE IN FOIMINISTRY MODAL)
+    # def oiadvancedsearch(self, params={'usertype': 'iao', 'groups':[], 'page':1, 'size':10, 'sortingitems':[], 'sortingorders':[], 'requeststate':[], 'requeststatus':[], 'requesttype':[], 'requestflags':[], 'publicbody':[], 'daterangetype':None, 'fromdate':None, 'todate':None, 'search':None, 'keywords':[], 'userid':None}):
+    #     userid = AuthHelper.getuserid()
+    #     is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
         
-        if is_oi_team:
-            requests = FOIOpenInformationRequests.advancedsearch(params, userid, AuthHelper.isiaorestrictedfilemanager())
-        elif (params['usertype'] == "iao"):
-            requests = FOIRawRequest.advancedsearch(params, userid, AuthHelper.isiaorestrictedfilemanager())
-        else:
-            requests = FOIMinistryRequest.advancedsearch(params, userid, AuthHelper.isministryrestrictedfilemanager())
+    #     if is_oi_team:
+    #         requests = FOIOpenInformationRequests.advancedsearch(params, userid, AuthHelper.isiaorestrictedfilemanager())
+    #     elif (params['usertype'] == "iao"):
+    #         requests = FOIRawRequest.advancedsearch(params, userid, AuthHelper.isiaorestrictedfilemanager())
+    #     else:
+    #         requests = FOIMinistryRequest.advancedsearch(params, userid, AuthHelper.isministryrestrictedfilemanager())
         
-        requestqueue = []
-        for request in requests.items:
-            if is_oi_team:
-                requestqueue.append(self.__handle_oi_request(request))
-            else:    
-                if(request.receivedDateUF is None): #request from online form has no received date in json
-                    _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
-                else:
-                    _receiveddate = parser.parse(request.receivedDateUF)
+    #     requestqueue = []
+    #     for request in requests.items:
+    #         if is_oi_team:
+    #             requestqueue.append(self.__handle_oi_request(request))
+    #         else:    
+    #             if(request.receivedDateUF is None): #request from online form has no received date in json
+    #                 _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
+    #             else:
+    #                 _receiveddate = parser.parse(request.receivedDateUF)
 
-                if(request.ministryrequestid == None):
-                    unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
-                    unopenrequest.update({'description':request.description})
-                    unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
-                    unopenrequest.update({'isiaorestricted': request.isiaorestricted})
+    #             if(request.ministryrequestid == None):
+    #                 unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
+    #                 unopenrequest.update({'description':request.description})
+    #                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
+    #                 unopenrequest.update({'isiaorestricted': request.isiaorestricted})
 
-                    requestqueue.append(unopenrequest)
-                else:
-                    _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
-                    _openrequest.update({'ministryrequestid':request.ministryrequestid})
-                    _openrequest.update({'extensions': request.extensions})
-                    _openrequest.update({'description':request.description})
-                    _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
-                    _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
+    #                 requestqueue.append(unopenrequest)
+    #             else:
+    #                 _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
+    #                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
+    #                 _openrequest.update({'extensions': request.extensions})
+    #                 _openrequest.update({'description':request.description})
+    #                 _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
+    #                 _openrequest.update({'ministryAssignedToFormatted': request.ministryAssignedToFormatted})
 
-                    isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
-                    _openrequest.update({'isiaorestricted': isiaorestricted})
+    #                 isiaorestricted = request.isiaorestricted if request.isiaorestricted == True else False
+    #                 _openrequest.update({'isiaorestricted': isiaorestricted})
 
-                    requestqueue.append(_openrequest)
+    #                 requestqueue.append(_openrequest)
 
-        meta = {
-            'page': requests.page,
-            'pages': requests.pages,
-            'total': requests.total,
-            'prev_num': requests.prev_num,
-            'next_num': requests.next_num,
-            'has_next': requests.has_next,
-            'has_prev': requests.has_prev,
-        }
+    #     meta = {
+    #         'page': requests.page,
+    #         'pages': requests.pages,
+    #         'total': requests.total,
+    #         'prev_num': requests.prev_num,
+    #         'next_num': requests.next_num,
+    #         'has_next': requests.has_next,
+    #         'has_prev': requests.has_prev,
+    #     }
 
-        return jsonify({'data': requestqueue, 'meta': meta})
+    #     return jsonify({'data': requestqueue, 'meta': meta})
 
     def __preparefoioirequestinfo(self, request, receivedDate, publicationDate, fromClosed):
         return {
