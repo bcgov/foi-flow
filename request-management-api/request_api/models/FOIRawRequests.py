@@ -835,7 +835,13 @@ class FOIRawRequest(db.Model):
     def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
         basequery = FOIRawRequest.getbasequery(None, userid, isiaorestrictedfilemanager)
         basequery = basequery.add_columns(literal(None).label('closereason'))
-        basequery  = basequery.add_columns(literal(None).label('oistatusid'))
+
+        is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
+        if is_oi_team:
+            basequery  = basequery.add_columns(literal(None).label('oistatusid'))
+            basequery  = basequery.add_columns(literal(None).label('oiAssignedTo'))
+            basequery  = basequery.add_columns(literal(None).label('publicationDate'))
+            basequery  = basequery.add_columns(literal(None).label('oiReceivedDate'))
 
         #filter/search
         filtercondition = FOIRawRequest.getfilterforadvancedsearch(params)
