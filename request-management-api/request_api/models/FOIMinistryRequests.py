@@ -1234,10 +1234,22 @@ class FOIMinistryRequest(db.Model):
             CloseReason.name.label('closereason'),
         ]
         if is_oi_team:
+            oiAssignedToFormatted = case([
+                (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
+                func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
+                (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
+                FOIAssignee.lastname),
+                (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
+                FOIAssignee.firstname),
+                (foiopeninfo.oiassignedto.is_(None),
+                'Unassigned'),
+            ],
+            else_ = foiopeninfo.oiassignedto).label('oiAssignedTo')
+
             selectedcolumns.append(FOIMinistryRequest.oistatus_id.label('oistatusid'))
-            selectedcolumns.append(foiopeninfo.oiassignedto.label('oiAssignedTo'))
-            selectedcolumns.append(cast(foiopeninfo.publicationdate, String).label('publicationDate'))
-            selectedcolumns.append(cast(foiopeninfo.receiveddate, String).label('oiReceivedDate'))
+            selectedcolumns.append(foiopeninfo.publicationdate.label('publicationDate'))
+            selectedcolumns.append(foiopeninfo.receiveddate.label('oiReceivedDate'))
+            selectedcolumns.append(oiAssignedToFormatted)
 
         basequery = _session.query(
                                 *selectedcolumns
@@ -1320,7 +1332,7 @@ class FOIMinistryRequest(db.Model):
                     foiopeninfo.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid, 
                     foiopeninfo.foiministryrequestversion_id == FOIMinistryRequest.version, 
                     foiopeninfo.isactive == True), 
-                isouter=True)
+                isouter=True).join(FOIAssignee, FOIAssignee.username == foiopeninfo.oiassignedto, isouter=True)
         if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
             dbquery = basequery.filter(ministryfilter)
         else:
