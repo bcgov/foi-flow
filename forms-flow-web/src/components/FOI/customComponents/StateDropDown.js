@@ -260,6 +260,12 @@ const StateDropDown = ({
         if (!isMinistryCoordinator) {
           return appendPreviousStateForHoldOthers(_stateList.onholdother, previousState);
         } else return _stateList.onholdother;
+      case StateEnum.recordsintransit.name.toLowerCase():
+        if (_isMinistryCoordinator) {
+          return _stateList.recordsintransit;
+        } else {
+          return _stateList.recordsintransit;
+        }
       default:
         return [];
     }
