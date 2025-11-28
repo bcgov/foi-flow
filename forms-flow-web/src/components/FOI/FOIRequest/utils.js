@@ -146,6 +146,8 @@ export const getTabBG = (_tabStatus, _requestState) => {
         return "foitabheadercollection foitabheaderRecordsReadyForReviewBG";
     case StateEnum.onholdother.name:
         return "foitabheadercollection foitabheaderOnholdOtherBG";
+    case StateEnum.recordsintransit.name:
+      return "foitabheadercollection foitabheaderRecordsInTransitBG";
     default:
       return "foitabheadercollection foitabheaderdefaultBG";
   }
@@ -493,7 +495,8 @@ export const getUniqueIdentifier = (obj) => {
   return (obj.extensionstatusid+formatDate(obj.extendedduedate, "MMM dd yyyy")+obj.extensionreasonid).replace(/\s+/g, '');
 }
 
-export const isReadyForPublishing = (openinfo, additionalfiles, requestnumber) => {
-  return !(openinfo?.copyrightsevered === null || additionalfiles?.findIndex(f => f.filename.includes("Response_Letter_" + requestnumber + ".pdf")) < 0)
+export const isReadyForPublishing = (openinfo, additionalfiles) => {
+  const responseLetterRegex = /Response[_\-\s]*Letter/i;
+  return !(openinfo?.copyrightsevered === null || !additionalfiles?.some(f => responseLetterRegex.test(f.filename)))
 }
 

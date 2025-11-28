@@ -97,16 +97,16 @@ class openinfoevent:
         if OpenInfoNotificationType.EXEMPTION_REQUEST.value == notificationtype:
             return "New Exemption Request is Received"
         elif OpenInfoNotificationType.EXEMPTION_APPROVED.value == notificationtype:
-            return "Exemption request approved"
+            return "Publication exemption request approved"
         elif OpenInfoNotificationType.EXEMPTION_DENIED.value == notificationtype:
-            return "Exemption request denied. See Open Information tab for more information."
+            return "Publication exemption request denied. See the Publication tab for more information."
         return None  
 
     def __commentmessage(self, username, event_type, exemption_reason):
         if event_type == OpenInfoNotificationType.EXEMPTION_APPROVED.value:
-            return f"Publication Exemption Approved by {username} for {exemption_reason}"
+            return f"Publication exemption approved by {username} for {exemption_reason}"
         elif event_type == OpenInfoNotificationType.EXEMPTION_DENIED.value:
-            return f"Publication Exemption Denied by {username}"
+            return f"Publication exemption denied by {username}"
         return None
 
     def __createnotification(self, requestid, userid, type, message, requestjson):

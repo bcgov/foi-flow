@@ -380,6 +380,7 @@ const BottomButtonGroup = React.memo(
           case StateEnum.appfeeowing.name:
           case StateEnum.onholdother.name:
           case StateEnum.recordsreadyforreview.name:
+          case StateEnum.recordsintransit.name:
             const status = Object.values(StateEnum).find(
               (statusValue) => statusValue.name === currentSelectedStatus
             );

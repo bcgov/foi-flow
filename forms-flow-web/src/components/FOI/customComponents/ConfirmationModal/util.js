@@ -142,6 +142,8 @@ import { isReadyForPublishing } from '../../FOIRequest/utils';
           return {title: "Change Request to On Hold - Other", 
                  body: <>Are you sure you want to change Request #{_requestNumber} to {StateEnum.onholdother.name}? This should be used for scenarios 
                  that are not fee related (such as Third Party notice).<b> This will stop the clock.</b></>};
+      case StateEnum.recordsintransit.name.toLowerCase():
+        return {title: "Changing the state", body: "Are you sure you want to change the state to Records in Transit?"};
       default:
           return {title: "", body: ""};
     }
@@ -150,7 +152,7 @@ import { isReadyForPublishing } from '../../FOIRequest/utils';
   export const getMessageForOITeam = (state, openinfo, additionalfiles, requestnumber) => {
     if (state === 'Ready to Publish') {
       if (!isReadyForPublishing(openinfo, additionalfiles, requestnumber)) {
-        return {title: "Changing the state", body: 'Unable to update state: please make sure the copyright is selected and a response letter is uploaded with the file name format "Response_Letter_{Request No.}.pdf"'}
+        return {title: "Changing the state", body: 'Unable to update state: please make sure the copyright is selected and a response letter is uploaded with "Response Letter" in the filename'}
       }
     }
     return {title: "Changing the state", body: "Are you sure you want to change the state of this request to " + state + "?"}

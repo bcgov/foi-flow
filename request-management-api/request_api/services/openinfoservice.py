@@ -29,14 +29,20 @@ class openinfoservice:
     def getcurrentfoiopeninforequest(self, foiministryrequestid):
        return FOIOpenInformationRequests().getcurrentfoiopeninforequest(foiministryrequestid)
     
-    def createopeninforequest(self, foirequestschema, userid, foiministryrequest):
+    def createopeninforequest(self, foirequestschema, userid, foiministryrequest, publish=True):
         foiministryrequestid = foiministryrequest.foiministryrequestid
         current_oirequest = self.getcurrentfoiopeninforequest(foiministryrequestid)
         if foirequestschema["requestType"] == 'general' and foirequestschema["selectedMinistries"][0]["code"].upper() not in SKIP_OPENINFO_MINISTRIES and current_oirequest == {}:
-            default_foiopeninforequest = {
-                "oipublicationstatus_id": 2,
-                "receiveddate": datetime.now(pytz.timezone('America/Vancouver')).strftime('%Y-%m-%d %H:%M:%S'),
-            }
+            if publish:
+                default_foiopeninforequest = {
+                    "oipublicationstatus_id": 2,
+                    "receiveddate": datetime.now(pytz.timezone('America/Vancouver')).strftime('%Y-%m-%d %H:%M:%S'),
+                }
+            else:
+                default_foiopeninforequest = {
+                    "oipublicationstatus_id": 1,
+                    "oiexemption_id": 5,
+                } 
             foiopeninforequest = FOIOpenInfoSchema().load(default_foiopeninforequest)
             version = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
             foiopeninforequest['foiministryrequestversion_id'] = version
