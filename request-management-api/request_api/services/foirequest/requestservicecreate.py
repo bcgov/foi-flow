@@ -135,7 +135,12 @@ class requestservicecreate:
             selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
 
         applicant = FOIRequestApplicant().getlatestprofilebyaxisapplicantid(foirequestschema.get('axisapplicantid') or 0) # temporary for axis sync, remove after axis decommissioned
-        foirequestschema['foiRequestApplicantID'] = applicant.get('foirequestapplicantid', 0) # temporary for axis sync, remove after axis decommissioned
+        # since applicant might not have axisapplicantid but still exist, only update this if it exists 
+        if applicant and 'foirequestapplicantid' in applicant:
+            foirequestschema['foiRequestApplicantID'] = applicant.get('foirequestapplicantid', 0) # temporary for axis sync, remove after axis decommissioned
+        # if no applicant from axisapplicant id, fall back on provided foiRequestApplicantID to retrieve applicant
+        if applicant == {} and foirequestschema and 'foiRequestApplicantID' in foirequestschema:
+            applicant = FOIRequestApplicant().getlatestprofilebyapplicantid(foirequestschema['foiRequestApplicantID'])
         # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
         if foirequestschema.get('foiRequestApplicantID', 0) > 0:
             applicant = FOIRequestApplicant.updateapplicantprofile( # temporary for axis sync, remove after axis decommissioned
