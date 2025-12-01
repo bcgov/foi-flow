@@ -107,7 +107,7 @@ class FOIRequestApplicant(db.Model):
     @classmethod
     def getlatestprofilebyapplicantid(cls, applicantid):
         schema = FOIRequestApplicantSchema(many=False)
-        sq = db.session.query(FOIRequestApplicant).filter_by(foirequestapplicantid=applicantid).order_by(FOIRequestApplicant.foirequestapplicantid.desc()).first()
+        sq = db.session.query(FOIRequestApplicant).filter_by(foirequestapplicantid=applicantid).first()
         if sq is None or (not sq.applicantprofileid):
             return schema.dump(sq)
         query = db.session.query(FOIRequestApplicant).filter(FOIRequestApplicant.applicantprofileid == sq.applicantprofileid).order_by(FOIRequestApplicant.foirequestapplicantid.desc()).first()
