@@ -177,18 +177,14 @@ const StateDropDown = ({
           return _stateList.callforrecordsForConsult; 
         }
         if (_isMinistryCoordinator) {
-          if (isMCFMinistryTeam) {
-            return appendRecordsReadyForReview(_stateList.callforrecordsforpersonal);
+          if (personalRequest && isMCFMinistryTeam) {
+            return _stateList.callforrecordsforcfdpersonal;
           } else if (personalRequest) {
             return _stateList.callforrecordsforpersonal;
           }
         }
-        if (
-          personalIAO &&
-          (requestDetails.bcgovcode.toLowerCase() === "mcf" ||
-            requestDetails.bcgovcode.toLowerCase() === "msd")
-        )
-          return _stateList.callforrecordscfdmsdpersonal;
+        if (personalIAO && (requestDetails.bcgovcode?.toLowerCase() === "mcf")) return _stateList.callforrecordscfdpersonal;
+        if (personalIAO && (requestDetails.bcgovcode?.toLowerCase() === "msd")) return _stateList.callforrecordsmsdpersonal;
         return _stateList.callforrecords;
       case StateEnum.tagging.name.toLowerCase():
         return consultflag ? _stateList.taggingforConsult : _stateList.tagging;

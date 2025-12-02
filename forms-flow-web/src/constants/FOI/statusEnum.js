@@ -43,7 +43,7 @@ const StateList = Object.freeze({
     { status: "On Hold - Other", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
-  callforrecordscfdmsdpersonal: [
+  callforrecordscfdpersonal: [
     { status: "Call For Records", isSelected: false },
     { status: "Open", isSelected: false },
     { status: "Tagging", isSelected: false },
@@ -51,7 +51,15 @@ const StateList = Object.freeze({
     { status: "Ready to Scan", isSelected: false },
     { status: "Records Ready for Review", isSelected: false },
     { status: "On Hold - Other", isSelected: false },
-    { status: "Response", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
+  callforrecordsmsdpersonal: [
+    { status: "Call For Records", isSelected: false },
+    { status: "Open", isSelected: false },
+    { status: "Tagging", isSelected: false },
+    { status: "Ready to Scan", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
+    { status: "On Hold - Other", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
   recordsintransit: [
@@ -299,6 +307,15 @@ const MinistryStateList = Object.freeze({
     { status: "Deduplication", isSelected: false },
     { status: "Records Review", isSelected: false },
     { status: "Ministry Sign Off", isSelected: false },
+  ],
+  callforrecordsforcfdpersonal: [
+    { status: "Call For Records", isSelected: false },
+    { status: "Records in Transit", isSelected: false },
+    { status: "Harms Assessment", isSelected: false },
+    { status: "Deduplication", isSelected: false },
+    { status: "Records Ready for Review", isSelected: false },
+    { status: "Ministry Sign Off", isSelected: false },
+    { status: "Response", isSelected: false },
   ],
   recordsintransit: [
     { status: "Records in Transit", isSelected: false },
