@@ -146,6 +146,8 @@ export const getTabBG = (_tabStatus, _requestState) => {
         return "foitabheadercollection foitabheaderRecordsReadyForReviewBG";
     case StateEnum.onholdother.name:
         return "foitabheadercollection foitabheaderOnholdOtherBG";
+    case StateEnum.recordsintransit.name:
+      return "foitabheadercollection foitabheaderRecordsInTransitBG";
     default:
       return "foitabheadercollection foitabheaderdefaultBG";
   }

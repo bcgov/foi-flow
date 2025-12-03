@@ -506,6 +506,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
     case StateEnum.onholdother.name:
       foitabheaderBG = "foitabheadercollection foitabheaderOnHoldOtherBG";
       break;
+    case StateEnum.recordsintransit.name:
+      foitabheaderBG = "foitabheadercollection foitabheaderRecordsInTransitBG";
+      break;
     default:
       foitabheaderBG = "foitabheadercollection foitabheaderdefaultBG";
       break;
