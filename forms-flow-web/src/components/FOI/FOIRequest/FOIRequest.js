@@ -110,7 +110,8 @@ import {
   isRequestRestricted,
   convertSTRToDate,
   getCommentTypeIdByName,
-  isMinistryLogin
+  isMinistryLogin,
+  addBusinessDays
 } from "../../../helper/FOI/helper";
 import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
@@ -748,6 +749,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     requestStartDate: "",
     dueDate: "",
     requestState: "",
+    originalDueDate: "",
+    recordsDueDate: ""
   };
 
   const requiredApplicantDetailsValues = {
@@ -837,6 +840,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     const detailsData = assignValue(requiredRequestDetailsValues, value, name);
     if (value2) {
       detailsData.dueDate = value2;
+    }
+    if (name === FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE && requestDetails?.originalDueDate) {
+      detailsData.originalDueDate = addBusinessDays(value, 30);
     }
     setRequiredRequestDetailsValues(detailsData);
   };
@@ -937,7 +943,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     _currentrequestStatus,
     oipcData,
     requestDetails.isoipcreview,
-    requestDetails.isconsultflag
+    requestDetails.isconsultflag,
+    requestDetails.cfrDueDate
   );
 
   const classes = useStyles();
@@ -1576,8 +1583,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           handleRequestDetailsInitialValue
                         }
                         createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput || isHistoricalRequest}
                         isHistoricalRequest={isHistoricalRequest}
+                        requestExtensions={requestExtensions}
                       />
                       {(redactedSections && Object.keys(redactedSections).length > 0 && (
                         <RedactionSummary sections={redactedSections} isoipcreview={isOIPCReview}/>

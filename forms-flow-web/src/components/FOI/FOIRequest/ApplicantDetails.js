@@ -12,6 +12,7 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { StateEnum } from '../../../constants/FOI/statusEnum';
 
 const ApplicantDetails = React.memo(
   ({
@@ -335,7 +336,7 @@ const ApplicantDetails = React.memo(
                 className={warning && warning(FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) && classes.warning}
                 fullWidth
                 required
-                disabled={disableInput || disableFieldForMinistryRequest}
+                disabled={StateEnum.closed.name.toLowerCase() === requestDetails?.currentState?.toLowerCase()}
                 error={selectedCategory.toLowerCase().includes("select")}
               >
                 {menuItems}
