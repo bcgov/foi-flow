@@ -2,13 +2,13 @@ import logging
 from datetime import datetime
 from typing import List, Set, Tuple
 
-from sqlalchemy import select, tuple_
+from sqlalchemy import select, tuple_, exists
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, relationship
 from sqlalchemy import func
 from sqlalchemy import desc
-
+from request_api.models.FOIRequestRecordGroup import FOIRequestRecordGroup, FOIRequestRecordGroups
 from .db import db, ma
 from .default_method_result import DefaultMethodResult
 
@@ -17,7 +17,7 @@ class FOIRequestRecord(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRequestRecords'
     # Defining the columns
-    recordid = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    recordid = db.Column(db.Integer, primary_key=True, autoincrement=True)
     version =db.Column(db.Integer,nullable=False)
     foirequestid =db.Column(db.Integer,  nullable=False)
     ministryrequestid =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
@@ -31,6 +31,13 @@ class FOIRequestRecord(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False,default=True)
     replacementof = db.Column(db.Integer, unique=False, nullable=False)
+
+    groups = relationship(
+        "FOIRequestRecordGroup",
+        secondary="FOIRequestRecordGroups",
+        back_populates="records",
+        lazy="selectin"
+    )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -100,54 +107,80 @@ class FOIRequestRecord(db.Model):
     def fetch(cls, foirequestid, ministryrequestid):
         records = []
         try:
-            fr1 = aliased(FOIRequestRecord)  # current record
-            fr2 = aliased(FOIRequestRecord)  # original record (replacementof)
+            sql = text("""
+                       WITH latest_group AS (SELECT DISTINCT
+                       ON (rg.record_id)
+                           rg.record_id,
+                           g.document_set_id,
+                           g.ministry_request_id,
+                           g.name,
+                           g.is_active
+                       FROM "FOIRequestRecordGroups" rg
+                           JOIN "FOIRequestRecordGroup" g
+                       ON g.document_set_id = rg.document_set_id
+                       WHERE g.is_active = TRUE
+                       ORDER BY rg.record_id, g.document_set_id DESC
+                           )
+                       SELECT fr1.recordid,
+                              fr1.isactive,
+                              fr1.filename,
+                              fr1.s3uripath,
+                              fr1.attributes,
+                              json_extract_path_text(fr1.attributes::json, 'batch') AS batchid,
+                              fr1.createdby,
+                              fr1.created_at,
+                              fr1.replacementof,
+                              -- group info
+                              lg.ministry_request_id                                AS group_ministry_request_id,
+                              lg.document_set_id                                    AS group_document_set_id,
+                              lg.is_active                                          AS group_is_active,
+                              lg.name                                               AS group_name
+                       FROM "FOIRequestRecords" fr1
+                                LEFT JOIN latest_group lg
+                                          ON lg.record_id = fr1.recordid
+                       WHERE fr1.foirequestid = :foirequestid
+                         AND fr1.ministryrequestid = :ministryrequestid
+                         AND fr1.isactive = TRUE
+                       ORDER BY fr1.recordid DESC;
+                       """)
 
-            # If 'attributes' is JSON/JSONB in SQLAlchemy, you can do:
-            #   batch_expr = fr1.attributes['batch'].astext.label("batchid")
-            # If it's TEXT storing JSON, use a func/json operator like below (Postgres):
-            batch_expr = func.json_extract_path_text(
-                fr1.attributes.cast(db.JSON), 'batch'
-            ).label("batchid")
+            rs = db.session.execute(sql, {
+                'foirequestid': foirequestid,
+                'ministryrequestid': ministryrequestid
+            })
 
-            query = (
-                db.session.query(
-                    fr1.recordid,
-                    fr1.filename,
-                    fr1.s3uripath,
-                    fr1.attributes.label("attributes"),
-                    batch_expr,
-                    fr1.createdby,
-                    fr1.created_at,
-                    fr1.replacementof,
-                    fr2.s3uripath.label("originalfile"),
-                    fr2.filename.label("originalfilename"),
-                )
-                .outerjoin(fr2, fr1.replacementof == fr2.recordid)
-                .filter(
-                    fr1.foirequestid == foirequestid,
-                    fr1.ministryrequestid == ministryrequestid,
-                    fr1.isactive.is_(True),
-                )
-                .order_by(fr1.recordid.desc())
-            )
+            for row in rs:
+                # handle replacement file
+                originalfile = ""
+                originalfilename = ""
 
-            for row in query.all():
+                if row["replacementof"] is not None:
+                    originalrecord = FOIRequestRecord.getrecordbyid(row["replacementof"])
+                    if originalrecord:
+                        originalfile = originalrecord.get("s3uripath", "")
+                        originalfilename = originalrecord.get("filename", "")
+
                 records.append({
-                    "recordid": row.recordid,
-                    "filename": row.filename,
-                    "s3uripath": row.s3uripath,
-                    "attributes": row.attributes,
-                    "batchid": row.batchid,
-                    "createdby": row.createdby,
-                    "created_at": row.created_at,
-                    "replacementof": row.replacementof,
-                    "originalfile": row.originalfile or "",
-                    "originalfilename": row.originalfilename or "",
+                    "recordid": row["recordid"],
+                    "filename": row["filename"],
+                    "s3uripath": row["s3uripath"],
+                    "attributes": row["attributes"],
+                    "batchid": row["batchid"],
+                    "createdby": row["createdby"],
+                    "created_at": row["created_at"],
+                    "replacementof": row["replacementof"],
+                    # replacement file
+                    "originalfile": originalfile,
+                    "originalfilename": originalfilename,
+                    # group fields
+                    "groupdocumentsetid": row["group_document_set_id"],
+                    "groupministryrequestid": row["group_ministry_request_id"],
+                    "groupisactive": row["group_is_active"],
+                    "groupname": row["group_name"]
                 })
 
         except Exception as ex:
-            logging.error(ex)
+            logging.error(f"Error fetching FOIRequestRecords: {ex}")
             raise
         finally:
             db.session.close()
@@ -237,29 +270,67 @@ class FOIRequestRecord(db.Model):
 
     @classmethod
     def validate_records(
-        cls,
-        foirequestid: int,
-        ministryrequestid: int,
-        pairs: List[Tuple[int, int]],
-    ) -> Set[Tuple[int, int]]:
+            cls,
+            foirequestid: int,
+            ministryrequestid: int,
+            records: List[int],
+    ) -> Set[int]:
         """
-        Return subset of (recordid, version) that exist, are active,
+        Return subset of recordid that exist, are active,
         and belong to the specified request/ministry.
         """
-        if not pairs:
+        if not records:
             return set()
 
-        stmt = (
-            select(FOIRequestRecord.recordid, FOIRequestRecord.version)
-            .where(
-                tuple_(FOIRequestRecord.recordid, FOIRequestRecord.version).in_(pairs),
+        rows = (
+            db.session.query(FOIRequestRecord.recordid)
+            .filter(
+                FOIRequestRecord.recordid.in_(records),
                 FOIRequestRecord.foirequestid == foirequestid,
                 FOIRequestRecord.ministryrequestid == ministryrequestid,
                 FOIRequestRecord.isactive.is_(True),
             )
+            .all()
         )
-        rows = db.session.execute(stmt).all()
-        return {(r[0], r[1]) for r in rows}
+
+        return {r[0] for r in rows}
+
+    @classmethod
+    def get_records_without_group(
+            cls,
+            ministryrequestid: int
+    ) -> Set[int]:
+            """
+            Return all active records for the latest version of the ministry request
+            that are NOT assigned to any group.
+            """
+
+            # 1) Determine latest version automatically
+            max_version = (
+                db.session.query(db.func.max(FOIRequestRecord.ministryrequestversion))
+                .filter(FOIRequestRecord.ministryrequestid == ministryrequestid)
+                .scalar()
+            )
+
+            if max_version is None:
+                return set()
+
+            # 2) Retrieve all records matching latest version and not in any group
+            rows = (
+                db.session.query(FOIRequestRecord.recordid)
+                .filter(
+                    FOIRequestRecord.ministryrequestid == ministryrequestid,
+                    FOIRequestRecord.ministryrequestversion == max_version,
+                    FOIRequestRecord.isactive.is_(True),
+                    ~exists().where(
+                        FOIRequestRecordGroups.record_id == FOIRequestRecord.recordid
+                    ),
+                )
+                .all()
+            )
+
+            return {r[0] for r in rows}
+
 
 class FOIRequestRecordSchema(ma.Schema):
     class Meta:
