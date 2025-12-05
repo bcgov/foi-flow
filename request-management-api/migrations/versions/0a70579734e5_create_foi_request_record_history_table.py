@@ -122,6 +122,20 @@ def upgrade():
 
     # ----------------------------------------------------------
 
+    op.execute(
+        """
+            CREATE INDEX IF NOT EXISTS  idx_frg_record_id
+            ON "FOIRequestRecordGroups"(record_id);
+            
+            CREATE INDEX IF NOT EXISTS  idx_frg_document_set_id
+            ON "FOIRequestRecordGroups"(document_set_id);
+            
+            CREATE INDEX IF NOT EXISTS  idx_records_active_mrid_foireqid
+            ON "FOIRequestRecords"(isactive, ministryrequestid, foirequestid);
+        
+        """
+    )
+
 
 def downgrade():
     op.drop_table('FOIRequestRecordHistory')
