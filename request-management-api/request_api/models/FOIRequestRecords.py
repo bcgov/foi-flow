@@ -2,13 +2,14 @@ import logging
 from datetime import datetime
 from typing import List, Set, Tuple
 
-from sqlalchemy import select, tuple_
+from sqlalchemy import select, tuple_, exists
 from sqlalchemy import text
 from sqlalchemy.dialects.postgresql import JSON
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, relationship
 from sqlalchemy import func
 from sqlalchemy import desc
 
+from request_api.models.FOIRequestRecordGroups import FOIRequestRecordGroups as FOIRequestRecordGroupsModel
 from .db import db, ma
 from .default_method_result import DefaultMethodResult
 
@@ -17,7 +18,7 @@ class FOIRequestRecord(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIRequestRecords'
     # Defining the columns
-    recordid = db.Column(db.Integer, primary_key=True,autoincrement=True)
+    recordid = db.Column(db.Integer, primary_key=True, autoincrement=True)
     version =db.Column(db.Integer,nullable=False)
     foirequestid =db.Column(db.Integer,  nullable=False)
     ministryrequestid =db.Column(db.Integer, db.ForeignKey('FOIMinistryRequests.foiministryrequestid'))
@@ -31,6 +32,13 @@ class FOIRequestRecord(db.Model):
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
     isactive = db.Column(db.Boolean, unique=False, nullable=False,default=True)
     replacementof = db.Column(db.Integer, unique=False, nullable=False)
+
+    groups = relationship(
+        "FOIRequestRecordGroup",
+        secondary="FOIRequestRecordGroups",
+        back_populates="records",
+        lazy="selectin"
+    )
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -237,29 +245,66 @@ class FOIRequestRecord(db.Model):
 
     @classmethod
     def validate_records(
-        cls,
-        foirequestid: int,
-        ministryrequestid: int,
-        pairs: List[Tuple[int, int]],
-    ) -> Set[Tuple[int, int]]:
+            cls,
+            foirequestid: int,
+            ministryrequestid: int,
+            records: List[int],
+    ) -> Set[int]:
         """
-        Return subset of (recordid, version) that exist, are active,
+        Return subset of recordid that exist, are active,
         and belong to the specified request/ministry.
         """
-        if not pairs:
+        if not records:
             return set()
 
-        stmt = (
-            select(FOIRequestRecord.recordid, FOIRequestRecord.version)
-            .where(
-                tuple_(FOIRequestRecord.recordid, FOIRequestRecord.version).in_(pairs),
+        rows = (
+            db.session.query(FOIRequestRecord.recordid)
+            .filter(
+                FOIRequestRecord.recordid.in_(records),
                 FOIRequestRecord.foirequestid == foirequestid,
                 FOIRequestRecord.ministryrequestid == ministryrequestid,
                 FOIRequestRecord.isactive.is_(True),
             )
+            .all()
         )
-        rows = db.session.execute(stmt).all()
-        return {(r[0], r[1]) for r in rows}
+
+        return {r[0] for r in rows}
+
+    @classmethod
+    def get_records_without_group(
+            cls,
+            ministryrequestid: int
+    ) -> Set[int]:
+            """
+            Return all active records for the latest version of the ministry request
+            that are NOT assigned to any group.
+            """
+
+            # 1) Determine latest version automatically
+            max_version = (
+                db.session.query(db.func.max(FOIRequestRecord.ministryrequestversion))
+                .filter(FOIRequestRecord.ministryrequestid == ministryrequestid)
+                .scalar()
+            )
+
+            if max_version is None:
+                return set()
+
+            # 2) Retrieve all records matching latest version and not in any group
+            rows = (
+                db.session.query(FOIRequestRecord.recordid)
+                .filter(
+                    FOIRequestRecord.ministryrequestid == ministryrequestid,
+                    FOIRequestRecord.ministryrequestversion == max_version,
+                    FOIRequestRecord.isactive.is_(True),
+                    ~exists().where(
+                        FOIRequestRecordGroupsModel.record_id == FOIRequestRecord.recordid
+                    ),
+                )
+                .all()
+            )
+
+            return {r[0] for r in rows}
 
 class FOIRequestRecordSchema(ma.Schema):
     class Meta:
