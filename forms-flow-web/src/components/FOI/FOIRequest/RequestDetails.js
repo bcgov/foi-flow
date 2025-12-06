@@ -129,9 +129,8 @@ const RequestDetails = React.memo(
         requestStartDate: startDate ? formatDate(startDate): "",
         dueDate:  validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, startDate ? formatDate(startDate): ""),
         requestState: findRequestState(requestDetails?.requeststatuslabel),
-        originalDueDate: requestDetails?.originalDueDate ? formatDate(requestDetails.originalDueDate) : "",
-        recordsDueDate: requestDetails?.cfrDueDate ? formatDate(requestDetails.cfrDueDate) : ""
       }
+      if (requestDetails?.cfrDueDate) requestDetailsObject["recordsDueDate"] = formatDate(requestDetails.cfrDueDate);
       //event bubble up - sets the initial value to validate the required fields
       handleRequestDetailsInitialValue(requestDetailsObject);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES, requestDetailsObject);

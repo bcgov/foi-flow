@@ -273,8 +273,7 @@ export const createRequestDetailsObjectFunc = (
       requestObject.dueDate = value.dueDate;
       requestObject.receivedMode = value.receivedMode;
       requestObject.deliveryMode = value.deliveryMode;
-      requestObject.originalDueDate = value.originalDueDate;
-      requestObject.recordsDueDate = value.recordsDueDate
+      if ("cfrDueDate" in requestObject) requestObject.cfrDueDate = value.recordsDueDate;
       break;
     case FOI_COMPONENT_CONSTANTS.ASSIGNED_TO:
       const assigneeDetails = createAssigneeDetails(value, value2);
@@ -294,9 +293,7 @@ export const createRequestDetailsObjectFunc = (
     case FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE:
       requestObject.requestProcessStart = value;
       requestObject.dueDate = value2;
-      if (requestObject.originalDueDate) {
-        requestObject.originalDueDate = addBusinessDays(formatDate(value, "yyyy MMM, dd"), 30)
-      }
+      if ("originalDueDate" in requestObject) requestObject.originalDueDate = addBusinessDays(formatDate(value, "yyyy MMM, dd"), 30);
       break;
     case FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST:
       requestObject.selectedMinistries = [];
@@ -371,7 +368,6 @@ export const checkValidationError = (
   oipcData,
   isOipcReview,
   isconsultflag,
-  cfrDueDate
 ) => {
   return (
     (!isconsultflag && (
@@ -398,7 +394,7 @@ export const checkValidationError = (
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
     !requiredRequestDetailsValues.dueDate ||
-    (cfrDueDate && !requiredRequestDetailsValues.recordsDueDate) ||
+    ("recordsDueDate" in requiredRequestDetailsValues  && !requiredRequestDetailsValues.recordsDueDate) ||
     !requiredAxisDetails.axisRequestId || 
     (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
       if (oipc.inquiryattributes?.inquirydate) {
