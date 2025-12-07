@@ -344,7 +344,7 @@ const RequestDetails = React.memo(
                     shrink: true,
                     }}
                     onChange={handleRecordsDueDate}
-                    InputProps={{inputProps: { min: startDateText} }}
+                    InputProps={{inputProps: { min: receivedDateText} }}
                     variant="outlined"
                     required
                     error={startDateText === undefined || startDateText === "" || cfrDueDate === undefined || cfrDueDate === ""}
