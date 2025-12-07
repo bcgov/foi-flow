@@ -184,7 +184,7 @@ const RequestDetails = React.memo(
     const [selectedReceivedMode, setSelectedReceivedMode] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE));
     const [selectedDeliveryMode, setSelectedDeliveryMode] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE));
     const [originalDueDate, setOriginlaDueDate] = React.useState(requestDetails?.originalDueDate ? formatDate(requestDetails.originalDueDate) : "N/A");
-    const [cfrDueDate, setCfrDueDate] = React.useState(requestDetails?.cfrDueDate ? formatDate(requestDetails.cfrDueDate) : "N/A")
+    const [cfrDueDate, setCfrDueDate] = React.useState(requestDetails?.cfrDueDate ? formatDate(requestDetails.cfrDueDate) : "N/A");
 
     //generating the menuItems for RequestTypes, ReceivedModes and DeliveryModes
     const requestTypes = requestType.map((item) => {
@@ -210,7 +210,7 @@ const RequestDetails = React.memo(
       if (requestDetails?.originalDueDate) setOriginlaDueDate(dueDate);
       // Add extensions to dueDate when start date changed
       if (requestExtensions) {
-        const extDays = requestExtensions.reduce((acc, ext) => acc + parseInt(ext.extendedduedays), 0)
+        const extDays = requestExtensions.reduce((acc, ext) => acc + (ext.extensionstatus === "Approved" ? parseInt(ext.extendedduedays) : 0), 0);
         dueDate = addBusinessDays(dueDate, extDays)
       }
       setDueDate(dueDate);
@@ -312,7 +312,7 @@ const RequestDetails = React.memo(
                   InputProps={{inputProps: { min: startDateText} }}
                   required
                   error={dueDateText === undefined || dueDateText === ""}
-                  disabled={disableInput}
+                  disabled={(requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || requestDetails?.currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) || disableInput}
                   fullWidth
                 />
             </div>
