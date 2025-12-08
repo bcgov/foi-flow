@@ -242,8 +242,7 @@
         public async Task<FOIMinistryRequestDto> GetRequestOriginalDueDate(int ministryRequestId)
         {
             const string query = @"SELECT * FROM public.""FOIMinistryRequests"" 
-                WHERE foiministryrequestid = @MinistryRequestId AND requeststatuslabel = 'open'";
-            // WHAT DO I DO HERE? cONIRM WIHT BIZ THAT OG date is currently taking the first open requests due date as the og date, but now that we can change it should b te latest requests og date
+                WHERE foiministryrequestid = @MinistryRequestId";
 
             var parameters = new { MinistryRequestId = ministryRequestId };
 
