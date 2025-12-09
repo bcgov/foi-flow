@@ -272,7 +272,7 @@ export const createRequestDetailsObjectFunc = (
       requestObject.requestProcessStart = value.requestStartDate;
       requestObject.dueDate = value.dueDate;
       requestObject.receivedMode = value.receivedMode;
-      requestObject.deliveryMode = value.deliveryMode;
+      requestObject.deliveryMode = value.deliveryMode?.toLowerCase()?.includes("select")?"":value.deliveryMode;
       break;
     case FOI_COMPONENT_CONSTANTS.ASSIGNED_TO:
       const assigneeDetails = createAssigneeDetails(value, value2);
@@ -314,6 +314,7 @@ export const createRequestDetailsObjectFunc = (
       break;
     case FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER:
     case FOI_COMPONENT_CONSTANTS.DOB:
+    case FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS:
     case FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME:
     case FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME:
     case FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME:
@@ -381,9 +382,6 @@ export const checkValidationError = (
     assignedToValue.toLowerCase().includes("unassigned") ||
     requiredRequestDetailsValues.requestType.toLowerCase().includes("select") ||
     requiredRequestDetailsValues.receivedMode
-      .toLowerCase()
-      .includes("select") ||
-    requiredRequestDetailsValues.deliveryMode
       .toLowerCase()
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||

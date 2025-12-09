@@ -102,10 +102,11 @@ class requestservicegetter:
                 requestortypeid = applicant['requestortypeid']
                 businessname = None
                 axisapplicantid = applicant['axisapplicantid']
+                alsoknownas = applicant['alsoknownas']
 
                 if requestortypeid == 1:
                     baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, axisapplicantid))
-                additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob))
+                additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob, alsoknownas))
             baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
             baserequestinfo.update(baserequestdetails)
             additionalpersonalinfo.update(additionalpersonalinfodetails)
@@ -163,8 +164,8 @@ class requestservicegetter:
             'requestType': request['requesttype'],
             'receivedDate': _receiveddate.strftime('%Y %b, %d'),
             'receivedDateUF': parse(request['receiveddate']).strftime('%Y-%m-%d %H:%M:%S.%f'),
-            'deliverymodeid':request['deliverymode.deliverymodeid'],
-            'deliveryMode':request['deliverymode.name'],
+            'deliverymodeid':request['deliverymode.deliverymodeid'] if 'deliverymode' in request and request["deliverymode.deliverymodeid"] is not None else None,
+            'deliveryMode':request['deliverymode.name'] if 'deliverymode' in request and request["deliverymode.name"] is not None else "",
             'receivedmodeid':request['receivedmode.receivedmodeid'],
             'receivedMode':request['receivedmode.name'],
             'assignedGroup': requestministry["assignedgroup"],

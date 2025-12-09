@@ -171,13 +171,16 @@ const RequestDescription = React.memo(({
     }
 
     const subjectCodes = subjectCodeList.map((item) => {
-      return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
+      return ( <MenuItem key={item.name} value={item.name}>{item.name}</MenuItem> )
     });
 
     const handleSubjectCodeChange = (e) => {
       setSelectedSubjectCode(e.target.value);
       handleOnChangeRequiredRequestDescriptionValues(e.target.checked, FOI_COMPONENT_CONSTANTS.SUBJECT_CODE)
-      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.SUBJECT_CODE, e.target.value);
+      let selectedCode ="";
+      if(!e.target.value?.toLowerCase().includes("select"))
+        selectedCode=e.target.value;
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.SUBJECT_CODE, selectedCode );
     }
 
     const [openModal, setOpenModal] = React.useState(false);
