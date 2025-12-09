@@ -286,7 +286,7 @@ import {
             let data = foiDeliveryModeList.map((deliveryMode) => {
               return { ...deliveryMode };
             });
-            data.unshift(firstDeliveryMode);
+            //data.unshift(firstDeliveryMode);
             dispatch(setFOIDeliveryModeList(data));
             dispatch(setFOILoader(false));
           } else {
