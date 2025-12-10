@@ -1,22 +1,22 @@
 """Delivery Mode update
 
-Revision ID: 4ad3724b593b
-Revises: cfe019598f8b
-Create Date: 2025-09-08 16:25:46.895124
+Revision ID: 35ac2fc5754e
+Revises: 8f16afbd3bae
+Create Date: 2025-12-10 07:08:00.057558
 
 """
 from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 from sqlalchemy.sql import column, table
 from sqlalchemy.sql.sqltypes import Boolean, String
 
 
+
 # revision identifiers, used by Alembic.
-revision = '4ad3724b593b'
-down_revision = 'cfe019598f8b'
+revision = '35ac2fc5754e'
+down_revision = '8f16afbd3bae'
 branch_labels = None
 depends_on = None
+
 
 
 def upgrade():
