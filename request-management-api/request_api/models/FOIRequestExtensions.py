@@ -182,6 +182,10 @@ class FOIRequestExtension(db.Model):
             return DefaultMethodResult(True,'Extensions disabled for extension ids ','',foirequestextensionids)
         else:
             return DefaultMethodResult(True,'No Extensions to disable ')
+        
+    @classmethod
+    def getlastextensiondays(cls, ministryid):
+        return db.session.query(FOIRequestExtension.extendedduedays).filter(FOIRequestExtension.foiministryrequest_id == ministryid, FOIRequestExtension.extensionreasonid == 2).order_by(FOIRequestExtension.foiministryrequest_id.desc(), FOIRequestExtension.version.desc()).first()[0]
             
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:
