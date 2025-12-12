@@ -107,7 +107,7 @@ class FOIRequestWrapperSchema(Schema):
     paymentExpiryDate = fields.Str(data_key="paymentExpiryDate", required=False,allow_none=True)
     cfrDueDate = fields.Date(data_key="cfrDueDate", required=False,allow_none=True)
     originalDueDate = fields.Date(data_key="originalDueDate", required=False,allow_none=True)
-    deliveryMode = fields.Str(data_key="deliveryMode",allow_none=True)   
+    deliveryMode = fields.Str(data_key="deliveryMode", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])   
     receivedMode = fields.Str(data_key="receivedMode", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])   
     receivedDate = fields.Str(data_key="receivedDateUF", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
     startDate = fields.Str(data_key="requestProcessStart", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])  

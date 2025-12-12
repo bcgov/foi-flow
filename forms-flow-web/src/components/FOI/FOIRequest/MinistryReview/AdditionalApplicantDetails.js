@@ -23,7 +23,6 @@ const AdditionalApplicantDetails = React.memo((requestDetails) => {
     birthDate: _requestDetails?.additionalPersonalInfo?.birthDate,
     employeeNumber: _requestDetails?.publicServiceEmployeeNumber,
     correctionsNumber: _requestDetails?.correctionalServiceNumber,
-    alsoKnownAs: _requestDetails?.additionalPersonalInfo?.alsoKnownAs
   };
 
   const additionalApplicantDetailsEntered = Object.values(
@@ -39,7 +38,7 @@ const AdditionalApplicantDetails = React.memo((requestDetails) => {
       <label className="foi-details-label">Additional Applicant Details</label>
       <CardContent>
         <div className={clsx("row", "foi-details-row", classes.rowMargin)}>
-          <div className="col-lg-4 foi-details-col">
+          <div className="col-lg-6 foi-details-col">
             <div>
               <b>Personal Health Number</b>
             </div>
@@ -47,7 +46,7 @@ const AdditionalApplicantDetails = React.memo((requestDetails) => {
               <span>{additionalApplicantDetails.personalHealthNumber}</span>
             </div>
           </div>
-          <div className="col-lg-4 foi-details-col">
+          <div className="col-lg-6 foi-details-col">
             <div>
               <b>Employee Number</b>
             </div>
@@ -55,7 +54,10 @@ const AdditionalApplicantDetails = React.memo((requestDetails) => {
               <span>{additionalApplicantDetails.employeeNumber}</span>
             </div>
           </div>
-          <div className="col-lg-4 foi-details-col">
+        </div>
+
+        <div className="row foi-details-row">
+          <div className="col-lg-6 foi-details-col">
             <div>
               <b>Date of Birth</b>
             </div>
@@ -65,33 +67,12 @@ const AdditionalApplicantDetails = React.memo((requestDetails) => {
               </span>
             </div>
           </div>
-        </div>
-
-        <div className="row foi-details-row">
-          {/* <div className="col-lg-3 foi-details-col">
-            <div>
-              <b>Date of Birth</b>
-            </div>
-            <div>
-              <span>
-                {formatDate(additionalApplicantDetails.birthDate, "yyyy/MM/dd")}
-              </span>
-            </div>
-          </div> */}
-          <div className="col-lg-4 foi-details-col">
+          <div className="col-lg-6 foi-details-col">
             <div>
               <b>Corrections Number</b>
             </div>
             <div>
               <span>{additionalApplicantDetails.correctionsNumber}</span>
-            </div>
-          </div>
-          <div className="col-lg-4 foi-details-col">
-            <div>
-              <b>Also Known As</b>
-            </div>
-            <div>
-              <span>{additionalApplicantDetails.alsoKnownAs}</span>
             </div>
           </div>
         </div>
