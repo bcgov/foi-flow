@@ -159,13 +159,16 @@ class requestservicegetter:
         assignedgroupemail = OperatingTeamEmail.getoperatingteamemail(requestministry["assignedgroup"])
         if assignedgroupemail is None:
             assignedgroupemail = KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"])
+        print("\nrequest in __preparebaseinfo:", request)
         baserequestinfo = {
             'id': request['foirequestid'],
             'requestType': request['requesttype'],
             'receivedDate': _receiveddate.strftime('%Y %b, %d'),
             'receivedDateUF': parse(request['receiveddate']).strftime('%Y-%m-%d %H:%M:%S.%f'),
-            'deliverymodeid':request['deliverymode.deliverymodeid'] if 'deliverymode' in request and request["deliverymode.deliverymodeid"] is not None else None,
-            'deliveryMode':request['deliverymode.name'] if 'deliverymode' in request and request["deliverymode.name"] is not None else "",
+            'deliverymodeid':request['deliverymode.deliverymodeid'] if 'deliverymode' in request or 'deliverymode.deliverymodeid' in request and
+              request["deliverymode.deliverymodeid"] is not None else None,
+            'deliveryMode':request['deliverymode.name'] if 'deliverymode' in request or 'deliverymode.name' in request and
+              request["deliverymode.name"] is not None else "",
             'receivedmodeid':request['receivedmode.receivedmodeid'],
             'receivedMode':request['receivedmode.name'],
             'assignedGroup': requestministry["assignedgroup"],
