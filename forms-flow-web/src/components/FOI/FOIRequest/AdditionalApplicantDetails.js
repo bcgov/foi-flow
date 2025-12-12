@@ -223,7 +223,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                       fullWidth
                       disabled={disableInput}
                   />
-                  <Box sx={{ width: "100%", maxWidth: 600, mx: "auto" }}>
+                  <Box>
                     <TextField   
                         id='alsoKnownAsText'                         
                         label="Also Known As" 

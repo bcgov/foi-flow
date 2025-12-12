@@ -64,7 +64,7 @@ const RequestDescription = React.memo(({
     const getSubjectCode = () => {
       if (requestDetails?.subjectCode)
         return requestDetails.subjectCode;
-      return "Select Subject Code (if required)"
+      return "No Subject Code"
     }
 
     //updates the default values from the request description box    
