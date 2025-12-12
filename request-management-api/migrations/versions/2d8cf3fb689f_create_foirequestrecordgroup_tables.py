@@ -23,6 +23,7 @@ def upgrade():
         'FOIRequestRecordGroup',
         sa.Column('document_set_id', sa.Integer(), primary_key=True, autoincrement=True),
         sa.Column('ministry_request_id', sa.Integer(), nullable=False),
+        sa.Column('request_id', sa.Integer(), nullable=False),
 
         sa.Column('name', sa.String(length=255), nullable=True),
         sa.Column('is_active', sa.Boolean(), nullable=False, server_default=sa.text('true')),

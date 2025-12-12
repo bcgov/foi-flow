@@ -369,8 +369,13 @@ class FOIRequestRecordGroupList(Resource):
     @auth.ismemberofgroups(getrequiredmemberships())
     def get(requestid, ministryrequestid):
         try:
-            result = recordservice().fetch(requestid, ministryrequestid)
-            return json.dumps(result), 200
+            result = recordgroupservice().fetch(requestid, ministryrequestid)
+            return {
+                "success": result.success,
+                "message": result.message,
+                "code": result.code,
+                "data": result.data,
+            }, 200
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
         except Exception as exception:

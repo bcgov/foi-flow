@@ -14,6 +14,7 @@ class FOIRequestRecordGroup(db.Model):
 
     document_set_id = Column(Integer, primary_key=True, autoincrement=True)
     ministry_request_id = Column(Integer, nullable=False, index=True)
+    request_id = Column(Integer, nullable=False, index=True)
 
     name = Column(String(255))
     is_active = db.Column(db.Boolean, unique=False, nullable=False, default=True)
@@ -33,24 +34,26 @@ class FOIRequestRecordGroup(db.Model):
     )
 
     __table_args__ = (
-        # old composite index included ministryrequestversion; now just mrid or drop entirely
         Index(
             "ix_fr_group_request",
             "ministry_request_id",
         ),
     )
 
-    def __repr__(self) -> str:
+    def __repr__(self):
         return (
-            f"<FOIRequestRecordGroup(documentsetid={self.documentsetid}, "
-            f"mrid={self.ministryrequestid}, "
-            f"name={self.name!r}, isactive={self.isactive})>"
+            f"<FOIRequestRecordGroup(document_set_id={self.document_set_id}, "
+            f"ministry_request_id={self.ministry_request_id}, "
+            f"request_id={self.request_id}, "
+            f"name={self.name!r}, "
+            f"is_active={self.is_active})>"
         )
 
     @classmethod
     def create_group(
             cls,
             ministry_request_id: int,
+            request_id: int,
             name: str,
             created_by: str,
             records: List[int],
@@ -60,6 +63,7 @@ class FOIRequestRecordGroup(db.Model):
             # 1. Insert parent group
             group = cls(
                 ministry_request_id=ministry_request_id,
+                request_id=request_id,
                 name=name,
                 created_by=created_by,
             )
@@ -108,3 +112,22 @@ class FOIRequestRecordGroup(db.Model):
             .first()
             is not None
         )
+
+    @classmethod
+    def get_by_ministry_request_id(
+            cls, ministry_request_id: int, include_records: bool = False
+    ) -> list["FOIRequestRecordGroup"]:
+        """
+        Retrieve all active FOIRequestRecordGroup rows for a given ministry_request_id.
+        Optionally loads the associated records using selectinload.
+        """
+
+        query = db.session.query(cls).filter(
+            cls.ministry_request_id == ministry_request_id,
+            cls.is_active.is_(True)
+        )
+
+        if include_records:
+            query = query.options(db.selectinload(cls.records))
+
+        return query.order_by(cls.document_set_id.asc()).all()

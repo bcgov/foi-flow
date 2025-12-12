@@ -1,5 +1,3 @@
-from operator import and_
-from typing import List
 
 from .db import db
 

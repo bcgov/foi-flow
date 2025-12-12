@@ -49,7 +49,7 @@ class recordgroupservice:
             return DefaultMethodResult(False, "Ministry request not found.", None)
 
         raw_name = recordgroupschema.get("name", "")
-        name = raw_name.strip() or "documentSet"
+        name = raw_name.strip() or "Document Set 1"
         records: List[int] = recordgroupschema.get("records", []) or []
 
         try:
@@ -66,21 +66,12 @@ class recordgroupservice:
             )
 
         try:
-            # On the initial creation, we need to place the remaining records into a second group.
             group = FOIRequestRecordGroup.create_group(
                 ministry_request_id=ministryrequestid,
-                name=f"{name}1",
+                request_id=requestid,
+                name=name,
                 created_by=username,
                 records=sorted(valid_records),
-            )
-
-            records_without_group = FOIRequestRecord.get_records_without_group(ministryrequestid) - valid_records
-
-            FOIRequestRecordGroup.create_group(
-                ministry_request_id=ministryrequestid,
-                name=f"{name}2",
-                created_by=username,
-                records=sorted(records_without_group),
             )
 
             if group is None:
@@ -89,6 +80,7 @@ class recordgroupservice:
             data = {
                 "group": {
                     "documentsetid": group.document_set_id,
+                    "requestid": group.request_id,
                     "name": group.name,
                     "ministryrequestid": group.ministry_request_id,
                     "created_by": group.created_by,
@@ -134,6 +126,7 @@ class recordgroupservice:
         # Fetch group
         group = FOIRequestRecordGroup.query.filter_by(
             document_set_id=document_set_id,
+            request_id=requestid,
             ministry_request_id=ministryrequestid
         ).first()
 
@@ -146,7 +139,6 @@ class recordgroupservice:
             group.updated_by = username
             group.updated_at = datetime.utcnow()
 
-        # Update records (optional)
         if "records" in payload:
             try:
                 # Normalize & validate incoming record list
@@ -205,3 +197,51 @@ class recordgroupservice:
                 "records": sorted(payload.get("records", [])),
             },
         )
+
+    def fetch(
+            self,
+            requestid: int,
+            ministryrequestid: int,
+    ) -> DefaultMethodResult:
+        """
+        Retrieve all active record groups for a Ministry Request.
+        """
+
+        try:
+            # Ensure ministry request exists
+            ministry_req = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
+            if ministry_req is None:
+                return DefaultMethodResult(False, "Ministry request not found.", 404)
+
+            # Fetch all groups (with records included)
+            groups = FOIRequestRecordGroup.get_by_ministry_request_id(
+                ministry_request_id=ministryrequestid,
+                include_records=True,
+            )
+
+            # Transform for API response
+            result = []
+            for g in groups:
+                result.append({
+                    "documentsetid": g.document_set_id,
+                    "name": g.name,
+                    "ministryrequestid": g.ministry_request_id,
+                    "is_active": g.is_active,
+                    "created_at": g.created_at,
+                    "created_by": g.created_by,
+                    "updated_at": g.updated_at,
+                    "updated_by": g.updated_by,
+                    "records": sorted([r.recordid for r in g.records]),
+                })
+
+            return DefaultMethodResult(
+                True,
+                "Groups retrieved.",
+                200,
+                result
+            )
+
+        except Exception:
+            current_app.logger.exception("Error fetching record groups")
+            return DefaultMethodResult(False, "Unexpected error fetching groups.", 500)
+
