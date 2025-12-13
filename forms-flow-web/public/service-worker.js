@@ -56,14 +56,30 @@
 //   }
 // });
 
-// --- No-op service worker (disables all caching and behavior safely) --- Bug Fix to prevent issue where users would encounter random blank pages in EDGE (NGINX.conf adjust as well)
+// // --- No-op service worker (disables all caching and behavior safely) --- 
 
-self.addEventListener("install", () => {
-  // Ensure this SW activates immediately
+// self.addEventListener("install", () => {
+//   // Ensure this SW activates immediately
+//   self.skipWaiting();
+// });
+
+// self.addEventListener("activate", () => {
+//   // Ensure pages immediately use this (non-caching) SW
+//   clients.claim();
+// });
+
+//KILL SWITCH To remove old/cached service workers from client-side (users browsers)
+self.addEventListener('install', () => {
   self.skipWaiting();
 });
 
-self.addEventListener("activate", () => {
-  // Ensure pages immediately use this (non-caching) SW
-  clients.claim();
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    (async () => {
+      const cacheNames = await caches.keys();
+      await Promise.all(cacheNames.map(name => caches.delete(name)));
+      await self.registration.unregister();
+      await self.clients.claim();
+    })()
+  );
 });

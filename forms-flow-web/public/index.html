@@ -14,54 +14,32 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#536878" />
-    <link rel="shortcut icon" href="%PUBLIC_URL%/FOI/assets/Images/favicon.ico" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/FOI/assets/Images/favicon.ico"/>
+    <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" /> 
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/favicon.ico"/> 
     <title>foi.flow</title>
   </head>
   <body class="no-scroll">
     <div id="app" class="scrollable-page"></div>
     <script src="%PUBLIC_URL%/config/config.js"></script>
     <script>
-      // Check that service workers are supported
-      let newWorker;
-
       if ('serviceWorker' in navigator) {
-        // Register the service worker
-        navigator.serviceWorker.register('/service-worker.js').then(reg => {
-          reg.addEventListener('updatefound', () => {
-            // An updated service worker has appeared in reg.installing!
-            newWorker = reg.installing;
+        navigator.serviceWorker.register('/service-worker.js')
+          .catch(err => console.log('SW registration failed', err));
 
-            newWorker.addEventListener('statechange', () => {
-
-              // Has service worker state changed?
-              switch (newWorker.state) {
-                case 'installed':
-
-                  // There is a new service worker available, show the notification
-                  if (navigator.serviceWorker.controller) {
-                    newWorker.postMessage({ action: 'skipWaiting' });
-                  }
-
-                  break;
-              }
-            });
-          });
-        },(err) => {
-            console.log("Worker registration failed", err);
-        }).catch((err) => {
-          console.log(err);
-        });
-        let refreshing;
-        // The event listener that is fired when the service worker updates
-        // Here we reload the page
-        navigator.serviceWorker.addEventListener('controllerchange', function () {
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
           if (refreshing) return;
-          window.location.reload();
           refreshing = true;
+          window.location.reload();
         });
-      }else{
-          console.log("Service Worker is not supported by browser.");
+
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          regs.forEach(reg => reg.unregister());
+        });
+
+        navigator.serviceWorker.getRegistrations().then(regs => {
+          console.log('Active SWs on this client:', regs.filter(r => r.active).length);
+        });
       }
     </script>
     <style>
