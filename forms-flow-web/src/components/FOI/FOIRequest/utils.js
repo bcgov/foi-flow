@@ -365,11 +365,16 @@ export const checkValidationError = (
   isOipcReview,
   isconsultflag
 ) => {
+  console.log("applicant details", requiredApplicantDetails)
   return (
     (!isconsultflag && (
       requiredApplicantDetails.firstName === "" ||
-      requiredApplicantDetails.lastName === ""
+      requiredApplicantDetails.lastName === "" ||
+      requiredApplicantDetails.firstName.length > 50 || 
+      requiredApplicantDetails.lastName.length > 50 ||
+      requiredApplicantDetails.middleName.length > 50
     )) ||
+    requiredApplicantDetails.businessName.length > 255 ||
     requiredApplicantDetails.category.toLowerCase().includes("select") ||
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||

@@ -753,8 +753,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const requiredApplicantDetailsValues = {
     firstName: "",
     lastName: "",
+    middleName: "",
     email: "",
     category: "",
+    businessName: ""
   };
 
   const requiredContactDetailsValue = {
@@ -1236,6 +1238,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       return StateEnum.unopened.name
     }
   }
+  console.log("reqinit", requiredApplicantDetailsValues)
+  console.log("req", requiredApplicantDetails)
 
   return (!isLoading &&
     requestDetails &&
