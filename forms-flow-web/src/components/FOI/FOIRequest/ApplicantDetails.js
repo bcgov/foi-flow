@@ -84,7 +84,7 @@ const ApplicantDetails = React.memo(
           if (categoryValue.length <= 0) return options.defaultValue;
         }
       }
-
+      
       return data[name] || options.defaultValue;
     };
 
@@ -167,6 +167,8 @@ const ApplicantDetails = React.memo(
             defaultValue: "Select Category",
           }
         ),
+        middleName: "",
+        businessName: ""
       };
       handleApplicantDetailsInitialValue(applicantDetailsObject);
     }, [requestDetails, handleApplicantDetailsInitialValue]);
@@ -186,6 +188,10 @@ const ApplicantDetails = React.memo(
     //handle onchange of middleName
     const handleMiddleNameChange = (e) => {
       setApplicantMiddleName(e.target.value);
+      handleApplicantDetailsValue(
+        e.target.value,
+        FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME
+      );
       createSaveRequestObject(
         FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME,
         e.target.value
@@ -206,6 +212,10 @@ const ApplicantDetails = React.memo(
     //handle onchange of organization
     const handleOrganizationChange = (e) => {
       setOrganization(e.target.value);
+      handleApplicantDetailsValue(
+        e.target.value,
+        FOI_COMPONENT_CONSTANTS.ORGANIZATION
+      );
       createSaveRequestObject(
         FOI_COMPONENT_CONSTANTS.ORGANIZATION,
         e.target.value
@@ -249,6 +259,25 @@ const ApplicantDetails = React.memo(
 
     const [isConsultFlagFieldRequired, setIsConsultFlagFieldRequired] = React.useState(!requestDetails?.isconsultflag);
 
+    const generateCharLengthMsg = (value, field) => {
+      if (field === "organization" && value.length > 255) {
+        return "Name field length must not exceed 255 characters"
+      }
+      if (field !== "organization" && value.length > 50) {
+        return "Name field length must not exceed 50 characters"
+      }
+      return "";
+    }
+    const validateApplicantFieldCharLength = (value, field) => {
+      if (field === "organization") {
+        return value.length > 255;
+      }
+      if (field === "middleName") {
+        return value.length > 50;
+      }
+      return  value === "" || value.length > 50;
+    }
+
     React.useEffect(() => {
 
       setIsConsultFlagFieldRequired(!requestDetails?.isconsultflag);
@@ -280,7 +309,8 @@ const ApplicantDetails = React.memo(
                 onChange={handleFirtNameChange}
                 required={isConsultFlagFieldRequired}
                 disabled={disableInput}
-                error={isConsultFlagFieldRequired && applicantFirstNameText === ""}
+                helperText={generateCharLengthMsg(applicantFirstNameText, "firstName")}
+                error={isConsultFlagFieldRequired && validateApplicantFieldCharLength(applicantFirstNameText, "firstName")}
               />
               <TextField
                 id="middleName"
@@ -292,7 +322,9 @@ const ApplicantDetails = React.memo(
                 className={isConsultFlagFieldRequired &&warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) && classes.warning}
                 fullWidth
                 disabled={disableInput}
+                helperText={generateCharLengthMsg(applicantMiddleNameText, "middleName")}
                 onChange={handleMiddleNameChange}
+                error={validateApplicantFieldCharLength(applicantMiddleNameText, "middleName")}
               />
               <TextField
                 id="lastName"
@@ -304,9 +336,10 @@ const ApplicantDetails = React.memo(
                 className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) && classes.warning}
                 fullWidth
                 onChange={handleLastNameChange}
+                helperText={generateCharLengthMsg(applicantLastNameText, "lastName")}
                 required={isConsultFlagFieldRequired}
                 disabled={disableInput}
-                error={isConsultFlagFieldRequired && applicantLastNameText === ""}
+                error={isConsultFlagFieldRequired && validateApplicantFieldCharLength(applicantLastNameText, "lastName")}
               />
             </div>
             <div className="col-lg-6 foi-details-col">
@@ -321,6 +354,8 @@ const ApplicantDetails = React.memo(
                 fullWidth
                 disabled={disableInput}
                 onChange={handleOrganizationChange}
+                helperText={generateCharLengthMsg(organizationText, "organization")}
+                error={validateApplicantFieldCharLength(organizationText, "organization")}
               />
               <TextField
                 id="category"
