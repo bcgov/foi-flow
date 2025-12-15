@@ -10,6 +10,7 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import {closeChildDetails} from '../FOIRequest/utils';
+import { Box, Fade } from "@mui/material";
 
 
 const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput,userDetail,requestType}) => {
@@ -140,17 +141,38 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
                     />                                                
                 </div>
                 <div className="col-lg-6 foi-details-col">
-                    <TextField          
-                        id='childAlsoKnownAs'                  
-                        label="Also Known As" 
-                        inputProps={{ "aria-labelledby": "childAlsoKnownAs-label"}}
-                        InputLabelProps={{ shrink: true, }} 
-                        value={childNickNameText}
-                        variant="outlined"
-                        onChange={handleNickNameChange}
-                        fullWidth
-                        disabled={disableInput}
-                    />                        
+                    <Box>
+                        <TextField          
+                            id='childAlsoKnownAs'                  
+                            label="Also Known As" 
+                            inputProps={{ "aria-labelledby": "childAlsoKnownAs-label"}}
+                            InputLabelProps={{ shrink: true, }} 
+                            value={childNickNameText}
+                            variant="outlined"
+                            onChange={handleNickNameChange}
+                            fullWidth
+                            disabled={disableInput}
+                            error={childNickNameText.length >= 250}
+                            helperText={(childNickNameText.length >= 250) ? "250 character limit reached" : ""}
+                            multiline
+                            minRows={1}
+                            maxRows={3}
+                        />         
+                        <Fade in={childNickNameText.length > 0 && childNickNameText.length < 250} timeout={300}> 
+                            <Typography
+                            variant="caption"
+                            sx={{
+                                display: "block",
+                                textAlign: "right",
+                                mt: 0.5,
+                                color: childNickNameText.length >= 250 ? "error.main" : "text.secondary",
+                                wordBreak: "break-word",
+                            }}
+                            >
+                            {childNickNameText.length}/{250} characters
+                            </Typography>
+                        </Fade>
+                    </Box>                     
                     <TextField        
                         id='childDOB'        
                         label="Date of Birth"
