@@ -79,7 +79,7 @@ const OnBehalfDetails = React.memo((requestDetails) => {
               <b>Also Known As</b>
             </div>
             <div>
-              <span>{onBehalfDetails.alsoKnownAs}</span>
+              <span className="long-text">{onBehalfDetails.alsoKnownAs}</span>
             </div>
           </div>
         </div>
