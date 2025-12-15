@@ -69,17 +69,19 @@
 // });
 
 //KILL SWITCH To remove old/cached service workers from client-side (users browsers)
-self.addEventListener('install', () => {
+self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    (async () => {
-      const cacheNames = await caches.keys();
-      await Promise.all(cacheNames.map(name => caches.delete(name)));
-      await self.registration.unregister();
-      await self.clients.claim();
-    })()
-  );
+self.addEventListener("activate", (event) => {
+  self.registration
+    .unregister()
+    .then(() => self.clients.matchAll())
+    .then((clients) => {
+      clients.forEach((client) => {
+        if (client.url && "navigate" in client) {
+          client.navigate(client.url);
+        }
+      });
+    });
 });
