@@ -261,10 +261,10 @@ const ApplicantDetails = React.memo(
 
     const generateCharLengthMsg = (value, field) => {
       if (field === "organization" && value.length > 255) {
-        return "Name field length must not exceed 255 characters"
+        return "Text field length must not exceed 255 characters"
       }
       if (field !== "organization" && value.length > 50) {
-        return "Name field length must not exceed 50 characters"
+        return "Text field length must not exceed 50 characters"
       }
       return "";
     }
