@@ -759,12 +759,18 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     businessName: ""
   };
 
+  // ADD OTHER FIELDS HERE and USE checkContactGiven func to create the object being sent to utils/checkValidation func
   const requiredContactDetailsValue = {
     address: "",
     city: "",
     province: "",
     country: "",
     postal: "",
+    phonePrimary: "",
+    phoneSecondary: "",
+    workPhonePrimary: "",
+    workPhoneSecondary: "",
+    addressSecondary: ""
   };
 
   const requiredAxisDetailsValue = {
@@ -792,6 +798,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [requiredAxisDetails, setRequiredAxisDetails] = React.useState(
     requiredAxisDetailsValue
   );
+  const [addressAndContactInfoErr, setAddressAndContactInfoErr] = React.useState(false);
   //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
   const handleInitialRequiredRequestDescriptionValues = React.useCallback(
     (requestDescriptionObject) => {
