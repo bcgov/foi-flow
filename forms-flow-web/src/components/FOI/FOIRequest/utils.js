@@ -366,7 +366,6 @@ export const checkValidationError = (
   isconsultflag,
   requiredContactDetails
 ) => {
-  console.log("applicant details", requiredApplicantDetails)
   return (
     (!isconsultflag && (
       requiredApplicantDetails.firstName === "" ||
