@@ -26,14 +26,6 @@
         navigator.serviceWorker.register('/service-worker.js')
           .catch(err => console.log('SW registration failed', err));
 
-        // Reload page once SW takes control
-        let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          if (refreshing) return;
-          refreshing = true;
-          window.location.reload();
-        });
-
         // Optional: log active SWs for monitoring
         navigator.serviceWorker.getRegistrations().then(regs => {
           const activeSWs = regs.filter(r => r.active);
