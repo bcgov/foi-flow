@@ -145,7 +145,7 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
                         <TextField          
                             id='childAlsoKnownAs'                  
                             label="Also Known As" 
-                            inputProps={{ "aria-labelledby": "childAlsoKnownAs-label"}}
+                            inputProps={{ "aria-labelledby": "childAlsoKnownAs-label", maxLength: 250}}
                             InputLabelProps={{ shrink: true, }} 
                             value={childNickNameText}
                             variant="outlined"
