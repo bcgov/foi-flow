@@ -224,11 +224,11 @@ const RequestDetails = React.memo(
       setSelectedDeliveryMode(e.target.value);
       //event bubble up - for required feild validation
       let delMode="";
-      if (!e.target.value.toLowerCase().includes("select") && e.target.value !="" ){
-        handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
+      handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
+      if (!e.target.value.toLowerCase().includes("no delivery mode") && e.target.value !="" ){
         delMode=e.target.value
-        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, delMode);
       }
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, delMode);
     }
 
     const handleDueDateChange = (e) => {
@@ -411,7 +411,7 @@ const RequestDetails = React.memo(
                     >
                     {/* {deliveryModes} */}
                       <MenuItem value="">
-                        Select Delivery Mode
+                        No Delivery Mode
                       </MenuItem>
                      {deliveryModes}
                   </TextField>
