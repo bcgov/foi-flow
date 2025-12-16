@@ -797,7 +797,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [requiredAxisDetails, setRequiredAxisDetails] = React.useState(
     requiredAxisDetailsValue
   );
-  const [addressAndContactInfoErr, setAddressAndContactInfoErr] = React.useState(false);
   //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
   const handleInitialRequiredRequestDescriptionValues = React.useCallback(
     (requestDescriptionObject) => {
