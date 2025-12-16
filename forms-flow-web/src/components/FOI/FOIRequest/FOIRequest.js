@@ -853,9 +853,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     setAssignedToValue(value);
   };
 
-  console.log("adressInfoInit", requiredContactDetailsValue)
-  console.log("adressInfo", requiredContactDetails)
-
   const saveOIPCNoReview = () => {
     const toastID = toast.loading("Saving request with removed OIPC review...")
     removeAllOIPCs();
@@ -1248,8 +1245,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       return StateEnum.unopened.name
     }
   }
-  console.log("reqinit", requiredApplicantDetailsValues)
-  console.log("req", requiredApplicantDetails)
 
   return (!isLoading &&
     requestDetails &&
