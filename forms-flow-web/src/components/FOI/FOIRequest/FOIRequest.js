@@ -759,7 +759,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     businessName: ""
   };
 
-  // ADD OTHER FIELDS HERE and USE checkContactGiven func to create the object being sent to utils/checkValidation func
   const requiredContactDetailsValue = {
     address: "",
     city: "",
@@ -854,6 +853,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     setAssignedToValue(value);
   };
 
+  console.log("adressInfoInit", requiredContactDetailsValue)
+  console.log("adressInfo", requiredContactDetails)
+
   const saveOIPCNoReview = () => {
     const toastID = toast.loading("Saving request with removed OIPC review...")
     removeAllOIPCs();
@@ -946,7 +948,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     _currentrequestStatus,
     oipcData,
     requestDetails.isoipcreview,
-    requestDetails.isconsultflag
+    requestDetails.isconsultflag,
+    requiredContactDetails,
   );
 
   const classes = useStyles();

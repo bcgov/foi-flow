@@ -149,7 +149,11 @@ const AddressContactDetails = memo(
           requestDetails,
           FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL
         ),
-        
+        phonePrimary: "",
+        phoneSecondary: "",
+        workPhonePrimary: "",
+        workPhoneSecondary: "",
+        addressSecondary: ""
       };
       handleContactDetailsInitialValue(contanctDetailsObject);
     }, [requestDetails, handleContactDetailsInitialValue]);
@@ -202,6 +206,10 @@ const AddressContactDetails = memo(
 
     const handleHomePhoneChange = (e) => {
       setHomePhone(e.target.value);
+      handleContanctDetailsValue(
+        e.target.value,
+        FOI_COMPONENT_CONSTANTS.HOME_PHONE
+      );
       createSaveRequestObject(
         FOI_COMPONENT_CONSTANTS.HOME_PHONE,
         e.target.value
@@ -209,6 +217,10 @@ const AddressContactDetails = memo(
     };
     const handleMobilePhoneChange = (e) => {
       setMobilePhone(e.target.value);
+      handleContanctDetailsValue(
+        e.target.value,
+        FOI_COMPONENT_CONSTANTS.MOBILE_PHONE
+      );
       createSaveRequestObject(
         FOI_COMPONENT_CONSTANTS.MOBILE_PHONE,
         e.target.value
@@ -216,6 +228,10 @@ const AddressContactDetails = memo(
     };
     const handleWorkPhonePrimaryChange = (e) => {
       setWorkPhonePrimary(e.target.value);
+      handleContanctDetailsValue(
+        e.target.value,
+        FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY
+      );
       createSaveRequestObject(
         FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY,
         e.target.value
@@ -223,6 +239,10 @@ const AddressContactDetails = memo(
     };
     const handleWorkPhoneSecondarChange = (e) => {
       setWorkPhoneSecondary(e.target.value);
+      handleContanctDetailsValue(
+        e.target.value,
+        FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY
+      );
       createSaveRequestObject(
         FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY,
         e.target.value
@@ -242,6 +262,10 @@ const AddressContactDetails = memo(
     };
     const handleScondaryStreetAddressChange = (e) => {
       setSecondaryStreetAddress(e.target.value);
+      handleContanctDetailsValue(
+        e.target.value,
+        FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY
+      );
       createSaveRequestObject(
         FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY,
         e.target.value

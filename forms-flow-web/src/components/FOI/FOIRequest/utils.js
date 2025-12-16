@@ -363,7 +363,8 @@ export const checkValidationError = (
   currentrequestStatus,
   oipcData,
   isOipcReview,
-  isconsultflag
+  isconsultflag,
+  requiredContactDetails
 ) => {
   console.log("applicant details", requiredApplicantDetails)
   return (
@@ -389,6 +390,7 @@ export const checkValidationError = (
     requiredRequestDetailsValues.receivedMode
       .toLowerCase()
       .includes("select") ||
+    Object.values(requiredContactDetails).some((contactInfo) => contactInfo.length > 500) ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
     !requiredAxisDetails.axisRequestId || 
