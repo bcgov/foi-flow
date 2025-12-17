@@ -1,7 +1,7 @@
 """Deactivate Old Processing Teams
 
 Revision ID: 05dee3d60a8c
-Revises: 3a4f7b2c6d9e
+Revises: 35ac2fc5754e
 Create Date: 2025-12-07 15:26:16.304413
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '05dee3d60a8c'
-down_revision = '3a4f7b2c6d9e'
+down_revision = '35ac2fc5754e'
 branch_labels = None
 depends_on = None
 
