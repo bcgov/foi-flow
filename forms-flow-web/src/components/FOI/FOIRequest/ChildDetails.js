@@ -141,7 +141,11 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
                     />                                                
                 </div>
                 <div className="col-lg-6 foi-details-col">
-                    <Box>
+                    <Box sx={{
+                        ".MuiInputBase-multiline.Mui-disabled": {
+                                background: "#eee",
+                                }
+                    }}>
                         <TextField          
                             id='childAlsoKnownAs'                  
                             label="Also Known As" 
