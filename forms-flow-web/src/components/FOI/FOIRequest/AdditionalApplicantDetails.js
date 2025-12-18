@@ -223,7 +223,11 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                       fullWidth
                       disabled={disableInput}
                   />
-                  <Box>
+                  <Box sx={{
+                        ".MuiInputBase-multiline.Mui-disabled": {
+                                background: "#eee",
+                                }
+                    }}>
                     <TextField   
                         id='alsoKnownAsText'                         
                         label="Also Known As" 
