@@ -6,15 +6,16 @@
    <elementGuidId>b554a910-a534-4f2f-8654-83cb3528fdc7</elementGuidId>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//span[@id='selectspanEDU']</value>
-      </entry>
-      <entry>
          <key>CSS</key>
          <value>#selectspanEDU</value>
       </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//label[11]/span</value>
+      </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>

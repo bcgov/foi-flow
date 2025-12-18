@@ -96,3 +96,4 @@ WebUI.click(findTestObject('Page_foi.flow/form/state change dialog/button_Save C
 
 WebUI.closeBrowser()
 
+

@@ -10,15 +10,15 @@
          <value>//*[@data-programareaid = '6']</value>
       </entry>
       <entry>
-         <key>XPATH</key>
-         <value>id(&quot;Request&quot;)/div[@class=&quot;container foi-review-request-container&quot;]/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;jss11 foi-request-form&quot;]/div[@class=&quot;request-accordian&quot;]/div[@class=&quot;MuiPaper-root MuiAccordion-root Mui-expanded MuiAccordion-rounded MuiPaper-elevation1 MuiPaper-rounded&quot;]/div[@class=&quot;MuiCollapse-root MuiCollapse-entered&quot;]/div[@class=&quot;MuiCollapse-wrapper&quot;]/div[@class=&quot;MuiCollapse-wrapperInner&quot;]/div[1]/div[@class=&quot;MuiAccordionDetails-root&quot;]/div[@class=&quot;foi-ministries-container&quot;]/div[@class=&quot;foi-ministries-checkboxes&quot;]/label[@class=&quot;check-item&quot;]/span[@class=&quot;checkmark&quot;]</value>
+         <key>CSS</key>
       </entry>
       <entry>
-         <key>CSS</key>
-         <value></value>
+         <key>XPATH</key>
+         <value>//label[11]/span</value>
       </entry>
    </selectorCollection>
-   <selectorMethod>BASIC</selectorMethod>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>false</isSelected>
