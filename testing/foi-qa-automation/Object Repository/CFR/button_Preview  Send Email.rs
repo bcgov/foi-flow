@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>button_Preview  Send Email</name>
+   <tag></tag>
+   <elementGuidId>cd1af671-b510-4a97-bb3a-fce30e6979f9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>div.previewEmail > button.btn.addCorrespondence</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='correspondence-editor-ql-toolbar']/div/button</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>ba13de6e-3adc-46ee-905e-fd0703b254d7</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>btn addCorrespondence</value>
+      <webElementGuid>bd7eefe7-a881-4247-9a23-3eba4e921be3</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>data-variant</name>
+      <type>Main</type>
+      <value>contained</value>
+      <webElementGuid>9f78765c-d6a8-4522-a1d4-20e8b9fbe097</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>color</name>
+      <type>Main</type>
+      <value>primary</value>
+      <webElementGuid>9c757aa4-5fd6-4ce5-9ce9-abd3995ecb84</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Preview &amp; Send Email</value>
+      <webElementGuid>64caa08f-950b-45b0-aecb-cfa7bfe9aa8f</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;correspondence-editor-ql-toolbar&quot;)/div[@class=&quot;previewEmail&quot;]/button[@class=&quot;btn addCorrespondence&quot;]</value>
+      <webElementGuid>86b721c0-7069-4094-8e80-d11113be2dcb</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='correspondence-editor-ql-toolbar']/div/button</value>
+      <webElementGuid>a9582040-690c-40d4-89c7-c3ebbe3f3685</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='test2.pdf'])[2]/following::button[7]</value>
+      <webElementGuid>9edb41d8-5d36-4153-8071-7886555cf0ff</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Pay Online'])[1]/following::button[7]</value>
+      <webElementGuid>495c435e-0758-4852-b616-a30cb7aa0d9c</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='System Generated Email'])[1]/preceding::button[2]</value>
+      <webElementGuid>aa00d0b2-4cdf-4981-b667-ee3d2affec5b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='Preview &amp; Send Email']/parent::*</value>
+      <webElementGuid>98955c47-10d7-479e-8107-4fef4dfae19c</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[3]/div/button</value>
+      <webElementGuid>6dc0820a-9452-4dbc-89d4-1a788dbb48b8</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//button[(text() = 'Preview &amp; Send Email' or . = 'Preview &amp; Send Email')]</value>
+      <webElementGuid>bcf5e46b-80bc-4350-968d-c8710288c268</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

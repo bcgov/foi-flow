@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>button_reply 3_postBtn</name>
+   <tag></tag>
+   <elementGuidId>033e6985-f77b-4450-8dbe-5c3a5ef568de</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;replySection&quot;]/div[2]/div[@class=&quot;inputActions&quot;]/div[@class=&quot;col-lg-1 paperplanecontainer&quot;]/button[@class=&quot;postBtn&quot;][count(. | //*[@type = 'button']) = count(//*[@type = 'button'])]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>div.replySection > div > div.inputActions > div.col-lg-1.paperplanecontainer > button.postBtn</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>(//form[contains(@class,'addform') and contains(@class,'newreply')]&#xd;
+   [not(contains(@style,'display: none'))]&#xd;
+)[last()]//button[contains(@class,'postBtn')]&#xd;
+&#xd;
+&#xd;
+</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>08e3743b-e224-4b07-bd26-7908b83a7b36</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>postBtn</value>
+      <webElementGuid>1b572259-ae95-4858-99e5-317407a08b11</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>type</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>f24a2bf7-d091-44e1-9137-f91f0f2b2c34</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;replySection&quot;]/div[2]/div[@class=&quot;inputActions&quot;]/div[@class=&quot;col-lg-1 paperplanecontainer&quot;]/button[@class=&quot;postBtn&quot;]</value>
+      <webElementGuid>89d315ae-5157-47a3-bfbd-5c7e30292ecd</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:attributes</name>
+      <type>Main</type>
+      <value>(//button[@type='button'])[19]</value>
+      <webElementGuid>f8ef2992-8974-4135-8d31-1f2db0043d10</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='Comments']/div/div[4]/div[2]/div/div[2]/div/div[2]/div[2]/button</value>
+      <webElementGuid>c88b38d8-a78d-49c6-8a2d-c3f9de4a980c</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='test'])[2]/following::button[1]</value>
+      <webElementGuid>9b36ed0a-02bf-4070-a2fa-5828515fc958</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Processing, Intake'])[2]/preceding::button[1]</value>
+      <webElementGuid>c11b88a8-f470-4114-8f13-a52d871e4382</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[2]/div[2]/button</value>
+      <webElementGuid>3f1e0a6f-249b-45b9-8e5e-f40802bccb9f</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//button[@type = 'button']</value>
+      <webElementGuid>d741f757-93bd-4d09-ad64-9033be080adb</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>
