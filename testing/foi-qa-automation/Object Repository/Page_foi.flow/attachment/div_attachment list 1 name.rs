@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_attachment list 1 name</name>
+   <tag></tag>
+   <elementGuidId>b8277367-461b-476d-a2f9-7e7153869051</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='Attachments']/div/div/div[5]/div[1]/div[1]/div</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//div[@class = 'attachment-name ']</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>4cded05c-2556-48b0-bf88-f616743c07ec</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>attachment-name </value>
+      <webElementGuid>18039fc1-dc91-4177-acc6-240ea4373a05</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>test.docx</value>
+      <webElementGuid>70dd871c-a36d-403b-9bf3-3a69c01f7b58</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;Attachments&quot;)/div[@class=&quot;jss40&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root jss42 MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-11&quot;]/div[@class=&quot;attachment-name&quot;]</value>
+      <webElementGuid>50deee6d-097c-4b6a-8be9-7b6b53cd5d44</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='Attachments']/div/div/div[4]/div/div/div</value>
+      <webElementGuid>e64785d6-3610-4467-a3d1-beef94d7a7d9</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='+ Add Attachment'])[1]/following::div[4]</value>
+      <webElementGuid>f43414cb-68fb-4c0e-bd99-5767eba91885</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Request #U-002876'])[1]/following::div[5]</value>
+      <webElementGuid>9dace64b-917a-4549-a9d7-254825471438</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='GENERAL'])[1]/preceding::div[1]</value>
+      <webElementGuid>0dce94fe-07fc-4b54-8201-4db46850c91b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='User, Super'])[1]/preceding::div[5]</value>
+      <webElementGuid>073480e9-6c9b-42bf-aafc-cd3f710c4c23</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='test.docx']/parent::*</value>
+      <webElementGuid>25f41b78-9096-475a-8d3c-64c595f8aec4</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[2]/div[2]/div/div/div[3]/div/div/div</value>
+      <webElementGuid>deb11449-351f-4b62-8c14-e45b530a9143</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'test.docx' or . = 'test.docx')]</value>
+      <webElementGuid>4da90729-e36e-4881-a6a9-846c12bccc3e</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

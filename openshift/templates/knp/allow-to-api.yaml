@@ -1,0 +1,48 @@
+# kind: NetworkPolicy
+# apiVersion: networking.k8s.io/v1
+# spec:
+#   podSelector:
+#     matchLabels:
+#       role: api
+#   ingress:
+#     - ports:
+#         - protocol: TCP
+#           port: 5000
+#       from:
+#         - podSelector:
+#             matchLabels:
+#               role: api
+#         - podSelector:
+#             matchLabels:
+#               role: queue
+#         - podSelector:
+#             matchLabels:
+#               role: job
+#   policyTypes:
+#     - Ingress
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-to-api
+  namespace: d7abee-test
+spec:
+  podSelector:
+    matchLabels:
+      role: api
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: 5000
+      from:
+        - podSelector:
+            matchLabels:
+              role: api
+        - podSelector:
+            matchLabels:
+              role: queue
+        - podSelector:
+            matchLabels:
+              role: job
+  policyTypes:
+    - Ingress

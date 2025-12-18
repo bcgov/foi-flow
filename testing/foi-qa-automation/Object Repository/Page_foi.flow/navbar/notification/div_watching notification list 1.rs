@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_watching notification list 1</name>
+   <tag></tag>
+   <elementGuidId>f14be22c-e2fd-497f-bc7e-d4b6aa6f4318</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='uncontrolled-tab-example-tabpane-watch-request']/div[2]/div[1]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>div.list-group-item</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>ad65a2d3-2391-494c-a334-343ac1a456f5</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>list-group-item</value>
+      <webElementGuid>4add20d9-f8f4-4145-850a-ae82bd2146ff</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>U-001435New Request Assigned to You.Processing, Intake2022 FEB 07 | 11:48 AM</value>
+      <webElementGuid>1060612e-a4d9-4ce0-bd0f-69c806f5438b</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;uncontrolled-tab-example-tabpane-my-request&quot;)/div[@class=&quot;notification-list list-group&quot;]/div[@class=&quot;list-group-item&quot;]</value>
+      <webElementGuid>cc3ab6e6-0ad4-4939-84b4-446680f24ee2</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='uncontrolled-tab-example-tabpane-my-request']/div[2]/div</value>
+      <webElementGuid>760b8bbb-0743-4e11-953e-7001bcdb63bc</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Dismiss All'])[1]/following::div[2]</value>
+      <webElementGuid>c967bfdb-7223-4484-9144-17473160636b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='No'])[7]/following::div[29]</value>
+      <webElementGuid>cd94752c-380f-414a-9b78-7da65e7d21f8</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[2]/div[2]/div[2]/div/div[2]/div</value>
+      <webElementGuid>0e0fdd80-b5fe-4be7-a4b9-faf18151f4b1</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'U-001435New Request Assigned to You.Processing, Intake2022 FEB 07 | 11:48 AM' or . = 'U-001435New Request Assigned to You.Processing, Intake2022 FEB 07 | 11:48 AM')]</value>
+      <webElementGuid>08eec1da-1379-4eb1-9380-0bc2233bab4c</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

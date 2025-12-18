@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>li_Download Original</name>
+   <tag></tag>
+   <elementGuidId>41101abf-6287-41bd-be01-a4a381987a6a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Replace Manually'])[1]/following::li[1]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value></value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>li</value>
+      <webElementGuid>d79bbda2-a4d8-45ec-8713-97cd2f06b372</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiButtonBase-root MuiListItem-root MuiMenuItem-root MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button</value>
+      <webElementGuid>efff24cc-757f-4312-926f-cac64dc41467</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tabindex</name>
+      <type>Main</type>
+      <value>-1</value>
+      <webElementGuid>1055ff4f-e133-4153-8486-8288f4918a05</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>role</name>
+      <type>Main</type>
+      <value>menuitem</value>
+      <webElementGuid>c2225624-0d37-4997-a7d0-7e1feefb2c61</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>aria-disabled</name>
+      <type>Main</type>
+      <value>false</value>
+      <webElementGuid>5d559ee6-8d7f-44ae-87df-6fe89844e141</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Download Original</value>
+      <webElementGuid>776ea452-3290-4920-902a-ea506fb7cd44</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>/html[1]/body[@class=&quot;no-scroll&quot;]/div[@class=&quot;MuiPopover-root&quot;]/div[@class=&quot;MuiPaper-root MuiPopover-paper MuiPaper-elevation8 MuiPaper-rounded&quot;]/ul[@class=&quot;MuiList-root MuiList-padding&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button&quot;]</value>
+      <webElementGuid>842cafb3-f709-4e4d-9d77-ebef5da49a0b</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Replace Manually'])[1]/following::li[1]</value>
+      <webElementGuid>930ddf7a-5b58-4940-aae3-aa82bd3f65c1</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='`'])[2]/following::li[2]</value>
+      <webElementGuid>71157be9-d146-4f8e-bb63-2fc27f53ee29</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Download Replaced'])[1]/preceding::li[1]</value>
+      <webElementGuid>e2eb9a9f-e711-43a2-99d4-adb3aa19611b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Delete'])[1]/preceding::li[2]</value>
+      <webElementGuid>5b4e8d80-c7af-4c45-bc4e-38a52509bf3d</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='Download Original']/parent::*</value>
+      <webElementGuid>ae7f0d24-fab9-416d-adfe-4d0217184038</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[3]/div[3]/ul/li[2]</value>
+      <webElementGuid>d21afde9-6b64-4c03-b2a6-848a3351b9a5</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//li[(text() = 'Download Original' or . = 'Download Original')]</value>
+      <webElementGuid>c2190a13-e765-44e3-b39f-6e716430af51</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

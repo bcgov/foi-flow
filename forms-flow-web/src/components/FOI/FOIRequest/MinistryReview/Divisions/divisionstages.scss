@@ -1,0 +1,87 @@
+#foi-division-dropdown {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#foi-divisionstage-dropdown {
+    padding-top: 0px !important;
+    padding-bottom: 0px !important;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.foi-division-dropdown .MuiOutlinedInput-root {
+    color: gray;
+} 
+.foi-divisionstage-dropdown .MuiOutlinedInput-root {
+    color: gray;
+} 
+.foi-division-dropdown .MuiOutlinedInput-root .MuiSvgIcon-root {
+    color: gray;
+} 
+
+.foi-divisionstage-dropdown .MuiOutlinedInput-root .MuiSvgIcon-root {
+    color: gray;
+} 
+
+.foi-division-menuitem  {
+    padding-left: 0px !important;
+}
+
+.foi-divisionstage-menuitem  {
+    padding-left: 0px !important;
+}
+
+.foi-menuitem-span {
+    width: 10px;
+    height: 30px;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+#foi-division-dropdown .foi-menuitem-span {
+    display: none !important;
+}
+#foi-divisionstage-dropdown .foi-menuitem-span {
+    display: none !important;
+}
+
+.foi-bin{
+    font-size: 25px!important;
+    padding: 12px;
+    color:#38598a!important
+}
+
+.foi-add {
+    font-size: 25px!important;
+    padding: 3px;
+    color:#38598a!important;
+}
+
+.btn.btn-link.foi-add-division {
+    padding: 0 0 9px 0;
+    font-size: 16px;
+}
+
+.hidebin
+{
+    display: none!important;
+}
+
+#foi-division-dropdown, #foi-divisionstage-dropdown {
+    color: black;
+}
+
+.divstages {
+    margin-bottom: 1em;
+}
+
+.due-date-field {
+
+
+    .MuiOutlinedInput-input{
+        padding: 12px 14px;
+    }
+}

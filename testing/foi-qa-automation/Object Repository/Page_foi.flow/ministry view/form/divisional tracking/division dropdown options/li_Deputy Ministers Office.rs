@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>li_Deputy Ministers Office</name>
+   <tag></tag>
+   <elementGuidId>05844bad-edd2-4d7c-84bd-d409f2221b53</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//li[(text() = concat('Deputy Minister' , &quot;'&quot; , 's Office') or . = concat('Deputy Minister' , &quot;'&quot; , 's Office'))]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>(.//*[normalize-space(text()) and normalize-space(.)='Select Division'])[2]/following::li[2]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>li</value>
+      <webElementGuid>56437cf5-dc0b-4607-b6eb-8cdfff24e523</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-division-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button</value>
+      <webElementGuid>152bbf9d-8349-47f7-b6d4-371f79b9bc6d</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tabindex</name>
+      <type>Main</type>
+      <value>-1</value>
+      <webElementGuid>858c6e67-f51d-4d41-a719-b7fc7c68fd27</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>role</name>
+      <type>Main</type>
+      <value>option</value>
+      <webElementGuid>e0c60f13-b501-49ef-a5e6-0d8c3cc1f6d9</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>aria-disabled</name>
+      <type>Main</type>
+      <value>false</value>
+      <webElementGuid>22ff35a6-d1eb-44fd-ae16-462b43ff0f98</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>data-value</name>
+      <type>Main</type>
+      <value>31</value>
+      <webElementGuid>eb46c784-7ad1-49d3-a977-d7d5721501a6</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Deputy Minister's Office</value>
+      <webElementGuid>040c3b7a-82d9-47a8-886f-0df5ea5e2579</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;menu-&quot;)/div[@class=&quot;MuiPaper-root MuiMenu-paper MuiPopover-paper MuiPaper-elevation8 MuiPaper-rounded&quot;]/ul[@class=&quot;MuiList-root MuiMenu-list MuiList-padding&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root foi-division-menuitem MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button&quot;]</value>
+      <webElementGuid>c7069ae2-8d34-46ef-8281-e3df935bf0ec</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='menu-']/div[3]/ul/li[3]</value>
+      <webElementGuid>33a95b17-82b5-41ff-bc73-1a09a98a1a84</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Arts &amp; Culture'])[1]/following::li[1]</value>
+      <webElementGuid>b5668baf-66cd-454a-a131-0430c017c8ae</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Select Division'])[2]/following::li[2]</value>
+      <webElementGuid>50208a1b-d449-4311-985b-fafdf8c18908</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Management Services'])[1]/preceding::li[1]</value>
+      <webElementGuid>6822b4ad-5b5b-44bc-bd5a-860c1150777d</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)=concat('Minister', &quot;'&quot;, 's Office')])[1]/preceding::li[2]</value>
+      <webElementGuid>4efe5fb7-fb6a-4139-bf9c-3b27bea22600</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[3]/ul/li[3]</value>
+      <webElementGuid>ca9b3b06-2449-4744-80fc-8bcfc5f33e20</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='menu-']/div[3]/ul/li[2]</value>
+      <webElementGuid>880375fb-ba9a-4234-b63c-c8544705e9c3</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Select Division'])[2]/following::li[1]</value>
+      <webElementGuid>8583a243-3d90-4f0b-b56a-d10f3d7cce31</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='`'])[2]/following::li[2]</value>
+      <webElementGuid>749aea94-5d96-46fb-aa4f-288ccaa3cbe1</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Education Programs'])[1]/preceding::li[1]</value>
+      <webElementGuid>654c793a-fe3c-486e-84bd-49629225d7a8</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Governance &amp; Analytics'])[1]/preceding::li[2]</value>
+      <webElementGuid>e1fb782f-b4f2-45f3-8f93-f285f7e25bf7</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[3]/div[3]/ul/li[2]</value>
+      <webElementGuid>a03c2f43-38d9-4af7-9ba1-0248d84fc8b2</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

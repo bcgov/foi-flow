@@ -1,0 +1,7 @@
+# Openshift Namespace
+IMAGE_NAMESPACE=04d1a3-tools
+NAME=forms-flow-api
+TAG_NAME=latest
+# Route you would like for your API
+# Example is: formsflow-api.<opemshiftdomain>
+WEBAPI_URL=

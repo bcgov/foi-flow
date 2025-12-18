@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>p_comment list 2 text</name>
+   <tag></tag>
+   <elementGuidId>89ba0e08-e94b-4829-9ad6-e7e6503daa19</elementGuidId>
+   <imagePath></imagePath>
+   <selectorCollection>
+      <entry>
+         <key>IMAGE</key>
+         <value></value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value></value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>div.commenttext > p</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>(//*[@id='Comments']//div[contains(@class,'displayComments')]&#xd;
+  //div[contains(@class,'commentsection') and @data-comid and not(.//form)]&#xd;
+)[2]//div[@class='commenttext']/p&#xd;
+</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorCollection>
+      <entry>
+         <key>SMART_LOCATOR</key>
+         <value></value>
+      </entry>
+   </smartLocatorCollection>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>p</value>
+      <webElementGuid>06a91c8d-80d1-42ea-a2ed-fc218df8c2c9</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Intake Flex changed the state of the request to Intake in Progress</value>
+      <webElementGuid>7442ad88-c601-4735-b93e-4c5c735f2fda</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;halfDiv&quot;]/div[@class=&quot;userInfo&quot;]/div[@class=&quot;commenttext&quot;]/p[1]</value>
+      <webElementGuid>409e162a-0869-4c4c-8ad0-be93fc3cd711</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='Comments']/div/div[2]/div[2]/div[2]/form/div[2]/div/div/div/div/div/span/span</value>
+      <webElementGuid>7598286d-2ca3-4f27-ba80-5484331d38aa</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Request History'])[2]/following::p[1]</value>
+      <webElementGuid>98f66c83-840f-4683-800d-c34cb5cd2dbe</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Show more comments'])[1]/preceding::p[1]</value>
+      <webElementGuid>ff9d3f0c-e82b-4d74-b528-3919da0052c7</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='Intake Flex changed the state of the request to Intake in Progress']/parent::*</value>
+      <webElementGuid>47cdc558-55bc-4e6f-ad63-9087d8410503</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div/div/span/span</value>
+      <webElementGuid>85d8bb70-d201-47c2-b159-69c4ae917652</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>button_Add Files1</name>
+   <tag></tag>
+   <elementGuidId>1745afb5-4b24-4584-bcdc-7251ca1a6fd9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>(//button[@type='button'])[19]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>button.btn-add-files</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>400d244c-3488-4e97-b306-d8c534e03c04</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>btn-add-files</value>
+      <webElementGuid>3c2f84fb-3318-4e9e-ba1c-545a2a57b40d</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>type</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>a42fa200-17c1-4f05-98dc-37327baeca6f</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Add Files</value>
+      <webElementGuid>b63a656a-6f91-4a2e-91ea-4787c4fd1855</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;state-change-dialog-description&quot;)/section[@class=&quot;file-upload-container&quot;]/div[@class=&quot;row file-upload-preview&quot;]/div[@class=&quot;file-upload-column file-upload-column-3&quot;]/button[@class=&quot;btn-add-files&quot;]</value>
+      <webElementGuid>e0d7edc5-c65f-418e-abf0-5774ede022d4</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:attributes</name>
+      <type>Main</type>
+      <value>(//button[@type='button'])[19]</value>
+      <webElementGuid>da85267a-b597-4508-8470-992964d5b641</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//span[@id='state-change-dialog-description']/section/div/div[3]/button</value>
+      <webElementGuid>9dcd9a11-f6f5-4f90-b04f-dce0d795dec5</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='LEARNING AND EDUCATION PROGRAMS'])[1]/following::button[1]</value>
+      <webElementGuid>63649592-50da-473e-84b0-1a2160e2c20b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Continue'])[1]/preceding::button[1]</value>
+      <webElementGuid>0b2e7e6e-92f7-49a9-a695-80d50c8d3da5</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Cancel'])[1]/preceding::button[2]</value>
+      <webElementGuid>bbb246eb-9215-4bb1-bd84-3aac14e30961</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='Add Files']/parent::*</value>
+      <webElementGuid>21491889-5556-4813-a4ec-0e8f8afcc236</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//section/div/div[3]/button</value>
+      <webElementGuid>85a91669-ff75-4003-89a4-b55a6576b7ca</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//button[@type = 'button' and (text() = 'Add Files' or . = 'Add Files')]</value>
+      <webElementGuid>e1342493-636d-4eaa-af15-a29dbec95f67</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

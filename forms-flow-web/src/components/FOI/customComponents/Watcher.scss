@@ -1,0 +1,67 @@
+.foi-watcher {
+    color: white !important;
+}
+
+.foi-watcher .MuiSelect-icon {
+    color: white !important;
+}
+
+.foi-watcher .MuiOutlinedInput-notchedOutline {
+    border: none !important;
+    // color: white;
+}
+.foi-watcher .MuiInputBase-input,
+.foi-watcher .MuiOutlinedInput-input {
+    padding: 0px !important
+}
+
+.foi-watcher .MuiSelect-select.MuiSelect-select {
+    padding-right: 12px !important;
+    padding-left: 12px !important;
+}
+.foi-watcher-container {   
+    width: 180px;
+    height: 40px;
+    background-color: #00336652;
+    border-radius: 40px 40px 40px 40px;
+}
+
+.foi-eye-container {
+    width: auto;
+    height: 40px;
+    background-color: #00336652;
+    border-radius: 40px 0px 0px 40px;
+    border: none;
+    font-size: 15px;
+}
+
+.foi-watcher-all {
+    padding-top: 10px; 
+    display: flex;
+}
+
+.foi-watcher-select {
+    padding-top: 8px; 
+    width: 80px;
+    height: 40px;
+    background-color:#003366;
+    color: white;
+    border-radius: 0px 40px 40px 0;
+    padding-left: 16px;
+}
+
+.foi-eye {
+    padding-left: 6px;
+}
+
+.MuiCheckbox-colorSecondary.Mui-checked {
+    color: green !important;
+}
+
+.MuiPaper-elevation8 {
+    max-height: 60% !important;
+}
+
+#foi-watcher-label {
+    display: none;
+}

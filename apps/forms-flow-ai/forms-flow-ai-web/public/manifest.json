@@ -1,0 +1,20 @@
+{
+  "short_name": "foi.flow",
+  "name": "foi.flow",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "192x192"
+    },
+    {
+      "src": "favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#222",
+  "theme_color": "#222",
+  "display": "standalone"
+}

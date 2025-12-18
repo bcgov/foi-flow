@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_Clear All Filters_MuiBackdrop-root MuiBackdrop-invisible MuiModal-backdrop css-esi9ax</name>
+   <tag></tag>
+   <elementGuidId>701d3485-43cb-4135-92e6-6102f108c42e</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='menu-']/div</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>div.MuiBackdrop-root.MuiBackdrop-invisible.MuiModal-backdrop.css-esi9ax</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorCollection>
+      <entry>
+         <key>SMART_LOCATOR</key>
+         <value>.MuiBackdrop-root</value>
+      </entry>
+   </smartLocatorCollection>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>288564ff-8637-4617-a52e-56e7ec6bafb5</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>aria-hidden</name>
+      <type>Main</type>
+      <value>true</value>
+      <webElementGuid>7406835f-2512-47cb-8081-7544de463754</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiBackdrop-root MuiBackdrop-invisible MuiModal-backdrop css-esi9ax</value>
+      <webElementGuid>d8c85bc6-aa94-41d7-a234-876183846529</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;menu-&quot;)/div[@class=&quot;MuiBackdrop-root MuiBackdrop-invisible MuiModal-backdrop css-esi9ax&quot;]</value>
+      <webElementGuid>ee6a990a-0180-449d-9a0b-468450aaea1a</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='menu-']/div</value>
+      <webElementGuid>5a64f19b-a647-472d-a477-c047337d25a2</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[2]/div</value>
+      <webElementGuid>41a8c16d-3648-46aa-b8f1-0ec667e677a9</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

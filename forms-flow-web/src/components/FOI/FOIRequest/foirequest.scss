@@ -1,0 +1,164 @@
+
+.scrollable-page {
+    position: relative !important;  
+    height: 100% !important;;  
+}
+
+#app {
+    background-color: #f1f1f1 !important;
+}
+
+.foi-request-number-header {
+    margin-top: 20px;
+    padding: 0 !important;
+
+}
+.foi-request-form {
+    background-color: white;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 10px;
+}
+.foi-review-request-container {
+    
+    width: 100%!important;
+    height: auto!important;
+    display: inline-block;
+}
+
+.foi-review-container {
+    padding-top: 1px;    
+    width: 75%!important;
+    position: relative;
+    margin-left: auto!important;
+    margin-right: auto!important;
+    right: 0px;
+    left: 0px;
+    background-color: white;
+    
+}
+
+.foi-breadcrumb {
+    margin-top: 15px !important;
+    background-color: white !important;
+}
+
+.foi-details-card {
+    margin-top: 50px;
+    box-shadow: none !important;
+    border: 1px solid #dfdede !important;
+    border-radius: 2px;
+}
+.foi-details-label {
+   // font-family: "BCSans-Regular", sans-serif;
+    color: #000 !important;
+    padding-left: 15px;
+
+}
+.foi-details-row {
+    display: flex;
+    width: 100%;
+}
+.foi-details-col {
+    display: block;    
+    align-items: flex-start; 
+}
+
+.MuiOutlinedInput-notchedOutline {
+    border: 1px solid !important;     
+}
+
+
+.MuiOutlinedInput-root.Mui-error .MuiOutlinedInput-notchedOutline {
+    border-color: #f44336 !important;
+}
+.MuiInputBase-root {
+   // font-family: "BCSans-Regular", sans-serif !important;
+}
+
+.MuiFormLabel-root {
+    font-family: "BCSans-Bold", sans-serif !important;
+    color: black !important;   
+}
+
+.MuiFormLabel-root.Mui-error {
+    font-family: "BCSans-Bold", sans-serif !important;
+    color: #f44336 !important;
+
+}
+
+.MuiMenuItem-root {
+    font-family: "BCSans-Regular", sans-serif !important;
+}
+.PrivateNotchedOutline-legendLabelled-4 {
+    font-size: 0.80rem !important;
+}
+
+.foitabbedContainer{
+height: fit-content;
+}
+
+.btn-axis-sync {
+    background-color: #FFFFFF;
+    border: 2px solid #38598A;
+    border-radius: 4px;
+    color: #38598A;
+    margin-top: 10px;
+    height: 51px;
+    width: 179px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.dialog-close-button {
+    display: none;
+}
+
+.remaining-days-alert {
+    font-size: 15px;
+    font-weight: bolder;
+    // padding-bottom: 1rem;
+}
+
+.request-accordian {
+
+    .MuiAccordion-root {       
+        border: #003366 1px solid;
+        margin-top: 30px !important;
+        margin-bottom: 30px !important;
+        background-color: #FFFFFF !important; 
+    }
+
+    .MuiAccordionDetails-root {
+        padding: 16px !important;
+        display: block !important;
+    }
+
+    .MuiAccordionSummary-root {
+        background-color: #003366 !important;  
+    }
+
+    .MuiIconButton-edgeEnd{
+        margin-right: 0px !important;
+    }
+
+    > div > div > div > .MuiIconButton-label {
+        color: white !important;
+    }
+
+    .MuiAccordionSummary-content.Mui-expanded {
+        margin: 0px !important;
+    }
+}
+
+.request-scrollbar-height {
+    &::-webkit-scrollbar-track {
+        margin-top: 105px !important;
+    }
+}
+
+.foi-details-row-break {
+    margin-bottom: 2em;
+}

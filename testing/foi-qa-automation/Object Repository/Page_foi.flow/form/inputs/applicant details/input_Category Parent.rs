@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>input_Category Parent</name>
+   <tag></tag>
+   <elementGuidId>36bcc8ad-fd9d-4da4-8542-6daa50578c5b</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='category']//ancestor::div[1]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>body.no-scroll</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>body</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>no-scroll</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>FOI  Intake User Sign OutFOIUnopened​RequestOption 4Add RequestAssigned To *UnassignedAssigned To *APPLICANT DETAILSApplicant First Name *Applicant First Name *Applicant Middle NameApplicant Middle NameApplicant Last Name *Applicant Last Name *OrganizationOrganizationCategory *Select CategoryCategory *Email *Email *ADDRESS AND CONTACT INFORMATIONStreet Address *Street Address *Secondary Street AddressSecondary Street AddressCity *City *Province *Province *Country *Country *Postal Code *Postal Code *Home PhoneHome PhoneMobile PhoneMobile PhoneWork PhoneWork PhoneAlternative PhoneAlternative PhoneREQUEST DESCRIPTIONDescription HistoryDate Range for Record SearchStart DateStart DateEnd DateEnd DateRequest Description *Request Description *Description contains NO Personal InformationSelect Ministry Client *AEDAGRMAGCFDCTZEDUEMLMOEFINFNRHLTHIRRJERLBRMHAMMAPSSMSDTACTRAOCCPSABRDCLBCASEMBEAOGCPIIOOOPLDBTICOBCMGCREQUEST DETAILSRequest Type *Select Request TypeRequest Type *Received Mode *Select Received ModeReceived Mode *Delivery Mode *Select Delivery ModeDelivery Mode *Received Date *Received Date *Start Date *Start Date *Due Date *Due Date *REQUEST NOTESSaveReturn to QueueRequest #U-00undefined+ Add CommentAll CommentsRequest HistoryUser CommentsNo comments under this filter categoryShow more commentsOption 4HelpContactDisclaimerPrivacyAccessibilityCopyrightlet newWorker;if(&quot;serviceWorker&quot;in navigator){let e;navigator.serviceWorker.register(&quot;/service-worker.js&quot;).then(e=>{e.addEventListener(&quot;updatefound&quot;,()=>{newWorker=e.installing,newWorker.addEventListener(&quot;statechange&quot;,()=>{switch(newWorker.state){case&quot;installed&quot;:navigator.serviceWorker.controller&amp;&amp;newWorker.postMessage({action:&quot;skipWaiting&quot;})}})})},e=>{console.log(&quot;Worker registration failed&quot;,e)}).catch(e=>{console.log(e)}),navigator.serviceWorker.addEventListener(&quot;controllerchange&quot;,(function(){e||(window.location.reload(),e=!0)}))}else console.log(&quot;Service Worker is not supported by browser.&quot;).scrollable-page{position:relative;overflow-y:scroll;top:0;right:0;bottom:0;left:0;-ms-overflow-style:none;scrollbar-width:none}.scrollable-page::-webkit-scrollbar{display:none}.no-scroll{overflow:auto}body{font-family:BCSans-Regular,sans-serif!important}This website requires JavaScript.!function(e){function r(r){for(var n,f,l=r[0],a=r[1],i=r[2],p=0,s=[];p&lt;l.length;p++)f=l[p],Object.prototype.hasOwnProperty.call(o,f)&amp;&amp;o[f]&amp;&amp;s.push(o[f][0]),o[f]=0;for(n in a)Object.prototype.hasOwnProperty.call(a,n)&amp;&amp;(e[n]=a[n]);for(c&amp;&amp;c(r);s.length;)s.shift()();return u.push.apply(u,i||[]),t()}function t(){for(var e,r=0;r&lt;u.length;r++){for(var t=u[r],n=!0,l=1;l&lt;t.length;l++){var a=t[l];0!==o[a]&amp;&amp;(n=!1)}n&amp;&amp;(u.splice(r--,1),e=f(f.s=t[0]))}return e}var n={},o={1:0},u=[];function f(r){if(n[r])return n[r].exports;var t=n[r]={i:r,l:!1,exports:{}};return e[r].call(t.exports,t,t.exports,f),t.l=!0,t.exports}f.m=e,f.c=n,f.d=function(e,r,t){f.o(e,r)||Object.defineProperty(e,r,{enumerable:!0,get:t})},f.r=function(e){&quot;undefined&quot;!=typeof Symbol&amp;&amp;Symbol.toStringTag&amp;&amp;Object.defineProperty(e,Symbol.toStringTag,{value:&quot;Module&quot;}),Object.defineProperty(e,&quot;__esModule&quot;,{value:!0})},f.t=function(e,r){if(1&amp;r&amp;&amp;(e=f(e)),8&amp;r)return e;if(4&amp;r&amp;&amp;&quot;object&quot;==typeof e&amp;&amp;e&amp;&amp;e.__esModule)return e;var t=Object.create(null);if(f.r(t),Object.defineProperty(t,&quot;default&quot;,{enumerable:!0,value:e}),2&amp;r&amp;&amp;&quot;string&quot;!=typeof e)for(var n in e)f.d(t,n,function(r){return e[r]}.bind(null,n));return t},f.n=function(e){var r=e&amp;&amp;e.__esModule?function(){return e.default}:function(){return e};return f.d(r,&quot;a&quot;,r),r},f.o=function(e,r){return Object.prototype.hasOwnProperty.call(e,r)},f.p=&quot;/&quot;;var l=this[&quot;webpackJsonpformsflow-ai-react&quot;]=this[&quot;webpackJsonpformsflow-ai-react&quot;]||[],a=l.push.bind(l);l.push=r,l=l.slice();for(var i=0;i&lt;l.length;i++)r(l[i]);var c=a;t()}([])id(&quot;menu-&quot;)/div[@class=&quot;MuiPaper-root MuiMenu-paper MuiPopover-paper MuiPaper-elevation8 MuiPaper-rounded&quot;]/ul[@class=&quot;MuiList-root MuiMenu-list MuiList-padding&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button Mui-focusVisible Mui-focusVisible&quot;]Select CategoryBusinessIndividualInterest GroupLaw FirmMediaPolitical PartyResearcherOther GovernmentsOther Public Body</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>/html[1]/body[@class=&quot;no-scroll&quot;]</value>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//body</value>
+   </webElementXpaths>
+</WebElementEntity>

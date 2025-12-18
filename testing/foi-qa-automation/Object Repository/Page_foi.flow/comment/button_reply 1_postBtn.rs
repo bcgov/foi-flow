@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>button_reply 1_postBtn</name>
+   <tag></tag>
+   <elementGuidId>4fc19167-790e-48c8-a1dc-23428db08cd2</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>div.commentsection > div.inputActions > div.col-lg-1.paperplanecontainer > button.postBtn</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>(//form[contains(@class,'addform') and contains(@class,'newreply')])[1]//button[contains(@class,'postBtn')]&#xd;
+</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>693b69ef-61bd-4c77-a4e8-c1952faeb422</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>postBtn</value>
+      <webElementGuid>c5cea219-57c2-4578-b383-015c7a5d172e</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>type</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>66b784f7-a6e7-48c3-9419-cbe8308c1da7</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;inputActions&quot;]/div[@class=&quot;col-lg-1 paperplanecontainer&quot;]/button[@class=&quot;postBtn&quot;]</value>
+      <webElementGuid>063c6090-ceb3-43b8-93e2-a8f2386bf30a</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:attributes</name>
+      <type>Main</type>
+      <value>(//button[@type='button'])[19]</value>
+      <webElementGuid>a69b2da0-5726-44e1-8795-9b6c8cc8b1a7</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='Comments']/div/div[4]/div[2]/div/div[2]/div[2]/button</value>
+      <webElementGuid>58f68b84-debd-4d16-9b49-ccc04c5bac1b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='test'])[1]/following::button[1]</value>
+      <webElementGuid>342e0f27-361d-4ca2-bfb7-f2508567954b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Processing, Intake'])[2]/preceding::button[1]</value>
+      <webElementGuid>345ce14d-1e58-48f1-8712-9430bc0b9ed8</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[2]/div[2]/button</value>
+      <webElementGuid>d80954e2-d4d3-41a0-85cc-5fc877d4f9ad</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//button[@type = 'button']</value>
+      <webElementGuid>3af02f3e-5eb9-46ca-b6cc-92ed22dae097</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

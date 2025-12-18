@@ -1,0 +1,27 @@
+
+
+#request-history-dialog-title {
+    font-family: "BCSans-Bold", sans-serif!important;
+    color: #036 ;
+    padding: 30px 26px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.request-history-header {
+    margin-left: 30px;
+    font-size: xx-large;
+    font-weight: bold;
+    font-family: "BCSans-Bold", sans-serif !important;
+}
+
+#request-history-dialog-title .MuiIconButton-root {
+    background-color: #036 ;
+    color: white;
+    border-radius: unset;
+}
+#request-history-content {
+    padding: 15px 50px 50px 50px;
+}
+

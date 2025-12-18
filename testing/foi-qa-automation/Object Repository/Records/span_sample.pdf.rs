@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>span_sample.pdf</name>
+   <tag></tag>
+   <elementGuidId>09ddcc90-9937-4e33-8400-5e1438d5e714</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='Records']/div/div[2]/div[7]/div/div/span</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>span.jss56</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>span</value>
+      <webElementGuid>f7713425-e0b1-4629-a986-2b12bf366dbb</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>jss56</value>
+      <webElementGuid>257c6004-931f-4b13-9287-e1ce33729a5b</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>sample.pdf </value>
+      <webElementGuid>f8a0b20f-cd44-4f27-b734-20a6e1b5056f</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;Records&quot;)/div[@class=&quot;jss49&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root jss51 MuiGrid-container MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6&quot;]/span[@class=&quot;jss56&quot;]</value>
+      <webElementGuid>0830dc9e-1ca8-4348-a515-3042282f9a37</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='Records']/div/div[2]/div[7]/div/div/span</value>
+      <webElementGuid>a95c37dc-5bc0-4498-9f91-250600bd5685</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='INCOMPATIBLE'])[1]/following::span[2]</value>
+      <webElementGuid>8d592d57-ae3b-422c-bc22-f0f320da2ba8</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='ERRORS'])[1]/following::span[4]</value>
+      <webElementGuid>83986e14-ffb7-4d80-8222-d054008d19c0</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Ready for Redaction'])[1]/preceding::span[2]</value>
+      <webElementGuid>072a1eca-65a9-4b55-a7bf-333748a71d8b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)=concat('Minister', &quot;'&quot;, 's Office')])[2]/preceding::span[5]</value>
+      <webElementGuid>238d13bc-5970-4518-9916-bf8ff0957841</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='sample.pdf']/parent::*</value>
+      <webElementGuid>7b23394c-0352-4d3f-838f-3450383b1995</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[7]/div/div/span</value>
+      <webElementGuid>c64208da-1f0b-4a66-8b83-0cc6cb098b30</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//span[(text() = 'sample.pdf ' or . = 'sample.pdf ')]</value>
+      <webElementGuid>af209885-73cb-45a7-8764-8aa08d908dd2</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

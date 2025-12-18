@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <link rel="preload" href="{{ffaurl}}/static/media/BCSans-Regular.0079ea8e.woff" as="font" type="font/woff" crossorigin>
+    <style type="text/css">
+
+      div {
+          font-family: 'BC Sans', sans-serif;
+          font-style: normal;
+          font-display: swap;
+      }
+      .back-color {
+        background-color:#003366 !important;
+      }
+      </style>
+  </head>
+  <body>
+    <div class="container-fluid back-color" style="width: 100%; background-color:#003366; height:55px; position:relative;">  
+      <img style="height: 60%; padding-top: 10px; margin-left:25px;" src="{{ffaurl}}/logobanner.jpg"/>
+    </div><br>
+    <div style="width:70%;margin:auto;color:black; font-family: 'BC Sans';">      
+      <div style="width:100%">
+        <h5 style="color: #003366; display: block; text-align:right; font-family: 'BC Sans'; font-weight: bold;">Request ID: {{axisRequestId}}</h5>
+      </div>
+      <div>
+        <h4 style="color: #003366; display: block; text-align:center; font-family: 'BC Sans'; font-weight:bold">Freedom of Information and Protection for Privacy Act (FOIPPA)<br> Request for Records - {{title}}</h4>
+      </div>
+      {{content}}
+      <hr style="height:2px;border-width:0;color:gray;background-color:gray">   
+      <p>
+        <b style='margin:0; color: #036;'><span>Ministry of Citizens&#39; Services | </span>
+          <span>Information Access Operations</span>
+        </b><br> 
+      PO Box 9569 Stn Prov Gov't Victoria BC V8W 9K1<br>
+        <a style='margin:0;' href="https://www.gov.bc.ca/freedomofinformation/">
+          http://www.gov.bc.ca/freedomofinformation
+        </a><br>
+      FOI.Requests@gov.bc.ca<br>
+      250-387-1321 or 1-833-283-8200</p>  
+    </div>
+  </body>
+</html>

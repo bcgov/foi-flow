@@ -1,0 +1,65 @@
+
+.notification-tab{
+
+    display: flex !important;
+    flex-direction: row !important;
+    border-bottom: 3px solid #036 !important;
+    background-color: white !important;
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
+}
+
+.popup-background.active {
+    background-color: transparent !important;
+}
+
+.notification-tab.nav-tabs .nav-link.active {
+    background-color: transparent !important;
+    color:#036 !important;
+    border-color: transparent !important;
+    border-bottom: 5px solid #036 !important;
+}
+
+.notification-tab.nav-tabs .nav-link.active:focus-visible {
+    outline: none;
+}
+
+.notification-tab.navbar-nav {
+    padding-bottom: 0px !important;
+}
+
+.notification-list{
+    overflow: auto;
+    background-color: #E5EAEF !important;
+    border-bottom-left-radius: 10px !important;
+    border-bottom-right-radius: 10px !important;
+    height: 475px !important;
+}
+
+.list-header{
+    color: #003366;
+    padding: 0.5rem 0.5rem !important;
+    background-color: #E5EAEF !important;
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+}
+
+.notification-tab.nav-tabs .nav-link {
+    border: transparent !important;
+    color:#003366 !important;
+}
+
+.notification-tab .nav-item{
+    margin-right: 20px !important;
+    margin-left: 20px !important;
+}
+
+.notification-dismiss {
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.empty-notifications{
+    text-align: center;
+    justify-content: center;
+}

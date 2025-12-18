@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>i_Watch eye icon</name>
+   <tag></tag>
+   <elementGuidId>193071ef-06c5-4792-9b7d-943b8aae4591</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='Request']/div/div/form/div[2]/div/div/div/div/div/button/i</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>i.fa.fa-eye.foi-eye</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>i</value>
+      <webElementGuid>2be2e9e5-6fe5-4829-b946-0663d45ddb1c</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>fa fa-eye foi-eye</value>
+      <webElementGuid>ed53f888-5ea4-42d1-a681-370d9e917d95</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;Request&quot;)/div[@class=&quot;container foi-review-request-container&quot;]/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;jss5 foi-request-form&quot;]/div[@class=&quot;foi-request-review-header-row1&quot;]/div[@class=&quot;foi-request-review-header-col1&quot;]/div[@class=&quot;foi-request-review-header-col1-row&quot;]/div[1]/div[@class=&quot;foi-watcher-all&quot;]/button[@class=&quot;foi-eye-container&quot;]/i[@class=&quot;fa fa-eye foi-eye&quot;]</value>
+      <webElementGuid>f98e776f-15b5-4f5a-b5e4-2c39cc0201a5</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='Request']/div/div/form/div[2]/div/div/div/div/div/button/i</value>
+      <webElementGuid>65c1bcc4-39ee-47d8-b8dc-f7c72cdef4c6</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//button/i</value>
+      <webElementGuid>bb3c1d29-edd9-4113-9a09-cb0c43343f9c</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

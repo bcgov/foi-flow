@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_Ministries checkboxes</name>
+   <tag></tag>
+   <elementGuidId>b9eaaae3-870d-4a20-8b22-f4745c916ef1</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='Request']/div/div/form/div[5]/div[2]/div[5]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>div.foi-ministries-container</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>foi-ministries-container</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Select Ministry Client *AEDAGRMAGCFDCTZEDUEMLMOEFINFNRHLTHIRRJERLBRMHAMMAPSSMSDTACTRAOCCPSABRDCLBCASEMBEAOGCPIIOOOPLDBTICOBCMGC</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;Request&quot;)/div[@class=&quot;container foi-review-request-container&quot;]/div[@class=&quot;foi-review-container&quot;]/form[@class=&quot;jss11 foi-request-form&quot;]/div[@class=&quot;MuiPaper-root MuiCard-root foi-details-card MuiPaper-elevation1 MuiPaper-rounded&quot;]/div[@class=&quot;MuiCardContent-root&quot;]/div[@class=&quot;foi-ministries-container&quot;]</value>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='Request']/div/div/form/div[5]/div[2]/div[5]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Description contains NO Personal Information'])[1]/following::div[1]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[2]/div[5]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'Select Ministry Client *AEDAGRMAGCFDCTZEDUEMLMOEFINFNRHLTHIRRJERLBRMHAMMAPSSMSDTACTRAOCCPSABRDCLBCASEMBEAOGCPIIOOOPLDBTICOBCMGC' or . = 'Select Ministry Client *AEDAGRMAGCFDCTZEDUEMLMOEFINFNRHLTHIRRJERLBRMHAMMAPSSMSDTACTRAOCCPSABRDCLBCASEMBEAOGCPIIOOOPLDBTICOBCMGC')]</value>
+   </webElementXpaths>
+</WebElementEntity>

@@ -1,0 +1,38 @@
+{
+    "version": "1.0.0",
+    "createdat": "2022-05-27",
+    "locating": {
+        "type": "hour",
+        "freehours": 3,
+        "unit": 0.25,
+        "price": 7.5
+    },
+    "producing": {
+        "type": "hour",
+        "freehours": 0,
+        "unit": 0.25,
+        "price": 7.5
+    },
+    "ministryPreparing": {
+        "type": "hour",
+        "freehours": 0,
+        "unit": 0.25,
+        "price": 7.5
+    },
+    "iaoPreparing": {
+        "type": "hour",
+        "freehours": 0,
+        "unit": 0.25,
+        "price": 7.5
+    },
+    "electronicPages":  {
+        "type": "page",
+        "unit": 1,
+        "price": 0
+    },
+    "hardcopyPages":  {
+        "type": "page",
+        "unit": 1,
+        "price": 0.1
+    }
+}  

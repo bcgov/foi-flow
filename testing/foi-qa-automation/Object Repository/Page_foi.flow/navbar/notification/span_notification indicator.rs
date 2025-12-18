@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>span_notification indicator</name>
+   <tag></tag>
+   <elementGuidId>1de89bfb-5d46-4676-b52e-8d8d8a4d26c3</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='responsive-navbar-nav']/div/div/ul/li[@class='bell-icon foinavitem']/div/span/span</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>span.MuiBadge-badge.MuiBadge-anchorOriginTopRightRectangle.MuiBadge-colorSecondary</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>id(&quot;responsive-navbar-nav&quot;)/div[@class=&quot;ml-auto navbar-nav&quot;]/div[@class=&quot;ml-auto banner-right foihamburgermenu&quot;]/ul[@class=&quot;navbar-nav foihamburgermenulist&quot;]/li[@class=&quot;bell-icon foinavitem&quot;]/div[@class=&quot;drawer-div false&quot;]/span[@class=&quot;MuiBadge-root&quot;]/span[@class=&quot;MuiBadge-badge MuiBadge-anchorOriginTopRightRectangle MuiBadge-colorSecondary&quot;]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>span</value>
+      <webElementGuid>3c04edba-fc44-4388-8ae8-66bdebcac878</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiBadge-badge MuiBadge-anchorOriginTopRightRectangle MuiBadge-colorSecondary</value>
+      <webElementGuid>595239e9-1820-4d94-895e-4a9aaf08089e</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>2</value>
+      <webElementGuid>3916fe95-cfd4-4ed0-ade4-cf31dae3f76e</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;responsive-navbar-nav&quot;)/div[@class=&quot;ml-auto navbar-nav&quot;]/div[@class=&quot;ml-auto banner-right foihamburgermenu&quot;]/ul[@class=&quot;navbar-nav foihamburgermenulist&quot;]/li[@class=&quot;bell-icon foinavitem&quot;]/div[@class=&quot;drawer-div false&quot;]/span[@class=&quot;MuiBadge-root&quot;]/span[@class=&quot;MuiBadge-badge MuiBadge-anchorOriginTopRightRectangle MuiBadge-colorSecondary&quot;]</value>
+      <webElementGuid>11674029-4f51-49da-8599-fba001a4481c</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='responsive-navbar-nav']/div/div/ul/li[2]/div/span/span</value>
+      <webElementGuid>03fe74b5-41b9-4ba9-9445-1797acf2d370</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='FOI'])[1]/following::span[4]</value>
+      <webElementGuid>1cad31ee-cea2-4286-85c1-0a74d741bf40</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Sign Out'])[1]/preceding::span[1]</value>
+      <webElementGuid>d3073a29-1d31-4761-b387-39c8fe353cb5</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Your FOI Request Queue'])[1]/preceding::span[1]</value>
+      <webElementGuid>d4e2e868-9261-43ce-9cf2-c6416f850e0d</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='2']/parent::*</value>
+      <webElementGuid>54349918-069e-46bd-81fb-ae4c5e2821f7</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//span/span</value>
+      <webElementGuid>e2c215af-9a83-4685-aba1-0ccbb2433a9d</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//span[(text() = '2' or . = '2')]</value>
+      <webElementGuid>e124bd15-0561-43ad-873c-d9803704a071</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

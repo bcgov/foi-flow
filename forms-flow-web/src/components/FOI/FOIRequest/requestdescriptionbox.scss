@@ -1,0 +1,73 @@
+
+.foi-request-description-row {
+    display: inline-flex;
+}
+.foi-request-description-textbox {   
+    display: grid;
+    margin-top: 10px;
+}
+
+.btn-description-history {
+    float: right;
+    text-decoration: underline !important;
+}
+
+.foi-request-description-history {
+    width: 100%;
+}
+
+.foi-date-range-h5 {
+    font-family: "BCSans-Bold", sans-serif !important;
+    margin-left: 8px;
+    padding: 20px 0;
+    font-size: 16px!important;
+    margin-bottom: 0;
+}
+
+.foi-request-dates {
+    display: flex;
+}
+// #outlined-multiline-request-description {
+//     width: 100%;
+//     height: 100%;
+// }
+
+.bottombtn {
+    border: 1px solid #38598A !important;
+    background-color: #FFFFFF !important;
+    color: #38598A !important;    
+    margin-right: 20px;
+    margin-top: 10px;
+    position: relative;
+    width: 30%;
+    font-family: "BCSans-Bold", sans-serif!important;
+}
+
+.bottombtn-saverequestdetails {
+    border: none;
+    background-color: #38598A !important;
+    color: #FFFFFF !important;    
+    margin-right: 20px;
+    margin-top: 10px;
+    position: relative;
+    width: 30%;
+    font-family: "BCSans-Bold", sans-serif!important;
+}
+
+
+.foi-requestdescription-button-group {
+    display: flex;
+}
+
+
+.has-error {
+    color: #ff0000;
+    text-align: right;
+    margin: 0.5rem;
+}
+
+.no-personal-info{
+    width: auto !important;
+     padding-left: 4% !important;
+
+  }
