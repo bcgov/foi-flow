@@ -6,19 +6,22 @@
    <elementGuidId>287d3cb2-ff70-4486-beac-8fc3073e71c9</elementGuidId>
    <selectorCollection>
       <entry>
+         <key>BASIC</key>
+         <value>//button[(text() = '  Reply' or . = '  Reply')]</value>
+      </entry>
+      <entry>
          <key>CSS</key>
          <value>#btncomment604</value>
       </entry>
       <entry>
          <key>XPATH</key>
-         <value>//div[@id='Comments']/div/div[@class='displayComments']/div[2]/div[1]/div/div[@class='userActions']/div[2]/button</value>
-      </entry>
-      <entry>
-         <key>BASIC</key>
-         <value>//button[(text() = '  Reply' or . = '  Reply')]</value>
+         <value>(//*[@id='Comments']//div[contains(@class,'displayComments')]&#xd;
+  //div[contains(@class,'commentsection') and @data-comid and not(.//form)]&#xd;
+)[1]//button[contains(@class,'replyBtn')]</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
    <useRalativeImagePath>true</useRalativeImagePath>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -26,6 +29,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>button</value>
+      <webElementGuid>78a4767c-1439-43ee-b1ce-2b8baacc123a</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -33,6 +37,7 @@
       <name>id</name>
       <type>Main</type>
       <value>btncomment604</value>
+      <webElementGuid>83890624-f49d-412b-9e53-53a343891ad1</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -40,6 +45,7 @@
       <name>class</name>
       <type>Main</type>
       <value>replyBtn  show</value>
+      <webElementGuid>7c99b562-263f-4aad-895b-350a5847ec0d</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -47,6 +53,7 @@
       <name>text</name>
       <type>Main</type>
       <value>  Reply</value>
+      <webElementGuid>d25db9e5-ac17-488a-b79c-d86bda45c051</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -54,6 +61,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;btncomment604&quot;)</value>
+      <webElementGuid>432b1785-2f0b-4d4a-9b67-574528adaa7e</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -61,6 +69,7 @@
       <name>xpath:attributes</name>
       <type>Main</type>
       <value>//button[@id='btncomment604']</value>
+      <webElementGuid>6136d62f-83cc-42b0-b446-b9cba9119f46</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -68,6 +77,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='Comments']/div/div[3]/div[2]/div/div/div/div[3]/button</value>
+      <webElementGuid>91149076-8a66-4384-bd09-0ee4d9198fe7</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -75,6 +85,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Processing, Intake'])[1]/following::button[1]</value>
+      <webElementGuid>53f975a9-0591-4a73-9386-e0cc0d7bc6b2</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -82,6 +93,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Processing, Intake'])[2]/preceding::button[1]</value>
+      <webElementGuid>42795c9a-91cc-4dd2-a3ca-86db9202fc66</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -89,6 +101,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='Reply']/parent::*</value>
+      <webElementGuid>e131a366-1fce-4260-9b02-75aee866d756</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -96,6 +109,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[2]/div/div/div/div[3]/button</value>
+      <webElementGuid>85b9eece-40d2-49a4-8a8e-69eca4cf16fe</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -103,5 +117,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//button[@id = 'btncomment604' and (text() = '  Reply' or . = '  Reply')]</value>
+      <webElementGuid>b64ed3b2-7cfe-47dc-aeb8-79074164f10c</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

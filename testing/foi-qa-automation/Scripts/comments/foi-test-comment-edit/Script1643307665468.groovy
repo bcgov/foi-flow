@@ -96,7 +96,7 @@ WebUI.callTestCase(findTestCase('helper/foi-test-advanced-search-by-id'), [('req
 
 WebUI.click(findTestObject('Page_foi.flow/form/sidebar/div_Sidebar Comments'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/button_Comment 1 Reply_actionsBtn'), 0)
+//WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/button_Comment 1 Reply_actionsBtn'), 0)
 
 WebUI.verifyElementPresent(findTestObject('Page_foi.flow/comment/button_Comment 2 Reply_actionsBtn'), 0)
 

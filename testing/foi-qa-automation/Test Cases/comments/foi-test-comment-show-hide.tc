@@ -4,6 +4,7 @@
    <name>foi-test-comment-show-hide</name>
    <tag></tag>
    <comment></comment>
+   <recordOption>OTHER</recordOption>
    <testCaseGuid>777b283d-a1e1-4273-b610-7418fdaf904e</testCaseGuid>
    <variableLinks>
       <testDataLinkId></testDataLinkId>

@@ -4,23 +4,22 @@
    <name>div_general</name>
    <tag></tag>
    <elementGuidId>183e453f-629d-408f-8de0-81411b9e3507</elementGuidId>
-   <imagePath></imagePath>
    <selectorCollection>
       <entry>
-         <key>XPATH</key>
-         <value>//div[@id='app']/div/div[3]/div/div[2]/div[4]/div[3]/div/div[2]/div[2]/div/div/div/div/div[3]/a/div</value>
-      </entry>
-      <entry>
-         <key>CSS</key>
-         <value></value>
-      </entry>
-      <entry>
          <key>IMAGE</key>
-         <value></value>
       </entry>
       <entry>
          <key>BASIC</key>
          <value>//*[(text() = 'general' or . = 'general')]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@role='row' and @data-id='${ROW_ID}']//div[@data-field='axisRequestId']//a&#xd;
+&#xd;
+</value>
       </entry>
    </selectorCollection>
    <selectorMethod>XPATH</selectorMethod>
@@ -38,7 +37,7 @@
       <name>tag</name>
       <type>Main</type>
       <value>div</value>
-      <webElementGuid>36774d40-0446-46a6-88a2-a12a7a40a1f5</webElementGuid>
+      <webElementGuid>0cf81e53-4ffc-42d5-8f3b-2ebf38d8e4e6</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -46,7 +45,7 @@
       <name>class</name>
       <type>Main</type>
       <value>MuiDataGrid-cellContent</value>
-      <webElementGuid>2860c0c3-cbfa-4fdb-a92f-ec1f11798c7b</webElementGuid>
+      <webElementGuid>fb322237-58f4-4ef1-a8e8-a7bc7a7527e5</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>true</isSelected>
@@ -54,7 +53,7 @@
       <name>text</name>
       <type>Main</type>
       <value>general</value>
-      <webElementGuid>e06a668e-678a-461b-a52f-6746e69c4f03</webElementGuid>
+      <webElementGuid>a67586cd-c7e1-4c61-9f3c-c687299840c7</webElementGuid>
    </webElementProperties>
    <webElementProperties>
       <isSelected>false</isSelected>
@@ -62,7 +61,7 @@
       <name>xpath</name>
       <type>Main</type>
       <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 foi-grid-container css-tuxzvu&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-p4ki1t&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-spacing-xs-1 MuiGrid-grid-xs-12 jss315 css-q0oq2u&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-15j76c0&quot;]/div[@class=&quot;foi-data-grid MuiDataGrid-root MuiDataGrid-autoHeight MuiDataGrid-root--densityStandard css-iclwpf&quot;]/div[@class=&quot;MuiDataGrid-main css-opb0c2&quot;]/div[2]/div[@class=&quot;MuiDataGrid-virtualScroller css-1grl8tv&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerContent css-0&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerRenderZone css-1inm7gi&quot;]/div[@class=&quot;super-app-theme--unopened MuiDataGrid-row Mui-selected&quot;]/div[@class=&quot;foi-advanced-search-result-cell MuiDataGrid-cell--withRenderer MuiDataGrid-cell MuiDataGrid-cell--textLeft&quot;]/a[@class=&quot;MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-z4r21k&quot;]/div[@class=&quot;MuiDataGrid-cellContent&quot;]</value>
-      <webElementGuid>77ab1a1d-2e72-42a7-9ae0-17b03eed6d12</webElementGuid>
+      <webElementGuid>a303f1b1-f3db-4e3d-81a6-68c1cad36347</webElementGuid>
    </webElementProperties>
    <webElementXpaths>
       <isSelected>true</isSelected>
@@ -70,7 +69,7 @@
       <name>xpath:idRelative</name>
       <type>Main</type>
       <value>//div[@id='app']/div/div[3]/div/div[2]/div[4]/div[3]/div/div[2]/div[2]/div/div/div/div/div[3]/a/div</value>
-      <webElementGuid>a8456f31-cd7e-42b8-87d9-3713420edd33</webElementGuid>
+      <webElementGuid>62dc22a5-d66a-43a9-a5f5-4455f72dbc81</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -78,7 +77,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Lastname, Firstname'])[1]/following::div[2]</value>
-      <webElementGuid>a3086623-885d-4d4f-8897-40b41aded2e9</webElementGuid>
+      <webElementGuid>f7e31e17-e6c1-464a-a384-956e68a8a7d2</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -86,7 +85,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='RECEIVED DATE'])[1]/following::div[13]</value>
-      <webElementGuid>33e18536-51c2-4d85-9aa6-72518face11a</webElementGuid>
+      <webElementGuid>cb697400-6cc8-4bc1-a5a3-65169fc9142f</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -94,7 +93,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value></value>
-      <webElementGuid>d0061d53-f352-496b-a9e4-efb53ae72bc3</webElementGuid>
+      <webElementGuid>53dc57bd-290b-4111-be5e-f0ee6f247a85</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -102,7 +101,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>(.//*[normalize-space(text()) and normalize-space(.)='Unopened'])[2]/preceding::div[3]</value>
-      <webElementGuid>6be229fc-6b14-4864-828d-5be0b5942e11</webElementGuid>
+      <webElementGuid>2f0cfd31-f874-4d88-9d83-33dc7ead25b4</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -110,7 +109,7 @@
       <name>xpath:neighbor</name>
       <type>Main</type>
       <value>//*/text()[normalize-space(.)='general']/parent::*</value>
-      <webElementGuid>cca7ce9b-112e-434b-ac4b-17a11b723055</webElementGuid>
+      <webElementGuid>e8272110-5e52-411c-ade7-7214e84c273d</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -118,7 +117,7 @@
       <name>xpath:position</name>
       <type>Main</type>
       <value>//div[3]/a/div</value>
-      <webElementGuid>4013dc2e-3ea1-40e4-87c5-66ac88579028</webElementGuid>
+      <webElementGuid>10b12548-ca32-4dd9-9784-d0034c1c83d3</webElementGuid>
    </webElementXpaths>
    <webElementXpaths>
       <isSelected>false</isSelected>
@@ -126,6 +125,6 @@
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//div[(text() = 'general' or . = 'general')]</value>
-      <webElementGuid>2ca318ad-6ce3-4d2b-bf5f-c2f2820576f1</webElementGuid>
+      <webElementGuid>ddd8aada-ff47-4268-97ed-bcb08baf9656</webElementGuid>
    </webElementXpaths>
 </WebElementEntity>

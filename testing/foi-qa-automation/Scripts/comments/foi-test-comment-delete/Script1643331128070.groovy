@@ -20,6 +20,11 @@ import com.kms.katalon.core.configuration.RunConfiguration as RunConfiguration
 import org.openqa.selenium.WebDriver as WebDriver
 import com.kms.katalon.core.webui.driver.DriverFactory as DriverFactory
 import groovy.json.JsonSlurper as JsonSlurper
+import org.openqa.selenium.WebDriver
+import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.chrome.ChromeOptions
+import com.kms.katalon.core.webui.driver.DriverFactory
+import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
 
 WebUI.openBrowser(GlobalVariable.BASE_URL)
 
@@ -82,12 +87,19 @@ WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/p_comment list 1 t
 WebUI.verifyElementNotPresent(findTestObject('Page_foi.flow/comment/div_Comment list 3'), 0)
 
 WebDriver user1 = DriverFactory.getWebDriver()
+assert user1 != null : 'user1 driver is null'
 
-WebUI.openBrowser('')
+//WebUI.openBrowser('')
 
-not_run: WebDriver user2 = CustomKeywords.'browser.newWindow.open'()
+ChromeOptions opts2 = new ChromeOptions()
+// give user2 an isolated profile so cookies/sessions don’t collide
+opts2.addArguments("--user-data-dir=" + System.getProperty("java.io.tmpdir") + "/katalon-user2")
+opts2.addArguments("--profile-directory=ProfileUser2")
 
-not_run: DriverFactory.changeWebDriver(user2)
+//WebDriver user2 = DriverFactory.getWebDriver()
+WebDriver user2 = new ChromeDriver(opts2)
+
+DriverFactory.changeWebDriver(user2)
 
 WebUI.navigateToUrl(GlobalVariable.BASE_URL)
 
@@ -118,13 +130,17 @@ WebUI.click(findTestObject('Page_foi.flow/comment/button_Comment 1 Reply_actions
 
 WebUI.click(findTestObject('Page_foi.flow/comment/button_comment Delete'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_Comment delete modal message'), 'Parent comments with a reply cannot be deleted. You may edit the comment.')
+WebUI.click(findTestObject('Page_foi.flow/comment/button_Delete comment modal confirm'), FailureHandling.STOP_ON_FAILURE)
 
-WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/comment/button_Delete comment modal confirm'), FailureHandling.STOP_ON_FAILURE)
+WebUI.waitForElementVisible(findTestObject('Page_foi.flow/comment/div_toast_message'), 5)
 
-user1.close()
+WebUI.verifyElementText(findTestObject('Page_foi.flow/comment/div_toast_message'), 'Cannot delete parent comment with replies')
 
-user2.close()
+not_run: WebUI.verifyElementNotClickable(findTestObject('Page_foi.flow/comment/button_Delete comment modal confirm'), FailureHandling.STOP_ON_FAILURE)
+
+not_run: user1.close()
+
+not_run: user2.close()
 
 @com.kms.katalon.core.annotation.SetUp
 def setup() {
