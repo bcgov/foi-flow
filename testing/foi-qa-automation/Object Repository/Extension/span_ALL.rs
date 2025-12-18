@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>span_ALL</name>
+   <tag></tag>
+   <elementGuidId>b5f40aa5-305a-4124-a816-6062bd253707</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='allAttachments']/span</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>#allAttachments > span.MuiChip-label.MuiChip-labelSmall.css-1pjtbja</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>span</value>
+      <webElementGuid>8d09633a-032f-44a0-b57c-891665cd4fae</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiChip-label MuiChip-labelSmall css-1pjtbja</value>
+      <webElementGuid>fed4bcf2-b032-4df5-8f2f-c75b5ad58c8f</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>ALL</value>
+      <webElementGuid>26fbc772-9dfa-461a-a3ae-7cfb9a986927</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;allAttachments&quot;)/span[@class=&quot;MuiChip-label MuiChip-labelSmall css-1pjtbja&quot;]</value>
+      <webElementGuid>62c0bf73-214e-44b6-88b8-fabf8adfa069</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='allAttachments']/span</value>
+      <webElementGuid>6c6a5237-8ce1-4491-a49e-f40b19ada8e2</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='EXTENSIONS'])[1]/following::span[2]</value>
+      <webElementGuid>f71ba152-e8ca-44b7-8461-5386b7f51216</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='APPLICANT'])[1]/following::span[4]</value>
+      <webElementGuid>69bf6dd0-02ad-41f6-a3c4-960c128549cc</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Extension OIPC - Approved.docx'])[1]/preceding::span[2]</value>
+      <webElementGuid>7f946e47-04b2-4b18-a6ba-0dd3bb223edb</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Extension - Approved'])[1]/preceding::span[4]</value>
+      <webElementGuid>94e28f60-879d-409e-abe3-25ab92ac7b67</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='ALL']/parent::*</value>
+      <webElementGuid>f73653e0-e0af-42f2-9cc7-dda3b6ee0ab5</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[4]/span</value>
+      <webElementGuid>27a2e536-ce45-441b-a5c6-5bfffd8feb92</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//span[(text() = 'ALL' or . = 'ALL')]</value>
+      <webElementGuid>319a31c6-8566-403b-b628-649b9fddc114</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

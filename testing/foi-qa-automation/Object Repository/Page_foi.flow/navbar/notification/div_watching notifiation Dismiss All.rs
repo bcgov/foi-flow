@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_watching notifiation Dismiss All</name>
+   <tag></tag>
+   <elementGuidId>c40f07c5-eedf-40f6-8ca7-61c4c99e0ad4</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='uncontrolled-tab-example-tabpane-watch-request']/div/div/div[@class=&quot;notification-dismiss&quot;]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>div.notification-dismiss</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>82258810-dfa5-455d-8e60-66575cc9f93c</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>notification-dismiss</value>
+      <webElementGuid>75166eb6-33fe-46ee-a182-a863d1a3f91c</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Dismiss All</value>
+      <webElementGuid>8def5655-a577-419f-8748-0147175fdd89</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;uncontrolled-tab-example-tabpane-my-request&quot;)/div[@class=&quot;list-header row&quot;]/div[@class=&quot;close-btn-align col&quot;]/div[@class=&quot;notification-dismiss&quot;]</value>
+      <webElementGuid>b5490bc8-6c7d-4a71-90e7-8b1630088efe</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='uncontrolled-tab-example-tabpane-my-request']/div/div/div</value>
+      <webElementGuid>937cffaf-3df6-4dd6-9a9a-3c6f399dda3e</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='`'])[2]/following::div[10]</value>
+      <webElementGuid>52702faa-2ede-4511-9d4f-bcdecf9c8f3b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Alt'])[2]/following::div[10]</value>
+      <webElementGuid>e48028d0-ead9-4781-87c1-12cbdbc31d4f</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='EDU-2022-334727211'])[1]/preceding::div[1]</value>
+      <webElementGuid>96cc2eaf-597c-45df-8f8d-72b959dc79d8</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='New Request Assigned to You.'])[1]/preceding::div[5]</value>
+      <webElementGuid>817d5417-1979-42e0-be30-5639c3ae2d22</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='Dismiss All']/parent::*</value>
+      <webElementGuid>6623f8f9-17d2-4472-870b-8eb06d0c325e</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[3]/div[2]/div[2]/div/div/div/div</value>
+      <webElementGuid>646767f4-3234-4ecc-be6e-e525827b51fd</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'Dismiss All' or . = 'Dismiss All')]</value>
+      <webElementGuid>5500227b-73cb-465e-968a-cb99bad9145a</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>
