@@ -1,0 +1,41 @@
+.docset-wrapper {
+  border: 1px solid #38598A;
+  border-radius: 8px;
+  background: #fff;
+  margin-bottom: 5px;
+  margin-left: 1px;
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.docset-header {
+  background: #38598A;
+  color: white;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+
+.docset-title {
+  flex: 1;
+}
+
+.docset-size {
+  margin-right: 15px;
+  opacity: 0.9;
+}
+
+.docset-actions {
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.docset-body {
+  padding: 5px 10px 10px 10px;
+}

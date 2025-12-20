@@ -18,6 +18,8 @@ from flask import g, request
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
 from request_api.auth import auth, AuthHelper
+from request_api.schemas.foirequestrecord import FOIRequestCreateGroupSchema, FOIRequestUpdateGroupSchema
+from request_api.services.records.recordgroupservice import recordgroupservice
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships
 from request_api.exceptions import BusinessException, Error
@@ -355,3 +357,99 @@ class RetrieveFOIDocument(Resource):
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('GET,POST,OPTIONS')
+@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups')
+class FOIRequestRecordGroupList(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def get(requestid, ministryrequestid):
+        try:
+            result = recordgroupservice().fetch(requestid, ministryrequestid)
+            return {
+                "success": result.success,
+                "message": result.message,
+                "code": result.code,
+                "data": result.data,
+            }, 200
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except Exception as exception:
+            return {'status': False, 'message': str(exception)}, 500
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def post(requestid, ministryrequestid):
+        try:
+            request_json = request.get_json(silent=False, force=False)
+            payload = FOIRequestCreateGroupSchema().load(request_json)
+            username = AuthHelper.getusername()
+
+            response = recordgroupservice().create(
+                int(requestid),
+                int(ministryrequestid),
+                payload,
+                username
+            )
+
+            return {
+                'status': response.success,
+                'message': response.message,
+                'data': response.data,
+            }, response.code
+
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message': exception.message}, 500
+
+
+@cors_preflight('GET,POST,OPTIONS')
+@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups/<documentsetid>')
+class FOIRequestRecordGroups(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def put(requestid, ministryrequestid, documentsetid):
+        try:
+            request_json = request.get_json(silent=False, force=False)
+            payload = FOIRequestUpdateGroupSchema().load(request_json)
+            username = AuthHelper.getusername()
+
+            payload["documentsetid"] = int(documentsetid)
+
+            response = recordgroupservice().update(
+                int(requestid),
+                int(ministryrequestid),
+                payload,
+                username
+            )
+
+            return {
+                'status': response.success,
+                'message': response.message,
+                'data': response.data,
+            }, response.code
+
+        except KeyError as error:
+            return {
+                'status': False,
+                'message': CUSTOM_KEYERROR_MESSAGE + str(error)
+            }, 400
+
+        except BusinessException as exception:
+            return {
+                'status': exception.status_code,
+                'message': exception.message
+            }, 500
