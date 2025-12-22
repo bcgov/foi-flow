@@ -103,6 +103,16 @@ class recordgroupservice:
             current_app.logger.exception("Unexpected error creating FOIRequestRecordGroup")
             return DefaultMethodResult(False, "Unexpected error creating group.", 500)
 
+    def fetch_records_by_documentsetid(self, documentsetid: int) -> List[int]:
+        """
+        Fetch records for a given documentsetid.
+        """
+        if documentsetid is None:
+            return []
+
+        records = FOIRequestRecordGroups.get_record_ids(documentsetid)
+        return sorted(records)
+
     def fetch_valid_records(self, ministryrequestid, records, requestid):
         # Validate requested record IDs
         requested_records: Set[int] = set(records)

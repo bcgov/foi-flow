@@ -163,15 +163,15 @@ class requestservice:
         return rawrequestid
 
     def getrequestdetailsforministry(
-        self, foirequestid, foiministryrequestid, authmembershipgroups
+        self, foirequestid, foiministryrequestid, authmembershipgroups, documentsetid=None
     ):
         return requestservicegetter().getrequestdetailsforministry(
-            foirequestid, foiministryrequestid, authmembershipgroups
+            foirequestid, foiministryrequestid, authmembershipgroups, documentsetid
         )
 
-    def getrequestdetails(self, foirequestid, foiministryrequestid):
+    def getrequestdetails(self, foirequestid, foiministryrequestid,documentsetid=None):
         return requestservicegetter().getrequestdetails(
-            foirequestid, foiministryrequestid
+            foirequestid, foiministryrequestid,documentsetid
         )
 
     def getrequestid(self, foiministryrequestid):
