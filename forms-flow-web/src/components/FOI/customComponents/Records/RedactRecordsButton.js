@@ -60,7 +60,7 @@ export default function RedactRecordsButton({ records, groups }) {
 
   const handleRedactGroup = (set) => {
     window.open(
-      `${DOC_REVIEWER_WEB_URL}/foi/${set.ministryId}?set=${set.id}`,
+      `${DOC_REVIEWER_WEB_URL}/foi/${set.ministryId}?documentsetid=${set.id}`,
       "_blank"
     );
     handleMenuClose();
