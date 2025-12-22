@@ -202,6 +202,7 @@ class recordgroupservice:
             self,
             requestid: int,
             ministryrequestid: int,
+            documentsetid=None
     ) -> DefaultMethodResult:
         """
         Retrieve all active record groups for a Ministry Request.
@@ -214,15 +215,16 @@ class recordgroupservice:
                 return DefaultMethodResult(False, "Ministry request not found.", 404)
 
             # Fetch all groups (with records included)
-            groups = FOIRequestRecordGroup.get_by_ministry_request_id(
+            groups = FOIRequestRecordGroup.get_active_groups_for_request(
                 ministry_request_id=ministryrequestid,
+                request_id=requestid,
+                document_set_id=documentsetid,
                 include_records=True,
             )
 
             # Transform for API response
-            result = []
-            for g in groups:
-                result.append({
+            result = [
+                {
                     "documentsetid": g.document_set_id,
                     "name": g.name,
                     "ministryrequestid": g.ministry_request_id,
@@ -231,8 +233,10 @@ class recordgroupservice:
                     "created_by": g.created_by,
                     "updated_at": g.updated_at,
                     "updated_by": g.updated_by,
-                    "records": sorted([r.recordid for r in g.records]),
-                })
+                    "records": sorted(r.recordid for r in g.records),
+                }
+                for g in groups
+            ]
 
             return DefaultMethodResult(
                 True,
