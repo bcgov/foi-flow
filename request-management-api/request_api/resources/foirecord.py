@@ -368,8 +368,10 @@ class FOIRequestRecordGroupList(Resource):
     @auth.require
     @auth.ismemberofgroups(getrequiredmemberships())
     def get(requestid, ministryrequestid):
+        documentsetid = request.args.get('documentsetid', type=int)
+
         try:
-            result = recordgroupservice().fetch(requestid, ministryrequestid)
+            result = recordgroupservice().fetch(requestid, ministryrequestid, documentsetid)
             return {
                 "success": result.success,
                 "message": result.message,

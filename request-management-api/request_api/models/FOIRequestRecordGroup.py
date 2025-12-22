@@ -131,3 +131,35 @@ class FOIRequestRecordGroup(db.Model):
             query = query.options(db.selectinload(cls.records))
 
         return query.order_by(cls.document_set_id.asc()).all()
+
+
+    @classmethod
+    def get_active_groups_for_request(
+            cls,
+            ministry_request_id: int,
+            request_id: int,
+            document_set_id: int | None = None,
+            include_records: bool = False,
+    ) -> list["FOIRequestRecordGroup"]:
+        """
+        Retrieve active document groups for a ministry + request.
+        Optionally filter by document_set_id.
+        """
+        query = (
+            db.session.query(cls)
+            .filter(
+                cls.ministry_request_id == ministry_request_id,
+                cls.request_id == request_id,
+                cls.is_active.is_(True),
+            )
+        )
+
+        if document_set_id:
+            query = query.filter(cls.document_set_id == document_set_id)
+
+        if include_records:
+            query = query.options(db.selectinload(cls.records))
+
+        return query.order_by(cls.document_set_id.asc()).all()
+
+
