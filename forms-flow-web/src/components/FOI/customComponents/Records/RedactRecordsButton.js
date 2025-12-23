@@ -6,7 +6,7 @@ import {
   DOC_REVIEWER_WEB_URL
 } from "../../../../constants/constants";
 
-export default function RedactRecordsButton({ records, groups }) {
+export default function RedactRecordsButton({ records, groups, ministryrequestid }) {
 
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -51,11 +51,7 @@ export default function RedactRecordsButton({ records, groups }) {
   };
 
   const handleRedactAll = () => {
-    const ministryId =
-      records[0]?.groupministryrequestid || records[0]?.ministryId;
-    if (!ministryId) return;
-
-    window.open(`${DOC_REVIEWER_WEB_URL}/foi/${ministryId}`, "_blank");
+    window.open(`${DOC_REVIEWER_WEB_URL}/foi/${ministryrequestid}`, "_blank");
   };
 
   const handleRedactGroup = (set) => {
