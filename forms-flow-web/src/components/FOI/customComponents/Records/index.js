@@ -38,7 +38,7 @@ import {
   editPersonalAttributes,
   fetchPDFStitchedRecordsForPhasedRedlines,
   fetchPDFStitchedRecordsForPhasedResponsePackages,
-  retrieveSelectedRecordVersion,
+  retrieveSelectedRecordVersion, deleteFOIRecordFromGroup,
 } from "../../../../apiManager/services/FOI/foiRecordServices";
 import {
   saveRequestDetails,
@@ -141,6 +141,7 @@ import FileInfoBar from "../DocumentSet/FileInfoBar";
 import DocumentSetWrapper from "../DocumentSet/DocumentSetWrapper";
 import DocumentSetModal from "../DocumentSet/DocumentSetModal";
 import RedactRecordsButton  from "./RedactRecordsButton";
+import DocumentSetDeleteModal from "../DocumentSet/DocumentSetDeleteModal";
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -493,6 +494,10 @@ export const RecordsLog = ({
 
   const [openModal, setModal] = useState(false);
   const [openDocumentSetModal, setOpenDocumentSetModal] = useState(false);
+  const [documentSetDeleteModal, setDocumentSetDeleteModal] = useState({
+    open: false,
+    target: null, // { recordId, documentSetId, label }
+  });
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [divisionsModalOpen, setDivisionsModalOpen] = useState(false);
   const [divisionModalTagValue, setDivisionModalTagValue] = useState(-1);
@@ -1811,11 +1816,47 @@ export const RecordsLog = ({
           );
         }
         break;
+      case "deleteRecordFromDocumentSet":
+        setDocumentSetDeleteModal({
+          open: true,
+          target: {
+            recordId: _record.recordid,
+            documentSetId: _record.groupdocumentsetid,
+            label: _record.filename,
+          },
+        });
+        break;
       default:
         setModal(false);
         break;
     }
   };
+
+  const handleConfirmDelete = () => {
+    const target = documentSetDeleteModal.target;
+
+    if (!target) return;
+
+    dispatch(
+      deleteFOIRecordFromGroup(
+        requestId,
+        ministryId,
+        target.documentSetId,
+        target.recordId,
+        (err) => {
+          if (!err) {
+            toast.success("Record removed from Document Set");
+            dispatch(fetchFOIRecords(requestId, ministryId));
+            setDocumentSetDeleteModal({ open: false, target: null });
+          } else {
+            toast.error("Failed to remove record");
+          }
+        }
+      )
+    );
+  };
+
+
 
   const handleRename = (_record, newFilename) => {
     setModal(false);
@@ -3372,6 +3413,12 @@ export const RecordsLog = ({
             uiState={documentSetUIState}
           />
 
+          <DocumentSetDeleteModal
+            open={documentSetDeleteModal.open}
+            onClose={() => setDocumentSetDeleteModal({ open: false, target: null })}
+            onConfirm={handleConfirmDelete}
+          />
+
 
           {!isHistoricalRequest && <AttachmentModal
             modalFor={modalFor}
@@ -4166,6 +4213,13 @@ const AttachmentPopup = React.memo(
       handlePopupButtonClick("delete", record);
     };
 
+    const handleDeleteDocumentSetMenu = () => {
+      closeTooltip();
+      handlePopupButtonClick("deleteRecordFromDocumentSet", record);
+    };
+
+
+
     const handleRetry = (record) => {
       setRetry(true);
       closeTooltip();
@@ -4229,6 +4283,21 @@ const AttachmentPopup = React.memo(
             }}
           >
             Delete
+          </MenuItem>
+        );
+      };
+
+      const DeleteDocumentSetMenu = () => {
+        return (
+          <MenuItem
+            style={ (lockRecords || disableMinistryUser) ? { pointerEvents: "none" } : {} }
+            disabled={lockRecords || disableMinistryUser}
+            onClick={() => {
+              handleDeleteDocumentSetMenu();
+              setPopoverOpen(false);
+            }}
+          >
+            Delete Document Set
           </MenuItem>
         );
       };
@@ -4358,6 +4427,13 @@ const AttachmentPopup = React.memo(
             }
 
             {!record.isattachment && !isHistoricalRequest && <DeleteMenu />}
+
+            {record.groupdocumentsetid !== null &&
+              !record.isattachment &&
+              !isHistoricalRequest && (
+                <DeleteDocumentSetMenu />
+              )}
+
             {!record.isredactionready && !record.selectedfileprocessversion &&
               (record.failed ||
                 isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
@@ -4372,9 +4448,8 @@ const AttachmentPopup = React.memo(
                 </MenuItem>
               )}
 
-            {/* {record.category === "personal" ? (
-          ""
-        ) : <DeleteMenu />} */}
+            {
+          }
           </MenuList>
         </Popover>
       );

@@ -1,4 +1,5 @@
 import {
+  httpDELETERequest,
   httpGETRequest,
   httpGETRequest1,
   httpPOSTRequest, httpPUTRequest,
@@ -1136,6 +1137,38 @@ export const updateFOIRecordGroup = (
       });
   };
 };
+
+export const deleteFOIRecordFromGroup = (
+  requestId,
+  ministryId,
+  groupId,
+  recordId,
+  done
+) => {
+  let apiUrl = API.FOI_DELETE_RECORD_GROUP;
+  apiUrl = replaceUrl(apiUrl, "<requestid>", requestId);
+  apiUrl = replaceUrl(apiUrl, "<ministryrequestid>", ministryId);
+  apiUrl = replaceUrl(apiUrl, "<groupid>", groupId);
+  apiUrl = replaceUrl(apiUrl, "<recordid>", recordId);
+
+  return (dispatch) => {
+    httpDELETERequest(apiUrl, UserService.getToken())
+      .then((res) => {
+        const payload = res?.data;
+        if (payload) {
+          done(null, payload);
+        } else {
+          dispatch(serviceActionError(res));
+          done("Error deleting record from document set");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
+
 
 export const getFOIRecordGroup = async (requestId, ministryId) => {
   let apiUrl = API.FOI_GET_RECORD_GROUP;

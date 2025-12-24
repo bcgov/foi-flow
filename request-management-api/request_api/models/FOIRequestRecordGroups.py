@@ -80,4 +80,19 @@ class FOIRequestRecordGroups(db.Model):
             .delete(synchronize_session=False)
         )
 
+    @classmethod
+    def remove(cls, document_set_id: int, record_id: int) -> int:
+        if record_id is None:
+            return 0
+
+        deleted_count = (
+            db.session.query(cls)
+            .filter(
+                cls.document_set_id == document_set_id,
+                cls.record_id == record_id,
+            )
+            .delete(synchronize_session=False)
+        )
+
+        return deleted_count
 

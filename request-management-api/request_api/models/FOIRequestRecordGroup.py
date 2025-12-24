@@ -162,4 +162,29 @@ class FOIRequestRecordGroup(db.Model):
 
         return query.order_by(cls.document_set_id.asc()).all()
 
+    @classmethod
+    def find_record_association(
+            cls,
+            *,
+            ministry_request_id: int,
+            request_id: int,
+            document_set_id: int,
+            record_id: int,
+    ):
+        """
+        Validate that a record belongs to an active document set
+        within the given ministry + request scope.
+        """
+        return (
+            db.session.query(cls)
+            .join(FOIRequestRecordGroups, cls.document_set_id == FOIRequestRecordGroups.document_set_id)
+            .filter(
+                cls.ministry_request_id == ministry_request_id,
+                cls.request_id == request_id,
+                cls.document_set_id == document_set_id,
+                cls.is_active.is_(True),
+                FOIRequestRecordGroups.record_id == record_id,
+            )
+            .first()
+        )
 

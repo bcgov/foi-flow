@@ -128,6 +128,54 @@ class recordgroupservice:
 
         return valid_records
 
+    def delete(self, requestid: int, ministryrequestid: int, document_set_id: int, record_id: int):
+        try:
+            association = FOIRequestRecordGroup.find_record_association(
+                ministry_request_id=ministryrequestid,
+                request_id=requestid,
+                document_set_id=document_set_id,
+                record_id=record_id,
+            )
+
+            if not association:
+                return DefaultMethodResult(
+                    False,
+                    "Record not found in the specified document set.",
+                    code=404,
+                )
+
+            deleted_rows = FOIRequestRecordGroups.remove(
+                document_set_id, record_id
+            )
+
+            remaining = FOIRequestRecordGroups.query.filter_by(
+                document_set_id=document_set_id
+            ).count()
+
+            document_set_deleted = False
+            if remaining == 0:
+                association.is_active = False
+                document_set_deleted = True
+
+            db.session.commit()
+
+            return DefaultMethodResult(
+                True,
+                {
+                    "rows_deleted": deleted_rows,
+                    "document_set_deleted": document_set_deleted,
+                },
+                code=200,
+            )
+
+        except Exception:
+            db.session.rollback()
+            return DefaultMethodResult(
+                False,
+                "Failed to remove record from document set.",
+                code=500,
+            )
+
     def update(self, requestid: int, ministryrequestid: int, payload: dict, username: str):
         document_set_id = payload.get("documentsetid")
         if not document_set_id:
@@ -210,9 +258,9 @@ class recordgroupservice:
 
     def fetch(
             self,
-            requestid: int,
-            ministryrequestid: int,
-            documentsetid=None
+            request_id: int,
+            ministry_request_id: int,
+            document_set_id=None
     ) -> DefaultMethodResult:
         """
         Retrieve all active record groups for a Ministry Request.
@@ -220,15 +268,15 @@ class recordgroupservice:
 
         try:
             # Ensure ministry request exists
-            ministry_req = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
+            ministry_req = FOIMinistryRequest.getrequestbyministryrequestid(ministry_request_id)
             if ministry_req is None:
                 return DefaultMethodResult(False, "Ministry request not found.", 404)
 
             # Fetch all groups (with records included)
             groups = FOIRequestRecordGroup.get_active_groups_for_request(
-                ministry_request_id=ministryrequestid,
-                request_id=requestid,
-                document_set_id=documentsetid,
+                ministry_request_id=ministry_request_id,
+                request_id=request_id,
+                document_set_id=document_set_id,
                 include_records=True,
             )
 

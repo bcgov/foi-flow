@@ -16,7 +16,6 @@
 
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
-from flask_expects_json import expects_json
 from request_api.auth import auth, AuthHelper
 from request_api.schemas.foirequestrecord import FOIRequestCreateGroupSchema, FOIRequestUpdateGroupSchema
 from request_api.services.records.recordgroupservice import recordgroupservice
@@ -30,6 +29,7 @@ import json
 from flask_cors import cross_origin
 import asyncio
 import traceback
+import logging
 
 
 API = Namespace('FOIWatcher', description='Endpoints for FOI record management')
@@ -455,3 +455,62 @@ class FOIRequestRecordGroups(Resource):
                 'status': exception.status_code,
                 'message': exception.message
             }, 500
+
+@cors_preflight('DELETE,OPTIONS')
+@API.route(
+    '/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups/<documentsetid>/records/<recordid>'
+)
+class FOIRequestRecordGroupRecord(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def delete(requestid, ministryrequestid, documentsetid, recordid):
+        try:
+            request_id = int(requestid)
+            ministry_request_id = int(ministryrequestid)
+            document_set_id = int(documentsetid)
+            record_id = int(recordid)
+
+            response = recordgroupservice().delete(
+                request_id,
+                ministry_request_id,
+                document_set_id,
+                record_id,
+            )
+
+            return {
+                "success": response.success,
+                "message": response.message,
+                "data": response.data,
+            }, response.code
+
+        except ValueError:
+            return {
+                "success": False,
+                "message": "Invalid path parameters.",
+            }, 400
+
+        except BusinessException as exc:
+            return {
+                "success": False,
+                "message": exc.message,
+            }, exc.status_code
+
+        except Exception:
+            logging.exception(
+                "Failed to delete record from document set",
+                extra={
+                    "requestid": requestid,
+                    "ministryrequestid": ministryrequestid,
+                    "documentsetid": documentsetid,
+                    "recordid": recordid,
+                },
+            )
+            return {
+                "success": False,
+                "message": "Unexpected error.",
+            }, 500
+

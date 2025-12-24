@@ -222,5 +222,7 @@ const API = {
   FOI_POST_RECORD_GROUP: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups`,
   FOI_PUT_RECORD_GROUP: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups/<groupid>`,
   FOI_GET_RECORD_GROUP: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups`,
+  FOI_DELETE_RECORD_GROUP: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups/<groupid>/records/<recordid>`,
+
 };
 export default API;
