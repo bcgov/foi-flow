@@ -27,7 +27,17 @@ export default function DocumentSetUI({
 
   useEffect(() => {
     getFOIRecordGroup(requestId, ministryId)
-      .then(groups => setDocumentSets(transformGroupsToDocumentSets(groups)));
+      .then(groups => {
+        const sets = transformGroupsToDocumentSets(groups);
+        if (sets.length > 0) {
+          setDocumentSets(sets);
+          setSelectedSet(sets[0].id);
+        } else {
+          const newSet = { id: "new-1", label: "Document Set 1" };
+          setDocumentSets([newSet]);
+          setSelectedSet("new-1");
+        }
+      });
   }, [requestId, ministryId]);
 
   function transformGroupsToDocumentSets(groups) {

@@ -493,8 +493,6 @@ export const RecordsLog = ({
 
   const [openModal, setModal] = useState(false);
   const [openDocumentSetModal, setOpenDocumentSetModal] = useState(false);
-  const handleOpenDocumentSetModal = () => setOpenDocumentSetModal(true);
-  const handleCloseDocumentSetModal = () => setOpenDocumentSetModal(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [divisionsModalOpen, setDivisionsModalOpen] = useState(false);
   const [divisionModalTagValue, setDivisionModalTagValue] = useState(-1);
@@ -1802,14 +1800,16 @@ export const RecordsLog = ({
         break;
       case "documentSet":
         setOpenDocumentSetModal(true);
-        setRetrieveSelectedRecords(
-          records
-            .filter(record => record.isselected)
-            .map(record => ({
-              ...record,
-              ministryId: record.ministryId ?? ministryId,
-            }))
-        );
+        if (_record && _record.length > 0) {
+          setRetrieveSelectedRecords(
+            _record
+              .filter(record => record.isselected)
+              .map(record => ({
+                ...record,
+                ministryId: record.ministryId ?? ministryId,
+              }))
+          );
+        }
         break;
       default:
         setModal(false);
@@ -2613,6 +2613,7 @@ export const RecordsLog = ({
                     <RedactRecordsButton
                       records={records}
                       groups={groups}
+                      ministryrequestid={ministryId}
                     />
 
                   </Grid>
@@ -2884,10 +2885,10 @@ export const RecordsLog = ({
                   borderBottomLeftRadius: 0,
                   borderBottomRightRadius: 0,
                 }}
+                container
                 alignItems="center"
                 justifyContent="center"
                 direction="row"
-                container
                 item
                 xs={12}
                 elevation={0}
@@ -3244,7 +3245,7 @@ export const RecordsLog = ({
                   <button
                     className={` btn`}
                     onClick={() => handlePopupButtonClick("documentSet", records)}
-                    disabled={lockRecords || isHistoricalRequest}
+                    disabled={lockRecords || isHistoricalRequest || !checkIsAnySelected()}
                     style={
                       lockRecords ? {pointerEvents: "none"} : {}
                     }
@@ -3699,18 +3700,6 @@ const Attachment = React.memo(
       (division) => {
         return division.divisionname != "TBD";
       });
-
-    // useEffect(() => {
-    //   if(record && record.filename) {
-    //     setDisabled(isMinistryCoordinator && record.category == 'personal')
-    //   }
-    // }, [record])
-
-    const getCategory = (category) => {
-      return AttachmentCategories.categorys.find(
-        (element) => element.name === category
-      );
-    };
 
     const handleSelect = (e) => {
       handleSelectRecord(record, e);
