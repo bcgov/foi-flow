@@ -128,6 +128,7 @@ export default function DocumentSetUI({
             <Radio
               checked={selectedSet === set.id}
               onChange={() => setSelectedSet(set.id)}
+              onClick={() => setSelectedSet(set.id)}
               color="primary"
             />
 
