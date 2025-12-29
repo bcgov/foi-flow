@@ -15,7 +15,7 @@ class foiinvoiceservice:
             foiministryrequest = FOIMinistryRequest.getrequest(feedata["ministryrequestid"])
             invoice_date = datetime2.now()
             current_invoiceid = FOIRequestInvoices.getcurrentinvoiceid().invoiceid if FOIRequestInvoices.getcurrentinvoiceid() is not None else 0
-            filename = f"Invoice-{(current_invoiceid+1):10d}-{foiministryrequest['axisrequestid']}"
+            filename = f"Invoice-{(current_invoiceid+1):10d}-{foiministryrequest['axisrequestid']}.pdf"
             invoice_template_data = {
                 "invoice_num": f"{(current_invoiceid+1):10d}",
                 "invoice_date": invoice_date.strftime("%B %d, %Y"),
