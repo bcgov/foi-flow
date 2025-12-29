@@ -14,8 +14,8 @@ class FOIRequestInvoices(db.Model):
     __tablename__ = "FOIRequestInvoices"
     # Defining the columns
     invoiceid = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
-    foicfrefee_id = db.Column(db.Integer, ForeignKey('FOIRequestCFRFees.cfrfeeid'), nullable=False)
-    foicfrefeeversion_id = db.Column(db.Integer, ForeignKey('FOIRequestCFRFees.version'), nullable=False)
+    foirequestcfrfee_id = db.Column(db.Integer, ForeignKey('FOIRequestCFRFees.cfrfeeid'), nullable=False)
+    foirequestcfrfeeversion_id = db.Column(db.Integer, ForeignKey('FOIRequestCFRFees.version'), nullable=False)
     documentpath = db.Column(db.Text, nullable=False)
     filename = db.Column(db.String(500), nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
@@ -35,8 +35,8 @@ class FOIRequestInvoices(db.Model):
     def save_invoice(cls, invoice):
         try:
             new_invoice = FOIRequestInvoices(
-                foicfrefee_id=invoice["foirequestcfrfee_id"],
-                foicfrefeeversion_id=invoice["foicfrefeeversion_id"],
+                foirequestcfrfee_id=invoice["foirequestcfrfee_id"],
+                foirequestcfrfeeversion_id=invoice["foicfrefeeversion_id"],
                 documentpath=invoice["documentpath"],
                 filename=invoice["filename"],
                 applicant_name=invoice["applicant_name"],
@@ -45,8 +45,9 @@ class FOIRequestInvoices(db.Model):
                 created_by=invoice["created_by"]
             )
             db.session.add(new_invoice)
-            db.session.commit()   
-            return DefaultMethodResult(True, "FOIRequestInvoice entry created", new_invoice)
+            db.session.commit()
+            documentpath = new_invoice.documentpath
+            return DefaultMethodResult(True, "FOIRequestInvoice entry created", documentpath)
         except Exception as exception:
             logging.error(f"Error: {exception}")
             return DefaultMethodResult(False, "FOIRequestInvoice entry unable to be created")
@@ -55,4 +56,4 @@ class FOIRequestInvoices(db.Model):
 
     class FOIRequestInvoiceSchema(ma.Schema):
         class Meta:
-            fields=('invoiceid', 'documentpath', 'foicfrefee_id', 'foicfrefeeversion_id', 'filename', 'applicant_name', 'applicant_address', 'created_at', 'created_by')
+            fields=('invoiceid', 'documentpath', 'foirequestcfrfee_id', 'foirequestcfrfeeversion_id', 'filename', 'applicant_name', 'applicant_address', 'created_at', 'created_by')

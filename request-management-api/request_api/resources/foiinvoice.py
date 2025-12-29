@@ -1,4 +1,4 @@
-from flask import g, request
+from flask import g, request, current_app
 from flask_restx import Namespace, Resource
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
@@ -36,8 +36,7 @@ class FOIRequestInvoiceById(Resource):
             return {"message": "Unable to find invoice with given CFR Fee ID", "status": 404}, 404
         
 @cors_preflight('POST, PUT, OPTIONS') 
-@API.route('/foirequestinvoice/foicfrfee/<int:foicfrfeeid>', defaults={'usertype':None})
-@API.route('/foirequestinvoice/foicfrfee/<int:foicfrfeeid>/<string:usertype>')
+@API.route('/foirequestinvoice/foicfrfee/<int:foicfrfeeid>')
 class FOIRequestInvoice(Resource):
     """Creates (updates) a new version of foirequest invoice"""
     @staticmethod
@@ -48,11 +47,15 @@ class FOIRequestInvoice(Resource):
     def post(foicfrfeeid):
         try:
             data = request.get_json() #Passes created by, documentpath, cfrfeedata (has cfr feeid and foiministryreuestid), applicant_name, applicant address
-            new_invoice =  FOIRequestInvoiceSchema().load(data),
+            print("DATA", data)
+            new_invoice =  FOIRequestInvoiceSchema().load(data)
+            print("new inv", new_invoice)
             cfrdata = data["cfrfee"]
             result = foiinvoiceservice().generate_invoice(new_invoice, cfrdata)
+            print("RES", result)
             if result.success:
-                return {"message": result.message, "invoice": result.identifier.documentpath, "status": 201}, 201
-        except:
+                return {"message": result.message, "invoice": result.identifier, "status": 201}, 201
+        except Exception as exception:
+            current_app.logger.exception(f"Invoice creation failed")
             return {"message":"Invoice creation failed", "status": 400}, 400
 
