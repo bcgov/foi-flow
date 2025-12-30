@@ -13,35 +13,39 @@ jobs:
 
 # Build the docker image, tag with pull request
   REQUEST-MANAGEMENT-API-IMAGE-BUILD:
-  runs-on: ubuntu-latest
-  steps:
-# Checkout repo
-    - name: Checkout
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+    runs-on: ubuntu-latest
+    steps:
+  # Checkout repo
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-# Login to BC Gov Openshift Image Repository via docker
+  # Login to BC Gov Openshift Image Repository via docker
 
-    - name: Login to Openshift Docker
-      run: |
-        docker login ${{ secrets.PUBLIC_IMAGE_REPOSITORY }} -u ${{ secrets.OPENSHIFT_SA_NAME }} --password-stdin ${{ secrets.OPENSHIFT_SA_TOOLS_TOKEN }}
+      - name: Login to Openshift Docker
+        run: |
+          docker login ${{ secrets.PUBLIC_IMAGE_REPOSITORY }} -u ${{ secrets.OPENSHIFT_SA_NAME }} --password-stdin${{ secrets.OPENSHIFT_SA_TOOLS_TOKEN }}
 
-# Build the Request Management API Image, Tag with Pull Request number
+  # Build the Request Management API Image, Tag with Pull Request number
 
-    - name: Build Request Management API Image
-      working-directory: request-management-api
-      run: |
-         docker build -t ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/request-management-api:${{github.event.pull_request.number}} -f Dockerfile.local
+      - name: Build Request Management API Image
+        working-directory: request-management-api
+        run: |
+          docker build -t ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/request-management-api:${{github.event.pull_request.number}} -f Dockerfile.local
 
-# Push Built Image to BC Gov Openshift Image Repository
-    - name: Push Request Management API Image
-      run: |
-        docker push ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/request-management-api:${{github.event.pull_request.number}}
+  # Push Built Image to BC Gov Openshift Image Repository
+      - name: Push Request Management API Image
+        run: |
+          docker push ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/request-management-api:${{github.event.pull_request.number}}
 
-    - name: Comment on PR
-      uses: thollander/actions-comment-pull-request@v3
-      with:
-        message: |
-          **Tag:** `${{ github.event.pull_request.number }}`  
-          **Image:** `${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/request-management-api:${{ github.event.pull_request.number }}`
+  REQUEST-MANAGEMENT-API-PR-COMMENT:
+    needs: REQUEST-MANAGEMENT-API-IMAGE-BUILD
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on PR
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            **Tag:** `${{ github.event.pull_request.number }}`  
+            **Image:** `${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/request-management-api:${{ github.event.pull_request.number }}`
