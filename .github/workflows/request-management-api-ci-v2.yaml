@@ -12,7 +12,7 @@ jobs:
 # Job for automated unit tests goes HERE
 
 # Build the docker image, tag with pull request
-  COMPRESSION-SERVICE-IMAGE-BUILD:
+  REQUEST-MANAGEMENT-API-IMAGE-BUILD:
   runs-on: ubuntu-latest
   steps:
 # Checkout repo
@@ -27,19 +27,19 @@ jobs:
       run: |
         docker login ${{ secrets.PUBLIC_IMAGE_REPOSITORY }} -u ${{ secrets.OPENSHIFT_SA_NAME }} -p ${{ secrets.OPENSHIFT_SA_TOOLS_TOKEN }}
 
-# Build the Compression Service Image, Tag with Pull Request number
+# Build the Request Management API Image, Tag with Pull Request number
 
-    - name: Build Compression Image
+    - name: Build Request Management API Image
       run: |
         cd request-management-api && docker build -t ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/request-management-api:${{github.event.pull_request.number}} -f Dockerfile.local
 
 # Push Built Image to BC Gov Openshift Image Repository
-    - name: Push API Image
+    - name: Push Request Management API Image
       run: |
         docker push ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/request-management-api:${{github.event.pull_request.number}}
 
-  COMPRESSION-SERVICE-PR-COMMENT:
-  needs: COMPRESSION-SERVICE-IMAGE-BUILD
+  REQUEST-MANAGEMENT-API-PR-COMMENT:
+  needs: REQUEST-MANAGEMENT-API-IMAGE-BUILD
   runs-on: ubuntu-latest
   steps:
     - name: Comment on PR
