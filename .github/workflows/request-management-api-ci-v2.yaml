@@ -46,4 +46,5 @@ jobs:
       uses: thollander/actions-comment-pull-request@v3
       with:
         message: |
-         Your image tag is **${{ github.event.pull_request.number }}**. Please keep track of it in order to promote to TEST :cheese:
+          **Tag:** `${{ github.event.pull_request.number }}`  
+          **Image:** `${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/request-management-api:${{ github.event.pull_request.number }}`
