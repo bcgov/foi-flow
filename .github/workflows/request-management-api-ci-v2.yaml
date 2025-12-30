@@ -25,7 +25,7 @@ jobs:
 
       - name: Login to Openshift Docker
         run: |
-          docker login -u ${{ secrets.OPENSHIFT_SA_NAME }} --password-stdin ${{ secrets.OPENSHIFT_SA_TOOLS_TOKEN }} ${{ secrets.PUBLIC_IMAGE_REPOSITORY }} 
+          echo "${{ secrets.OPENSHIFT_SA_TOOLS_TOKEN }}" | docker login ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}  -u ${{ secrets.OPENSHIFT_SA_NAME }} --password-stdin 
 
   # Build the Request Management API Image, Tag with Pull Request number
 
