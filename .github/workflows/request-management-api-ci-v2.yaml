@@ -39,10 +39,6 @@ jobs:
       run: |
         docker push ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/request-management-api:${{github.event.pull_request.number}}
 
-  REQUEST-MANAGEMENT-API-PR-COMMENT:
-  needs: REQUEST-MANAGEMENT-API-IMAGE-BUILD
-  runs-on: ubuntu-latest
-  steps:
     - name: Comment on PR
       uses: thollander/actions-comment-pull-request@v3
       with:
