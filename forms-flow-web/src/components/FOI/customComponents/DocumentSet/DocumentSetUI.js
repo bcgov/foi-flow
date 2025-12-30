@@ -50,16 +50,6 @@ export default function DocumentSetUI({
     }));
   }
 
-  const hasIncompatibleFiles = () => {
-    if (!records || records.length === 0) {
-      return false;
-    }
-
-    return records.some(
-      (record) => record?.attributes?.incompatible === true
-    );
-  };
-
   const handleSave = () => {
     const recordIds = records?.map((r) =>
       r.recordid ||
@@ -172,20 +162,6 @@ export default function DocumentSetUI({
           trouble creating record packages.
         </div>
       </Paper>
-
-      {/* Incompatible File Error Panel */}
-      {hasIncompatibleFiles() && (
-        <Paper elevation={0} className="ds-alert">
-          <div className="ds-alert-title">
-            <FontAwesomeIcon icon={faExclamationCircle} />
-            Error: file not added to document set
-          </div>
-          <div className="ds-alert-text">
-            We noticed an issue with one of the files you selected. It contains
-            an error and will not be included in your document set.
-          </div>
-        </Paper>
-      )}
     </div>
   );
 }

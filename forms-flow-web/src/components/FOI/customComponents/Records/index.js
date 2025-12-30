@@ -328,7 +328,6 @@ export const RecordsLog = ({
   const [redactAnchorEl, setRedactAnchorEl] = useState(null);
 
   const [selectedFilesSize, setSelectedFilesSize] = useState(0);
-  const [documentSetUIState, setDocumentSetUIState] = useState("create");
   const [selectedFilesPages, setSelectedFilesPages] = useState(0);
 
   const [estimatedPageCount, setEstimatedPageCount] = useState(0);
@@ -1735,9 +1734,9 @@ export const RecordsLog = ({
       return sum + size;
     }, 0);
 
-    const mb = totalBytes / (1024 * 1024);
+    const mb = totalBytes / 1024;
 
-    return `${mb.toFixed(2)} MB`;
+    return `${mb.toFixed(2)} KB`;
   }
 
   const hasDocumentsToExport =
@@ -1908,16 +1907,21 @@ export const RecordsLog = ({
     return `Request #U-00${requestId}`;
   };
 
-  // const onFilterChange = (filterValue) => {
-  // let _filteredRecords = filterValue === "" ?
-  // records.records :
-  // records.records.filter(r =>
-  //   r.filename.toLowerCase().includes(filterValue?.toLowerCase()) ||
-  //   r.createdby.toLowerCase().includes(filterValue?.toLowerCase()) ||
-  //   r.attributes?.findIndex(a => a.divisionname.toLowerCase() === filterValue?.toLowerCase().trim()) > -1
-  // );
-  // setRecords(_filteredRecords)
-  // }
+  function countTotalPages(records) {
+    console.log("countTotalPages", records);
+    return records.reduce((total, record) => {
+      // pages on the main record (if present)
+      const recordPages = record.pagecount || 0;
+
+      // pages on attachments (if any)
+      const attachmentPages = (record.attachments || []).reduce(
+        (sum, att) => sum + (att.pagecount || 0),
+        0
+      );
+
+      return total + recordPages + attachmentPages;
+    }, 0);
+  }
 
   const getreplacementfiletypes = () => {
     var replacefileextensions = [...MimeTypeList.recordsLog];
@@ -2065,11 +2069,7 @@ export const RecordsLog = ({
     const selectedSize = calculateSize(newRecords.filter(r => r.isselected));
     setSelectedFilesSize(selectedSize);
 
-    if (selectedSize > 1024 * 1024 * 1024) {
-      setDocumentSetUIState("tooLarge")
-    } else {
-      setDocumentSetUIState("create")
-    }
+    setSelectedFilesPages(countTotalPages(newRecords.filter(r => r.isselected)));
 
     setIsAllSelected(checkIsAllSelected());
   };
@@ -3269,15 +3269,15 @@ export const RecordsLog = ({
                 title={
                   disableMultiRetrieve() ? (
                     <div style={{ fontSize: "11px" }}>
-                      <p>Create Document Set:</p>
+                      <p>Create/Update Document Set:</p>
                       <em>Recommended if you run into performance issues, or have challenges creating packages.</em>
-                      <ul>
+                      <ul style={{ marginTop: "15px" }}>
                         <li>Use this feature to split records into separate sets.</li>
                         <li>Each set will load in its own instance of the redaction app. </li>
                       </ul>
                     </div>
                   ) : (
-                    <div style={{ fontSize: "11px" }}>Create a Document Set</div>
+                    <div style={{ fontSize: "11px" }}>Create/Update a Document Set</div>
                   )
                 }
                 sx={{ fontSize: "11px" }}
@@ -3297,7 +3297,7 @@ export const RecordsLog = ({
               </Tooltip>
             </Grid>
 
-            <FileInfoBar pages={3647} size={selectedFilesSize} annotations={137} />
+            <FileInfoBar pages={selectedFilesPages} size={selectedFilesSize} />
 
             {groups.map((set, index) => (
               <DocumentSetWrapper
@@ -3410,7 +3410,6 @@ export const RecordsLog = ({
             requestId={requestId}
             ministryId={ministryId}
             onSave={handleDocumentSetSaved}
-            uiState={documentSetUIState}
           />
 
           <DocumentSetDeleteModal
@@ -4297,7 +4296,7 @@ const AttachmentPopup = React.memo(
               setPopoverOpen(false);
             }}
           >
-            Delete Document Set
+            Remove from Document Set
           </MenuItem>
         );
       };

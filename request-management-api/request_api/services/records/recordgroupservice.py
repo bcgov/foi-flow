@@ -148,22 +148,12 @@ class recordgroupservice:
                 document_set_id, record_id
             )
 
-            remaining = FOIRequestRecordGroups.query.filter_by(
-                document_set_id=document_set_id
-            ).count()
-
-            document_set_deleted = False
-            if remaining == 0:
-                association.is_active = False
-                document_set_deleted = True
-
             db.session.commit()
 
             return DefaultMethodResult(
                 True,
                 {
                     "rows_deleted": deleted_rows,
-                    "document_set_deleted": document_set_deleted,
                 },
                 code=200,
             )
@@ -201,6 +191,7 @@ class recordgroupservice:
             try:
                 # Normalize & validate incoming record list
                 new_records = set(payload.get("records") or [])
+
                 valid_records = self.fetch_valid_records(
                     ministryrequestid,
                     new_records,
@@ -210,16 +201,13 @@ class recordgroupservice:
                 # Records currently assigned to this group
                 current_records = FOIRequestRecordGroups.get_record_ids(document_set_id)
 
-                # Delta sets
-                to_remove = current_records - valid_records
+                # Append-only behavior
                 to_add = valid_records - current_records
 
                 # ------------------------------------------------------
                 # Enforce business rule:
                 #    A record may belong to ONLY ONE group at a time.
                 #
-                #    Remove the "to_add" records from ALL other groups
-                #    BEFORE adding them to this group.
                 # ------------------------------------------------------
                 if to_add:
                     FOIRequestRecordGroups.remove_from_other_groups(
@@ -227,17 +215,11 @@ class recordgroupservice:
                         record_ids=to_add
                     )
 
-                # Remove unselected records from this group
-                FOIRequestRecordGroups.remove_records(
-                    document_set_id=document_set_id,
-                    record_ids=to_remove
-                )
-
-                # Add newly selected records to this group
-                FOIRequestRecordGroups.add_records(
-                    document_set_id=document_set_id,
-                    record_ids=to_add
-                )
+                    # Add newly selected records to this group
+                    FOIRequestRecordGroups.add_records(
+                        document_set_id=document_set_id,
+                        record_ids=to_add
+                    )
 
             except ValueError as e:
                 return DefaultMethodResult(False, str(e), 400)

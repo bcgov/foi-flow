@@ -1,40 +1,66 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import Button from "@material-ui/core/Button";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 import {
   DOC_REVIEWER_WEB_URL
 } from "../../../../constants/constants";
+import Grid from "@mui/material/Grid";
+import Tooltip from "@mui/material/Tooltip";
 
-export default function RedactRecordsButton({ records, groups, ministryrequestid }) {
+export default function RedactRecordsButton({records, groups, ministryrequestid}) {
 
   const [anchorEl, setAnchorEl] = useState(null);
 
-  const isDisableRedactRecords = (allRecords) => {
-
-    if (groups.length > 0) {
-      return false;
+  const isDisableRedactRecords = (
+    allRecords = [],
+    { strict = true } = {}
+  ) => {
+    if (!Array.isArray(allRecords) || allRecords.length === 0) {
+      return true;
     }
 
-    const isInvalid = (record) =>
-      !record.isredactionready &&
-      !record.attributes?.incompatible &&
-      !record.selectedfileprocessversion &&
-      !record.ocrfilepath;
+    if (!strict) {
+      // Only block explicitly incompatible records
+      return allRecords.some(
+        r => r.attributes?.incompatible === true
+      );
+    }
 
-    const isInvalidAttachment = (record) =>
-      !record.isredactionready &&
-      !record.attributes?.incompatible
+    // Strict mode: require processing readiness
+    return allRecords.some(r =>
+      !r.isredactionready &&
+      !r.selectedfileprocessversion &&
+      !r.ocrfilepath
+    );
+  };
 
-    return allRecords.some(record => {
-      if (isInvalid(record)) return true;
 
-      if (Array.isArray(record.attachments)) {
-        return record.attachments.some(isInvalidAttachment);
-      }
-      return false;
-    });
-  }
+  const isDisableRedactSet = (
+    records = [],
+    { strict = true } = {}
+  ) => {
+    if (!Array.isArray(records) || records.length === 0) {
+      return true;
+    }
+
+    if (!strict) {
+      // Only block explicitly incompatible files
+      return records.some(
+        r => r.attributes?.incompatible === true
+      );
+    }
+
+    // Strict mode (optional)
+    return records.some(r =>
+      !r.isredactionready &&
+      !r.selectedfileprocessversion &&
+      !r.ocrfilepath
+    );
+  };
+
+
+
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -42,12 +68,6 @@ export default function RedactRecordsButton({ records, groups, ministryrequestid
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-  };
-
-  const parseGroupName = (raw) => {
-    if (!raw) return "Document Set";
-    const match = raw.match(/^documentSet(\d+)$/i);
-    return match ? `Document Set ${match[1]}` : raw;
   };
 
   const handleRedactAll = () => {
@@ -70,9 +90,8 @@ export default function RedactRecordsButton({ records, groups, ministryrequestid
             variant="contained"
             color="primary"
             onClick={handleMenuOpen}
-            disabled={isDisableRedactRecords(records)}
             style={{
-              background: "#153A6F",
+              background: "#38598A",
               color: "white",
               textTransform: "none",
               padding: "8px 18px",
@@ -88,8 +107,8 @@ export default function RedactRecordsButton({ records, groups, ministryrequestid
             keepMounted
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
-            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-            transformOrigin={{ vertical: "top", horizontal: "left" }}
+            anchorOrigin={{vertical: "bottom", horizontal: "left"}}
+            transformOrigin={{vertical: "top", horizontal: "left"}}
             PaperProps={{
               sx: {
                 mt: 1,
@@ -100,43 +119,78 @@ export default function RedactRecordsButton({ records, groups, ministryrequestid
               }
             }}
           >
-            {groups.map((set, index) => (
-              <MenuItem
-                key={set.id}
-                onClick={() => handleRedactGroup(set)}
-                sx={{
-                  fontSize: "14px",
-                  fontWeight: 800,
-                  color: "#333",
-                  paddingY: "8px",
-                  paddingX: "16px",
-                  "&:hover": { backgroundColor: "#F4F6F8" }
-                }}
-              >
-                {`Redact ${parseGroupName(
-                  set.groupname || `Document Set ${index + 1}`
-                )}`}
-              </MenuItem>
-            ))}
+            {groups.map((set) => {
+              const disabled = isDisableRedactSet(set.items);
+              const item = (
+                <MenuItem
+                  key={set.id}
+                  disabled={disabled}
+                  onClick={() => handleRedactGroup(set)}
+                  sx={{
+                    fontSize: "14px",
+                    fontWeight: 800,
+                    py: "8px",
+                    px: "16px",
+                    cursor: disabled ? "not-allowed" : "pointer",
+                  }}
+                >
+                  {`Redact ${set.name}`}
+                </MenuItem>
+              );
+
+              return disabled ? (
+                <Tooltip
+                  key={set.id}
+                  title="Some files in this set are still processing or have errors."
+                  placement="right"
+                >
+                  <span>{item}</span>
+                </Tooltip>
+              ) : (
+                item
+              );
+            })}
+
+
           </Menu>
         </>
       ) : (
+        <Grid item xs={1}>
+          <Tooltip
+            title={
+              isDisableRedactRecords(records) ? (
+                <div style={{fontSize: "11px"}}>
+                  Some files are still processing or have errors.
+                  Please ensure that all files are successfully processed.
+                </div>
+              ) : ""
+            }
+            disableHoverListener={!isDisableRedactRecords(records)}
+          >
+    <span>
         <Button
           variant="contained"
           color="primary"
-          disabled={isDisableRedactRecords(records)}
           onClick={handleRedactAll}
+          disabled={isDisableRedactRecords(records)}
           style={{
-            background: "#153A6F",
-            color: "white",
+            background: "#38598A",
             textTransform: "none",
             padding: "8px 18px",
             borderRadius: "4px",
-            fontWeight: 600
+            fontWeight: 600,
+            color: "#FFFFFF",
+            fontFamily: " BCSans-Bold, sans-serif !important",
+            cursor: isDisableRedactRecords(records) ? "not-allowed" : "pointer"
+
           }}
         >
           Redact Records
         </Button>
+      </span>
+          </Tooltip>
+        </Grid>
+
       )}
     </>
   );

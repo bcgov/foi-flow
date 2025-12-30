@@ -14,9 +14,7 @@ export default function DocumentSetModal({
                                            records,
                                            groups,
                                            requestId,
-                                           ministryId,
-                                           uiState = "create",      // "create" | "tooLarge"
-                                           selectedSize = null      // Only used for tooLarge
+                                           ministryId
                                          }) {
   const refreshData = () => {
     toast.success("Document Set saved successfully!");
@@ -24,13 +22,11 @@ export default function DocumentSetModal({
     if (onSave) onSave();
   };
 
-  const isTooLarge = uiState === "tooLarge";
-
   return (
     <Dialog
       open={open}
       onClose={onClose}
-      maxWidth={isTooLarge ? "sm" : "md"}
+      maxWidth="md"
       fullWidth
       aria-labelledby="document-set-title"
     >
@@ -42,27 +38,12 @@ export default function DocumentSetModal({
       {/* Title */}
       <DialogTitle id="document-set-title">
         <h2 className="state-change-header">
-          {isTooLarge ? "Reduce File Size to Continue" : "Create a Document Set"}
+          "Create or Update a Document Set"
         </h2>
       </DialogTitle>
 
       {/* Content */}
-      <DialogContent className="ds-content" style={{ textAlign: isTooLarge ? "center" : "left" }}>
-        {isTooLarge ? (
-          <>
-            <p style={{ marginTop: 8, fontWeight: 600 }}>
-              Your selection is too large to process (over 1GB).
-            </p>
-
-            <p>Please reduce the number of files in this set.</p>
-
-            {selectedSize && (
-              <p style={{ marginTop: 12 }}>
-                Total selected size: <strong>{selectedSize}</strong>
-              </p>
-            )}
-          </>
-        ) : (
+      <DialogContent className="ds-content">
           <DocumentSetUI
             records={records}
             groups={groups}
@@ -70,16 +51,10 @@ export default function DocumentSetModal({
             ministryId={ministryId}
             onSave={refreshData}
           />
-        )}
       </DialogContent>
 
       {/* Footer */}
       <div className="ds-footer">
-        {isTooLarge ? (
-          <button className="btn-bottom btn-save" onClick={onClose}>
-            Close
-          </button>
-        ) : (
           <>
             <button className="btn-bottom btn-save" onClick={() => window._saveDocumentSet?.()}>
               Save
@@ -89,7 +64,6 @@ export default function DocumentSetModal({
               Cancel
             </button>
           </>
-        )}
       </div>
     </Dialog>
   );
