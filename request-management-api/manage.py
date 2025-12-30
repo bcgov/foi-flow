@@ -35,8 +35,6 @@ MANAGER = Manager(APP)
 
 MANAGER.add_command('db', MigrateCommand)
 
-print("hello, world!")
-
 @MANAGER.command
 def list_routes():
     output = []
