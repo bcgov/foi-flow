@@ -29,6 +29,11 @@ jobs:
 
   # Build the Request Management API Image, Tag with Pull Request number
 
+      - name: Blah
+        working-directory: ./request-management-api
+        run: |
+          ls -al
+          
       - name: Build Request Management API Image
         working-directory: ./request-management-api
         run: |
