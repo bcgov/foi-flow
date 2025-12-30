@@ -30,9 +30,9 @@ jobs:
   # Build the Request Management API Image, Tag with Pull Request number
 
       - name: Build Request Management API Image
-        working-directory: request-management-api
+        working-directory: ./request-management-api
         run: |
-          docker build -t ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/request-management-api:${{github.event.pull_request.number}} -f Dockerfile.local
+          docker build -t ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/request-management-api:${{github.event.pull_request.number}} -f Dockerfile.local .
 
   # Push Built Image to BC Gov Openshift Image Repository
       - name: Push Request Management API Image
