@@ -28,6 +28,7 @@ from request_api.models import db
 ## python manage.py db migrate
 ## python manage.py db upgrade
 
+print("Hello, world!")
 
 APP = create_app()
 MIGRATE = Migrate(APP, db)
