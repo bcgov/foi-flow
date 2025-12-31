@@ -85,12 +85,13 @@ jobs:
   # Watch for healthy rollout of new deployed pod
       - name: Check on the health of the compression service
         run: |
+          oc project d7abee-dev
           oc rollout status deployment/request-management-api --watch=true
 
   # Get new pod name that was just deployed
       - name: Get name of new pod deployed
         run: |
-          POD_NAME = $(oc get pods -l "app=request-management-api -o jsonpath="{.items[0].metadata.name}")
+          POD_NAME=$(oc get pods -l app=request-management-api -o jsonpath='{.items[0].metadata.name}' 
       
   # TODO IF FAILURE ON HEALTH CHECK - @ devops team in PR comment
 
