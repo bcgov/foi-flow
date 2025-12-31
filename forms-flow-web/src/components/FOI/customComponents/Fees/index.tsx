@@ -6,7 +6,7 @@ import Chip from '@mui/material/Chip';
 import { errorToast, isMinistryLogin, readUploadedFileAsBytes } from "../../../../helper/FOI/helper";
 import type { params, CFRFormData, ApplicationFeeFormData } from './types';
 import foiFees from '../../../../constants/FOI/foiFees.json';
-import { fetchCFRForm, saveCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
+import { fetchCFRForm, saveCFRForm, saveInvoice} from "../../../../apiManager/services/FOI/foiCFRFormServices";
 import _ from 'lodash';
 import { toast } from "react-toastify";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
@@ -19,10 +19,11 @@ import { BottomButtonGroup } from './BottomButtonGroup';
 import { CFRFormStatus } from './CFRFormStatus';
 import { FeesSubtabValues } from './types';
 import { fetchApplicationFeeForm, saveApplicationFeeForm } from '../../../../apiManager/services/FOI/foiApplicationFeeFormServices';
-import { completeMultiPartUpload, postFOIS3DocumentPreSignedUrl, saveFilesinS3 } from '../../../../apiManager/services/FOI/foiOSSServices';
+import { completeMultiPartUpload, postFOIS3DocumentPreSignedUrl, saveFilesinS3, downloadFileFromS3, getFOIS3DocumentPreSignedUrl } from '../../../../apiManager/services/FOI/foiOSSServices';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { StatusChangeDialog } from './StatusChangeDialog';
 import { OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
+import { saveAs } from "file-saver";
 
 export const Fees = ({
     requestNumber,
@@ -87,6 +88,8 @@ export const Fees = ({
     const [initialCFRFormData, setInitialCFRFormData] = useState(blankCFRForm);
     const [CFRFormData, setCFRFormData] = useState(initialCFRFormData);
     const [rerenderFileUpload, setRerenderFileUpload] = useState(true);
+    console.log("REQ DETAILS", requestDetails)
+    console.log("initialCFRState", initialCFRState)
     
     React.useEffect(() => {
       let formattedData = {
@@ -700,6 +703,89 @@ export const Fees = ({
       requestDetails?.requestType ===
         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
     }
+    const generateApplicantAddress = (requestDetails : any) => {
+      if (!requestDetails) {
+        console.error("requestDetails do not exist.")
+      }
+      return `${requestDetails.address}\n${requestDetails.addressSecondary}\n${requestDetails.city}, ${requestDetails.province}\n${requestDetails.country}, ${requestDetails.postalcode}`
+    }
+    
+    const handleGenerateInvoice = async () => {
+      const toastID = toast.loading("Downloading Invoice (0%)");
+      const invoiceData = {
+        applicantName: `${requestDetails.firstName} ${requestDetails.lastName}`,
+        applicantAddress: generateApplicantAddress(requestDetails),
+        cfrFeeData: initialCFRState
+      };
+      const apiResponse = await saveInvoice(invoiceData, isMinistry, dispatch);
+      if (apiResponse?.status === 201) {
+        getFOIS3DocumentPreSignedUrl(
+          apiResponse.invoice.split("/").slice(4).join("/"),
+          ministryId,
+          dispatch,
+          (err: any, res: any) => {
+            if (!err) {
+              downloadFileFromS3(
+                {filepath: res},
+                (_err: any, response: any) => {
+                  const blob = new Blob([response.data], {type: "application/octet-stream"});
+                  saveAs(blob, `Invoice - ${ministryId}.pdf`);
+                  toast.update(toastID, {
+                    render: "Download complete",
+                    type: "success",
+                    className: "file-upload-toast",
+                    isLoading: false,
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    closeButton: true,
+                  });
+                },
+                (progressEvent : any) => {
+                  if(progressEvent.total > 0){
+                    toast.update(toastID, {
+                      render:
+                      "Downloading file (" +Math.floor(
+                      (progressEvent.loaded / progressEvent.total) * 100) +"%)",
+                      isLoading: true,
+                    });
+                  }
+                }
+              )
+            } else {
+              toast.update(toastID, {
+              render: "File download failed",
+              type: "error",
+              className: "file-upload-toast",
+              isLoading: false,
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              closeButton: true,
+            });
+            return;
+          }
+        })
+      } else {
+          toast.update(toastID, {
+          render: "File download failed",
+          type: "error",
+          className: "file-upload-toast",
+          isLoading: false,
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          closeButton: true,
+        });
+        return;
+      }
+    }
 
     return (
       <div className="foi-review-container">
@@ -816,6 +902,7 @@ export const Fees = ({
                   isMinistry={isMinistry}
                   setCreateModalOpen={setCreateModalOpen}
                   disableNewCfrFormBtn={disableNewCfrFormBtn}
+                  handleGenerateInvoice={handleGenerateInvoice}
                 />
               </div>
           </div>
