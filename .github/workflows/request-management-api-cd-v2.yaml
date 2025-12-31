@@ -1,0 +1,104 @@
+# GitHub Actions workflow for building and tagging the API image on PR
+name: REQUEST MANAGEMENT API - Continuous Delivery
+
+on:
+  pull_request:
+    types: [submitted] # Triggered by opened or changed pull requests.
+    branches: [main]
+    paths:
+      - 'request-management-api/**' # Triggers on changes to files in the express-api/ directory.
+    
+jobs:
+# Job for automated unit tests goes HERE
+
+  REQUEST-MANAGEMENT-UPDATE-ARGO:
+    if: github.event.review.state == 'approved'
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_TAG: ${{ github.event.pull_request.number }}
+    steps:
+  # Install yaml parser to alter Helm env file
+      - name: Install yaml Parser (yq)
+        run: |
+          curl -Lo yq "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64"
+          chmod +x yq
+          mv yq /home/runner/bin
+
+  # Add deploy key to runner
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.MANIFEST_REPO_DEPLOY_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
+  # Update DEV values to reflect new image
+      - name: Clone, Update, and Commit Changes
+        run: |
+          git clone git@github.com:bcgov-c/tenant-gitops-d7abee.git
+          cd tenant-gitops-d7abee
+
+          FILE_PATH="foi-flow/values-dev.yaml"
+          NEW_TAG="${{ env.IMAGE_TAG }}"
+
+          yq e ".request-management-api.image.tag = \"$NEW_TAG\"" -i "$FILE_PATH"
+
+          git config user.email "adam.kroon@gov.bc.ca"
+          git config user.name "adamkroonbcgov"
+          
+          git pull origin main
+          git add "$FILE_PATH"
+          git commit -m "Update backend image tag to $NEW_TAG"
+          
+          # Retry push with rebase to handle conflicts from simultaneous frontend/backend updates
+          RETRY_COUNT=2
+          RETRY_DELAY=15
+          for ((i=0; i<=$RETRY_COUNT; i++)); do
+            git push && break || {
+              echo "Push failed. Retrying in $RETRY_DELAY seconds..."
+              sleep $RETRY_DELAY
+              git pull --rebase origin main
+              git add "$FILE_PATH"
+              git commit --amend --no-edit
+            }
+          done
+    
+  REQUEST-MANAGEMENT-API-HEALTH-CHECK:
+    needs: REQUEST-MANAGEMENT-API-UPDATE-ARGO
+    runs-on: ubuntu-latest
+    steps:
+
+  # Install OC CLI
+      - name: Install OC CLI
+        uses: redhat-actions/oc-installer@v1
+        with:
+          oc_version: '4.6'
+
+  # TODO Replace server and token prior to testing
+
+  # Login to BC Gov Openshift Silver Cluster
+      - name: Login to BC Gov Openshift
+        shell: bash
+        run: |
+          oc login --server=${{ secrets.REPLACE_THIS }} --token=${{secrets.REPLACE_THIS }}
+
+  # Watch for healthy rollout of new deployed pod
+      - name: Check on the health of the compression service
+        run: |
+          oc rollout status deployment/request-management-api --watch=true
+
+  # Get new pod name that was just deployed
+      - name: Get name of new pod deployed
+        run: |
+          POD_NAME = $(oc get pods -l "app=request-management-api -o jsonpath="{.items[0].metadata.name}")
+      
+  # TODO IF FAILURE ON HEALTH CHECK - @ devops team in PR comment
+
+  # Comment on Pull Request with URL to link directly to pod
+      - name: Comment on PR
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            Your deployment is live in the DEV environment [here](${{ secrets.OPENSHIFT_BASE_URL }}/${{ secrets.OPENSHIFT_POD_PATH}}/$POD_NAME)
+
+  # TODO Implement Semantic Release
