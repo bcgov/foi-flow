@@ -32,17 +32,17 @@ class FOIRequestInvoices(db.Model):
         return db.session.query(FOIRequestInvoices).order_by(FOIRequestInvoices.invoiceid.desc()).first()
 
     @classmethod
-    def save_invoice(cls, invoice):
+    def save_invoice(cls, invoice, userid):
         try:
             new_invoice = FOIRequestInvoices(
                 foirequestcfrfee_id=invoice["foirequestcfrfee_id"],
                 foirequestcfrfeeversion_id=invoice["foicfrefeeversion_id"],
                 documentpath=invoice["documentpath"],
                 filename=invoice["filename"],
-                applicant_name=invoice["applicant_name"],
+                applicant_name=invoice["applicant_address"],
                 applicant_address=invoice["applicant_address"],
                 created_at=invoice["created_at"].isoformat(),
-                created_by=invoice["created_by"]
+                created_by=userid
             )
             db.session.add(new_invoice)
             db.session.commit()

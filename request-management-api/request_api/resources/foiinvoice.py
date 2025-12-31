@@ -50,8 +50,8 @@ class FOIRequestInvoice(Resource):
             print("DATA", data)
             new_invoice =  FOIRequestInvoiceSchema().load(data)
             print("new inv", new_invoice)
-            cfrdata = data["cfrfee"]
-            result = foiinvoiceservice().generate_invoice(new_invoice, cfrdata)
+            cfrdata = data["cfrFeeData"]
+            result = foiinvoiceservice().generate_invoice(new_invoice, cfrdata, AuthHelper.getuserid())
             print("RES", result)
             if result.success:
                 return {"message": result.message, "invoice": result.identifier, "status": 201}, 201

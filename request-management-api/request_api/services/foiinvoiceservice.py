@@ -10,14 +10,14 @@ class foiinvoiceservice:
     def get_invoice(self, foicfrfeedid):
         pass
     
-    def generate_invoice(self, invoice, feedata):
+    def generate_invoice(self, invoice, feedata, userid):
         try:
             foiministryrequest = FOIMinistryRequest.getrequest(feedata["ministryrequestid"])
             invoice_date = datetime2.now()
             current_invoiceid = FOIRequestInvoices.getcurrentinvoiceid().invoiceid if FOIRequestInvoices.getcurrentinvoiceid() is not None else 0
-            filename = f"Invoice-{(current_invoiceid+1):10d}-{foiministryrequest['axisrequestid']}.pdf"
+            filename = f"Invoice-{(current_invoiceid+1):010d}-{foiministryrequest['axisrequestid']}.pdf"
             invoice_template_data = {
-                "invoice_num": f"{(current_invoiceid+1):10d}",
+                "invoice_num": f"{(current_invoiceid+1):010d}",
                 "invoice_date": invoice_date.strftime("%B %d, %Y"),
                 "request_description": foiministryrequest['description'],
                 "cfrfee": feedata,
@@ -37,6 +37,6 @@ class foiinvoiceservice:
                 invoice["filename"] = filename
                 invoice["documentpath"] = response['documentpath']
                 invoice["created_at"] = invoice_date
-                return FOIRequestInvoices.save_invoice(invoice)
+                return FOIRequestInvoices.save_invoice(invoice, userid)
         except Exception as exeception:
             raise exeception

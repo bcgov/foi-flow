@@ -7,7 +7,8 @@ export const BottomButtonGroup = ({
   isNewCFRForm, 
   isMinistry, 
   setCreateModalOpen, 
-  disableNewCfrFormBtn 
+  disableNewCfrFormBtn,
+  handleGenerateInvoice
 }: any) => {
   return (
     <div className="foi-bottom-button-group cfrform">
@@ -32,6 +33,16 @@ export const BottomButtonGroup = ({
       >
         + Create New Processing Fee Form
       </button>}
+      <button
+        type="button"
+        className="col-lg-4 btn btn-bottom btn-save"
+        id="btncfrinvoice"
+        onClick={() => {handleGenerateInvoice()}}
+        color="primary"
+        // disabled={!validateFields() || requestState === StateEnum.peerreview.name || (formData?.reason === 'init' && isNewCFRForm)}
+      >
+        Generate Invoice
+      </button>
     </div>
   )
 }
