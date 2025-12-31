@@ -64,7 +64,7 @@ jobs:
           done
     
   REQUEST-MANAGEMENT-API-HEALTH-CHECK:
-    needs: REQUEST-MANAGEMENT-API-UPDATE-ARGO
+    needs: REQUEST-MANAGEMENT-UPDATE-ARGO
     runs-on: ubuntu-latest
     steps:
 
