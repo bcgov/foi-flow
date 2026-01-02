@@ -12,6 +12,7 @@ class foiinvoiceservice:
     
     def generate_invoice(self, invoice, feedata, userid):
         try:
+            print("FINAL", feedata)
             foiministryrequest = FOIMinistryRequest.getrequest(feedata["ministryrequestid"])
             invoice_date = datetime2.now()
             current_invoiceid = FOIRequestInvoices.getcurrentinvoiceid().invoiceid if FOIRequestInvoices.getcurrentinvoiceid() is not None else 0
@@ -21,14 +22,16 @@ class foiinvoiceservice:
                 "invoice_date": invoice_date.strftime("%B %d, %Y"),
                 "request_description": foiministryrequest['description'],
                 "cfrfee": feedata,
+                "balancedue": f"{float(feedata['feedata']['balanceremaining']):.2f}",
+                "amountpaid": f"{float(feedata['feedata']['amountpaid']):.2f}",
                 "axisRequestId": foiministryrequest['axisrequestid'],
                 "applicant_name": invoice["applicant_name"],
                 "applicant_address": invoice["applicant_address"],
                 "invoice_memo": INVOICE_MEMO,
+                "waivedAmount": feedata["feedata"]['estimatedlocatinghrs'] * 30 if feedata["feedata"]['estimatedlocatinghrs'] < 3 else 90
             }
             document_service : DocumentGenerationService = DocumentGenerationService("cfr_fee_invoice")
             basepath = 'request_api/receipt_templates/'
-            print("SNAKE", foiministryrequest["programarea.bcgovcode"])
             created_invoice = document_service.generate_receipt(invoice_template_data, basepath+document_service.documenttypename+".docx")
             response = document_service.upload_receipt(filename, created_invoice.content, foiministryrequest['foiministryrequestid'], foiministryrequest["programarea.bcgovcode"], foiministryrequest['axisrequestid'], "FEE-INVOICE")
             if response is not None and response['success']:
