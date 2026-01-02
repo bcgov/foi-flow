@@ -130,7 +130,7 @@ import {
 } from "./util";
 import { readUploadedFileAsBytes } from "../../../../helper/FOI/helper";
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
-import { isScanningTeam } from "../../../../helper/FOI/helper";
+import { isScanningTeam, isProcessingTeam } from "../../../../helper/FOI/helper";
 import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 //import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
@@ -253,6 +253,7 @@ export const RecordsLog = ({
 }) => {
   const user = useSelector((state) => state.user.userDetail);
   const userGroups = user?.groups?.map((group) => group.slice(1));
+  const isProcessingTeamMember = isProcessingTeam(userGroups);
 
   let recordsObj = useSelector((state) => state.foiRequests.foiRequestRecords);
 
@@ -336,6 +337,7 @@ export const RecordsLog = ({
   const [isScanningTeamMember, setIsScanningTeamMember] = useState(
     isScanningTeam(userGroups)
   );
+
   const [ministryCode, setMinistryCode] = useState(
     bcgovcode.replaceAll('"', "").toUpperCase()
   );
@@ -345,6 +347,7 @@ export const RecordsLog = ({
   );
   const [retrieveSelectedRecords, setRetrieveSelectedRecords] = useState({});
   useEffect(() => {
+    // console.log(JSON.stringify(recordsObj, null, 2))
     setRecords(recordsObj?.records);
     let nonDuplicateRecords = recordsObj?.records?.filter(
       (record) => !record.isduplicate
@@ -1716,18 +1719,6 @@ export const RecordsLog = ({
     setRedactAnchorEl(null);
   };
 
-  const handleRedactGroup = (group) => {
-    // TODO: call your redaction flow here
-    console.log("Redact group:", group.id, group);
-    handleRedactMenuClose();
-  };
-
-  const handleRedactAll = () => {
-    // TODO: redaction for all records (no group)
-    console.log("Redact ALL records");
-  };
-
-
   function calculateSize(records = []) {
     const totalBytes = records.reduce((sum, r) => {
       const size = r.attributes?.filesize ?? 0;
@@ -1805,6 +1796,7 @@ export const RecordsLog = ({
       case "documentSet":
         setOpenDocumentSetModal(true);
         if (_record && _record.length > 0) {
+          console.log(JSON.stringify(_record));
           setRetrieveSelectedRecords(
             _record
               .filter(record => record.isselected)
@@ -1909,6 +1901,7 @@ export const RecordsLog = ({
 
   function countTotalPages(records) {
     console.log("countTotalPages", records);
+    console.log(JSON.stringify(user, null, 2))
     return records.reduce((total, record) => {
       // pages on the main record (if present)
       const recordPages = record.pagecount || 0;
@@ -2088,6 +2081,9 @@ export const RecordsLog = ({
     });
     setRecords(newRecords);
     setIsAllSelected(checkIsAllSelected());
+    const selectedSize = calculateSize(newRecords.filter(r => r.isselected));
+    setSelectedFilesSize(selectedSize);
+
   };
 
   const checkIsAllSelected = () => {
@@ -3265,9 +3261,9 @@ export const RecordsLog = ({
                 </span>
               </Tooltip>
 
-              <Tooltip
-                title={
-                  disableMultiRetrieve() ? (
+              {isProcessingTeamMember && (
+                <Tooltip
+                  title={
                     <div style={{ fontSize: "11px" }}>
                       <p>Create/Update Document Set:</p>
                       <em>Recommended if you run into performance issues, or have challenges creating packages.</em>
@@ -3276,17 +3272,14 @@ export const RecordsLog = ({
                         <li>Each set will load in its own instance of the redaction app. </li>
                       </ul>
                     </div>
-                  ) : (
-                    <div style={{ fontSize: "11px" }}>Create/Update a Document Set</div>
-                  )
-                }
-                sx={{ fontSize: "11px" }}
-              >
+                  }
+                  sx={{ fontSize: "11px" }}
+                >
               <span>
                   <button
                     className={` btn`}
                     onClick={() => handlePopupButtonClick("documentSet", records)}
-                    disabled={lockRecords || isHistoricalRequest || !checkIsAnySelected()}
+                    disabled={lockRecords || isHistoricalRequest || !checkIsAnySelected() || retrieveSelectedRecords.length === 0}
                     style={
                       lockRecords ? {pointerEvents: "none"} : {}
                     }
@@ -3294,10 +3287,13 @@ export const RecordsLog = ({
                     <FontAwesomeIcon icon={faFile} size="lg" color="#38598A"/>
                   </button>
                 </span>
-              </Tooltip>
+                </Tooltip>
+
+              )}
+
             </Grid>
 
-            <FileInfoBar pages={selectedFilesPages} size={selectedFilesSize} />
+            {/*<FileInfoBar pages={selectedFilesPages} size={selectedFilesSize} />*/}
 
             {groups.map((set, index) => (
               <DocumentSetWrapper
@@ -3332,6 +3328,7 @@ export const RecordsLog = ({
                       setCurrentEditRecord={setCurrentEditRecord}
                       isHistoricalRequest={isHistoricalRequest}
                       lockRecords={lockRecords}
+                      isProcessingTeamMember={isProcessingTeamMember}
                     />
                   ))
                 ) : (
@@ -3381,6 +3378,7 @@ export const RecordsLog = ({
                       setCurrentEditRecord={setCurrentEditRecord}
                       isHistoricalRequest={isHistoricalRequest}
                       lockRecords={lockRecords}
+                      isProcessingTeamMember={isProcessingTeamMember}
                     />
                   ))
                 ) : (
@@ -3734,6 +3732,7 @@ const Attachment = React.memo(
     setCurrentEditRecord,
     isHistoricalRequest,
     lockRecords,
+    isProcessingTeamMember
   }) => {
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
@@ -3953,6 +3952,7 @@ const Attachment = React.memo(
               isMinistryCoordinator={isMinistryCoordinator}
               setCurrentEditRecord={setCurrentEditRecord}
               isHistoricalRequest={isHistoricalRequest}
+              isProcessingTeamMember={isProcessingTeamMember}
             />
           </Grid>
         </Grid>
@@ -4130,6 +4130,7 @@ const Attachment = React.memo(
             isMCFPersonal={isMCFPersonal}
             setEditTagModalOpen={setEditTagModalOpen}
             setCurrentEditRecord={setCurrentEditRecord}
+            isProcessingTeamMember={isProcessingTeamMember}
           />
         ))}
       </>
@@ -4158,6 +4159,7 @@ const AttachmentPopup = React.memo(
     isMinistryCoordinator,
     setCurrentEditRecord,
     isHistoricalRequest,
+    isProcessingTeamMember
   }) => {
     const ref = React.useRef();
     const closeTooltip = () => (ref.current && ref ? ref.current.close() : {});
@@ -4259,7 +4261,8 @@ const AttachmentPopup = React.memo(
       isMCFPersonal,
       isMinistryCoordinator,
       isHistoricalRequest,
-      lockRecords
+      lockRecords,
+      isProcessingTeamMember,
     }) => {
       const isUploadedByMinistryUser = (record) => {
         return hasValidDivisions(record);
@@ -4287,10 +4290,15 @@ const AttachmentPopup = React.memo(
       };
 
       const DeleteDocumentSetMenu = () => {
+        const isDisabled = lockRecords || disableMinistryUser;
+
+        if (!isProcessingTeamMember) {
+          return null; // hide HTML completely
+        }
         return (
           <MenuItem
-            style={ (lockRecords || disableMinistryUser) ? { pointerEvents: "none" } : {} }
-            disabled={lockRecords || disableMinistryUser}
+            style={ (isDisabled) ? { pointerEvents: "none" } : {} }
+            disabled={isDisabled}
             onClick={() => {
               handleDeleteDocumentSetMenu();
               setPopoverOpen(false);
@@ -4429,7 +4437,7 @@ const AttachmentPopup = React.memo(
 
             {record.groupdocumentsetid !== null &&
               !record.isattachment &&
-              !isHistoricalRequest && (
+              !isHistoricalRequest && isProcessingTeamMember && (
                 <DeleteDocumentSetMenu />
               )}
 
@@ -4479,6 +4487,7 @@ const AttachmentPopup = React.memo(
           isMinistryCoordinator={isMinistryCoordinator}
           isHistoricalRequest={isHistoricalRequest}
           lockRecords={lockRecords}
+          isProcessingTeamMember={isProcessingTeamMember}
         />
       </>
     );

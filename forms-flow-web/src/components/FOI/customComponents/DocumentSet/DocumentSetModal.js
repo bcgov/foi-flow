@@ -38,7 +38,7 @@ export default function DocumentSetModal({
       {/* Title */}
       <DialogTitle id="document-set-title">
         <h2 className="state-change-header">
-          "Create or Update a Document Set"
+          Create or Update a Document Set
         </h2>
       </DialogTitle>
 
