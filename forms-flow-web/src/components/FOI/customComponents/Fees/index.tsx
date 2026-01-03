@@ -24,6 +24,7 @@ import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConst
 import { StatusChangeDialog } from './StatusChangeDialog';
 import { OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
 import { saveAs } from "file-saver";
+import { GenerateInvoiceModal } from './GenerateInvoiceModal';
 
 export const Fees = ({
     requestNumber,
@@ -650,6 +651,11 @@ export const Fees = ({
     const handleStatusChangeModalClose = () => {
       setStatusChangeModalOpen(false);
     }
+
+    const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
+    const handleInvoiceModalClose = () => {
+      setInvoiceModalOpen(false);
+    }
   
     const disableNewCfrFormBtn = () => {
       return(CFRFormData?.formStatus !== 'approved' || requestState === StateEnum.peerreview.name || (requestState !== StateEnum.callforrecords.name &&
@@ -703,18 +709,35 @@ export const Fees = ({
       requestDetails?.requestType ===
         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
     }
-    const generateApplicantAddress = (requestDetails : any) => {
+    const formatApplicantAddress = (requestDetails : any) => {
       if (!requestDetails) {
-        console.error("requestDetails do not exist.")
+        console.error("requestDetails do not exist.");
       }
-      return `${requestDetails.address}\n${requestDetails.addressSecondary}\n${requestDetails.city}, ${requestDetails.province}\n${requestDetails.country}, ${requestDetails.postalcode}`
+      const primaryAddress = requestDetails.address? requestDetails.address : "";
+      const secondaryAddress = requestDetails.addressSecondary ? requestDetails.addressSecondary : "";
+      const city = requestDetails.city ? requestDetails.city : "";
+      const province = requestDetails.province ? requestDetails.province : "";
+      const country = requestDetails.country ? requestDetails.country : "";
+      const postalCode = requestDetails.postal ? requestDetails.postal : "";
+      
+      if (secondaryAddress) {
+        return `${primaryAddress}\n${secondaryAddress}\n${city} ${province} ${country} ${postalCode}`;
+      }
+      return `${primaryAddress}\n${city} ${province} ${country} ${postalCode}`;
     }
     
-    const handleGenerateInvoice = async () => {
+    const handleGenerateInvoice = () => {
+      setInvoiceModalOpen(true);
+    }
+    const handleInvoiceSave = () => {
+      genreateInvoice();
+      setInvoiceModalOpen(false);
+    }
+    const genreateInvoice = async () => {
       const toastID = toast.loading("Downloading Invoice (0%)");
       const invoiceData = {
         applicantName: `${requestDetails.firstName} ${requestDetails.lastName}`,
-        applicantAddress: generateApplicantAddress(requestDetails),
+        applicantAddress: formatApplicantAddress(requestDetails),
         cfrFeeData: initialCFRState
       };
       const apiResponse = await saveInvoice(invoiceData, isMinistry, dispatch);
@@ -729,7 +752,7 @@ export const Fees = ({
                 {filepath: res},
                 (_err: any, response: any) => {
                   const blob = new Blob([response.data], {type: "application/octet-stream"});
-                  saveAs(blob, `Invoice - ${ministryId}.pdf`);
+                  saveAs(blob, `Invoice - ${requestDetails.axisRequestId}.pdf`);
                   toast.update(toastID, {
                     render: "Download complete",
                     type: "success",
@@ -903,10 +926,17 @@ export const Fees = ({
                   setCreateModalOpen={setCreateModalOpen}
                   disableNewCfrFormBtn={disableNewCfrFormBtn}
                   handleGenerateInvoice={handleGenerateInvoice}
+                  cfrStatus={initialCFRState.status}
                 />
               </div>
           </div>
         </Box>
+        <GenerateInvoiceModal
+          modalOpen={invoiceModalOpen}
+          handleClose={handleInvoiceModalClose}
+          handleSave={handleInvoiceSave}
+          cfrFees={initialCFRState.feedata}
+        />
         <StateChangeDialog   
           modalOpen={modalOpen}
           handleClose={handleClose}

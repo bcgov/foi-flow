@@ -1,3 +1,5 @@
+import Tooltip from "@mui/material/Tooltip";
+
 export const BottomButtonGroup = ({ 
   save, 
   validateFields, 
@@ -8,8 +10,10 @@ export const BottomButtonGroup = ({
   isMinistry, 
   setCreateModalOpen, 
   disableNewCfrFormBtn,
-  handleGenerateInvoice
+  handleGenerateInvoice,
+  cfrStatus,
 }: any) => {
+  const generateInvoiceDisabled: boolean = cfrStatus !== "approved";
   return (
     <div className="foi-bottom-button-group cfrform">
       <button
@@ -33,16 +37,29 @@ export const BottomButtonGroup = ({
       >
         + Create New Processing Fee Form
       </button>}
-      <button
-        type="button"
-        className="col-lg-4 btn btn-bottom btn-save"
-        id="btncfrinvoice"
-        onClick={() => {handleGenerateInvoice()}}
-        color="primary"
-        // disabled={!validateFields() || requestState === StateEnum.peerreview.name || (formData?.reason === 'init' && isNewCFRForm)}
-      >
-        Generate Invoice
-      </button>
+      {!isMinistry && 
+      <Tooltip
+        title={
+          generateInvoiceDisabled && 
+          <div style={{ fontSize: "10px" }}>
+            CFR Fees do not exist, or are currently pending approval
+          </div>
+        }
+        enterDelay={1000}
+        leaveDelay={200}
+        >
+        <button
+          type="button"
+          className="col-lg-4 btn btn-bottom btn-save"
+          id="btncfrinvoice"
+          onClick={() => {handleGenerateInvoice()}}
+          color="primary"
+          disabled={generateInvoiceDisabled}
+        >
+          Generate Invoice
+        </button>
+      </Tooltip>
+      }
     </div>
   )
 }
