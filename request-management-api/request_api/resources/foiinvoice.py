@@ -14,25 +14,6 @@ import json
 
 API = Namespace('FOIREQUESTINVOICE', description='Endpoints for FOI Request Invoice management')
 TRACER = Tracer.get_instance()
-EXCEPTION_MESSAGE_NOTFOUND_REQUEST='Record not found'
-CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
-
-@cors_preflight('GET,OPTIONS')
-@API.route('/foirequestinvoice/foicfrfee/<int:foicfrfeeid>')
-class FOIRequestInvoiceById(Resource):
-    """Return foirequest invoice based on foicfrfeeid"""
-    @staticmethod
-    @cross_origin(origins=allowedorigins())
-    @TRACER.trace()
-    @auth.require
-    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
-    def get(foicfrfeeid):
-        try:
-            result = foiinvoiceservice().get_invoice(foicfrfeeid)
-            if result.success:
-                return {"invoice": result.documentpath, "status": 200}, 200
-        except:
-            return {"message": "Unable to find invoice with given CFR Fee ID", "status": 404}, 404
         
 @cors_preflight('POST, PUT, OPTIONS') 
 @API.route('/foirequestinvoice/foicfrfee/<int:foicfrfeeid>')
@@ -46,14 +27,11 @@ class FOIRequestInvoice(Resource):
     def post(foicfrfeeid):
         try:
             data = request.get_json()
-            print("DATA", data)
             new_invoice =  FOIRequestInvoiceSchema().load(data)
-            print("new inv", new_invoice)
             cfrdata = data["cfrFeeData"]
             result = foiinvoiceservice().generate_invoice(new_invoice, cfrdata, foicfrfeeid, AuthHelper.getuserid())
             if result.success:
                 return {"message": result.message, "invoice": result.identifier, "status": 201}, 201
-        except Exception as exception:
+        except Exception:
             current_app.logger.exception(f"Invoice creation failed")
             return {"message":"Invoice creation failed", "status": 400}, 400
-

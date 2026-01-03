@@ -4,8 +4,6 @@ from .db import  db, ma
 from sqlalchemy.orm import relationship, backref, aliased
 from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc
 from sqlalchemy.sql.sqltypes import Date, Integer, String
-from .FOIMinistryRequests import FOIMinistryRequest
-from .FOIRequests import FOIRequest
 from request_api.models.default_method_result import DefaultMethodResult
 from sqlalchemy import text
 import logging
@@ -25,7 +23,7 @@ class FOIRequestInvoices(db.Model):
 
     @classmethod
     def get_invoice_by_cfrfeeid(cls, foicfrfeeid):
-        pass
+        return db.session.query(FOIRequestInvoices).filter(FOIRequestInvoices.foirequestcfrfee_id == foicfrfeeid).order_by(FOIRequestInvoices.invoiceid.desc()).first()
 
     @classmethod
     def getcurrentinvoiceid(cls):
