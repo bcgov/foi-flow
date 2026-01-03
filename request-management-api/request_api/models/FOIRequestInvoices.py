@@ -39,7 +39,7 @@ class FOIRequestInvoices(db.Model):
                 foirequestcfrfeeversion_id=invoice["foicfrefeeversion_id"],
                 documentpath=invoice["documentpath"],
                 filename=invoice["filename"],
-                applicant_name=invoice["applicant_address"],
+                applicant_name=invoice["applicant_name"],
                 applicant_address=invoice["applicant_address"],
                 created_at=invoice["created_at"].isoformat(),
                 created_by=userid

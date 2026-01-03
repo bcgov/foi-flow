@@ -18,8 +18,7 @@ EXCEPTION_MESSAGE_NOTFOUND_REQUEST='Record not found'
 CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 
 @cors_preflight('GET,OPTIONS')
-@API.route('/foirequestinvoice/foicfrfee/<int:foicfrfeeid>', defaults={'usertype':None})
-@API.route('/foirequestinvoice/foicfrfee/<int:foicfrfeeid>/<string:usertype>')
+@API.route('/foirequestinvoice/foicfrfee/<int:foicfrfeeid>')
 class FOIRequestInvoiceById(Resource):
     """Return foirequest invoice based on foicfrfeeid"""
     @staticmethod
@@ -46,13 +45,12 @@ class FOIRequestInvoice(Resource):
     @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
     def post(foicfrfeeid):
         try:
-            data = request.get_json() #Passes created by, documentpath, cfrfeedata (has cfr feeid and foiministryreuestid), applicant_name, applicant address
+            data = request.get_json()
             print("DATA", data)
             new_invoice =  FOIRequestInvoiceSchema().load(data)
             print("new inv", new_invoice)
             cfrdata = data["cfrFeeData"]
-            result = foiinvoiceservice().generate_invoice(new_invoice, cfrdata, AuthHelper.getuserid())
-            print("RES", result)
+            result = foiinvoiceservice().generate_invoice(new_invoice, cfrdata, foicfrfeeid, AuthHelper.getuserid())
             if result.success:
                 return {"message": result.message, "invoice": result.identifier, "status": 201}, 201
         except Exception as exception:
