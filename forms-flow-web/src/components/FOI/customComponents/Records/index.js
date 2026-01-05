@@ -130,7 +130,7 @@ import {
 } from "./util";
 import { readUploadedFileAsBytes } from "../../../../helper/FOI/helper";
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
-import { isScanningTeam, isProcessingTeam } from "../../../../helper/FOI/helper";
+import { isScanningTeam, isNotMinistryGroup } from "../../../../helper/FOI/helper";
 import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 //import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
@@ -253,7 +253,7 @@ export const RecordsLog = ({
 }) => {
   const user = useSelector((state) => state.user.userDetail);
   const userGroups = user?.groups?.map((group) => group.slice(1));
-  const isProcessingTeamMember = isProcessingTeam(userGroups);
+  const isNonMinistryMember = isNotMinistryGroup(userGroups);
 
   let recordsObj = useSelector((state) => state.foiRequests.foiRequestRecords);
 
@@ -3261,7 +3261,7 @@ export const RecordsLog = ({
                 </span>
               </Tooltip>
 
-              {isProcessingTeamMember && (
+              {isNonMinistryMember && (
                 <Tooltip
                   title={
                     <div style={{ fontSize: "11px" }}>
@@ -3293,7 +3293,7 @@ export const RecordsLog = ({
 
             </Grid>
 
-            {/*<FileInfoBar pages={selectedFilesPages} size={selectedFilesSize} />*/}
+            <FileInfoBar size={selectedFilesSize} />
 
             {groups.map((set, index) => (
               <DocumentSetWrapper
@@ -3328,7 +3328,7 @@ export const RecordsLog = ({
                       setCurrentEditRecord={setCurrentEditRecord}
                       isHistoricalRequest={isHistoricalRequest}
                       lockRecords={lockRecords}
-                      isProcessingTeamMember={isProcessingTeamMember}
+                      isNonMinistryMember={isNonMinistryMember}
                     />
                   ))
                 ) : (
@@ -3378,7 +3378,7 @@ export const RecordsLog = ({
                       setCurrentEditRecord={setCurrentEditRecord}
                       isHistoricalRequest={isHistoricalRequest}
                       lockRecords={lockRecords}
-                      isProcessingTeamMember={isProcessingTeamMember}
+                      isNonMinistryMember={isNonMinistryMember}
                     />
                   ))
                 ) : (
@@ -3732,7 +3732,7 @@ const Attachment = React.memo(
     setCurrentEditRecord,
     isHistoricalRequest,
     lockRecords,
-    isProcessingTeamMember
+     isNonMinistryMember
   }) => {
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
@@ -3952,7 +3952,7 @@ const Attachment = React.memo(
               isMinistryCoordinator={isMinistryCoordinator}
               setCurrentEditRecord={setCurrentEditRecord}
               isHistoricalRequest={isHistoricalRequest}
-              isProcessingTeamMember={isProcessingTeamMember}
+              isNonMinistryMember={isNonMinistryMember}
             />
           </Grid>
         </Grid>
@@ -4130,7 +4130,7 @@ const Attachment = React.memo(
             isMCFPersonal={isMCFPersonal}
             setEditTagModalOpen={setEditTagModalOpen}
             setCurrentEditRecord={setCurrentEditRecord}
-            isProcessingTeamMember={isProcessingTeamMember}
+            isNonMinistryMember={isNonMinistryMember}
           />
         ))}
       </>
@@ -4159,7 +4159,7 @@ const AttachmentPopup = React.memo(
     isMinistryCoordinator,
     setCurrentEditRecord,
     isHistoricalRequest,
-    isProcessingTeamMember
+     isNonMinistryMember
   }) => {
     const ref = React.useRef();
     const closeTooltip = () => (ref.current && ref ? ref.current.close() : {});
@@ -4262,7 +4262,7 @@ const AttachmentPopup = React.memo(
       isMinistryCoordinator,
       isHistoricalRequest,
       lockRecords,
-      isProcessingTeamMember,
+      isNonMinistryMember,
     }) => {
       const isUploadedByMinistryUser = (record) => {
         return hasValidDivisions(record);
@@ -4292,7 +4292,7 @@ const AttachmentPopup = React.memo(
       const DeleteDocumentSetMenu = () => {
         const isDisabled = lockRecords || disableMinistryUser;
 
-        if (!isProcessingTeamMember) {
+        if (!isNonMinistryMember) {
           return null; // hide HTML completely
         }
         return (
@@ -4437,7 +4437,7 @@ const AttachmentPopup = React.memo(
 
             {record.groupdocumentsetid !== null &&
               !record.isattachment &&
-              !isHistoricalRequest && isProcessingTeamMember && (
+              !isHistoricalRequest && isNonMinistryMember && (
                 <DeleteDocumentSetMenu />
               )}
 
@@ -4487,7 +4487,7 @@ const AttachmentPopup = React.memo(
           isMinistryCoordinator={isMinistryCoordinator}
           isHistoricalRequest={isHistoricalRequest}
           lockRecords={lockRecords}
-          isProcessingTeamMember={isProcessingTeamMember}
+          isNonMinistryMember={isNonMinistryMember}
         />
       </>
     );
