@@ -105,7 +105,7 @@ export const saveInvoice = (invoiceData, isMinistry, dispatch) => {
       return res.data;
     })
     .catch((error) => {
-      console.log("An error occured while trying to save and generated CFR Fee Invoice", error);
+      console.error("An error occured while trying to save and generate CFR Fee Invoice", error);
       catchError(error, dispatch);
     });
 }

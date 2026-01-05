@@ -89,8 +89,6 @@ export const Fees = ({
     const [initialCFRFormData, setInitialCFRFormData] = useState(blankCFRForm);
     const [CFRFormData, setCFRFormData] = useState(initialCFRFormData);
     const [rerenderFileUpload, setRerenderFileUpload] = useState(true);
-    console.log("REQ DETAILS", requestDetails)
-    console.log("initialCFRState", initialCFRState)
     
     React.useEffect(() => {
       let formattedData = {
@@ -779,7 +777,7 @@ export const Fees = ({
               )
             } else {
               toast.update(toastID, {
-              render: "File download failed",
+              render: "Invoice download failed",
               type: "error",
               className: "file-upload-toast",
               isLoading: false,
@@ -795,7 +793,7 @@ export const Fees = ({
         })
       } else {
           toast.update(toastID, {
-          render: "File download failed",
+          render: "Invoice upload failed",
           type: "error",
           className: "file-upload-toast",
           isLoading: false,

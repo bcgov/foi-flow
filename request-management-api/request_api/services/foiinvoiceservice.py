@@ -7,21 +7,19 @@ from datetime import datetime as datetime2
 INVOICE_MEMO = "You have 20 business days to respond to this fee statement or your file will be closed as Abandoned. If the total estimate is over $200 you are only required to pay a 50% deposit, otherwise you are required to pay the full amount."
 
 class foiinvoiceservice:
-    def generate_invoice(self, invoice, cfrdata, foicfrfeeid, userid):
+    def generate_invoice(self, invoice, userid):
         try:
-            feedata = cfrdata["feedata"]
+            cfrdata = invoice["cfrfeedata"]
             invoice["created_at"] = datetime2.now()
             foiministryrequest = FOIMinistryRequest.getrequest(cfrdata["ministryrequestid"])
             current_invoiceid = FOIRequestInvoices.getcurrentinvoiceid().invoiceid if FOIRequestInvoices.getcurrentinvoiceid() is not None else 0
             filename = f"Invoice-{(current_invoiceid+1):010d}-{foiministryrequest['axisrequestid']}.pdf"
-            invoice_template_data = self.__prepare_invoice_data(feedata, foiministryrequest, invoice, current_invoiceid)
+            invoice_template_data = self.__prepare_invoice_data(cfrdata["feedata"], foiministryrequest, invoice, current_invoiceid)
             document_service : DocumentGenerationService = DocumentGenerationService("cfr_fee_invoice")
             basepath = 'request_api/receipt_templates/'
             created_invoice = document_service.generate_receipt(invoice_template_data, basepath+document_service.documenttypename+".docx")
             response = document_service.upload_receipt(filename, created_invoice.content, foiministryrequest['foiministryrequestid'], foiministryrequest["programarea.bcgovcode"], foiministryrequest['axisrequestid'], "FEE-INVOICE")
             if response is not None and response['success']:
-                invoice["foirequestcfrfee_id"] = foicfrfeeid
-                invoice["foicfrefeeversion_id"] = cfrdata['version']
                 invoice["filename"] = filename
                 invoice["documentpath"] = response['documentpath']
                 return FOIRequestInvoices.save_invoice(invoice, userid)

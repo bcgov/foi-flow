@@ -18,7 +18,7 @@ TRACER = Tracer.get_instance()
 @cors_preflight('POST, PUT, OPTIONS') 
 @API.route('/foirequestinvoice/foicfrfee/<int:foicfrfeeid>')
 class FOIRequestInvoice(Resource):
-    """Creates (updates) a new version of foirequest invoice"""
+    """Creates a new foirequest invoice"""
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
@@ -28,8 +28,7 @@ class FOIRequestInvoice(Resource):
         try:
             data = request.get_json()
             new_invoice =  FOIRequestInvoiceSchema().load(data)
-            cfrdata = data["cfrFeeData"]
-            result = foiinvoiceservice().generate_invoice(new_invoice, cfrdata, foicfrfeeid, AuthHelper.getuserid())
+            result = foiinvoiceservice().generate_invoice(new_invoice, AuthHelper.getuserid())
             if result.success:
                 return {"message": result.message, "invoice": result.identifier, "status": 201}, 201
         except Exception:

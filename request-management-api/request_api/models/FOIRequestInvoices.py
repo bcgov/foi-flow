@@ -33,8 +33,8 @@ class FOIRequestInvoices(db.Model):
     def save_invoice(cls, invoice, userid):
         try:
             new_invoice = FOIRequestInvoices(
-                foirequestcfrfee_id=invoice["foirequestcfrfee_id"],
-                foirequestcfrfeeversion_id=invoice["foicfrefeeversion_id"],
+                foirequestcfrfee_id=invoice["cfrfeedata"]["foirequestcfrfee_id"],
+                foirequestcfrfeeversion_id=invoice["cfrfeedata"]["foirequestcfrfeeversion_id"],
                 documentpath=invoice["documentpath"],
                 filename=invoice["filename"],
                 applicant_name=invoice["applicant_name"],
