@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import "../Attachments/attachments.scss";
 import "./records.scss";
 import { useDispatch, useSelector } from "react-redux";
@@ -253,7 +253,10 @@ export const RecordsLog = ({
 }) => {
   const user = useSelector((state) => state.user.userDetail);
   const userGroups = user?.groups?.map((group) => group.slice(1));
-  const isNonMinistryMember = isNotMinistryGroup(userGroups);
+  const isNonMinistryMember = useMemo(() => {
+    if (userGroups.length === 0) return false;
+    return isNotMinistryGroup(userGroups);
+  }, [userGroups]);
 
   let recordsObj = useSelector((state) => state.foiRequests.foiRequestRecords);
 
