@@ -163,6 +163,15 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
                   key={set.id}
                   title="Some files in this set are still processing or have errors."
                   placement="right"
+                  componentsProps={{
+                    tooltip: {
+                      sx: {
+                        fontSize: "12px",
+                        padding: "10px 14px",
+                        maxWidth: "350px",
+                      },
+                    },
+                  }}
                 >
                   <span>{item}</span>
                 </Tooltip>
@@ -170,8 +179,6 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
                 item
               );
             })}
-
-
           </Menu>
         </>
       ) : (
