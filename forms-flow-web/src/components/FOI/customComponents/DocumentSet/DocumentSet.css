@@ -195,7 +195,7 @@
 .ds-footer {
   display: flex;
   justify-content: center;
-  margin-top: 25px;
+  margin-top: 1px;
   gap: 16px;
 }
 
@@ -242,20 +242,37 @@
   gap: 8px;
 }
 
-/* Position X button like FOI */
-.ds-close-button {
-  position: absolute;
-  top: 18px;
-  right: 24px;
-  color: #0f2a5f !important;       /* FOI Navy Blue */
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  z-index: 2000;
+
+
+.add-attachment-modal-title {
+  padding-bottom: 10px !important;
 }
 
-.ds-close-button:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 50%;
+.state-change-header {
+  margin-left: 30px;
+  color: #036 ;
+  font-size: xx-large;
+  font-weight: bold;
+  font-family: "BCSans-Bold", sans-serif !important;
+  flex-direction: column;
+  flex-basis: 70%
+}
+
+.close-btn {
+  width: 40px !important;
+  height: 40px !important;
+  background-color: #003366 !important;
+  color: #ffffff !important;
+  border-radius: 2px !important;
+  padding: 0 !important;
+  margin-right: 20px !important;
+  margin-top: 20px !important;
+}
+
+.close-btn:hover {
+  background-color: #002b55 !important;
+}
+
+.close-btn svg {
+  font-size: 20px !important;
 }
