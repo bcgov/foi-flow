@@ -141,7 +141,7 @@ export default function AttachmentModal({
   );
   const maxFileSize =
     uploadFor === "record"
-      ? MaxFileSizeInMB.totalFileSize
+      ? MaxFileSizeInMB.recordMaxFileSize
       : multipleFiles
       ? MaxFileSizeInMB.attachmentLog
       : MaxFileSizeInMB.stateTransition;
