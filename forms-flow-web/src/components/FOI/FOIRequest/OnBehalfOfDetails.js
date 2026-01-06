@@ -9,6 +9,7 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { Box, Fade } from "@mui/material";
 
 const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput}) => {
     
@@ -140,17 +141,42 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
                         />                                                
                     </div>
                     <div className="col-lg-6 foi-details-col"> 
-                        <TextField                 
-                            id='onBehalfOfAlsoKnownAs'           
-                            label="Also Known As" 
-                            inputProps={{ "aria-labelledby": "onBehalfOfAlsoKnownAs-label"}}
-                            InputLabelProps={{ shrink: true, }} 
-                            value={anotherNickNameText}
-                            variant="outlined" 
-                            onChange={handleNickNameChange}
-                            fullWidth
-                            disabled={disableInput}
-                        />                       
+                        <Box sx={{
+                            ".MuiInputBase-multiline.Mui-disabled": {
+                                    background: "#eee",
+                                    }
+                            }}>
+                            <TextField                 
+                                id='onBehalfOfAlsoKnownAs'           
+                                label="Also Known As" 
+                                inputProps={{ "aria-labelledby": "onBehalfOfAlsoKnownAs-label", maxLength: 250}}
+                                InputLabelProps={{ shrink: true, }} 
+                                value={anotherNickNameText}
+                                variant="outlined" 
+                                onChange={handleNickNameChange}
+                                fullWidth
+                                disabled={disableInput}
+                                error={anotherNickNameText.length >= 250}
+                                helperText={(anotherNickNameText.length >= 250) ? "250 character limit reached" : ""}
+                                multiline
+                                minRows={1}
+                                maxRows={3}
+                            />      
+                            <Fade in={anotherNickNameText.length > 0 && anotherNickNameText.length < 250} timeout={300}> 
+                                <Typography
+                                variant="caption"
+                                sx={{
+                                    display: "block",
+                                    textAlign: "right",
+                                    mt: 0.5,
+                                    color: anotherNickNameText.length >= 250 ? "error.main" : "text.secondary",
+                                    wordBreak: "break-word",
+                                }}
+                                >
+                                {anotherNickNameText.length}/{250} characters
+                                </Typography>
+                            </Fade>
+                        </Box>   
                         <TextField       
                             id='onBehalfOfDOB'         
                             label="Date of Birth"
@@ -164,7 +190,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
                             variant="outlined"
                             fullWidth
                             disabled={disableInput}
-                        />                   
+                        />     
                     </div>
                 </div> 
             </AccordionDetails>

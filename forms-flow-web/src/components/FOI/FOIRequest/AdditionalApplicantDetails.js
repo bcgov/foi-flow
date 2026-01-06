@@ -9,6 +9,7 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import { Box, Fade } from "@mui/material";
 
 const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveRequestObject, disableInput, defaultExpanded, warning}) => {
     /**
@@ -72,6 +73,9 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
     const [employeeNumberText, setEmployeeNumber] = React.useState(
       validateField(requestDetails, FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER)
     );
+    const [alsoKnownAsText, setAlsoKnownAs] = React.useState(
+      validateField(requestDetails?.additionalPersonalInfo, FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS)
+    );
     const [birthDateText, setDOB] = React.useState(
       validateField(
         requestDetails?.additionalPersonalInfo,
@@ -106,6 +110,10 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
             defaultValue: "",
           }
         ));
+      setAlsoKnownAs(validateField(
+          requestDetails?.additionalPersonalInfo,
+          FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS
+        ))
     },[requestDetails]) 
 
   const handlePersonalHealthNumber = (e) => {
@@ -126,6 +134,13 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
   const handleEmployeeNumber = (e) => {
     setEmployeeNumber(e.target.value);
     createSaveRequestObject(FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER, e.target.value);
+  }
+
+  const handleAlsoKnownAs = (e) => {
+    if (e.target.value?.length <= 250){
+      setAlsoKnownAs(e.target.value);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS, e.target.value);
+    }
   }
 
   const handleBirthDate = (e) => {
@@ -207,7 +222,44 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                       onChange={handleEmployeeNumber}
                       fullWidth
                       disabled={disableInput}
-                  />                 
+                  />
+                  <Box sx={{
+                        ".MuiInputBase-multiline.Mui-disabled": {
+                                background: "#eee",
+                                }
+                    }}>
+                    <TextField   
+                        id='alsoKnownAsText'                         
+                        label="Also Known As" 
+                        inputProps={{ "aria-labelledby": "alsoKnownAsText-label", maxLength: 250}}
+                        InputLabelProps={{ shrink: true, }}                       
+                        variant="outlined" 
+                        value={alsoKnownAsText}
+                        className={warning && warning(FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS) && classes.warning}
+                        onChange={handleAlsoKnownAs}
+                        fullWidth
+                        disabled={disableInput}
+                        error={alsoKnownAsText.length >= 250}
+                        helperText={(alsoKnownAsText.length >= 250) ? "250 character limit reached" : ""}
+                        multiline
+                        minRows={1}
+                        maxRows={3}
+                    />
+                    <Fade in={alsoKnownAsText.length > 0 && alsoKnownAsText.length < 250} timeout={300}>     
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: "block",
+                          textAlign: "right",
+                          mt: 0.5,
+                          color: alsoKnownAsText.length >= 250 ? "error.main" : "text.secondary",
+                          wordBreak: "break-word", // ensures text wraps instead of being cut off
+                        }}
+                      >
+                        {alsoKnownAsText.length}/{250} characters
+                      </Typography>
+                    </Fade> 
+                  </Box>              
               </div>
           </div> 
         </AccordionDetails>

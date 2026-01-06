@@ -63,7 +63,7 @@ const RequestDetails = React.memo(
           return "Select Received Mode";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
-          return !!request.deliveryMode ? request.deliveryMode : "Select Delivery Mode";
+          return !!request.deliveryMode ? request.deliveryMode : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF) {
           return !!request.receivedDateUF ? request.receivedDateUF : "";
@@ -190,7 +190,7 @@ const RequestDetails = React.memo(
       return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select") || (item.name === FOI_COMPONENT_CONSTANTS.ONLINE_FORM && ((!requestDetails.receivedMode) || (requestDetails.receivedMode && requestDetails.receivedMode.toLowerCase() !== FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase())))}>{item.name}</MenuItem> )
     });
     const deliveryModes = deliveryMode.map((item) => {
-      return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
+      return ( <MenuItem key={item.name} value={item.name} >{item.name}</MenuItem> )
     });
     //handling the received date change
     const handleReceivedDateChange = (e) => {
@@ -223,8 +223,12 @@ const RequestDetails = React.memo(
     const handleDeliveryModeChange = (e) => {
       setSelectedDeliveryMode(e.target.value);
       //event bubble up - for required feild validation
+      let delMode="";
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
-      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, e.target.value);
+      if (!e.target.value.toLowerCase().includes("no delivery mode") && e.target.value !="" ){
+        delMode=e.target.value
+      }
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, delMode);
     }
 
     const handleDueDateChange = (e) => {
@@ -400,11 +404,16 @@ const RequestDetails = React.memo(
                         input={<Input />}
                         variant="outlined"
                         fullWidth
-                        required
+                        //required
                         disabled={disableInput || disableFieldForMinistryRequest}
-                        error={selectedDeliveryMode.toLowerCase().includes("select")}
+                        SelectProps={{ displayEmpty: true }}
+                        //error={selectedDeliveryMode.toLowerCase().includes("select")}
                     >
-                    {deliveryModes}
+                    {/* {deliveryModes} */}
+                      <MenuItem value="">
+                        No Delivery Mode
+                      </MenuItem>
+                     {deliveryModes}
                   </TextField>
                   :
                   <TextField

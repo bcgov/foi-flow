@@ -90,14 +90,11 @@ class ProcessingTeamWithKeycloackGroup(Enum):
     justicehealthteam = "Justice Health Team"
     mcfdpersonalteam = "MCFD Personals Team"
     socialtechteam = "Social Education"
-    centraleconteam = "Central and Economy Team" # To remove
-    resourcejusticeteam = "Resource and Justice Team" # To remove
     industryteam = "Industry Team"
     resourceteam = "Resource Team"
     communityhealthteam = "Community and Health Team"
     childrenfamilyteam = "Children and Family Team"
     childreneducationteam = "Children and Education Team"
-    coordinatedresponseunit = "Coordinated Response Unit" # To remove
     justiceteam = "Justice Team"
     bcpsteam = "BCPS Team"
 
@@ -174,6 +171,7 @@ class StateName(Enum):
     peerreview = "Peer Review"
     tagging = "Tagging"
     readytoscan = "Ready to Scan"
+    recordsintransit = "Records in Transit"
     appfeeowing = "App Fee Owing"
     section5pending = "Section 5 Pending"
     onholdother = "On Hold - Other"

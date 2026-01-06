@@ -62,7 +62,7 @@ class rawrequestservicegetter:
             if self.__ispersonalrequest(requesttype):
                 baserequestinfo['additionalPersonalInfo'] = self.__prepareadditionalpersonalinfo(requestrawdata)
             return baserequestinfo
-        elif request != {} and request['version'] != 1 and  request['sourceofsubmission'] != "intake":       
+        elif request != {} and request['version'] != 1 and  request['sourceofsubmission'] != "intake":    
             request['requestrawdata']['currentState'] = request['status']
             request['requestrawdata']['requeststatuslabel'] =  request['requeststatuslabel']
             request['requestrawdata']['lastStatusUpdateDate'] = FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat())
@@ -219,7 +219,8 @@ class rawrequestservicegetter:
                         'anotherAlsoKnownAs': _childandanotherpersoninfo['anotherAlsoKnownAs'] if _childandanotherpersoninfo.get('anotherAlsoKnownAs') is not None else '',
                         'anotherBirthDate':  _childandanotherpersoninfo['anotherBirthDate'] if _childandanotherpersoninfo.get('anotherBirthDate') is not None else '', 
                         'personalHealthNumber' : _childandanotherpersoninfo['personalHealthNumber'] if _childandanotherpersoninfo.get('personalHealthNumber') is not None else '',                  
-                        'birthDate': _childandanotherpersoninfo['birthDate'] if _childandanotherpersoninfo.get('birthDate') is not None else ''
+                        'birthDate': _childandanotherpersoninfo['birthDate'] if _childandanotherpersoninfo.get('birthDate') is not None else '',
+                        'alsoKnownAs': _childandanotherpersoninfo['alsoKnownAs'] if _childandanotherpersoninfo.get('alsoKnownAs') is not None else ''
                     }                 
         return additionalpersonalinfo    
 
