@@ -54,7 +54,7 @@
       <name>text</name>
       <type>Main</type>
       <value>System Generated Email  |  2023 Mar 21 | 11:24 AM     Dear Firstname Lastname,
-    Information Access Operations has received your payment for FOI request #ABC-2099-14073 on March 21, 2023.
+    FOI Operations has received your payment for FOI request #ABC-2099-14073 on March 21, 2023.
     FOI Request # ABC-2099-14073 is now due on May 05, 2023.
     You have paid the full estimate of $ 480.00  on your request. 
     Fees are subject to changes based off of the actual amount of time it takes the Ministry to gather records for your request. If there are any additional fees, you will NOT receive your records until the remaining balance is paid in full.
@@ -122,7 +122,7 @@ Fee Estimate Payment Receipt.pdf</value>
       <name>xpath:customAttributes</name>
       <type>Main</type>
       <value>//div[@name = 'reply_null' and (text() = 'System Generated Email  |  2023 Mar 21 | 11:24 AM     Dear Firstname Lastname,
-    Information Access Operations has received your payment for FOI request #ABC-2099-14073 on March 21, 2023.
+    FOI Operations has received your payment for FOI request #ABC-2099-14073 on March 21, 2023.
     FOI Request # ABC-2099-14073 is now due on May 05, 2023.
     You have paid the full estimate of $ 480.00  on your request. 
     Fees are subject to changes based off of the actual amount of time it takes the Ministry to gather records for your request. If there are any additional fees, you will NOT receive your records until the remaining balance is paid in full.
@@ -134,7 +134,7 @@ Fee Estimate Payment Receipt.pdf</value>
       Flex Team
     
 Fee Estimate Payment Receipt.pdf' or . = 'System Generated Email  |  2023 Mar 21 | 11:24 AM     Dear Firstname Lastname,
-    Information Access Operations has received your payment for FOI request #ABC-2099-14073 on March 21, 2023.
+    FOI Operations has received your payment for FOI request #ABC-2099-14073 on March 21, 2023.
     FOI Request # ABC-2099-14073 is now due on May 05, 2023.
     You have paid the full estimate of $ 480.00  on your request. 
     Fees are subject to changes based off of the actual amount of time it takes the Ministry to gather records for your request. If there are any additional fees, you will NOT receive your records until the remaining balance is paid in full.
