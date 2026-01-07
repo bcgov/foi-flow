@@ -205,7 +205,7 @@ class recordservice(recordservicebase):
             _record['attributes']['lastmodified'] = json.loads(replacingrecord['attributes'])['lastmodified']
             _filepath, extension = path.splitext(_record['filename'])
             _record['attributes']['extension'] = extension            
-            _record['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES 
+            _record['attributes']['incompatible'] = extension.lower() in NONREDACTABLE_FILE_TYPES
             record.__dict__.update(_record)
             recordlist.append(record)
         dbresponse = FOIRequestRecord.replace(recordid,recordlist)
@@ -341,7 +341,7 @@ class recordservice(recordservicebase):
             entry['attributes']['batch'] = batch
             _filepath, extension = path.splitext(entry['filename'])
             entry['attributes']['extension'] = extension
-            entry['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES
+            entry['attributes']['incompatible'] = extension.lower() in NONREDACTABLE_FILE_TYPES
             record = FOIRequestRecord(foirequestid=_ministryrequest['foirequest_id'], ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
                             version = 1, createdby = userid, created_at = datetime.now())
             record.__dict__.update(entry)
