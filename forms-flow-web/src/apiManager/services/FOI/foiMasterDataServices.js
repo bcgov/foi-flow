@@ -286,7 +286,7 @@ import {
             let data = foiDeliveryModeList.map((deliveryMode) => {
               return { ...deliveryMode };
             });
-            data.unshift(firstDeliveryMode);
+            //data.unshift(firstDeliveryMode);
             dispatch(setFOIDeliveryModeList(data));
             dispatch(setFOILoader(false));
           } else {
@@ -540,7 +540,7 @@ import {
   };
 
   export const fetchFOISubjectCodeList = () => {
-    const firstSubjectCode = { "subjectcodeid": 0, "name": "Select Subject Code (if required)" };
+    const firstSubjectCode = { "subjectcodeid": 0, "name": "No Subject Code" };
     return (dispatch) => {
       httpGETRequest(API.FOI_GET_SUBJECT_CODELIST, {}, UserService.getToken())
         .then((res) => {
