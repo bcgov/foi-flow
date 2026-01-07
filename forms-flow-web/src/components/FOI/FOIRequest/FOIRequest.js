@@ -753,8 +753,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const requiredApplicantDetailsValues = {
     firstName: "",
     lastName: "",
+    middleName: "",
     email: "",
     category: "",
+    businessName: ""
   };
 
   const requiredContactDetailsValue = {
@@ -763,6 +765,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     province: "",
     country: "",
     postal: "",
+    phonePrimary: "",
+    phoneSecondary: "",
+    workPhonePrimary: "",
+    workPhoneSecondary: "",
+    addressSecondary: ""
   };
 
   const requiredAxisDetailsValue = {
@@ -937,7 +944,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     _currentrequestStatus,
     oipcData,
     requestDetails.isoipcreview,
-    requestDetails.isconsultflag
+    requestDetails.isconsultflag,
+    requiredContactDetails,
   );
 
   const classes = useStyles();

@@ -363,13 +363,18 @@ export const checkValidationError = (
   currentrequestStatus,
   oipcData,
   isOipcReview,
-  isconsultflag
+  isconsultflag,
+  requiredContactDetails
 ) => {
   return (
     (!isconsultflag && (
       requiredApplicantDetails.firstName === "" ||
-      requiredApplicantDetails.lastName === ""
+      requiredApplicantDetails.lastName === "" ||
+      requiredApplicantDetails.firstName.length > 50 || 
+      requiredApplicantDetails.lastName.length > 50 ||
+      requiredApplicantDetails.middleName.length > 50
     )) ||
+    requiredApplicantDetails.businessName.length > 255 ||
     requiredApplicantDetails.category.toLowerCase().includes("select") ||
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
@@ -384,6 +389,7 @@ export const checkValidationError = (
     requiredRequestDetailsValues.receivedMode
       .toLowerCase()
       .includes("select") ||
+    Object.values(requiredContactDetails).some((contactInfo) => contactInfo.length > 500) ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
     !requiredAxisDetails.axisRequestId || 
