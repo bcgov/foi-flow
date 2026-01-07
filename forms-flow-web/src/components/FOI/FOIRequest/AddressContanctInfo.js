@@ -30,7 +30,7 @@ const useStyles = makeStyles((_theme) => ({
     '& label': {
       color: '#ed6c02 !important'
     }
-  
+
   }
 }));
 
@@ -120,7 +120,7 @@ const AddressContactDetails = memo(
 
   //   const [modalOpen, setModalOpen] = React.useState(false);
 
-    
+
   //   const handleModalClose = () => {
   //     setModalOpen(false);
   // }
@@ -347,11 +347,11 @@ const AddressContactDetails = memo(
     return (
       <div className='request-accordian' id="addressContactInfo">
       <Accordion defaultExpanded={defaultExpanded}>
-      <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
+      <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />}
           id="addressContactInfo-header">
           <Typography className={classes.heading}>ADDRESS AND CONTACT INFORMATION</Typography>
       </AccordionSummary>
-      <AccordionDetails>        
+      <AccordionDetails>
           <div>
               {/* {moreInfoAction && // comment back in after axis decommission
                 <button
