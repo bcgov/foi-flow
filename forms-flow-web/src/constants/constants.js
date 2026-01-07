@@ -50,7 +50,7 @@ export const OSS_S3_CHUNK_SIZE =
 
 export const TOTAL_RECORDS_UPLOAD_LIMIT =
   (window._env_ && window._env_.REACT_APP_TOTAL_RECORDS_UPLOAD_LIMIT) ||
-  process.env.REACT_APP_TOTAL_RECORDS_UPLOAD_LIMIT || 2048;
+  process.env.REACT_APP_TOTAL_RECORDS_UPLOAD_LIMIT || 20480;
 
 
 export const FOI_FFA_URL =  (window._env_ && window._env_.FOI_FFA_URL) ||
