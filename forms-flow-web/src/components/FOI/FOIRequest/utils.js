@@ -1,6 +1,6 @@
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from "../../../constants/FOI/statusEnum";
-import { formatDate, isProcessingTeam, isFlexTeam } from "../../../helper/FOI/helper";
+import { formatDate, isProcessingTeam, isFlexTeam, addBusinessDays } from "../../../helper/FOI/helper";
 import { extensionStatusId, KCProcessingTeams } from "../../../constants/FOI/enum";
 import MANDATORY_FOI_REQUEST_FIELDS from '../../../constants/FOI/mandatoryFOIRequestFields';
 import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
@@ -273,6 +273,7 @@ export const createRequestDetailsObjectFunc = (
       requestObject.dueDate = value.dueDate;
       requestObject.receivedMode = value.receivedMode;
       requestObject.deliveryMode = value.deliveryMode?.toLowerCase()?.includes("select")?"":value.deliveryMode;
+      if ("cfrDueDate" in requestObject) requestObject.cfrDueDate = value.recordsDueDate;
       break;
     case FOI_COMPONENT_CONSTANTS.ASSIGNED_TO:
       const assigneeDetails = createAssigneeDetails(value, value2);
@@ -292,6 +293,7 @@ export const createRequestDetailsObjectFunc = (
     case FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE:
       requestObject.requestProcessStart = value;
       requestObject.dueDate = value2;
+      if ("originalDueDate" in requestObject) requestObject.originalDueDate = addBusinessDays(formatDate(value, "yyyy MMM, dd"), 30);
       break;
     case FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST:
       requestObject.selectedMinistries = [];
@@ -311,6 +313,9 @@ export const createRequestDetailsObjectFunc = (
       break;
     case FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED:
       requestObject.identityVerified = value;
+      break;
+    case FOI_COMPONENT_CONSTANTS.RECORDS_DUE_DATE:
+      requestObject.cfrDueDate = value;
       break;
     case FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER:
     case FOI_COMPONENT_CONSTANTS.DOB:
@@ -363,7 +368,7 @@ export const checkValidationError = (
   currentrequestStatus,
   oipcData,
   isOipcReview,
-  isconsultflag
+  isconsultflag,
 ) => {
   return (
     (!isconsultflag && (
@@ -386,6 +391,8 @@ export const checkValidationError = (
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
+    !requiredRequestDetailsValues.dueDate ||
+    ("recordsDueDate" in requiredRequestDetailsValues  && !requiredRequestDetailsValues.recordsDueDate) ||
     !requiredAxisDetails.axisRequestId || 
     (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
       if (oipc.inquiryattributes?.inquirydate) {

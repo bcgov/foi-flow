@@ -242,7 +242,7 @@
         public async Task<FOIMinistryRequestDto> GetRequestOriginalDueDate(int ministryRequestId)
         {
             const string query = @"SELECT * FROM public.""FOIMinistryRequests"" 
-                WHERE foiministryrequestid = @MinistryRequestId AND requeststatuslabel = 'open'";
+                WHERE foiministryrequestid = @MinistryRequestId";
 
             var parameters = new { MinistryRequestId = ministryRequestId };
 

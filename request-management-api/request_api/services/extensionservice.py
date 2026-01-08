@@ -14,6 +14,7 @@ import asyncio
 import json
 import base64
 from request_api.exceptions import BusinessException, Error
+from request_api.services.commons.duecalculator import duecalculator
 
 class extensionservice:
     """ FOI Extension management service
@@ -316,12 +317,14 @@ class extensionservice:
             return FOIRequestExtension().getlatestapprovedextension(extensionid, ministryrequestid, ministryversion)
 
     def getlatestapprovedduedate(self, prevstatus, ministryrequestid, approvedextension):       
-        if approvedextension and len(approvedextension) != 0:  
+        if approvedextension and len(approvedextension) != 0:
             return approvedextension['extendedduedate']
-        # if Prev extension status was Approved and no approved extension in FOIRequestExtension table then get the original DueDate from FOIMinisrtRequests table   
+        # if Prev extension status was Approved and no approved extension in FOIRequestExtension table then subtract the latest extension days from current duedate from FOIMinisrtRequests table to get original due date  
         elif prevstatus == 2 and not approvedextension:
-            duedate = FOIMinistryRequest.getrequestoriginalduedate(ministryrequestid)
-            return duedate
+            # duedate = FOIMinistryRequest.getrequestoriginalduedate(ministryrequestid)
+            duedate = FOIMinistryRequest.getduedate(ministryrequestid)
+            latest_extension_days = FOIRequestExtension().getlastextensiondays(ministryrequestid)
+            return duecalculator().subtract_businessdays(duedate, latest_extension_days)
         #if current and prev status is Pending or Denied
         else:
             return None
