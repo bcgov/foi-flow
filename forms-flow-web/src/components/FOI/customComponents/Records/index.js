@@ -2101,6 +2101,18 @@ export const RecordsLog = ({
     return true;
   };
 
+  const checkIsSelected = () => {
+    for (let record of records) {
+      if (record.isselected) return true;
+      if (record.attachments) {
+        for (let attachment of record.attachments) {
+          if (attachment.isselected) return false;
+        }
+      }
+    }
+    return false;
+  };
+
   const checkIsAnySelected = () => {
     for (let record of records) {
       if (record.isselected) return true;
@@ -3282,7 +3294,7 @@ export const RecordsLog = ({
                   <button
                     className={` btn`}
                     onClick={() => handlePopupButtonClick("documentSet", records)}
-                    disabled={lockRecords || isHistoricalRequest || !checkIsAnySelected() || retrieveSelectedRecords.length === 0}
+                    disabled={lockRecords || isHistoricalRequest || !checkIsSelected() }
                     style={
                       lockRecords ? {pointerEvents: "none"} : {}
                     }
