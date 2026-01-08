@@ -177,7 +177,8 @@ const MimeTypeList = Object.freeze({
 const MaxFileSizeInMB = Object.freeze({
   stateTransition: 50,
   attachmentLog: 2000,
-  totalFileSize: 2000,
+  recordMaxFileSize: 1000,
+  totalFileSize: 50000,
   extensionAttachment: 50,
   feeEstimateAttachment: 25,
   totalFeeEstimateFileSize: 50,
@@ -207,13 +208,10 @@ const KCProcessingTeams = [
   "MCFD Personals Team",
   "Resource Team",
   "Social Education",
-  "Central and Economy Team", // To remove
-  "Resource and Justice Team", // To remove
   "Industry Team",
   "Community and Health Team",
   "Children and Family Team",
   "Children and Education Team",
-  "Coordinated Response Unit", // To remove
   "Justice Team",
   "BCPS Team"
 ];

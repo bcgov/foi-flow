@@ -39,6 +39,16 @@ class duecalculator:
             if self.isbusinessday(__calcdate, _holidays) == True:
                 businessdays += 1              
         return __calcdate
+    
+    def subtract_businessdays(self, inpdate, days):
+        _holidays = self.getholidays()
+        businessdays = 0
+        __calcdate = datetimehandler().getdate(inpdate)
+        while businessdays < days:
+            __calcdate =  __calcdate + timedelta(days=(-1))
+            if self.isbusinessday(__calcdate, _holidays) == True:
+                businessdays += 1              
+        return __calcdate
 
     def getbusinessdaysbetween(self, date1, date2=None):
         _holidays = self.getholidays()

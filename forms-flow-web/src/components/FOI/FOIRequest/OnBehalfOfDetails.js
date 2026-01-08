@@ -141,7 +141,11 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
                         />                                                
                     </div>
                     <div className="col-lg-6 foi-details-col"> 
-                        <Box sx={{ width: "100%", maxWidth: 600, mx: "auto" }}>
+                        <Box sx={{
+                            ".MuiInputBase-multiline.Mui-disabled": {
+                                    background: "#eee",
+                                    }
+                            }}>
                             <TextField                 
                                 id='onBehalfOfAlsoKnownAs'           
                                 label="Also Known As" 

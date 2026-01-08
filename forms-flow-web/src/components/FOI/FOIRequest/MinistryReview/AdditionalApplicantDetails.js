@@ -91,7 +91,7 @@ const AdditionalApplicantDetails = React.memo((requestDetails) => {
               <b>Also Known As</b>
             </div>
             <div>
-              <span>{additionalApplicantDetails.alsoKnownAs}</span>
+              <span className="long-text">{additionalApplicantDetails.alsoKnownAs}</span>
             </div>
           </div>
         </div>

@@ -64,7 +64,7 @@ const RequestDescription = React.memo(({
     const getSubjectCode = () => {
       if (requestDetails?.subjectCode)
         return requestDetails.subjectCode;
-      return "Select Subject Code (if required)"
+      return "No Subject Code"
     }
 
     //updates the default values from the request description box    
@@ -178,7 +178,7 @@ const RequestDescription = React.memo(({
       setSelectedSubjectCode(e.target.value);
       handleOnChangeRequiredRequestDescriptionValues(e.target.checked, FOI_COMPONENT_CONSTANTS.SUBJECT_CODE)
       let selectedCode ="";
-      if(!e.target.value?.toLowerCase().includes("select"))
+      if(!e.target.value?.toLowerCase().includes("no subject code"))
         selectedCode=e.target.value;
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.SUBJECT_CODE, selectedCode );
     }
