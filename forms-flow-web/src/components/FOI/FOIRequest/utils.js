@@ -272,7 +272,7 @@ export const createRequestDetailsObjectFunc = (
       requestObject.requestProcessStart = value.requestStartDate;
       requestObject.dueDate = value.dueDate;
       requestObject.receivedMode = value.receivedMode;
-      requestObject.deliveryMode = value.deliveryMode;
+      requestObject.deliveryMode = value.deliveryMode?.toLowerCase()?.includes("select")?"":value.deliveryMode;
       if ("cfrDueDate" in requestObject) requestObject.cfrDueDate = value.recordsDueDate;
       break;
     case FOI_COMPONENT_CONSTANTS.ASSIGNED_TO:
