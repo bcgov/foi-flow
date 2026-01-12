@@ -378,7 +378,7 @@ export const checkValidationError = (
     (requiredRequestDetailsValues.requestType.toLowerCase() ===
       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
       !requiredRequestDescriptionValues.ispiiredacted) ||
-    !!validation.helperTextValue ||
+    // !!validation.helperTextValue ||
     assignedToValue.toLowerCase().includes("unassigned") ||
     requiredRequestDetailsValues.requestType.toLowerCase().includes("select") ||
     requiredRequestDetailsValues.receivedMode
@@ -386,7 +386,7 @@ export const checkValidationError = (
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
-    !requiredAxisDetails.axisRequestId || 
+    // !requiredAxisDetails.axisRequestId || 
     (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
       if (oipc.inquiryattributes?.inquirydate) {
         return oipc.inquiryattributes.orderno === ""; 

@@ -43,9 +43,7 @@ class requestserviceconfigurator:
         return requestschema.get(property) if property in requestschema  else None
 
     def generatefilenumber(self, code, id):
-        tmp = str(id)
-        randomnum = secrets.randbits(32)
-        return code + "-" + str(datetime.date.today().year) + "-" + tmp + str(randomnum)[:5]
+        return f'{code}-{datetime.datetime.now().year}-{str(id).zfill(6)}'
     
     def contacttypemapping(self):
         return [{"name": ContactType.email.value, "key" : "email"},
