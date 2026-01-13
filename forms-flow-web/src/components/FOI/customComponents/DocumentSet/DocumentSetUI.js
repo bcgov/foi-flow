@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Paper, Radio } from "@material-ui/core";
+import { Paper, Radio, Tooltip } from "@material-ui/core"; // Import Tooltip
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faFolder,
@@ -14,6 +14,8 @@ import { useDispatch } from "react-redux";
 import {
   createFOIRecordGroup,updateFOIRecordGroup,getFOIRecordGroup
 } from "../../../../apiManager/services/FOI/foiRecordServices";
+
+const MAX_DOCUMENT_SETS = 20; // Define the maximum number of document sets allowed
 
 export default function DocumentSetUI({
                                         records,
@@ -94,15 +96,30 @@ export default function DocumentSetUI({
   window._saveDocumentSet = handleSave;
 
   const addSet = () => {
+    if (documentSets.length >= MAX_DOCUMENT_SETS) {
+      console.warn(`Cannot add more than ${MAX_DOCUMENT_SETS} document sets.`);
+      return;
+    }
+
+    const existingUnsavedSet = documentSets.find(set => typeof set.id === 'string' && set.id.startsWith('new-'));
+
+    if (existingUnsavedSet) {
+      setSelectedSet(existingUnsavedSet.id);
+      return;
+    }
+
     const nextId = documentSets.length + 1;
+    const newSet = { id: `new-${nextId}`, label: `Document Set ${nextId}` };
 
     setDocumentSets([
       ...documentSets,
-      { id: `new-${nextId}`, label: `Document Set ${nextId}` },
+      newSet,
     ]);
 
-    setSelectedSet(`new-${nextId}`);
+    setSelectedSet(newSet.id);
   };
+
+  const isLimitReached = documentSets.length >= MAX_DOCUMENT_SETS;
 
   return (
     <div className="ds-body">
@@ -134,9 +151,26 @@ export default function DocumentSetUI({
 
 
       {/* Add Document Set */}
-      <div className="ds-add" onClick={addSet}>
-        <FontAwesomeIcon icon={faCirclePlus} /> Add another document set
-      </div>
+      <Tooltip
+        title={isLimitReached ? `Maximum of ${MAX_DOCUMENT_SETS} document sets reached` : 'Add another document set'}
+        placement="right"
+        componentsProps={{
+          tooltip: {
+            sx: {
+              fontSize: "16px",
+              padding: "10px 14px",
+              maxWidth: "450px",
+            },
+          },
+        }}
+      >
+        <div
+          className={`ds-add ${isLimitReached ? 'ds-add-disabled' : ''}`}
+          onClick={isLimitReached ? null : addSet}
+        >
+          <FontAwesomeIcon icon={faCirclePlus} /> Add another document set
+        </div>
+      </Tooltip>
 
       {/* Info Box */}
       <Paper elevation={0} className="ds-info">
