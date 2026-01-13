@@ -14,7 +14,7 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
   const [anchorEl, setAnchorEl] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
-  const isDisableRedactRecords = (allRecords = [], { strict = true } = {}) => {
+  const isDisableRedactRecords = (allRecords = [], {strict = true} = {}) => {
     if (!Array.isArray(allRecords) || allRecords.length === 0) {
       return true;
     }
@@ -46,7 +46,17 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
     );
   };
 
-  const isDisableRedactSet = ( recordGroup = [],  { strict = true } = {} ) => {
+  const hasAnyGroupedRecord = (allRecords = []) => {
+    if (!Array.isArray(allRecords) || allRecords.length === 0) {
+      return false;
+    }
+
+    return allRecords.some(
+      record => record.groupdocumentsetid != null
+    );
+  };
+
+  const isDisableRedactSet = (recordGroup = [], {strict = true} = {}) => {
     if (!Array.isArray(recordGroup) || recordGroup.length === 0) {
       return true;
     }
@@ -78,7 +88,7 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
   };
 
   const handleRedactAll = () => {
-    if (isThereAnyUngroupedRecord(records)) {
+    if (hasAnyGroupedRecord(records)) {
       setOpenModal(true);
     } else {
       window.open(`${DOC_REVIEWER_WEB_URL}/foi/${ministryrequestid}`, "_blank");
@@ -98,7 +108,7 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
     if (!value) {
       setAnchorEl(null);
     } else if (groups.length === 0) {
-       window.open(`${DOC_REVIEWER_WEB_URL}/foi/${ministryrequestid}`, "_blank");
+      window.open(`${DOC_REVIEWER_WEB_URL}/foi/${ministryrequestid}`, "_blank");
     }
   }
 
@@ -228,9 +238,12 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
         requestId={""}
         attachment={null}
         attachmentsArray={[]}
-        handleRename={() => {}}
-        handleReclassify={() => {}}
-        handleChangeResponseDate={() => {}}
+        handleRename={() => {
+        }}
+        handleReclassify={() => {
+        }}
+        handleChangeResponseDate={() => {
+        }}
         isMinistryCoordinator={false}
         uploadFor="attachment"
         maxNoFiles={0}
