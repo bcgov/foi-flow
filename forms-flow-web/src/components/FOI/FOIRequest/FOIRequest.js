@@ -35,7 +35,8 @@ import {
   fetchOpenInfoStatuses,
   fetchOpenInfoExemptions,
   fetchFOICommentTypes,
-  fetchFOIEmailTemplates
+  fetchFOIEmailTemplates,
+  fetchFOIProactiveDisclosureCategoryList,
 } from "../../../apiManager/services/FOI/foiMasterDataServices";
 import {
   fetchFOIRequestDetailsWrapper,
@@ -45,7 +46,7 @@ import {
   deleteOIPCDetails,
   fetchHistoricalRequestDetails,
   fetchFOIHistoricalRequestDescriptionList,
-  fetchHistoricalExtensions
+  fetchHistoricalExtensions,
 } from "../../../apiManager/services/FOI/foiRequestServices";
 import { fetchFOIRequestAttachmentsList } from "../../../apiManager/services/FOI/foiAttachmentServices";
 import { fetchCFRForm } from "../../../apiManager/services/FOI/foiCFRFormServices";
@@ -102,7 +103,7 @@ import {
   isAxisSyncDisplayField,
   getUniqueIdentifier,
   closeContactInfo,
-  closeApplicantDetails
+  closeApplicantDetails,
 } from "./utils";
 import {
   ConditionalComponent,
@@ -110,7 +111,7 @@ import {
   isRequestRestricted,
   convertSTRToDate,
   getCommentTypeIdByName,
-  isMinistryLogin
+  isMinistryLogin,
 } from "../../../helper/FOI/helper";
 import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
@@ -119,18 +120,27 @@ import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
 import { toast } from "react-toastify";
 import HomeIcon from "@mui/icons-material/Home";
 import { RecordsLog } from "../customComponents/Records";
-import { UnsavedModal } from "../customComponents";
-import { DISABLE_GATHERINGRECORDS_TAB, SKIP_OPENINFO_MINISTRIES } from "../../../constants/constants";
+import { UnsavedModal, ConfirmSaveModal } from "../customComponents";
+import {
+  DISABLE_GATHERINGRECORDS_TAB,
+  SKIP_OPENINFO_MINISTRIES,
+} from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
 import ApplicantProfileModal from "./ApplicantProfileModal";
-import { setFOIRequestDetail, setFOIPDFStitchedOIPackage, setFOIPDFStitchStatusForOIPackage } from "../../../actions/FOI/foiRequestActions";
+import {
+  setFOIRequestDetail,
+  setFOIPDFStitchedOIPackage,
+  setFOIPDFStitchStatusForOIPackage,
+} from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
 import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
 import RequestHistorySection from "../customComponents/RequestHistory";
 import { Fees } from "../customComponents/Fees";
 import OpenInfo from "./OpenInformation/OpenInfo";
+import ProactiveDisclosureDetails from "./ProactiveDisclosureDetails";
+import ProactiveDisclosureDescription from "./ProactiveDisclosureDescription";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -161,7 +171,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const { requestId, ministryId } = useParams();
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
-  const isHistoricalRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.HISTORICAL_REQUEST) > -1;
+  const isHistoricalRequest =
+    url.indexOf(FOI_COMPONENT_CONSTANTS.HISTORICAL_REQUEST) > -1;
   const [isAddRequest, setIsAddRequest] = useState(urlIndexCreateRequest > -1);
   //gets the request detail from the store
   let requestDetails = useSelector(
@@ -206,27 +217,43 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   // );
   let requestApplicantProfile = useSelector(
     (state) => state.foiRequests.foiRequestApplicantProfile
-  )
+  );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
-  const [disableInput, setDisableInput] = useState(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !requestDetails?.isoipcreview);
-  const [_tabStatus, settabStatus] = React.useState(requestState);  
-  const isOITeam = userDetail.groups.includes("/OI Team");
-  const openInfoStates = useSelector(
-    (state) => state.foiRequests.oiStatuses
+  const [disableInput, setDisableInput] = useState(
+    requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() &&
+      !requestDetails?.isoipcreview
   );
-  let foitabheaderBG = isOITeam ? getOITabBG(requestDetails?.oistatusid, openInfoStates) : getTabBG(_tabStatus, requestState);
-  
+  const [_tabStatus, settabStatus] = React.useState(requestState);
+  const isOITeam = userDetail.groups.includes("/OI Team");
+  const openInfoStates = useSelector((state) => state.foiRequests.oiStatuses);
+  let foitabheaderBG = isOITeam
+    ? getOITabBG(requestDetails?.oistatusid, openInfoStates)
+    : getTabBG(_tabStatus, requestState);
 
   const [unsavedPrompt, setUnsavedPrompt] = useState(false);
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
-  const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes);
-  const activePublicationRequest = !SKIP_OPENINFO_MINISTRIES.split(",").includes(requestDetails?.bcgovcode?.toUpperCase()) && 
-                                      requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL;
-  
+  const commentTypes = useSelector(
+    (state) => state.foiRequests.foiCommentTypes
+  );
+  const activePublicationRequest =
+    !SKIP_OPENINFO_MINISTRIES.split(",").includes(
+      requestDetails?.bcgovcode?.toUpperCase()
+    ) &&
+    requestDetails?.requestType ===
+      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL;
+
+  const [isProactiveDisclosure, setIsProactiveDisclosure] = useState(
+    requestDetails?.requestType ==
+      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE
+      ? true
+      : false
+  );
+
   let isMinistry = false;
-  const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
+  const userGroups =
+    userDetail && userDetail.groups.map((group) => group.slice(1));
   if (Object.entries(userDetail).length !== 0) {
     isMinistry = isMinistryLogin(userGroups);
   }
@@ -236,8 +263,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     window.removeEventListener("beforeunload", handleBeforeUnload);
     dispatch(push(`/foi/dashboard`));
   };
-
-
 
   const returnToQueue = (e) => {
     if (unSavedRequest) {
@@ -318,7 +343,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       StateEnum.intakeinprogress.name.toLowerCase();
   const [axisSyncedData, setAxisSyncedData] = useState({});
   const [checkExtension, setCheckExtension] = useState(true);
-  let bcgovcode = isHistoricalRequest ? "" : getBCgovCode(ministryId, requestDetails);
+  let bcgovcode = isHistoricalRequest
+    ? ""
+    : getBCgovCode(ministryId, requestDetails);
   const [headerText, setHeaderText] = useState(
     getHeaderText({ requestDetails, ministryId, requestState })
   );
@@ -327,15 +354,30 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const dispatch = useDispatch();
   const [isIAORestricted, setIsIAORestricted] = useState(false);
   const [redactedSections, setRedactedSections] = useState("");
-  const [isMCFPersonal, setIsMCFPersonal] = useState(bcgovcode.replaceAll('"', '') == "MCF" && requestDetails.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
-  const {oipcData, addOIPC, removeOIPC, updateOIPC, isOIPCReview, setIsOIPCReview, removeAllOIPCs} = useOIPCHook();
+  const [isMCFPersonal, setIsMCFPersonal] = useState(
+    bcgovcode.replaceAll('"', "") == "MCF" &&
+      requestDetails.requestType ==
+        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
+  );
+  const {
+    oipcData,
+    addOIPC,
+    removeOIPC,
+    updateOIPC,
+    isOIPCReview,
+    setIsOIPCReview,
+    removeAllOIPCs,
+  } = useOIPCHook();
   const [oipcDataInitial, setOipcDataInitial] = useState(oipcData);
   const [lockRecordsTab, setLockRecordsTab] = useState(false);
 
   //Update disableInput when requestState changes
   useEffect(() => {
-    setDisableInput(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !isOIPCReview);
-  }, [requestState, isOIPCReview])
+    setDisableInput(
+      requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() &&
+        !isOIPCReview
+    );
+  }, [requestState, isOIPCReview]);
 
   useEffect(() => {
     if (!oipcDataInitial) {
@@ -344,7 +386,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     }
     //check to see if oipcData has been updated, if so, enable save button
     if (JSON.stringify(oipcData) != JSON.stringify(oipcDataInitial)) {
-      setDisableInput(false)
+      setDisableInput(false);
     }
   }, [oipcData, requestDetails.isoipcreview]);
 
@@ -360,18 +402,20 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   useEffect(async () => {
     if (isAddRequest) {
       let isbcpsteam = false;
-      if (userGroups.includes('BCPS Team')) isbcpsteam = true;
+      if (userGroups.includes("BCPS Team")) isbcpsteam = true;
       dispatch(fetchFOIAssignedToList("", "", "", isbcpsteam));
       dispatch(fetchFOIProgramAreaList());
     } else if (isHistoricalRequest) {
       dispatch(fetchHistoricalRequestDetails(requestId));
       dispatch(fetchFOIHistoricalRequestDescriptionList(requestId));
       dispatch(fetchHistoricalExtensions(requestId));
-      dispatch(fetchHistoricalRecords(requestId))
+      dispatch(fetchHistoricalRecords(requestId));
     } else {
       await Promise.all([
         dispatch(fetchFOIProgramAreaList()),
-        dispatch(fetchFOIRequestDetailsWrapper(requestId, ministryId, userGroups)),
+        dispatch(
+          fetchFOIRequestDetailsWrapper(requestId, ministryId, userGroups)
+        ),
         dispatch(fetchFOIRequestDescriptionList(requestId, ministryId)),
       ]);
       dispatch(fetchFOIRequestNotesList(requestId, ministryId));
@@ -381,7 +425,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       dispatch(fetchPDFStitchStatusForRedlines(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
       dispatch(fetchPDFStitchedStatusForOIPCRedline(requestId, ministryId));
-      dispatch(fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId));
+      dispatch(
+        fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId)
+      );
       dispatch(fetchPDFStitchStatusForConsults(requestId, ministryId));
       fetchCFRForm(ministryId, dispatch);
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
@@ -397,7 +443,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
         dispatch(fetchFOIEmailTemplates());
       }
     }
-
     dispatch(fetchFOICategoryList());
     dispatch(fetchOpenInfoExemptions());
     dispatch(fetchOpenInfoPublicationStatuses());
@@ -405,7 +450,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchFOISubjectCodeList());
     dispatch(fetchClosingReasonList());
-    
+
     dispatch(fetchOIPCOutcomes());
     dispatch(fetchOIPCStatuses());
     dispatch(fetchOIPCReviewtypes());
@@ -413,12 +458,26 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     if (isOITeam) {
       dispatch(fetchOpenInfoStatuses());
       dispatch(fetchFOIOpenInfoAdditionalFiles(requestId, ministryId));
-      dispatch(fetchPDFStitchedStatus(requestId, ministryId, "openinfo", (err, res) => {
-        dispatch(setFOIPDFStitchStatusForOIPackage(res))
-      }));
-      dispatch(fetchPDFStitchedPackage(requestId, ministryId, "openinfo", (err, res) => {
-        dispatch(setFOIPDFStitchedOIPackage(res))
-      }));
+      dispatch(
+        fetchPDFStitchedStatus(
+          requestId,
+          ministryId,
+          "openinfo",
+          (err, res) => {
+            dispatch(setFOIPDFStitchStatusForOIPackage(res));
+          }
+        )
+      );
+      dispatch(
+        fetchPDFStitchedPackage(
+          requestId,
+          ministryId,
+          "openinfo",
+          (err, res) => {
+            dispatch(setFOIPDFStitchedOIPackage(res));
+          }
+        )
+      );
     }
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
@@ -430,11 +489,15 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     }
     if (requestDetails?.isphasedrelease) {
       dispatch(fetchPDFStitchStatusesForPhasedRedlines(requestId, ministryId));
-      dispatch(fetchPDFStitchStatusesForPhasedResponsePackages(requestId, ministryId));
+      dispatch(
+        fetchPDFStitchStatusesForPhasedResponsePackages(requestId, ministryId)
+      );
     }
-  }, [requestId, ministryId, requestDetails])
+  }, [requestId, ministryId, requestDetails]);
 
-  const validLockRecordsState = (currentState=requestDetails.currentState) => {
+  const validLockRecordsState = (
+    currentState = requestDetails.currentState
+  ) => {
     return (
       currentState === StateEnum.harms.name ||
       currentState === StateEnum.onhold.name ||
@@ -447,15 +510,19 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       currentState === StateEnum.onholdother.name ||
       currentState === StateEnum.closed.name
     );
-  }
+  };
 
   useEffect(() => {
     const requestDetailsValue = requestDetails;
     setSaveRequestObject(requestDetailsValue);
-    const assignedTo = isHistoricalRequest ? requestDetails.assignedTo : getAssignedTo(requestDetails);
+    const assignedTo = isHistoricalRequest
+      ? requestDetails.assignedTo
+      : getAssignedTo(requestDetails);
     setAssignedToValue(assignedTo);
     if (Object.entries(requestDetails)?.length !== 0) {
-       let requestStateFromId = findRequestState(requestDetails.requeststatuslabel)
+      let requestStateFromId = findRequestState(
+        requestDetails.requeststatuslabel
+      )
         ? findRequestState(requestDetails.requeststatuslabel)
         : StateEnum.unopened.name;
       setRequestState(requestStateFromId);
@@ -471,23 +538,30 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
         : [];
       if (requestDetails.axisRequestId) axisBannerCheck();
       setIsIAORestricted(isRequestRestricted(requestDetails, ministryId));
+      if (
+        requestDetails.requestType ==
+        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE
+      )
+        setIsProactiveDisclosure(true);
     }
 
-    if(
-      MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', '')) &&
+    if (
+      MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', "")) &&
       requestDetails.requestType ==
         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
     ) {
-      dispatch(fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', '')));
-      if(bcgovcode.replaceAll('"', '') == "MCF") {
-        dispatch(fetchFOIPersonalPeople(bcgovcode.replaceAll('"', '')));
-        dispatch(fetchFOIPersonalFiletypes(bcgovcode.replaceAll('"', '')));
-        dispatch(fetchFOIPersonalVolumes(bcgovcode.replaceAll('"', '')));
+      dispatch(
+        fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', ""))
+      );
+      if (bcgovcode.replaceAll('"', "") == "MCF") {
+        dispatch(fetchFOIPersonalPeople(bcgovcode.replaceAll('"', "")));
+        dispatch(fetchFOIPersonalFiletypes(bcgovcode.replaceAll('"', "")));
+        dispatch(fetchFOIPersonalVolumes(bcgovcode.replaceAll('"', "")));
         setIsMCFPersonal(true);
       }
     }
-    
-    if(requestDetails.isoipcreview) {
+
+    if (requestDetails.isoipcreview) {
       setIsOIPCReview(true);
     } else {
       setIsOIPCReview(false);
@@ -495,42 +569,50 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
     //Adjust lockRecords value based on requestState if there is no manual user lockedrecords value present in requestDetails from DB
     const updateRecordsTabAccess = () => {
-      if(requestDetails.userrecordslockstatus === null) {
+      if (requestDetails.userrecordslockstatus === null) {
         return validLockRecordsState(requestDetails.currentState);
       } else {
         return requestDetails.userrecordslockstatus;
       }
-    }
+    };
     setLockRecordsTab(updateRecordsTabAccess());
   }, [requestDetails]);
 
   //useEffect to manage isoipcreview attribute for requestdetails state
   useEffect(() => {
-    if(Object.keys(requestDetails).length !== 0 && oipcData?.length <= 0) {
+    if (Object.keys(requestDetails).length !== 0 && oipcData?.length <= 0) {
       requestDetails.isoipcreview = false;
       setIsOIPCReview(false);
     }
-  }, [oipcData])
+  }, [oipcData]);
 
-  
-
-  
   useEffect(() => {
-    if (requestApplicantProfile) {      
+    if (
+      saveRequestObject?.requestType ==
+      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE
+    ) {
+      setIsProactiveDisclosure(true);
+      //dispatch(fetchFOIProactiveDisclosureCategoryList());
+    } else setIsProactiveDisclosure(false);
+  }, [saveRequestObject]);
+
+  useEffect(() => {
+    if (requestApplicantProfile) {
       if (!ministryId) {
         let newRequestDetails = { ...saveRequestObject };
         for (let field in requestApplicantProfile) {
           if (field === "additionalPersonalInfo") {
-            newRequestDetails["additionalPersonalInfo"] = newRequestDetails["additionalPersonalInfo"] || {}
+            newRequestDetails["additionalPersonalInfo"] =
+              newRequestDetails["additionalPersonalInfo"] || {};
             for (let infofield in requestApplicantProfile[field]) {
               newRequestDetails[field][infofield] =
-              requestApplicantProfile[field][infofield];
+                requestApplicantProfile[field][infofield];
             }
           } else {
             newRequestDetails[field] = requestApplicantProfile[field];
           }
         }
-        dispatch(setFOIRequestDetail(newRequestDetails))
+        dispatch(setFOIRequestDetail(newRequestDetails));
       } else {
         handleSaveRequest(requestDetails.currentState, false, "");
       }
@@ -563,7 +645,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 typeof data["linkedRequests"] == "string"
                   ? JSON.parse(data["linkedRequests"])
                   : data["linkedRequests"];
-              data["axisApplicantID"] = ("axisApplicantID" in data) ? parseInt(data["axisApplicantID"]) : null;
+              data["axisApplicantID"] =
+                "axisApplicantID" in data
+                  ? parseInt(data["axisApplicantID"])
+                  : null;
               setAxisSyncedData(data);
               let axisDataUpdated = checkIfAxisDataUpdated(data);
               if (axisDataUpdated) {
@@ -604,12 +689,13 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   };
 
   const checkValidation = (key, axisData) => {
-
     if (key === MANDATORY_FOI_REQUEST_FIELDS.TOTAL_NO_OF_PAGES) {
-      if ((requestDetails["axispagecount"] || axisData[key]) && requestDetails["axispagecount"] !== axisData[key])
+      if (
+        (requestDetails["axispagecount"] || axisData[key]) &&
+        requestDetails["axispagecount"] !== axisData[key]
+      )
         return true;
       return false;
-
 
       // if (requestDetails["recordspagecount"] > 0)
       //   return false;
@@ -769,6 +855,14 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     axisRequestId: "",
   };
 
+  const requiredProactiveDetailsInitialValues = {
+      proactiveDisclosureCategory: "",
+      reportPeriod: "",
+      startDate: "",
+      cfrDueDate: "",
+      publicationDate: ""
+  }
+
   //below states are used to find if required fields are set or not
   const [
     requiredRequestDescriptionValues,
@@ -783,6 +877,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [requiredContactDetails, setrequiredContactDetails] = React.useState(
     requiredContactDetailsValue
   );
+  const [requiredProactiveDetailsValues, setRequiredProactiveDetailsValues] =
+    React.useState(requiredProactiveDetailsInitialValues);
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
   const [recordsUploading, setRecordsUploading] = React.useState(false);
   const [CFRUnsaved, setCFRUnsaved] = React.useState(false);
@@ -808,6 +904,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   }, []);
   const handleAxisDetailsInitialValue = React.useCallback((value) => {
     setRequiredAxisDetails(value);
+  }, []);
+  const handleProactiveDetailsInitialValue = React.useCallback((value) => {
+    setRequiredProactiveDetailsValues(value);
   }, []);
 
   const handleApplicantDetailsValue = (value, name) => {
@@ -845,16 +944,22 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     setAssignedToValue(value);
   };
 
+    //Update required fields of proactive disclosure details box with latest value
+  const handleProactiveDetailsValue = (value, name, value2) => {
+    const detailsData = assignValue(requiredProactiveDetailsValues, value, name);
+    // if (value2) {
+    //   detailsData.dueDate = value2;
+    // }
+    setRequiredProactiveDetailsValues(detailsData);
+  };
+
   const saveOIPCNoReview = () => {
-    const toastID = toast.loading("Saving request with removed OIPC review...")
+    const toastID = toast.loading("Saving request with removed OIPC review...");
     removeAllOIPCs();
     setIsOIPCReview(false);
     dispatch(
-      deleteOIPCDetails(
-        requestId,
-        ministryId, 
-        (err, _res) => {
-        if(!err) {
+      deleteOIPCDetails(requestId, ministryId, (err, _res) => {
+        if (!err) {
           toast.update(toastID, {
             type: "success",
             render: "OIPC details have been saved successfully.",
@@ -882,8 +987,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           );
         }
       })
-    )
-  }
+    );
+  };
 
   const oipcSectionRef = React.useRef(null);
   const handleOipcReviewFlagChange = (isSelected) => {
@@ -896,14 +1001,14 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       //timeout to allow react state to update after setState call
       setTimeout(() => {
         oipcSectionRef.current.scrollIntoView();
-      }, (10));
+      }, 10);
     }
-  }
+  };
 
   const handleConsultFlagChange = (isSelected) => {
     requestDetails.isconsultflag = isSelected;
-    createSaveRequestObject('isconsultflag', isSelected);
-  }
+    createSaveRequestObject("isconsultflag", isSelected);
+  };
 
   //handle email validation
   const [validation, setValidation] = React.useState({});
@@ -937,7 +1042,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     _currentrequestStatus,
     oipcData,
     requestDetails.isoipcreview,
-    requestDetails.isconsultflag
+    requestDetails.isconsultflag,
+    isProactiveDisclosure,
+    requiredProactiveDetailsValues
   );
 
   const classes = useStyles();
@@ -975,8 +1082,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
 
-    if (_state?.toLowerCase() === StateEnum.unopened.name.toLowerCase() && 
-      (saveRequestObject.isconsultflag === null || saveRequestObject.isconsultflag === undefined)) {
+    if (
+      _state?.toLowerCase() === StateEnum.unopened.name.toLowerCase() &&
+      (saveRequestObject.isconsultflag === null ||
+        saveRequestObject.isconsultflag === undefined)
+    ) {
       saveRequestObject.isconsultflag = false;
     }
 
@@ -1018,7 +1128,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const handleStateChange = (currentStatus) => {
     if (isOITeam) {
-      setOIStatus(currentStatus)
+      setOIStatus(currentStatus);
     } else {
       setcurrentrequestStatus(currentStatus);
     }
@@ -1032,7 +1142,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       _status,
       requestExtensions,
     });
-    
+
     setRequestStatus(mappedBottomText);
   };
 
@@ -1057,7 +1167,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       };
     }
   }, [editorChange]);
-  
+
   const tabclick = (param) => {
     if (param === "Comments") {
       sessionStorage.setItem("foicommentcategory", 1);
@@ -1136,14 +1246,14 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const showRecordsTab = () => {
     if (isHistoricalRequest) {
-      return requestAttachments.length === 0
+      return requestAttachments.length === 0;
     }
     return (
       requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name &&
       requestState !== StateEnum.open.name &&
       (requestDetails?.divisions?.length > 0 || isMCFPersonal) &&
-      DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() =='false'
+      DISABLE_GATHERINGRECORDS_TAB?.toLowerCase() == "false"
     );
   };
 
@@ -1171,7 +1281,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
       );
     } else {
-      return (requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL);
+      return (
+        requestDetails?.requestType ===
+        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
+      );
     }
   };
 
@@ -1181,61 +1294,79 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestState !== StateEnum.unopened.name &&
       requestState !== StateEnum.open.name &&
       requestState !== StateEnum.appfeeowing.name &&
-      requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
-  }
-  
+      requestDetails?.requestType ===
+        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
+    );
+  };
+
   const showOpenInformationTab = () => {
     return (
       activePublicationRequest &&
       requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name
     );
-  } 
+  };
 
   const getHistoryCount = () => {
-    let historyCount= visibleCorrespondence.length + requestNotes.filter(
-            c => c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
-                c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review")
-        ).length;
-    return '('+historyCount+')'
-  } 
+    let historyCount =
+      visibleCorrespondence.length +
+      requestNotes.filter(
+        (c) =>
+          c.commentTypeId !==
+            getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
+          c.commentTypeId !==
+            getCommentTypeIdByName(commentTypes, "Ministry Peer Review")
+      ).length;
+    return "(" + historyCount + ")";
+  };
 
   const getMergedHistory = (applicantCorrespondence, requestNotes) => {
     const mergedHistory = [
       ...(applicantCorrespondence || []).map((message) => ({
         ...message,
-        type: 'message',
-        created_at: message.date ? convertSTRToDate(message.date) : message.date
+        type: "message",
+        created_at: message.date
+          ? convertSTRToDate(message.date)
+          : message.date,
       })),
       ...(requestNotes || []).map((comment) => ({
         ...comment,
-        type: 'comment'
-      }))
+        type: "comment",
+      })),
     ];
 
     return mergedHistory.sort((a, b) => {
       const dateA = new Date(a.created_at || a.dateUF);
       const dateB = new Date(b.created_at || b.dateUF);
-      return dateA - dateB || (a.commentId || a.applicantcorrespondenceid || 0) - (b.commentId || b.applicantcorrespondenceid || 0);
+      return (
+        dateA - dateB ||
+        (a.commentId || a.applicantcorrespondenceid || 0) -
+          (b.commentId || b.applicantcorrespondenceid || 0)
+      );
     });
   };
   const getCommentsCount = () => {
-    let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
-          c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
-    return '('+commentsCount+')'
-
-}
-  const visibleCorrespondence = applicantCorrespondence?.filter(
-    (c) => c.category !== 'draft'
-  ) || [];
+    let commentsCount = requestNotes.filter(
+      (c) =>
+        c.commentTypeId !==
+          getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
+        c.commentTypeId !==
+          getCommentTypeIdByName(commentTypes, "Ministry Peer Review")
+    ).length;
+    return "(" + commentsCount + ")";
+  };
+  const visibleCorrespondence =
+    applicantCorrespondence?.filter((c) => c.category !== "draft") || [];
 
   const getOIRequestState = () => {
     if (requestDetails?.oistatusid) {
-      return openInfoStates?.find(s => s.oistatusid === requestDetails?.oistatusid)?.name;
+      return openInfoStates?.find(
+        (s) => s.oistatusid === requestDetails?.oistatusid
+      )?.name;
     } else {
-      return StateEnum.unopened.name
+      return StateEnum.unopened.name;
     }
-  }
+  };
 
   return (!isLoading &&
     requestDetails &&
@@ -1362,19 +1493,19 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               name="RequestHistory"
               onClick={() => tabclick("RequestHistory")}
             >
-              Request History{" "}
-              {getHistoryCount()}
+              Request History {getHistoryCount()}
             </div>
           </div>
 
           <div className="foileftpanelstatus">
-            {isOIPCReview && requestDetails.isreopened ? "" 
-            : bottomTextArray.length > 0 &&
-              _requestStatus &&
-              _requestStatus.toLowerCase().includes("days") &&
-              bottomTextArray.map((text) => {
-                return <div className="remaining-days-alert">{text}</div>;
-              })}
+            {isOIPCReview && requestDetails.isreopened
+              ? ""
+              : bottomTextArray.length > 0 &&
+                _requestStatus &&
+                _requestStatus.toLowerCase().includes("days") &&
+                bottomTextArray.map((text) => {
+                  return <div className="remaining-days-alert">{text}</div>;
+                })}
           </div>
         </div>
         <div className="foitabpanelcollection">
@@ -1479,140 +1610,226 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         isMinistry={false}
                         isAddRequest={isAddRequest}
                         handleOipcReviewFlagChange={handleOipcReviewFlagChange}
-                        showFlags={requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()}
-                        showConsultFlag={requestState.toLowerCase() == StateEnum.unopened.name.toLowerCase() || (requestDetails.isconsultflag === true)}
+                        showFlags={
+                          requestState.toLowerCase() !==
+                            StateEnum.intakeinprogress.name.toLowerCase() &&
+                          requestState.toLowerCase() !==
+                            StateEnum.unopened.name.toLowerCase()
+                        }
+                        showConsultFlag={
+                          requestState.toLowerCase() ==
+                            StateEnum.unopened.name.toLowerCase() ||
+                          requestDetails.isconsultflag === true
+                        }
                         handleConsultFlagChange={handleConsultFlagChange}
                       />
                       {(isAddRequest ||
-                        requestState === StateEnum.unopened.name) && (
-                        <AxisDetails
-                          requestDetails={requestDetails}
-                          createSaveRequestObject={createSaveRequestObject}
-                          handleAxisDetailsInitialValue={
-                            handleAxisDetailsInitialValue
-                          }
-                          handleAxisDetailsValue={handleAxisDetailsValue}
-                          handleAxisIdValidation={handleAxisIdValidation}
-                          setAxisMessage={setAxisMessage}
-                          saveRequestObject={saveRequestObject}
-                        />
-                      )}
-                      <ApplicantDetails
-                        requestDetails={requestDetails}
-                        requestStatus={_requestStatus}
-                        contactDetailsNotGiven={contactDetailsNotGiven}
-                        handleApplicantDetailsInitialValue={
-                          handleApplicantDetailsInitialValue
-                        }
-                        handleApplicantDetailsValue={
-                          handleApplicantDetailsValue
-                        }
-                        createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput || isHistoricalRequest || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
-                        defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}                        
-                        userDetail={userDetail}
-                      />
-                      {requiredRequestDetailsValues.requestType.toLowerCase() ===
-                        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
-                        <>
-                          <ChildDetails
-                            additionalInfo={
-                              requestDetails.additionalPersonalInfo
+                        requestState === StateEnum.unopened.name) &&
+                        !isProactiveDisclosure && (
+                          <AxisDetails
+                            requestDetails={requestDetails}
+                            createSaveRequestObject={createSaveRequestObject}
+                            handleAxisDetailsInitialValue={
+                              handleAxisDetailsInitialValue
                             }
+                            handleAxisDetailsValue={handleAxisDetailsValue}
+                            handleAxisIdValidation={handleAxisIdValidation}
+                            setAxisMessage={setAxisMessage}
+                            saveRequestObject={saveRequestObject}
+                          />
+                        )}
+                      {isProactiveDisclosure ? (
+                        <>
+                          <ProactiveDisclosureDetails
+                            requestDetails={requestDetails}
+                            handleRequestDetailsValue={
+                              handleRequestDetailsValue
+                            }
+                            handleRequestDetailsInitialValue={
+                              handleRequestDetailsInitialValue
+                            }
+                            handleProactiveDetailsValue={handleProactiveDetailsValue}
+                            handleProactiveDetailsInitialValue={handleProactiveDetailsInitialValue}
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput || isHistoricalRequest}
-                            userDetail={userDetail}
-                            requestType={requestDetails?.requestType}
+                            saveRequestObject={saveRequestObject}
                           />
-                          <OnBehalfOfDetails
-                            additionalInfo={
-                              requestDetails.additionalPersonalInfo
+                          <ProactiveDisclosureDescription
+                            programAreaList={programAreaList}
+                            urlIndexCreateRequest={urlIndexCreateRequest}
+                            requestDetails={requestDetails}
+                            requiredRequestDetailsValues={
+                              requiredRequestDetailsValues
+                            }
+                            handleUpdatedProgramAreaList={
+                              handleUpdatedProgramAreaList
+                            }
+                            handleOnChangeRequiredRequestDescriptionValues={
+                              handleOnChangeRequiredRequestDescriptionValues
+                            }
+                            handleInitialRequiredRequestDescriptionValues={
+                              handleInitialRequiredRequestDescriptionValues
                             }
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput || isHistoricalRequest}
                           />
                         </>
-                      )}
+                      ) : (
+                        <>
+                          <RequestDetails
+                            requestDetails={requestDetails}
+                            requestStatus={_requestStatus}
+                            handleRequestDetailsValue={
+                              handleRequestDetailsValue
+                            }
+                            handleRequestDetailsInitialValue={
+                              handleRequestDetailsInitialValue
+                            }
+                            createSaveRequestObject={createSaveRequestObject}
+                            disableInput={disableInput || isHistoricalRequest}
+                            isHistoricalRequest={isHistoricalRequest}
+                          />
+                          <ApplicantDetails
+                            requestDetails={requestDetails}
+                            requestStatus={_requestStatus}
+                            contactDetailsNotGiven={contactDetailsNotGiven}
+                            handleApplicantDetailsInitialValue={
+                              handleApplicantDetailsInitialValue
+                            }
+                            handleApplicantDetailsValue={
+                              handleApplicantDetailsValue
+                            }
+                            createSaveRequestObject={createSaveRequestObject}
+                            disableInput={
+                              disableInput ||
+                              isHistoricalRequest ||
+                              requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/
+                            }
+                            defaultExpanded={
+                              !closeApplicantDetails(
+                                userDetail,
+                                requestDetails?.requestType
+                              )
+                            }
+                            userDetail={userDetail}
+                          />
+                          {requiredRequestDetailsValues.requestType.toLowerCase() ===
+                            FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
+                            <>
+                              <ChildDetails
+                                additionalInfo={
+                                  requestDetails.additionalPersonalInfo
+                                }
+                                createSaveRequestObject={
+                                  createSaveRequestObject
+                                }
+                                disableInput={
+                                  disableInput || isHistoricalRequest
+                                }
+                                userDetail={userDetail}
+                                requestType={requestDetails?.requestType}
+                              />
+                              <OnBehalfOfDetails
+                                additionalInfo={
+                                  requestDetails.additionalPersonalInfo
+                                }
+                                createSaveRequestObject={
+                                  createSaveRequestObject
+                                }
+                                disableInput={
+                                  disableInput || isHistoricalRequest
+                                }
+                              />
+                            </>
+                          )}
 
-                      <AddressContactDetails
-                        requestDetails={requestDetails}
-                        contactDetailsNotGiven={contactDetailsNotGiven}
-                        createSaveRequestObject={createSaveRequestObject}
-                        handleContactDetailsInitialValue={
-                          handleContactDetailsInitialValue
-                        }
-                        handleContanctDetailsValue={handleContanctDetailsValue}
-                        disableInput={disableInput || isHistoricalRequest /* || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
-                        handleEmailValidation={handleEmailValidation}
-                        defaultExpanded={!closeContactInfo(userDetail,requestDetails)}
-                        moreInfoAction={openApplicantProfileModal}
-                        userDetail={userDetail}
-                      />
+                          <AddressContactDetails
+                            requestDetails={requestDetails}
+                            contactDetailsNotGiven={contactDetailsNotGiven}
+                            createSaveRequestObject={createSaveRequestObject}
+                            handleContactDetailsInitialValue={
+                              handleContactDetailsInitialValue
+                            }
+                            handleContanctDetailsValue={
+                              handleContanctDetailsValue
+                            }
+                            disableInput={
+                              disableInput ||
+                              isHistoricalRequest /* || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/
+                            }
+                            handleEmailValidation={handleEmailValidation}
+                            defaultExpanded={
+                              !closeContactInfo(userDetail, requestDetails)
+                            }
+                            moreInfoAction={openApplicantProfileModal}
+                            userDetail={userDetail}
+                          />
 
-                      <RequestDescriptionBox
-                        programAreaList={programAreaList}
-                        urlIndexCreateRequest={urlIndexCreateRequest}
-                        requestDetails={requestDetails}
-                        requiredRequestDetailsValues={
-                          requiredRequestDetailsValues
-                        }
-                        handleUpdatedProgramAreaList={
-                          handleUpdatedProgramAreaList
-                        }
-                        handleOnChangeRequiredRequestDescriptionValues={
-                          handleOnChangeRequiredRequestDescriptionValues
-                        }
-                        handleInitialRequiredRequestDescriptionValues={
-                          handleInitialRequiredRequestDescriptionValues
-                        }
-                        createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput || isHistoricalRequest}
-                      />
-                      <RequestDetails
-                        requestDetails={requestDetails}
-                        requestStatus={_requestStatus}
-                        handleRequestDetailsValue={handleRequestDetailsValue}
-                        handleRequestDetailsInitialValue={
-                          handleRequestDetailsInitialValue
-                        }
-                        createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput || isHistoricalRequest}
-                        isHistoricalRequest={isHistoricalRequest}
-                      />
-                      {(redactedSections && Object.keys(redactedSections).length > 0 && (
-                        <RedactionSummary sections={redactedSections} isoipcreview={isOIPCReview}/>
-                      ))}
+                          <RequestDescriptionBox
+                            programAreaList={programAreaList}
+                            urlIndexCreateRequest={urlIndexCreateRequest}
+                            requestDetails={requestDetails}
+                            requiredRequestDetailsValues={
+                              requiredRequestDetailsValues
+                            }
+                            handleUpdatedProgramAreaList={
+                              handleUpdatedProgramAreaList
+                            }
+                            handleOnChangeRequiredRequestDescriptionValues={
+                              handleOnChangeRequiredRequestDescriptionValues
+                            }
+                            handleInitialRequiredRequestDescriptionValues={
+                              handleInitialRequiredRequestDescriptionValues
+                            }
+                            createSaveRequestObject={createSaveRequestObject}
+                            disableInput={disableInput || isHistoricalRequest}
+                          />
+                          {redactedSections &&
+                            Object.keys(redactedSections).length > 0 && (
+                              <RedactionSummary
+                                sections={redactedSections}
+                                isoipcreview={isOIPCReview}
+                              />
+                            )}
 
-                      <ExtensionDetails
-                        requestDetails={requestDetails}
-                        requestState={requestState}
-                      />
-                      {requiredRequestDetailsValues.requestType.toLowerCase() ===
-                        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
-                        <AdditionalApplicantDetails
-                          requestDetails={requestDetails}
-                          createSaveRequestObject={createSaveRequestObject}
-                          disableInput={disableInput /* || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
-                          defaultExpanded={true}
-                        />
+                          <ExtensionDetails
+                            requestDetails={requestDetails}
+                            requestState={requestState}
+                          />
+                          {requiredRequestDetailsValues.requestType.toLowerCase() ===
+                            FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
+                            <AdditionalApplicantDetails
+                              requestDetails={requestDetails}
+                              createSaveRequestObject={createSaveRequestObject}
+                              disableInput={
+                                disableInput /* || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/
+                              }
+                              defaultExpanded={true}
+                            />
+                          )}
+                          {showDivisionalTracking && (
+                            <DivisionalTracking
+                              divisions={requestDetails.divisions}
+                            />
+                          )}
+                          <div ref={oipcSectionRef}></div>
+                          {isOIPCReview &&
+                            requestState &&
+                            requestState.toLowerCase() !==
+                              StateEnum.intakeinprogress.name.toLowerCase() &&
+                            requestState.toLowerCase() !==
+                              StateEnum.unopened.name.toLowerCase() && (
+                              <OIPCDetails
+                                oipcData={oipcData}
+                                updateOIPC={updateOIPC}
+                                addOIPC={addOIPC}
+                                removeOIPC={removeOIPC}
+                                isMinistry={false}
+                                isHistoricalRequest={isHistoricalRequest}
+                              />
+                            )}
+                        </>
                       )}
-                      {showDivisionalTracking && (
-                        <DivisionalTracking
-                          divisions={requestDetails.divisions}
-                        />
-                      )}
-                      <div ref={oipcSectionRef}></div>
-                      {isOIPCReview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
-                        <OIPCDetails 
-                          oipcData={oipcData}
-                          updateOIPC={updateOIPC}
-                          addOIPC={addOIPC}
-                          removeOIPC={removeOIPC}
-                          isMinistry={false}
-                          isHistoricalRequest={isHistoricalRequest}
-                        />
-                      )}
-
                       <BottomButtonGroup
                         stateChanged={stateChanged}
                         isValidationError={isValidationError}
@@ -1623,7 +1840,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         CFRUnsaved={CFRUnsaved}
                         handleSaveRequest={handleSaveRequest}
                         handleOpenRequest={handleOpenRequest}
-                        currentSelectedStatus={isOITeam ? OIStatus : _currentrequestStatus}
+                        currentSelectedStatus={
+                          isOITeam ? OIStatus : _currentrequestStatus
+                        }
                         hasStatusRequestSaved={hasStatusRequestSaved}
                         disableInput={disableInput}
                         requestState={requestState}
@@ -1951,7 +2170,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
             {!isLoading && (requestNotes || applicantCorrespondence) ? (
               <>
                 <RequestHistorySection
-                  requestHistoryArray={getMergedHistory(visibleCorrespondence, requestNotes)}
+                  requestHistoryArray={getMergedHistory(
+                    visibleCorrespondence,
+                    requestNotes
+                  )}
                   currentUser={
                     userId && {
                       userId: userId,
@@ -1968,7 +2190,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   isMinistry={false}
                   commentTypes={commentTypes}
                   ministryId={ministryId}
-                  applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
+                  applicantCorrespondenceTemplates={
+                    applicantCorrespondenceTemplates
+                  }
                   setComment={setComment}
                   requestDetails={requestDetails}
                   requestState={requestState}

@@ -64,6 +64,7 @@ class FOIRawRequest(Resource):
             requestidisinteger = int(requestid)
             if requestidisinteger :                
                 baserequestinfo = rawrequestservice().getrawrequest(requestid)
+                print("baserequestinfo:",baserequestinfo)
                 assignee = baserequestinfo['assignedTo']
                 isiaorestricted = baserequestinfo['isiaorestricted']
                 # print('Request # {0} Assigned to {1} and is restricted {2} '.format(requestid,assignee,isiaorestricted))

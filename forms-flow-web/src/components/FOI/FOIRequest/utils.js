@@ -363,8 +363,26 @@ export const checkValidationError = (
   currentrequestStatus,
   oipcData,
   isOipcReview,
-  isconsultflag
+  isconsultflag,
+  isProactiveDisclosure,
+  requiredProactiveDetailsValues
 ) => {
+
+   if (isProactiveDisclosure) {
+    return (
+      requiredProactiveDetailsValues.categoryType
+        ?.toLowerCase()
+        ?.includes("select") ||
+      !requiredProactiveDetailsValues.requestStartDate ||
+      !requiredProactiveDetailsValues.cfrDueDate ||
+      !requiredProactiveDetailsValues.publicationDate||
+      requiredRequestDescriptionValues.description === ""||
+      assignedToValue.toLowerCase().includes("unassigned")
+    //   ||
+    // (!requiredRequestDescriptionValues.isProgramAreaSelected 
+    //   && ([StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(currentrequestStatus?.toLowerCase()) || isAddRequest))
+    );
+  }
   return (
     (!isconsultflag && (
       requiredApplicantDetails.firstName === "" ||
@@ -462,7 +480,7 @@ export const isValidMinistryCode = (selectedMinistry, ministriesList) => {
 }
 
 export const countOfMinistrySelected = (selectedMinistryList) => {
-  return selectedMinistryList.reduce(function(n, ministry) {
+  return selectedMinistryList?.reduce(function(n, ministry) {
     return n + (ministry.isChecked);
   }, 0);
 }

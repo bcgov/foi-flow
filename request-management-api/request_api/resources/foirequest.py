@@ -26,7 +26,7 @@ from request_api.exceptions import BusinessException
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
-from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema
+from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema, FOIPDRequestWrapperSchema
 from request_api.schemas.foiassignee import FOIRequestAssigneeSchema
 from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup
 from marshmallow import Schema, fields, validate, ValidationError
@@ -97,8 +97,14 @@ class FOIRequests(Resource):
         """ POST Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json()
-            foirequestschema = FOIRequestWrapperSchema().load(request_json)
-            
+            request_type = request_json.get('requestType', '').lower()
+            print("Request type in api /foirequests: ",request_type)
+            if request_type == 'proactive disclosure':
+                foirequestschema = FOIPDRequestWrapperSchema().load(request_json)
+            else:
+                foirequestschema = FOIRequestWrapperSchema().load(request_json)
+
+            print("foirequestschema: ",foirequestschema)
             assignedgroup = request_json['assignedGroup'] if 'assignedGroup' in foirequestschema  else None
             assignedto = request_json['assignedTo'] if 'assignedTo' in foirequestschema  else None
             assignedtofirstname = request_json["assignedToFirstName"] if request_json.get("assignedToFirstName") != None else None
@@ -142,7 +148,12 @@ class FOIRequestsById(Resource):
         """ POST Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json()
-            foirequestschema = FOIRequestWrapperSchema().load(request_json)  
+            request_type = request_json.get('requestType', '').lower()
+            print("Request type in api /foirequests: ",request_type)
+            if request_type == 'proactive disclosure':
+                foirequestschema = FOIPDRequestWrapperSchema().load(request_json)
+            else:
+                foirequestschema = FOIRequestWrapperSchema().load(request_json)  
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:                             
                 event_loop = asyncio.get_running_loop()

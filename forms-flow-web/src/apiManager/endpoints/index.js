@@ -218,6 +218,9 @@ const API = {
   FOI_GET_EMAIL_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/GetCorrespondenceByName`,
   FOI_EXPORT_SFDT: `${FOI_TEMPLATE_API_URL}/api/documenteditor/ExportSFDT`,
   FOI_EXPORT_PDF: `${FOI_TEMPLATE_API_URL}/api/documenteditor/ExportPdf`,
-  FOI_REFRESH_REDIS_CACHE_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/UpdateTemplateCache`
+  FOI_REFRESH_REDIS_CACHE_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/UpdateTemplateCache`,
+
+  FOI_GET_PROACTIVE_DISCLOSURE_CATEGORIES_API: `${FOI_BASE_API_URL}/api/foiflow/proactivedisclosurecategories`,
+
 };
 export default API;

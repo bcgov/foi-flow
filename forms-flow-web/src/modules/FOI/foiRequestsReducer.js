@@ -36,6 +36,7 @@ const initialState = {
     { requesttypeid: 0, name: "Select Request Type" },
     { requesttypeid: 1, name: "general" },
     { requesttypeid: 2, name: "personal" },
+    { requesttypeid: 3, name: "proactive disclosure" }
   ],
   foiReceivedModeList: [],
   foiDeliveryModeList: [],
@@ -184,7 +185,27 @@ const initialState = {
   foiCommentTypes:[],
   foiEmailTemplates: [],
   foiadvancedsearchfilter:"foimod",
-  foiCommentTypes:[]
+  foiProactiveDisclosureCategoryList:[],
+  foiReportPeriodList:[
+    { reportperiodid: 0, name: "N/A" },
+    { reportperiodid: 1, name: "January" },
+    { reportperiodid: 2, name: "February" },
+    { reportperiodid: 3, name: "March" },
+    { reportperiodid: 4, name: "April" },
+    { reportperiodid: 5, name: "May" },
+    { reportperiodid: 6, name: "June" },
+    { reportperiodid: 7, name: "July" },
+    { reportperiodid: 8, name: "August" },
+    { reportperiodid: 9, name: "September" },
+    { reportperiodid: 10, name: "October" },
+    { reportperiodid: 11, name: "November" },
+    { reportperiodid: 12, name: "December" },
+    { reportperiodid: 13, name: "Quarter 1" },
+    { reportperiodid: 14, name: "Quarter 2" },
+    { reportperiodid: 15, name: "Quarter 3" },
+    { reportperiodid: 16, name: "Quarter 4" },
+    { reportperiodid: 17, name: "Fiscal Year" }
+  ]
 };
 
 const foiRequests = (state = initialState, action) => {
@@ -429,6 +450,8 @@ const foiRequests = (state = initialState, action) => {
       return {...state, foiPDFStitchStatusForOIPackage: action.payload}
     case FOI_ACTION_CONSTANTS.FOI_EMAIL_TEMPLATES:
       return { ...state, foiEmailTemplates: action.payload };
+    case FOI_ACTION_CONSTANTS.FOI_PROACTIVE_DISCLOSURE_CATEGORYLIST:
+      return { ...state, foiProactiveDisclosureCategoryList: action.payload };
     default:
       return state;
   }

@@ -81,6 +81,15 @@ class FOIMinistryRequestOIPCSchema(Schema):
     receiveddate = fields.Str(data_key="receiveddate",allow_none=True)
     closeddate = fields.Str(data_key="closeddate",allow_none=True)
 
+# class FOIMinistryRequestPDSchema(Schema):
+#     class Meta:  # pylint: disable=too-few-public-methods
+#         """Exclude unknown fields in the deserialized output."""
+
+#         unknown = EXCLUDE
+#     proactivedisclosurecategoryid = fields.Int(data_key="proactivedisclosurecategoryid",allow_none=True)
+#     reportperiod = fields.Str(data_key="reportperiod",allow_none=True, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])  
+#     publicationdate = fields.Str(data_key="publicationdate",allow_none=True)
+
 class FOIRequestWrapperSchema(Schema):
 
     class Meta:  # pylint: disable=too-few-public-methods
@@ -164,6 +173,14 @@ class FOIRequestWrapperSchema(Schema):
     estimatedtaggedpagecount = fields.Int(data_key="estimatedtaggedpagecount",allow_none=True)
 
     axislanpagecount = fields.Int(data_key="axislanpagecount",allow_none=True)
+    #proactivedisclosuredetails = fields.Nested(FOIMinistryRequestPDSchema, many=True,allow_none=True)
+    # proactivedisclosurecategory = fields.Str(data_key="proactiveDisclosureCategory", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
+    # reportperiod = fields.Str(data_key="reportperiod",allow_none=True, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])  
+    # publicationdate = fields.Str(data_key="publicationdate",allow_none=True)
+    # category = fields.Str(data_key="category", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
+
+
+    
 
 class EditableFOIMinistryRequestWrapperSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
@@ -224,3 +241,58 @@ class FOIRequestMinistrySchema(Schema):
     ministrysignoffapproval = fields.Nested(CreateMinistrySignOffApprovalSchema, data_key="ministrysignoffapproval", allow_none=True)
     userrecordslockstatus = fields.Bool(data_key="userrecordslockstatus", allow_none=True)
     isconsultflag = fields.Bool(data_key="isconsultflag", missing=False)#missing is deprecated, use load_default for marshmallow >3.12
+
+
+class FOIPDRequestWrapperSchema(Schema):
+
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    foirawrequestid = fields.Int(data_key="id")
+    axisSyncDate = fields.Str(data_key="axisSyncDate",allow_none=True)  
+    axisRequestId = fields.Str(data_key="axisRequestId",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    axispagecount = fields.Int(data_key="axispagecount",allow_none=True)
+    description = fields.Str(data_key="description", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
+    requestType = fields.Str(data_key="requestType", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)]) 
+    assignedGroup = fields.Str(data_key="assignedGroup",allow_none=True, validate=[validate.Length(max=250, error=MAX_EXCEPTION_MESSAGE)])
+    assignedTo = fields.Str(data_key="assignedTo",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])  
+    fromDate = fields.Str(data_key="fromDate",allow_none=True)
+    toDate = fields.Str(data_key="toDate",allow_none=True)
+    #dueDate = fields.Str(data_key="dueDate", required=False,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
+    cfrDueDate = fields.Date(data_key="cfrDueDate", required=True,allow_none=True)
+    #originalDueDate = fields.Date(data_key="originalDueDate", required=False,allow_none=True)
+    startDate = fields.Str(data_key="requestProcessStart", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])  
+    assignedministrygroup = fields.Str(data_key="assignedministrygroup",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    assignedministryperson = fields.Str(data_key="assignedministryperson",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])        
+    assignedToFirstName = fields.Str(data_key="assignedToFirstName",allow_none=True)
+    assignedToMiddleName = fields.Str(data_key="assignedToMiddleName",allow_none=True)
+    assignedToLastName = fields.Str(data_key="assignedToLastName",allow_none=True)
+    assignedministrypersonFirstName = fields.Str(data_key="assignedministrypersonFirstName",allow_none=True)
+    assignedministrypersonMiddleName = fields.Str(data_key="assignedministrypersonMiddleName",allow_none=True)
+    assignedministrypersonLastName = fields.Str(data_key="assignedministrypersonLastName",allow_none=True)
+    reopen = fields.Bool(data_key="reopen",allow_none=True)
+    requeststatusid = fields.Int(data_key="requeststatusid",allow_none=True)
+    requeststatuslabel = fields.Str(data_key="requeststatuslabel",allow_none=False)
+    closedate = fields.Date(data_key="closedate", required=False,allow_none=True)
+    closereasonid = fields.Int(data_key="closereasonid",allow_none=True)
+    isiaorestricted =   fields.Bool(data_key="isiaorestricted")
+    isconsultflag = fields.Bool(data_key="isconsultflag", missing=False)#missing is deprecated, use load_default for marshmallow >3.12
+    axisapplicantid = fields.Int(data_key="axisApplicantID",required=False,allow_none=True)
+    isoipcreview =   fields.Bool(data_key="isoipcreview")
+    oistatusid = fields.Int(data_key="oistatusid",required=False,allow_none=True)
+    isphasedrelease =   fields.Bool(data_key="isphasedrelease")
+
+    selectedMinistries = fields.Nested(FOIMinistryRequestWrapperSchema, many=True)
+    documents = fields.Nested(FOIMinistryRequestDocumentSchema, many=True,allow_none=True)
+    idNumber = fields.Str(data_key="idNumber",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)]) 
+    isofflinepayment =   fields.Bool(data_key="isofflinepayment")
+    linkedRequests = fields.List(fields.Dict(data_key="linkedRequests", required=False))
+    userrecordslockstatus = fields.Bool(data_key="userrecordslockstatus", allow_none=True)
+    estimatedpagecount = fields.Int(data_key="estimatedpagecount",allow_none=True)
+    estimatedtaggedpagecount = fields.Int(data_key="estimatedtaggedpagecount",allow_none=True)
+    axislanpagecount = fields.Int(data_key="axislanpagecount",allow_none=True)
+    proactivedisclosurecategory = fields.Str(data_key="proactiveDisclosureCategory", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
+    reportperiod = fields.Str(data_key="reportPeriod",allow_none=True, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])  
+    publicationdate = fields.Str(data_key="publicationDate",allow_none=True)
+    proactivedisclosurecategory = fields.Str(data_key="proactiveDisclosureCategory", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])

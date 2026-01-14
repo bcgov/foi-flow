@@ -184,7 +184,7 @@ export const fetchFOIRawRequestDetails = (requestId, userGroups) => {
           let isagbcpsteam = false;
           if (!ministryCode && foiRequest.selectedMinistries[0].code.toLowerCase() == 'ag' && userGroups.includes('BCPS Team')) isagbcpsteam = true;
           dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ministryCode, isagbcpsteam));
-          dispatch(fetchFOIProcessingTeamList(foiRequest.requestType.toLowerCase()));
+          dispatch(fetchFOIProcessingTeamList(foiRequest.requestType.toLowerCase() == 'proactive disclosure'? 'general' : foiRequest.requestType.toLowerCase()));
           dispatch(setFOILoader(false));
         } else {
           dispatch(serviceActionError(res));

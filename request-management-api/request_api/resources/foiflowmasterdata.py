@@ -36,6 +36,7 @@ from request_api.services.subjectcodeservice import subjectcodeservice
 from request_api.services.oipcservice import oipcservice
 from request_api.services.openinfoservice import openinfoservice
 from request_api.services.commentservice import commentservice
+from request_api.services.proactivedisclosurecategoryservice import proactivedisclosurecategoryservice
 import json
 import request_api
 import requests
@@ -563,3 +564,25 @@ class FOIFlowOpenInformationPublicationStatuses(Resource):
             return jsondata , 200
         except BusinessException:
             return "Error happened while accessing OpenInformation publication statuses" , 500
+        
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiflow/proactivedisclosurecategories')
+class FOIFlowProactiveDisclosureCategories(Resource):
+    """Retrieves all active proactive disclosure categories.
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @request_api.cache.cached(
+        key_prefix="proactivedisclosurecategories",
+        unless=cache_filter,
+        response_filter=response_filter
+        )
+    def get():
+        try:
+            data = proactivedisclosurecategoryservice().getproactivedisclosurecategories()
+            jsondata = json.dumps(data)
+            return jsondata , 200
+        except BusinessException:
+            return "Error happened while accessing proactive disclosure categories" , 500

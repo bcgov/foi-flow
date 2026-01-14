@@ -47,7 +47,9 @@ class requestservicecreate:
         if foirequestid is not None:         
            openfoirequest.foirequestid = foirequestid
         openfoirequest.wfinstanceid = wfinstanceid if wfinstanceid is not None else None
-        openfoirequest.createdby = userid          
+        openfoirequest.createdby = userid
+        openfoirequest_dict = openfoirequest.__dict__
+        print("\n---------openfoirequest in saveRequest:",openfoirequest_dict)     
         return FOIRequest.saverequest(openfoirequest)
         
     
@@ -91,7 +93,8 @@ class requestservicecreate:
         foiministryrequestarr = []
         if foirequestschema.get("selectedMinistries") is not None:
             for ministry in foirequestschema.get("selectedMinistries"):
-                foiministryrequestarr.append(requestservicebuilder().createministry(foirequestschema, ministry, activeversion, userid, filenumber,ministryid))           
+                foiministryrequestarr.append(requestservicebuilder().createministry(foirequestschema, ministry, activeversion, userid, filenumber,ministryid))     
+        print("\n------foiministryrequestarr in __prepareministries:",foiministryrequestarr)           
         return foiministryrequestarr
 
     def _prearepersonalattributes(self, foirequestschema, userid):
@@ -213,3 +216,4 @@ class requestservicecreate:
 
     def __getkeyvalue(self, inputschema, property):
         return inputschema[property] if inputschema is not None and inputschema.get(property) is not None  else ''
+    

@@ -14,6 +14,7 @@ import {
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
 import { ConfirmationModal } from "../../customComponents";
+import ConfirmSaveModal from "../../customComponents/ConfirmSaveModal";
 import {
   addBusinessDays,
   formatDate,
@@ -116,6 +117,8 @@ const BottomButtonGroup = React.memo(
       setClosingReasonId(cReasonId);
     };
 
+    const [saveConfirmationModal, setSaveConfirmationModal]= useState(false);
+
     useEffect(() => {
       if (stateChanged) {
         requestState = saveRequestObject.currentState;
@@ -123,6 +126,7 @@ const BottomButtonGroup = React.memo(
     }, [stateChanged]);
 
     const saveRequest = async (setLoader = false) => {
+      //setSaveConfirmationModal(true);
       if (urlIndexCreateRequest > -1) {
         saveRequestObject.requeststatuslabel = StateEnum.intakeinprogress.label;
         setIsAddRequest(false);
@@ -471,6 +475,23 @@ const BottomButtonGroup = React.memo(
             attachmentsArray={attachmentsArray}
           />
         </ConditionalComponent>
+
+        {saveConfirmationModal &&
+          <ConfirmSaveModal
+          //   modalMessage={""}
+          //   modalDescription={""}
+          //   showModal={true}
+          // //  saveAssigneeDetails={}
+          //   assigneeVal={""}
+          //   assigneeName={""}
+          //   resetModal={false}
+            showModal={true}
+            selectedMinistries = {[]}
+            allMinistries = {[]}
+            onProceed={true}
+            />
+
+        }
 
         <div className="foi-bottom-button-group">
           {urlIndexCreateRequest < 0 &&

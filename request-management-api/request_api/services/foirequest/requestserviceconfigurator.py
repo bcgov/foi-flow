@@ -7,6 +7,7 @@ from request_api.models.ReceivedModes import ReceivedMode
 from request_api.models.ApplicantCategories import ApplicantCategory
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.SubjectCodes import SubjectCode
+from request_api.models.ProactiveDisclosureCategories import ProactiveDisclosureCategory
 from enum import Enum
 import datetime 
 import secrets
@@ -38,6 +39,11 @@ class requestserviceconfigurator:
         elif name == "subjectCode":
             subjectcode = SubjectCode().getsubjectcodebyname(key)
             return subjectcode["subjectcodeid"] if subjectcode is not None else None
+        elif name == "proactiveDisclosureCategory":
+            print("Key:",key)
+            pdcategory = ProactiveDisclosureCategory().getproactivedisclosurecategory(key)
+            print("pdcategory:",pdcategory)
+            return pdcategory["proactivedisclosurecategoryid"]
 
     def getpropertyvaluefromschema(self,requestschema,property):
         return requestschema.get(property) if property in requestschema  else None

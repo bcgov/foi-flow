@@ -55,6 +55,7 @@ const FOI_COMPONENT_CONSTANTS = {
 
     REQUEST_TYPE_GENERAL: "general",
     REQUEST_TYPE_PERSONAL: "personal",
+    REQUEST_TYPE_PROACTIVE_DISCLOSURE: "proactive disclosure",
     CURRENT_STATE: "currentState",
     XGOVE: "xgov",
     ID_NUMBER: "idNumber",    
@@ -79,7 +80,10 @@ const FOI_COMPONENT_CONSTANTS = {
     DIVISION_RECEIVED_DATE: "divisionReceivedDate",
 
     SUBJECT_CODE: "subjectCode",
-    LINKED_REQUESTS: "linkedRequests"
+    LINKED_REQUESTS: "linkedRequests",
+    PROACTIVE_DISCLOSURE_CATEGORY: "proactiveDisclosureCategory",
+    SELECTED_PROACTIVE_DISCLOSURE_CATEGORY: "selectedProactiveCategory",
+    REPORT_PERIOD: "reportPeriod",
   };
   
   export default FOI_COMPONENT_CONSTANTS;

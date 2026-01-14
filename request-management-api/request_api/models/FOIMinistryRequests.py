@@ -115,6 +115,9 @@ class FOIMinistryRequest(db.Model):
     oistatus_id = db.Column(db.Integer, ForeignKey('OpenInformationStatuses.oistatusid'), unique=False, nullable=True)
     isphasedrelease = db.Column(db.Boolean, unique=False, nullable=True,default=False)
 
+    proactivedisclosures = relationship('FOIProactiveDisclosureRequests', uselist=False, primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIProactiveDisclosureRequests.foiministryrequest_id, "
+                        "FOIMinistryRequest.version==FOIProactiveDisclosureRequests.foiministryrequestversion_id)")
+
     @classmethod
     def getrequest(cls,ministryrequestid):
         request_schema = FOIMinistryRequestSchema(many=False)
