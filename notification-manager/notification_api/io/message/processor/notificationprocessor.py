@@ -82,7 +82,7 @@ class notificationprocessor:
         )
 
     def __createcomment(self, notification):
-        rint("===========__createcomment : ",notification)
+        print("===========__createcomment : ",notification)
         comment = {"comment": self.__commentmessage(notification.createdby)}
         return commentservice().createcomment(
             "ministryrequest",
