@@ -394,7 +394,16 @@ export const checkValidationError = (
     requiredRequestDetailsValues.receivedMode
       .toLowerCase()
       .includes("select") ||
-    Object.values(requiredContactDetails).some((contactInfo) => contactInfo.length > 500) ||
+    requiredContactDetails.address.length > 120 ||
+    requiredContactDetails.city.length > 120 ||
+    requiredContactDetails.addressSecondary.length > 120 ||
+    requiredContactDetails.province.length > 120 ||
+    requiredContactDetails.country.length > 120 ||
+    requiredContactDetails.postal.length > 10 ||
+    requiredContactDetails.phonePrimary.length > 50 ||
+    requiredContactDetails.phoneSecondary.length > 50 ||
+    requiredContactDetails.workPhonePrimary.length > 50 ||
+    requiredContactDetails.workPhoneSecondary.length > 50 ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
     !requiredRequestDetailsValues.dueDate ||
