@@ -131,7 +131,7 @@ class FOIRequestWrapperSchema(Schema):
     city = fields.Str(data_key="city",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])    
     province = fields.Str(data_key="province",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])    
     postal = fields.Str(data_key="postal",allow_none=True, validate=[validate.Length(max=10, error=MAX_EXCEPTION_MESSAGE)])   
-    country = fields.Str(data_key="country",allow_none=True) 
+    country = fields.Str(data_key="country",allow_none=True,validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)]) 
     requeststatusid = fields.Int(data_key="requeststatusid",allow_none=True)
     requeststatuslabel = fields.Str(data_key="requeststatuslabel",allow_none=False)
     closedate = fields.Date(data_key="closedate", required=False,allow_none=True)
