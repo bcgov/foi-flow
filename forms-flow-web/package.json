@@ -124,6 +124,9 @@
     },
     "jsdom": {
       "form-data": "^3.0.4"
+    },
+    "axios": {
+      "form-data": "^4.0.4"
     }
   },
   "browserslist": [
