@@ -53,6 +53,57 @@ class requestserviceconfigurator:
         randomnum = secrets.randbits(32)
         return code + "-" + str(datetime.date.today().year) + "-" + tmp + str(randomnum)[:5]
     
+    def generatepdfilenumber(self, code, foirequestschema):
+        file_number = ""
+        pd_category =  foirequestschema["proactivedisclosurecategory"].lower()
+        reportperiod = foirequestschema["reportperiod"] if 'reportperiod' in foirequestschema else ""
+        if (foirequestschema.get("startDate") is not None):
+            startdate = foirequestschema.get("startDate")
+        elif (foirequestschema.get("requestProcessStart") is not None):
+            startdate = foirequestschema.get("requestProcessStart")
+        year= startdate[:4]
+        randomnum = secrets.randbits(32)
+        ending_id= str(randomnum)[:5]
+        match pd_category:
+            case "calendars":
+                file_number = "CAL-" + code + "-" + year + "-" + self._getpdrequestreportperiodabbr(reportperiod) + "-" +ending_id
+                print("\nfile_number=",file_number)
+                return file_number
+            case "briefing notes":
+                return reportperiod + "-" +ending_id
+            case _:
+                return file_number
+        return file_number
+    
+
+    def _getpdrequestreportperiodabbr(self,month_name: str) -> str:
+    #Converts full month name/ report period to 
+    # shorten uppercase abbreviation.
+        month_map = {
+            "january": "JAN",
+            "february": "FEB",
+            "march": "MAR",
+            "april": "APR",
+            "may": "MAY",
+            "june": "JUN",
+            "july": "JUL",
+            "august": "AUG",
+            "september": "SEP",
+            "october": "OCT",
+            "november": "NOV",
+            "december": "DEC",
+            "quarter 1": "Q1",
+            "quarter 2": "Q2",
+            "quarter 3": "Q3",
+            "quarter 4": "Q4",
+            "fiscal year": "FISCAL",
+        }
+        abbr = month_map.get(month_name.lower())
+        if abbr is None:
+            raise ValueError(f"Invalid month name: {month_name}")
+        return abbr
+
+    
     def contacttypemapping(self):
         return [{"name": ContactType.email.value, "key" : "email"},
             {"name": ContactType.homephone.value, "key" : "phonePrimary"},

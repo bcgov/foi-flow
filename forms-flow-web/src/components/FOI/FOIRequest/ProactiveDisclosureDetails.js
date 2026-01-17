@@ -10,9 +10,7 @@ import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { formatDate } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
-import {
-    fetchFOIProactiveDisclosureCategoryList,
-} from "../../../apiManager/services/FOI/foiMasterDataServices";
+import { fetchFOIProactiveDisclosureCategoryList } from "../../../apiManager/services/FOI/foiMasterDataServices";
 
 const useStyles = makeStyles({
   heading: {
@@ -51,8 +49,8 @@ const ProactiveDisclosureDetails = React.memo(
     );
 
     useEffect(() => {
-        dispatch(fetchFOIProactiveDisclosureCategoryList());
-    },[])
+      dispatch(fetchFOIProactiveDisclosureCategoryList());
+    }, []);
 
     // Validation helper
     const validateField = (request, fieldName, value) => {
@@ -106,7 +104,9 @@ const ProactiveDisclosureDetails = React.memo(
         FOI_COMPONENT_CONSTANTS.REPORT_PERIOD
       );
       //const startDate = !!requestDetails.requestProcessStart ? formatDate(request.requestProcessStart) : "";
-      const initialStartDate = requestDetails?.requestProcessStart ? formatDate(requestDetails.requestProcessStart) : validateField(requestDetails, "startDate");
+      const initialStartDate = requestDetails?.requestProcessStart
+        ? formatDate(requestDetails.requestProcessStart)
+        : validateField(requestDetails, "startDate");
       const initialCfrDueDate = validateField(requestDetails, "cfrDueDate");
       const initialPublicationDate = validateField(
         requestDetails,
@@ -121,7 +121,7 @@ const ProactiveDisclosureDetails = React.memo(
       setPublicationDate(initialPublicationDate);
 
       const disclosureDetailsObject = {
-        categoryType: initialCategoryType,
+        proactiveDisclosureCategory: initialCategoryType,
         reportPeriod: initialReportPeriod,
         requestStartDate: initialStartDate,
         cfrDueDate: initialCfrDueDate,
@@ -187,13 +187,9 @@ const ProactiveDisclosureDetails = React.memo(
         value,
         FOI_COMPONENT_CONSTANTS.REPORT_PERIOD
       );
-      createSaveRequestObject?.(
-        FOI_COMPONENT_CONSTANTS.REPORT_PERIOD,
-        value
-      );
+      createSaveRequestObject?.(FOI_COMPONENT_CONSTANTS.REPORT_PERIOD, value);
     };
 
-    
     const handleCFRDueDateChange = (e) => {
       const value = e.target.value;
       setCfrDueDate(value);
@@ -204,8 +200,8 @@ const ProactiveDisclosureDetails = React.memo(
     const handleStartDateChange = (e) => {
       const value = e.target.value;
       setStartDate(value);
-      handleProactiveDetailsValue?.(value, "startDate");
-      createSaveRequestObject?.("startDate", value);
+      handleProactiveDetailsValue?.(value, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE);
+      createSaveRequestObject?.(FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, value);
     };
 
     const handlePublicationDateChange = (e) => {

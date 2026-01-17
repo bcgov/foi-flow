@@ -73,6 +73,7 @@ import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
 import {isMinistryLogin} from "../../../../helper/FOI/helper";
 import OIPCDetails from "../OIPCDetails/Index";
 import { Fees } from "../../customComponents/Fees";
+import ProactiveDisclosureDetails from "./ProactiveDisclosureDetails";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -246,6 +247,13 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [saveMinistryRequestObject, setSaveMinistryRequestObject] =
     React.useState(requestDetails);
+
+  const [isProactiveDisclosure, setIsProactiveDisclosure] = useState(
+    requestDetails?.requestType ==
+      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE
+      ? true
+      : false
+  );
 
   const [divstages, setdivStages] = React.useState([]);
   const [originalDivisions, setOriginalDivisions] = React.useState([]);
@@ -840,6 +848,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           ministryAssigneeValue={ministryAssignedToValue}
                           isMinistry={isMinistry}
                         />
+                        {
+                        isProactiveDisclosure ?
+                        <>
                         <ApplicantDetails requestDetails={requestDetails} />
                         <ChildDetails requestDetails={requestDetails} />
                         <OnBehalfDetails requestDetails={requestDetails} />
@@ -860,6 +871,13 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           isMinistry={isMinistry}
                         />
                         )}
+                        </>:
+                        <>
+                          <ProactiveDisclosureDetails requestDetails={requestDetails} />
+                          <RequestDescription requestDetails={requestDetails} />
+                          {divisionsBox}
+                        </>
+                        }
                         <BottomButtonGroup
                           requestState={requestState}
                           stateChanged={stateChanged}

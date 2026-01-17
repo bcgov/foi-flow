@@ -306,16 +306,22 @@ export const LightTooltip = styled(({ className, ...props }) => (
 }));
 
 export const cellTooltipRender = (params) => {
-  var description = params.row.description;
+  let description = params.row.description;
   if (params.row.fromdate && params.row.todate) {
     description += "\n(" + (new Date(params.row.fromdate)).toLocaleDateString() + " to " + (new Date(params.row.todate)).toLocaleDateString() + ")"
   }
+  let idNumber = "";
+  if (params.row.requestType == "proactive disclosure")
+    idNumber = params.row.idNumber
+  else 
+    idNumber = params.row.axisRequestId
+
   return <LightTooltip placement="bottom-start" title={
     <div style={{whiteSpace: "pre-line"}}>
       {description}
     </div>
   }>
-    <span className="table-cell-truncate">{params.row.axisRequestId}</span>
+    <span className="table-cell-truncate">{idNumber}</span>
   </LightTooltip>
 };
 

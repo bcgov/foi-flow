@@ -1,9 +1,16 @@
-import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
+import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
-import { formatDate, isProcessingTeam, isFlexTeam } from "../../../helper/FOI/helper";
-import { extensionStatusId, KCProcessingTeams } from "../../../constants/FOI/enum";
-import MANDATORY_FOI_REQUEST_FIELDS from '../../../constants/FOI/mandatoryFOIRequestFields';
-import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
+import {
+  formatDate,
+  isProcessingTeam,
+  isFlexTeam,
+} from "../../../helper/FOI/helper";
+import {
+  extensionStatusId,
+  KCProcessingTeams,
+} from "../../../constants/FOI/enum";
+import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
+import AXIS_SYNC_DISPLAY_FIELDS from "../../../constants/FOI/axisSyncDisplayFields";
 
 export const getTabBottomText = ({
   _daysRemaining,
@@ -15,7 +22,7 @@ export const getTabBottomText = ({
   const _cfrDaysRemainingText = getcfrDaysRemainingText(_cfrDaysRemaining);
   const _extensionsCountText = getExtensionsCountText(requestExtensions);
 
-  let bottomTextArray = []
+  let bottomTextArray = [];
 
   const statusesToNotAppearIn = [
     StateEnum.unopened.name,
@@ -46,7 +53,7 @@ export const getTabBottomText = ({
     }
   }
 
-  return bottomTextArray.join('|');
+  return bottomTextArray.join("|");
 };
 
 const getDaysRemainingText = (_daysRemaining) => {
@@ -55,12 +62,16 @@ const getDaysRemainingText = (_daysRemaining) => {
     : `${Math.abs(_daysRemaining)} Days Overdue`;
 };
 
-const getcfrDaysRemainingText = (_cfrDaysRemaining) => {  
-     return`CFR Due in ${_cfrDaysRemaining} Days`    
+const getcfrDaysRemainingText = (_cfrDaysRemaining) => {
+  return `CFR Due in ${_cfrDaysRemaining} Days`;
 };
 
 export const isBeforeOpen = (requestDetails) => {
-  return !requestDetails.stateTransition?.filter(s => s.status === StateEnum.open.name).length > 0;
+  return (
+    !requestDetails.stateTransition?.filter(
+      (s) => s.status === StateEnum.open.name
+    ).length > 0
+  );
 };
 
 export const getExtensionsCountText = (extensions) => {
@@ -135,17 +146,17 @@ export const getTabBG = (_tabStatus, _requestState) => {
     case StateEnum.peerreview.name:
       return "foitabheadercollection foitabheaderPeerreviewBG";
     case StateEnum.tagging.name:
-        return "foitabheadercollection foitabheaderTaggingBG"; 
+      return "foitabheadercollection foitabheaderTaggingBG";
     case StateEnum.readytoscan.name:
-        return "foitabheadercollection foitabheaderReadytoScanBG";
+      return "foitabheadercollection foitabheaderReadytoScanBG";
     case StateEnum.section5pending.name:
-      return "foitabheadercollection foitabheaderSection5Pending";            
+      return "foitabheadercollection foitabheaderSection5Pending";
     case StateEnum.appfeeowing.name:
-        return "foitabheadercollection foitabheaderAppFeeOwingBG";
+      return "foitabheadercollection foitabheaderAppFeeOwingBG";
     case StateEnum.recordsreadyforreview.name:
-        return "foitabheadercollection foitabheaderRecordsReadyForReviewBG";
+      return "foitabheadercollection foitabheaderRecordsReadyForReviewBG";
     case StateEnum.onholdother.name:
-        return "foitabheadercollection foitabheaderOnholdOtherBG";
+      return "foitabheadercollection foitabheaderOnholdOtherBG";
     case StateEnum.recordsintransit.name:
       return "foitabheadercollection foitabheaderRecordsInTransitBG";
     default:
@@ -155,7 +166,9 @@ export const getTabBG = (_tabStatus, _requestState) => {
 
 export const getOITabBG = (OIRequestStatusId, OIStatuses) => {
   if (OIStatuses) {
-    var OIStatusName = OIStatuses.find(s => s.oistatusid === OIRequestStatusId)?.name
+    var OIStatusName = OIStatuses.find(
+      (s) => s.oistatusid === OIRequestStatusId
+    )?.name;
     switch (OIStatusName) {
       case "First Review":
         return "foitabheadercollection foitabheaderFirstReviewBG";
@@ -173,7 +186,6 @@ export const getOITabBG = (OIRequestStatusId, OIStatuses) => {
         return "foitabheadercollection foitabheaderDoNotPublishBG";
       case "Exemption Request":
         return "foitabheadercollection foitabheaderExemptionBG";
-      
 
       default:
         return "foitabheadercollection foitabheaderdefaultBG";
@@ -222,31 +234,34 @@ export const createAssigneeDetails = (value, value2) => {
     assignedTo: "",
     assignedToFirstName: "",
     assignedToLastName: "",
-    assignedToName: ""
-  }
+    assignedToName: "",
+  };
   const assignedTo = value.split("|");
-      if (
-        FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(
-          (groupName) =>
-            groupName === assignedTo[0] && groupName === assignedTo[1]
-        ) || KCProcessingTeams.find((groupName) =>
-        groupName === assignedTo[0] && groupName === assignedTo[1])
-      ) {
-        assigneeObject.assignedGroup = assignedTo[0];
-        assigneeObject.assignedTo = "";
-      } else if (assignedTo.length > 3) {
-        assigneeObject.assignedGroup = assignedTo[0];
-        assigneeObject.assignedTo = assignedTo[1];
-        assigneeObject.assignedToFirstName = assignedTo[2];
-        assigneeObject.assignedToLastName = assignedTo[3];
-      } else {
-        assigneeObject.assignedGroup = "Unassigned";
-        assigneeObject.assignedTo = assignedTo[0];
-      }
-        //assigneeObject.assignedToName = value2;
-        assigneeObject.assignedToName = value2 ? value2 : `${assigneeObject.assignedToFirstName}, ${assigneeObject.assignedToFirstName}`;
-      return assigneeObject;
-}
+  if (
+    FOI_COMPONENT_CONSTANTS.ASSIGNEE_GROUPS.find(
+      (groupName) => groupName === assignedTo[0] && groupName === assignedTo[1]
+    ) ||
+    KCProcessingTeams.find(
+      (groupName) => groupName === assignedTo[0] && groupName === assignedTo[1]
+    )
+  ) {
+    assigneeObject.assignedGroup = assignedTo[0];
+    assigneeObject.assignedTo = "";
+  } else if (assignedTo.length > 3) {
+    assigneeObject.assignedGroup = assignedTo[0];
+    assigneeObject.assignedTo = assignedTo[1];
+    assigneeObject.assignedToFirstName = assignedTo[2];
+    assigneeObject.assignedToLastName = assignedTo[3];
+  } else {
+    assigneeObject.assignedGroup = "Unassigned";
+    assigneeObject.assignedTo = assignedTo[0];
+  }
+  //assigneeObject.assignedToName = value2;
+  assigneeObject.assignedToName = value2
+    ? value2
+    : `${assigneeObject.assignedToFirstName}, ${assigneeObject.assignedToFirstName}`;
+  return assigneeObject;
+};
 
 export const createRequestDetailsObjectFunc = (
   requestObject,
@@ -257,22 +272,28 @@ export const createRequestDetailsObjectFunc = (
   value2
 ) => {
   requestObject.id = requestId;
-  if(requiredRequestDetailsValues.requestStartDate)
+  if (requiredRequestDetailsValues.requestStartDate)
     requestObject.requestProcessStart =
-    requiredRequestDetailsValues.requestStartDate;
+      requiredRequestDetailsValues.requestStartDate;
   requestObject.dueDate = requiredRequestDetailsValues.dueDate;
   requestObject.receivedMode = requiredRequestDetailsValues.receivedMode;
   requestObject.deliveryMode = requiredRequestDetailsValues.deliveryMode;
   switch (name) {
     case FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES:
-      requestObject.receivedDate = value.receivedDate?formatDate(value.receivedDate, "yyyy MMM, dd"): "";
+      requestObject.receivedDate = value.receivedDate
+        ? formatDate(value.receivedDate, "yyyy MMM, dd")
+        : "";
       requestObject.receivedDateUF = value.receivedDate
         ? new Date(value.receivedDate)?.toISOString()
         : "";
       requestObject.requestProcessStart = value.requestStartDate;
       requestObject.dueDate = value.dueDate;
       requestObject.receivedMode = value.receivedMode;
-      requestObject.deliveryMode = value.deliveryMode?.toLowerCase()?.includes("select")?"":value.deliveryMode;
+      requestObject.deliveryMode = value.deliveryMode
+        ?.toLowerCase()
+        ?.includes("select")
+        ? ""
+        : value.deliveryMode;
       break;
     case FOI_COMPONENT_CONSTANTS.ASSIGNED_TO:
       const assigneeDetails = createAssigneeDetails(value, value2);
@@ -280,10 +301,10 @@ export const createRequestDetailsObjectFunc = (
       requestObject.assignedTo = assigneeDetails.assignedTo;
       requestObject.assignedToFirstName = assigneeDetails.assignedToFirstName;
       requestObject.assignedToLastName = assigneeDetails.assignedToLastName;
-      requestObject.assignedToName = assigneeDetails.assignedToName
+      requestObject.assignedToName = assigneeDetails.assignedToName;
       break;
     case FOI_COMPONENT_CONSTANTS.RECEIVED_DATE:
-      if(!!value){
+      if (!!value) {
         requestObject.receivedDate = formatDate(value, "yyyy MMM, dd");
         const receivedDateUTC = new Date(value)?.toISOString();
         requestObject.receivedDateUF = receivedDateUTC;
@@ -307,7 +328,8 @@ export const createRequestDetailsObjectFunc = (
       requestObject.selectedMinistries = filteredData;
       break;
     case FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS:
-      requestObject.linkedRequests = typeof value == 'string' ? JSON.parse(value) :value;
+      requestObject.linkedRequests =
+        typeof value == "string" ? JSON.parse(value) : value;
       break;
     case FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED:
       requestObject.identityVerified = value;
@@ -367,32 +389,37 @@ export const checkValidationError = (
   isProactiveDisclosure,
   requiredProactiveDetailsValues
 ) => {
-
-   if (isProactiveDisclosure) {
+  if (isProactiveDisclosure) {
     return (
-      requiredProactiveDetailsValues.categoryType
+      requiredProactiveDetailsValues.proactiveDisclosureCategory
         ?.toLowerCase()
         ?.includes("select") ||
       !requiredProactiveDetailsValues.requestStartDate ||
       !requiredProactiveDetailsValues.cfrDueDate ||
-      !requiredProactiveDetailsValues.publicationDate||
-      requiredRequestDescriptionValues.description === ""||
-      assignedToValue.toLowerCase().includes("unassigned")
-    //   ||
-    // (!requiredRequestDescriptionValues.isProgramAreaSelected 
-    //   && ([StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(currentrequestStatus?.toLowerCase()) || isAddRequest))
+      !requiredProactiveDetailsValues.publicationDate ||
+      requiredRequestDescriptionValues.description === "" ||
+      assignedToValue.toLowerCase().includes("unassigned") ||
+      (!requiredRequestDescriptionValues.isProgramAreaSelected &&
+        ([
+          StateEnum.unopened.name.toLowerCase(),
+          StateEnum.intakeinprogress.name.toLowerCase(),
+        ].includes(currentrequestStatus?.toLowerCase()) ||
+          isAddRequest))
     );
   }
   return (
-    (!isconsultflag && (
-      requiredApplicantDetails.firstName === "" ||
-      requiredApplicantDetails.lastName === ""
-    )) ||
+    (!isconsultflag &&
+      (requiredApplicantDetails.firstName === "" ||
+        requiredApplicantDetails.lastName === "")) ||
     requiredApplicantDetails.category.toLowerCase().includes("select") ||
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
-    (!requiredRequestDescriptionValues.isProgramAreaSelected 
-      && ([StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(currentrequestStatus?.toLowerCase()) || isAddRequest)) ||
+    (!requiredRequestDescriptionValues.isProgramAreaSelected &&
+      ([
+        StateEnum.unopened.name.toLowerCase(),
+        StateEnum.intakeinprogress.name.toLowerCase(),
+      ].includes(currentrequestStatus?.toLowerCase()) ||
+        isAddRequest)) ||
     (requiredRequestDetailsValues.requestType.toLowerCase() ===
       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
       !requiredRequestDescriptionValues.ispiiredacted) ||
@@ -404,16 +431,28 @@ export const checkValidationError = (
       .includes("select") ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
-    !requiredAxisDetails.axisRequestId || 
-    (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
-      if (oipc.inquiryattributes?.inquirydate) {
-        return oipc.inquiryattributes.orderno === ""; 
-      }
-      if (oipc.inquiryattributes?.orderno) {
-        return oipc.inquiryattributes?.inquirydate === null || oipc.inquiryattributes?.inquirydate === ""; 
-      }
-      return oipc.oipcno === "" || oipc.receiveddate === null || oipc.receiveddate === "" || oipc.reviewtypeid === null || oipc.reasonid === null || oipc.statusid === null;
-    }))
+    !requiredAxisDetails.axisRequestId ||
+    (oipcData?.length > 0 &&
+      isOipcReview &&
+      oipcData?.some((oipc) => {
+        if (oipc.inquiryattributes?.inquirydate) {
+          return oipc.inquiryattributes.orderno === "";
+        }
+        if (oipc.inquiryattributes?.orderno) {
+          return (
+            oipc.inquiryattributes?.inquirydate === null ||
+            oipc.inquiryattributes?.inquirydate === ""
+          );
+        }
+        return (
+          oipc.oipcno === "" ||
+          oipc.receiveddate === null ||
+          oipc.receiveddate === "" ||
+          oipc.reviewtypeid === null ||
+          oipc.reasonid === null ||
+          oipc.statusid === null
+        );
+      }))
   );
 };
 
@@ -452,67 +491,98 @@ export const handleBeforeUnload = (e) => {
   alertUser(e);
 };
 
-export  const isAxisSyncDisplayField = (field) => {
-  return Object.entries(AXIS_SYNC_DISPLAY_FIELDS).find(([key]) => key === field)?.[1];
+export const isAxisSyncDisplayField = (field) => {
+  return Object.entries(AXIS_SYNC_DISPLAY_FIELDS).find(
+    ([key]) => key === field
+  )?.[1];
 };
 
 export const isMandatoryField = (field) => {
-  return  Object.values(MANDATORY_FOI_REQUEST_FIELDS).find((element) =>element === field);
+  return Object.values(MANDATORY_FOI_REQUEST_FIELDS).find(
+    (element) => element === field
+  );
 };
 
 export const closeApplicantDetails = (user, requestType) => {
-  const userGroups = user?.groups?.map(group => group.slice(1));
-  return !!(isProcessingTeam(userGroups) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL);
-}
+  const userGroups = user?.groups?.map((group) => group.slice(1));
+  return !!(
+    isProcessingTeam(userGroups) &&
+    requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL
+  );
+};
 
 export const closeChildDetails = (user, requestType) => {
-  const userGroups = user?.groups?.map(group => group.slice(1));
-  return !!(isProcessingTeam(userGroups) && requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL);
-}
+  const userGroups = user?.groups?.map((group) => group.slice(1));
+  return !!(
+    isProcessingTeam(userGroups) &&
+    requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
+  );
+};
 
-export const closeContactInfo = (user,requestDetails) => {
-  const userGroups = user?.groups?.map(group => group.slice(1));
-  return !!(Object.entries(requestDetails)?.length !== 0 && (isProcessingTeam(userGroups) || isFlexTeam(userGroups)));
-}
+export const closeContactInfo = (user, requestDetails) => {
+  const userGroups = user?.groups?.map((group) => group.slice(1));
+  return !!(
+    Object.entries(requestDetails)?.length !== 0 &&
+    (isProcessingTeam(userGroups) || isFlexTeam(userGroups))
+  );
+};
 
 export const isValidMinistryCode = (selectedMinistry, ministriesList) => {
-  return ministriesList.some(ministry => ministry.bcgovcode === selectedMinistry)
-}
+  return ministriesList.some(
+    (ministry) => ministry.bcgovcode === selectedMinistry
+  );
+};
 
 export const countOfMinistrySelected = (selectedMinistryList) => {
-  return selectedMinistryList?.reduce(function(n, ministry) {
-    return n + (ministry.isChecked);
+  return selectedMinistryList?.reduce(function (n, ministry) {
+    return n + ministry.isChecked;
   }, 0);
-}
+};
 
-export const persistRequestFieldsNotInAxis = (newRequestDetails, existingRequestDetails) => {
+export const persistRequestFieldsNotInAxis = (
+  newRequestDetails,
+  existingRequestDetails
+) => {
   newRequestDetails.assignedGroup = existingRequestDetails.assignedGroup;
-  newRequestDetails.assignedTo= existingRequestDetails.assignedTo;
-  newRequestDetails.assignedToFirstName= existingRequestDetails.assignedToFirstName;
-  newRequestDetails.assignedToLastName= existingRequestDetails.assignedToLastName;
-  newRequestDetails.assignedToName= existingRequestDetails.assignedToName;
-  let foiReqAdditionalPersonalInfo = existingRequestDetails.additionalPersonalInfo;
+  newRequestDetails.assignedTo = existingRequestDetails.assignedTo;
+  newRequestDetails.assignedToFirstName =
+    existingRequestDetails.assignedToFirstName;
+  newRequestDetails.assignedToLastName =
+    existingRequestDetails.assignedToLastName;
+  newRequestDetails.assignedToName = existingRequestDetails.assignedToName;
+  let foiReqAdditionalPersonalInfo =
+    existingRequestDetails.additionalPersonalInfo;
   let axisAdditionalPersonalInfo = newRequestDetails.additionalPersonalInfo;
-  if(newRequestDetails.requestType === 'personal'){
-    for(let key of Object.keys(existingRequestDetails)){
-      if((key == 'correctionalServiceNumber' || key == 'publicServiceEmployeeNumber' ) && !isAxisSyncDisplayField(key))
+  if (newRequestDetails.requestType === "personal") {
+    for (let key of Object.keys(existingRequestDetails)) {
+      if (
+        (key == "correctionalServiceNumber" ||
+          key == "publicServiceEmployeeNumber") &&
+        !isAxisSyncDisplayField(key)
+      )
         newRequestDetails[key] = existingRequestDetails[key];
     }
-    for(let key of Object.keys(foiReqAdditionalPersonalInfo)){
-      if(!isAxisSyncDisplayField(key)){
+    for (let key of Object.keys(foiReqAdditionalPersonalInfo)) {
+      if (!isAxisSyncDisplayField(key)) {
         axisAdditionalPersonalInfo[key] = foiReqAdditionalPersonalInfo[key];
       }
     }
   }
   return newRequestDetails;
-}
+};
 
 export const getUniqueIdentifier = (obj) => {
-  return (obj.extensionstatusid+formatDate(obj.extendedduedate, "MMM dd yyyy")+obj.extensionreasonid).replace(/\s+/g, '');
-}
+  return (
+    obj.extensionstatusid +
+    formatDate(obj.extendedduedate, "MMM dd yyyy") +
+    obj.extensionreasonid
+  ).replace(/\s+/g, "");
+};
 
 export const isReadyForPublishing = (openinfo, additionalfiles) => {
   const responseLetterRegex = /Response[_\-\s]*Letter/i;
-  return !(openinfo?.copyrightsevered === null || !additionalfiles?.some(f => responseLetterRegex.test(f.filename)))
-}
-
+  return !(
+    openinfo?.copyrightsevered === null ||
+    !additionalfiles?.some((f) => responseLetterRegex.test(f.filename))
+  );
+};

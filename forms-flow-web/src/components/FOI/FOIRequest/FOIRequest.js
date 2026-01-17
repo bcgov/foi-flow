@@ -858,7 +858,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const requiredProactiveDetailsInitialValues = {
       proactiveDisclosureCategory: "",
       reportPeriod: "",
-      startDate: "",
+      requestStartDate: "",
       cfrDueDate: "",
       publicationDate: ""
   }

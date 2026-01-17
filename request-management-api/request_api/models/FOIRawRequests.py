@@ -499,27 +499,27 @@ class FOIRawRequest(db.Model):
                             (FOIRawRequest.status == StateName.unopened.value,
                              FOIRawRequest.requestrawdata['descriptionTimeframe']['fromDate'].astext),
                            ],
-                           else_ = FOIRawRequest.requestrawdata['fromDate'].astext).label('recordsearchfromdate')
+                           else_ = func.nullif(FOIRawRequest.requestrawdata['fromDate'].astext, '')).label('recordsearchfromdate')
         recordsearchtodate = case([
                             (FOIRawRequest.status == StateName.unopened.value,
                              FOIRawRequest.requestrawdata['descriptionTimeframe']['toDate'].astext),
                            ],
-                           else_ = FOIRawRequest.requestrawdata['toDate'].astext).label('recordsearchtodate')
+                           else_ = func.nullif(FOIRawRequest.requestrawdata['toDate'].astext, '')).label('recordsearchtodate')
         duedate = case([
                             (FOIRawRequest.status == StateName.unopened.value,
                              literal(None)),
                            ],
-                           else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
+                           else_ = func.nullif(FOIRawRequest.requestrawdata['dueDate'].astext, '')).label('duedate')
         receiveddate = case([
                             (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['receivedDate'].is_(None)),
                              func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD')),
                            ],
-                           else_ = FOIRawRequest.requestrawdata['receivedDate'].astext).label('receivedDate')
+                           else_ = func.nullif(FOIRawRequest.requestrawdata['receivedDate'].astext, '')).label('receivedDate')
         receiveddateuf = case([
                             (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['receivedDateUF'].is_(None)),
                              func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD HH:MM:SS')),
                            ],
-                           else_ = FOIRawRequest.requestrawdata['receivedDateUF'].astext).label('receivedDateUF')
+                           else_ = func.nullif(FOIRawRequest.requestrawdata['receivedDateUF'].astext, '')).label('receivedDateUF')
 
         assignedtoformatted = case([
                             (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
@@ -549,7 +549,7 @@ class FOIRawRequest(db.Model):
                             (FOIRawRequest.assignedto == None, # Unassigned requests first
                              literal(None)),
                            ],
-                           else_ = cast(FOIRawRequest.requestrawdata['receivedDateUF'].astext, TIMESTAMP)).label('intakeSorting')
+                           else_ = cast(func.nullif(FOIRawRequest.requestrawdata['receivedDateUF'].astext, ''),TIMESTAMP)).label('intakeSorting')
 
         isiaorestricted = case([
                             (FOIRawRequest.isiaorestricted.is_(None),
@@ -732,7 +732,7 @@ class FOIRawRequest(db.Model):
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
         subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-
+        print("\n-------subquery_ministry_queue:",subquery_ministry_queue)
         #sorting
         if is_oi_team:
             sortingcondition = FOIOpenInformationRequests.getsorting(sortingitems, sortingorders)
@@ -746,9 +746,24 @@ class FOIRawRequest(db.Model):
                 return subquery_oirequest_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
             else:
                 subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups)
+                print("\n------IAO query:", subquery_rawrequest_queue)
                 query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
                 return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
+                # union_subq = subquery_rawrequest_queue.union(
+                #     subquery_ministry_queue
+                # ).subquery()
+                # sortingcondition = FOIRawRequest.getsorting(union_subq, sortingitems, sortingorders)
+                # query = db.session.query(union_subq)
+                # print("\n------IAO query:",query)
+                # return query.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:
+            # ministry_subq = subquery_ministry_queue.subquery()
+            # sortingcondition = FOIRawRequest.getsorting(
+            #     ministry_subq, sortingitems, sortingorders
+            # )
+            # query1 = db.session.query(ministry_subq)
+            # print("\n------Ministry query:",query1)
+            # return query1.order_by(*sortingcondition).paginate(page=page, per_page=size)
             return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
 
     @classmethod
@@ -831,6 +846,36 @@ class FOIRawRequest(db.Model):
         return sortingcondition
 
 
+
+    @classmethod
+    def getsorting1(cls, subq, sortingitems, sortingorders):
+        sortingcondition = []
+
+        if (
+            sortingitems and sortingorders and
+            len(sortingitems) == len(sortingorders)
+        ):
+            for field, order in zip(sortingitems, sortingorders):
+                # validate field name AND ensure it exists on subquery
+                if cls.validatefield(field) and hasattr(subq.c, field):
+                    col = getattr(subq.c, field)
+
+                    if order == 'desc':
+                        sortingcondition.append(col.desc().nullslast())
+                    else:
+                        sortingcondition.append(col.asc().nullsfirst())
+
+        # default sorting
+        if not sortingcondition and hasattr(subq.c, 'currentState'):
+            sortingcondition.append(subq.c.currentState.asc())
+
+        # always stabilize pagination
+        if hasattr(subq.c, 'created_at'):
+            sortingcondition.append(subq.c.created_at.asc())
+
+        return sortingcondition
+
+    
     @classmethod
     def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
         basequery = FOIRawRequest.getbasequery(None, userid, isiaorestrictedfilemanager)

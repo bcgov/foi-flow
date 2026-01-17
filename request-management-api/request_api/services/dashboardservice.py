@@ -31,6 +31,7 @@ class dashboardservice:
     """
 
     def __preparefoirequestinfo(self, request, receiveddate, receiveddateuf, idnumberprefix = ''):
+        print("\nrequest in __preparefoirequestinfo-dashboard",request)
         idnumber = self.__getidnumber(idnumberprefix, request.axisRequestId, request.idNumber)
         baserequestinfo = self.__preparebaserequestinfo(
             request.id, 
@@ -67,6 +68,9 @@ class dashboardservice:
         baserequestinfo.update({'isoipcreview': isoipcreview})
         baserequestinfo.update({'isphasedrelease': request.isphasedrelease if request.isphasedrelease == True else False})
         return baserequestinfo
+    
+    
+
         
     def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, axisrequestid, version, description, fromdate, todate):
         return {'id': id,
@@ -101,7 +105,7 @@ class dashboardservice:
                     _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
                 else:
                     _receiveddate = parser.parse(request.receivedDateUF)
-
+                print("\nrequest:",request)
                 if(request.ministryrequestid == None):                
                     unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
                     unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})

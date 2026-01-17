@@ -32,7 +32,7 @@ class requestservicegetter:
         requestapplicants = FOIRequestApplicantMapping.getrequestapplicantinfos(foirequestid,request['version'])
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
         iaorestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(ministryrequestid=foiministryrequestid,type='iao')
-        requestproactive = FOIProactiveDisclosureRequests.getproactiverequestbyministryrequestid(foiministryrequestid, requestministry['version'])
+        requestproactive = FOIProactiveDisclosureRequests.getcurrentfoiproactiverequest(foiministryrequestid)
         print("\nrequestproactive:",requestproactive)
         baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions, requestproactive)
         print("baserequestinfo:",baserequestinfo)
@@ -88,9 +88,11 @@ class requestservicegetter:
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
         ministryrestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(foiministryrequestid,type='ministry')
+        requestproactive = FOIProactiveDisclosureRequests.getcurrentfoiproactiverequest(foiministryrequestid)
+        print("\n----requestproactive in getrequestdetailsforministry:",requestproactive)
         baserequestinfo = {}
         if requestministry["assignedministrygroup"] in authmembershipgroups:
-            baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
+            baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions, requestproactive)
 
         if request['requesttype'] == 'personal':
             requestapplicants = FOIRequestApplicantMapping.getrequestapplicantinfos(foirequestid,request['version'])
@@ -223,11 +225,10 @@ class requestservicegetter:
             'userrecordslockstatus': requestministry['userrecordslockstatus'],
             'isconsultflag': requestministry['isconsultflag'],
             'publicationDate': requestproactive['publicationdate'] if requestproactive != None and 'publicationdate' in requestproactive else None,
-            'reportperiod': requestproactive['reportperiod'] if requestproactive != None and 'reportperiod' in requestproactive else '',
+            'reportPeriod': requestproactive['reportperiod'] if requestproactive != None and 'reportperiod' in requestproactive else '',
             #'proactivedisclosurecategoryid': requestproactive['proactivedisclosurecategoryid'] if requestproactive != None and 'proactivedisclosurecategoryid' in requestproactive else ''
             'proactiveDisclosureCategory':requestproactive['proactivedisclosurecategory.name'] if requestproactive != None and 'proactivedisclosurecategory.name' in requestproactive else "",
-            'proactivedisclosurecategoryid':requestproactive['proactivedisclosurecategory.proactivedisclosurecategoryid'] if requestproactive != None and 'proactivedisclosurecategory' in requestproactive or 
-                            'proactivedisclosurecategory.proactivedisclosurecategoryid' in requestproactive else None,
+            'proactivedisclosurecategoryid':requestproactive['proactivedisclosurecategory.proactivedisclosurecategoryid'] if requestproactive != None and 'proactivedisclosurecategory.proactivedisclosurecategoryid' in requestproactive else None,
         }
         if requestministry['cfrduedate'] is not None:
             baserequestinfo.update({'cfrDueDate':parse(requestministry['cfrduedate']).strftime(self.__genericdateformat())})

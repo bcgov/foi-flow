@@ -32,7 +32,7 @@ const RequestDescription = React.memo((requestDetails) => {
             copyRequest.description === request.description && copyRequest.fromDate === request.fromDate && copyRequest.toDate === request.toDate
         ))
     )
-
+    let isProactiveDisclosure = _requestDetails?.requestType == "proactive disclosure";
     const [openModal, setOpenModal] = React.useState(false);
     const handleDescriptionHistoryClick = () => {
         setOpenModal(true);
@@ -49,7 +49,8 @@ const RequestDescription = React.memo((requestDetails) => {
         />
         <div className="row foi-details-row">
           <div className="col-lg-8 foi-details-col">
-            <label className="foi-details-label">REQUEST DESCRIPTION</label>
+            <label className="foi-details-label">{isProactiveDisclosure ? 
+              "PROACTIVE DISCLOSURE DESCRIPTION":"REQUEST DESCRIPTION"}</label>
           </div>
           <div className="col-lg-4 foi-details-col">
             <div className="foi-request-description-history">
@@ -61,7 +62,7 @@ const RequestDescription = React.memo((requestDetails) => {
                 disabled={filteredList.length <= 1}
                 onClick={handleDescriptionHistoryClick}
               >
-                Description History
+                {isProactiveDisclosure ? "Description History" : "Ministerial Directive"}
               </button>
             </div>
           </div>

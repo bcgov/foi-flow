@@ -36,11 +36,12 @@ class FOIProactiveDisclosureRequests(db.Model):
         query = db.session.query(FOIProactiveDisclosureRequests).filter_by(foiministryrequest_id=ministryrequestid , foiministryrequestversion_id = ministryversion).order_by(FOIProactiveDisclosureRequests.foiministryrequestversion_id.desc()).first()
         return request_schema.dump(query) 
 
-    def getcurrentfoiproactiverequest(cls, foiminstryrequestid)->DefaultMethodResult:
+    @classmethod
+    def getcurrentfoiproactiverequest(cls, foiministryrequestid)->DefaultMethodResult:
         try:
-            foiopeninforequest_schema = FOIProactiveDisclosureRequestSchema()
-            query = db.session.query(FOIProactiveDisclosureRequests).filter_by(foiministryrequest_id=foiminstryrequestid).order_by(FOIProactiveDisclosureRequests.version.desc()).first()
-            return foiopeninforequest_schema.dump(query)
+            request_schema = FOIProactiveDisclosureRequestSchema()
+            query = db.session.query(FOIProactiveDisclosureRequests).filter_by(foiministryrequest_id=foiministryrequestid).order_by(FOIProactiveDisclosureRequests.foiministryrequestversion_id.desc()).first()
+            return request_schema.dump(query)
         except Exception as exception:
             logging.error(f"Error: {exception}")
                 
@@ -71,7 +72,7 @@ class FOIProactiveDisclosureRequests(db.Model):
 class FOIProactiveDisclosureRequestSchema(ma.Schema):
     class Meta:
         fields = (
-            'proactivedisclosureid', 'foiministryrequest_id', 'foiministryrequestversion_id', 'proactivedisclosurecategoryid', 
+            'proactivedisclosureid', 'foiministryrequest_id', 'foiministryrequestversion_id',
             'proactivedisclosurecategory.proactivedisclosurecategoryid','proactivedisclosurecategory.name','reportperiod',
             'publicationdate', 'created_at', 'updated_at', 'createdby', 'updatedby',
         )

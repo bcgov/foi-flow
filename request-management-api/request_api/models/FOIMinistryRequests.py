@@ -503,13 +503,13 @@ class FOIMinistryRequest(db.Model):
                             (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
-                           else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
+                           else_ = func.nullif(cast(FOIMinistryRequest.duedate, String), '')).label('duedate')
         
         cfrduedate = case([
                             (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
-                           else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
+                           else_ = func.nullif(cast(FOIMinistryRequest.cfrduedate, String),'')).label('cfrduedate')
 
         axispagecount = case ([
             (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
@@ -561,8 +561,10 @@ class FOIMinistryRequest(db.Model):
             FOIRequestApplicant.firstname.label('firstName'),
             FOIRequestApplicant.lastname.label('lastName'),
             FOIRequest.requesttype.label('requestType'),
-            cast(FOIRequest.receiveddate, String).label('receivedDate'),
-            cast(FOIRequest.receiveddate, String).label('receivedDateUF'),
+            # cast(FOIRequest.receiveddate, String).label('receivedDate'),
+            # cast(FOIRequest.receiveddate, String).label('receivedDateUF'),
+            func.nullif(cast(FOIRequest.receiveddate, String), '').label('receivedDate'),
+            func.nullif(cast(FOIRequest.receiveddate, String), '').label('receivedDateUF'),
             FOIRequestStatus.name.label('currentState'),
             FOIMinistryRequest.assignedgroup.label('assignedGroup'),
             FOIMinistryRequest.assignedto.label('assignedTo'),
@@ -585,8 +587,8 @@ class FOIMinistryRequest(db.Model):
             ministryassignee.firstname.label('assignedministrypersonFirstName'),
             ministryassignee.lastname.label('assignedministrypersonLastName'),
             FOIMinistryRequest.description,
-            cast(FOIMinistryRequest.recordsearchfromdate, String).label('recordsearchfromdate'),
-            cast(FOIMinistryRequest.recordsearchtodate, String).label('recordsearchtodate'),
+            func.nullif(cast(FOIMinistryRequest.recordsearchfromdate, String), '').label('recordsearchfromdate'),
+            func.nullif(cast(FOIMinistryRequest.recordsearchtodate, String), '').label('recordsearchtodate'),
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
             defaultsorting,
@@ -622,10 +624,12 @@ class FOIMinistryRequest(db.Model):
                                 FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
                             ).join(
                                 FOIRequestApplicantMapping,
-                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value)
+                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value),
+                                isouter=True
                             ).join(
                                 FOIRequestApplicant,
-                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
+                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
+                                isouter=True
                             ).join(
                                 onbehalf_applicantmapping,
                                 and_(
@@ -636,10 +640,11 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 onbehalf_applicant,
                                 onbehalf_applicant.foirequestapplicantid == onbehalf_applicantmapping.foirequestapplicantid,  
-                                isouter=True
+                                isouter=True #Made it to left join to allow proactivedisclosure requests
                             ).join(
                                 ApplicantCategory,
-                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
+                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True),
+                                isouter=True
                             ).join(
                                 ProgramArea,
                                 FOIMinistryRequest.programareaid == ProgramArea.programareaid
@@ -1127,13 +1132,13 @@ class FOIMinistryRequest(db.Model):
                             (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
-                           else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
+                           else_ = func.nullif(cast(FOIMinistryRequest.duedate, String), '')).label('duedate')
         
         cfrduedate = case([
                             (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
-                           else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
+                           else_ = func.nullif(cast(FOIMinistryRequest.cfrduedate, String), '')).label('cfrduedate')
 
         axispagecount = case ([
             (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
@@ -1183,8 +1188,8 @@ class FOIMinistryRequest(db.Model):
             FOIRequestApplicant.firstname.label('firstName'),
             FOIRequestApplicant.lastname.label('lastName'),
             FOIRequest.requesttype.label('requestType'),
-            cast(FOIRequest.receiveddate, String).label('receivedDate'),
-            cast(FOIRequest.receiveddate, String).label('receivedDateUF'),
+            func.nullif(cast(FOIRequest.receiveddate, String),'').label('receivedDate'),
+            func.nullif(cast(FOIRequest.receiveddate, String),'').label('receivedDateUF'),
             FOIRequestStatus.name.label('currentState'),
             FOIMinistryRequest.assignedgroup.label('assignedGroup'),
             FOIMinistryRequest.assignedto.label('assignedTo'),
@@ -1207,8 +1212,8 @@ class FOIMinistryRequest(db.Model):
             ministryassignee.firstname.label('assignedministrypersonFirstName'),
             ministryassignee.lastname.label('assignedministrypersonLastName'),
             FOIMinistryRequest.description,
-            cast(FOIMinistryRequest.recordsearchfromdate, String).label('recordsearchfromdate'),
-            cast(FOIMinistryRequest.recordsearchtodate, String).label('recordsearchtodate'),
+            func.nullif(cast(FOIMinistryRequest.recordsearchfromdate, String),'').label('recordsearchfromdate'),
+            func.nullif(cast(FOIMinistryRequest.recordsearchtodate, String),'').label('recordsearchtodate'),
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
             defaultsorting,
@@ -1262,7 +1267,8 @@ class FOIMinistryRequest(db.Model):
                                 isouter=True
                             ).join(
                                 ApplicantCategory,
-                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
+                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True),
+                                isouter=True
                             ).join(
                                 ProgramArea,
                                 FOIMinistryRequest.programareaid == ProgramArea.programareaid

@@ -37,7 +37,10 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.axispagecount = requestschema.get("axispagecount")
         foiministryrequest.axislanpagecount = requestschema.get("axislanpagecount")
         foiministryrequest.recordspagecount = current_foiministryrequest["recordspagecount"] if current_foiministryrequest not in (None, {}) else 0
-        foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else filenumber
+        if requestschema.get("requestType") == "proactive disclosure":
+            foiministryrequest.filenumber = self.generatepdfilenumber(ministry["code"], requestschema) if filenumber is None else filenumber
+        else:
+            foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid")) if filenumber is None else filenumber
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
         foiministryrequest.description = requestschema.get("description")
         foiministryrequest.duedate = requestschema.get("dueDate")
