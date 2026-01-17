@@ -124,6 +124,16 @@
   text-decoration: underline;
 }
 
+.ds-add-disabled {
+  color: #a0a0a0; /* Dim the text */
+  cursor: not-allowed; /* Change cursor to indicate it's not clickable */
+  text-decoration: none; /* Remove underline on hover */
+}
+
+.ds-add-disabled:hover {
+  text-decoration: none; /* Ensure no underline on hover for disabled state */
+}
+
 /****************************************************
  * Info Box (What this does / When to use)
  ****************************************************/

@@ -195,6 +195,16 @@ export default function DocumentSetUI({
           Recommended if you're experiencing performance issues or having
           trouble creating record packages.
         </div>
+
+        <div className="ds-muted">
+          For optimal performance, it is recommended a document set not exceed:
+        </div>
+        <div className="ds-muted">
+          <ul>
+            <li>500 files</li>
+            <li>1GB in total file size</li>
+          </ul>
+        </div>
       </Paper>
     </div>
   );

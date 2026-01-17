@@ -8,9 +8,33 @@ import {
 import Grid from "@mui/material/Grid";
 import Tooltip from "@mui/material/Tooltip";
 import AttachmentModal from "../Attachments/AttachmentModal";
+import {makeStyles} from "@material-ui/core/styles";
+import clsx from "clsx";
 
 export default function RedactRecordsButton({records, groups, ministryrequestid}) {
 
+  const useStyles = makeStyles((_theme) => ({
+    createButton: {
+      margin: 0,
+      width: "100%",
+      height: "50%",
+      backgroundColor: "#38598A",
+      color: "#FFFFFF",
+      fontWeight: 700,
+      fontFamily: "BCSans-Bold, sans-serif ",
+      textTransform: "none",
+      whiteSpace: "nowrap",
+
+      "&:hover": {
+        backgroundColor: "#38598A",
+      },
+      "&:active": {
+        backgroundColor: "#38598A",
+      },
+    },
+  }));
+
+  const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
@@ -56,25 +80,24 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
     );
   };
 
-  const isDisableRedactSet = (recordGroup = [], {strict = true} = {}) => {
+  const isDisableRedactSet = (recordGroup = []) => {
     if (!Array.isArray(recordGroup) || recordGroup.length === 0) {
       return true;
     }
 
-    if (!strict) {
-      // Only block explicitly incompatible files
-      return recordGroup.some(
-        r => r.attributes?.incompatible === true
-      );
-    }
+    return recordGroup.some(r => {
+      const isIncompatible = r.attributes?.incompatible === true;
+      const isDuplicate = r.isduplicate === true;
 
-    // Strict mode (optional)
-    return recordGroup.some(r =>
-      !r.isredactionready &&
-      !r.selectedfileprocessversion &&
-      !r.ocrfilepath
-    );
+      const isNotReady =
+        !r.isredactionready &&
+        !r.selectedfileprocessversion &&
+        !r.ocrfilepath;
+
+      return isIncompatible || isDuplicate || isNotReady;
+    });
   };
+
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -115,19 +138,18 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
   return (
     <>
       {groups.length > 0 ? (
-        <>
+        <div>
+
           <Button
             variant="contained"
             color="primary"
             onClick={handleMenuOpen}
-            style={{
-              background: "#38598A",
-              color: "white",
-              textTransform: "none",
-              padding: "8px 18px",
-              borderRadius: "4px",
-              fontWeight: 600
-            }}
+            className={clsx(
+              "btn",
+              classes.createButton
+            )}
+
+
           >
             Redact Records ▾
           </Button>
@@ -137,16 +159,17 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
             keepMounted
             open={Boolean(anchorEl) && !openModal}
             onClose={handleMenuClose}
+            getContentAnchorEl={null}
             anchorOrigin={{vertical: "bottom", horizontal: "left"}}
             transformOrigin={{vertical: "top", horizontal: "left"}}
             PaperProps={{
               sx: {
-                mt: 1,
+                mt: 1, // small spacing below button
                 borderRadius: "8px",
                 boxShadow: "0px 4px 14px rgba(0,0,0,0.15)",
                 minWidth: "200px",
-                paddingY: "4px"
-              }
+                py: "4px",
+              },
             }}
           >
             {groups.map((set) => {
@@ -190,7 +213,7 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
               );
             })}
           </Menu>
-        </>
+        </div>
       ) : (
         <Grid item xs={1}>
           <Tooltip
@@ -204,27 +227,20 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
             }
             disableHoverListener={!isDisableRedactRecords(records)}
           >
-    <span>
+    <div style={{display: "flex", minWidth: "130px", width: "100%", justifyContent: "revert" , whiteSpace: "nowrap"}}>
         <Button
           variant="contained"
           color="primary"
           onClick={handleRedactAll}
           disabled={isDisableRedactRecords(records)}
-          style={{
-            background: "#38598A",
-            textTransform: "none",
-            padding: "8px 18px",
-            borderRadius: "4px",
-            fontWeight: 600,
-            color: "#FFFFFF",
-            fontFamily: " BCSans-Bold, sans-serif !important",
-            cursor: isDisableRedactRecords(records) ? "not-allowed" : "pointer"
-
-          }}
+          className={clsx(
+            "btn",
+            classes.createButton
+          )}
         >
           Redact Records
         </Button>
-      </span>
+      </div>
           </Tooltip>
         </Grid>
 
