@@ -13,7 +13,7 @@ import {closeChildDetails} from '../FOIRequest/utils';
 import { Box, Fade } from "@mui/material";
 
 
-const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput,userDetail,requestType,setError,errorState}) => {
+const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput,userDetail,requestType,setError}) => {
 
      /**
      *  Child details box in the UI
@@ -76,22 +76,21 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
     }, [additionalInfo]);
  
     const handleFirtNameChange = (e) => {
-        handleErrorState(e.target.value);
+        setError(prev => ({...prev, childDetailFirstName: validateTextFieldError(e.target.value)}));
         setChildFirstName(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME, e.target.value);
     }
     const handleMiddleNameChange = (e) => {
-        handleErrorState(e.target.value);
+        setError(prev => ({...prev, childDetailMiddleName: validateTextFieldError(e.target.value)}));
         setChildMiddleName(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME, e.target.value);
     }
     const handleLastNameChange = (e) => {
-        handleErrorState(e.target.value);
+        setError(prev => ({...prev, childDetailLastName: validateTextFieldError(e.target.value)}));
         setChildLastName(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_LAST_NAME, e.target.value);
     }
     const handleNickNameChange = (e) => {
-        handleErrorState(e.target.value);
         setNickName(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME, e.target.value);
     }
@@ -102,13 +101,6 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
     const TEXTFIELD_LENGTH_ERROR = "Text field length must not exceed 50 characters";
     const validateTextFieldError = (value) => {
         return value.length > 50;
-    }
-    const handleErrorState = (value) => {
-        if (validateTextFieldError(value)) {
-            setError(true);
-        } else {
-            if (errorState) setError(false);
-        }
     }
 
      return (
