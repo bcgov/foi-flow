@@ -13,7 +13,7 @@ import {closeChildDetails} from '../FOIRequest/utils';
 import { Box, Fade } from "@mui/material";
 
 
-const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput,userDetail,requestType}) => {
+const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput,userDetail,requestType,setError,errorState}) => {
 
      /**
      *  Child details box in the UI
@@ -76,25 +76,41 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
     }, [additionalInfo]);
  
     const handleFirtNameChange = (e) => {
+        handleErrorState(e.target.value);
         setChildFirstName(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME, e.target.value);
     }
     const handleMiddleNameChange = (e) => {
+        handleErrorState(e.target.value);
         setChildMiddleName(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME, e.target.value);
     }
     const handleLastNameChange = (e) => {
+        handleErrorState(e.target.value);
         setChildLastName(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_LAST_NAME, e.target.value);
     }
     const handleNickNameChange = (e) => {
+        handleErrorState(e.target.value);
         setNickName(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME, e.target.value);
     }
     const handleDOBChange = (e) => {
         setDOB(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CHILD_DOB, e.target.value);
-    }  
+    }
+    const TEXTFIELD_LENGTH_ERROR = "Text field length must not exceed 50 characters";
+    const validateTextFieldError = (value) => {
+        return value.length > 50;
+    }
+    const handleErrorState = (value) => {
+        if (validateTextFieldError(value)) {
+            setError(true);
+        } else {
+            if (errorState) setError(false);
+        }
+    }
+
      return (
         
         <div className='request-accordian' id="childDetails">
@@ -116,6 +132,8 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
                         onChange={handleFirtNameChange}
                         fullWidth
                         disabled={disableInput}
+                        error={validateTextFieldError(childFirstNameText)}
+                        helperText={validateTextFieldError(childFirstNameText) ? TEXTFIELD_LENGTH_ERROR : null}
                     />
                     <TextField            
                         id='childMiddleName'                
@@ -127,6 +145,8 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
                         onChange={handleMiddleNameChange}
                         fullWidth
                         disabled={disableInput}
+                        error={validateTextFieldError(childMiddleNameText)}
+                        helperText={validateTextFieldError(childMiddleNameText) ? TEXTFIELD_LENGTH_ERROR : null}
                     />
                     <TextField          
                         id='childLastName'                  
@@ -138,6 +158,8 @@ const ChildDetails = React.memo(({additionalInfo, createSaveRequestObject, disab
                         onChange={handleLastNameChange}
                         fullWidth
                         disabled={disableInput}
+                        error={validateTextFieldError(childLastNameText)}
+                        helperText={validateTextFieldError(childLastNameText) ? TEXTFIELD_LENGTH_ERROR : null}
                     />                                                
                 </div>
                 <div className="col-lg-6 foi-details-col">
