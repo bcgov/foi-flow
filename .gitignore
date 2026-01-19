@@ -153,6 +153,3 @@ integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Infrastructure/bin/*
 integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Infrastructure/obj/
 integrationapi/MCS.FOI.Integration/MCS.FOI.Integration.Infrastructure/obj/*
 .gitignore
-testing/foi-qa-automation/Test Attachments/Book17.pdf
-
-testing/foi-qa-automation/Test Attachments/Book20.pdf
