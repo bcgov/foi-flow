@@ -44,7 +44,6 @@ export default function DocumentSetUI({
 
   function transformGroupsToDocumentSets(groups) {
     if (!Array.isArray(groups)) return [];
-    console.log(groups);
     return groups.map((g) => ({
       id: g.documentsetid,
       label: g.name,
