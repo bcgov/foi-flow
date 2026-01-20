@@ -269,6 +269,14 @@ const isProcessingTeam = (userGroups) => {
   );
 };
 
+const isMinistryGroup = (userGroups = []) =>
+  Object.values(MINISTRYGROUPS).some(group =>
+    userGroups.includes(group)
+  );
+
+const isNotMinistryGroup = (userGroups = []) =>
+  !isMinistryGroup(userGroups);
+
 const isScanningTeam = (userGroups) => {
   return userGroups?.some((userGroup) =>
     userGroup.replace("/", "") == KCScanningTeam
@@ -696,5 +704,6 @@ export {
   setTeamTagList,
   calculateBusinessDaysBetween,
   addBusinessDaysToDate,
-  getIAOTagList
+  getIAOTagList,
+  isNotMinistryGroup
 };

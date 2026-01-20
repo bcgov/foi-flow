@@ -55,8 +55,8 @@ const getDaysRemainingText = (_daysRemaining) => {
     : `${Math.abs(_daysRemaining)} Days Overdue`;
 };
 
-const getcfrDaysRemainingText = (_cfrDaysRemaining) => {  
-     return`CFR Due in ${_cfrDaysRemaining} Days`    
+const getcfrDaysRemainingText = (_cfrDaysRemaining) => {
+     return`CFR Due in ${_cfrDaysRemaining} Days`
 };
 
 export const isBeforeOpen = (requestDetails) => {
@@ -135,11 +135,11 @@ export const getTabBG = (_tabStatus, _requestState) => {
     case StateEnum.peerreview.name:
       return "foitabheadercollection foitabheaderPeerreviewBG";
     case StateEnum.tagging.name:
-        return "foitabheadercollection foitabheaderTaggingBG"; 
+        return "foitabheadercollection foitabheaderTaggingBG";
     case StateEnum.readytoscan.name:
         return "foitabheadercollection foitabheaderReadytoScanBG";
     case StateEnum.section5pending.name:
-      return "foitabheadercollection foitabheaderSection5Pending";            
+      return "foitabheadercollection foitabheaderSection5Pending";
     case StateEnum.appfeeowing.name:
         return "foitabheadercollection foitabheaderAppFeeOwingBG";
     case StateEnum.recordsreadyforreview.name:
@@ -173,7 +173,7 @@ export const getOITabBG = (OIRequestStatusId, OIStatuses) => {
         return "foitabheadercollection foitabheaderDoNotPublishBG";
       case "Exemption Request":
         return "foitabheadercollection foitabheaderExemptionBG";
-      
+
 
       default:
         return "foitabheadercollection foitabheaderdefaultBG";
@@ -375,7 +375,7 @@ export const checkValidationError = (
     (!isconsultflag && (
       requiredApplicantDetails.firstName === "" ||
       requiredApplicantDetails.lastName === "" ||
-      requiredApplicantDetails.firstName.length > 50 || 
+      requiredApplicantDetails.firstName.length > 50 ||
       requiredApplicantDetails.lastName.length > 50 ||
       requiredApplicantDetails.middleName.length > 50
     )) ||
@@ -383,7 +383,7 @@ export const checkValidationError = (
     requiredApplicantDetails.category.toLowerCase().includes("select") ||
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
-    (!requiredRequestDescriptionValues.isProgramAreaSelected 
+    (!requiredRequestDescriptionValues.isProgramAreaSelected
       && ([StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(currentrequestStatus?.toLowerCase()) || isAddRequest)) ||
     (requiredRequestDetailsValues.requestType.toLowerCase() ===
       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
@@ -408,13 +408,13 @@ export const checkValidationError = (
     !requiredRequestDetailsValues.requestStartDate ||
     !requiredRequestDetailsValues.dueDate ||
     ("recordsDueDate" in requiredRequestDetailsValues  && !requiredRequestDetailsValues.recordsDueDate) ||
-    !requiredAxisDetails.axisRequestId || 
+    !requiredAxisDetails.axisRequestId ||
     (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
       if (oipc.inquiryattributes?.inquirydate) {
-        return oipc.inquiryattributes.orderno === ""; 
+        return oipc.inquiryattributes.orderno === "";
       }
       if (oipc.inquiryattributes?.orderno) {
-        return oipc.inquiryattributes?.inquirydate === null || oipc.inquiryattributes?.inquirydate === ""; 
+        return oipc.inquiryattributes?.inquirydate === null || oipc.inquiryattributes?.inquirydate === "";
       }
       return oipc.oipcno === "" || oipc.receiveddate === null || oipc.receiveddate === "" || oipc.reviewtypeid === null || oipc.reasonid === null || oipc.statusid === null;
     }))

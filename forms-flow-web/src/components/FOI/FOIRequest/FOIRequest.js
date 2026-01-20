@@ -212,20 +212,20 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
   const [disableInput, setDisableInput] = useState(requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() && !requestDetails?.isoipcreview);
-  const [_tabStatus, settabStatus] = React.useState(requestState);  
+  const [_tabStatus, settabStatus] = React.useState(requestState);
   const isOITeam = userDetail.groups.includes("/OI Team");
   const openInfoStates = useSelector(
     (state) => state.foiRequests.oiStatuses
   );
   let foitabheaderBG = isOITeam ? getOITabBG(requestDetails?.oistatusid, openInfoStates) : getTabBG(_tabStatus, requestState);
-  
+
 
   const [unsavedPrompt, setUnsavedPrompt] = useState(false);
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
   const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes);
-  const activePublicationRequest = !SKIP_OPENINFO_MINISTRIES.split(",").includes(requestDetails?.bcgovcode?.toUpperCase()) && 
+  const activePublicationRequest = !SKIP_OPENINFO_MINISTRIES.split(",").includes(requestDetails?.bcgovcode?.toUpperCase()) &&
                                       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL;
-  
+
   let isMinistry = false;
   const userGroups = userDetail && userDetail.groups.map(group => group.slice(1));
   if (Object.entries(userDetail).length !== 0) {
@@ -406,7 +406,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     dispatch(fetchFOIDeliveryModeList());
     dispatch(fetchFOISubjectCodeList());
     dispatch(fetchClosingReasonList());
-    
+
     dispatch(fetchOIPCOutcomes());
     dispatch(fetchOIPCStatuses());
     dispatch(fetchOIPCReviewtypes());
@@ -487,7 +487,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
         setIsMCFPersonal(true);
       }
     }
-    
+
     if(requestDetails.isoipcreview) {
       setIsOIPCReview(true);
     } else {
@@ -513,11 +513,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     }
   }, [oipcData])
 
-  
 
-  
+
+
   useEffect(() => {
-    if (requestApplicantProfile) {      
+    if (requestApplicantProfile) {
       if (!ministryId) {
         let newRequestDetails = { ...saveRequestObject };
         for (let field in requestApplicantProfile) {
@@ -861,7 +861,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     dispatch(
       deleteOIPCDetails(
         requestId,
-        ministryId, 
+        ministryId,
         (err, _res) => {
         if(!err) {
           toast.update(toastID, {
@@ -985,7 +985,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
 
-    if (_state?.toLowerCase() === StateEnum.unopened.name.toLowerCase() && 
+    if (_state?.toLowerCase() === StateEnum.unopened.name.toLowerCase() &&
       (saveRequestObject.isconsultflag === null || saveRequestObject.isconsultflag === undefined)) {
       saveRequestObject.isconsultflag = false;
     }
@@ -1042,7 +1042,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       _status,
       requestExtensions,
     });
-    
+
     setRequestStatus(mappedBottomText);
   };
 
@@ -1067,7 +1067,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       };
     }
   }, [editorChange]);
-  
+
   const tabclick = (param) => {
     if (param === "Comments") {
       sessionStorage.setItem("foicommentcategory", 1);
@@ -1193,14 +1193,14 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       requestState !== StateEnum.appfeeowing.name &&
       requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
   }
-  
+
   const showOpenInformationTab = () => {
     return (
       activePublicationRequest &&
       requestState !== StateEnum.intakeinprogress.name &&
       requestState !== StateEnum.unopened.name
     );
-  } 
+  }
 
   const getHistoryCount = () => {
     let historyCount= visibleCorrespondence.length + requestNotes.filter(
@@ -1208,7 +1208,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review")
         ).length;
     return '('+historyCount+')'
-  } 
+  }
 
   const getMergedHistory = (applicantCorrespondence, requestNotes) => {
     const mergedHistory = [
@@ -1230,7 +1230,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     });
   };
   const getCommentsCount = () => {
-    let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
+    let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") &&
           c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
     return '('+commentsCount+')'
 
@@ -1378,7 +1378,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           </div>
 
           <div className="foileftpanelstatus">
-            {isOIPCReview && requestDetails.isreopened ? "" 
+            {isOIPCReview && requestDetails.isreopened ? ""
             : bottomTextArray.length > 0 &&
               _requestStatus &&
               _requestStatus.toLowerCase().includes("days") &&
@@ -1519,7 +1519,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         }
                         createSaveRequestObject={createSaveRequestObject}
                         disableInput={disableInput || isHistoricalRequest || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
-                        defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}                        
+                        defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}
                         userDetail={userDetail}
                       />
                       {requiredRequestDetailsValues.requestType.toLowerCase() ===
@@ -1613,7 +1613,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                       )}
                       <div ref={oipcSectionRef}></div>
                       {isOIPCReview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
-                        <OIPCDetails 
+                        <OIPCDetails
                           oipcData={oipcData}
                           updateOIPC={updateOIPC}
                           addOIPC={addOIPC}

@@ -46,7 +46,7 @@ const API = {
   FOI_GET_MINISTRY_REQUEST_WATCHERS: `${FOI_BASE_API_URL}/api/foiwatcher/ministryrequest/<ministryid>`,
   FOI_GET_CLOSING_REASONS: `${FOI_BASE_API_URL}/api/foiflow/closereasons`,
   FOI_POST_OSS_HEADER: `${FOI_BASE_API_URL}/api/foiflow/oss/authheader`,
-  
+
   FOI_GET_REQUEST_APPLICANTS: `${FOI_BASE_API_URL}/api/foiapplicants/<email>`,
   FOI_SAVE_REQUEST_APPLICANT_INFO: `${FOI_BASE_API_URL}/api/foiapplicants/save`,
   FOI_REQUEST_APPLICANTS_SEARCH_KEYWORDS: `${FOI_BASE_API_URL}/api/foiapplicants/search`,
@@ -152,9 +152,9 @@ const API = {
   FOI_RETRIEVE_RECORDS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/retrieve`,
 
   DOC_REVIEWER_REDACTED_SECTIONS: `${DOC_REVIEWER_BASE_API_URL}/api/redactedsections/ministryrequest/<ministryrequestid>`,
-  
+
   DOC_REVIEWER_REDACTED_DOCUMENT_RECORDS: `${DOC_REVIEWER_BASE_API_URL}/api/documentpage/ministryrequest/<ministryrequestid>`,
-  
+
   DOC_REVIEWER_REDACTED_PAGEFLAG_RECORDS: `${DOC_REVIEWER_BASE_API_URL}/api/documentpageflags/ministryrequest/<ministryrequestid>`,
 
   FOI_TRIGGER_DOWNLOAD_RECORDS_FOR_HARMS: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/triggerdownload/harms`,
@@ -218,6 +218,11 @@ const API = {
   FOI_GET_EMAIL_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/GetCorrespondenceByName`,
   FOI_EXPORT_SFDT: `${FOI_TEMPLATE_API_URL}/api/documenteditor/ExportSFDT`,
   FOI_EXPORT_PDF: `${FOI_TEMPLATE_API_URL}/api/documenteditor/ExportPdf`,
-  FOI_REFRESH_REDIS_CACHE_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/UpdateTemplateCache`
+  FOI_REFRESH_REDIS_CACHE_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/UpdateTemplateCache`,
+  FOI_POST_RECORD_GROUP: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups`,
+  FOI_PUT_RECORD_GROUP: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups/<groupid>`,
+  FOI_GET_RECORD_GROUP: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups`,
+  FOI_DELETE_RECORD_GROUP: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups/<groupid>/records/<recordid>`,
+
 };
 export default API;

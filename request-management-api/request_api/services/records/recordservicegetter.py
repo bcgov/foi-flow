@@ -25,7 +25,6 @@ class recordservicegetter(recordservicebase):
             resultrecords = []
             if len(uploadedrecords) > 0:
                 computingresponses, err = self.getdatafromdocreviewer(uploadedrecords, ministryrequestid)
-                #print("computingresponses:",computingresponses)
                 if err is None:
                     (
                         _convertedfiles,
@@ -37,12 +36,10 @@ class recordservicegetter(recordservicebase):
                         _computingresponse = self.__getcomputingresponse(
                             computingresponses, "recordid", record
                         )
-                        #print("\n_computingresponse:",_computingresponse)
 
                         _record = self.__preparerecord(
                             record, _computingresponse, computingresponses, divisions
                         )
-                        #print("\n__record:",_record)
 
                         if not _record["attributes"].get("isportfolio", False):
                             resultrecords.append(_record)
