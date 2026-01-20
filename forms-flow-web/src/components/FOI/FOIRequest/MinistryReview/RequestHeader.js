@@ -22,6 +22,7 @@ const RequestHeader = React.memo(({
     setSaveMinistryRequestObject,
     ministryAssigneeValue,
     isMinistry,
+    isProactiveDisclosure,
 }) => {
     const { requestId, ministryId } = useParams();
     const _requestDetails = requestDetails;
@@ -167,11 +168,13 @@ const RequestHeader = React.memo(({
                             />
                         }
                     </Grid>
-                    <Grid>
-                        <div className="foi-request-review-header-col1-row">
-                            {requestFlagsBox}
-                        </div>
-                    </Grid>
+                    {!isProactiveDisclosure &&
+                        <Grid>
+                            <div className="foi-request-review-header-col1-row">
+                                {requestFlagsBox}
+                            </div>
+                        </Grid>
+                    }
                 </Grid>
             </div>
             <div className="col-lg-6">

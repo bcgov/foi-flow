@@ -8,7 +8,7 @@ import {
   displayQueueFlagIcons,
   cellTooltipRender,
   pagecountcellTooltipRender,
-  calculateFromClosed
+  calculateFromClosed,
 } from "../utils";
 import {
   isProcessingTeam,
@@ -33,14 +33,16 @@ const ProcessingTeamColumns = [
     headerName: "ID NUMBER",
     headerAlign: "left",
     width: 160,
-    renderCell: cellTooltipRender
+    renderCell: cellTooltipRender,
   },
   {
     field: "applicantName",
     headerName: "APPLICANT NAME",
     headerAlign: "left",
     valueGetter: (params) =>
-      getFullName(params.row.firstName, params.row.lastName),
+      params.row.requestType == "proactive disclosure"
+        ? "N/A"
+        : getFullName(params.row.firstName, params.row.lastName),
     width: 180,
   },
   {
@@ -61,6 +63,10 @@ const ProcessingTeamColumns = [
     field: "applicantcategory",
     headerName: "CATEGORY",
     headerAlign: "left",
+    valueGetter: (params) =>
+      params.row.requestType == "proactive disclosure"
+        ? params.row.proactivedisclosurecategory
+        : params.row.applicantcategory,
     flex: 1,
   },
   {
@@ -88,7 +94,8 @@ const ProcessingTeamColumns = [
     headerName: "CFR DUE",
     flex: 1,
     headerAlign: "left",
-    valueGetter: (params) => formatDate(params.row.cfrduedate, "MMM dd yyyy").toUpperCase(),
+    valueGetter: (params) =>
+      formatDate(params.row.cfrduedate, "MMM dd yyyy").toUpperCase(),
   },
   {
     field: "extensions",
@@ -105,8 +112,8 @@ const ProcessingTeamColumns = [
     headerAlign: "left",
     flex: 0.5,
     valueGetter: (params) => parseInt(params.row.requestpagecount),
-    renderCell: pagecountcellTooltipRender
-  }
+    renderCell: pagecountcellTooltipRender,
+  },
 ];
 
 const IntakeTeamColumns = [
@@ -121,13 +128,15 @@ const IntakeTeamColumns = [
     headerName: "ID NUMBER",
     headerAlign: "left",
     width: 160,
-    renderCell: cellTooltipRender
+    renderCell: cellTooltipRender,
   },
   {
     field: "applicantName",
     headerName: "APPLICANT NAME",
     headerAlign: "left",
     valueGetter: (params) =>
+      params.row.requestType == "proactive disclosure"
+        ? "N/A":
       getFullName(params.row.firstName, params.row.lastName),
     width: 180,
   },
@@ -136,13 +145,20 @@ const IntakeTeamColumns = [
     headerName: "ON BEHALF",
     headerAlign: "left",
     valueGetter: (params) =>
-      params.row.onBehalfFormatted === undefined || params.row.onBehalfFormatted === null ? "N/A" : params.row.onBehalfFormatted,
+      params.row.onBehalfFormatted === undefined ||
+      params.row.onBehalfFormatted === null
+        ? "N/A"
+        : params.row.onBehalfFormatted,
     width: 120,
   },
   {
     field: "applicantcategory",
     headerName: "CATEGORY",
     headerAlign: "left",
+    valueGetter: (params) =>
+      params.row.requestType == "proactive disclosure"
+        ? params.row.proactivedisclosurecategory
+        : params.row.applicantcategory,
     flex: 1,
   },
   {
@@ -168,7 +184,8 @@ const IntakeTeamColumns = [
     headerName: "CFR DUE",
     flex: 1,
     headerAlign: "left",
-    valueGetter: (params) => formatDate(params.row.cfrduedate, "MMM dd yyyy").toUpperCase(),
+    valueGetter: (params) =>
+      formatDate(params.row.cfrduedate, "MMM dd yyyy").toUpperCase(),
   },
   {
     field: "DaysLeftValue",
@@ -199,8 +216,8 @@ const IntakeTeamColumns = [
     headerAlign: "left",
     flex: 0.5,
     valueGetter: (params) => parseInt(params.row.requestpagecount),
-    renderCell: pagecountcellTooltipRender
-  }
+    renderCell: pagecountcellTooltipRender,
+  },
 ];
 
 const FlexTeamColumns = [
@@ -215,13 +232,15 @@ const FlexTeamColumns = [
     headerName: "ID NUMBER",
     headerAlign: "left",
     width: 160,
-    renderCell: cellTooltipRender
+    renderCell: cellTooltipRender,
   },
   {
     field: "applicantName",
     headerName: "APPLICANT NAME",
     headerAlign: "left",
     valueGetter: (params) =>
+      params.row.requestType == "proactive disclosure"
+        ? "N/A":
       getFullName(params.row.firstName, params.row.lastName),
     width: 180,
   },
@@ -229,6 +248,10 @@ const FlexTeamColumns = [
     field: "applicantcategory",
     headerName: "CATEGORY",
     headerAlign: "left",
+    valueGetter: (params) =>
+      params.row.requestType == "proactive disclosure"
+        ? params.row.proactivedisclosurecategory
+        : params.row.applicantcategory,
     flex: 1,
   },
   {
@@ -254,7 +277,8 @@ const FlexTeamColumns = [
     headerName: "CFR DUE",
     flex: 1,
     headerAlign: "left",
-    valueGetter: (params) => formatDate(params.row.cfrduedate, "MMM dd yyyy").toUpperCase(),
+    valueGetter: (params) =>
+      formatDate(params.row.cfrduedate, "MMM dd yyyy").toUpperCase(),
   },
   {
     field: "DaysLeftValue",
@@ -270,7 +294,7 @@ const FlexTeamColumns = [
     headerAlign: "left",
     valueGetter: getReceivedDate,
     flex: 1,
-  }
+  },
 ];
 
 const OITeamColumns = [
@@ -278,13 +302,13 @@ const OITeamColumns = [
     field: "receivedDate",
     headerName: "RECEIVED DATE",
     flex: 1,
-    headerAlign: "left"
+    headerAlign: "left",
   },
   {
     field: "axisRequestId",
     headerName: "ID NUMBER",
     flex: 1,
-    headerAlign: "left"
+    headerAlign: "left",
   },
   {
     field: "requestType",
@@ -327,22 +351,18 @@ const OITeamColumns = [
     headerName: "APPLICANT TYPE",
     flex: 1,
     headerAlign: "left",
-  }
+  },
 ];
 
 const defaultTableInfo = {
-  sort: [
-    { field: "defaultSorting", sort: "asc" },
-  ],
-  noAssignedClassName: "not-assigned"
+  sort: [{ field: "defaultSorting", sort: "asc" }],
+  noAssignedClassName: "not-assigned",
 };
 
 const getTableInfo = (userGroups) => {
   if (!userGroups || isIntakeTeam(userGroups)) {
     defaultTableInfo.columns = IntakeTeamColumns;
-    defaultTableInfo.sort = [
-      { field: "intakeSorting", sort: "asc" },
-    ];
+    defaultTableInfo.sort = [{ field: "intakeSorting", sort: "asc" }];
   }
 
   if (isProcessingTeam(userGroups)) {

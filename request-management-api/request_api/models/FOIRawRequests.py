@@ -562,6 +562,12 @@ class FOIRawRequest(db.Model):
             literal(None)),
             ],
             else_ = cast(FOIRawRequest.requestrawdata['subjectCode'], String)).label('subjectcode')
+        
+        proactivedisclosurecategory = case([
+            (FOIRawRequest.requestrawdata['proactiveDisclosureCategory'].is_(None),
+            literal(None)),
+            ],
+            else_ = cast(FOIRawRequest.requestrawdata['proactiveDisclosureCategory'], String)).label('proactivedisclosurecategory')
 
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
@@ -611,7 +617,8 @@ class FOIRawRequest(db.Model):
             subjectcode,
             literal(None).label('isoipcreview'),
             literal(None).label('isphasedrelease'),
-            literal(None).label('oipc_number')
+            literal(None).label('oipc_number'),
+            proactivedisclosurecategory
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -749,21 +756,7 @@ class FOIRawRequest(db.Model):
                 print("\n------IAO query:", subquery_rawrequest_queue)
                 query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
                 return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
-                # union_subq = subquery_rawrequest_queue.union(
-                #     subquery_ministry_queue
-                # ).subquery()
-                # sortingcondition = FOIRawRequest.getsorting(union_subq, sortingitems, sortingorders)
-                # query = db.session.query(union_subq)
-                # print("\n------IAO query:",query)
-                # return query.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:
-            # ministry_subq = subquery_ministry_queue.subquery()
-            # sortingcondition = FOIRawRequest.getsorting(
-            #     ministry_subq, sortingitems, sortingorders
-            # )
-            # query1 = db.session.query(ministry_subq)
-            # print("\n------Ministry query:",query1)
-            # return query1.order_by(*sortingcondition).paginate(page=page, per_page=size)
             return subquery_ministry_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
 
     @classmethod
@@ -790,7 +783,8 @@ class FOIRawRequest(db.Model):
             'duedate': FOIRawRequest.requestrawdata['dueDate'].astext,
             'DueDateValue': FOIRawRequest.requestrawdata['dueDate'].astext,
             'DaysLeftValue': FOIRawRequest.requestrawdata['dueDate'].astext,
-            'subjectcode': FOIRawRequest.requestrawdata['subjectCode'].astext
+            'subjectcode': FOIRawRequest.requestrawdata['subjectCode'].astext,
+            'proactivedisclosurecategory': FOIRawRequest.requestrawdata['proactiveDisclosureCategory'].astext,
         }.get(x, cast(FOIRawRequest.requestid, String))
     
     @classmethod

@@ -1622,6 +1622,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           requestDetails.isconsultflag === true
                         }
                         handleConsultFlagChange={handleConsultFlagChange}
+                        isProactiveDisclosure={isProactiveDisclosure}
                       />
                       {(isAddRequest ||
                         requestState === StateEnum.unopened.name) &&

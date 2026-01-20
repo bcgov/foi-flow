@@ -67,6 +67,7 @@ class dashboardservice:
         isoipcreview = request.isoipcreview if request.isoipcreview == True else False
         baserequestinfo.update({'isoipcreview': isoipcreview})
         baserequestinfo.update({'isphasedrelease': request.isphasedrelease if request.isphasedrelease == True else False})
+        baserequestinfo.update({'proactivedisclosurecategory': request.proactivedisclosurecategory if request.requestType == 'proactive disclosure' else ""})
         return baserequestinfo
     
     
@@ -96,6 +97,8 @@ class dashboardservice:
         is_oi_team = AuthHelper.getusertype() == "iao" and groups and 'OI Team' in groups     
 
         for request in requests.items:
+            # print("KEyssss-",request.keys())
+            # print("Fieldsss",request._fields)
             if is_oi_team:
                 # Handle OI requests format
                 requestqueue.append(self.__handle_oi_request(request))
@@ -131,7 +134,7 @@ class dashboardservice:
                     if isiaorestricted == True:
                         _openrequest.update({'lastName': 'Restricted'})
                         _openrequest.update({'firstName': 'Request'})
-
+                    print("\n????proactivedisclosurecategory:",request.proactivedisclosurecategory)
                     requestqueue.append(_openrequest)   
                    
 
@@ -176,6 +179,7 @@ class dashboardservice:
             isoipcreview = request.isoipcreview if request.isoipcreview == True else False
             _openrequest.update({'isoipcreview': isoipcreview})
             _openrequest.update({'isphasedrelease': request.isphasedrelease if request.isphasedrelease == True else False})
+            _openrequest.update({'proactivedisclosurecategory': request.proactivedisclosurecategory})
             requestqueue.append(_openrequest)
 
         meta = {

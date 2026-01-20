@@ -226,7 +226,7 @@ const ProactiveDisclosureDetails = React.memo(
       <MenuItem
         key={item.name}
         value={item.name}
-        disabled={item.name.toLowerCase().includes("select")}
+        disabled={!item.name.toLowerCase().includes("calendars")}
       >
         {item.name}
       </MenuItem>
@@ -302,7 +302,7 @@ const ProactiveDisclosureDetails = React.memo(
                     onChange={handleCFRDueDateChange}
                     inputProps={{
                       "aria-labelledby": "cfrDueDate-label",
-                      max: formatDate(new Date()),
+                      // max: formatDate(new Date()),
                     }}
                     InputLabelProps={{ shrink: true }}
                     variant="outlined"
@@ -357,7 +357,7 @@ const ProactiveDisclosureDetails = React.memo(
                     onChange={handlePublicationDateChange}
                     inputProps={{
                       "aria-labelledby": "publicationDate-label",
-                      max: formatDate(new Date()),
+                      // max: formatDate(new Date()),
                     }}
                     InputLabelProps={{ shrink: true }}
                     variant="outlined"

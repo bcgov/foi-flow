@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship, backref, aliased
 from .default_method_result import DefaultMethodResult
 from .FOIRequests import FOIRequest, FOIRequestsSchema
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc
+from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc, true
 from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.dialects.postgresql import JSON
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
@@ -29,6 +29,8 @@ from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .SubjectCodes import SubjectCode
 from request_api.utils.enums import StateName
 from .FOIRequestOIPC import FOIRequestOIPC
+from .ProactiveDisclosureCategories import ProactiveDisclosureCategory
+from .FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -438,6 +440,18 @@ class FOIMinistryRequest(db.Model):
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
 
+        latest_proactive_subq = (
+            _session.query(
+                FOIProactiveDisclosureRequests.foiministryrequest_id.label("foiministryrequest_id"),
+                func.max(FOIProactiveDisclosureRequests.foiministryrequestversion_id).label("max_version")
+            )
+            .group_by(FOIProactiveDisclosureRequests.foiministryrequest_id)
+            .subquery()
+        )
+
+        latest_proactive = aliased(FOIProactiveDisclosureRequests)
+
+
         #filter/search
         _keywords = []
         if(keyword is not None):
@@ -605,6 +619,8 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.isoipcreview.label('isoipcreview'),
             FOIMinistryRequest.isphasedrelease.label('isphasedrelease'),
             literal(None).label('oipc_number'),
+            ProactiveDisclosureCategory.name.label('proactivedisclosurecategory'),
+            #latest_proactive.foiministryrequestversion_id.label(""),
         ]
 
         basequery = _session.query(
@@ -687,7 +703,22 @@ class FOIMinistryRequest(db.Model):
                             ).filter(or_(FOIMinistryRequest.requeststatuslabel != StateName.closed.name, 
                                          and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3,subquery_with_oipc.c.outcomeid == None)))
 
-       
+        basequery = basequery.join(
+            latest_proactive_subq,
+            latest_proactive_subq.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid,
+            isouter=True
+        ).join(
+            latest_proactive,
+            (latest_proactive.foiministryrequest_id == latest_proactive_subq.c.foiministryrequest_id) &
+            (latest_proactive.foiministryrequestversion_id == latest_proactive_subq.c.max_version),
+            isouter=True
+        )
+
+        basequery = basequery.join(
+            ProactiveDisclosureCategory,
+            ProactiveDisclosureCategory.proactivedisclosurecategoryid == latest_proactive.proactivedisclosurecategoryid,
+            isouter=True
+        )
 
         if(additionalfilter == 'watchingRequests'):
             #watchby
@@ -834,7 +865,8 @@ class FOIMinistryRequest(db.Model):
             'closedate': FOIMinistryRequest.closedate,
             'subjectcode': SubjectCode.name,
             'isoipcreview': FOIMinistryRequest.isoipcreview,
-            'isphasedrelease': FOIMinistryRequest.isphasedrelease
+            'isphasedrelease': FOIMinistryRequest.isphasedrelease,
+            'proactivedisclosurecategory': ProactiveDisclosureCategory.name
         }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
@@ -1090,6 +1122,18 @@ class FOIMinistryRequest(db.Model):
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
 
+        latest_proactive_subq = (
+            _session.query(
+                FOIProactiveDisclosureRequests.foiministryrequest_id.label("foiministryrequest_id"),
+                func.max(FOIProactiveDisclosureRequests.foiministryrequestversion_id).label("max_version")
+            )
+            .group_by(FOIProactiveDisclosureRequests.foiministryrequest_id)
+            .subquery()
+        )
+
+        latest_proactive = aliased(FOIProactiveDisclosureRequests)
+
+
         intakesorting = case([
                             (FOIMinistryRequest.assignedto == None, # Unassigned requests first
                              literal(None)),
@@ -1230,7 +1274,8 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.isoipcreview.label('isoipcreview'),
             FOIMinistryRequest.isphasedrelease.label('isphasedrelease'),
             literal(None).label('oipc_number'),
-            CloseReason.name.label('closereason')
+            CloseReason.name.label('closereason'),
+            ProactiveDisclosureCategory.name.label('proactivedisclosurecategory'),
         ]
 
         basequery = _session.query(
@@ -1308,6 +1353,22 @@ class FOIMinistryRequest(db.Model):
                                 isouter=True
                             )
                             
+        basequery = basequery.join(
+            latest_proactive_subq,
+            latest_proactive_subq.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid,
+            isouter=True
+        ).join(
+            latest_proactive,
+            (latest_proactive.foiministryrequest_id == latest_proactive_subq.c.foiministryrequest_id) &
+            (latest_proactive.foiministryrequestversion_id == latest_proactive_subq.c.max_version),
+            isouter=True
+        )
+
+        basequery = basequery.join(
+            ProactiveDisclosureCategory,
+            ProactiveDisclosureCategory.proactivedisclosurecategoryid == latest_proactive.proactivedisclosurecategoryid,
+            isouter=True
+        )
 
         if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
             dbquery = basequery.filter(ministryfilter)

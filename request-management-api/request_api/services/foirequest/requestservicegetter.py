@@ -223,8 +223,8 @@ class requestservicegetter:
             'estimatedpagecount':requestministry['estimatedpagecount'],
             'estimatedtaggedpagecount':requestministry['estimatedtaggedpagecount'],
             'userrecordslockstatus': requestministry['userrecordslockstatus'],
-            'isconsultflag': requestministry['isconsultflag'],
-            'publicationDate': requestproactive['publicationdate'] if requestproactive != None and 'publicationdate' in requestproactive else None,
+            'isconsultflag': requestministry['isconsultflag'],  
+            'publicationDate': parse(requestproactive['publicationdate']).strftime(self.__genericdateformat()) if requestproactive != None and 'publicationdate' in requestproactive and requestproactive['publicationdate'] is not None else '',
             'reportPeriod': requestproactive['reportperiod'] if requestproactive != None and 'reportperiod' in requestproactive else '',
             #'proactivedisclosurecategoryid': requestproactive['proactivedisclosurecategoryid'] if requestproactive != None and 'proactivedisclosurecategoryid' in requestproactive else ''
             'proactiveDisclosureCategory':requestproactive['proactivedisclosurecategory.name'] if requestproactive != None and 'proactivedisclosurecategory.name' in requestproactive else "",

@@ -96,7 +96,7 @@ const RequestDescription = React.memo((requestDetails) => {
                 </div>
               </div>
               <Typography className="ministry-bottom-request-description-header ministry-heading">
-                <b>Request Description</b>
+                <b>{isProactiveDisclosure ? "Ministerial Directive" : "Request Description"}</b>
               </Typography>
               <Typography>{_requestDetails.description}</Typography>
             </div>

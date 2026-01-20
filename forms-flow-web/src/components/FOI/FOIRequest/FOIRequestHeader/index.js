@@ -59,7 +59,8 @@ const FOIRequestHeader = React.memo(
     isMinistry,
     isHistoricalRequest,
     showConsultFlag,
-    handleConsultFlagChange
+    handleConsultFlagChange,
+    isProactiveDisclosure
   }) => {
     /**
      *  Header of Review request in the UI
@@ -357,6 +358,7 @@ const FOIRequestHeader = React.memo(
                 }
               </div>
             </Grid>
+            {!isProactiveDisclosure &&
             <Grid>
               <div>
                 <RequestFlag
@@ -384,6 +386,7 @@ const FOIRequestHeader = React.memo(
                 />
               </div>
             </Grid>
+            }
           </Grid>
         </div>
         <div className="col-lg-6">

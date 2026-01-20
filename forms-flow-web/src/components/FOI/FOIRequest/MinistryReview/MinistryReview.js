@@ -21,7 +21,7 @@ import {
   fetchFOIPersonalPeople,
   fetchFOIPersonalFiletypes,
   fetchFOIPersonalVolumes,
-  fetchFOICommentTypes
+  fetchFOICommentTypes,
 } from "../../../../apiManager/services/FOI/foiMasterDataServices";
 
 import { fetchFOIRequestAttachmentsList } from "../../../../apiManager/services/FOI/foiAttachmentServices";
@@ -45,7 +45,7 @@ import {
   ConditionalComponent,
   calculateDaysRemaining,
   addToRestrictedRequestTagList,
-  getCommentTypeIdByName
+  getCommentTypeIdByName,
 } from "../../../../helper/FOI/helper";
 import ApplicantDetails from "./ApplicantDetails";
 import ChildDetails from "./ChildDetails";
@@ -70,7 +70,7 @@ import { UnsavedModal } from "../../customComponents";
 import { DISABLE_GATHERINGRECORDS_TAB } from "../../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
-import {isMinistryLogin} from "../../../../helper/FOI/helper";
+import { isMinistryLogin } from "../../../../helper/FOI/helper";
 import OIPCDetails from "../OIPCDetails/Index";
 import { Fees } from "../../customComponents/Fees";
 import ProactiveDisclosureDetails from "./ProactiveDisclosureDetails";
@@ -120,19 +120,20 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   const [_tabStatus, settabStatus] = React.useState(requestState);
-  const commentTypes = useSelector((state) => state.foiRequests.foiCommentTypes); 
+  const commentTypes = useSelector(
+    (state) => state.foiRequests.foiCommentTypes,
+  );
 
-  
   //gets the request detail from the store
   const IsDivisionalCoordinator = () => {
     return userDetail?.role?.includes("DivisionalCoordinator");
   };
 
   let requestDetails = useSelector(
-    (state) => state.foiRequests.foiMinistryViewRequestDetail
+    (state) => state.foiRequests.foiMinistryViewRequestDetail,
   );
   let requestNotes = useSelector(
-    (state) => state.foiRequests.foiRequestComments
+    (state) => state.foiRequests.foiRequestComments,
   );
   let requestAttachments = useSelector((state) =>
     state.foiRequests.foiRequestAttachments.filter((attachment) => {
@@ -144,18 +145,18 @@ const MinistryReview = React.memo(({ userDetail }) => {
           "fee balance outstanding - payment receipt",
         ].indexOf(attachment.category.toLowerCase()) === -1
       );
-    })
+    }),
   );
 
   let CFRFormHistoryLength = useSelector(
-    (state) => state.foiRequests.foiRequestCFRFormHistory.length
+    (state) => state.foiRequests.foiRequestCFRFormHistory.length,
   );
   // let requestRecords = useSelector(
   //   (state) => state.foiRequests.foiRequestRecords
   // );
 
   const requestExtensions = useSelector(
-    (state) => state.foiRequests.foiRequestExtesions
+    (state) => state.foiRequests.foiRequestExtesions,
   );
 
   let bcgovcode =
@@ -202,7 +203,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [attachments, setAttachments] = useState(requestAttachments);
   const dispatch = useDispatch();
   const requestWatchers = useSelector(
-    (state) => state.foiRequests.foiWatcherList
+    (state) => state.foiRequests.foiWatcherList,
   );
 
   useEffect(() => {
@@ -227,7 +228,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchPDFStitchStatusForRedlines(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
       dispatch(fetchPDFStitchedStatusForOIPCRedline(requestId, ministryId));
-      dispatch(fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId));
+      dispatch(
+        fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId),
+      );
       fetchCFRForm(ministryId, dispatch);
       if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
     }
@@ -236,9 +239,11 @@ const MinistryReview = React.memo(({ userDetail }) => {
   useEffect(() => {
     if (requestDetails?.isphasedrelease) {
       dispatch(fetchPDFStitchStatusesForPhasedRedlines(requestId, ministryId));
-      dispatch(fetchPDFStitchStatusesForPhasedResponsePackages(requestId, ministryId));
+      dispatch(
+        fetchPDFStitchStatusesForPhasedResponsePackages(requestId, ministryId),
+      );
     }
-  }, [requestId, ministryId, requestDetails])
+  }, [requestId, ministryId, requestDetails]);
 
   const [headerValue, setHeader] = useState("");
   const [ministryAssignedToValue, setMinistryAssignedToValue] =
@@ -248,12 +253,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [saveMinistryRequestObject, setSaveMinistryRequestObject] =
     React.useState(requestDetails);
 
-  const [isProactiveDisclosure, setIsProactiveDisclosure] = useState(
+  const isProactiveDisclosure =
     requestDetails?.requestType ==
-      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE
-      ? true
-      : false
-  );
+    FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE;
 
   const [divstages, setdivStages] = React.useState([]);
   const [originalDivisions, setOriginalDivisions] = React.useState([]);
@@ -262,15 +264,17 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [isMCFPersonal, setIsMCFPersonal] = useState(
     bcgovcode.replaceAll('"', "") == "MCF" &&
       requestDetails.requestType ==
-        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
+        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL,
   );
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
   let ministryassignedtousername = "Unassigned";
 
-  const userGroups = userDetail?.groups?.map(group => group.slice(1));
+  const userGroups = userDetail?.groups?.map((group) => group.slice(1));
   const isMinistry = isMinistryLogin(userGroups);
 
-  const validLockRecordsState = (currentState=requestDetails.currentState) => {
+  const validLockRecordsState = (
+    currentState = requestDetails.currentState,
+  ) => {
     return (
       currentState === StateEnum.harms.name ||
       currentState === StateEnum.onhold.name ||
@@ -283,8 +287,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
       currentState === StateEnum.onholdother.name ||
       currentState === StateEnum.closed.name
     );
-  }
-  
+  };
+
   useEffect(() => {
     const requestDetailsValue = requestDetails;
     setSaveMinistryRequestObject(requestDetailsValue);
@@ -300,7 +304,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
       setRequestState(requestDetails.currentState);
       settabStatus(requestDetails.currentState);
       setIsMinistryRestricted(
-        requestDetails.ministryrestricteddetails?.isrestricted
+        requestDetails.ministryrestricteddetails?.isrestricted,
       );
     }
 
@@ -309,23 +313,25 @@ const MinistryReview = React.memo(({ userDetail }) => {
       requestDetails.requestType ==
         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
     ) {
-      dispatch(fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', "")));
+      dispatch(
+        fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', "")),
+      );
       if (bcgovcode.replaceAll('"', "") == "MCF") {
-        dispatch(fetchFOIPersonalPeople(bcgovcode.replaceAll('"', '')));
-        dispatch(fetchFOIPersonalFiletypes(bcgovcode.replaceAll('"', '')));
-        dispatch(fetchFOIPersonalVolumes(bcgovcode.replaceAll('"', '')));
+        dispatch(fetchFOIPersonalPeople(bcgovcode.replaceAll('"', "")));
+        dispatch(fetchFOIPersonalFiletypes(bcgovcode.replaceAll('"', "")));
+        dispatch(fetchFOIPersonalVolumes(bcgovcode.replaceAll('"', "")));
         setIsMCFPersonal(true);
       }
     }
 
     //Adjust lockRecords value based on requestState if there is no manual user lockedrecords value present in requestDetails from DB
     const updateRecordsTabAccess = () => {
-      if(requestDetails.userrecordslockstatus === null) {
+      if (requestDetails.userrecordslockstatus === null) {
         return validLockRecordsState(requestDetails.currentState);
       } else {
         return requestDetails.userrecordslockstatus;
       }
-    }
+    };
     setLockRecordsTab(updateRecordsTabAccess());
   }, [requestDetails, unSavedRequest]);
 
@@ -358,7 +364,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     requestDetails,
     requestState,
     _cfrDaysRemaining,
-    requestExtensions
+    requestExtensions,
   );
 
   //gets the latest ministry assigned to value
@@ -403,15 +409,21 @@ const MinistryReview = React.memo(({ userDetail }) => {
       dispatch(fetchPDFStitchStatusForRedlines(requestId, ministryId));
       dispatch(fetchPDFStitchStatusForResponsePackage(requestId, ministryId));
       dispatch(fetchPDFStitchedStatusForOIPCRedline(requestId, ministryId));
-      dispatch(fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId));
+      dispatch(
+        fetchPDFStitchedStatusForOIPCRedlineReview(requestId, ministryId),
+      );
       dispatch(fetchPDFStitchStatusesForPhasedRedlines(requestId, ministryId));
-      dispatch(fetchPDFStitchStatusesForPhasedResponsePackages(requestId, ministryId));
+      dispatch(
+        fetchPDFStitchStatusesForPhasedResponsePackages(requestId, ministryId),
+      );
       fetchCFRForm(ministryId, dispatch);
       setStateChanged(false);
       setcurrentrequestStatus(_state);
       setTimeout(() => {
         dispatch(
-          push(`/foi/ministryreview/${requestId}/ministryrequest/${ministryId}`)
+          push(
+            `/foi/ministryreview/${requestId}/ministryrequest/${ministryId}`,
+          ),
         );
         dispatch(fetchFOIRequestNotesList(requestId, ministryId));
       }, 1000);
@@ -442,7 +454,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const returnToQueue = (e) => {
     if (unSavedRequest) {
       setUnsavedMessage(
-        <>Are you sure you want to leave? Your changes will be lost.</>
+        <>Are you sure you want to leave? Your changes will be lost.</>,
       );
       setUnsavedPrompt(true);
     } else if (recordsUploading) {
@@ -451,7 +463,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
           Are you sure you want to leave? Records are currently in the process
           of being uploaded.
           <br /> If you continue they will not be saved.
-        </>
+        </>,
       );
       setUnsavedPrompt(true);
     } else {
@@ -504,13 +516,14 @@ const MinistryReview = React.memo(({ userDetail }) => {
       break;
     case StateEnum.tagging.name:
       foitabheaderBG = "foitabheadercollection foitabheaderTaggingBG";
-      break; 
+      break;
     case StateEnum.readytoscan.name:
       foitabheaderBG = "foitabheadercollection foitabheaderReadytoScanBG";
-      break;       
+      break;
     case StateEnum.recordsreadyforreview.name:
-      foitabheaderBG = "foitabheadercollection foitabheaderRecordsReadyForReviewBG";
-      break;      
+      foitabheaderBG =
+        "foitabheadercollection foitabheaderRecordsReadyForReviewBG";
+      break;
     case StateEnum.onholdother.name:
       foitabheaderBG = "foitabheadercollection foitabheaderOnHoldOtherBG";
       break;
@@ -557,7 +570,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
         () => {
           setEditorChange(true);
           setRemoveComment(false);
-        }
+        },
       );
     } else {
       changeTabLinkStatuses(param);
@@ -578,7 +591,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const confirmChangesLost = (positiveCallback, negativeCallback) => {
     if (
       window.confirm(
-        "Are you sure you want to leave? Your changes will be lost."
+        "Are you sure you want to leave? Your changes will be lost.",
       )
     ) {
       positiveCallback();
@@ -601,14 +614,14 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const signupUrl = "/signup";
 
   let iaoassignedToList = useSelector(
-    (state) => state.foiRequests.foiFullAssignedToList
+    (state) => state.foiRequests.foiFullAssignedToList,
   );
   let ministryAssignedToList = useSelector(
-    (state) => state.foiRequests.foiMinistryAssignedToList
+    (state) => state.foiRequests.foiMinistryAssignedToList,
   );
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
   const isAttachmentListLoading = useSelector(
-    (state) => state.foiRequests.isAttachmentListLoading
+    (state) => state.foiRequests.isAttachmentListLoading,
   );
 
   const requestNumber = requestDetails?.axisRequestId
@@ -653,25 +666,33 @@ const MinistryReview = React.memo(({ userDetail }) => {
     );
 
   const showAdvancedSearch = useSelector(
-    (state) => state.foiRequests.showAdvancedSearch
+    (state) => state.foiRequests.showAdvancedSearch,
   );
   const showEventQueue = useSelector(
-    (state) => state.foiRequests.showEventQueue
+    (state) => state.foiRequests.showEventQueue,
   );
 
   const getCommentsCount = () => {
-    if(isMinistry){
-       let commentsCount= (requestNotes.filter(c => c.commentTypeId !== getCommentTypeIdByName(commentTypes, "IAO Internal") && 
-          c.commentTypeId !== getCommentTypeIdByName(commentTypes, "IAO Peer Review"))).length;
-        return '('+commentsCount+')'
+    if (isMinistry) {
+      let commentsCount = requestNotes.filter(
+        (c) =>
+          c.commentTypeId !==
+            getCommentTypeIdByName(commentTypes, "IAO Internal") &&
+          c.commentTypeId !==
+            getCommentTypeIdByName(commentTypes, "IAO Peer Review"),
+      ).length;
+      return "(" + commentsCount + ")";
+    } else {
+      let commentsCount = requestNotes.filter(
+        (c) =>
+          c.commentTypeId !==
+            getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
+          c.commentTypeId !==
+            getCommentTypeIdByName(commentTypes, "Ministry Peer Review"),
+      ).length;
+      return "(" + commentsCount + ")";
     }
-    else{
-      let commentsCount= (requestNotes.filter( c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
-            c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))).length;
-      return '('+commentsCount+')'
-    }
-
-  }
+  };
 
   return !isLoading &&
     requestDetails &&
@@ -847,37 +868,49 @@ const MinistryReview = React.memo(({ userDetail }) => {
                           }
                           ministryAssigneeValue={ministryAssignedToValue}
                           isMinistry={isMinistry}
+                          isProactiveDisclosure={isProactiveDisclosure}
                         />
-                        {
-                        isProactiveDisclosure ?
-                        <>
-                        <ApplicantDetails requestDetails={requestDetails} />
-                        <ChildDetails requestDetails={requestDetails} />
-                        <OnBehalfDetails requestDetails={requestDetails} />
-                        <RequestDescription requestDetails={requestDetails} />
-                        <RequestDetails requestDetails={requestDetails} />
-                        <AdditionalApplicantDetails
-                          requestDetails={requestDetails}
-                        />
-                        <ExtensionDetails
-                          requestDetails={requestDetails}
-                          requestState={requestState}
-                        />
-                        {divisionsBox}
-                        {/* <RequestNotes /> */}
-                        {requestDetails.isoipcreview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
-                        <OIPCDetails 
-                          oipcData={requestDetails.oipcdetails}
-                          isMinistry={isMinistry}
-                        />
+                        {isProactiveDisclosure ? (
+                          <>
+                            <ProactiveDisclosureDetails
+                              requestDetails={requestDetails}
+                            />
+                            <RequestDescription
+                              requestDetails={requestDetails}
+                            />
+                            {divisionsBox}
+                          </>
+                        ) : (
+                          <>
+                            <ApplicantDetails requestDetails={requestDetails} />
+                            <ChildDetails requestDetails={requestDetails} />
+                            <OnBehalfDetails requestDetails={requestDetails} />
+                            <RequestDescription
+                              requestDetails={requestDetails}
+                            />
+                            <RequestDetails requestDetails={requestDetails} />
+                            <AdditionalApplicantDetails
+                              requestDetails={requestDetails}
+                            />
+                            <ExtensionDetails
+                              requestDetails={requestDetails}
+                              requestState={requestState}
+                            />
+                            {divisionsBox}
+                            {/* <RequestNotes /> */}
+                            {requestDetails.isoipcreview &&
+                              requestState &&
+                              requestState.toLowerCase() !==
+                                StateEnum.intakeinprogress.name.toLowerCase() &&
+                              requestState.toLowerCase() !==
+                                StateEnum.unopened.name.toLowerCase() && (
+                                <OIPCDetails
+                                  oipcData={requestDetails.oipcdetails}
+                                  isMinistry={isMinistry}
+                                />
+                              )}
+                          </>
                         )}
-                        </>:
-                        <>
-                          <ProactiveDisclosureDetails requestDetails={requestDetails} />
-                          <RequestDescription requestDetails={requestDetails} />
-                          {divisionsBox}
-                        </>
-                        }
                         <BottomButtonGroup
                           requestState={requestState}
                           stateChanged={stateChanged}
