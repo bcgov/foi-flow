@@ -16,30 +16,33 @@ depends_on = None
 
 
 def upgrade():
-    op.create_table(
-        'FOIRequestRecordHistory',
-        sa.Column('id', sa.Integer(), primary_key=True, autoincrement=True),
+    op.execute("""
+        CREATE TABLE IF NOT EXISTS "FOIRequestRecordHistory" (
+        id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 
-        # original PK components
-        sa.Column('recordid', sa.Integer(), nullable=False),
-        sa.Column('version', sa.Integer(), nullable=False),
+        -- original PK components
+        recordid INTEGER NOT NULL,
+        version INTEGER NOT NULL,
 
-        # full record schema
-        sa.Column('foirequestid', sa.Integer(), nullable=False),
-        sa.Column('ministryrequestid', sa.Integer(), nullable=True),
-        sa.Column('ministryrequestversion', sa.Integer(), nullable=True),
-        sa.Column('filename', sa.Text(), nullable=True),
-        sa.Column('s3uripath', sa.Text(), nullable=True),
-        sa.Column('attributes', postgresql.JSON(astext_type=sa.Text()), nullable=True),
-        sa.Column('created_at', sa.DateTime(), nullable=True),
-        sa.Column('createdby', sa.String(length=120), nullable=True),
-        sa.Column('updated_at', sa.DateTime(), nullable=True),
-        sa.Column('updatedby', sa.String(length=120), nullable=True),
-        sa.Column('isactive', sa.Boolean(), nullable=False, server_default=sa.text('true')),
-        sa.Column('replacementof', sa.Integer(), nullable=True),
+        -- full record schema
+        foirequestid INTEGER NOT NULL,
+        ministryrequestid INTEGER,
+        ministryrequestversion INTEGER,
+        filename TEXT,
+        s3uripath TEXT,
+        attributes JSON,
+        created_at TIMESTAMP,
+        createdby VARCHAR(120),
+        updated_at TIMESTAMP,
+        updatedby VARCHAR(120),
+        isactive BOOLEAN NOT NULL DEFAULT true,
+        replacementof INTEGER,
 
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('recordid', 'version', name='uq_foirequestrecordhist_recordid_version')
+        CONSTRAINT uq_foirequestrecordhist_recordid_version
+            UNIQUE (recordid, version)
+    );
+    
+    """
     )
 
     # NOTE:
@@ -122,20 +125,22 @@ def upgrade():
 
     # ----------------------------------------------------------
 
-    op.execute(
-        """
-            CREATE INDEX IF NOT EXISTS  idx_frg_record_id
-            ON "FOIRequestRecordGroups"(record_id);
-            
-            CREATE INDEX IF NOT EXISTS  idx_frg_document_set_id
-            ON "FOIRequestRecordGroups"(document_set_id);
-            
-            CREATE INDEX IF NOT EXISTS  idx_records_active_mrid_foireqid
-            ON "FOIRequestRecords"(isactive, ministryrequestid, foirequestid);
-        
-        """
-    )
+    # op.execute(
+    #     """
+    #         CREATE INDEX IF NOT EXISTS  idx_frg_record_id
+    #         ON "FOIRequestRecordGroups"(record_id);
+    #
+    #         CREATE INDEX IF NOT EXISTS  idx_frg_document_set_id
+    #         ON "FOIRequestRecordGroups"(document_set_id);
+    #
+    #         CREATE INDEX IF NOT EXISTS  idx_records_active_mrid_foireqid
+    #         ON "FOIRequestRecords"(isactive, ministryrequestid, foirequestid);
+    #
+    #     """
+    # )
 
 
-def downgrade():
-    op.drop_table('FOIRequestRecordHistory')
+# def downgrade():
+#     op.execute("""
+#         DROP TABLE IF EXISTS "FOIRequestRecordHistory";
+#     """)
