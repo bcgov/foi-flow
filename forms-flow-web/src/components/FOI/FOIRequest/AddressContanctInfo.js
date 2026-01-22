@@ -99,16 +99,16 @@ const AddressContactDetails = memo(
           FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY
         )
       );
-    const [CityText, setCity] = React.useState(
+    const [cityText, setCity] = React.useState(
       validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CITY)
     );
-    const [PostalText, setPostal] = React.useState(
+    const [postalText, setPostal] = React.useState(
       validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.POSTALCODE)
     );
-    const [ProvinceText, setProvince] = React.useState(
+    const [provinceText, setProvince] = React.useState(
       validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.PROVINCE)
     );
-    const [CountryText, setCountry] = React.useState(
+    const [countryText, setCountry] = React.useState(
       validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.COUNTRY)
     );
     const [emailText, setEmail] = React.useState(
@@ -149,6 +149,11 @@ const AddressContactDetails = memo(
           requestDetails,
           FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL
         ),
+        phonePrimary: "",
+        phoneSecondary: "",
+        workPhonePrimary: "",
+        workPhoneSecondary: "",
+        addressSecondary: ""
       };
       handleContactDetailsInitialValue(contanctDetailsObject);
     }, [requestDetails, handleContactDetailsInitialValue]);
@@ -201,6 +206,10 @@ const AddressContactDetails = memo(
 
     const handleHomePhoneChange = (e) => {
       setHomePhone(e.target.value);
+      handleContanctDetailsValue(
+        e.target.value,
+        FOI_COMPONENT_CONSTANTS.HOME_PHONE
+      );
       createSaveRequestObject(
         FOI_COMPONENT_CONSTANTS.HOME_PHONE,
         e.target.value
@@ -208,6 +217,10 @@ const AddressContactDetails = memo(
     };
     const handleMobilePhoneChange = (e) => {
       setMobilePhone(e.target.value);
+      handleContanctDetailsValue(
+        e.target.value,
+        FOI_COMPONENT_CONSTANTS.MOBILE_PHONE
+      );
       createSaveRequestObject(
         FOI_COMPONENT_CONSTANTS.MOBILE_PHONE,
         e.target.value
@@ -215,6 +228,10 @@ const AddressContactDetails = memo(
     };
     const handleWorkPhonePrimaryChange = (e) => {
       setWorkPhonePrimary(e.target.value);
+      handleContanctDetailsValue(
+        e.target.value,
+        FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY
+      );
       createSaveRequestObject(
         FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY,
         e.target.value
@@ -222,6 +239,10 @@ const AddressContactDetails = memo(
     };
     const handleWorkPhoneSecondarChange = (e) => {
       setWorkPhoneSecondary(e.target.value);
+      handleContanctDetailsValue(
+        e.target.value,
+        FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY
+      );
       createSaveRequestObject(
         FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY,
         e.target.value
@@ -241,6 +262,10 @@ const AddressContactDetails = memo(
     };
     const handleScondaryStreetAddressChange = (e) => {
       setSecondaryStreetAddress(e.target.value);
+      handleContanctDetailsValue(
+        e.target.value,
+        FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY
+      );
       createSaveRequestObject(
         FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY,
         e.target.value
@@ -305,6 +330,20 @@ const AddressContactDetails = memo(
         e.target.value
       );
     };
+    const TEXT_FIELD_LOCATION_ERROR = "Text field length must not exceed 120 characters";
+    const TEXT_FIELD_CONTACT_ERROR = "Text field length must not exceed 50 characters";
+    const textFieldLengthValidation = (value, contactType) => {
+      if (contactType === "LOCATION") {
+        return value.length > 120;
+      }
+      if (contactType === "CONTACT") {
+        return value.length > 50;
+      }
+      if (contactType === "POSTAL") {
+        return value.length > 10;
+      }
+    }
+
     return (
       <div className='request-accordian' id="addressContactInfo">
       <Accordion defaultExpanded={defaultExpanded}>
@@ -360,6 +399,8 @@ const AddressContactDetails = memo(
                 onChange={handleHomePhoneChange}
                 fullWidth
                 disabled={disableInput}
+                helperText={textFieldLengthValidation(homePhoneText, "CONTACT") ? TEXT_FIELD_CONTACT_ERROR : ""}
+                error={textFieldLengthValidation(homePhoneText, "CONTACT")}
               />
             </div>
 
@@ -374,6 +415,8 @@ const AddressContactDetails = memo(
                 onChange={handleMobilePhoneChange}
                 fullWidth
                 disabled={disableInput}
+                helperText={textFieldLengthValidation(mobilePhoneText, "CONTACT") ? TEXT_FIELD_CONTACT_ERROR : ""}
+                error={textFieldLengthValidation(mobilePhoneText, "CONTACT")}
               />
             </div>
 
@@ -388,6 +431,8 @@ const AddressContactDetails = memo(
                 onChange={handleWorkPhonePrimaryChange}
                 fullWidth
                 disabled={disableInput}
+                helperText={textFieldLengthValidation(workPhonePrimaryText, "CONTACT") ? TEXT_FIELD_CONTACT_ERROR : ""}
+                error={textFieldLengthValidation(workPhonePrimaryText, "CONTACT")}
               />
             </div>
 
@@ -402,6 +447,8 @@ const AddressContactDetails = memo(
                 onChange={handleWorkPhoneSecondarChange}
                 fullWidth
                 disabled={disableInput}
+                helperText={textFieldLengthValidation(workPhoneSecondaryText, "CONTACT") ? TEXT_FIELD_CONTACT_ERROR : ""}
+                error={textFieldLengthValidation(workPhoneSecondaryText, "CONTACT")}
               />
             </div>
           </div>
@@ -419,7 +466,8 @@ const AddressContactDetails = memo(
                 fullWidth
                 required={true}
                 disabled={disableInput}
-                error={streetAddressText === "" && contactDetailsNotGiven}
+                error={(streetAddressText === "" && contactDetailsNotGiven) || textFieldLengthValidation(streetAddressText, "LOCATION")}
+                helperText={textFieldLengthValidation(streetAddressText, "LOCATION") ? TEXT_FIELD_LOCATION_ERROR : ""}
               />
             </div>
 
@@ -434,6 +482,8 @@ const AddressContactDetails = memo(
                 onChange={handleScondaryStreetAddressChange}
                 fullWidth
                 disabled={disableInput}
+                helperText={textFieldLengthValidation(secondaryStreetAddressText, "LOCATION") ? TEXT_FIELD_LOCATION_ERROR : ""}
+                error={textFieldLengthValidation(secondaryStreetAddressText, "LOCATION")}
               />
             </div>
 
@@ -444,12 +494,13 @@ const AddressContactDetails = memo(
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
                 className={warning && warning(FOI_COMPONENT_CONSTANTS.CITY) && classes.warning}
-                value={CityText}
+                value={cityText}
                 onChange={handleCityChange}
                 fullWidth
                 required={true}
                 disabled={disableInput}
-                error={CityText === "" && contactDetailsNotGiven}
+                error={(cityText === "" && contactDetailsNotGiven) || textFieldLengthValidation(cityText, "LOCATION")}
+                helperText={textFieldLengthValidation(cityText, "LOCATION") ? TEXT_FIELD_LOCATION_ERROR : ""}
               />
             </div>
 
@@ -460,12 +511,13 @@ const AddressContactDetails = memo(
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
                 className={warning && warning(FOI_COMPONENT_CONSTANTS.PROVINCE) && classes.warning}
-                value={ProvinceText}
+                value={provinceText}
                 onChange={handleProvinceChange}
                 fullWidth
                 required={true}
                 disabled={disableInput}
-                error={ProvinceText === "" && contactDetailsNotGiven}
+                error={(provinceText === "" && contactDetailsNotGiven) || textFieldLengthValidation(provinceText, "LOCATION")}
+                helperText={textFieldLengthValidation(provinceText, "LOCATION") ? TEXT_FIELD_LOCATION_ERROR : ""}
               />
             </div>
 
@@ -476,12 +528,13 @@ const AddressContactDetails = memo(
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
                 className={warning && warning(FOI_COMPONENT_CONSTANTS.COUNTRY) && classes.warning}
-                value={CountryText}
+                value={countryText}
                 onChange={handleCountryChange}
                 fullWidth
                 required={true}
                 disabled={disableInput}
-                error={CountryText === "" && contactDetailsNotGiven}
+                error={(countryText === "" && contactDetailsNotGiven || textFieldLengthValidation(countryText, "LOCATION"))}
+                helperText={textFieldLengthValidation(countryText, "LOCATION") ? TEXT_FIELD_LOCATION_ERROR : ""}
               />
             </div>
 
@@ -492,13 +545,14 @@ const AddressContactDetails = memo(
                 InputLabelProps={{ shrink: true }}
                 variant="outlined"
                 className={warning && warning(FOI_COMPONENT_CONSTANTS.POSTALCODE) && classes.warning}
-                value={PostalText}
+                value={postalText}
                 onChange={handlePostalChange}
                 inputProps={{ maxLength: 6 }}
                 fullWidth
                 required={true}
                 disabled={disableInput}
-                error={PostalText === "" && contactDetailsNotGiven}
+                error={(postalText === "" && contactDetailsNotGiven) || textFieldLengthValidation(postalText, "POSTAL")}
+                helperText={textFieldLengthValidation(postalText, "POSTAL") ? "Text field length must not exceed 10 characters" : ""}
               />
             </div>
           </div>

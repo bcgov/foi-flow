@@ -45,6 +45,8 @@ const FOI_COMPONENT_CONSTANTS = {
     RECEIVED_DATE_UF: "receivedDateUF",
     REQUEST_START_DATE: "requestStartDate",
     DUE_DATE: "dueDate",
+    ORIGINAL_DUE_DATE: "originalDueDate",
+    RECORDS_DUE_DATE: "recordsDueDate",
 
     PERSONAL_HEALTH_NUMBER: "personalHealthNumber",
     CORRECTIONS_NUMBER: "correctionalServiceNumber",

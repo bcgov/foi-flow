@@ -1,7 +1,8 @@
 import {
+  httpDELETERequest,
   httpGETRequest,
   httpGETRequest1,
-  httpPOSTRequest,
+  httpPOSTRequest, httpPUTRequest,
 } from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
@@ -28,7 +29,7 @@ import {
   setFOIPDFStitchStatusesForPhasedRedlines,
   setFOIPDFStitchedRecordsForPhasedRedlines,
   setFOIPDFStitchStatusesForPhasedResponsePackages,
-  setFOIPDFStitchedRecordsForPhasedResponsePackages,
+  setFOIPDFStitchedRecordsForPhasedResponsePackages
 } from "../../../actions/FOI/foiRequestActions";
 import { fnDone } from "./foiServicesUtil";
 import UserService from "../../../services/UserService";
@@ -138,37 +139,52 @@ export const checkForRecordsChange = (requestId, ministryId, ...rest) => {
   };
 };
 
-export const fetchFOIRecords = (requestId, ministryId, ...rest) => {
+// Helper function (assuming you can refactor or create this)
+// const replaceUrl = (url, placeholder, value) => url.replace(placeholder, value);
+
+export const fetchFOIRecords = (requestId, ministryId) => async (dispatch) => {
+  // 1. Cleaner Early Exit
   if (!ministryId) {
-    return () => {};
+    console.warn("Cannot fetch records: ministryId is missing.");
+    return;
   }
-  const done = fnDone(rest);
+
   let apiUrl = replaceUrl(
     replaceUrl(API.FOI_GET_RECORDS, "<ministryrequestid>", ministryId),
     "<requestid>",
     requestId
   );
-  return (dispatch) => {
-    dispatch(setRecordsLoader("inprogress"));
-    httpGETRequest(apiUrl, {}, UserService.getToken())
-      .then((res) => {
-        if (res.data) {
-          dispatch(setRequestRecords(res.data));
-          dispatch(setRecordsLoader("completed"));
-          done(null, res.data);
-        } else {
-          console.log("Error in fetching records", res);
-          dispatch(serviceActionError(res));
-          dispatch(setRecordsLoader("error"));
-        }
-      })
-      .catch((error) => {
-        console.log("Error in fetching records", error);
-        dispatch(serviceActionError(error));
-        dispatch(setRecordsLoader("error"));
-        done(error);
-      });
-  };
+
+  // 2. Start Loading
+  dispatch(setRecordsLoader("inprogress"));
+
+  try {
+    // 3. Await the API call for linear reading
+    const res = await httpGETRequest(apiUrl, {}, UserService.getToken());
+
+    if (res.data) {
+      // 4. Success
+      dispatch(setRequestRecords(res.data));
+      dispatch(setRecordsLoader("completed"));
+
+      // Removed the 'done' callback pattern for simplicity,
+      // relying on the caller to handle the promise or thunk result if needed.
+      return res.data;
+
+    } else {
+      // API call succeeded but returned unexpected data
+      console.error("API returned incomplete data for records:", res);
+      dispatch(serviceActionError(res));
+      dispatch(setRecordsLoader("error"));
+      // Throw error to be caught by the outer catch block if necessary, or just log
+    }
+
+  } catch (error) {
+    // 5. Catch API Failure
+    console.error("Error in fetching FOI records:", error);
+    dispatch(serviceActionError(error));
+    dispatch(setRecordsLoader("error"));
+  }
 };
 
 export const fetchRedactedSections = (ministryId, ...rest) => {
@@ -881,8 +897,8 @@ export const fetchPDFStitchedRecordForOIPCRedlineReview = (
       httpGETRequest(apiUrl, {}, UserService.getToken())
         .then((res) => {
           if (res.data) {
-            if (!res.data.records) {              
-              dispatch(setRequestAttachments(res.data)); 
+            if (!res.data.records) {
+              dispatch(setRequestAttachments(res.data));
               dispatch(setFOIAttachmentListLoader(false));
             } else {
               dispatch(setRequestRecords(res.data));
@@ -904,7 +920,7 @@ export const fetchPDFStitchedRecordForOIPCRedlineReview = (
     };
   };
 
-  
+
 export const fetchPDFStitchStatusForConsults = (
   requestId,
   ministryId,
@@ -1021,7 +1037,7 @@ export const updateUserLockedRecords = (data, requestId, ministryId, ...rest) =>
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
-          throw new Error(`Error while updating records lock status for the (request# ${requestId}, ministry# ${ministryId})`);            
+          throw new Error(`Error while updating records lock status for the (request# ${requestId}, ministry# ${ministryId})`);
         }
       })
       .catch((error) => {
@@ -1060,4 +1076,105 @@ export const retrieveSelectedRecordVersion = (
         dispatch(setFOILoader(false));
       });
   };
+};
+
+
+export const createFOIRecordGroup = (
+  requestId,
+  ministryId,
+  data,
+  done
+) => {
+  let apiUrl = API.FOI_POST_RECORD_GROUP;
+  apiUrl = replaceUrl(apiUrl, "<requestid>", requestId);
+  apiUrl = replaceUrl(apiUrl, "<ministryrequestid>", ministryId);
+
+  return (dispatch) => {
+    httpPOSTRequest(apiUrl, data, UserService.getToken())
+      .then((res) => {
+        if (res?.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          done("Error saving record group");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
+
+
+export const updateFOIRecordGroup = (
+  requestId,
+  ministryId,
+  groupId,
+  data,
+  done
+) => {
+
+  let apiUrl = API.FOI_PUT_RECORD_GROUP;
+  apiUrl = replaceUrl(apiUrl, "<requestid>", requestId);
+  apiUrl = replaceUrl(apiUrl, "<ministryrequestid>", ministryId);
+  apiUrl = replaceUrl(apiUrl, "<groupid>", groupId);
+
+  return (dispatch) => {
+    httpPUTRequest(apiUrl, data, UserService.getToken())
+      .then((res) => {
+        const payload = res?.data;
+        if (payload) {
+          done(null, payload);
+        } else {
+          dispatch(serviceActionError(res));
+          done("Error updating record group");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
+
+export const deleteFOIRecordFromGroup = (
+  requestId,
+  ministryId,
+  groupId,
+  recordId,
+  done
+) => {
+  let apiUrl = API.FOI_DELETE_RECORD_GROUP;
+  apiUrl = replaceUrl(apiUrl, "<requestid>", requestId);
+  apiUrl = replaceUrl(apiUrl, "<ministryrequestid>", ministryId);
+  apiUrl = replaceUrl(apiUrl, "<groupid>", groupId);
+  apiUrl = replaceUrl(apiUrl, "<recordid>", recordId);
+
+  return (dispatch) => {
+    httpDELETERequest(apiUrl, UserService.getToken())
+      .then((res) => {
+        const payload = res?.data;
+        if (payload) {
+          done(null, payload);
+        } else {
+          dispatch(serviceActionError(res));
+          done("Error deleting record from document set");
+        }
+      })
+      .catch((error) => {
+        dispatch(serviceActionError(error));
+        done(error);
+      });
+  };
+};
+
+
+export const getFOIRecordGroup = async (requestId, ministryId) => {
+  let apiUrl = API.FOI_GET_RECORD_GROUP;
+  apiUrl = replaceUrl(apiUrl, "<requestid>", requestId);
+  apiUrl = replaceUrl(apiUrl, "<ministryrequestid>", ministryId);
+
+  const res = await httpGETRequest(apiUrl, null, UserService.getToken());
+  return res?.data?.data || [];
 };

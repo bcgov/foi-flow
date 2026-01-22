@@ -112,6 +112,7 @@ import {
   convertSTRToDate,
   getCommentTypeIdByName,
   isMinistryLogin,
+  addBusinessDays
 } from "../../../helper/FOI/helper";
 import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
@@ -835,12 +836,15 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     dueDate: "",
     requestState: "",
   };
+  if (requestDetails?.cfrDueDate) requiredRequestDetailsInitialValues["recordsDueDate"] = "";
 
   const requiredApplicantDetailsValues = {
     firstName: "",
     lastName: "",
+    middleName: "",
     email: "",
     category: "",
+    businessName: ""
   };
 
   const requiredContactDetailsValue = {
@@ -849,6 +853,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     province: "",
     country: "",
     postal: "",
+    phonePrimary: "",
+    phoneSecondary: "",
+    workPhonePrimary: "",
+    workPhoneSecondary: "",
+    addressSecondary: ""
   };
 
   const requiredAxisDetailsValue = {
@@ -1044,7 +1053,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     requestDetails.isoipcreview,
     requestDetails.isconsultflag,
     isProactiveDisclosure,
-    requiredProactiveDetailsValues
+    requiredProactiveDetailsValues,
+    requiredContactDetails
   );
 
   const classes = useStyles();
@@ -1831,6 +1841,23 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             )}
                         </>
                       )}
+                      {showDivisionalTracking && (
+                        <DivisionalTracking
+                          divisions={requestDetails.divisions}
+                        />
+                      )}
+                      <div ref={oipcSectionRef}></div>
+                      {isOIPCReview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
+                        <OIPCDetails
+                          oipcData={oipcData}
+                          updateOIPC={updateOIPC}
+                          addOIPC={addOIPC}
+                          removeOIPC={removeOIPC}
+                          isMinistry={false}
+                          isHistoricalRequest={isHistoricalRequest}
+                        />
+                      )}
+
                       <BottomButtonGroup
                         stateChanged={stateChanged}
                         isValidationError={isValidationError}

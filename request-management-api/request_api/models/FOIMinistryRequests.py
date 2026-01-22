@@ -909,8 +909,11 @@ class FOIMinistryRequest(db.Model):
         return ministryfilterwithclosedoipc
 
     @classmethod
-    def getrequestoriginalduedate(cls,ministryrequestid):       
-        return db.session.query(FOIMinistryRequest.duedate).filter(FOIMinistryRequest.foiministryrequestid == ministryrequestid, FOIMinistryRequest.requeststatuslabel == StateName.open.name).order_by(FOIMinistryRequest.version).first()[0]
+    def getrequestoriginalduedate(cls,ministryrequestid): 
+        result = db.session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == ministryrequestid).order_by(FOIMinistryRequest.version.desc()).first()
+        originaldd = result.originalldd
+        duedate = result.duedate
+        return originaldd if originaldd is not None else duedate
 
     @classmethod
     def getduedate(cls,ministryrequestid):

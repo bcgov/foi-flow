@@ -1,16 +1,9 @@
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
-import {
-  formatDate,
-  isProcessingTeam,
-  isFlexTeam,
-} from "../../../helper/FOI/helper";
-import {
-  extensionStatusId,
-  KCProcessingTeams,
-} from "../../../constants/FOI/enum";
-import MANDATORY_FOI_REQUEST_FIELDS from "../../../constants/FOI/mandatoryFOIRequestFields";
-import AXIS_SYNC_DISPLAY_FIELDS from "../../../constants/FOI/axisSyncDisplayFields";
+import { formatDate, isProcessingTeam, isFlexTeam, addBusinessDays } from "../../../helper/FOI/helper";
+import { extensionStatusId, KCProcessingTeams } from "../../../constants/FOI/enum";
+import MANDATORY_FOI_REQUEST_FIELDS from '../../../constants/FOI/mandatoryFOIRequestFields';
+import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
 
 export const getTabBottomText = ({
   _daysRemaining,
@@ -289,11 +282,8 @@ export const createRequestDetailsObjectFunc = (
       requestObject.requestProcessStart = value.requestStartDate;
       requestObject.dueDate = value.dueDate;
       requestObject.receivedMode = value.receivedMode;
-      requestObject.deliveryMode = value.deliveryMode
-        ?.toLowerCase()
-        ?.includes("select")
-        ? ""
-        : value.deliveryMode;
+      requestObject.deliveryMode = value.deliveryMode?.toLowerCase()?.includes("select")?"":value.deliveryMode;
+      if ("cfrDueDate" in requestObject) requestObject.cfrDueDate = value.recordsDueDate;
       break;
     case FOI_COMPONENT_CONSTANTS.ASSIGNED_TO:
       const assigneeDetails = createAssigneeDetails(value, value2);
@@ -313,6 +303,7 @@ export const createRequestDetailsObjectFunc = (
     case FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE:
       requestObject.requestProcessStart = value;
       requestObject.dueDate = value2;
+      if ("originalDueDate" in requestObject) requestObject.originalDueDate = addBusinessDays(formatDate(value, "yyyy MMM, dd"), 30);
       break;
     case FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST:
       requestObject.selectedMinistries = [];
@@ -333,6 +324,9 @@ export const createRequestDetailsObjectFunc = (
       break;
     case FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED:
       requestObject.identityVerified = value;
+      break;
+    case FOI_COMPONENT_CONSTANTS.RECORDS_DUE_DATE:
+      requestObject.cfrDueDate = value;
       break;
     case FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER:
     case FOI_COMPONENT_CONSTANTS.DOB:
@@ -387,7 +381,8 @@ export const checkValidationError = (
   isOipcReview,
   isconsultflag,
   isProactiveDisclosure,
-  requiredProactiveDetailsValues
+  requiredProactiveDetailsValues,
+  requiredContactDetails
 ) => {
   if (isProactiveDisclosure) {
     return (
@@ -408,18 +403,19 @@ export const checkValidationError = (
     );
   }
   return (
-    (!isconsultflag &&
-      (requiredApplicantDetails.firstName === "" ||
-        requiredApplicantDetails.lastName === "")) ||
+    (!isconsultflag && (
+      requiredApplicantDetails.firstName === "" ||
+      requiredApplicantDetails.lastName === "" ||
+      requiredApplicantDetails.firstName.length > 50 ||
+      requiredApplicantDetails.lastName.length > 50 ||
+      requiredApplicantDetails.middleName.length > 50
+    )) ||
+    requiredApplicantDetails.businessName.length > 255 ||
     requiredApplicantDetails.category.toLowerCase().includes("select") ||
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
-    (!requiredRequestDescriptionValues.isProgramAreaSelected &&
-      ([
-        StateEnum.unopened.name.toLowerCase(),
-        StateEnum.intakeinprogress.name.toLowerCase(),
-      ].includes(currentrequestStatus?.toLowerCase()) ||
-        isAddRequest)) ||
+    (!requiredRequestDescriptionValues.isProgramAreaSelected
+      && ([StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(currentrequestStatus?.toLowerCase()) || isAddRequest)) ||
     (requiredRequestDetailsValues.requestType.toLowerCase() ===
       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
       !requiredRequestDescriptionValues.ispiiredacted) ||
@@ -429,30 +425,30 @@ export const checkValidationError = (
     requiredRequestDetailsValues.receivedMode
       .toLowerCase()
       .includes("select") ||
+    requiredContactDetails.address.length > 120 ||
+    requiredContactDetails.city.length > 120 ||
+    requiredContactDetails.addressSecondary.length > 120 ||
+    requiredContactDetails.province.length > 120 ||
+    requiredContactDetails.country.length > 120 ||
+    requiredContactDetails.postal.length > 10 ||
+    requiredContactDetails.phonePrimary.length > 50 ||
+    requiredContactDetails.phoneSecondary.length > 50 ||
+    requiredContactDetails.workPhonePrimary.length > 50 ||
+    requiredContactDetails.workPhoneSecondary.length > 50 ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
+    !requiredRequestDetailsValues.dueDate ||
+    ("recordsDueDate" in requiredRequestDetailsValues  && !requiredRequestDetailsValues.recordsDueDate) ||
     !requiredAxisDetails.axisRequestId ||
-    (oipcData?.length > 0 &&
-      isOipcReview &&
-      oipcData?.some((oipc) => {
-        if (oipc.inquiryattributes?.inquirydate) {
-          return oipc.inquiryattributes.orderno === "";
-        }
-        if (oipc.inquiryattributes?.orderno) {
-          return (
-            oipc.inquiryattributes?.inquirydate === null ||
-            oipc.inquiryattributes?.inquirydate === ""
-          );
-        }
-        return (
-          oipc.oipcno === "" ||
-          oipc.receiveddate === null ||
-          oipc.receiveddate === "" ||
-          oipc.reviewtypeid === null ||
-          oipc.reasonid === null ||
-          oipc.statusid === null
-        );
-      }))
+    (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
+      if (oipc.inquiryattributes?.inquirydate) {
+        return oipc.inquiryattributes.orderno === "";
+      }
+      if (oipc.inquiryattributes?.orderno) {
+        return oipc.inquiryattributes?.inquirydate === null || oipc.inquiryattributes?.inquirydate === "";
+      }
+      return oipc.oipcno === "" || oipc.receiveddate === null || oipc.receiveddate === "" || oipc.reviewtypeid === null || oipc.reasonid === null || oipc.statusid === null;
+    }))
   );
 };
 

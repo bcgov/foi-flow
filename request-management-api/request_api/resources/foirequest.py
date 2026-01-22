@@ -172,7 +172,7 @@ class FOIRequestsById(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
     
-@cors_preflight('POST,OPTIONS')
+@cors_preflight('POST, OPTIONS')
 @API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>')
 @API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/<string:usertype>/<string:actiontype>')
 class FOIRequestsByIdAndType(Resource):
@@ -349,37 +349,41 @@ class FOIRequestsById(Resource):
 class FOIRequestForDocReviewer(Resource):
     """Retrieve foi request for opened request - Used
     in docreviewer"""
-    
+
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
     def get(ministryrequestid,usertype=None):
+        documentsetid = request.args.get('documentsetid', type=int)
+
         try :
             jsondata = {}
             statuscode = 200
             foirequestid=requestservice().getrequestid(ministryrequestid)
             if (AuthHelper.getusertype() == "iao") and (usertype is None or (usertype == "iao")):
-                jsondata = requestservice().getrequestdetails(foirequestid,ministryrequestid)
+
+                jsondata = requestservice().getrequestdetails(foirequestid,ministryrequestid, documentsetid)
                 assignee = jsondata['assignedTo']
                 isrestricted = jsondata['iaorestricteddetails']['isrestricted'] if ('isrestricted' in jsondata['iaorestricteddetails']) else False
                 if(canrestictdata(ministryrequestid,assignee,isrestricted,False)):
                     jsondata = {}
                     statuscode = 401
             elif usertype is not None and usertype == "ministry" and AuthHelper.getusertype() == "ministry":
-                jsondata = requestservice().getrequestdetailsforministry(foirequestid,ministryrequestid,AuthHelper.getministrygroups())
+                jsondata = requestservice().getrequestdetailsforministry(foirequestid,ministryrequestid,AuthHelper.getministrygroups(), documentsetid)
                 assignee = jsondata['assignedministryperson']
                 isrestricted = jsondata['ministryrestricteddetails']['isrestricted'] if ('isrestricted' in jsondata['ministryrestricteddetails']) else False
                 if(canrestictdata_ministry(ministryrequestid,assignee,isrestricted)):
                     jsondata = {}
                     statuscode = 401
             else:
-                statuscode = 401 
-            return jsondata , statuscode 
+                statuscode = 401
+            return jsondata , statuscode
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as error:
             traceback.print_exc()
-            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400        
-        except BusinessException as exception:            
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
+

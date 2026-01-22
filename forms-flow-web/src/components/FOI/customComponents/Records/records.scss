@@ -108,7 +108,39 @@
     font-family: BCSans-Regular, sans-serif !important;
     padding: 2%;
   }
-  
+
   .record-checkmark {
     accent-color: #178100;
+  }
+
+
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    padding: 8px 0;
+    min-width: 250px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 1000;
+  }
+
+  .dropdown-item {
+    width: 100%;
+    padding: 8px 16px;
+    text-align: left;
+    background: white;
+    border: none;
+    cursor: pointer;
+  }
+
+  .dropdown-item:hover {
+    background: #f2f2f2;
   }
