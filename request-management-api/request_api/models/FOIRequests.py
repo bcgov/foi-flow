@@ -71,7 +71,6 @@ class FOIRequest(db.Model):
             assignedministrygroup = ministry.assignedministrygroup if ministry.assignedministrygroup is not None else ""                                
             assignedgroup = ministry.assignedgroup if ministry.assignedgroup is not None else ""                                
             ministryarr.append({"id": ministry.foiministryrequestid, "foirequestid": ministry.foirequest_id, "axisrequestid": ministry.axisrequestid, "filenumber": ministry.filenumber, "status": ministry.requeststatus.name, "assignedministrygroup": assignedministrygroup, "assignedgroup": assignedgroup, "version":ministry.version})    
-        print("ministryarr in saverequest:",ministryarr)
         return DefaultMethodResult(True,'Request added',foirequest.foirequestid,ministryarr,foirequest.wfinstanceid)
                           
     @classmethod

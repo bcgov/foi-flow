@@ -30,6 +30,7 @@ from .SubjectCodes import SubjectCode
 from request_api.utils.enums import StateName
 from .FOIRequestOIPC import FOIRequestOIPC
 from .ProactiveDisclosureCategories import ProactiveDisclosureCategory
+from request_api.models import FOIProactiveDisclosureRequests
 from .FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 
 class FOIMinistryRequest(db.Model):
@@ -1741,6 +1742,195 @@ class FOIMinistryRequest(db.Model):
         finally:
             db.session.close()
         return requestdetails
+
+
+    @classmethod
+    def getpdrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby, 
+                            isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
+        pdbasequery = cls.getpdbasequery(additionalfilter, userid, isiaorestrictedfilemanager, groups, isadvancedsearch=False)
+        if len(filterfields) > 0 and keyword is not None:
+            filtercondition = cls.getfilterforrequestssubquery(filterfields, keyword)
+            return pdbasequery.filter(filtercondition)
+        else:
+            return pdbasequery  
+
+
+    @classmethod
+    def getpdbasequery(cls, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, groups=[], isadvancedsearch=False):
+        _session = db.session
+        # subquery for getting the latest version of FOIProactiveDisclosureRequests
+        latest_proactive_subq = (
+            _session.query(
+                FOIProactiveDisclosureRequests.foiministryrequest_id,
+                func.max(FOIProactiveDisclosureRequests.foiministryrequestversion_id).label("max_version")
+            )
+            .group_by(FOIProactiveDisclosureRequests.foiministryrequest_id)
+            .subquery()
+        )
+        # joincondition = [
+        #     subquery_maxversion.c.foiopeninforequestid == FOIOpenInformationRequests.foiopeninforequestid,
+        #     subquery_maxversion.c.max_version == FOIOpenInformationRequests.version,
+        #     FOIOpenInformationRequests.isactive == True
+        # ]
+
+        recordspagecount = case ([
+            (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
+            ],
+            else_= literal("0").label("recordspagecount")
+        )
+
+        # oistatusname = case(
+        #     [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
+        #     else_=OpenInformationStatuses.name
+        # ).label('oiStatusName')
+        assignedtoformatted = case(
+            [
+                (
+                    and_(
+                        FOIAssignee.lastname.isnot(None),
+                        FOIAssignee.firstname.isnot(None)
+                    ),
+                    func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)
+                ),
+                (
+                    and_(
+                        FOIAssignee.lastname.isnot(None),
+                        FOIAssignee.firstname.is_(None)
+                    ),
+                    FOIAssignee.lastname
+                ),
+                (
+                    and_(
+                        FOIAssignee.lastname.is_(None),
+                        FOIAssignee.firstname.isnot(None)
+                    ),
+                    FOIAssignee.firstname
+                )
+            ],
+            else_=''
+        ).label('assignedtoformatted')
+
+
+        #oifilter = cls.getgroupfilters(groups)
+        # excluded_program_areas = ExcludedProgramArea.list()
+        # eligible_close_reasons = OICloseReason.list()
+        selectedcolumns = [
+            FOIRequest.foirequestid.label('id'), 
+            FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'), 
+            cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
+            cls.closedate, 
+            FOIRequest.requesttype.label('requestType'), 
+            cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
+            ProactiveDisclosureCategory.name.label('proactivedisclosurecategory'),
+            recordspagecount.label('recordspagecount'),  
+            #oistatusname.label('oiStatusName'),
+            #cls.receiveddate.label('receivedDate'),
+            FOIProactiveDisclosureRequests.publicationdate,
+            cls.created_at, 
+            assignedtoformatted, 
+            cls.version,
+            #cls.foiopeninforequestid,
+            FOIRequestStatus.name.label('currentState'),
+            #FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
+            SubjectCode.name.label('subjectcode'),
+            cls.closedate
+        ]   
+        basequery = (
+            _session.query(*selectedcolumns)
+            .join(
+                latest_proactive_subq,
+                latest_proactive_subq.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid
+            )
+            .join(
+                FOIProactiveDisclosureRequests,
+                and_(
+                    FOIProactiveDisclosureRequests.foiministryrequest_id == latest_proactive_subq.c.foiministryrequest_id,
+                    FOIProactiveDisclosureRequests.foiministryrequestversion_id == latest_proactive_subq.c.max_version
+                )
+            )
+            .join(
+                ProactiveDisclosureCategory,
+                ProactiveDisclosureCategory.proactivedisclosurecategoryid ==
+                FOIProactiveDisclosureRequests.proactivedisclosurecategoryid
+            )
+            .join(FOIMinistryRequest, and_(
+                FOIMinistryRequest.foiministryrequestid == cls.foiministryrequest_id, 
+                FOIMinistryRequest.isactive == True,
+            ))
+            .join(FOIRequest, and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id, FOIRequest.requesttype != 'personal'))
+            .join(ApplicantCategory,and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True))
+            #.outerjoin(OpenInformationStatuses, OpenInformationStatuses.oistatusid == FOIMinistryRequest.oistatus_id)
+            .join(FOIRequestStatus, FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid)
+            # .join(FOIRestrictedMinistryRequest,
+            #                     and_(
+            #                         FOIRestrictedMinistryRequest.ministryrequestid == FOIMinistryRequest.foiministryrequestid,
+            #                         FOIRestrictedMinistryRequest.type == 'iao',
+            #                         FOIRestrictedMinistryRequest.isactive == True),
+            #                     isouter=True
+            #)
+        .outerjoin(FOIAssignee, FOIAssignee.username == cls.oiassignedto)
+            .outerjoin(FOIMinistryRequestSubjectCode, 
+                and_(
+                    FOIMinistryRequestSubjectCode.foiministryrequestid == FOIMinistryRequest.foiministryrequestid, FOIMinistryRequestSubjectCode.foiministryrequestversion == FOIMinistryRequest.version
+                )
+            )
+            .join(
+                  SubjectCode,
+                  SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
+                  isouter=True
+                 )
+        )
+        if additionalfilter == 'watchingRequests':
+            subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
+            basequery = basequery.join(
+                subquery_watchby, 
+                subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid
+            )
+        elif additionalfilter == 'myRequests':
+            basequery = basequery.filter(
+                and_(
+                    cls.oiassignedto == userid
+                )
+            )
+        elif additionalfilter == 'unassignedRequests':
+            basequery = basequery.filter(
+                    cls.oiassignedto.is_(None),                         
+            )
+        elif additionalfilter is not None and additionalfilter.lower() == 'all':
+            basequery = basequery.filter(cls.oiassignedto != None)
+        return basequery
+
+
+
+        
+    @classmethod
+    def getfilterforrequestssubquery(cls, filterfields, keyword):
+        _keywords = []
+        if(keyword is not None):
+            _keywords = keyword.lower().replace(",", " ").split()
+
+        #filter/search
+        filtercondition = []
+        for _keyword in _keywords:
+            onekeywordfiltercondition = []
+            #if(_keyword != 'restricted'):
+            for field in filterfields:
+                if(field == 'idNumber'):
+                    _keyword = _keyword.replace('u-00', '')
+                field_value = cls.findfield(field)
+                condition = field_value.ilike('%'+_keyword+'%')
+                onekeywordfiltercondition.append(condition)            
+            # else:
+            #     filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
+
+            if onekeywordfiltercondition:
+                filtercondition.append(or_(*onekeywordfiltercondition))
+            elif _keyword != 'restricted':  
+                filtercondition.append(literal(False))
+
+        return and_(*filtercondition)
+
+
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
         fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate',

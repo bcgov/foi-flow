@@ -59,13 +59,10 @@ class FOIRequest(Resource):
         try :
             jsondata = {}
             statuscode = 200
-            print("\n------------usertype",usertype)
-            print("\n------------Logged in as:",AuthHelper.getusertype())
             if (AuthHelper.getusertype() == "iao") and (usertype is None or (usertype == "iao")):
                 jsondata = requestservice().getrequest(foirequestid,foiministryrequestid)
                 assignee = jsondata['assignedTo']
                 isrestricted = jsondata['iaorestricteddetails']['isrestricted'] if ('isrestricted' in jsondata['iaorestricteddetails']) else False
-                print("\n------------isrestricted-iao",isrestricted)
                 if(canrestictdata(foiministryrequestid,assignee,isrestricted,False)):
                     jsondata = {}
                     statuscode = 401
@@ -73,7 +70,6 @@ class FOIRequest(Resource):
                 jsondata = requestservice().getrequestdetailsforministry(foirequestid,foiministryrequestid,AuthHelper.getministrygroups())
                 assignee = jsondata['assignedministryperson']
                 isrestricted = jsondata['ministryrestricteddetails']['isrestricted'] if ('isrestricted' in jsondata['ministryrestricteddetails']) else False
-                print("\n------------isrestricted-ministry",isrestricted)
                 if(canrestictdata_ministry(foiministryrequestid,assignee,isrestricted)):
                     jsondata = {}
                     statuscode = 401

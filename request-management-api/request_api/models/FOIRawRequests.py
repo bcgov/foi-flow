@@ -22,6 +22,7 @@ from dateutil import parser
 import json
 from request_api.utils.enums import StateName
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
+from .FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -750,7 +751,10 @@ class FOIRawRequest(db.Model):
         if usertype == "iao" or groups is None:
             if is_oi_team:
                 subquery_oirequest_queue = FOIOpenInformationRequests.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, "OI", isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-                return subquery_oirequest_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
+                subquery_pdrequest_queue = FOIMinistryRequest.getpdrequestssubquery(groups, filterfields, keyword, additionalfilter, 
+                                                                userid, iaoassignee, ministryassignee, "OI", isiaorestrictedfilemanager, isministryrestrictedfilemanager)
+                query_full_queue = subquery_oirequest_queue.union(subquery_pdrequest_queue)
+                return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
             else:
                 subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups)
                 print("\n------IAO query:", subquery_rawrequest_queue)
