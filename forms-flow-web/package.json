@@ -121,6 +121,12 @@
     "react-scripts": {
       "css-select": "5.1.0",
       "nth-check": "2.1.1"
+    },
+    "jsdom": {
+      "form-data": "^3.0.4"
+    },
+    "axios": {
+      "form-data": "^4.0.4"
     }
   },
   "browserslist": [
