@@ -1,4 +1,5 @@
 //Remove duplicate records
+
 export const removeDuplicateFiles = (recordList) =>
   recordList.filter(({ isduplicate }) => !isduplicate);
 
@@ -176,7 +177,7 @@ export const sortDivisionalFiles = (divisionMap) => {
 export const calculateTotalUploadedFileSizeInKB = (records) => {
   return records?.reduce((total, record) => {
     const size =
-        record?.selectedfileprocessversion == 1 ? 
+        record?.selectedfileprocessversion == 1 ?
           record?.attributes?.filesize :
         record?.attributes?.ocrfilesize ??
        (record?.selectedfileversion !== 1 &&
@@ -198,3 +199,17 @@ export const getReadableFileSize = (mb) => {
     return mb.toFixed(4) + " MB";
   }
 };
+
+export const formatBytes = (bytes) => {
+  if (bytes >= 1024 * 1024 * 1024) {
+    return (bytes / (1024 * 1024 * 1024)).toFixed(1) + " GB";
+  }
+  if (bytes >= 1024 * 1024) {
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+  }
+  if (bytes >= 1024) {
+    return (bytes / 1024).toFixed(1) + " KB";
+  }
+  return bytes;
+};
+

@@ -8,33 +8,14 @@ import {
 import Grid from "@mui/material/Grid";
 import Tooltip from "@mui/material/Tooltip";
 import AttachmentModal from "../Attachments/AttachmentModal";
-import {makeStyles} from "@material-ui/core/styles";
 import clsx from "clsx";
 
-export default function RedactRecordsButton({records, groups, ministryrequestid}) {
-
-  const useStyles = makeStyles((_theme) => ({
-    createButton: {
-      margin: 0,
-      width: "100%",
-      height: "50%",
-      backgroundColor: "#38598A",
-      color: "#FFFFFF",
-      fontWeight: 700,
-      fontFamily: "BCSans-Bold, sans-serif ",
-      textTransform: "none",
-      whiteSpace: "nowrap",
-
-      "&:hover": {
-        backgroundColor: "#38598A",
-      },
-      "&:active": {
-        backgroundColor: "#38598A",
-      },
-    },
-  }));
-
-  const classes = useStyles();
+export default function RedactRecordsButton({
+  records,
+  groups,
+  ministryrequestid,
+  buttonClassName,
+}) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
@@ -144,9 +125,10 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
             variant="contained"
             color="primary"
             onClick={handleMenuOpen}
+            style={{ minWidth: "100px" }}
             className={clsx(
               "btn",
-              classes.createButton
+              buttonClassName
             )}
 
 
@@ -227,20 +209,19 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
             }
             disableHoverListener={!isDisableRedactRecords(records)}
           >
-    <div style={{display: "flex", minWidth: "130px", width: "100%", justifyContent: "revert" , whiteSpace: "nowrap"}}>
         <Button
           variant="contained"
           color="primary"
           onClick={handleRedactAll}
           disabled={isDisableRedactRecords(records)}
+          style={{ minWidth: "100px" }}
           className={clsx(
             "btn",
-            classes.createButton
+            buttonClassName
           )}
         >
           Redact Records
         </Button>
-      </div>
           </Tooltip>
         </Grid>
 
