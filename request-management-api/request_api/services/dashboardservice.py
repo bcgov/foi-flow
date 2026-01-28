@@ -212,9 +212,9 @@ class dashboardservice:
                 if is_oi_team:
                     unopenrequest.update({'receivedDate': request.oiReceivedDate.strftime("%b %d %Y") if request.oiReceivedDate else None})
                     unopenrequest.update({'applicantType': request.applicantcategory})
-                    unopenrequest.update({'fromClosed': self.__calculate_from_closed(request.closedate)})
+                    unopenrequest.update({'closedate': self.__calculate_from_closed(request.closedate)})
                     unopenrequest.update({'publicationDate': request.publicationDate.strftime("%b %d %Y") if request.publicationDate else "N/A"})
-                    unopenrequest.update({'assignedTo': "Unassigned"})
+                    unopenrequest.update({'oiAssignedTo': "Unassigned"})
                     unopenrequest.update({'publicationStatus': "unopened"})
 
                 requestqueue.append(unopenrequest)
@@ -230,7 +230,7 @@ class dashboardservice:
                 _openrequest.update({'isiaorestricted': isiaorestricted})
                 _openrequest.update({'closereason': request.closereason})
                 if is_oi_team:
-                    oistatusid = request.oistatusid
+                    oistatusid = request.publicationStatus
                     match oistatusid:
                         case OIStatusEnum.FIRST_REVIEW.value:
                             _openrequest.update({'publicationStatus': "First Review"})
@@ -252,9 +252,9 @@ class dashboardservice:
                             _openrequest.update({'publicationStatus': "unopened"})
                     _openrequest.update({'receivedDate': request.oiReceivedDate.strftime("%b %d %Y") if request.oiReceivedDate else None})
                     _openrequest.update({'publicationDate': request.publicationDate.strftime("%b %d %Y") if request.publicationDate else "N/A"})
-                    _openrequest.update({'assignedTo': request.oiAssignedTo})
-                    _openrequest.update({'fromClosed': self.__calculate_from_closed(request.closedate)})
-                    _openrequest.update({'applicantType': request.applicantcategory})
+                    _openrequest.update({'oiAssignedTo': request.oiAssignedTo})
+                    _openrequest.update({'closedate': self.__calculate_from_closed(request.closedate)})
+                    _openrequest.update({'applicantcategory': request.applicantcategory})
 
                 requestqueue.append(_openrequest)
 
