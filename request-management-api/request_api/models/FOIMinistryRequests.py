@@ -1246,7 +1246,7 @@ class FOIMinistryRequest(db.Model):
             ],
             else_ = foiopeninfo.oiassignedto).label('oiAssignedTo')
 
-            selectedcolumns.append(FOIMinistryRequest.oistatus_id.label('oistatusid'))
+            selectedcolumns.append(FOIMinistryRequest.oistatus_id.label('oistatusid').label('publicationStatus'))
             selectedcolumns.append(foiopeninfo.publicationdate.label('publicationDate'))
             selectedcolumns.append(foiopeninfo.receiveddate.label('oiReceivedDate'))
             selectedcolumns.append(oiAssignedToFormatted)
