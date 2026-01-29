@@ -1664,6 +1664,7 @@ class FOIMinistryRequest(db.Model):
                     ,FMR.description
                     ,PA.iaocode AS programareacode
                     ,FR.requesttype
+                    ,FRRG.document_set_id
                     FROM public."FOIMinistryRequests" FMR INNER JOIN (
                         SELECT 
                         DISTINCT FMR.foiministryrequestid as ministryrequestid
@@ -1676,6 +1677,8 @@ class FOIMinistryRequest(db.Model):
                     JOIN public."FOIRequestApplicantMappings" FRAM ON FRAM.foirequest_id=MaxRequestVersions.requestid
                     JOIN public."FOIRequestApplicants" FRA ON FRA.foirequestapplicantid=FRAM.foirequestapplicantid
                     LEFT JOIN public."ProgramAreas" PA	ON FMR.programareaid = PA.programareaid
+                    LEFT JOIN public."FOIRequestRecordGroup" FRRG	ON FRRG.ministry_request_id = FMR.foiministryrequestid
+                                                                         AND FRRG.request_id = FMR.foirequest_id
    	                JOIN public."FOIRequests" FR ON FMR.foirequest_id = FR.foirequestid AND FMR.version = FR.version"""            
             result = db.session.execute(text(query),{"csvrequestnumbers":csvrequestnumbers})        
             rows = result.fetchall()            
@@ -1704,6 +1707,7 @@ class FOIMinistryRequest(db.Model):
                 requestdetail["description"]=row["description"]
                 requestdetail["requestType"]=row["requesttype"]
                 requestdetail["bcgovcode"]=row["programareacode"]
+                requestdetail["documentsetid"]=row["document_set_id"]
                 requestdetails.append(requestdetail)
 
         except Exception as ex:
