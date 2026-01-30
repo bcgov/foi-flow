@@ -210,7 +210,7 @@ class dashboardservice:
                 unopenrequest.update({'isiaorestricted': request.isiaorestricted})
                 unopenrequest.update({'closereason': request.closereason})
                 if is_oi_team:
-                    unopenrequest.update({'receivedDate': request.oiReceivedDate.strftime("%b %d %Y") if request.oiReceivedDate else None})
+                    unopenrequest.update({'oiReceivedDate': request.oiReceivedDate.strftime("%b %d %Y") if request.oiReceivedDate else None})
                     unopenrequest.update({'applicantType': request.applicantcategory})
                     unopenrequest.update({'closedate': self.__calculate_from_closed(request.closedate)})
                     unopenrequest.update({'publicationDate': request.publicationDate.strftime("%b %d %Y") if request.publicationDate else "N/A"})
@@ -230,27 +230,8 @@ class dashboardservice:
                 _openrequest.update({'isiaorestricted': isiaorestricted})
                 _openrequest.update({'closereason': request.closereason})
                 if is_oi_team:
-                    oistatusid = request.publicationStatus
-                    match oistatusid:
-                        case OIStatusEnum.FIRST_REVIEW.value:
-                            _openrequest.update({'publicationStatus': "First Review"})
-                        case OIStatusEnum.PEER_REVIEW.value:
-                            _openrequest.update({'publicationStatus': "Peer Review"})
-                        case OIStatusEnum.READY_TO_PUBLISH.value:
-                            _openrequest.update({'publicationStatus': "Ready to Publish"})
-                        case OIStatusEnum.PUBLISHED.value:
-                            _openrequest.update({'publicationStatus': "Published"})
-                        case OIStatusEnum.HOLD_PUBLICATION.value:
-                            _openrequest.update({'publicationStatus': "HOLD Publication"})
-                        case OIStatusEnum.UNPUBLISHED.value:
-                            _openrequest.update({'publicationStatus': "Unpublished"})
-                        case OIStatusEnum.DO_NOT_PUBLISH.value:
-                            _openrequest.update({'publicationStatus': "Do Not Publish"})
-                        case OIStatusEnum.EXEMPTION_REQUEST.value:
-                            _openrequest.update({'publicationStatus': "Exemption Request"})
-                        case _:
-                            _openrequest.update({'publicationStatus': "unopened"})
-                    _openrequest.update({'receivedDate': request.oiReceivedDate.strftime("%b %d %Y") if request.oiReceivedDate else None})
+                    _openrequest.update({'publicationStatus': request.publicationStatus})
+                    _openrequest.update({'oiReceivedDate': request.oiReceivedDate.strftime("%b %d %Y") if request.oiReceivedDate else None})
                     _openrequest.update({'publicationDate': request.publicationDate.strftime("%b %d %Y") if request.publicationDate else "N/A"})
                     _openrequest.update({'oiAssignedTo': request.oiAssignedTo})
                     _openrequest.update({'closedate': self.__calculate_from_closed(request.closedate)})
