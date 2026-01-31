@@ -429,7 +429,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
 
   const OITeamColumns = [
     {
-      field: "receivedDate",
+      field: "oiReceivedDate",
       headerName: "RECEIVED DATE",
       flex: 1,
       renderCell: hyperlinkRenderCell,
@@ -453,7 +453,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerAlign: "left",
     },
     {
-      field: "recordspagecount",
+      field: "requestpagecount",
       headerName: "PAGES",
       flex: 1,
       renderCell: hyperlinkRenderCell,

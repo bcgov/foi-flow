@@ -29,6 +29,7 @@ from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .SubjectCodes import SubjectCode
 from request_api.utils.enums import StateName
 from .FOIRequestOIPC import FOIRequestOIPC
+from .OpenInformationStatuses import OpenInformationStatuses
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -794,6 +795,13 @@ class FOIMinistryRequest(db.Model):
                     axispagecount),
                 ],
                 else_= literal("0")).label('requestpagecount')
+        publicationStatus = cast(
+                case(
+                    [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
+                    else_=OpenInformationStatuses.name
+                ),
+                String
+            )
 
         return {
             'firstName': FOIRequestApplicant.firstname,
@@ -805,6 +813,7 @@ class FOIMinistryRequest(db.Model):
             'rawRequestNumber': FOIMinistryRequest.filenumber,
             'currentState': FOIRequestStatus.name,
             'assignedTo': FOIMinistryRequest.assignedto,
+            'oiAssignedTo': FOIAssignee.lastname,
             'receivedDate': FOIRequest.receiveddate,
             'receivedDateUF': FOIRequest.receiveddate,
             'applicantcategory': ApplicantCategory.name,
@@ -827,7 +836,8 @@ class FOIMinistryRequest(db.Model):
             'closedate': FOIMinistryRequest.closedate,
             'subjectcode': SubjectCode.name,
             'isoipcreview': FOIMinistryRequest.isoipcreview,
-            'isphasedrelease': FOIMinistryRequest.isphasedrelease
+            'isphasedrelease': FOIMinistryRequest.isphasedrelease,
+            'publicationStatus': publicationStatus
         }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
@@ -1245,8 +1255,12 @@ class FOIMinistryRequest(db.Model):
                 'Unassigned'),
             ],
             else_ = foiopeninfo.oiassignedto).label('oiAssignedTo')
+            publicationStatus = case(
+                [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
+                else_=OpenInformationStatuses.name
+            ).label('publicationStatus')
 
-            selectedcolumns.append(FOIMinistryRequest.oistatus_id.label('oistatusid').label('publicationStatus'))
+            selectedcolumns.append(publicationStatus)
             selectedcolumns.append(foiopeninfo.publicationdate.label('publicationDate'))
             selectedcolumns.append(foiopeninfo.receiveddate.label('oiReceivedDate'))
             selectedcolumns.append(oiAssignedToFormatted)
@@ -1332,7 +1346,7 @@ class FOIMinistryRequest(db.Model):
                     foiopeninfo.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid, 
                     foiopeninfo.foiministryrequestversion_id == FOIMinistryRequest.version, 
                     foiopeninfo.isactive == True), 
-                isouter=True).join(FOIAssignee, FOIAssignee.username == foiopeninfo.oiassignedto, isouter=True)
+                isouter=True).join(FOIAssignee, FOIAssignee.username == foiopeninfo.oiassignedto, isouter=True).join(OpenInformationStatuses, OpenInformationStatuses.oistatusid == FOIMinistryRequest.oistatus_id, isouter=True)
         if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
             dbquery = basequery.filter(ministryfilter)
         else:
