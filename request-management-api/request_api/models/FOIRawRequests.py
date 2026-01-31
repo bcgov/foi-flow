@@ -804,12 +804,12 @@ class FOIRawRequest(db.Model):
             'onBehalfFormatted',
             'extensions',
             'isiaorestricted',
-            'recordspagecount',
-            'publicationStatus',
             'closedate',
-            'publicationDate',
             'closereason',
-            'oiAssignedTo'
+            'publicationDate',
+            'oiReceivedDate',
+            'oiAssignedTo',
+            'publicationStatus'
         ]
         if x in validfields:
             return True
