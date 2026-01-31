@@ -771,6 +771,8 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def findfield(cls, x, iaoassignee, ministryassignee):
         #add more fields here if need sort/filter/search more columns
+        from .FOIOpenInformationRequests import FOIOpenInformationRequests
+        foiopeninfo=aliased(FOIOpenInformationRequests)
         axispagecount = case ([
             (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
             ],
@@ -795,13 +797,13 @@ class FOIMinistryRequest(db.Model):
                     axispagecount),
                 ],
                 else_= literal("0")).label('requestpagecount')
-        publicationStatus = cast(
-                case(
-                    [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
-                    else_=OpenInformationStatuses.name
-                ),
-                String
-            )
+        # publicationStatus = cast(
+        #         case(
+        #             [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
+        #             else_=OpenInformationStatuses.name
+        #         ),
+        #         String
+        #     )
 
         return {
             'firstName': FOIRequestApplicant.firstname,
@@ -813,7 +815,7 @@ class FOIMinistryRequest(db.Model):
             'rawRequestNumber': FOIMinistryRequest.filenumber,
             'currentState': FOIRequestStatus.name,
             'assignedTo': FOIMinistryRequest.assignedto,
-            'oiAssignedTo': FOIAssignee.lastname,
+            'oiAssignedTo': foiopeninfo.oiassignedto,
             'receivedDate': FOIRequest.receiveddate,
             'receivedDateUF': FOIRequest.receiveddate,
             'applicantcategory': ApplicantCategory.name,
@@ -837,7 +839,7 @@ class FOIMinistryRequest(db.Model):
             'subjectcode': SubjectCode.name,
             'isoipcreview': FOIMinistryRequest.isoipcreview,
             'isphasedrelease': FOIMinistryRequest.isphasedrelease,
-            'publicationStatus': publicationStatus
+            # 'publicationStatus': publicationStatus
         }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
