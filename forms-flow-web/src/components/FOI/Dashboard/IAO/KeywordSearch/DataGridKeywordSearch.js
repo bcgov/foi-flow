@@ -9,7 +9,7 @@ import {
   updateSortModel,
   getFullName,
   LightTooltip,
-  pagecountcellTooltipRender,
+  pagecountcellTooltipRender, 
   getClosedDate,
   formatRequestType
 } from "../../utils";
@@ -57,7 +57,7 @@ const DataGridKeywordSearch = ({ userDetail }) => {
 
   const hyperlinkTooltipRenderCell = (params) => {
     let link;
-    if (params.row.ministryrequestid) {
+    if (params.row.ministryrequestid) { 
       link = "./foirequests/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
     } else {
       link = "./reviewrequest/" + params.row.id;
@@ -81,7 +81,7 @@ const DataGridKeywordSearch = ({ userDetail }) => {
 
   const hyperlinkRenderCell = (params) => {
     let link;
-    if (params.row.ministryrequestid) {
+    if (params.row.ministryrequestid) { 
       link = "./foirequests/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
     } else {
       link = "./reviewrequest/" + params.row.id;
@@ -94,41 +94,31 @@ const DataGridKeywordSearch = ({ userDetail }) => {
   };
 
   const goToRecordsRenderCell = (params) => {
-    if (!params?.row?.ministryrequestid) return null;
-
-    const searchParams = new URLSearchParams();
-
     const keywordSearchParam = keywordSearchParamsRef.current;
-    if (keywordSearchParam?.keywords?.length > 0) {
+    let link;
+    if (params.row.ministryrequestid && keywordSearchParam?.keywords?.length > 0) {
       const keywords = keywordSearchParam.keywords
-        .filter(k => k.category?.toUpperCase() !== "NOT")
-        .map(k => `"${k.text}"`)
-        .join(" ");
-
-      searchParams.set("query", keywords);
+      .filter(keyword => keyword.category.toUpperCase() !== "NOT")
+      .map(keyword => `"${keyword.text}"`)
+      .join(" ");
+      let queryString= {"query": keywords };
+      const queryStringParam = new URLSearchParams(queryString).toString();
+      const formattedQueryString = queryStringParam.replace(/\+/g, '%20');
+      link = `${DOC_REVIEWER_WEB_URL}/foi/${params.row.ministryrequestid}?${formattedQueryString}`;
     }
-
-    const setId = Number(params?.row?.documentsetid);
-    if (Number.isInteger(setId) && setId > 0) {
-      searchParams.set("documentsetid", setId.toString());
-    }
-
-    const href = `${DOC_REVIEWER_WEB_URL}/foi/${params.row.ministryrequestid}?${searchParams
-      .toString()
-      .replace(/\+/g, "%20")}`;
-
     return (
       <Link
-        href={href}
+        href={link}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
       >
         <div className="MuiDataGrid-cellContent">Go to records</div>
       </Link>
     );
   };
-
 
 
   const IAOColumns = [
@@ -159,7 +149,7 @@ const DataGridKeywordSearch = ({ userDetail }) => {
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: (params) => params.row.requestnumber,
       width: 160,
-    },
+    },  
     {
       field: "requeststatus",
       headerName: "CURRENT STATE",
@@ -195,7 +185,7 @@ const DataGridKeywordSearch = ({ userDetail }) => {
       flex: 1,
     },
   ];
-
+    
   const defaultTableInfo = {
     columns: IAOColumns,
     sort: [
@@ -208,7 +198,7 @@ const DataGridKeywordSearch = ({ userDetail }) => {
   };
 
   const tableInfo = defaultTableInfo;
-
+  
   const classes = useStyles();
 
   const defaultRowsState = { page: 0, pageSize: 10 };
@@ -234,7 +224,7 @@ const DataGridKeywordSearch = ({ userDetail }) => {
       // });
 
     }
-
+    
   }, [rowsState, sortModel]);
 
   const columnsRef = React.useRef(tableInfo?.columns || []);
