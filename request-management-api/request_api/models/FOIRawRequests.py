@@ -844,10 +844,10 @@ class FOIRawRequest(db.Model):
 
         is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
         if is_oi_team:
-            basequery  = basequery.add_columns(literal(None).label('publicationStatus'))
+            basequery  = basequery.add_columns(literal("unopened").label('publicationStatus'))
             basequery  = basequery.add_columns(literal(None).label('publicationDate'))
             basequery  = basequery.add_columns(literal(None).label('oiReceivedDate'))
-            basequery  = basequery.add_columns(literal(None).label('oiAssignedTo'))
+            basequery  = basequery.add_columns(literal("ZZZ").label('oiAssignedTo'))
 
         #filter/search
         filtercondition = FOIRawRequest.getfilterforadvancedsearch(params)
