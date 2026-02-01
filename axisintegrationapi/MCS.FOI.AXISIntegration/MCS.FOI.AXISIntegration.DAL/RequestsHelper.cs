@@ -1,4 +1,5 @@
 ﻿using MCS.FOI.AXISIntegration.DataModels;
+using MCS.FOI.AXISIntegration.DataModels.Document;
 using Newtonsoft.Json;
 using System;
 using System.Data;
@@ -145,6 +146,24 @@ namespace MCS.FOI.AXISIntegration.DAL
         {
             // Join the array values with commas and enclose each value in single quotes
             return string.Join(",", values.Select(val => $"'{val}'"));
+        }
+
+        // get a list of items in list1 but not in list2
+        public static List<AXISFile> CompareAttachmentLists(List<AXISFile> list1, List<AXISFile> list2)
+        {
+            // 1. Create a HashSet of Tuples (CorrespondenceID, CorrespondenceType) from list2.
+            // This allows us to look up the combination of both fields in O(1) time.
+            var existingRecords = list2
+                .Select(f => (f.CorrespondenceID, f.CorrespondenceType))
+                .ToHashSet();
+
+            // 2. Filter list1 to include only items where the combination of 
+            // ID and Type is NOT found in the HashSet.
+            List<AXISFile> resultList = list1
+                .Where(f => !existingRecords.Contains((f.CorrespondenceID, f.CorrespondenceType)))
+                .ToList();
+
+            return resultList;
         }
     }
 }
