@@ -1,6 +1,7 @@
 using MCS.FOI.AXISIntegration.DAL;
 using MCS.FOI.AXISIntegration.DAL.Interfaces;
 using MCS.FOI.AXISIntegration.Utilities;
+using MCS.FOI.AXISIntegration.Utilities.Types;
 using MCS.FOI.AXISIntegrationWebAPI.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -116,7 +117,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI
 
             });
 
-
+            services.Configure<S3Configuration>(Configuration.GetSection("S3Configuration"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

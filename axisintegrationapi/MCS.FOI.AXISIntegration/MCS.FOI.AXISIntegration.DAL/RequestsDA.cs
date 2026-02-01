@@ -1,9 +1,13 @@
-﻿using MCS.FOI.AXISIntegration.DAL.Interfaces;
+﻿using MCS.FOI.AXISIntegration.DAL;
+using MCS.FOI.AXISIntegration.DAL.Interfaces;
 using MCS.FOI.AXISIntegration.DataModels;
+using MCS.FOI.AXISIntegration.DataModels.Document;
 using MCS.FOI.AXISIntegration.Utilities;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using Dapper;
+// using Microsoft.Data.SqlClient; // or System.Data.SqlClient
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -13,15 +17,15 @@ namespace MCS.FOI.AXISIntegration.DAL
     public class RequestsDA : IRequestDA
     {
         private SqlConnection sqlConnection;
-
         private readonly ILogger<RequestsDA> Ilogger;
-      
         public static string ConnectionString;
+        private readonly IFOIFlowRequestUserDA _fOIFlowRequestDA;
 
         public RequestsDA(ILogger<RequestsDA> _Ilogger)
         {
             Ilogger = _Ilogger;                     
             SettingsManager.DBConnectionInitializer();
+            _fOIFlowRequestDA = new FOIFlowRequestUsersDA(_Ilogger);
         }
 
         public string GetAXISRequestString(string requestNumber)
@@ -95,6 +99,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     axisRequest.AxisSyncDate = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
                     var extensions = GetAxisExtensionData(request);
                     axisRequest.Extensions = GetAXISExtensions(extensions);
+                    axisRequest.CorrespondenceLogs = CompareCorrespondenceFiles(request);
                 }
                 catch (Exception e)
                 {
@@ -430,5 +435,90 @@ namespace MCS.FOI.AXISIntegration.DAL
             return dataTable;
         }
 
+        private List<AXISFile>? GetCorrespondenceLogDocuments(string cs_requestnumber)
+        {
+            ConnectionString = SettingsManager.ConnectionString;
+            string query = @"SELECT * FROM (
+                                SELECT
+                                    R.vcVisibleRequestID AS AXISRequestID
+                                    ,C.iCorrespondenceID AS CorrespondenceID
+                                    ,NULL AS EmailSubject
+                                    ,NULL AS EmailDate
+                                    ,NULL AS EmailTo
+                                    ,NULL AS EmailFrom
+                                    ,NULL AS EmailContent
+                                    ,C.vcFilePath AS FilePathOnServer
+                                    ,C.vcFileName AS FileName
+                                    ,'upload' AS CorresponcenceType
+                                    ,NULL AS AttachmentName
+                                    FROM tblCorrespondence C
+                                    JOIN tblRequests R on C.iRequestID = R.iRequestID
+                                    WHERE R.vcVisibleRequestID = @axisRequestId and C.vcBody is null
+                                                            
+                                UNION ALL
+                                                            
+                                SELECT 
+                                    R.vcVisibleRequestID AS AXISRequestID
+                                    ,C.iCorrespondenceID AS CorrespondenceID
+                                    ,C.vcSubject AS EmailSubject
+                                    ,C.sdtMailedDate AS EmailDate
+                                    ,C.vcEmail AS EmailTo
+                                    ,C.vcFromEmail AS EmailFrom
+                                    ,CAST(C.vcBody AS NVARCHAR(max)) AS EmailContent
+                                    ,NULL AS FilePathOnServer
+                                    ,NULL AS FileName
+                                    ,'email' AS CorresponcenceType
+                                    ,C.vcFileName AS AttachmentName
+                                    FROM tblCorrespondence C
+                                    JOIN tblRequests R on C.iRequestID = R.iRequestID
+                                    WHERE R.vcVisibleRequestID = @axisRequestId and C.vcBody is not null
+                                                            
+                                UNION ALL
+                                                            
+                                SELECT 
+                                    R.vcVisibleRequestID AS AXISRequestID
+                                    ,C.iCorrespondenceID AS CorrespondenceID
+                                    ,C.vcSubject AS EmailSubject
+                                    ,C.sdtMailedDate AS EmailDate
+                                    ,C.vcEmail AS EmailTo
+                                    ,C.vcFromEmail AS EmailFrom
+                                    ,CAST(C.vcBody AS NVARCHAR(max)) AS EmailContent
+                                    ,C.vcFilePath AS FilePathOnServer
+                                    ,C.vcFileName AS FileName
+                                    ,'attachment' AS CorresponcenceType
+                                    ,NULL AS AttachmentName
+                                    FROM tblCorrespondence C
+                                    JOIN tblRequests R on C.iRequestID = R.iRequestID
+                                    WHERE R.vcVisibleRequestID = @axisRequestId and C.vcBody is not null and vcFilePath is not null
+                            ) list
+                            ORDER BY CorrespondenceID, CorresponcenceType DESC
+                            ";
+
+            using (var connection = new SqlConnection(ConnectionString))
+            {
+                // Dapper executes the query and maps rows to AXISFile objects automatically
+                var documents = connection.Query<AXISFile>(query, new { axisRequestId = cs_requestnumber }).ToList();
+                return documents;
+            }
+        }
+
+        private List<AXISFile>? CompareCorrespondenceFiles(string axisRequestId)
+        {
+            if (string.IsNullOrWhiteSpace(axisRequestId))
+            {
+                return null;
+            }
+
+            // 1. Get List 1: Correspondence Log Documents
+            List<AXISFile> list1 = GetCorrespondenceLogDocuments(axisRequestId);
+
+            // 2. Get List 2: Attachments
+            List<AXISFile> list2 = _fOIFlowRequestDA.GetAttachments(axisRequestId);
+
+            // 3. Compare and filter the lists
+            List<AXISFile> result = RequestsHelper.CompareAttachmentLists(list1, list2);
+
+            return result;
+        }
     }    
 }

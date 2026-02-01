@@ -73,7 +73,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI.Controllers
                 if (!string.IsNullOrEmpty(requestNumber) && requestNumber.Length > 10)
                 {
                     AXISRequest axisrequest = _requestDA.GetAXISRequest(requestNumber);
-                    var isrestricted = axisrequest.IsRestricted;
+                    var isrestricted = axisrequest.IsRestricted ?? false;
 
                     _logger.Log(LogLevel.Information, $"This Request {requestNumber} is restricted {isrestricted} and current user is an assignee {isassigneeorwatcher}");
 

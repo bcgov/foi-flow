@@ -1,7 +1,7 @@
 version: '3'
 services: 
   foiredis:
-    image: redis:4.0
+    image: redis:7.4
     container_name: aot_foi_request_redis
     ports:
       - "6379:6379" 

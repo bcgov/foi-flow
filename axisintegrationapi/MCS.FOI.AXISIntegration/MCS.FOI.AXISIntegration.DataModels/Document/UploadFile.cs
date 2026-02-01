@@ -1,0 +1,21 @@
+﻿using System.IO;
+
+namespace MCS.FOI.AXISIntegration.DataModels.Document
+{
+    public class UploadFile
+    {
+        public string? SourceFileName { get; set; }
+        public string? DestinationFileName { get; set; }
+        public string? AXISRequestID { get; set; }
+        public string? SubFolderPath { get; set; }
+        public UploadType? UploadType { get; set; }
+        public string? S3BucketName { get; set; }
+        public Stream? FileStream { get; set; }
+    }
+
+    public enum UploadType
+    {
+        Attachments = 1,
+        Records = 2
+    }
+}

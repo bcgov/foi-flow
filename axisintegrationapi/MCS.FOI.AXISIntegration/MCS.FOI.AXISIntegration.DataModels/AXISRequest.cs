@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
+using MCS.FOI.AXISIntegration.DataModels.Document;
 
 namespace MCS.FOI.AXISIntegration.DataModels
 {
@@ -10,153 +11,155 @@ namespace MCS.FOI.AXISIntegration.DataModels
         //MORE PROPERTIES TO ADD HERE. TODO
 
         [DataMember(Name = "axisRequestId")]
-        public string AXISRequestID { get; set; }
+        public string? AXISRequestID { get; set; }
 
         [DataMember(Name = "axisSyncDate")]
-        public string AxisSyncDate { get; set; }
+        public string? AxisSyncDate { get; set; }
 
         [DataMember(Name = "description")]
-        public string RequestDescription { get; set; }
+        public string? RequestDescription { get; set; }
      
         [DataMember(Name = "fromDate")]
-        public string RequestDescriptionFromDate { get; set; }
+        public string? RequestDescriptionFromDate { get; set; }
 
         [DataMember(Name = "toDate")]
-        public string RequestDescriptionToDate { get; set; }
+        public string? RequestDescriptionToDate { get; set; }
        
         [DataMember(Name = "requestType")]
-        public string RequestType { get; set; }
+        public string? RequestType { get; set; }
 
         [DataMember(Name = "isRestricted")]
-        public bool IsRestricted { get; set; }
+        public bool? IsRestricted { get; set; }
 
         [DataMember(Name = "receivedDate")]
-        public string ReceivedDate { get; set; }
+        public string? ReceivedDate { get; set; }
 
         [DataMember(Name = "compareReceivedDate")]
-        public string CompareReceivedDate { get; set; }
+        public string? CompareReceivedDate { get; set; }
 
         [DataMember(Name = "receivedDateUF")]
-        public string ReceivedDateUF { get; set; }
+        public string? ReceivedDateUF { get; set; }
        
         [DataMember(Name = "requestProcessStart")]
-        public string StartDate { get; set; }
+        public string? StartDate { get; set; }
 
         [DataMember(Name = "dueDate")]
-        public string DueDate { get; set; }
+        public string? DueDate { get; set; }
 
         [DataMember(Name = "originalDueDate")]
-        public string OriginalDueDate { get; set; }
+        public string? OriginalDueDate { get; set; }
 
         [DataMember(Name = "cfrDueDate")]
-        public string CFRDueDate { get; set; }
+        public string? CFRDueDate { get; set; }
 
         [DataMember(Name = "category")]
-        public string Category { get; set; }
+        public string? Category { get; set; }
         
         [DataMember(Name = "receivedMode")]
-        public string ReceivedMode { get; set; }
+        public string? ReceivedMode { get; set; }
 
         [DataMember(Name = "deliveryMode")]
-        public string DeliveryMode { get; set; }
+        public string? DeliveryMode { get; set; }
 
         [DataMember(Name = "ispiiredacted")]
-        public bool Ispiiredacted { get; set; }
+        public bool? Ispiiredacted { get; set; }
 
         [DataMember(Name = "firstName")]
-        public string ApplicantFirstName { get; set; }
+        public string? ApplicantFirstName { get; set; }
 
         [DataMember(Name = "middleName")]
-        public string ApplicantMiddleName { get; set; }
+        public string? ApplicantMiddleName { get; set; }
 
         [DataMember(Name = "lastName")]
-        public string ApplicantLastName { get; set; }
+        public string? ApplicantLastName { get; set; }
 
         [DataMember(Name = "axisApplicantID")]
-        public string AXISApplicantID { get; set; }
+        public string? AXISApplicantID { get; set; }
 
         [DataMember(Name = "businessName")]
-        public string BusinessName { get; set; }
+        public string? BusinessName { get; set; }
 
         [DataMember(Name = "email")]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         [DataMember(Name = "address")]
-        public string Address { get; set; }
+        public string? Address { get; set; }
 
         [DataMember(Name = "addressSecondary")]
-        public string AddressSecondary { get; set; }
+        public string? AddressSecondary { get; set; }
 
         [DataMember(Name = "city")]
-        public string City { get; set; }
+        public string? City { get; set; }
 
         [DataMember(Name = "province")]
-        public string Province { get; set; }
+        public string? Province { get; set; }
 
         [DataMember(Name = "country")]
-        public string Country { get; set; }
+        public string? Country { get; set; }
 
         [DataMember(Name = "postal")]
-        public string PostalCode { get; set; }
+        public string? PostalCode { get; set; }
 
         [DataMember(Name = "phonePrimary")]
-        public string PhonePrimary { get; set; }
+        public string? PhonePrimary { get; set; }
 
         [DataMember(Name = "phoneSecondary")]
-        public string PhoneSecondary { get; set; }
+        public string? PhoneSecondary { get; set; }
 
         [DataMember(Name = "workPhonePrimary")]
-        public string WorkPhonePrimary { get; set; }
+        public string? WorkPhonePrimary { get; set; }
 
         [DataMember(Name = "workPhoneSecondary")]
-        public string WorkPhoneSecondary { get; set; }
+        public string? WorkPhoneSecondary { get; set; }
   
         [DataMember(Name = "correctionalServiceNumber")]
-        public string CorrectionalServiceNumber { get; set; }
+        public string? CorrectionalServiceNumber { get; set; }
 
         [DataMember(Name = "publicServiceEmployeeNumber")]
-        public string PublicServiceEmployeeNumber { get; set; }
+        public string? PublicServiceEmployeeNumber { get; set; }
 
         [DataMember(Name = "requestPageCount")]
-        public int RequestPageCount { get; set; }
+        public int? RequestPageCount { get; set; }
 
         [DataMember(Name = "lanPageCount")]
-        public int LANPageCount { get; set; }
+        public int? LANPageCount { get; set; }
 
         [DataMember(Name = "subjectCode")]
-        public string SubjectCode { get; set; }
+        public string? SubjectCode { get; set; }
         
         [DataMember(Name = "linkedRequests")]
-        public string LinkedRequests { get; set; }
+        public string? LinkedRequests { get; set; }
 
         [DataMember(Name = "selectedMinistries")]
-        public List<Ministry> SelectedMinistries { get; set; }
+        public List<Ministry>? SelectedMinistries { get; set; }
         
         [DataMember(Name = "additionalPersonalInfo")]
-        public AdditionalPersonalInformation AdditionalPersonalInfo { get; set; }
+        public AdditionalPersonalInformation? AdditionalPersonalInfo { get; set; }
 
         [DataMember(Name = "Extensions")]
-        public List<Extension> Extensions { get; set; }
+        public List<Extension>? Extensions { get; set; }
 
         [DataMember(Name = "identityVerified")]
-        public string IdentityVerified { get; set; }
+        public string? IdentityVerified { get; set; }
 
+        [DataMember(Name = "correspondenceLogs")]
+        public List<AXISFile>? CorrespondenceLogs { get; set; }
     }
 
     [DataContract]
     public class AdditionalPersonalInformation
     {
         [DataMember(Name = "birthDate")]
-        public string ApplicantDOB { get; set; }
+        public string? ApplicantDOB { get; set; }
 
         [DataMember(Name = "anotherFirstName")]
-        public string OnBehalfFirstName { get; set; }
+        public string? OnBehalfFirstName { get; set; }
 
         [DataMember(Name = "anotherMiddleName")]
-        public string OnBehalfMiddleName { get; set; }
+        public string? OnBehalfMiddleName { get; set; }
 
         [DataMember(Name = "anotherLastName")]
-        public string OnBehalfLastName { get; set; }
+        public string? OnBehalfLastName { get; set; }
         
         public AdditionalPersonalInformation(string birthDate, string anotherFirstName, string anotherMiddleName, string anotherLastName)
         {

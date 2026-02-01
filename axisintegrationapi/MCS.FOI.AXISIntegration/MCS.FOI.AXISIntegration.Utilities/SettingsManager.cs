@@ -13,6 +13,8 @@ namespace MCS.FOI.AXISIntegration.Utilities
         /// </summary>
         public static string ConfigurationFileName { get; set; } = "appsettings.json";
 
+        private static IConfigurationRoot _config;
+
         /// <summary>
         /// Must be first call to obtain properties
         /// </summary>
@@ -48,7 +50,6 @@ namespace MCS.FOI.AXISIntegration.Utilities
             JWT_OIDC_AUDIENCE = setting.JWT_OIDC_AUDIENCE;
             IAOGroups = setting.IAOGroups;
             CORSORIGINS = setting.CORSORIGINS;
-
         }
         /// <summary>
         /// Assign connection string by Environment from appsettings.json
@@ -92,10 +93,8 @@ namespace MCS.FOI.AXISIntegration.Utilities
         /// </summary>
         public static Environments Environment { get; set; }
 
-
         public static string FOIFlowDevelopmentConnectionString { get; set; }
         public static string FOIFlowTestConnectionString { get; set; }
-
         public static string FOIFlowProductionConnectionString { get; set; }
         /// <summary>
         /// Current connection string
@@ -105,19 +104,12 @@ namespace MCS.FOI.AXISIntegration.Utilities
         /// Current environment
         /// </summary>
         public static Environments FOIFlowEnvironment { get; set; }
-
         public static string JWT_OIDC_WELL_KNOWN_CONFIG { get; set; }
-
         public static string JWT_OIDC_AUDIENCE { get; set; }
-
         public static string JWT_OIDC_ISSUER { get; set; }
-
         public static string JWT_OIDC_ALGORITHMS { get; set; }
-
         public static string JWT_OIDC_JWKS_URI { get; set; }
-
         public static string IAOGroups { get; set; }
-
         public static string CORSORIGINS { get; set; }
 
         /// <summary>
@@ -126,13 +118,14 @@ namespace MCS.FOI.AXISIntegration.Utilities
         /// <returns>IConfigurationRoot</returns>
         private static IConfigurationRoot InitConfiguration()
         {
-
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile(ConfigurationFileName);
-
-            return builder.Build();
-
+            if (_config == null)
+            {
+                _config = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile(ConfigurationFileName)
+                    .Build();
+            }
+            return _config;
         }
 
         /// <summary>
@@ -143,8 +136,7 @@ namespace MCS.FOI.AXISIntegration.Utilities
         /// <returns>Instance of T</returns>
         public static T InitOptions<T>(string section) where T : new()
         {
-            var config = InitConfiguration();
-            return config.GetSection(section).Get<T>();
+            return InitConfiguration().GetSection(section).Get<T>();
         }
     }
 }
