@@ -13,8 +13,7 @@ namespace MCS.FOI.AXISIntegrationWebAPI.UnitTests
         [TestInitialize]
         public void Init()
         {
-            configuration = ConfigurationManager.OpenExeConfiguration(@"MCS.FOI.AXISIntegrationWebAPI.UnitTests.dll");
-
+            configuration = System.Configuration.ConfigurationManager.OpenExeConfiguration(@"MCS.FOI.AXISIntegrationWebAPI.UnitTests.dll");
         }
 
 
