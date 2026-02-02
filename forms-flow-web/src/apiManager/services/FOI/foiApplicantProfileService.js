@@ -159,6 +159,28 @@ export const saveApplicantInfo = (applicant, ...rest) => {
   }
 };
 
+export const changeApplicantProfile = (applicant, data, ...rest) => {
+  const payload = {...data, "applicant": applicant}
+  const done = fnDone(rest);
+  const apiUrlgetRequestDetails = API.FOI_CHANGE_REQUEST_APPLICANT_PROFILE;
+  return (dispatch) => {
+    httpPOSTRequest(apiUrlgetRequestDetails, payload, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setRestrictedReqTaglist(res.data));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in changing applicant profile`);
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  }
+};
+
 export const fetchApplicantProfileByKeyword = (keywords, ...rest) => {
   const done = fnDone(rest);
   const apiUrl = API.FOI_REQUEST_APPLICANTS_SEARCH_KEYWORDS;
