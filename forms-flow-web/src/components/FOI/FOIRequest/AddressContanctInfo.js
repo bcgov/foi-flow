@@ -9,7 +9,6 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { isBeforeOpen } from "./utils";
 
 const useStyles = makeStyles((_theme) => ({
   row: {
@@ -343,18 +342,6 @@ const AddressContactDetails = memo(
           <Typography className={classes.heading}>ADDRESS AND CONTACT INFORMATION</Typography>
       </AccordionSummary>
       <AccordionDetails>        
-          <div>
-              {/* {moreInfoAction && // comment back in after axis decommission
-                <button
-                  type="button"
-                  className={`btn btn-link btn-description-history`}
-                  onClick={moreInfoAction}
-                  style={(isBeforeOpen(requestDetails) && !requestDetails.foiRequestApplicantID) ? {color: "#9E2929"} : {}}
-                >
-                  {(isBeforeOpen(requestDetails)) && 'Search' } Applicant Profiles
-                </button>
-              } */}
-          </div>
           <div className={clsx("row", "foi-details-row", classes.row)}>
             <div className="col-lg-6 foi-details-col">
               <TextField
