@@ -294,7 +294,7 @@ class dashboardservice:
                     business_days += 1
                 closed_date += dt.timedelta(days=1)
 
-            return str(business_days) if business_days > 0 else "N/A"
+            return str(business_days) if business_days >= 0 else "N/A"
         except Exception as e:
             print("Error in calculate_from_closed: ", e)
             return "N/A"
