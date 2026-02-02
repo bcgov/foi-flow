@@ -437,7 +437,7 @@ namespace MCS.FOI.AXISIntegration.DAL
 
         private List<AXISFile>? GetCorrespondenceLogDocuments(string cs_requestnumber)
         {
-            ConnectionString = SettingsManager.FOIFlowConnectionString;
+            ConnectionString = SettingsManager.ConnectionString;
             string query = @"SELECT * FROM (
                                 SELECT
                                     R.vcVisibleRequestID AS AXISRequestID
