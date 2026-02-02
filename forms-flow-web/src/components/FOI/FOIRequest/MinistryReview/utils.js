@@ -17,7 +17,7 @@ export const getMinistryBottomTextMap = (
       : `${Math.abs(_daysRemaining)} Days Overdue`;
 
   const _cfrDaysRemainingText = `CFR Due in ${_cfrDaysRemaining} Days`;
-      
+
 
   const hideCFRDaysRemaining = [
     StateEnum.review.name.toLowerCase(),
@@ -37,12 +37,13 @@ export const getMinistryBottomTextMap = (
   return bottomTexts;
 };
 
-export const getHeaderText = (requestDetails) => {
-  if(requestDetails.axisRequestId)
+export const getHeaderText = (requestDetails, isProactiveDisclosure = false) => {
+  if (requestDetails.axisRequestId)
     return requestDetails.axisRequestId;
 
   if (requestDetails.idNumber)
-    return `Request #${requestDetails.idNumber}`;   
+    if (isProactiveDisclosure) { return requestDetails.idNumber; }
+    else { return `Request #${requestDetails.idNumber}`; }
   return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
 };
 
@@ -53,7 +54,7 @@ export const alertUser = (e) => {
 
 
 export const createAssignedToDetailsObject = (
-    value
+  value
 ) => {
   const assigneeObject = {
     assignedministrygroup: "",
@@ -62,18 +63,18 @@ export const createAssignedToDetailsObject = (
     assignedministrypersonLastName: ""
   }
   const assignedToValue = value?.split("|");
-      if (
-        assignedToValue.length > 1 &&
-        assignedToValue[0] &&
-        assignedToValue[1] &&
-        assignedToValue[2] &&
-        assignedToValue[3]
-      ) {
-        assigneeObject.assignedministrygroup = assignedToValue[0];
-        assigneeObject.assignedministryperson = assignedToValue[1];
-        assigneeObject.assignedministrypersonFirstName = assignedToValue[2];
-        assigneeObject.assignedministrypersonLastName = assignedToValue[3];
-      }
+  if (
+    assignedToValue.length > 1 &&
+    assignedToValue[0] &&
+    assignedToValue[1] &&
+    assignedToValue[2] &&
+    assignedToValue[3]
+  ) {
+    assigneeObject.assignedministrygroup = assignedToValue[0];
+    assigneeObject.assignedministryperson = assignedToValue[1];
+    assigneeObject.assignedministrypersonFirstName = assignedToValue[2];
+    assigneeObject.assignedministrypersonLastName = assignedToValue[3];
+  }
   return assigneeObject;
-  
+
 };

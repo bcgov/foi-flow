@@ -1,0 +1,69 @@
+.foi-request-header-card {
+    background-color: #F1F8FE;
+    border-radius: 6px;
+    padding: 20px 30px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #1E5189;
+    margin-top: 15px;
+}
+
+.foi-request-number-header-pd {
+    margin: 0;
+}
+
+.foi-request-number-text {
+    font-family: "BCSans-Bold", sans-serif !important;
+    font-size: 2.2rem;
+    color: #2D2D2D;
+    margin: 0;
+    font-weight: 700;
+}
+
+.btn-calendar {
+    color: #003366;
+    border: 1px solid #003366;
+    text-transform: none;
+    font-family: "BCSans-Bold", sans-serif !important;
+    font-weight: bold;
+    background-color: white;
+    padding: 8px 20px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background-color: #f0f5fa;
+    }
+
+    svg {
+        font-size: 1.2rem;
+    }
+}
+
+.foi-review-request-text {
+    font-family: "BCSans-Bold", sans-serif !important;
+    color: #036;
+    font-size: 25px;
+}
+
+.axis-request-id {
+    margin-top: 20px !important;
+}
+
+.foi-request-review-header-col1-row {
+    display: inline-flex;
+    height: fit-content;
+}
+
+@media (max-width: 1242px) {
+    .foi-request-review-header-col1-row {
+        display: block;
+    }
+}

@@ -140,8 +140,10 @@ import PhaseMenu from "./PhaseMenu";
 import FileInfoBar from "../DocumentSet/FileInfoBar";
 import DocumentSetWrapper from "../DocumentSet/DocumentSetWrapper";
 import DocumentSetModal from "../DocumentSet/DocumentSetModal";
-import RedactRecordsButton  from "./RedactRecordsButton";
+import RedactRecordsButton from "./RedactRecordsButton";
 import DocumentSetDeleteModal from "../DocumentSet/DocumentSetDeleteModal";
+import RequestHeaderRow from '../RequestHeaderRow';
+
 
 const useStyles = makeStyles((_theme) => ({
   createButton: {
@@ -249,7 +251,8 @@ export const RecordsLog = ({
   setLockRecordsTab,
   validLockRecordsState,
   setSaveRequestObject,
-  isPhasedRelease
+  isPhasedRelease,
+  isProactiveDisclosure
 }) => {
   const user = useSelector((state) => state.user.userDetail);
   const userGroups = user?.groups?.map((group) => group.slice(1));
@@ -346,7 +349,7 @@ export const RecordsLog = ({
   );
   const [isMCFPersonal, setIsMCFPersonal] = useState(
     ministryCode == "MCF" &&
-      requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
+    requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
   );
   const [retrieveSelectedRecords, setRetrieveSelectedRecords] = useState({});
   useEffect(() => {
@@ -386,9 +389,9 @@ export const RecordsLog = ({
   const [newPersonalAttributes, setNewPersonalAttributes] = useState();
 
   useEffect(() => {
-    if(currentEditRecord?.attributes?.personalattributes)
+    if (currentEditRecord?.attributes?.personalattributes)
       setCurPersonalAttributes(currentEditRecord.attributes.personalattributes);
-  },[currentEditRecord])
+  }, [currentEditRecord])
 
   const MCFPeople = useSelector(
     (state) => state.foiRequests.foiPersonalPeople
@@ -411,34 +414,34 @@ export const RecordsLog = ({
     let _fileTypeFilters = [];
     let _volumeFilters = [];
     let _personalTagFilters = []
-    if(recordsObj?.records?.length > 0) {
+    if (recordsObj?.records?.length > 0) {
       recordsObj.records.forEach((record) => {
-        if(record.attributes?.personalattributes?.person && MCFPeople?.people) {
-          if(_personFilters.filter((p)=>{return p.name === record.attributes.personalattributes.person}).length === 0) {
-            _personFilters = _personFilters.concat(MCFPeople.people.filter((p)=>{return p.name === record.attributes.personalattributes.person}));
+        if (record.attributes?.personalattributes?.person && MCFPeople?.people) {
+          if (_personFilters.filter((p) => { return p.name === record.attributes.personalattributes.person }).length === 0) {
+            _personFilters = _personFilters.concat(MCFPeople.people.filter((p) => { return p.name === record.attributes.personalattributes.person }));
           }
         }
-        if(record.attributes?.personalattributes?.filetype && MCFFiletypes?.filetypes) {
-          if(_fileTypeFilters.filter((ft)=>{return ft.name === record.attributes.personalattributes.filetype}).length === 0) {
-            _fileTypeFilters = _fileTypeFilters.concat(MCFFiletypes.filetypes.filter((ft)=>{return ft.name === record.attributes.personalattributes.filetype}));
+        if (record.attributes?.personalattributes?.filetype && MCFFiletypes?.filetypes) {
+          if (_fileTypeFilters.filter((ft) => { return ft.name === record.attributes.personalattributes.filetype }).length === 0) {
+            _fileTypeFilters = _fileTypeFilters.concat(MCFFiletypes.filetypes.filter((ft) => { return ft.name === record.attributes.personalattributes.filetype }));
           }
         }
-        if(record.attributes?.personalattributes?.volume && MCFVolumes?.volumes) {
-          if(_volumeFilters.filter((v)=>{return v.name === record.attributes.personalattributes.volume}).length === 0) {
-            _volumeFilters = _volumeFilters.concat(MCFVolumes.volumes.filter((v)=>{return v.name === record.attributes.personalattributes.volume}));
+        if (record.attributes?.personalattributes?.volume && MCFVolumes?.volumes) {
+          if (_volumeFilters.filter((v) => { return v.name === record.attributes.personalattributes.volume }).length === 0) {
+            _volumeFilters = _volumeFilters.concat(MCFVolumes.volumes.filter((v) => { return v.name === record.attributes.personalattributes.volume }));
           }
         }
-        if(record.attributes?.personalattributes?.personaltag && MCFSections?.sections) {
-          if(_personalTagFilters.filter((pt)=>{return pt.name === record.attributes.personalattributes.personaltag}).length === 0) {
-            _personalTagFilters = _personalTagFilters.concat(MCFSections.sections.filter((d)=>{return d.name === record.attributes.personalattributes.personaltag}));
+        if (record.attributes?.personalattributes?.personaltag && MCFSections?.sections) {
+          if (_personalTagFilters.filter((pt) => { return pt.name === record.attributes.personalattributes.personaltag }).length === 0) {
+            _personalTagFilters = _personalTagFilters.concat(MCFSections.sections.filter((d) => { return d.name === record.attributes.personalattributes.personaltag }));
           }
         }
       });
     }
-    setPersonFilters(_personFilters.sort((a, b)=>a.sortorder-b.sortorder));
-    setFileTypeFilters(_fileTypeFilters.sort((a, b)=>a.sortorder-b.sortorder));
-    setVolumeFilters(_volumeFilters.sort((a, b)=>a.sortorder-b.sortorder));
-    setPersonalTagFilters(_personalTagFilters.sort((a, b)=>a.sortorder-b.sortorder));
+    setPersonFilters(_personFilters.sort((a, b) => a.sortorder - b.sortorder));
+    setFileTypeFilters(_fileTypeFilters.sort((a, b) => a.sortorder - b.sortorder));
+    setVolumeFilters(_volumeFilters.sort((a, b) => a.sortorder - b.sortorder));
+    setPersonalTagFilters(_personalTagFilters.sort((a, b) => a.sortorder - b.sortorder));
   }, [recordsObj, MCFPeople, MCFFiletypes, MCFVolumes, MCFSections]);
 
   useEffect(() => {
@@ -468,10 +471,10 @@ export const RecordsLog = ({
   }, [recordsTabSelect, conversionFormats]);
 
   const divisionFilters = [
-    ...personFilters.map((p)=>{p.divisionname=p.name; p.type='person'; return p;}),
-    ...fileTypeFilters.map((ft)=>{ft.divisionname=ft.name; ft.type='filetype'; return ft;}),
-    ...volumeFilters.map((v)=>{v.divisionname=v.name; v.type='volume'; return v;}),
-    ...personalTagFilters.map((pt)=>{pt.divisionname=pt.name; pt.type='personaltag'; return pt;}),
+    ...personFilters.map((p) => { p.divisionname = p.name; p.type = 'person'; return p; }),
+    ...fileTypeFilters.map((ft) => { ft.divisionname = ft.name; ft.type = 'filetype'; return ft; }),
+    ...volumeFilters.map((v) => { v.divisionname = v.name; v.type = 'volume'; return v; }),
+    ...personalTagFilters.map((pt) => { pt.divisionname = pt.name; pt.type = 'personaltag'; return pt; }),
     ...new Map(
       recordsObj?.records?.reduce(
         (acc, file) => [
@@ -795,12 +798,12 @@ export const RecordsLog = ({
           )
         );
       }
-    } else if(modalFor.toLowerCase() === "retrieve_uncompressed" && value){
-        retrieveRecordVersion("retrieve_uncompressed", retrieveSelectedRecords)
-    } else if(modalFor.toLowerCase() === "documentSet" && value){
-        retrieveRecordVersion("documentSet", retrieveSelectedRecords)
+    } else if (modalFor.toLowerCase() === "retrieve_uncompressed" && value) {
+      retrieveRecordVersion("retrieve_uncompressed", retrieveSelectedRecords)
+    } else if (modalFor.toLowerCase() === "documentSet" && value) {
+      retrieveRecordVersion("documentSet", retrieveSelectedRecords)
     } else if (files) {
-        saveDocument(value, fileInfoList, files);
+      saveDocument(value, fileInfoList, files);
     }
   };
 
@@ -828,10 +831,10 @@ export const RecordsLog = ({
               let failed = [];
               const toastID = toast.loading(
                 "Uploading files (" +
-                  completed +
-                  "/" +
-                  fileInfoList.length +
-                  ")"
+                completed +
+                "/" +
+                fileInfoList.length +
+                ")"
               );
               for (let header of res) {
                 const _file = files.find(
@@ -854,7 +857,7 @@ export const RecordsLog = ({
                     },
                     replacementof:
                       replaceRecord["replacementof"] == null ||
-                      replaceRecord["replacementof"] == ""
+                        replaceRecord["replacementof"] == ""
                         ? replaceRecord["recordid"]
                         : replaceRecord["replacementof"],
                     s3uripath: header.filepathdb,
@@ -987,9 +990,9 @@ export const RecordsLog = ({
                 render:
                   failed.length > 0
                     ? "The following " +
-                      failed.length +
-                      " file uploads failed\n- " +
-                      failed.join("\n- ")
+                    failed.length +
+                    " file uploads failed\n- " +
+                    failed.join("\n- ")
                     : fileInfoList.length + " Files successfully saved",
                 type: failed.length > 0 ? "error" : "success",
               };
@@ -1015,38 +1018,38 @@ export const RecordsLog = ({
   const downloadDocument = (file, isPDF = false, originalfile = false, downloadReplacedOriginal = false) => {
 
     const extension = file?.filename?.split('.')?.pop()
-    var filePath = downloadReplacedOriginal ? file.s3uripath : (file.selectedfileprocessversion != 1  && 'ocrfilepath' in file && file.ocrfilepath != null)? file.ocrfilepath
-                    : ( file.selectedfileprocessversion != 1  && 'compresseds3uripath' in file && file.compresseds3uripath != null)?
-                    file.compresseds3uripath : file.s3uripath
+    var filePath = downloadReplacedOriginal ? file.s3uripath : (file.selectedfileprocessversion != 1 && 'ocrfilepath' in file && file.ocrfilepath != null) ? file.ocrfilepath
+      : (file.selectedfileprocessversion != 1 && 'compresseds3uripath' in file && file.compresseds3uripath != null) ?
+        file.compresseds3uripath : file.s3uripath
     var s3filepath = !originalfile
-      ? filePath : getOriginalFileS3Path((file.originalfile && !downloadReplacedOriginal) ? file.originalfile : file.s3uripath , file?.attributes?.incompatible)
-      // : !file.isattachment
-      // ? getOriginalFileS3Path(file.originalfile ? file.originalfile : file.s3uripath , file?.attributes?.incompatible)
-      // : filePath;
+      ? filePath : getOriginalFileS3Path((file.originalfile && !downloadReplacedOriginal) ? file.originalfile : file.s3uripath, file?.attributes?.incompatible)
+    // : !file.isattachment
+    // ? getOriginalFileS3Path(file.originalfile ? file.originalfile : file.s3uripath , file?.attributes?.incompatible)
+    // : filePath;
     var filename = !originalfile
-      ? file.filename :((file.originalfilename && !downloadReplacedOriginal)? file.originalfilename : file.filename)
-      // : !file.isattachment
-      // ? (file.originalfilename? file.originalfilename : file.filename)
-      // : file.filename;
+      ? file.filename : ((file.originalfilename && !downloadReplacedOriginal) ? file.originalfilename : file.filename)
+    // : !file.isattachment
+    // ? (file.originalfilename? file.originalfilename : file.filename)
+    // : file.filename;
     //if (isPDF && !downloadReplacedOriginal) {
     if (!["png", "jpg", "jpeg", "pdf"].includes(extension.toLowerCase())) {
-      if (isPDF || (file.selectedfileprocessversion == 1 && !originalfile && !downloadReplacedOriginal )){
+      if (isPDF || (file.selectedfileprocessversion == 1 && !originalfile && !downloadReplacedOriginal)) {
         s3filepath = s3filepath.substr(0, s3filepath.lastIndexOf(".")) + ".pdf";
         filename = filename + ".pdf";
       }
-      else if (!originalfile && !downloadReplacedOriginal){
+      else if (!originalfile && !downloadReplacedOriginal) {
         filename = filename + ".pdf";
       }
     }
     if (originalfile)
-      attemptDownload(s3filepath, filename,(file.originalfile ? file.originalfile : file.s3uripath));
+      attemptDownload(s3filepath, filename, (file.originalfile ? file.originalfile : file.s3uripath));
     else
       attemptDownload(s3filepath, filename);
   };
 
-  const attemptDownload = (s3filepath, filename, fallbackPath = null) =>{
-      const toastID = toast.loading("Downloading file (0%)");
-      getFOIS3DocumentPreSignedUrl(
+  const attemptDownload = (s3filepath, filename, fallbackPath = null) => {
+    const toastID = toast.loading("Downloading file (0%)");
+    getFOIS3DocumentPreSignedUrl(
       s3filepath.split("/").slice(4).join("/"),
       ministryId,
       dispatch,
@@ -1064,7 +1067,7 @@ export const RecordsLog = ({
                   // Retry with the fallback path
                   attemptDownload(fallbackPath, filename); // No further fallback
                 }
-                else{
+                else {
                   // let blob = new Blob([response.data], {
                   //   type: "application/octet-stream",
                   // });
@@ -1085,7 +1088,7 @@ export const RecordsLog = ({
                 return;
               }
               let blob = new Blob([response.data], {
-                  type: "application/octet-stream",
+                type: "application/octet-stream",
               });
               saveAs(blob, filename);
               toast.update(toastID, {
@@ -1102,7 +1105,7 @@ export const RecordsLog = ({
               });
             },
             (progressEvent) => {
-              if(progressEvent.total > 0){
+              if (progressEvent.total > 0) {
                 toast.update(toastID, {
                   render:
                     "Downloading file (" +
@@ -1116,7 +1119,7 @@ export const RecordsLog = ({
             }
           );
         }
-        else{
+        else {
           toast.update(toastID, {
             render: "File download failed",
             type: "error",
@@ -1141,25 +1144,25 @@ export const RecordsLog = ({
     const extIndex = path.lastIndexOf(".");
     if (extIndex === -1)
       return path;
-    let extension=path.slice(extIndex)
+    let extension = path.slice(extIndex)
     if (extension?.toLowerCase() != ".pdf" || isIncompatible)
       return path;
-    console.log("ORIGINAL path:",path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex))
+    console.log("ORIGINAL path:", path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex))
     return path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex);
   }
 
 
-    const handlePhasePackageDownload = (packageObj, itemid) => {
-      const phasedDownloadStatuses = itemid === 2 ? phasedRedlineDownloadStatuses : phasedResponsePackageDownloadStatuses;
-      const phasedStichedRecords = itemid === 2 ? phasedRedlinesStitchedRecords : phasedResponsePackageStitchedRecords;
-      const packageName = `${packageObj.category}phase${packageObj.phase}`;
-      const isDownloadReady = phasedDownloadStatuses?.find(phasedPackage => phasedPackage.phase === packageObj.phase).downloadReady;
-      if (isDownloadReady) {
-        const s3filepath = phasedStichedRecords?.find(phasedPackage => packageName === phasedPackage.category).finalpackagepath;
-        handleDownloadZipFile(s3filepath, packageObj);
-      }
+  const handlePhasePackageDownload = (packageObj, itemid) => {
+    const phasedDownloadStatuses = itemid === 2 ? phasedRedlineDownloadStatuses : phasedResponsePackageDownloadStatuses;
+    const phasedStichedRecords = itemid === 2 ? phasedRedlinesStitchedRecords : phasedResponsePackageStitchedRecords;
+    const packageName = `${packageObj.category}phase${packageObj.phase}`;
+    const isDownloadReady = phasedDownloadStatuses?.find(phasedPackage => phasedPackage.phase === packageObj.phase).downloadReady;
+    if (isDownloadReady) {
+      const s3filepath = phasedStichedRecords?.find(phasedPackage => packageName === phasedPackage.category).finalpackagepath;
+      handleDownloadZipFile(s3filepath, packageObj);
     }
-    const handleDownloadChange = (e) => {
+  }
+  const handleDownloadChange = (e) => {
     //if clicked on harms
     if (
       e.target.value === 1 &&
@@ -1409,11 +1412,11 @@ export const RecordsLog = ({
     );
     if (packageObj.category === "redline") {
       setPhasedRedlineDownloadStatuses((prev) => {
-        prev.map(item => item.phase === packageObj.phase ? {...item, downloadReady: false, downloadWIP: false, downloadFailed: true} : item)
+        prev.map(item => item.phase === packageObj.phase ? { ...item, downloadReady: false, downloadWIP: false, downloadFailed: true } : item)
       });
     } else if (packageObj.category === "responsepackage") {
       setPhasedResponsePackageDownloadStatuses((prev) => {
-        prev.map(item => item.phase === packageObj.phase ? {...item, downloadReady: false, downloadWIP: false, downloadFailed: true} : item)
+        prev.map(item => item.phase === packageObj.phase ? { ...item, downloadReady: false, downloadWIP: false, downloadFailed: true } : item)
       })
     }
   }
@@ -1475,10 +1478,10 @@ export const RecordsLog = ({
     let failed = 0;
     var selected = records.filter((record) => record.isselected);
 
-    for(let record of records) {
-      if(record.attachments && !record.isselected) {
-        for(let attachment of record.attachments) {
-          if(attachment.isselected) {
+    for (let record of records) {
+      if (record.attachments && !record.isselected) {
+        for (let attachment of record.attachments) {
+          if (attachment.isselected) {
             selected.push(attachment);
           }
         }
@@ -1490,19 +1493,19 @@ export const RecordsLog = ({
       var filename = record.filename;
       var divisionname = record.attributes.divisions[0].divisionname;
 
-      if(!record.newfilename) {
+      if (!record.newfilename) {
         let duplicatename = selected.filter((_record) => (_record.filename == filename));
-        if(duplicatename.length > 1) {
+        if (duplicatename.length > 1) {
           record.newfilename = filename.substring(0, filename.lastIndexOf(".")) + "_" + divisionname + filename.substring(filename.lastIndexOf("."));
         }
 
         let duplicatenamedivision = duplicatename.filter((_record) => (_record.attributes.divisions[0].divisionname == divisionname));
-        if(duplicatenamedivision.length > 1) {
+        if (duplicatenamedivision.length > 1) {
           let counter = 0;
           for (let duprecord of duplicatenamedivision) {
-            if(counter == 1)
+            if (counter == 1)
               duprecord.newfilename = filename.substring(0, filename.lastIndexOf(".")) + "_" + divisionname + "_Duplicate" + filename.substring(filename.lastIndexOf("."));
-            if(counter > 1)
+            if (counter > 1)
               duprecord.newfilename = filename.substring(0, filename.lastIndexOf(".")) + "_" + divisionname + "_Duplicate (" + counter + ")" + filename.substring(filename.lastIndexOf("."));
             counter++;
           }
@@ -1518,7 +1521,7 @@ export const RecordsLog = ({
         var filepath = record.s3uripath;
         var filename = record.filename;
 
-        if(record.newfilename) {
+        if (record.newfilename) {
           filename = record.newfilename;
           record.newfilename = null;
         }
@@ -1566,7 +1569,7 @@ export const RecordsLog = ({
       draggable: true,
       closeButton: true,
     });
-    if(blobs.length == 1) {
+    if (blobs.length == 1) {
       saveAs(blobs[0].input, blobs[0].name);
     } else {
       const zipfile = await downloadZip(blobs).blob();
@@ -1575,16 +1578,16 @@ export const RecordsLog = ({
   };
 
   const retryDocument = (record) => {
-    let selectedRecords =[]
+    let selectedRecords = []
     if (Object.keys(record).length === 0)
       selectedRecords = records.filter((record) => record.isselected);
     else
       selectedRecords = [record]
     for (let record of selectedRecords) {
       record.trigger = "recordretry";
-      let retryServiceName = record.failed ? record.failed.split('.')[0] : "all" ;
+      let retryServiceName = record.failed ? record.failed.split('.')[0] : "all";
       if (retryServiceName == 'ocr-queue')
-        retryServiceName='ocr'
+        retryServiceName = 'ocr'
       console.log(retryServiceName);
       record.service = retryServiceName
       //record.failed ? record.failed : "all";
@@ -1637,9 +1640,9 @@ export const RecordsLog = ({
   };
 
   const retrieveRecordVersion = (action, record) => {
-    console.log("-->",Object.keys(record).length)
-    let selectedRecords=[]
-    if(Object.keys(record).length === 0)
+    console.log("-->", Object.keys(record).length)
+    let selectedRecords = []
+    if (Object.keys(record).length === 0)
       selectedRecords = records.filter((record) => record.isselected);
     else
       selectedRecords = [record]
@@ -1648,9 +1651,10 @@ export const RecordsLog = ({
       retrieveSelectedRecordVersion(
         requestId,
         ministryId,
-        { documentmasterids: documentMasterIds,
+        {
+          documentmasterids: documentMasterIds,
           recordretrieveversion: action
-         }));
+        }));
     //     (err, _res) => {
     //     }
     //   )
@@ -1896,9 +1900,14 @@ export const RecordsLog = ({
     }
   };
 
-  const getRequestNumber = () => {
-    if (requestNumber) return `Request #${requestNumber}`;
-    return `Request #U-00${requestId}`;
+  const getRequestNumber = (isProactiveDisclosure) => {
+    if (requestNumber) {
+      if (isProactiveDisclosure)
+        return requestNumber;
+      else
+        return `Request #${requestNumber}`;
+    }
+    return isProactiveDisclosure ? requestId : `U-00${requestId}`;
   };
 
   function countTotalPages(records) {
@@ -1982,23 +1991,23 @@ export const RecordsLog = ({
         (_filterValue === -3
           ? r.attributes?.incompatible
           : _filterValue === -2
-          ? !r.isredactionready &&
+            ? !r.isredactionready &&
             !r.attributes?.incompatible &&
             (r.failed ||
               isrecordtimeout(r.created_at, RECORD_PROCESSING_HRS) == true)
-          : _filterValue > -1
-          ? r.attributes?.divisions?.findIndex(
-              (a) => a.divisionid === _filterValue && a.divisionname !== "TBD"
-            ) > -1
-            ||
-            r.attributes?.personalattributes?.person === _filterText
-            ||
-            r.attributes?.personalattributes?.filetype === _filterText
-            ||
-            r.attributes?.personalattributes?.volume === _filterText
-            ||
-            r.attributes?.personalattributes?.personaltag === _filterText
-          : true)
+            : _filterValue > -1
+              ? r.attributes?.divisions?.findIndex(
+                (a) => a.divisionid === _filterValue && a.divisionname !== "TBD"
+              ) > -1
+              ||
+              r.attributes?.personalattributes?.person === _filterText
+              ||
+              r.attributes?.personalattributes?.filetype === _filterText
+              ||
+              r.attributes?.personalattributes?.volume === _filterText
+              ||
+              r.attributes?.personalattributes?.personaltag === _filterText
+              : true)
       )
       if (isMatch) {
         return true;
@@ -2123,48 +2132,48 @@ export const RecordsLog = ({
   };
 
   const disableMultiRetrieve = () => {
-      let selectedRecords = records.filter((record) => record.isselected);
-      if (selectedRecords?.length <=0)
-        return true
-      for (let record of selectedRecords) {
-        if (record.selectedfileprocessversion || record.attributes?.incompatible || !record.isdedupecomplete) return true;
-        if (record.attachments) {
-          for (let attachment of record.attachments) {
-            if (record.selectedfileprocessversion || record.attributes?.incompatible || !record.isdedupecomplete) return true;
-          }
+    let selectedRecords = records.filter((record) => record.isselected);
+    if (selectedRecords?.length <= 0)
+      return true
+    for (let record of selectedRecords) {
+      if (record.selectedfileprocessversion || record.attributes?.incompatible || !record.isdedupecomplete) return true;
+      if (record.attachments) {
+        for (let attachment of record.attachments) {
+          if (record.selectedfileprocessversion || record.attributes?.incompatible || !record.isdedupecomplete) return true;
         }
       }
-      return false;
+    }
+    return false;
   }
 
   const disableMultiRetry = () => {
-      let selectedRecords = records.filter((record) => record.isselected);
-      if (selectedRecords?.length <=0)
-        return true
-      for (let record of selectedRecords) {
-        if (record.isredactionready || record.selectedfileprocessversion ||
-              (!record.failed && !isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
-                  true)) return true;
-        if (record.attachments) {
-          for (let attachment of record.attachments) {
-            if (record.isredactionready || record.selectedfileprocessversion ||
-              !record.failed || !isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
-                  true) return true;
-          }
+    let selectedRecords = records.filter((record) => record.isselected);
+    if (selectedRecords?.length <= 0)
+      return true
+    for (let record of selectedRecords) {
+      if (record.isredactionready || record.selectedfileprocessversion ||
+        (!record.failed && !isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
+          true)) return true;
+      if (record.attachments) {
+        for (let attachment of record.attachments) {
+          if (record.isredactionready || record.selectedfileprocessversion ||
+            !record.failed || !isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
+            true) return true;
         }
       }
-      return false;
+    }
+    return false;
   }
 
 
 
   const displaySizeLimit = () => {
-    if(RECORD_DOWNLOAD_SIZE_LIMIT >= (1024*1024*1024))
-      return (RECORD_DOWNLOAD_SIZE_LIMIT/(1024*1024*1024)).toFixed(1) + "GB";
-    if(RECORD_DOWNLOAD_SIZE_LIMIT >= (1024*1024))
-      return (RECORD_DOWNLOAD_SIZE_LIMIT/(1024*1024)).toFixed(1) + "MB";
-    if(RECORD_DOWNLOAD_SIZE_LIMIT >= 1024 )
-      return (RECORD_DOWNLOAD_SIZE_LIMIT/(1024)).toFixed(1) + "KB";
+    if (RECORD_DOWNLOAD_SIZE_LIMIT >= (1024 * 1024 * 1024))
+      return (RECORD_DOWNLOAD_SIZE_LIMIT / (1024 * 1024 * 1024)).toFixed(1) + "GB";
+    if (RECORD_DOWNLOAD_SIZE_LIMIT >= (1024 * 1024))
+      return (RECORD_DOWNLOAD_SIZE_LIMIT / (1024 * 1024)).toFixed(1) + "MB";
+    if (RECORD_DOWNLOAD_SIZE_LIMIT >= 1024)
+      return (RECORD_DOWNLOAD_SIZE_LIMIT / (1024)).toFixed(1) + "KB";
     return RECORD_DOWNLOAD_SIZE_LIMIT + "Bytes";
   }
 
@@ -2180,17 +2189,17 @@ export const RecordsLog = ({
         fileCount++;
         totalFileSize += record.attributes.filesize;
 
-        if(fileCount > recordlimit || totalFileSize > sizelimt)
+        if (fileCount > recordlimit || totalFileSize > sizelimt)
           return true;
       } else {
-        if(record.attachments) {
-          for(let attachment of record.attachments) {
-            if(attachment.isselected) {
+        if (record.attachments) {
+          for (let attachment of record.attachments) {
+            if (attachment.isselected) {
               fileCount++;
               totalFileSize += parseInt(attachment.attributes.filesize);
 
 
-              if(fileCount > recordlimit || totalFileSize > sizelimt)
+              if (fileCount > recordlimit || totalFileSize > sizelimt)
                 return true;
             }
           }
@@ -2198,7 +2207,7 @@ export const RecordsLog = ({
       }
     }
 
-    if(fileCount == 0)
+    if (fileCount == 0)
       return true;
     else
       return false;
@@ -2336,9 +2345,9 @@ export const RecordsLog = ({
 
   const comparePersonalAttributes = (a, b) => {
     return a?.person === b?.person && a?.volume === b?.volume
-              && a?.filetype === b?.filetype
-              && a?.personaltag === b?.personaltag
-              && a?.trackingid === b?.trackingid;
+      && a?.filetype === b?.filetype
+      && a?.personaltag === b?.personaltag
+      && a?.trackingid === b?.trackingid;
   };
 
   const [isBulkEdit, setIsBulkEdit] = React.useState(false);
@@ -2350,7 +2359,7 @@ export const RecordsLog = ({
 
   const isBulkEditDisabled = () => {
     if (isBulkEdit) {
-    return false;
+      return false;
     } else {
       return true;
     }
@@ -2362,11 +2371,11 @@ export const RecordsLog = ({
     var updateRecords = [];
     var updateDivisionForRecords = [];
 
-    if(newPersonalAttributes) {
-      if(_all) {
+    if (newPersonalAttributes) {
+      if (_all) {
         for (let record of records) {
-          if(record.attributes?.personalattributes?.person
-             && record.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
+          if (record.attributes?.personalattributes?.person
+            && record.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
             //  && record.attributes?.personalattributes?.filetype
             //  && record.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
           ) {
@@ -2379,9 +2388,9 @@ export const RecordsLog = ({
             );
           }
 
-          if(record.attachments) {
+          if (record.attachments) {
             for (let attachment of record.attachments) {
-              if(attachment.attributes?.personalattributes?.person
+              if (attachment.attributes?.personalattributes?.person
                 && attachment.attributes?.personalattributes?.person === currentEditRecord.attributes?.personalattributes?.person
                 // && attachment.attributes?.personalattributes?.filetype
                 // && attachment.attributes?.personalattributes?.filetype === currentEditRecord.attributes?.personalattributes?.filetype
@@ -2417,7 +2426,7 @@ export const RecordsLog = ({
       }
     }
 
-    if(isMinistryCoordinator
+    if (isMinistryCoordinator
       && currentEditRecord
       && currentEditRecord.attributes.divisions[0].divisionname != "TBD"
       && currentEditRecord.attributes.divisions[0].divisionid != divisionModalTagValue) {
@@ -2430,7 +2439,7 @@ export const RecordsLog = ({
       );
     }
 
-    if(isMinistryCoordinator
+    if (isMinistryCoordinator
       && selectedRecords.length > 1
       && divisionModalTagValue !== -1
     )
@@ -2444,8 +2453,8 @@ export const RecordsLog = ({
         );
       }
 
-    if(currentEditRecord || selectedRecords.length > 1) {
-      if(updateRecords.length > 0 && !comparePersonalAttributes(newPersonalAttributes, curPersonalAttributes)) {
+    if (currentEditRecord || selectedRecords.length > 1) {
+      if (updateRecords.length > 0 && !comparePersonalAttributes(newPersonalAttributes, curPersonalAttributes)) {
         dispatch(
           editPersonalAttributes(
             requestId,
@@ -2455,7 +2464,7 @@ export const RecordsLog = ({
               newpersonalattributes: newPersonalAttributes,
             },
             (err, _res) => {
-              if(updateDivisionForRecords.length > 0) {
+              if (updateDivisionForRecords.length > 0) {
                 dispatch(
                   updateFOIRecords(
                     requestId,
@@ -2477,7 +2486,7 @@ export const RecordsLog = ({
           )
         );
       } else {
-        if(updateDivisionForRecords.length > 0) {
+        if (updateDivisionForRecords.length > 0) {
           dispatch(
             updateFOIRecords(
               requestId,
@@ -2520,7 +2529,7 @@ export const RecordsLog = ({
 
   const handleLockRecords = () => {
     const toastID = toast.loading("Updating records lock status for request...");
-    const data = {userrecordslockstatus: !lockRecords};
+    const data = { userrecordslockstatus: !lockRecords };
     dispatch(
       updateSpecificRequestSection(
         data,
@@ -2528,36 +2537,36 @@ export const RecordsLog = ({
         requestId,
         ministryId,
         (err, _res) => {
-        if(!err) {
-          setSaveRequestObject(prev => ({...prev, userrecordslockstatus: !lockRecords}));
-          setLockRecordsTab(!lockRecords);
-          toast.update(toastID, {
-            type: "success",
-            render: "Request details have been saved successfully.",
-            position: "top-right",
-            isLoading: false,
-            autoClose: 3000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
-        } else {
-          toast.error(
-            "Temporarily unable to update records lock status for request. Please try again in a few minutes.",
-            {
+          if (!err) {
+            setSaveRequestObject(prev => ({ ...prev, userrecordslockstatus: !lockRecords }));
+            setLockRecordsTab(!lockRecords);
+            toast.update(toastID, {
+              type: "success",
+              render: "Request details have been saved successfully.",
               position: "top-right",
+              isLoading: false,
               autoClose: 3000,
               hideProgressBar: true,
               closeOnClick: true,
               pauseOnHover: true,
               draggable: true,
               progress: undefined,
-            }
-          );
-        }
-      })
+            });
+          } else {
+            toast.error(
+              "Temporarily unable to update records lock status for request. Please try again in a few minutes.",
+              {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              }
+            );
+          }
+        })
     )
   }
 
@@ -2571,7 +2580,7 @@ export const RecordsLog = ({
         requestId,
         ministryId,
         (err, res) => {
-          if (res!= null && res?.status == true) {
+          if (res != null && res?.status == true) {
             toast.success("The request has been saved successfully.", {
               position: "top-right",
               autoClose: 3000,
@@ -2613,144 +2622,234 @@ export const RecordsLog = ({
           <Grid
             container
             direction="row"
-            justify="flex-start"
+            justify={isProactiveDisclosure ? "flex-end" : "flex-start"}
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={5} style={{marginBottom: 15}}>
-              <h1 className="foi-review-request-text foi-ministry-requestheadertext foi-records-request-text">
-                {getRequestNumber()}
-              </h1>
+            <Grid item xs={12}>
+              <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure} />
             </Grid>
-            {validLockRecordsState() ?
-            <Grid item xs={isScanningTeamMember ? 1 : 1}>
-              <Tooltip
-                enterDelay={1000}
-                title={isMinistryCoordinator ? "Only the IAO analyst can manually lock or unlock the records log, please contact the assigned analyst for assistance" : "Manually unlock or lock the records log"}
+            {isProactiveDisclosure ? (
+              <Grid
+                container
+                item
+                direction="row"
+                justifyContent="flex-end"
+                alignItems="flex-start"
+                xs={12}
+                spacing={1}
               >
-                {isMinistryCoordinator ?
-                  <p
-                    style={{ fontWeight: "bold", fontSize: "17.5px", marginTop: "4px", color: "#036" }}
-                  >
-                    {lockRecords ? "Records Locked" : "Records Unlocked"}
-                  </p>
-                : <span>
-                <button
-                disabled={isMinistryCoordinator}
-                onClick={handleLockRecords}
-                className={clsx(
-                  "btn",
-                  classes.createButton
-                  )}
-                  variant="contained"
-                  color="primary"
-                >
-                  {lockRecords ? "Unlock Records" : "Lock Records"}
-                </button>
-                </span>
-                }
-              </Tooltip>
-            </Grid> :  <Grid item xs={isScanningTeamMember ? 1 : 1}></Grid>
-            }
-            {isMinistryCoordinator == false &&
-              records?.length > 0 &&
-              DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
-                // <Tooltip title={<div style={{ fontSize: "11px" }}>Some files are still processing or have errors.
-                //   Please ensure that all files are successfully processed.</div>}>
-                  <Grid item xs={1}>
-
-                    <RedactRecordsButton
-                      records={records}
-                      groups={groups}
-                      ministryrequestid={ministryId}
-                    />
-
+                {validLockRecordsState() && (
+                  <Grid item xs={isMinistryCoordinator ? 3 : 2}>
+                    <Tooltip
+                      enterDelay={1000}
+                      title={isMinistryCoordinator ? "Only the IAO analyst can manually lock or unlock the records log, please contact the assigned analyst for assistance" : "Manually unlock or lock the records log"}
+                    >
+                      {isMinistryCoordinator ? (
+                        <p style={{ fontWeight: "bold", fontSize: "17.5px", marginTop: "10px", color: "#036", textAlign: "center" }}>
+                          {lockRecords ? "Records Locked" : "Records Unlocked"}
+                        </p>
+                      ) : (
+                        <span>
+                          <button
+                            disabled={isMinistryCoordinator}
+                            onClick={handleLockRecords}
+                            className={clsx("btn", classes.createButton)}
+                            variant="contained"
+                            color="primary"
+                          >
+                            {lockRecords ? "Unlock Records" : "Lock Records"}
+                          </button>
+                        </span>
+                      )}
+                    </Tooltip>
                   </Grid>
+                )}
+                {isMinistryCoordinator == false && records?.length > 0 && DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
+                  <Grid item xs={2}>
+                    <RedactRecordsButton records={records} groups={groups} ministryrequestid={ministryId} />
+                  </Grid>
+                )}
+                <Grid item xs={isMinistryCoordinator ? 3 : 2}>
+                  {hasDocumentsToDownload && !isHistoricalRequest && (
+                    <TextField
+                      className="download-dropdown custom-select-wrapper foi-download-button"
+                      id="download"
+                      label={currentDownload === 0 ? "Download" : ""}
+                      inputProps={{ "aria-labelledby": "download-label" }}
+                      InputLabelProps={{ shrink: false }}
+                      select
+                      name="download"
+                      value={currentDownload}
+                      onChange={handleDownloadChange}
+                      placeholder="Download"
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                    >
+                      {recordsDownloadList.map((item, index) => {
+                        if (item.id !== 0) {
+                          if ((item.id === 2 || item.id === 3) && isPhasedRelease) {
+                            return <PhaseMenu
+                              handlePhasePackageDownload={handlePhasePackageDownload}
+                              item={item}
+                              index={index}
+                              phasedPackageDownloadStatuses={item.id === 2 ? phasedRedlineDownloadStatuses : phasedResponsePackageDownloadStatuses}
+                              getPhasePackageDatetime={getPhasePackageDatetime}
+                            />
+                          } else {
+                            return (
+                              <MenuItem
+                                className="download-menu-item"
+                                key={item.id}
+                                value={index}
+                                disabled={item.disabled}
+                                sx={{ display: "flex" }}
+                              >
+                                {isReady(item.id) ? (
+                                  <FontAwesomeIcon icon={faCheckCircle} size="2x" color="#1B8103" className={classes.statusIcons} />
+                                ) : isFailed(item.id) ? (
+                                  <FontAwesomeIcon icon={faExclamationCircle} size="2x" color="#A0192F" className={classes.statusIcons} />
+                                ) : isInprogress(item.id) ? (
+                                  <FontAwesomeIcon icon={faSpinner} size="2x" color="#FAA915" className={classes.statusIcons} />
+                                ) : null}
+                                <Tooltip enterDelay={500} title={`Created On: ${getPackageDatetime(item.id) ? getPackageDatetime(item.id) : "N/A"}`}>
+                                  <span>{item.label}</span>
+                                </Tooltip>
+                              </MenuItem>
+                            )
+                          };
+                        }
+                      })}
+                    </TextField>
+                  )}
+                </Grid>
+                <Grid item xs={isMinistryCoordinator ? 3 : 2}>
+                  {!isHistoricalRequest && (
+                    <button
+                      className={clsx("btn", "addAttachment", classes.createButton)}
+                      variant="contained"
+                      onClick={addAttachments}
+                      color="primary"
+                      disabled={lockRecords || conversionFormats?.length < 1 || (isMinistryCoordinator && divisions.length === 0)}
+                    >
+                      + Upload Records
+                    </button>
+                  )}
+                </Grid>
+              </Grid>
+            ) : (
+              <Grid
+                container
+                item
+                direction="row"
+                justifyContent="flex-end"
+                alignItems="flex-start"
+                xs={12}
+                spacing={1}
+              >
+                {validLockRecordsState() ? (
+                  <Grid item xs={3}>
+                    <Tooltip
+                      enterDelay={1000}
+                      title={isMinistryCoordinator ? "Only the IAO analyst can manually lock or unlock the records log, please contact the assigned analyst for assistance" : "Manually unlock or lock the records log"}
+                    >
+                      {isMinistryCoordinator ? (
+                        <p style={{ fontWeight: "bold", fontSize: "17.5px", marginTop: "10px", color: "#036" }}>
+                          {lockRecords ? "Records Locked" : "Records Unlocked"}
+                        </p>
+                      ) : (
+                        <span>
+                          <button
+                            disabled={isMinistryCoordinator}
+                            onClick={handleLockRecords}
+                            className={clsx("btn", classes.createButton)}
+                            variant="contained"
+                            color="primary"
+                          >
+                            {lockRecords ? "Unlock Records" : "Lock Records"}
+                          </button>
+                        </span>
+                      )}
+                    </Tooltip>
+                  </Grid>
+                ) : (
+                  <Grid item xs={3}></Grid>
+                )}
+                {isMinistryCoordinator == false && records?.length > 0 && DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
+                  <Grid item xs={3}>
+                    <RedactRecordsButton records={records} groups={groups} ministryrequestid={ministryId} />
+                  </Grid>
+                )}
+                <Grid item xs={3}>
+                  {hasDocumentsToDownload && !isHistoricalRequest && (
+                    <TextField
+                      className="download-dropdown custom-select-wrapper foi-download-button"
+                      id="download"
+                      label={currentDownload === 0 ? "Download" : ""}
+                      inputProps={{ "aria-labelledby": "download-label" }}
+                      InputLabelProps={{ shrink: false }}
+                      select
+                      name="download"
+                      value={currentDownload}
+                      onChange={handleDownloadChange}
+                      placeholder="Download"
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                    >
+                      {recordsDownloadList.map((item, index) => {
+                        if (item.id !== 0) {
+                          if ((item.id === 2 || item.id === 3) && isPhasedRelease) {
+                            return <PhaseMenu
+                              handlePhasePackageDownload={handlePhasePackageDownload}
+                              item={item}
+                              index={index}
+                              phasedPackageDownloadStatuses={item.id === 2 ? phasedRedlineDownloadStatuses : phasedResponsePackageDownloadStatuses}
+                              getPhasePackageDatetime={getPhasePackageDatetime}
+                            />
+                          } else {
+                            return (
+                              <MenuItem
+                                className="download-menu-item"
+                                key={item.id}
+                                value={index}
+                                disabled={item.disabled}
+                                sx={{ display: "flex" }}
+                              >
+                                {isReady(item.id) ? (
+                                  <FontAwesomeIcon icon={faCheckCircle} size="2x" color="#1B8103" className={classes.statusIcons} />
+                                ) : isFailed(item.id) ? (
+                                  <FontAwesomeIcon icon={faExclamationCircle} size="2x" color="#A0192F" className={classes.statusIcons} />
+                                ) : isInprogress(item.id) ? (
+                                  <FontAwesomeIcon icon={faSpinner} size="2x" color="#FAA915" className={classes.statusIcons} />
+                                ) : null}
+                                <Tooltip enterDelay={500} title={`Created On: ${getPackageDatetime(item.id) ? getPackageDatetime(item.id) : "N/A"}`}>
+                                  <span>{item.label}</span>
+                                </Tooltip>
+                              </MenuItem>
+                            )
+                          };
+                        }
+                      })}
+                    </TextField>
+                  )}
+                </Grid>
+                <Grid item xs={3}>
+                  {!isHistoricalRequest && (
+                    <button
+                      className={clsx("btn", "addAttachment", classes.createButton)}
+                      variant="contained"
+                      onClick={addAttachments}
+                      color="primary"
+                      disabled={lockRecords || conversionFormats?.length < 1 || (isMinistryCoordinator && divisions.length === 0)}
+                    >
+                      + Upload Records
+                    </button>
+                  )}
+                </Grid>
+              </Grid>
             )}
-            <Grid item xs={3}>
-              {hasDocumentsToDownload && !isHistoricalRequest && (
-                <TextField
-                  className="download-dropdown custom-select-wrapper foi-download-button"
-                  id="download"
-                  label={currentDownload === 0 ? "Download" : ""}
-                  inputProps={{ "aria-labelledby": "download-label" }}
-                  InputLabelProps={{ shrink: false }}
-                  select
-                  name="download"
-                  value={currentDownload}
-                  onChange={handleDownloadChange}
-                  placeholder="Download"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                >
-                  {recordsDownloadList.map((item, index) => {
-                    if (item.id !== 0) {
-                      if ((item.id === 2 || item.id === 3) && isPhasedRelease) {
-                        return <PhaseMenu
-                        handlePhasePackageDownload={handlePhasePackageDownload}
-                        item={item}
-                        index={index}
-                        phasedPackageDownloadStatuses={item.id === 2 ? phasedRedlineDownloadStatuses : phasedResponsePackageDownloadStatuses}
-                        getPhasePackageDatetime={getPhasePackageDatetime}
-                        />
-                      } else {
-                      return (
-                        <MenuItem
-                          className="download-menu-item"
-                          key={item.id}
-                          value={index}
-                          disabled={item.disabled}
-                          sx={{ display: "flex" }}
-                        >
-                          {isReady(item.id) ? (
-                            <FontAwesomeIcon
-                              icon={faCheckCircle}
-                              size="2x"
-                              color="#1B8103"
-                              className={classes.statusIcons}
-                            />
-                          ) : isFailed(item.id) ? (
-                            <FontAwesomeIcon
-                              icon={faExclamationCircle}
-                              size="2x"
-                              color="#A0192F"
-                              className={classes.statusIcons}
-                            />
-                          ) : isInprogress(item.id) ? (
-                            <FontAwesomeIcon
-                              icon={faSpinner}
-                              size="2x"
-                              color="#FAA915"
-                              className={classes.statusIcons}
-                            />
-                          ) : null}
-                          <Tooltip enterDelay={500} title={`Created On: ${getPackageDatetime(item.id) ? getPackageDatetime(item.id) : "N/A"}`}>
-                            <span>{item.label}</span>
-                          </Tooltip>
-                        </MenuItem>
-                      )};
-                    }
-                  })}
-                </TextField>
-              )}
-            </Grid>
-            <Grid item xs={2}>
-              {
-              (!isHistoricalRequest) && (
-                <button
-                  className={clsx("btn", "addAttachment", classes.createButton)}
-                  variant="contained"
-                  onClick={addAttachments}
-                  color="primary"
-                  disabled={lockRecords || conversionFormats?.length < 1 || (isMinistryCoordinator && divisions.length === 0)}
-                >
-                  + Upload Records
-                </button>
-              )}
-            </Grid>
-
-
           </Grid>
           <Grid
             container
@@ -2760,54 +2859,54 @@ export const RecordsLog = ({
             spacing={1}
           >
             {!isHistoricalRequest && <>
-            <Grid item xs={7}>
-              <span style={{ fontWeight: "bold" }}>
-                <div >
-                  Total Uploaded Size :{" "}
-                  {getReadableFileSize(totalUploadedRecordSize)}
-                </div>
-              </span>
-            </Grid>
-            <Grid item xs={3}>
-              <span style={{ fontWeight: "bold" }}>
-                {isMCFPersonal && <div >
-                  Estimated Physical Pages:{" "}
-                </div>}
-              </span>
-            </Grid>
-            <Grid item xs={2}>
-              {isMCFPersonal && <span style={{ fontWeight: "bold" }}>
-                <div>
-                  <TextField
-                    type="number"
-                    inputProps={{
-                      step: 1,
-                      min: 0,
-                      style: {height: 12}
-                    }}
-                    style={{width: 90}}
-                    size="small"
-                    value={estimatedPageCount}
-                    onChange={(e) => setEstimatedPageCount(e.target.value)}
-                    disabled={isMinistryCoordinator}
-                  ></TextField>
-                </div>
-              </span>}
-            </Grid>
+              <Grid item xs={7}>
+                <span style={{ fontWeight: "bold" }}>
+                  <div >
+                    Total Uploaded Size :{" "}
+                    {getReadableFileSize(totalUploadedRecordSize)}
+                  </div>
+                </span>
+              </Grid>
+              <Grid item xs={3}>
+                <span style={{ fontWeight: "bold" }}>
+                  {isMCFPersonal && <div >
+                    Estimated Physical Pages:{" "}
+                  </div>}
+                </span>
+              </Grid>
+              <Grid item xs={2}>
+                {isMCFPersonal && <span style={{ fontWeight: "bold" }}>
+                  <div>
+                    <TextField
+                      type="number"
+                      inputProps={{
+                        step: 1,
+                        min: 0,
+                        style: { height: 12 }
+                      }}
+                      style={{ width: 90 }}
+                      size="small"
+                      value={estimatedPageCount}
+                      onChange={(e) => setEstimatedPageCount(e.target.value)}
+                      disabled={isMinistryCoordinator}
+                    ></TextField>
+                  </div>
+                </span>}
+              </Grid>
 
-            <Grid item xs={7}>
-              <span style={{ fontWeight: "bold" }}>
-                <div>
-                  Total Upload Limit :{" "}
-                  {getReadableFileSize(TOTAL_RECORDS_UPLOAD_LIMIT)}
-                </div>
-              </span>
-            </Grid>
-            <Grid item xs={3}>
-              <span style={{ fontWeight: "bold" }}>
-                {isMCFPersonal && <div>
-                  Estimated Pages After Tagging:{" "}
-                  {/* <button
+              <Grid item xs={7}>
+                <span style={{ fontWeight: "bold" }}>
+                  <div>
+                    Total Upload Limit :{" "}
+                    {getReadableFileSize(TOTAL_RECORDS_UPLOAD_LIMIT)}
+                  </div>
+                </span>
+              </Grid>
+              <Grid item xs={3}>
+                <span style={{ fontWeight: "bold" }}>
+                  {isMCFPersonal && <div>
+                    Estimated Pages After Tagging:{" "}
+                    {/* <button
                     class="btn"
                     style={{
                       backgroundColor: "#38598A",
@@ -2820,45 +2919,45 @@ export const RecordsLog = ({
                   >
                     Save
                   </button> */}
-                </div>}
-              </span>
-            </Grid>
-            <Grid item xs={2}>
-              {isMCFPersonal &&
-                <>
-                  <TextField
-                    type="number"
-                    inputProps={{
-                      step: 1,
-                      min: 0,
-                      style: {height: 12}
-                    }}
-                    style={{width: 90}}
-                    size="small"
-                    value={estimatedTaggedPageCount}
-                    onChange={(e) => setEstimatedTaggedPageCount(e.target.value)}
-                    disabled={isMinistryCoordinator}
-                  ></TextField>
-                  <button
-                    class="btn"
-                    style={{
-                      backgroundColor: "#38598A",
-                      color: "White",
-                      height: 29,
-                      paddingTop: 2,
-                      marginLeft: 10,
-                      fontWeight: "bold",
-                      width: "calc(100% - 100px)"
-                    }}
-                    onClick={saveEstimates}
-                    disabled={isMinistryCoordinator || (estimatedTaggedPageCount === requestDetails.estimatedtaggedpagecount &&
-                      estimatedPageCount === requestDetails.estimatedpagecount)}
-                  >
-                    Save
-                  </button>
-                </>
-              }
-            </Grid>
+                  </div>}
+                </span>
+              </Grid>
+              <Grid item xs={2}>
+                {isMCFPersonal &&
+                  <>
+                    <TextField
+                      type="number"
+                      inputProps={{
+                        step: 1,
+                        min: 0,
+                        style: { height: 12 }
+                      }}
+                      style={{ width: 90 }}
+                      size="small"
+                      value={estimatedTaggedPageCount}
+                      onChange={(e) => setEstimatedTaggedPageCount(e.target.value)}
+                      disabled={isMinistryCoordinator}
+                    ></TextField>
+                    <button
+                      class="btn"
+                      style={{
+                        backgroundColor: "#38598A",
+                        color: "White",
+                        height: 29,
+                        paddingTop: 2,
+                        marginLeft: 10,
+                        fontWeight: "bold",
+                        width: "calc(100% - 100px)"
+                      }}
+                      onClick={saveEstimates}
+                      disabled={isMinistryCoordinator || (estimatedTaggedPageCount === requestDetails.estimatedtaggedpagecount &&
+                        estimatedPageCount === requestDetails.estimatedpagecount)}
+                    >
+                      Save
+                    </button>
+                  </>
+                }
+              </Grid>
             </>}
             {/* <Grid item xs={1}>
             </Grid> */}
@@ -3012,8 +3111,8 @@ export const RecordsLog = ({
                       division.divisionid === -2
                         ? "#A0192F"
                         : division.divisionid === -3
-                        ? "#B57808"
-                        : "primary"
+                          ? "#B57808"
+                          : "primary"
                     }
                     size="small"
                     onClick={(e) => {
@@ -3080,93 +3179,93 @@ export const RecordsLog = ({
                 </span>
               </Tooltip>
               {(!isMCFPersonal) && (
-              <Tooltip
-                title={
-                  isUpdateDivisionsDisabled() ? (
-                    <div style={{ fontSize: "11px" }}>
-                      To update divisions:{" "}
-                      <ul>
-                        <li>Records log must be unlocked</li>
-                        <li>at least one record must be selected</li>
-                        <li>
-                          all records selected must be tagged to the same
-                          division
-                        </li>
-                        <li>
-                          {" "}
-                          and all records selected must be finished processing
-                        </li>
-                      </ul>
-                    </div>
-                  ) : (
-                    <div style={{ fontSize: "11px" }}>Update Divisions</div>
-                  )
-                }
-                sx={{ fontSize: "11px" }}
-              >
-                <span>
-                  <button
-                    className={` btn`}
-                    onClick={() => setDivisionsModalOpen(true)}
-                    // title="Update Divisions"
-                    disabled={lockRecords || isUpdateDivisionsDisabled()}
-                    style={
-                      lockRecords || isUpdateDivisionsDisabled()
-                        ? { pointerEvents: "none" }
-                        : {}
-                    }
-                  >
-                    <FontAwesomeIcon
-                      icon={faPenToSquare}
-                      size="lg"
-                      color="#38598A"
-                    />
-                  </button>
-                </span>
-              </Tooltip>
+                <Tooltip
+                  title={
+                    isUpdateDivisionsDisabled() ? (
+                      <div style={{ fontSize: "11px" }}>
+                        To update divisions:{" "}
+                        <ul>
+                          <li>Records log must be unlocked</li>
+                          <li>at least one record must be selected</li>
+                          <li>
+                            all records selected must be tagged to the same
+                            division
+                          </li>
+                          <li>
+                            {" "}
+                            and all records selected must be finished processing
+                          </li>
+                        </ul>
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: "11px" }}>Update Divisions</div>
+                    )
+                  }
+                  sx={{ fontSize: "11px" }}
+                >
+                  <span>
+                    <button
+                      className={` btn`}
+                      onClick={() => setDivisionsModalOpen(true)}
+                      // title="Update Divisions"
+                      disabled={lockRecords || isUpdateDivisionsDisabled()}
+                      style={
+                        lockRecords || isUpdateDivisionsDisabled()
+                          ? { pointerEvents: "none" }
+                          : {}
+                      }
+                    >
+                      <FontAwesomeIcon
+                        icon={faPenToSquare}
+                        size="lg"
+                        color="#38598A"
+                      />
+                    </button>
+                  </span>
+                </Tooltip>
               )}
               {(isMCFPersonal) && (
-              <Tooltip
-                title={
-                  isBulkEditDisabled() ? (
-                    <div style={{ fontSize: "11px" }}>
-                      To bulk edit tags, please select two or more files, otherwise please use the 'Edit Tags' option from the ellipses dropdown next to the individual file
-                    </div>
-                  ) : (
-                    <div style={{ fontSize: "11px" }}>Edit Tags</div>
-                  )
-                }
-                sx={{ fontSize: "11px" }}
-              >
-                <span>
-                  <button
-                    className={` btn`}
-                    onClick={() => {
-                      setCurPersonalAttributes({
-                        person: "",
-                        filetype: "",
-                        volume: "",
-                        trackingid: "",
-                        personaltag: ""
-                      });
-                      setDivisionModalTagValue(-1);
-                      setEditTagModalOpen(true);
-                    }}
-                    disabled={lockRecords || isBulkEditDisabled()}
-                    style={
-                      lockRecords || isBulkEditDisabled()
-                        ? { pointerEvents: "none" }
-                        : {}
-                    }
-                  >
-                    <FontAwesomeIcon
-                      icon={faPenToSquare}
-                      size="lg"
-                      color="#38598A"
-                    />
-                  </button>
-                </span>
-              </Tooltip>
+                <Tooltip
+                  title={
+                    isBulkEditDisabled() ? (
+                      <div style={{ fontSize: "11px" }}>
+                        To bulk edit tags, please select two or more files, otherwise please use the 'Edit Tags' option from the ellipses dropdown next to the individual file
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: "11px" }}>Edit Tags</div>
+                    )
+                  }
+                  sx={{ fontSize: "11px" }}
+                >
+                  <span>
+                    <button
+                      className={` btn`}
+                      onClick={() => {
+                        setCurPersonalAttributes({
+                          person: "",
+                          filetype: "",
+                          volume: "",
+                          trackingid: "",
+                          personaltag: ""
+                        });
+                        setDivisionModalTagValue(-1);
+                        setEditTagModalOpen(true);
+                      }}
+                      disabled={lockRecords || isBulkEditDisabled()}
+                      style={
+                        lockRecords || isBulkEditDisabled()
+                          ? { pointerEvents: "none" }
+                          : {}
+                      }
+                    >
+                      <FontAwesomeIcon
+                        icon={faPenToSquare}
+                        size="lg"
+                        color="#38598A"
+                      />
+                    </button>
+                  </span>
+                </Tooltip>
               )}
               <Tooltip title={<div style={{ fontSize: "11px" }}>Delete</div>}>
                 <span>
@@ -3190,8 +3289,8 @@ export const RecordsLog = ({
                       To download records:{" "}
                       <ul>
                         <li>at least one record must be selected</li>
-                        {RECORD_DOWNLOAD_SIZE_LIMIT>0 && (<li>download size limit is {displaySizeLimit()}</li>)}
-                        {RECORD_DOWNLOAD_LIMIT>0 && (<li>download records limit is {RECORD_DOWNLOAD_LIMIT}</li>)}
+                        {RECORD_DOWNLOAD_SIZE_LIMIT > 0 && (<li>download size limit is {displaySizeLimit()}</li>)}
+                        {RECORD_DOWNLOAD_LIMIT > 0 && (<li>download records limit is {RECORD_DOWNLOAD_LIMIT}</li>)}
                       </ul>
                     </div>
                   ) : (
@@ -3287,18 +3386,18 @@ export const RecordsLog = ({
                   }
                   sx={{ fontSize: "11px" }}
                 >
-              <span>
-                  <button
-                    className={` btn`}
-                    onClick={() => handlePopupButtonClick("documentSet", records)}
-                    disabled={lockRecords || isHistoricalRequest || !checkIsSelected() }
-                    style={
-                      lockRecords ? {pointerEvents: "none"} : {}
-                    }
-                  >
-                    <FontAwesomeIcon icon={faFile} size="lg" color="#38598A"/>
-                  </button>
-                </span>
+                  <span>
+                    <button
+                      className={` btn`}
+                      onClick={() => handlePopupButtonClick("documentSet", records)}
+                      disabled={lockRecords || isHistoricalRequest || !checkIsSelected()}
+                      style={
+                        lockRecords ? { pointerEvents: "none" } : {}
+                      }
+                    >
+                      <FontAwesomeIcon icon={faFile} size="lg" color="#38598A" />
+                    </button>
+                  </span>
                 </Tooltip>
 
               )}
@@ -3313,51 +3412,51 @@ export const RecordsLog = ({
                 title={parseGroupName(set.name)}
                 size={`${calculateSize(set.items)}`}
               >
-              <Grid
-                container
-                item
-                xs={12}
-                direction="row"
-                justify="flex-start"
-                alignItems="flex-start"
-                className={classes.recordLog}
-              >
-                {isRecordsfetching === "completed" && set.items?.length > 0 ? (
-                  set.items.map((record, i) => (
-                    <Attachment
-                      key={i}
-                      indexValue={i}
-                      record={record}
-                      handlePopupButtonClick={handlePopupButtonClick}
-                      getFullname={getFullname}
-                      isMinistryCoordinator={isMinistryCoordinator}
-                      ministryId={ministryId}
-                      classes={classes}
-                      handleSelectRecord={handleSelectRecord}
-                      setDivisionsModalOpen={setDivisionsModalOpen}
-                      isMCFPersonal={isMCFPersonal}
-                      setEditTagModalOpen={setEditTagModalOpen}
-                      setCurrentEditRecord={setCurrentEditRecord}
-                      isHistoricalRequest={isHistoricalRequest}
-                      lockRecords={lockRecords}
-                      isNonMinistryMember={isNonMinistryMember}
-                    />
-                  ))
-                ) : (
-                  <div className="recordsstatus">
-                    {isRecordsfetching === "inprogress"
-                      ? "Records loading is in progress, please wait!"
-                      : isRecordsfetching === "completed" &&
-                      (records?.length === 0 ||
-                        records === null ||
-                        records === undefined)
-                        ? "No records are available to list, please confirm whether records are uploaded or not"
-                        : isRecordsfetching === "error"
-                          ? "Error fetching records, please try again."
-                          : isRecordsfetching }
-                  </div>
-                )}
-              </Grid>
+                <Grid
+                  container
+                  item
+                  xs={12}
+                  direction="row"
+                  justify="flex-start"
+                  alignItems="flex-start"
+                  className={classes.recordLog}
+                >
+                  {isRecordsfetching === "completed" && set.items?.length > 0 ? (
+                    set.items.map((record, i) => (
+                      <Attachment
+                        key={i}
+                        indexValue={i}
+                        record={record}
+                        handlePopupButtonClick={handlePopupButtonClick}
+                        getFullname={getFullname}
+                        isMinistryCoordinator={isMinistryCoordinator}
+                        ministryId={ministryId}
+                        classes={classes}
+                        handleSelectRecord={handleSelectRecord}
+                        setDivisionsModalOpen={setDivisionsModalOpen}
+                        isMCFPersonal={isMCFPersonal}
+                        setEditTagModalOpen={setEditTagModalOpen}
+                        setCurrentEditRecord={setCurrentEditRecord}
+                        isHistoricalRequest={isHistoricalRequest}
+                        lockRecords={lockRecords}
+                        isNonMinistryMember={isNonMinistryMember}
+                      />
+                    ))
+                  ) : (
+                    <div className="recordsstatus">
+                      {isRecordsfetching === "inprogress"
+                        ? "Records loading is in progress, please wait!"
+                        : isRecordsfetching === "completed" &&
+                          (records?.length === 0 ||
+                            records === null ||
+                            records === undefined)
+                          ? "No records are available to list, please confirm whether records are uploaded or not"
+                          : isRecordsfetching === "error"
+                            ? "Error fetching records, please try again."
+                            : isRecordsfetching}
+                    </div>
+                  )}
+                </Grid>
 
               </DocumentSetWrapper>
             ))}
@@ -3398,13 +3497,13 @@ export const RecordsLog = ({
                     {isRecordsfetching === "inprogress"
                       ? "Records loading is in progress, please wait!"
                       : isRecordsfetching === "completed" &&
-                      (records?.length === 0 ||
-                        records === null ||
-                        records === undefined)
+                        (records?.length === 0 ||
+                          records === null ||
+                          records === undefined)
                         ? "No records are available to list, please confirm whether records are uploaded or not"
                         : isRecordsfetching === "error"
                           ? "Error fetching records, please try again."
-                          : isRecordsfetching }
+                          : isRecordsfetching}
                   </div>
                 )}
               </Grid>
@@ -3464,7 +3563,7 @@ export const RecordsLog = ({
               aria-describedby="state-change-dialog-description"
               maxWidth={"md"}
               fullWidth={true}
-              // id="state-change-dialog"
+            // id="state-change-dialog"
             >
               <DialogTitle disableTypography id="state-change-dialog-title">
                 <h2 className="state-change-header">Remove Attachments</h2>
@@ -3514,7 +3613,7 @@ export const RecordsLog = ({
             </Dialog>
           </div>
 
-          {isMCFPersonal?(
+          {isMCFPersonal ? (
             <MCFPersonal
               editTagModalOpen={editTagModalOpen}
               setEditTagModalOpen={setEditTagModalOpen}
@@ -3532,71 +3631,71 @@ export const RecordsLog = ({
               currentEditRecord={currentEditRecord}
               isBulkEdit={isBulkEdit}
             />
-          ):(
+          ) : (
             <div className="state-change-dialog">
-            <Dialog
-              open={divisionsModalOpen}
-              onClose={() => setDivisionsModalOpen(false)}
-              aria-labelledby="state-change-dialog-title"
-              aria-describedby="state-change-dialog-description"
-              maxWidth={"md"}
-              fullWidth={true}
+              <Dialog
+                open={divisionsModalOpen}
+                onClose={() => setDivisionsModalOpen(false)}
+                aria-labelledby="state-change-dialog-title"
+                aria-describedby="state-change-dialog-description"
+                maxWidth={"md"}
+                fullWidth={true}
               // id="state-change-dialog"
-            >
-              <DialogTitle disableTypography id="state-change-dialog-title">
-                <h2 className="state-change-header">Update Divisions</h2>
-                <IconButton
-                  className="title-col3"
-                  onClick={() => setDivisionsModalOpen(false)}
-                >
-                  <i className="dialog-close-button">Close</i>
-                  <CloseIcon />
-                </IconButton>
-              </DialogTitle>
-              <DialogContent className={"dialog-content-nomargin"}>
-                <DialogContentText
-                  id="state-change-dialog-description"
-                  component={"span"}
-                >
-                  {records.filter(
-                    (r) => r.isselected && r.attributes.divisions?.length > 1
-                  ).length > 0 && filterValue < 0 ? (
-                    <div className="tagtitle">
-                      <span>
-                        You have selected a record that was provided by more
-                        than one division. <br></br>
-                        To change the division you must first filter the Records
-                        Log by the division that you want to no longer be
-                        associated with the selected records.
-                      </span>
-                    </div>
-                  ) : (
-                    <>
+              >
+                <DialogTitle disableTypography id="state-change-dialog-title">
+                  <h2 className="state-change-header">Update Divisions</h2>
+                  <IconButton
+                    className="title-col3"
+                    onClick={() => setDivisionsModalOpen(false)}
+                  >
+                    <i className="dialog-close-button">Close</i>
+                    <CloseIcon />
+                  </IconButton>
+                </DialogTitle>
+                <DialogContent className={"dialog-content-nomargin"}>
+                  <DialogContentText
+                    id="state-change-dialog-description"
+                    component={"span"}
+                  >
+                    {records.filter(
+                      (r) => r.isselected && r.attributes.divisions?.length > 1
+                    ).length > 0 && filterValue < 0 ? (
                       <div className="tagtitle">
                         <span>
-                          Select the divisions that corresponds to the records
-                          you have selected.<br></br>
-                          This will update the divisions on all records you have
-                          selected both in the gathering records log and the
-                          redaction app.
+                          You have selected a record that was provided by more
+                          than one division. <br></br>
+                          To change the division you must first filter the Records
+                          Log by the division that you want to no longer be
+                          associated with the selected records.
                         </span>
                       </div>
+                    ) : (
+                      <>
+                        <div className="tagtitle">
+                          <span>
+                            Select the divisions that corresponds to the records
+                            you have selected.<br></br>
+                            This will update the divisions on all records you have
+                            selected both in the gathering records log and the
+                            redaction app.
+                          </span>
+                        </div>
 
-                      {requestType ==
-                      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ? (
-                        bcgovcode == "MSD" ? (
-                          <MSDPersonal
-                            setNewDivision={setDivisionModalTagValue}
-                            tagValue={
-                              records.filter((r) => r.isselected)[0]?.attributes
-                                .divisions[0].divisionid
-                            }
-                            divisionModalTagValue={divisionModalTagValue}
-                            divisions={tagList}
-                          />
-                        ) : (
-                          <div className="taglist">
-                            {divisions?.filter((division) => {
+                        {requestType ==
+                          FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ? (
+                          bcgovcode == "MSD" ? (
+                            <MSDPersonal
+                              setNewDivision={setDivisionModalTagValue}
+                              tagValue={
+                                records.filter((r) => r.isselected)[0]?.attributes
+                                  .divisions[0].divisionid
+                              }
+                              divisionModalTagValue={divisionModalTagValue}
+                              divisions={tagList}
+                            />
+                          ) : (
+                            <div className="taglist">
+                              {divisions?.filter((division) => {
                                 if (
                                   division.divisionname.toLowerCase() ===
                                   "communications"
@@ -3617,41 +3716,41 @@ export const RecordsLog = ({
                                   return false;
                                 }
                               })
-                              .map((division) => (
-                                <ClickableChip
-                                  item
-                                  id={`${division.divisionid}updateTag`}
-                                  key={`${division.divisionid}-updateTag`}
-                                  label={division.divisionname.toUpperCase()}
-                                  sx={{
-                                    width: "fit-content",
-                                    marginLeft: "8px",
-                                    marginBottom: "8px",
-                                  }}
-                                  color={
-                                    division.divisionid === -2
-                                      ? "#A0192F"
-                                      : division.divisionid === -3
-                                      ? "#B57808"
-                                      : "primary"
-                                  }
-                                  size="small"
-                                  onClick={(e) => {
-                                    setDivisionModalTagValue(
+                                .map((division) => (
+                                  <ClickableChip
+                                    item
+                                    id={`${division.divisionid}updateTag`}
+                                    key={`${division.divisionid}-updateTag`}
+                                    label={division.divisionname.toUpperCase()}
+                                    sx={{
+                                      width: "fit-content",
+                                      marginLeft: "8px",
+                                      marginBottom: "8px",
+                                    }}
+                                    color={
+                                      division.divisionid === -2
+                                        ? "#A0192F"
+                                        : division.divisionid === -3
+                                          ? "#B57808"
+                                          : "primary"
+                                    }
+                                    size="small"
+                                    onClick={(e) => {
+                                      setDivisionModalTagValue(
+                                        division.divisionid
+                                      );
+                                    }}
+                                    clicked={
+                                      divisionModalTagValue ===
                                       division.divisionid
-                                    );
-                                  }}
-                                  clicked={
-                                    divisionModalTagValue ===
-                                    division.divisionid
-                                  }
-                                />
-                              ))}
-                          </div>
-                        )
-                      ) : (
-                        <div className="taglist">
-                          {divisions?.filter((division) => {
+                                    }
+                                  />
+                                ))}
+                            </div>
+                          )
+                        ) : (
+                          <div className="taglist">
+                            {divisions?.filter((division) => {
                               if (
                                 division.divisionname.toLowerCase() ===
                                 "communications"
@@ -3672,60 +3771,61 @@ export const RecordsLog = ({
                                 return false;
                               }
                             })
-                            .map((division) => (
-                              <ClickableChip
-                                item
-                                id={`${division.divisionid}updateTag`}
-                                key={`${division.divisionid}-updateTag`}
-                                label={division.divisionname.toUpperCase()}
-                                sx={{
-                                  width: "fit-content",
-                                  marginLeft: "8px",
-                                  marginBottom: "8px",
-                                }}
-                                color={
-                                  division.divisionid === -2
-                                    ? "#A0192F"
-                                    : division.divisionid === -3
-                                    ? "#B57808"
-                                    : "primary"
-                                }
-                                size="small"
-                                onClick={(e) => {
-                                  setDivisionModalTagValue(division.divisionid);
-                                }}
-                                clicked={
-                                  divisionModalTagValue === division.divisionid
-                                }
-                              />
-                            ))}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <button
-                  className={`btn-bottom btn-save btn`}
-                  onClick={updateDivisions}
-                  disabled={divisionModalTagValue === -1}
-                >
-                  Continue
-                </button>
-                <button
-                  className="btn-bottom btn-cancel"
-                  onClick={() => setDivisionsModalOpen(false)}
-                >
-                  Cancel
-                </button>
-              </DialogActions>
-            </Dialog>
-          </div>
+                              .map((division) => (
+                                <ClickableChip
+                                  item
+                                  id={`${division.divisionid}updateTag`}
+                                  key={`${division.divisionid}-updateTag`}
+                                  label={division.divisionname.toUpperCase()}
+                                  sx={{
+                                    width: "fit-content",
+                                    marginLeft: "8px",
+                                    marginBottom: "8px",
+                                  }}
+                                  color={
+                                    division.divisionid === -2
+                                      ? "#A0192F"
+                                      : division.divisionid === -3
+                                        ? "#B57808"
+                                        : "primary"
+                                  }
+                                  size="small"
+                                  onClick={(e) => {
+                                    setDivisionModalTagValue(division.divisionid);
+                                  }}
+                                  clicked={
+                                    divisionModalTagValue === division.divisionid
+                                  }
+                                />
+                              ))}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <button
+                    className={`btn-bottom btn-save btn`}
+                    onClick={updateDivisions}
+                    disabled={divisionModalTagValue === -1}
+                  >
+                    Continue
+                  </button>
+                  <button
+                    className="btn-bottom btn-cancel"
+                    onClick={() => setDivisionsModalOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                </DialogActions>
+              </Dialog>
+            </div>
           )}
         </>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
 
@@ -3744,7 +3844,7 @@ const Attachment = React.memo(
     setCurrentEditRecord,
     isHistoricalRequest,
     lockRecords,
-     isNonMinistryMember
+    isNonMinistryMember
   }) => {
     const classes = useStyles();
     const [disabled, setDisabled] = useState(false);
@@ -3796,10 +3896,10 @@ const Attachment = React.memo(
       }
     };
 
-    const showCompressedTag= (record)=> {
+    const showCompressedTag = (record) => {
       /**TODO: Create ENUM for document processes */
       if (record.iscompressed && (!record.selectedfileprocessversion
-        || record.selectedfileprocessversion != 1 ))
+        || record.selectedfileprocessversion != 1))
         return true;
       return false;
     }
@@ -3832,7 +3932,7 @@ const Attachment = React.memo(
               onChange={handleSelect}
               required
               checked={record.isselected}
-              // defaultChecked={record.isselected}
+            // defaultChecked={record.isselected}
             />
             {record.isattachment && (
               <FontAwesomeIcon
@@ -3856,14 +3956,14 @@ const Attachment = React.memo(
                 color="#FAA915"
                 className={classes.statusIcons}
               />
-            ) : record.isredactionready || record.selectedfileprocessversion? (
+            ) : record.isredactionready || record.selectedfileprocessversion ? (
               <FontAwesomeIcon
                 icon={faCheckCircle}
                 size="2x"
                 color="#1B8103"
                 className={classes.statusIcons}
               />
-            ) : record.failed && !record.selectedfileprocessversion && record.attributes.trigger != "recordreplace"? (
+            ) : record.failed && !record.selectedfileprocessversion && record.attributes.trigger != "recordreplace" ? (
               <FontAwesomeIcon
                 icon={faExclamationCircle}
                 size="2x"
@@ -3871,11 +3971,11 @@ const Attachment = React.memo(
                 className={classes.statusIcons}
               />
             ) : ((record.updated_at != null && record.updated_at != undefined)
-                    ? isrecordtimeout(record.updated_at, RECORD_PROCESSING_HRS) == true
-                    : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) &&
-                  isRetry == false && !record.selectedfileprocessversion && record.attributes.trigger != "recordreplace" ?(
-                // isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
-                // true && isRetry == false && !record.selectedfileprocessversion? (
+              ? isrecordtimeout(record.updated_at, RECORD_PROCESSING_HRS) == true
+              : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) == true) &&
+              isRetry == false && !record.selectedfileprocessversion && record.attributes.trigger != "recordreplace" ? (
+              // isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
+              // true && isRetry == false && !record.selectedfileprocessversion? (
               <FontAwesomeIcon
                 icon={faExclamationCircle}
                 size="2x"
@@ -3900,13 +4000,13 @@ const Attachment = React.memo(
               KB -orginal
             </span> */}
             <span className={classes.fileSize}>
-            {(
-              (record?.selectedfileprocessversion == 1 ? record?.attributes?.filesize :
-                record?.attributes?.ocrfilesize ? record?.attributes?.ocrfilesize
-                : record?.attributes?.compressedfilesize
-                ?? record?.attributes?.filesize ?? 0) / 1024
-            ).toFixed(2)} KB
-          </span>
+              {(
+                (record?.selectedfileprocessversion == 1 ? record?.attributes?.filesize :
+                  record?.attributes?.ocrfilesize ? record?.attributes?.ocrfilesize
+                    : record?.attributes?.compressedfilesize
+                    ?? record?.attributes?.filesize ?? 0) / 1024
+              ).toFixed(2)} KB
+            </span>
           </Grid>
           <Grid
             item
@@ -3916,41 +4016,41 @@ const Attachment = React.memo(
             alignItems="flex-end"
             className={classes.recordStatus}
           >
-            { isHistoricalRequest ? <></>
+            {isHistoricalRequest ? <></>
               : record.isduplicate ? (
-              <span>Duplicate of {record.duplicateof}</span>
-            ) : record.attributes?.incompatible &&
-              record.attributes?.trigger !== "recordreplace" ? (
-              <span>Incompatible File Type</span>
-            ) : (record.failed && record.isredactionready) ||
-              (record.attributes?.trigger === "recordreplace" &&
-                record.attributes?.isattachment) ? (
-              <span>Record Manually Replaced Due to Error</span>
-            ) : record.attributes?.isattachment ? (
-              <span
-                style={{
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-                title={record.failed && !record.selectedfileprocessversion? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
-              >
-                {record.failed && !record.selectedfileprocessversion? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
-              </span>
-            ) : record.isredactionready || record.selectedfileprocessversion ? (
-              <span>Ready for Redaction</span>
-            ) : record.failed && !record.selectedfileprocessversion? (
-              <span>Error during {record.failed}</span>
-            ) : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
+                <span>Duplicate of {record.duplicateof}</span>
+              ) : record.attributes?.incompatible &&
+                record.attributes?.trigger !== "recordreplace" ? (
+                <span>Incompatible File Type</span>
+              ) : (record.failed && record.isredactionready) ||
+                (record.attributes?.trigger === "recordreplace" &&
+                  record.attributes?.isattachment) ? (
+                <span>Record Manually Replaced Due to Error</span>
+              ) : record.attributes?.isattachment ? (
+                <span
+                  style={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                  title={record.failed && !record.selectedfileprocessversion ? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
+                >
+                  {record.failed && !record.selectedfileprocessversion ? `Error during ${record.failed}` : `Attachment of ${record.attachmentof}`}
+                </span>
+              ) : record.isredactionready || record.selectedfileprocessversion ? (
+                <span>Ready for Redaction</span>
+              ) : record.failed && !record.selectedfileprocessversion ? (
+                <span>Error during {record.failed}</span>
+              ) : isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
                 true && isRetry == false && !record.selectedfileprocessversion ? (
-              <span>Error due to timeout</span>
-            ) : !record.isdedupecomplete?(
-              <span>Deduplication & file conversion in progress</span>
-            ): !record.iscompressed ? (
-              <span>Compression in progress</span>
-            ) : (
-              <span>OCR in progress</span>
-            )}
+                <span>Error due to timeout</span>
+              ) : !record.isdedupecomplete ? (
+                <span>Deduplication & file conversion in progress</span>
+              ) : !record.iscompressed ? (
+                <span>Compression in progress</span>
+              ) : (
+                <span>OCR in progress</span>
+              )}
             <AttachmentPopup
               indexValue={indexValue}
               record={record}
@@ -3991,8 +4091,8 @@ const Attachment = React.memo(
                     record.isattachment && i === 0
                       ? "4px 4px 4px 95px"
                       : i === 0
-                      ? "4px 4px 4px 35px"
-                      : "4px",
+                        ? "4px 4px 4px 35px"
+                        : "4px",
                 }}
               />
             ))}
@@ -4009,8 +4109,8 @@ const Attachment = React.memo(
                     record.isattachment && removeInValidTagsFromDivisions?.length === 0
                       ? "4px 4px 4px 95px"
                       : removeInValidTagsFromDivisions?.length === 0
-                      ? "4px 4px 4px 35px"
-                      : "4px",
+                        ? "4px 4px 4px 35px"
+                        : "4px",
                 }}
               />
             }
@@ -4066,27 +4166,27 @@ const Attachment = React.memo(
                 }}
               />
             }
-              <Chip
-                key={record.recordid}
-                icon={
-                  <FontAwesomeIcon
-                    icon={showCompressedTag(record) ? faMinimize : faMaximize}
-                    size="sm"
-                    style={{
-                      color:"#38598A",
-                    }}
-                  />
-                }
-                label={showCompressedTag(record) ? "Compressed" : "Uncompressed"}
-                size="small"
-                className={clsx(classes.chip, classes.chipPrimary)}
-                style={{
-                  color: "#003366",
-                  backgroundColor:"#fff",
-                  border: "1px solid #38598A",
-                  margin: "4px 10px",
-                }}
-              />
+            <Chip
+              key={record.recordid}
+              icon={
+                <FontAwesomeIcon
+                  icon={showCompressedTag(record) ? faMinimize : faMaximize}
+                  size="sm"
+                  style={{
+                    color: "#38598A",
+                  }}
+                />
+              }
+              label={showCompressedTag(record) ? "Compressed" : "Uncompressed"}
+              size="small"
+              className={clsx(classes.chip, classes.chipPrimary)}
+              style={{
+                color: "#003366",
+                backgroundColor: "#fff",
+                border: "1px solid #38598A",
+                margin: "4px 10px",
+              }}
+            />
           </Grid>
 
           <Grid
@@ -4171,7 +4271,7 @@ const AttachmentPopup = React.memo(
     isMinistryCoordinator,
     setCurrentEditRecord,
     isHistoricalRequest,
-     isNonMinistryMember
+    isNonMinistryMember
   }) => {
     const ref = React.useRef();
     const closeTooltip = () => (ref.current && ref ? ref.current.close() : {});
@@ -4289,7 +4389,7 @@ const AttachmentPopup = React.memo(
       const DeleteMenu = () => {
         return (
           <MenuItem
-          style={ (lockRecords || disableMinistryUser) ? { pointerEvents: "none" } : {} }
+            style={(lockRecords || disableMinistryUser) ? { pointerEvents: "none" } : {}}
             disabled={lockRecords || disableMinistryUser}
             onClick={() => {
               handleDelete();
@@ -4309,7 +4409,7 @@ const AttachmentPopup = React.memo(
         }
         return (
           <MenuItem
-            style={ (isDisabled) ? { pointerEvents: "none" } : {} }
+            style={(isDisabled) ? { pointerEvents: "none" } : {}}
             disabled={isDisabled}
             onClick={() => {
               handleDeleteDocumentSetMenu();
@@ -4369,28 +4469,28 @@ const AttachmentPopup = React.memo(
             )}
             {!isHistoricalRequest && !record.selectedfileprocessversion &&
               !record.attributes?.incompatible && record.isdedupecomplete && (
-              <MenuItem
-                disabled={lockRecords || disableMinistryUser}
-                onClick={() => {
-                  handleRetrieveFileVersion("retrieve_uncompressed", record);
-                  setPopoverOpen(false);
-                }}
-              >
-                Retrieve Uncompressed
-              </MenuItem>
-            )}
+                <MenuItem
+                  disabled={lockRecords || disableMinistryUser}
+                  onClick={() => {
+                    handleRetrieveFileVersion("retrieve_uncompressed", record);
+                    setPopoverOpen(false);
+                  }}
+                >
+                  Retrieve Uncompressed
+                </MenuItem>
+              )}
             {(!record.attributes?.isattachment ||
               record.attributes?.isattachment === undefined) && !isHistoricalRequest && (
-              <MenuItem
-                disabled={lockRecords || disableMinistryUser}
-                onClick={() => {
-                  handleReplace();
-                  setPopoverOpen(false);
-                }}
-              >
-                Replace Manually
-              </MenuItem>
-            )}
+                <MenuItem
+                  disabled={lockRecords || disableMinistryUser}
+                  onClick={() => {
+                    handleReplace();
+                    setPopoverOpen(false);
+                  }}
+                >
+                  Replace Manually
+                </MenuItem>
+              )}
             {record.attributes?.isattachment && (
               <MenuItem
                 disabled={lockRecords || disableMinistryUser}
@@ -4413,27 +4513,27 @@ const AttachmentPopup = React.memo(
             </MenuItem>
             {/* )} */}
             {(record.attributes?.isattachment &&
-                record.attributes?.trigger === "recordreplace") && (
-              <MenuItem
-                onClick={() => {
-                  handleDownloadPDF();
-                  setPopoverOpen(false);
-                }}
-              >
-                Download Replaced
-              </MenuItem>
-            )}
+              record.attributes?.trigger === "recordreplace") && (
+                <MenuItem
+                  onClick={() => {
+                    handleDownloadPDF();
+                    setPopoverOpen(false);
+                  }}
+                >
+                  Download Replaced
+                </MenuItem>
+              )}
             {(record.isredactionready && (record.isconverted || record.iscompressed ||
-                 record.ocrfilepath) && !record.attributes.incompatible) && (
-              <MenuItem
-                onClick={() => {
-                  handleDownload()
-                  setPopoverOpen(false);
-                }}
-              >
-                Download Converted
-              </MenuItem>
-            )}
+              record.ocrfilepath) && !record.attributes.incompatible) && (
+                <MenuItem
+                  onClick={() => {
+                    handleDownload()
+                    setPopoverOpen(false);
+                  }}
+                >
+                  Download Converted
+                </MenuItem>
+              )}
             {record.originalfile != "" && record.originalfile != undefined &&
               <MenuItem
                 onClick={() => {
@@ -4456,7 +4556,7 @@ const AttachmentPopup = React.memo(
             {!record.isredactionready && !record.selectedfileprocessversion &&
               (record.failed ||
                 isrecordtimeout(record.created_at, RECORD_PROCESSING_HRS) ==
-                  true) && (
+                true) && (
                 <MenuItem
                   onClick={() => {
                     handleRetry(record);
@@ -4468,7 +4568,7 @@ const AttachmentPopup = React.memo(
               )}
 
             {
-          }
+            }
           </MenuList>
         </Popover>
       );

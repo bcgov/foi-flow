@@ -283,7 +283,8 @@ export const createRequestDetailsObjectFunc = (
       requestObject.dueDate = value.dueDate;
       requestObject.receivedMode = value.receivedMode;
       requestObject.deliveryMode = value.deliveryMode?.toLowerCase()?.includes("select")?"":value.deliveryMode;
-      if ("cfrDueDate" in requestObject) requestObject.cfrDueDate = value.recordsDueDate;
+      if (requestObject.requestType != "proactive disclosure" && "cfrDueDate" in requestObject) 
+        requestObject.cfrDueDate = value.recordsDueDate;
       break;
     case FOI_COMPONENT_CONSTANTS.ASSIGNED_TO:
       const assigneeDetails = createAssigneeDetails(value, value2);

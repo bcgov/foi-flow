@@ -232,15 +232,18 @@ const ProactiveDisclosureDetails = React.memo(
       </MenuItem>
     ));
 
-    const reportPeriodMenuItems = reportPeriods.map((item) => (
-      <MenuItem
-        key={item.name}
-        value={item.name}
-        disabled={item.name.toLowerCase().includes("N/A")}
-      >
-        {item.name}
-      </MenuItem>
-    ));
+    const reportPeriodMenuItems = reportPeriods.map((item) => {
+      const year = startDate ? startDate.split("-")[0] : "";
+      return (
+        <MenuItem
+          key={item.name}
+          value={item.name}
+          disabled={item.name.toLowerCase().includes("n/a")}
+        >
+          {year && !item.name.toLowerCase().includes("n/a") ? `${item.name} ${year}` : item.name}
+        </MenuItem>
+      );
+    });
 
     return (
       <div className="request-accordian">
@@ -286,7 +289,7 @@ const ProactiveDisclosureDetails = React.memo(
                     variant="outlined"
                     fullWidth
                     required
-                    disabled={disableInput}
+                    disabled={disableInput || !startDate}
                     error={selectedReportPeriod
                       ?.toLowerCase()
                       ?.includes("select")}

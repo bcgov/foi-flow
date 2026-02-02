@@ -1,7 +1,7 @@
 """ProactiveDisclosure Categories
 
 Revision ID: 565afecc8627
-Revises: 05dee3d60a8c
+Revises: 2d8cf3fb689f
 Create Date: 2025-12-23 11:33:01.546726
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '565afecc8627'
-down_revision = '05dee3d60a8c'
+down_revision = '2d8cf3fb689f'
 branch_labels = None
 depends_on = None
 

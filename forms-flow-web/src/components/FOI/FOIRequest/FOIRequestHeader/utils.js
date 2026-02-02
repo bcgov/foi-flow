@@ -43,7 +43,7 @@ export const getMenuItems = ({
   let menuItems = [];
   menuItems.push(
     <MenuItem className={classes.group} key={0} value={"|"}>
-      {}
+      { }
     </MenuItem>
   );
   menuItems.push(
@@ -61,7 +61,7 @@ export const getMenuItems = ({
   }
   else {
     assignedToList = assignedToList.filter(assignedTo => assignedTo.type === 'iao');
-  }  
+  }
   assignedToList?.forEach((group) => {
     const groupItem = (
       <MenuItem
@@ -84,23 +84,23 @@ export const getMenuItems = ({
         {getFullName(assignee.lastname, assignee.firstname, assignee.username)}
       </MenuItem>
     ));
-    
+
     menuItems.push(assigneeItems);
 
   });
   return menuItems;
 };
 
-export const getHeaderText = ({requestDetails, ministryId, status}) => {
+export const getHeaderText = ({ requestDetails, ministryId, status }) => {
   if (window.location.href.includes(FOI_COMPONENT_CONSTANTS.ADDREQUEST)) {
     return FOI_COMPONENT_CONSTANTS.ADD_REQUEST;
   }
-  
-  if(status?.toLowerCase() === StateEnum.unopened.name.toLowerCase()){
+
+  if (status?.toLowerCase() === StateEnum.unopened.name.toLowerCase()) {
     return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
   }
 
-  if(requestDetails.axisRequestId)
+  if (requestDetails.axisRequestId)
     return requestDetails.axisRequestId;
 
   if (requestDetails.idNumber && ministryId) {

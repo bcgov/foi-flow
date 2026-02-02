@@ -7,9 +7,11 @@ import './index.scss'
 import { ConditionalComponent, errorToast, getFullnameList } from "../../../../helper/FOI/helper";
 import { toast } from "react-toastify";
 import type { Template } from './types';
-import { fetchApplicantCorrespondence, saveEmailCorrespondence, saveDraftCorrespondence, 
-  editDraftCorrespondence, deleteDraftCorrespondence, deleteResponseCorrespondence, saveCorrespondenceResponse, 
-  fetchEmailTemplate, exportSFDT, exportPDF, updateApplicantCorrespondence, sendPreviewEmail} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
+import {
+  fetchApplicantCorrespondence, saveEmailCorrespondence, saveDraftCorrespondence,
+  editDraftCorrespondence, deleteDraftCorrespondence, deleteResponseCorrespondence, saveCorrespondenceResponse,
+  fetchEmailTemplate, exportSFDT, exportPDF, updateApplicantCorrespondence, sendPreviewEmail
+} from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 import _ from 'lodash';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
@@ -26,7 +28,7 @@ import { PAYMENT_EXPIRY_DAYS } from "../../../../constants/FOI/constants";
 import { PreviewModal } from './PreviewModal';
 import { OSS_S3_BUCKET_FULL_PATH } from "../../../../constants/constants";
 import Loading from "../../../../containers/Loading";
-import {setFOICorrespondenceLoader} from "../../../../actions/FOI/foiRequestActions";
+import { setFOICorrespondenceLoader } from "../../../../actions/FOI/foiRequestActions";
 import { applyVariables, getTemplateVariables, getTemplateVariablesAsync, isFeeTemplateDisabled, getExtensionType } from './util';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
 import CustomizedTooltip from '../Tooltip/MuiTooltip/Tooltip';
@@ -49,6 +51,8 @@ import { formatDateInPst } from '../../../../helper/FOI/helper';
 import { getCorrespondenceSubject, getFullEmailListText, getFullCCEmailListText, convertDateStringToNumeric } from './helper';
 //@ts-ignore
 import * as html2pdf from 'html-to-pdf-js';
+import RequestHeaderRow from '../RequestHeaderRow';
+
 
 export const ContactApplicant = ({
   requestNumber,
@@ -57,10 +61,11 @@ export const ContactApplicant = ({
   ministryCode,
   applicantCorrespondence,
   requestId,
+  isProactiveDisclosure
 }: any) => {
   const [curTemplate, setCurTemplate] = useState<string>('');
   const [curTemplateName, setCurTemplateName] = useState<string>('');
-  const [selectedCorrespondence, setSelectedCorrespondence] = useState <any> ({});
+  const [selectedCorrespondence, setSelectedCorrespondence] = useState<any>({});
   const [correspondenceSubject, setCorrespondenceSubject] = useState<string>(`Your FOI Request ${requestNumber || requestId}`);
 
   const dispatch = useDispatch();
@@ -128,14 +133,14 @@ export const ContactApplicant = ({
   const selectTemplateFromDropdown = (event: React.ChangeEvent<{}> | null, item: Template | null) => {
     // console.log("Selected option:", item?.label);
 
-    if(item?.templateid) {
+    if (item?.templateid) {
       setShowLagacyEditor(true);
       setCurTemplate('');
       setCurTemplateName('');
     } else {
       setShowLagacyEditor(false);
       setEnableAutoFocus(false);
-      if(item?.label) {
+      if (item?.label) {
         let newData = {
           "foiRequestId": requestId,
           "foiMinistryRequestId": ministryId,
@@ -180,7 +185,7 @@ export const ContactApplicant = ({
     const loadPreview = async (html: string) => {
       // setEditorValue(html.replace("<body bgcolor=\"#FFFFFF\">", "<body bgcolor=\"#FFFFFF\" style=\"width: 6.5in; margin-left: auto; margin-right: auto; padding: 1in;\">"));
       // setEditorValue( removeHeaderParagraph(html) );
-      setEditorValue( html );
+      setEditorValue(html);
     }
     await exportSFDT(dispatch, newDataHtml, loadPreview);
     if (selectedEmails?.length == 0 && selectedCCEmails?.length == 0) {
@@ -199,7 +204,7 @@ export const ContactApplicant = ({
   //   // Create a temporary DOM element to parse the HTML string.
   //   const tempDiv = document.createElement('div');
   //   tempDiv.innerHTML = htmlString;
-  
+
   //   // Find the <p class="Header"> or <h1 class="Heading_1"> elements.
   //   const removeHeader = () => {
   //     const header = tempDiv.querySelector('p.Header, h1.Heading_1');
@@ -215,7 +220,7 @@ export const ContactApplicant = ({
   //   // tempDiv.querySelectorAll("p").forEach((p) => {
   //   //   const textContent = p.textContent?.trim();
   //   //   if (!textContent || textContent === " " || textContent === "&nbsp;") return;
-    
+
   //   //   const nextNode = p.nextSibling;
   //   //   if (nextNode?.nodeType === Node.TEXT_NODE && /^[ \t\r]*\n[ \t\r]*$/.test(nextNode.nodeValue ?? "")) {
   //   //     p.insertAdjacentHTML("afterend", "<br>");
@@ -243,7 +248,7 @@ export const ContactApplicant = ({
 
   const downloadForExport = async (correspondence: any, blobs: any) => {
     let fileInfoList = correspondence.attachments.map((attachment: any) => {
-      return  {
+      return {
         filename: attachment.filename,
         s3sourceuri: attachment.documenturipath
       }
@@ -261,23 +266,23 @@ export const ContactApplicant = ({
       let element = headerDiv.outerHTML
       if (correspondence?.text) element = element + correspondence?.text
       let emailFilename = correspondence?.correspondencesubject ? `${correspondence?.correspondencesubject.replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf` : `${getCorrespondenceSubject(correspondence, templateList, requestNumber).replaceAll(/[^a-z A-Z0-9_\-]/g, "")}.pdf`
-      const pdfEmailBlob = await html2pdf().set({margin: 20}).from(element).outputPdf('blob')
-      blobs.push({name: folderName + '/' + emailFilename, lastModified: new Date(), input: pdfEmailBlob})
+      const pdfEmailBlob = await html2pdf().set({ margin: 20 }).from(element).outputPdf('blob')
+      blobs.push({ name: folderName + '/' + emailFilename, lastModified: new Date(), input: pdfEmailBlob })
     }
-    if (correspondence.attachments.length == 0) return {folder: folderName, status: 'success'}
+    if (correspondence.attachments.length == 0) return { folder: folderName, status: 'success' }
 
     try {
       const response = await getOSSHeaderDetails(fileInfoList, dispatch);
       for (let header of response.data) {
         await getFileFromS3(header, (_err: any, res: any) => {
-          let blob = new Blob([res.data], {type: "application/octet-stream"});
-          blobs.push({name: folderName + '/' + header.filename, lastModified: res.headers['last-modified'], input: blob})
+          let blob = new Blob([res.data], { type: "application/octet-stream" });
+          blobs.push({ name: folderName + '/' + header.filename, lastModified: res.headers['last-modified'], input: blob })
         });
       }
-      return {folder: folderName, status: 'success'}
+      return { folder: folderName, status: 'success' }
     } catch (error) {
       console.log(error)
-      return {folder: folderName, status: 'failed'}
+      return { folder: folderName, status: 'failed' }
     }
   }
 
@@ -313,20 +318,23 @@ export const ContactApplicant = ({
       const zipfileName = requestNumber ? requestNumber : `U-00${requestId}`
       saveAs(zipfile, zipfileName + "- Correspondence" + ".zip");
       if (failedAttachments.length > 0) {
-        toast.update(toastID, {...toastOptions, 
+        toast.update(toastID, {
+          ...toastOptions,
           render: `Download complete, but the following correspondences have failed to download all attachments: ${failedAttachments.join(', \n')}`,
           type: "error",
           autoClose: false
         });
       } else {
-        toast.update(toastID, {...toastOptions, 
+        toast.update(toastID, {
+          ...toastOptions,
           render: `Exporting correspondences complete`,
           type: "success"
         });
       }
     } catch (error) {
       console.log(error)
-      toast.update(toastID, {...toastOptions,
+      toast.update(toastID, {
+        ...toastOptions,
         render: `Exporting correspondences failed.`,
         type: "error"
       });
@@ -336,18 +344,18 @@ export const ContactApplicant = ({
   const exportAsPdf = async (sfdtString: string) => {
     const attachments = await saveExport();
     let fileInfoList = attachments.map((attachment: any) => {
-      return  {
+      return {
         filename: attachment.filename,
         s3sourceuri: attachment.url
       }
     })
-    let blobs: any  = [];
+    let blobs: any = [];
     try {
       const response = await getOSSHeaderDetails(fileInfoList, dispatch);
       for (let header of response.data) {
         await getFileFromS3(header, (_err: any, res: any) => {
-          let blob = new Blob([res.data], {type: "application/octet-stream"});
-          blobs.push({name: header.filename, lastModified: res.headers['last-modified'], input: blob})
+          let blob = new Blob([res.data], { type: "application/octet-stream" });
+          blobs.push({ name: header.filename, lastModified: res.headers['last-modified'], input: blob })
         });
       }
     } catch (error) {
@@ -360,7 +368,7 @@ export const ContactApplicant = ({
     };
     const saveBlobToPdf = async (pdf: any) => {
       const currentEditorContentAsPdfBlob = new Blob([pdf], { type: 'application/pdf' });
-      blobs.push({name: `Correspondence Letter - ${requestNumber}.pdf`, lastModified: new Date(), input: currentEditorContentAsPdfBlob})
+      blobs.push({ name: `Correspondence Letter - ${requestNumber}.pdf`, lastModified: new Date(), input: currentEditorContentAsPdfBlob })
       const zipfile = await downloadZip(blobs).blob()
       toast.success("Message has been exported successfully", {
         position: "top-right",
@@ -370,7 +378,7 @@ export const ContactApplicant = ({
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-      }); 
+      });
       saveAs(zipfile, user?.preferred_username + " | " + formatDateInPst(new Date(), "yyyy MMM dd | hh:mm aa") + ".zip");
     }
     await exportPDF(dispatch, newData, saveBlobToPdf);
@@ -399,7 +407,7 @@ export const ContactApplicant = ({
     setResetTemplateDropdownValue(true);
   }
 
-  
+
 
   const currentCFRForm: any = useSelector((state: any) => state.foiRequests.foiRequestCFRForm);
   const isLoading: boolean = useSelector((state: any) => state.foiRequests.isCorrespondenceLoading);
@@ -414,29 +422,29 @@ export const ContactApplicant = ({
     return user && user.fullname ? user.fullname : userid;
   }
 
-  const getRequestNumber = () => {
+  const getRequestNumber = (isProactiveDisclosure: boolean) => {
     if (requestNumber)
-      return `Request #${requestNumber}`;
-    return `Request #U-00${requestId}`;
+      return isProactiveDisclosure ? requestNumber : `Request #${requestNumber}`;
+    return isProactiveDisclosure ? requestId : `Request #U-00${requestId}`;
   }
 
   const handleContinueModal = (_value: any, _fileInfoList: any, _files: any) => {
     setModal(false)
     if (_files)
-      setFiles(_files)    
+      setFiles(_files)
   }
 
   const [openModal, setModal] = useState(false);
   const [communicationUploadModalOpen, setCommunicationUploadModalOpen] = useState(false);
-  
+
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [confirmationFor, setConfirmationFor] = useState("");
   const [confirmationTitle, setConfirmationTitle] = useState("");
   const [confirmationMessage, setConfirmationMessage] = useState("");
-  const [currentResponseDate, setCurrentResponseDate] = useState <any> ("");
+  const [currentResponseDate, setCurrentResponseDate] = useState<any>("");
   const [extension, setExtension] = useState("");
 
-  const openAttachmentModal = () => { 
+  const openAttachmentModal = () => {
     setUploadFor("email");
     setModal(true);
   }
@@ -447,8 +455,8 @@ export const ContactApplicant = ({
     setCurrentTemplate(0)
     setUploadFor("response");
     setModalFor("add");
-    setModal(true);  
-    setShowEditor(false);  
+    setModal(true);
+    setShowEditor(false);
   }
 
   const addCorrespondence = () => {
@@ -460,11 +468,11 @@ export const ContactApplicant = ({
     setEditorValue("");
     setSelectedCorrespondence({});
     setCurrentTemplate(0);
-    
+
   }
 
-  const  cancelCorrespondence = () => {
-    if (currentTemplate> 0) {
+  const cancelCorrespondence = () => {
+    if (currentTemplate > 0) {
       setOpenConfirmationModal(true);
       setConfirmationFor("cancel-correspondence");
       setConfirmationTitle("Cancel")
@@ -473,8 +481,8 @@ export const ContactApplicant = ({
       setShowEditor(false);
     }
   }
-  
-  const  clearcorrespondence = () => {
+
+  const clearcorrespondence = () => {
     setShowEditor(false);
     setModal(false);
     setEditMode(false);
@@ -488,14 +496,14 @@ export const ContactApplicant = ({
     setCorrespondenceSubject(`Your FOI Request ${requestNumber || requestId}`);
   }
 
-  const handleConfirmationClose = () => {     
+  const handleConfirmationClose = () => {
     setConfirmationFor("");
     setConfirmationMessage("");
     setSelectedCorrespondence({});
     setOpenConfirmationModal(false);
   }
 
-  const handleConfirmationContinue = () => { 
+  const handleConfirmationContinue = () => {
     setConfirmationFor("");
     setConfirmationMessage("");
     setOpenConfirmationModal(false);
@@ -526,7 +534,7 @@ export const ContactApplicant = ({
     }
 
     const callback = (data: any) => {
-      clearcorrespondence(); 
+      clearcorrespondence();
       dispatch(setFOICorrespondenceLoader(false));
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       toast.success("Email subject has been renamed successfully", {
@@ -541,7 +549,7 @@ export const ContactApplicant = ({
     }
 
     const errorCallback = (message: string) => {
-      clearcorrespondence(); 
+      clearcorrespondence();
       dispatch(setFOICorrespondenceLoader(false));
       toast.error(message, {
         position: "top-right",
@@ -567,43 +575,43 @@ export const ContactApplicant = ({
 
   const requestDetails: any = useSelector((state: any) => state.foiRequests.foiRequestDetail);
   const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
-  
+
   const [files, setFiles] = useState<any[]>([]);
-  const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
-  const [initialTemplates, setInitialTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at:"" }]);
+  const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at: "" }]);
+  const [initialTemplates, setInitialTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at: "" }]);
 
   const isEnabledTemplate = (item: any) => {
-    var name:string = item?.name ? item.name : item?.fileName ? item.fileName : "";
-   if (['PAYONLINE', 'PAYOUTSTANDING'].includes(name)) { 
-      return !isFeeTemplateDisabled(currentCFRForm, name); 
-   } else if (['EXTENSIONS-PB'].includes(name)) {
+    var name: string = item?.name ? item.name : item?.fileName ? item.fileName : "";
+    if (['PAYONLINE', 'PAYOUTSTANDING'].includes(name)) {
+      return !isFeeTemplateDisabled(currentCFRForm, name);
+    } else if (['EXTENSIONS-PB'].includes(name)) {
       return getExtensionType(requestDetails, requestExtensions) === "PB";
-   } else if (['OIPCAPPLICANTCONSENTEXTENSION'].includes(name)) {
-    const isApplicantConsent = getExtensionType(requestDetails, requestExtensions) === "OIPCAPPLICANTCONSENTEXTENSION"
+    } else if (['OIPCAPPLICANTCONSENTEXTENSION'].includes(name)) {
+      const isApplicantConsent = getExtensionType(requestDetails, requestExtensions) === "OIPCAPPLICANTCONSENTEXTENSION"
       return isApplicantConsent;
-   } else if(['OIPCFIRSTTIMEEXTENSION'].includes(name)){
-    const isFirstTimeExtension = getExtensionType(requestDetails, requestExtensions) === "OIPCFIRSTTIMEEXTENSION"
+    } else if (['OIPCFIRSTTIMEEXTENSION'].includes(name)) {
+      const isFirstTimeExtension = getExtensionType(requestDetails, requestExtensions) === "OIPCFIRSTTIMEEXTENSION"
       return isFirstTimeExtension;
-   } else if(['OIPCSUBSEQUENTTIMEEXTENSION'].includes(name)){
-    const isSubsequentTimeExtension = getExtensionType(requestDetails, requestExtensions) === "OIPCSUBSEQUENTTIMEEXTENSION"
+    } else if (['OIPCSUBSEQUENTTIMEEXTENSION'].includes(name)) {
+      const isSubsequentTimeExtension = getExtensionType(requestDetails, requestExtensions) === "OIPCSUBSEQUENTTIMEEXTENSION"
       return isSubsequentTimeExtension;
-   } else if(['GENERICCOVEREMAILTEMPLATE'].includes(name)){
+    } else if (['GENERICCOVEREMAILTEMPLATE'].includes(name)) {
       return requestDetails.currentState !== "Intake in Progress";
-   } else if(['ACKNOWLEDGEMENTLETTER'].includes(name)){
-    if (requestDetails.currentState === "Intake in Progress" || requestDetails.currentState === "Open") {
-      return true;
+    } else if (['ACKNOWLEDGEMENTLETTER'].includes(name)) {
+      if (requestDetails.currentState === "Intake in Progress" || requestDetails.currentState === "Open") {
+        return true;
+      }
     }
-   }
-   return true;
+    return true;
   }
 
   const isduplicate = (item: string) => {
-    for(const element of templates) {
+    for (const element of templates) {
       if (element.value === item) {
-          return true;
-          }
+        return true;
       }
-      return false;
+    }
+    return false;
   }
 
   useEffect(() => {
@@ -611,13 +619,13 @@ export const ContactApplicant = ({
     // push sfdt templates to list
     let _templates: any[] = [];
     // console.log("templateList: ", templateList);
-    if(templateList.length > 0) {
+    if (templateList.length > 0) {
       _templates = templateList.map((template: any) => ({
-          label: template.templateName,
-          value: template.fileName,
-          disabled: !template.isActive || !isEnabledTemplate(template),
-          created_at: template.createdAt,
-          templatetype: template.templateType
+        label: template.templateName,
+        value: template.fileName,
+        disabled: !template.isActive || !isEnabledTemplate(template),
+        created_at: template.createdAt,
+        templatetype: template.templateType
       }));
     }
 
@@ -634,7 +642,7 @@ export const ContactApplicant = ({
     //     template => updatedTemplates.includes(template.value) || template.value === ""
     //   )
     // );
-    
+
     // // push s3 html templates to the list
     // console.log("applicantCorrespondenceTemplates: ", applicantCorrespondenceTemplates);
     // const updatedTemplates: string[] = [];
@@ -680,7 +688,7 @@ export const ContactApplicant = ({
     // });
 
     setOptions(_templates);
-    setDisabledOptions(_templates.filter((item)=>item.disabled === true).map((item)=>item.value));
+    setDisabledOptions(_templates.filter((item) => item.disabled === true).map((item) => item.value));
     setInitialTemplates(_templates);
     setTemplates(_templates);
   }, [applicantCorrespondence, requestExtensions, dispatch, templateList]);
@@ -694,7 +702,7 @@ export const ContactApplicant = ({
   const changeCorrespondenceFilter = (filter: string) => {
     if (filter === correspondenceFilter) return;
     setCorrespondenceFilter(filter.toLowerCase());
-    if(filter !== 'drafts'){
+    if (filter !== 'drafts') {
       setShowEditor(false);
     }
   }
@@ -702,7 +710,7 @@ export const ContactApplicant = ({
   useEffect(() => {
     let filteredCorrespondences = applicantCorrespondence.filter((message: any) => {
       if (correspondenceFilter === "log") {
-        return [ "correspondence","response"].includes(message.category);
+        return ["correspondence", "response"].includes(message.category);
       } else if (correspondenceFilter === "templates") {
         return message.category === "template";
       } else if (correspondenceFilter === "drafts") {
@@ -747,7 +755,7 @@ export const ContactApplicant = ({
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCurrentTemplate(+e.target.value)
-    
+
     // const callback = (templateVariables: any) => {
     //   const finalTemplate = applyVariables(templates[+e.target.value].text || "", templateVariables);
     //   setEditorValue(finalTemplate)
@@ -763,24 +771,24 @@ export const ContactApplicant = ({
 
   //When templates are selected from list
   const handleTemplateSelection = (template: any, index: number) => {
-    if(template.templateid) {
+    if (template.templateid) {
       setShowLagacyEditor(true);
       setCurTemplate('');
       setCurTemplateName('');
 
       setCurrentTemplate(index);
-    
+
       const callback = (templateVariables: any) => {
         const finalTemplate = applyVariables(templates[index].text || "", templateVariables);
         setEditorValue(finalTemplate);
         changeCorrespondenceFilter("log");
         setShowEditor(true);
       }
-      getTemplateVariablesAsync(requestDetails,requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index], callback);
+      getTemplateVariablesAsync(requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData, templates[index], callback);
     } else {
       setEnableAutoFocus(true);
       setShowLagacyEditor(false);
-      if(template?.label) {
+      if (template?.label) {
         let newData = {
           "foiRequestId": requestId,
           "foiMinistryRequestId": ministryId,
@@ -806,7 +814,7 @@ export const ContactApplicant = ({
     const searchLower = filterValue.toLowerCase();
     let _filteredMessages: any[] = [];
     let _filteredTemplates: any[] = [];
-  
+
     if (filterValue === "") {
       switch (correspondenceFilter) {
         case "log":
@@ -837,14 +845,15 @@ export const ContactApplicant = ({
           break;
       }
     }
-  
+
     setCorrespondences(_filteredMessages);
     setTemplates(_filteredTemplates);
   };
 
   const saveAttachments = async (attachmentfiles: any) => {
     attachmentfiles = attachmentfiles.filter((file: any) => {
-      return file instanceof File}
+      return file instanceof File
+    }
     )
     const fileInfoList = attachmentfiles?.map((file: any) => {
       return {
@@ -876,7 +885,7 @@ export const ContactApplicant = ({
   }
 
   // send email
-  const save = async (emailContent: string, skiptoast=false) => {
+  const save = async (emailContent: string, skiptoast = false) => {
     setDisablePreview(true);
     setPreviewModal(false);
     let filesToUpload = [];
@@ -885,7 +894,7 @@ export const ContactApplicant = ({
       if (file instanceof File) {
         filesToUpload.push(file)
       } else {
-        let existingAttachment = {...file, url: file.documenturipath}
+        let existingAttachment = { ...file, url: file.documenturipath }
         existingAttachments.push(existingAttachment)
       }
     }
@@ -896,23 +905,23 @@ export const ContactApplicant = ({
       changeCorrespondenceFilter("log");
       if (!skiptoast) {
         toast.success("Message has been sent to applicant successfully", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
+      }
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName)) ) ? "CFRFee" : "";
+    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName))) ? "CFRFee" : "";
     let israwrequest = selectedCorrespondence.israwrequest || false;
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
-      correspondenceid:correspondenceId,
+      correspondenceid: correspondenceId,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": emailContent,
         "subject": correspondenceSubject,
@@ -923,14 +932,14 @@ export const ContactApplicant = ({
       ccemails: selectedCCEmails,
       foiministryrequest_id: ministryId,
       attachments: attachments,
-      attributes: [{ 
+      attributes: [{
         "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS),
         "axisRequestId": requestNumber
       }],
       from_email: requestDetails.assignedGroupEmail,
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: templateId?"":"sfdt",
+      templatetype: templateId ? "" : "sfdt",
       correspondencesubject: correspondenceSubject
     };
     saveEmailCorrespondence(
@@ -957,7 +966,7 @@ export const ContactApplicant = ({
       "Content": sfdtString
     };
     const loadPreview = async (html: string) => {
-      setEditorValue( html );
+      setEditorValue(html);
     }
     await exportSFDT(dispatch, newDataHtml, loadPreview);
   }
@@ -980,10 +989,10 @@ export const ContactApplicant = ({
       setPreviewModal(false);
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName)) ) ? "CFRFee" : "";
+    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName))) ? "CFRFee" : "";
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
-      correspondenceid:correspondenceId,
+      correspondenceid: correspondenceId,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": emailContent,
         "subject": correspondenceSubject,
@@ -993,13 +1002,13 @@ export const ContactApplicant = ({
       emails: [emailAddress],
       foiministryrequest_id: ministryId,
       attachments: [],
-      attributes: [{ 
+      attributes: [{
         "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS),
         "axisRequestId": requestNumber
       }],
       from_email: requestDetails.assignedGroupEmail,
       templatename: curTemplateName,
-      templatetype: templateId?"":"sfdt",
+      templatetype: templateId ? "" : "sfdt",
       correspondencesubject: correspondenceSubject
     };
     sendPreviewEmail(
@@ -1010,22 +1019,22 @@ export const ContactApplicant = ({
       callback,
       () => {
         toast.update(toastId, {
-        render: "Preview email failed to send",
-        isLoading: false,
-        type: 'error',
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      })
+          render: "Preview email failed to send",
+          isLoading: false,
+          type: 'error',
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        })
       },
     )
   };
 
-  
+
   // trigger saving draft - get sfdt, export html, and save to db
   const saveDraft = async () => {
     setSaveSfdtDraftTrigger(true);
@@ -1037,7 +1046,7 @@ export const ContactApplicant = ({
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
       changeCorrespondenceFilter("drafts");
-      clearcorrespondence();      
+      clearcorrespondence();
       toast.success("Message has been saved to draft successfully", {
         position: "top-right",
         autoClose: 3000,
@@ -1050,7 +1059,7 @@ export const ContactApplicant = ({
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName)) ) ? "CFRFee" : "";
+    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName))) ? "CFRFee" : "";
     let israwrequest = selectedCorrespondence?.israwrequest ||
       requestDetails.requeststatuslabel == StateEnum.appfeeowing.label ||
       requestDetails.requeststatuslabel == StateEnum.intakeinprogress.label ||
@@ -1058,11 +1067,11 @@ export const ContactApplicant = ({
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: JSON.stringify({
-        "emailhtml": html?html:editorValue,
+        "emailhtml": html ? html : editorValue,
         "subject": correspondenceSubject,
         "id": approvedForm?.cfrfeeid,
         "type": type,
-        "emaildraft": sfdtString?sfdtString:""
+        "emaildraft": sfdtString ? sfdtString : ""
       }),
       foiministryrequest_id: ministryId,
       attachments: attachments,
@@ -1070,7 +1079,7 @@ export const ContactApplicant = ({
       ccemails: selectedCCEmails,
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: templateId?"":"sfdt",
+      templatetype: templateId ? "" : "sfdt",
       correspondencesubject: correspondenceSubject
     };
     saveDraftCorrespondence(
@@ -1096,15 +1105,15 @@ export const ContactApplicant = ({
     const attachments = await saveAttachments(files);
     let callback = (_res: string) => {
       clearcorrespondence();
-      changeCorrespondenceFilter("log");      
+      changeCorrespondenceFilter("log");
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName)) ) ? "CFRFee" : "";
+    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName))) ? "CFRFee" : "";
     let israwrequest = selectedCorrespondence.israwrequest || false;
     let data = {
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
-      correspondenceid:correspondenceId,
+      correspondenceid: correspondenceId,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": "<div></div>",
         "subject": correspondenceSubject,
@@ -1114,13 +1123,13 @@ export const ContactApplicant = ({
       foiministryrequest_id: ministryId,
       attachments: attachments,
       emails: [],
-      attributes: [{ 
+      attributes: [{
         "paymentExpiryDate": dueDateCalculation(new Date(), PAYMENT_EXPIRY_DAYS),
         "axisRequestId": requestNumber
       }],
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: templateId?"":"sfdt",
+      templatetype: templateId ? "" : "sfdt",
       correspondencesubject: correspondenceSubject
     };
     saveEmailCorrespondence(
@@ -1197,7 +1206,7 @@ export const ContactApplicant = ({
         },
       );
       setFOICorrespondenceLoader(false);
-      setDisablePreview(false);      
+      setDisablePreview(false);
     }
     clearcorrespondence();
     changeCorrespondenceFilter("log");
@@ -1207,7 +1216,7 @@ export const ContactApplicant = ({
 
   const [correspondenceId, setCorrespondenceId] = useState(null);
 
-  const editDraft = async (i : any) => {
+  const editDraft = async (i: any) => {
     setSelectedCorrespondence(i);
     setEditMode(true);
     setShowEditor(true);
@@ -1217,7 +1226,7 @@ export const ContactApplicant = ({
     if (i.attachments)
       setFiles(i.attachments);
     setCorrespondenceId(i.applicantcorrespondenceid);
-    if(i.draft) {
+    if (i.draft) {
       setEnableAutoFocus(true);
       setShowLagacyEditor(false);
       setCurTemplate(i.draft);
@@ -1225,16 +1234,16 @@ export const ContactApplicant = ({
     } else {
       setShowLagacyEditor(true);
       setEditorValue(i.text);
-      for(let j = 0; j < templates.length; j++) {
+      for (let j = 0; j < templates.length; j++) {
         if (templates[j].templateid === i.templateid) {
           setCurrentTemplate(+j);
           setCurTemplateName(i?.templatename);
-        } 
+        }
       }
     }
   };
 
-  const deleteDraft = (i : any) => {
+  const deleteDraft = (i: any) => {
     setSelectedCorrespondence(i);
     setOpenConfirmationModal(true);
     setConfirmationFor("delete-draft")
@@ -1245,42 +1254,42 @@ export const ContactApplicant = ({
 
   const deleteDraftAction = async () => {
     if (selectedCorrespondence) {
-    setCorrespondenceId(selectedCorrespondence.applicantcorrespondenceid);
-    setDisablePreview(true);
-    setPreviewModal(false);
-    let callback = (_res: string) => {
-      clearcorrespondence();
-      changeCorrespondenceFilter("drafts");
-      toast.success("Draft has been deleted successfully", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      dispatch(fetchApplicantCorrespondence(requestId, ministryId));
-    }
-    deleteDraftCorrespondence(selectedCorrespondence.applicantcorrespondenceid, selectedCorrespondence.israwrequest, ministryId,requestId,
-      dispatch,
-      callback,
-      (errorMessage: string) => {
+      setCorrespondenceId(selectedCorrespondence.applicantcorrespondenceid);
+      setDisablePreview(true);
+      setPreviewModal(false);
+      let callback = (_res: string) => {
         clearcorrespondence();
         changeCorrespondenceFilter("drafts");
+        toast.success("Draft has been deleted successfully", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
-        setFOICorrespondenceLoader(false);
-        setDisablePreview(false);
-      },
-    );
-    setFOICorrespondenceLoader(false);
-    setDisablePreview(false);
-    setEditMode(false);
-      
-  }
+      }
+      deleteDraftCorrespondence(selectedCorrespondence.applicantcorrespondenceid, selectedCorrespondence.israwrequest, ministryId, requestId,
+        dispatch,
+        callback,
+        (errorMessage: string) => {
+          clearcorrespondence();
+          changeCorrespondenceFilter("drafts");
+          dispatch(fetchApplicantCorrespondence(requestId, ministryId));
+          setFOICorrespondenceLoader(false);
+          setDisablePreview(false);
+        },
+      );
+      setFOICorrespondenceLoader(false);
+      setDisablePreview(false);
+      setEditMode(false);
+
+    }
   };
 
-  const deleteResponse = (i : any) => {
+  const deleteResponse = (i: any) => {
     setSelectedCorrespondence(i);
     setOpenConfirmationModal(true);
     setConfirmationFor("delete-response")
@@ -1313,7 +1322,7 @@ export const ContactApplicant = ({
         });
         dispatch(fetchApplicantCorrespondence(requestId, ministryId));
       }
-      deleteResponseCorrespondence(selectedCorrespondence.applicantcorrespondenceid,selectedCorrespondence.israwrequest, ministryId,requestId,
+      deleteResponseCorrespondence(selectedCorrespondence.applicantcorrespondenceid, selectedCorrespondence.israwrequest, ministryId, requestId,
         dispatch,
         callback,
         (errorMessage: string) => {
@@ -1363,7 +1372,7 @@ export const ContactApplicant = ({
       if (file instanceof File) {
         filesToUpload.push(file)
       } else {
-        let existingAttachment = {...file, url: file.documenturipath}
+        let existingAttachment = { ...file, url: file.documenturipath }
         existingAttachments.push(existingAttachment)
       }
     }
@@ -1383,10 +1392,10 @@ export const ContactApplicant = ({
       dispatch(fetchApplicantCorrespondence(requestId, ministryId));
     }
     const templateId = currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null;
-    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName)) ) ? "CFRFee" : "";
+    const type = ((templateId && [1, 2].includes(templateId)) || (['PAYONLINE', 'PAYOUTSTANDING'].includes(curTemplateName))) ? "CFRFee" : "";
     let israwrequest = selectedCorrespondence.israwrequest || false;
     let data = {
-      correspondenceid:correspondenceId,
+      correspondenceid: correspondenceId,
       templateid: currentTemplate ? templates[currentTemplate as keyof typeof templates].templateid : null,
       correspondencemessagejson: JSON.stringify({
         "emailhtml": html,
@@ -1401,7 +1410,7 @@ export const ContactApplicant = ({
       ccemails: selectedCCEmails,
       israwrequest: israwrequest,
       templatename: curTemplateName,
-      templatetype: templateId?"":"sfdt",
+      templatetype: templateId ? "" : "sfdt",
       correspondencesubject: correspondenceSubject
     };
     editDraftCorrespondence(
@@ -1430,9 +1439,9 @@ export const ContactApplicant = ({
 
     if (updateAttachment.filename !== newFilename) {
       updateApplicantCorrespondence(
-        { filename: newFilename, correspondenceattachmentid: correspondenceAttachmentId, correspondenceid: correspondenceId, israwrequest: selectedCorrespondence.israwrequest }, 
-        ministryId, 
-        requestId, 
+        { filename: newFilename, correspondenceattachmentid: correspondenceAttachmentId, correspondenceid: correspondenceId, israwrequest: selectedCorrespondence.israwrequest },
+        ministryId,
+        requestId,
         dispatch,
         () => {
           setSelectedCorrespondence({})
@@ -1449,7 +1458,8 @@ export const ContactApplicant = ({
         },
         (errorMessage: string) => {
           errorToast(errorMessage);
-          console.log('Error saving new filename: ', errorMessage)}
+          console.log('Error saving new filename: ', errorMessage)
+        }
       );
     }
   }
@@ -1459,10 +1469,10 @@ export const ContactApplicant = ({
     newDate = newDateObj.toISOString();
     setModal(false);
     updateApplicantCorrespondence(
-      {responsedate: newDate, correspondenceid: selectedCorrespondence.applicantcorrespondenceid, israwrequest: selectedCorrespondence.israwrequest}, 
-      ministryId, 
-      requestId, 
-      dispatch, 
+      { responsedate: newDate, correspondenceid: selectedCorrespondence.applicantcorrespondenceid, israwrequest: selectedCorrespondence.israwrequest },
+      ministryId,
+      requestId,
+      dispatch,
       () => {
         setSelectedCorrespondence({})
         setModalFor("add");
@@ -1476,10 +1486,11 @@ export const ContactApplicant = ({
           draggable: true,
           progress: undefined,
         })
-      }, 
+      },
       (errorMessage: string) => {
         errorToast(errorMessage);
-        console.log('Error updating response date: ', errorMessage)}
+        console.log('Error updating response date: ', errorMessage)
+      }
     )
   }
 
@@ -1531,7 +1542,7 @@ export const ContactApplicant = ({
         setSelectedCorrespondence={setSelectedCorrespondence}
         setCurrentResponseDate={setCurrentResponseDate}
         setUpdateAttachment={setUpdateAttachment}
-        templateVariableInfo={{requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData}}
+        templateVariableInfo={{ requestDetails, requestExtensions, responsePackagePdfStitchStatus, cfrFeeData }}
         correspondenceSubject={correspondenceSubject}
         showRenameCorrespondenceSubjectModal={showRenameCorrespondenceSubjectModal}
         clearcorrespondence={clearcorrespondence}
@@ -1542,7 +1553,7 @@ export const ContactApplicant = ({
 
 
   function onExportClick(output: string) {
-      console.log("Output: ", output);
+    console.log("Output: ", output);
   }
 
 
@@ -1551,33 +1562,33 @@ export const ContactApplicant = ({
   const parser = new DOMParser();
   let templateListItems = templates.map((template: any, index: any) => {
     if (template.label !== "" && !template.disabled) {
-    let lastItemInList = false
-    if (templates.length === index + 1) lastItemInList = true;
-    const htmlEmail = parser.parseFromString(template.text, 'text/html');
-    const htmlEmailText = htmlEmail.body.textContent || ''
-    let ellipses = htmlEmailText?.length > 300 ? '...' : ''
+      let lastItemInList = false
+      if (templates.length === index + 1) lastItemInList = true;
+      const htmlEmail = parser.parseFromString(template.text, 'text/html');
+      const htmlEmailText = htmlEmail.body.textContent || ''
+      let ellipses = htmlEmailText?.length > 300 ? '...' : ''
 
-    return (
-      <ListItem  
-        onClick={() => {
-          if (!showEditor) setShowEditor(true)
-          handleTemplateSelection(template, index)
-        }} 
-        className={`template-list-item ${lastItemInList ? 'template-list-item-last' : ''}`}
-        key={template.value}
-      >
-        <Grid container spacing={2}>
-          <Grid item xs={8}>
-            <ListItemText primary={template.label}/>
+      return (
+        <ListItem
+          onClick={() => {
+            if (!showEditor) setShowEditor(true)
+            handleTemplateSelection(template, index)
+          }}
+          className={`template-list-item ${lastItemInList ? 'template-list-item-last' : ''}`}
+          key={template.value}
+        >
+          <Grid container spacing={2}>
+            <Grid item xs={8}>
+              <ListItemText primary={template.label} />
+            </Grid>
+            <Grid item xs={4}>
+              <ListItemText secondary={template.created_at} />
+            </Grid>
           </Grid>
-          <Grid item xs={4}>
-          <ListItemText secondary={template.created_at}/>
-          </Grid>
-        </Grid>
-      </ListItem>
+        </ListItem>
       )
-      }
-    })
+    }
+  })
   templatesList = (
     <List>
       {templateListItems}
@@ -1592,13 +1603,16 @@ export const ContactApplicant = ({
         alignItems="flex-start"
         spacing={1}
       >
-        <Grid item xs={6}>
+        {/* <Grid item xs={6}>
           <h1 className="foi-review-request-text foi-ministry-requestheadertext">
-            {getRequestNumber()}
+            {getRequestNumber(isProactiveDisclosure)}
           </h1>
+        </Grid> */}
+        <Grid item xs={isProactiveDisclosure ? 12 : 6}>
+          <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure} />
         </Grid>
-        <Grid container xs={6} direction="row" justifyContent='flex-end'>
-        <ConditionalComponent condition={correspondenceFilter === "log"}>
+        <Grid container xs={isProactiveDisclosure ? 12 : 6} direction="row" justifyContent='flex-end'>
+          <ConditionalComponent condition={correspondenceFilter === "log"}>
             <button
               className="btn exportAllButton"
               onClick={exportAll}
@@ -1613,29 +1627,29 @@ export const ContactApplicant = ({
             id="add-correspondence"
             label="+ Add New"
             inputProps={{ "aria-labelledby": "correspondence-label" }}
-            InputLabelProps={{ shrink: false, style: {color: 'white'} }}
+            InputLabelProps={{ shrink: false, style: { color: 'white' } }}
             select
             variant="outlined"
             size="small"
             fullWidth
           >
             <div className="addCorrespondence-menuitem">
-            <MenuItem
-              onClick={() => addCorrespondence()}
-              key='messagetoapplicant'
-              disabled={false}
-              sx={{ display: "flex" }}
-            >
-              Select Template
-            </MenuItem>
-            <MenuItem
-              onClick={() => openResponseModal()}
-              key='attachresponse'
-              disabled={false}
-              sx={{ display: "flex" }}
-            >
-              Upload Correspondence
-            </MenuItem>
+              <MenuItem
+                onClick={() => addCorrespondence()}
+                key='messagetoapplicant'
+                disabled={false}
+                sx={{ display: "flex" }}
+              >
+                Select Template
+              </MenuItem>
+              <MenuItem
+                onClick={() => openResponseModal()}
+                key='attachresponse'
+                disabled={false}
+                sx={{ display: "flex" }}
+              >
+                Upload Correspondence
+              </MenuItem>
             </div>
           </TextField>
         </Grid>
@@ -1749,15 +1763,16 @@ export const ContactApplicant = ({
           </Paper>
         </Grid>
       </Grid>
-      {!showEditor || <div>
-        <Grid
-          container
-          direction="row"
-          justifyContent="flex-start"
-          className="select-template-bottom-margin"
-        >
-          <Grid item xs={'auto'}>
-              <CorrespondenceEmail 
+      {
+        !showEditor || <div>
+          <Grid
+            container
+            direction="row"
+            justifyContent="flex-start"
+            className="select-template-bottom-margin"
+          >
+            <Grid item xs={'auto'}>
+              <CorrespondenceEmail
                 ministryId={ministryId}
                 requestId={requestId}
                 selectedEmails={selectedEmails}
@@ -1769,7 +1784,7 @@ export const ContactApplicant = ({
               />
             </Grid>
             <Grid item xs={'auto'}>
-              <CorrespondenceEmail 
+              <CorrespondenceEmail
                 ministryId={ministryId}
                 requestId={requestId}
                 selectedEmails={selectedCCEmails}
@@ -1780,46 +1795,46 @@ export const ContactApplicant = ({
                 buttonText={"CC To"}
               />
             </Grid>
-        </Grid>
-        <Grid
-          container
-          direction="row"
-          justifyContent="flex-start"
-          className="select-template-bottom-margin"
-        >
-          <Grid xs={6}>
-            <TextField
-              className="correspondence-subject-field"
-              label="Customize Correspondence Subject"
-              name="correspondencesubject"
-              value={correspondenceSubject}
-              onChange={handleCorrespondenceSubjectChange}
-              variant="outlined"
-              margin='normal'
-              size="small"
-              fullWidth
-            >
-            </TextField>
           </Grid>
-          <Grid xs={6}
+          <Grid
             container
             direction="row"
-            justifyContent="flex-end"
-            spacing={1}
+            justifyContent="flex-start"
             className="select-template-bottom-margin"
           >
-            <Grid item xs={6}>
-              <CustomAutocomplete
-                className="email-template-dropdown"
-                list={options}
-                disabledValues={disabledOptions}
-                onChange={showSelectTemplateModal}
-                label="Select Template"
-                resetTemplateDropdownValue={resetTemplateDropdownValue}
-                setResetTemplateDropdownValue={setResetTemplateDropdownValue}
-              />
+            <Grid xs={6}>
+              <TextField
+                className="correspondence-subject-field"
+                label="Customize Correspondence Subject"
+                name="correspondencesubject"
+                value={correspondenceSubject}
+                onChange={handleCorrespondenceSubjectChange}
+                variant="outlined"
+                margin='normal'
+                size="small"
+                fullWidth
+              >
+              </TextField>
             </Grid>
-            {/* <Grid item xs={3}>
+            <Grid xs={6}
+              container
+              direction="row"
+              justifyContent="flex-end"
+              spacing={1}
+              className="select-template-bottom-margin"
+            >
+              <Grid item xs={6}>
+                <CustomAutocomplete
+                  className="email-template-dropdown"
+                  list={options}
+                  disabledValues={disabledOptions}
+                  onChange={showSelectTemplateModal}
+                  label="Select Template"
+                  resetTemplateDropdownValue={resetTemplateDropdownValue}
+                  setResetTemplateDropdownValue={setResetTemplateDropdownValue}
+                />
+              </Grid>
+              {/* <Grid item xs={3}>
               <TextField
                 className="email-template-dropdown"
                 id="emailtemplate"
@@ -1846,107 +1861,108 @@ export const ContactApplicant = ({
                 ))}
               </TextField>
             </Grid> */}
+            </Grid>
           </Grid>
-        </Grid>
-        <div className="correspondence-editor">
-          {/* <input type="file" id="file_upload" accept=".dotx,.docx,.docm,.dot,.doc,.rtf,.txt,.xml,.sfdt" onChange={onFileChange} /> */}
-          {/* <button onClick={onImportClick}>Import</button> */}
+          <div className="correspondence-editor">
+            {/* <input type="file" id="file_upload" accept=".dotx,.docx,.docm,.dot,.doc,.rtf,.txt,.xml,.sfdt" onChange={onFileChange} /> */}
+            {/* <button onClick={onImportClick}>Import</button> */}
 
-          {showLagacyEditor ? 
-            <>
-              <div className="closeDraft">
-                  <IconButton className="title-col3" onClick={()=>setShowEditor(false)}>
-                      <i className="dialog-close-button">Close</i>
-                      <CloseIcon />
+            {showLagacyEditor ?
+              <>
+                <div className="closeDraft">
+                  <IconButton className="title-col3" onClick={() => setShowEditor(false)}>
+                    <i className="dialog-close-button">Close</i>
+                    <CloseIcon />
                   </IconButton>
-              </div>
-              <ReactQuill
-                theme="snow"
-                value={editorValue}
-                onChange={setEditorValue}
-                modules={quillModules}
-                ref={handleRef}
-              />
-            </>
-            :
-            <>
-              <DocEditor
-                curTemplate = {curTemplate}
-                selectedTemplate={selectedTemplate}
-                saveSfdtDraft = {saveSfdtDraft}
-                saveSfdtDraftTrigger = {saveSfdtDraftTrigger}
-                setSaveSfdtDraftTrigger = {setSaveSfdtDraftTrigger}
-                preview = {preview}
-                previewTrigger = {previewTrigger}
-                setPreviewTrigger = {setPreviewTrigger}
-                setPreviewEmailEditorValue={setPreviewEmailEditorValue}
-                sendPreviewEmailTrigger={sendPreviewEmailTrigger}
-                setSendPreviewEmailTrigger={setSendPreviewEmailTrigger}
-                addAttachment={openAttachmentModal}
-                savepdf = {savePdf}
-                correspondenceSubject={correspondenceSubject || `Your FOI Request ${requestNumber || requestId}`}
-                attachpdf = {attachPdf}
-                attachPdfTrigger={attachPdfTrigger}
-                setAttachPdfTrigger={setAttachPdfTrigger}
-                exportAsPdf={exportAsPdf}
-                exportPdfTrigger={exportPdfTrigger}
-                setExportPdfTrigger={setExportPdfTrigger}
-                editDraftTrigger = {editDraftTrigger}
-                setEditDraftTrigger = {setEditDraftTrigger}
-                clearEditorTrigger={clearEditorTrigger}
-                setClearEditorTrigger={setClearEditorTrigger}
-                editSfdtDraft = {editSfdtDraft}
-                enableAutoFocus = {enableAutoFocus}
+                </div>
+                <ReactQuill
+                  theme="snow"
+                  value={editorValue}
+                  onChange={setEditorValue}
+                  modules={quillModules}
+                  ref={handleRef}
+                />
+              </>
+              :
+              <>
+                <DocEditor
+                  curTemplate={curTemplate}
+                  selectedTemplate={selectedTemplate}
+                  saveSfdtDraft={saveSfdtDraft}
+                  saveSfdtDraftTrigger={saveSfdtDraftTrigger}
+                  setSaveSfdtDraftTrigger={setSaveSfdtDraftTrigger}
+                  preview={preview}
+                  previewTrigger={previewTrigger}
+                  setPreviewTrigger={setPreviewTrigger}
+                  setPreviewEmailEditorValue={setPreviewEmailEditorValue}
+                  sendPreviewEmailTrigger={sendPreviewEmailTrigger}
+                  setSendPreviewEmailTrigger={setSendPreviewEmailTrigger}
+                  addAttachment={openAttachmentModal}
+                  savepdf={savePdf}
+                  correspondenceSubject={correspondenceSubject || `Your FOI Request ${requestNumber || requestId}`}
+                  attachpdf={attachPdf}
+                  attachPdfTrigger={attachPdfTrigger}
+                  setAttachPdfTrigger={setAttachPdfTrigger}
+                  exportAsPdf={exportAsPdf}
+                  exportPdfTrigger={exportPdfTrigger}
+                  setExportPdfTrigger={setExportPdfTrigger}
+                  editDraftTrigger={editDraftTrigger}
+                  setEditDraftTrigger={setEditDraftTrigger}
+                  clearEditorTrigger={clearEditorTrigger}
+                  setClearEditorTrigger={setClearEditorTrigger}
+                  editSfdtDraft={editSfdtDraft}
+                  enableAutoFocus={enableAutoFocus}
+                  selectedEmails={selectedEmails}
+                  selectedCCEmails={selectedCCEmails}
+                />
+              </>
+            }
+            <div>
+              {files.map((file: any, index: number) => {
+                let fileComponent;
+                let filename = file.filename
+                if (file instanceof Blob) {
+                  fileComponent =
+                    (<u
+                      onClick={() => {
+                        const fileURL = URL.createObjectURL(files[index]);
+                        window.open(fileURL);
+                      }}>{filename}</u>
+                    )
+                } else {
+                  fileComponent = <a href={`/foidocument?id=${ministryId}&filepath=${file.documenturipath.split('/').slice(4).join('/')}`} target="_blank">{file.filename}</a>
+                }
+                return (
+                  <div className="email-attachment-item" key={file.filename}>
+                    {fileComponent}
+                    <i
+                      className="fa fa-times-circle attachment-actions"
+                      onClick={() => removeFile(index)}
+                    >
+                    </i>
+                  </div>)
+              })}
+            </div>
+          </div>
+          <div id="correspondence-editor-ql-toolbar" className="ql-toolbar ql-snow">
+            <div className="previewEmail">
+              <PreviewModal
+                modalOpen={previewModal}
+                handleClose={handlePreviewClose}
+                handleSave={save}
+                handleSendPreviewEmail={handleSendPreviewEmail}
+                isSendPreviewEmail={isSendPreviewEmail}
+                handleExportAsPdfButton={handleExportAsPdfButton}
+                innerhtml={editorValue}
+                handleExport={saveExport}
+                attachments={files}
+                templateInfo={templates[currentTemplate]}
+                enableSend={selectedEmails?.length > 0 || selectedCCEmails?.length > 0}
                 selectedEmails={selectedEmails}
                 selectedCCEmails={selectedCCEmails}
+                correspondenceSubject={correspondenceSubject}
               />
-            </>
-          }
-          <div>
-          {files.map((file: any, index: number) => {
-            let fileComponent;
-            let filename = file.filename
-            if (file instanceof Blob) {
-              fileComponent = 
-                (<u 
-                  onClick={() => {
-                    const fileURL = URL.createObjectURL(files[index]);
-                    window.open(fileURL);
-                  }}>{filename}</u>
-                )
-            } else {
-              fileComponent = <a href={`/foidocument?id=${ministryId}&filepath=${file.documenturipath.split('/').slice(4).join('/')}`} target="_blank">{file.filename}</a>
-            }
-            return (
-            <div className="email-attachment-item" key={file.filename}>
-              {fileComponent}
-              <i
-                className="fa fa-times-circle attachment-actions"
-                onClick={() => removeFile(index)}
-              >
-              </i>
-            </div>)})}
-          </div>
-        </div>
-        <div id="correspondence-editor-ql-toolbar" className="ql-toolbar ql-snow">
-          <div className="previewEmail">
-            <PreviewModal
-              modalOpen={previewModal}
-              handleClose={handlePreviewClose}
-              handleSave={save}
-              handleSendPreviewEmail={handleSendPreviewEmail}
-              isSendPreviewEmail={isSendPreviewEmail}
-              handleExportAsPdfButton={handleExportAsPdfButton}
-              innerhtml={editorValue}
-              handleExport={saveExport}
-              attachments={files}
-              templateInfo={templates[currentTemplate]}
-              enableSend={selectedEmails?.length > 0 || selectedCCEmails?.length > 0}
-              selectedEmails={selectedEmails}
-              selectedCCEmails={selectedCCEmails}
-              correspondenceSubject={correspondenceSubject}
-            />  
-            {/*
+              {/*
             <button
             className="btn addCorrespondence"
             data-variant="contained" 
@@ -1955,120 +1971,121 @@ export const ContactApplicant = ({
           >
             Cancel
           </button>     
-          */ }    
-        <button
-          className="btn addCorrespondence"
-          data-variant="contained"
-          onClick={() => {
-            setPreviewModal(true);
-            setIsSendPreviewEmail(true);
-            setSendPreviewEmailTrigger(true);
-          }}
-          color="primary"
-        >
-          Send Preview Email
-        </button>
-        <button
-          className="btn addCorrespondence"
-          data-variant="contained"
-          onClick={() => {showAttachAsPdfModal()}}
-          color="primary"
-        >
-          Attach as PDF
-        </button>
-        <button
-          className="btn addCorrespondence"
-          data-variant="contained" 
-          onClick={ editMode ? editDraftNew : saveDraft}             
-          color="primary"
-          // disabled={(currentTemplate <= 0)}
-        >
-          {draftButtonValue}
-        </button>
-            <button
-              className="btn addCorrespondence"
-              data-variant="contained"
-              onClick={() => {setPreviewModal(true);setPreviewTrigger(true);} }
-              color="primary"
-              disabled={selectedEmails?.length == 0 && selectedCCEmails?.length == 0}
-            >
-              {previewButtonValue}
-            </button>
-          {(selectedEmails?.length === 0 && selectedCCEmails?.length === 0) && (
-            <HtmlTooltip title="Please select an email in Email To or CC To." placement="right">
-              <img
-                src="/assets/Images/infoicon.svg"
-                alt="info"
-                width="20px"
-                style={{ cursor: 'pointer' }}
-              />
-            </HtmlTooltip>
-          )}
+          */ }
+              <button
+                className="btn addCorrespondence"
+                data-variant="contained"
+                onClick={() => {
+                  setPreviewModal(true);
+                  setIsSendPreviewEmail(true);
+                  setSendPreviewEmailTrigger(true);
+                }}
+                color="primary"
+              >
+                Send Preview Email
+              </button>
+              <button
+                className="btn addCorrespondence"
+                data-variant="contained"
+                onClick={() => { showAttachAsPdfModal() }}
+                color="primary"
+              >
+                Attach as PDF
+              </button>
+              <button
+                className="btn addCorrespondence"
+                data-variant="contained"
+                onClick={editMode ? editDraftNew : saveDraft}
+                color="primary"
+              // disabled={(currentTemplate <= 0)}
+              >
+                {draftButtonValue}
+              </button>
+              <button
+                className="btn addCorrespondence"
+                data-variant="contained"
+                onClick={() => { setPreviewModal(true); setPreviewTrigger(true); }}
+                color="primary"
+                disabled={selectedEmails?.length == 0 && selectedCCEmails?.length == 0}
+              >
+                {previewButtonValue}
+              </button>
+              {(selectedEmails?.length === 0 && selectedCCEmails?.length === 0) && (
+                <HtmlTooltip title="Please select an email in Email To or CC To." placement="right">
+                  <img
+                    src="/assets/Images/infoicon.svg"
+                    alt="info"
+                    width="20px"
+                    style={{ cursor: 'pointer' }}
+                  />
+                </HtmlTooltip>
+              )}
+            </div>
           </div>
+          <Grid
+            container
+            direction="row"
+            justifyContent="flex-start"
+            alignItems="flex-start"
+            spacing={1}
+          >
+            <Grid item xs={10}>
+            </Grid>
+            <Grid item xs={2}>
+            </Grid>
+          </Grid>
         </div>
-        <Grid
-          container
-          direction="row"
-          justifyContent="flex-start"
-          alignItems="flex-start"
-          spacing={1}
-        >
-          <Grid item xs={10}>
-          </Grid>
-          <Grid item xs={2}>
-          </Grid>
-        </Grid>
-      </div>}
+      }
       <div style={{ marginTop: '20px' }}>
         {(correspondenceFilter === "log" || correspondenceFilter === "drafts") && correspondenceList}
         {correspondenceFilter === "templates" && templatesList}
       </div>
       <AttachmentModal
-      modalFor={modalFor}
-      openModal={openModal}
-      handleModal={uploadFor === "response" ? saveResponse : handleContinueModal}
-      multipleFiles={true}
-      requestNumber={requestNumber}
-      requestId={requestId}
-      attachmentsArray={files}
-      existingDocuments={files as unknown as never[]}
-      attachment={updateAttachment}//{{}}
-      handleRename= {handleRename} //{undefined}
-      handleReclassify={undefined}
-      handleChangeResponseDate={handleChangeResponseDate}
-      isMinistryCoordinator={false}
-      uploadFor={uploadFor}
-      maxNoFiles={uploadFor === "response" ? 10 : 10}
-      bcgovcode={undefined}
-      currentResponseDate={currentResponseDate}
-      retrieveSelectedRecords={() => {}}
-      handleChangeResponseTitle={handleChangeResponseTitle}
-    /> 
-    <div className="email-change-dialog">
-      <Dialog
-        open={openConfirmationModal}
-        onClose={handleConfirmationClose}
-        aria-labelledby="state-change-dialog-title"
-        aria-describedby="state-change-dialog-description"
-        maxWidth={'md'}
-        fullWidth={true}
+        modalFor={modalFor}
+        openModal={openModal}
+        handleModal={uploadFor === "response" ? saveResponse : handleContinueModal}
+        multipleFiles={true}
+        requestNumber={requestNumber}
+        requestId={requestId}
+        attachmentsArray={files}
+        existingDocuments={files as unknown as never[]}
+        attachment={updateAttachment}//{{}}
+        handleRename={handleRename} //{undefined}
+        handleReclassify={undefined}
+        handleChangeResponseDate={handleChangeResponseDate}
+        isMinistryCoordinator={false}
+        uploadFor={uploadFor}
+        maxNoFiles={uploadFor === "response" ? 10 : 10}
+        bcgovcode={undefined}
+        currentResponseDate={currentResponseDate}
+        retrieveSelectedRecords={() => { }}
+        handleChangeResponseTitle={handleChangeResponseTitle}
+      />
+      <div className="email-change-dialog">
+        <Dialog
+          open={openConfirmationModal}
+          onClose={handleConfirmationClose}
+          aria-labelledby="state-change-dialog-title"
+          aria-describedby="state-change-dialog-description"
+          maxWidth={'md'}
+          fullWidth={true}
         // id="state-change-dialog"
-      >
-        <DialogTitle disableTypography id="state-change-dialog-title">
+        >
+          <DialogTitle disableTypography id="state-change-dialog-title">
             <h2 className="state-change-header">{confirmationTitle}</h2>
             <IconButton className="title-col3" onClick={handleConfirmationClose}>
               <i className="dialog-close-button">Close</i>
               <CloseIcon />
             </IconButton>
           </DialogTitle>
-        <DialogContent className={'dialog-content-nomargin'}>
-          <DialogContentText id="state-change-dialog-description" component={'span'}>
-          <span className="confirmation-message">
-              {confirmationMessage}
-            </span>
-          </DialogContentText>
-          {confirmationFor === "attach-as-pdf" && <div className="row">
-            <div className="col-sm-1"></div>
+          <DialogContent className={'dialog-content-nomargin'}>
+            <DialogContentText id="state-change-dialog-description" component={'span'}>
+              <span className="confirmation-message">
+                {confirmationMessage}
+              </span>
+            </DialogContentText>
+            {confirmationFor === "attach-as-pdf" && <div className="row">
+              <div className="col-sm-1"></div>
               <div className="col-sm-9">
                 <TextField
                   id="emailattachmentfilename"
@@ -2079,15 +2096,15 @@ export const ContactApplicant = ({
                   variant="outlined"
                   fullWidth
                   value={attachAsPdfFilename}
-                  onChange={(e) => {setAttachAsPdfFilename(e.target.value)}}
+                  onChange={(e) => { setAttachAsPdfFilename(e.target.value) }}
                   error={attachAsPdfFilename === ""}
                 />
               </div>
               <div className="col-sm-1 extension-name">.pdf</div>
-            <div className="col-sm-1"></div>
-          </div>}
-          {confirmationFor === "rename-correspondence-subject" && <div className="row">
-            <div className="col-sm-1"></div>
+              <div className="col-sm-1"></div>
+            </div>}
+            {confirmationFor === "rename-correspondence-subject" && <div className="row">
+              <div className="col-sm-1"></div>
               <div className="col-sm-9">
                 <TextField
                   id="renamecorrespondencesubject"
@@ -2098,27 +2115,27 @@ export const ContactApplicant = ({
                   variant="outlined"
                   fullWidth
                   value={correspondenceSubject}
-                  onChange={(e) => {setCorrespondenceSubject(e.target.value)}}
+                  onChange={(e) => { setCorrespondenceSubject(e.target.value) }}
                   error={correspondenceSubject === ""}
                 />
               </div>
-            <div className="col-sm-1"></div>
-          </div>}
-        </DialogContent>
-        <DialogActions>
-          <button
-            className={`btn-bottom btn-save btn`}
-            onClick={handleConfirmationContinue}
-          >
-            Continue
-          </button>
-          <button className="btn-cancel" onClick={handleConfirmationClose}>
-            Cancel
-          </button>
-        </DialogActions>
-      </Dialog>
-    </div>
-    </div>
+              <div className="col-sm-1"></div>
+            </div>}
+          </DialogContent>
+          <DialogActions>
+            <button
+              className={`btn-bottom btn-save btn`}
+              onClick={handleConfirmationContinue}
+            >
+              Continue
+            </button>
+            <button className="btn-cancel" onClick={handleConfirmationClose}>
+              Cancel
+            </button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    </div >
   ) : (
     <Loading />
   );

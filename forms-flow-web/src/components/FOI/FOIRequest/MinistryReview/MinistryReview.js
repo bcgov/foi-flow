@@ -263,8 +263,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
   const [isMinistryRestricted, setIsMinistryRestricted] = useState(false);
   const [isMCFPersonal, setIsMCFPersonal] = useState(
     bcgovcode.replaceAll('"', "") == "MCF" &&
-      requestDetails.requestType ==
-        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL,
+    requestDetails.requestType ==
+    FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL,
   );
   const [unSavedRequest, setUnSavedRequest] = React.useState(false);
   let ministryassignedtousername = "Unassigned";
@@ -311,7 +311,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     if (
       MinistryNeedsScanning.includes(bcgovcode.replaceAll('"', "")) &&
       requestDetails.requestType ==
-        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
+      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
     ) {
       dispatch(
         fetchFOIPersonalDivisionsAndSections(bcgovcode.replaceAll('"', "")),
@@ -607,9 +607,8 @@ const MinistryReview = React.memo(({ userDetail }) => {
 
   const userId = userDetail && userDetail.preferred_username;
   const avatarUrl = "https://ui-avatars.com/api/name=Riya&background=random";
-  const name = `${userDetail && userDetail.family_name}, ${
-    userDetail && userDetail.given_name
-  }`;
+  const name = `${userDetail && userDetail.family_name}, ${userDetail && userDetail.given_name
+    }`;
   const signinUrl = "/signin";
   const signupUrl = "/signup";
 
@@ -677,18 +676,18 @@ const MinistryReview = React.memo(({ userDetail }) => {
       let commentsCount = requestNotes.filter(
         (c) =>
           c.commentTypeId !==
-            getCommentTypeIdByName(commentTypes, "IAO Internal") &&
+          getCommentTypeIdByName(commentTypes, "IAO Internal") &&
           c.commentTypeId !==
-            getCommentTypeIdByName(commentTypes, "IAO Peer Review"),
+          getCommentTypeIdByName(commentTypes, "IAO Peer Review"),
       ).length;
       return "(" + commentsCount + ")";
     } else {
       let commentsCount = requestNotes.filter(
         (c) =>
           c.commentTypeId !==
-            getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
+          getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
           c.commentTypeId !==
-            getCommentTypeIdByName(commentTypes, "Ministry Peer Review"),
+          getCommentTypeIdByName(commentTypes, "Ministry Peer Review"),
       ).length;
       return "(" + commentsCount + ")";
     }
@@ -698,7 +697,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     requestDetails &&
     Object.keys(requestDetails).length !== 0 &&
     requestState != undefined ? (
-    <div className="foiformcontent">
+    <div className="foiformcontent ministry-review-module">
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
           <h4 className="foileftpanelrequestno">
@@ -718,17 +717,17 @@ const MinistryReview = React.memo(({ userDetail }) => {
             </div>
             {requestDetails?.requestType ===
               FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && (
-              <div
-                className={clsx("tablinks", {
-                  active: tabLinksStatuses.Fees.active,
-                })}
-                name="Fees"
-                onClick={() => tabclick("Fees")}
-              >
-                Fees
-                {CFRFormHistoryLength > 0 ? ` (${CFRFormHistoryLength})` : ""}
-              </div>
-            )}
+                <div
+                  className={clsx("tablinks", {
+                    active: tabLinksStatuses.Fees.active,
+                  })}
+                  name="Fees"
+                  onClick={() => tabclick("Fees")}
+                >
+                  Fees
+                  {CFRFormHistoryLength > 0 ? ` (${CFRFormHistoryLength})` : ""}
+                </div>
+              )}
             <div
               className={clsx("tablinks", {
                 active: tabLinksStatuses.Attachments.active,
@@ -901,9 +900,9 @@ const MinistryReview = React.memo(({ userDetail }) => {
                             {requestDetails.isoipcreview &&
                               requestState &&
                               requestState.toLowerCase() !==
-                                StateEnum.intakeinprogress.name.toLowerCase() &&
+                              StateEnum.intakeinprogress.name.toLowerCase() &&
                               requestState.toLowerCase() !==
-                                StateEnum.unopened.name.toLowerCase() && (
+                              StateEnum.unopened.name.toLowerCase() && (
                                 <OIPCDetails
                                   oipcData={requestDetails.oipcdetails}
                                   isMinistry={isMinistry}
@@ -933,26 +932,26 @@ const MinistryReview = React.memo(({ userDetail }) => {
           </div>
           {requestDetails?.requestType ===
             FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL && (
-            <div
-              id="Fees"
-              className={clsx("tabcontent", {
-                active: tabLinksStatuses.Fees.active,
-                [classes.displayed]: tabLinksStatuses.Fees?.display,
-                [classes.hidden]: !tabLinksStatuses.Fees?.display,
-              })}
-            >
-              <Fees
-                requestNumber={requestNumber}
-                requestState={requestState}
-                requestDetails={requestDetails}
-                userDetail={userDetail}
-                ministryId={ministryId}
-                requestId={requestId}
-                setCFRUnsaved={setCFRUnsaved}
-                handleStateChange={handleStateChange}
-              />
-            </div>
-          )}
+              <div
+                id="Fees"
+                className={clsx("tabcontent", {
+                  active: tabLinksStatuses.Fees.active,
+                  [classes.displayed]: tabLinksStatuses.Fees?.display,
+                  [classes.hidden]: !tabLinksStatuses.Fees?.display,
+                })}
+              >
+                <Fees
+                  requestNumber={requestNumber}
+                  requestState={requestState}
+                  requestDetails={requestDetails}
+                  userDetail={userDetail}
+                  ministryId={ministryId}
+                  requestId={requestId}
+                  setCFRUnsaved={setCFRUnsaved}
+                  handleStateChange={handleStateChange}
+                />
+              </div>
+            )}
           <div
             id="Attachments"
             className={clsx("tabcontent", {
@@ -974,6 +973,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   iaoassignedToList={iaoassignedToList}
                   ministryAssignedToList={ministryAssignedToList}
                   isMinistryCoordinator={true}
+                  isProactiveDisclosure={isProactiveDisclosure}
                 />
               </>
             ) : (
@@ -1041,7 +1041,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                       />
                     )}
                     <Chip
-                      label={getHeaderText(requestDetails)}
+                      label={getHeaderText(requestDetails, isProactiveDisclosure)}
                       sx={{
                         backgroundColor: "#fff",
                         border: "1px solid #038",
@@ -1085,6 +1085,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   }
                   isMinistry={isMinistry}
                   commentTypes={commentTypes}
+                  isProactiveDisclosure={isProactiveDisclosure}
                 />
               </>
             ) : (
@@ -1100,7 +1101,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
             })}
           >
             {!isAttachmentListLoading &&
-            (originalDivisions?.length > 0 || isMCFPersonal) ? (
+              (originalDivisions?.length > 0 || isMCFPersonal) ? (
               <>
                 {url.indexOf("records") > -1 ? (
                   <Breadcrumbs
@@ -1180,6 +1181,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   validLockRecordsState={validLockRecordsState}
                   handleSaveRequest={handleSaveRequest}
                   isPhasedRelease={requestDetails.isphasedrelease}
+                  isProactiveDisclosure={isProactiveDisclosure}
                 />
               </>
             ) : (

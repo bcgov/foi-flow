@@ -114,14 +114,14 @@ def upgrade():
     # update the table structure:
     #
     # ----------------------------------------------------------
-    # op.execute("""
-    #   ALTER TABLE "FOIRequestRecords"
-    #   DROP CONSTRAINT "FOIRequestRecords_pkey";
-    #
-    #   ALTER TABLE "FOIRequestRecords"
-    #   ADD PRIMARY KEY (recordid);
-    #
-    #            """)
+    op.execute("""
+      ALTER TABLE "FOIRequestRecords"
+      DROP CONSTRAINT "FOIRequestRecords_pkey";
+    
+      ALTER TABLE "FOIRequestRecords"
+      ADD PRIMARY KEY (recordid);
+    
+               """)
 
     # ----------------------------------------------------------
 

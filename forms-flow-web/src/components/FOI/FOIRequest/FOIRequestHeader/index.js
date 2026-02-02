@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { makeStyles } from '@material-ui/core/styles';
 import "./foirequestheader.scss";
 import TextField from '@material-ui/core/TextField';
-import { getMenuItems, getAssignedTo, getStatus, getFullName} from "./utils";
+import { getMenuItems, getAssignedTo, getStatus, getFullName } from "./utils";
 import Input from '@material-ui/core/Input';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
@@ -16,7 +16,7 @@ import {
   saveAssignee
 } from "../../../../apiManager/services/FOI/foiAssigneeServices";
 import {
-  fetchRestrictedRequestCommentTagList,  
+  fetchRestrictedRequestCommentTagList,
   updateSpecificRequestSection,
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
@@ -24,24 +24,26 @@ import _ from 'lodash';
 import RequestRestriction from "../../customComponents/RequestRestriction";
 import ConfirmModal from "../../customComponents/ConfirmModal";
 import RequestFlag from '../../customComponents/RequestFlag';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import { Grid } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
-    formControl: {
-      margin: theme.spacing(1),
-      minWidth: 120,
-    },
-    item: {
-        paddingLeft: theme.spacing(3),
-    },
-    group: {
-        fontWeight: theme.typography.fontWeightBold,
-        opacity: 1,
-    },
-    blankrow: {
-      padding: 25
-    }
-  }));
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  item: {
+    paddingLeft: theme.spacing(3),
+  },
+  group: {
+    fontWeight: theme.typography.fontWeightBold,
+    opacity: 1,
+  },
+  blankrow: {
+    padding: 25
+  }
+}));
 const FOIRequestHeader = React.memo(
   ({
     headerValue,
@@ -73,9 +75,9 @@ const FOIRequestHeader = React.memo(
     const assignedToList = useSelector(
       (state) => state.foiRequests.foiAssignedToList
     );
-    const [isIAORestrictedRequest,setIsIAORestrictedRequest] = useState(false);
-    let assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo','assignedToFirstName','assignedToLastName',
-    'assignedministrygroup','assignedministryperson','assignedministrypersonFirstName','assignedministrypersonLastName']);
+    const [isIAORestrictedRequest, setIsIAORestrictedRequest] = useState(false);
+    let assigneeDetails = _.pick(requestDetails, ['assignedGroup', 'assignedTo', 'assignedToFirstName', 'assignedToLastName',
+      'assignedministrygroup', 'assignedministryperson', 'assignedministrypersonFirstName', 'assignedministrypersonLastName']);
     const [assigneeObj, setAssigneeObj] = useState(assigneeDetails);
 
     const isIAORestrictedFileManager = () => {
@@ -83,9 +85,9 @@ const FOIRequestHeader = React.memo(
     }
 
     const isRestricted = () => {
-      if(ministryId){
+      if (ministryId) {
         return requestDetails?.iaorestricteddetails?.isrestricted;
-      } 
+      }
       else
         return requestDetails?.isiaorestricted;
     }
@@ -105,19 +107,19 @@ const FOIRequestHeader = React.memo(
     useEffect(() => {
       setAssignedTo(getAssignedTo(assigneeObj));
     }, [assigneeObj]);
-  
+
     const [menuItems, setMenuItems] = useState([]);
- 
+
     const [selectedAssignedTo, setAssignedTo] = React.useState(() => getAssignedTo(assigneeDetails));
 
     const preventDefault = (event) => event.preventDefault();
 
     const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
     const [showModal, setShowModal] = useState(false);
-    const [modalMessage, setModalMessage] = useState(<></>);    
+    const [modalMessage, setModalMessage] = useState(<></>);
     const [modalDescription, setModalDescription] = useState(<></>);
-    const [assigneeVal, setAssigneeVal]= useState("");
-    const [assigneeName,setAssigneeName] = useState("");
+    const [assigneeVal, setAssigneeVal] = useState("");
+    const [assigneeName, setAssigneeName] = useState("");
     const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
@@ -144,7 +146,7 @@ const FOIRequestHeader = React.memo(
       setAssigneeVal(AssigneeValue);
       setAssigneeName(fullName);
 
-      if(isIAORestrictedRequest){
+      if (isIAORestrictedRequest) {
         setModalMessage(<span>Are you sure you want to assign <b>{fullName}</b> to this request?</span>);
         setModalDescription(<span><i>This will allow them to have access to this restricted request content.</i></span>);
         setShowModal(true);
@@ -152,7 +154,7 @@ const FOIRequestHeader = React.memo(
       else
         saveAssigneeDetails(AssigneeValue, fullName);
     }
-    
+
     const resetModal = () => {
       setShowModal(false);
     }
@@ -168,11 +170,11 @@ const FOIRequestHeader = React.memo(
           assigneeName
         );
       } else {
-        setAssigneeObj(createAssigneeDetails(assigneeVal, assigneeName));  
+        setAssigneeObj(createAssigneeDetails(assigneeVal, assigneeName));
         assigneeDetails = createAssigneeDetails(assigneeVal, assigneeName);
         dispatch(
           saveAssignee(assigneeDetails, requestId, ministryId, false, (err, _res) => {
-            if(!err) {
+            if (!err) {
               toast.success("Assignee has been saved successfully.", {
                 position: "top-right",
                 autoClose: 3000,
@@ -194,7 +196,7 @@ const FOIRequestHeader = React.memo(
               requestDetails.assignedToFirstName = assigneeDetails.assignedToFirstName;
               requestDetails.assignedToLastName = assigneeDetails.assignedToLastName;
               requestDetails.assignedToName = assigneeDetails.assignedToName
-              if(isRestricted())
+              if (isRestricted())
                 dispatch(fetchRestrictedRequestCommentTagList(requestId, ministryId));
             } else {
               toast.error(
@@ -213,7 +215,7 @@ const FOIRequestHeader = React.memo(
           })
         )
       }
-      
+
     }
 
     const status = getStatus({ headerValue, requestDetails });
@@ -245,155 +247,177 @@ const FOIRequestHeader = React.memo(
       const toastID = toast.loading("Updating phased release status for request...");
       dispatch(
         updateSpecificRequestSection(
-          {'isphasedrelease': isPhasedRelease},
+          { 'isphasedrelease': isPhasedRelease },
           'isphasedrelease',
           requestId,
-          ministryId, 
+          ministryId,
           (err, _res) => {
-          if(!err) {
-            createSaveRequestObject('isphasedrelease', isPhasedRelease)
-            toast.update(toastID, {
-              type: "success",
-              render: "Request details have been saved successfully.",
-              position: "top-right",
-              isLoading: false,
-              autoClose: 3000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
-            });
-          } else {
-            toast.error(
-              "Temporarily unable to update phased release status for request. Please try again in a few minutes.",
-              {
+            if (!err) {
+              createSaveRequestObject('isphasedrelease', isPhasedRelease)
+              toast.update(toastID, {
+                type: "success",
+                render: "Request details have been saved successfully.",
                 position: "top-right",
+                isLoading: false,
                 autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-              }
-            );
-          }
-        })
+              });
+            } else {
+              toast.error(
+                "Temporarily unable to update phased release status for request. Please try again in a few minutes.",
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
+            }
+          })
       )
     }
 
     return (
       <>
-      <div className='row'>
-        <div className="col-lg-6">
-          <div className='axis-request-id'>
-              <Link href="#" onClick={preventDefault}>
-                <h3 className="foi-review-request-text">{headerText}</h3>
-              </Link>
-          </div>
-        </div>
-        <div className="col-lg-6">
-          <div className="foi-assignee-dropdown">
-              {!isHistoricalRequest ? 
-                <TextField
-                  id="assignedTo"
-                  label={showMinistryAssignedTo ? "FOI Ops Assigned To" : "Assigned To"}
-                  inputProps={{ "aria-labelledby": "assignedTo-label"}}
-                  InputLabelProps={{ shrink: true }}
-                  select
-                  value={selectedAssignedTo}
-                  onChange={handleAssigneeUpdate}
-                  input={<Input />}
-                  variant="outlined"
-                  fullWidth
-                  required
-                  disabled={disableHeaderInput}
-                  error={selectedAssignedTo.toLowerCase().includes("unassigned")}
-                >
-                  {menuItems}
-                </TextField>
-              :
-                <TextField
-                  id="assignedTo"
-                  label={showMinistryAssignedTo ? "FOI Ops Assigned To" : "Assigned To"}
-                  inputProps={{ "aria-labelledby": "assignedTo-label"}}
-                  InputLabelProps={{ shrink: true }}
-                  value={requestDetails.assignedTo}
-                  input={<Input />}
-                  variant="outlined"
-                  fullWidth
-                  disabled
-                >
-                  {menuItems}
-                </TextField>
-              }
-            </div>
-        </div>
-      </div>
-      <div className='row'>
-        <div className="col-lg-6">
-          <Grid container columns={16}>
-            <Grid>
-              <div>
-                {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
-                    -1 && (
-                      <Watcher
-                        watcherFullList={watcherList}
-                        requestId={requestId}
-                        ministryId={ministryId}
-                        userDetail={userDetail}
-                        disableInput={disableInput || disableHeaderInput}
-                        isIAORestrictedRequest={isIAORestrictedRequest}
-                        setIsLoaded={setIsLoaded}
-                      />
-                  )}
-                {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isIAORestrictedFileManager() ||
-                  (isLoaded && isRequestWatcherOrAssignee(requestWatchers,assigneeObj,userDetail?.preferred_username))) && 
-                <RequestRestriction 
-                  isiaorestricted= {isRestricted()}
-                  isIAORestrictedFileManager={isIAORestrictedFileManager()}
-                  requestDetails={requestDetails}
-                  />
 
+
+        {!isProactiveDisclosure ? (
+          <div className='row'>
+            <div className="col-lg-6">
+              <div className='axis-request-id'>
+                <Link href="#" onClick={preventDefault}>
+                  <h3 className="foi-review-request-text">{headerText}</h3>
+                </Link>
+              </div>
+            </div>
+            <div className="col-lg-6">
+              <div className="foi-assignee-dropdown">
+                {!isHistoricalRequest ?
+                  <TextField
+                    id="assignedTo"
+                    label={showMinistryAssignedTo ? "FOI Ops Assigned To" : "Assigned To"}
+                    inputProps={{ "aria-labelledby": "assignedTo-label" }}
+                    InputLabelProps={{ shrink: true }}
+                    select
+                    value={selectedAssignedTo}
+                    onChange={handleAssigneeUpdate}
+                    input={<Input />}
+                    variant="outlined"
+                    fullWidth
+                    required
+                    disabled={disableHeaderInput}
+                    error={selectedAssignedTo.toLowerCase().includes("unassigned")}
+                  >
+                    {menuItems}
+                  </TextField>
+                  :
+                  <TextField
+                    id="assignedTo"
+                    label={showMinistryAssignedTo ? "FOI Ops Assigned To" : "Assigned To"}
+                    inputProps={{ "aria-labelledby": "assignedTo-label" }}
+                    InputLabelProps={{ shrink: true }}
+                    value={requestDetails.assignedTo}
+                    input={<Input />}
+                    variant="outlined"
+                    fullWidth
+                    disabled
+                  >
+                    {menuItems}
+                  </TextField>
                 }
               </div>
-            </Grid>
-            {!isProactiveDisclosure &&
-            <Grid>
-              <div>
-                <RequestFlag
-                    type="oipcreview"
-                    requestDetails={requestDetails}
-                    isActive={requestDetails.isoipcreview}
-                    handleSelect={handleOipcReviewFlagChange}
-                    showFlag={showFlags}
-                    isDisabled={isMinistry}
-                />
-                <RequestFlag
-                    type="consult"
-                    requestDetails={requestDetails}
-                    isActive={requestDetails.isconsultflag}
-                    handleSelect={handleConsultFlagChange}
-                    showFlag={showConsultFlag}
-                    isDisabled={!isAddRequest}
-                />
-                <RequestFlag
-                  type="phasedrelease"
-                  requestDetails={requestDetails}
-                  isActive={requestDetails.isphasedrelease}
-                  showFlag={showFlags}
-                  handleSelect={updateIsPhasedRelease}
-                />
+            </div>
+          </div>
+        ) : (
+          <div className='row'>
+            <div className="col-lg-12">
+              <div className="foi-request-header-card">
+                <div className="foi-request-number-header-pd">
+                  <h1 className="foi-request-number-text">{headerText}</h1>
+                </div>
+                <div className='foi-request-calendar'>
+                  <button type="button" className="btn-calendar">
+                    <FontAwesomeIcon icon={faCalendar} size="lg" /> Calendar
+                  </button>
+                </div>
               </div>
-            </Grid>
-            }
-          </Grid>
-        </div>
-        <div className="col-lg-6">
-          <div className="foi-assignee-dropdown">
-            {showMinistryAssignedTo && (
+            </div>
+          </div>
+        )}
+
+        <div className='row'>
+          <div className="col-lg-6" style={isProactiveDisclosure ? { alignContent: 'center' } : {}}>
+            <div style={isProactiveDisclosure ? { marginBottom: '20px' } : {}}>
+              <Grid container columns={16}>
+                <Grid>
+                  <div>
+                    {window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) ===
+                      -1 && (
+                        <Watcher
+                          watcherFullList={watcherList}
+                          requestId={requestId}
+                          ministryId={ministryId}
+                          userDetail={userDetail}
+                          disableInput={disableInput || disableHeaderInput}
+                          isIAORestrictedRequest={isIAORestrictedRequest}
+                          setIsLoaded={setIsLoaded}
+                        />
+                      )}
+                    {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isIAORestrictedFileManager() ||
+                      (isLoaded && isRequestWatcherOrAssignee(requestWatchers, assigneeObj, userDetail?.preferred_username))) &&
+                      <RequestRestriction
+                        isiaorestricted={isRestricted()}
+                        isIAORestrictedFileManager={isIAORestrictedFileManager()}
+                        requestDetails={requestDetails}
+                      />
+                    }
+                  </div>
+                </Grid>
+                {!isProactiveDisclosure &&
+                  <Grid>
+                    <div>
+                      <RequestFlag
+                        type="oipcreview"
+                        requestDetails={requestDetails}
+                        isActive={requestDetails.isoipcreview}
+                        handleSelect={handleOipcReviewFlagChange}
+                        showFlag={showFlags}
+                        isDisabled={isMinistry}
+                      />
+                      <RequestFlag
+                        type="consult"
+                        requestDetails={requestDetails}
+                        isActive={requestDetails.isconsultflag}
+                        handleSelect={handleConsultFlagChange}
+                        showFlag={showConsultFlag}
+                        isDisabled={!isAddRequest}
+                      />
+                      <RequestFlag
+                        type="phasedrelease"
+                        requestDetails={requestDetails}
+                        isActive={requestDetails.isphasedrelease}
+                        showFlag={showFlags}
+                        handleSelect={updateIsPhasedRelease}
+                      />
+                    </div>
+                  </Grid>
+                }
+              </Grid>
+            </div>
+          </div>
+          <div className="col-lg-6">
+            {!isProactiveDisclosure ? (
+              <div className="foi-assignee-dropdown">
+                {showMinistryAssignedTo && (
                   <>
-                  <TextField
+                    <TextField
                       id="ministryAssignedTotxt"
                       label="Ministry Assigned To"
                       InputLabelProps={{ shrink: true }}
@@ -404,21 +428,73 @@ const FOIRequestHeader = React.memo(
                     />
                   </>
                 )}
+              </div>
+            ) : (
+              <div className="foi-assigned-to-wrapper">
+                <div className="foi-assignee-dropdown stacked">
+                  {!isHistoricalRequest ?
+                    <TextField
+                      id="assignedTo"
+                      label={showMinistryAssignedTo ? "FOI Ops Assigned To" : "Assigned To"}
+                      inputProps={{ "aria-labelledby": "assignedTo-label" }}
+                      InputLabelProps={{ shrink: true }}
+                      select
+                      value={selectedAssignedTo}
+                      onChange={handleAssigneeUpdate}
+                      input={<Input />}
+                      variant="outlined"
+                      fullWidth
+                      required
+                      disabled={disableHeaderInput}
+                      error={selectedAssignedTo.toLowerCase().includes("unassigned")}
+                    >
+                      {menuItems}
+                    </TextField>
+                    :
+                    <TextField
+                      id="assignedTo"
+                      label={showMinistryAssignedTo ? "FOI Ops Assigned To" : "Assigned To"}
+                      inputProps={{ "aria-labelledby": "assignedTo-label" }}
+                      InputLabelProps={{ shrink: true }}
+                      value={requestDetails.assignedTo}
+                      input={<Input />}
+                      variant="outlined"
+                      fullWidth
+                      disabled
+                    >
+                      {menuItems}
+                    </TextField>
+                  }
+                </div>
+                {showMinistryAssignedTo && (
+                  <div className="foi-assignee-dropdown stacked">
+                    <TextField
+                      id="ministryAssignedTotxt"
+                      label="Ministry Assigned To"
+                      InputLabelProps={{ shrink: true }}
+                      value={ministryAssignedTo}
+                      variant="outlined"
+                      fullWidth
+                      disabled={true}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
-      </div>
 
-      <ConfirmModal 
-          modalMessage= {modalMessage}
-          modalDescription= {modalDescription} 
+        <ConfirmModal
+          modalMessage={modalMessage}
+          modalDescription={modalDescription}
           showModal={showModal}
-          saveAssigneeDetails = {saveAssigneeDetails}
+          saveAssigneeDetails={saveAssigneeDetails}
           assigneeVal={assigneeVal}
-          assigneeName ={assigneeName}
-          resetModal = {resetModal} />
+          assigneeName={assigneeName}
+          resetModal={resetModal} />
       </>
     );
-    
+
   }
 );
 
