@@ -1,7 +1,7 @@
 """create AXISCorrespondence
 
 Revision ID: 48f0a96fe2a1
-Revises: 3a4f7b2c6d9e
+Revises: 2d8cf3fb689f
 Create Date: 2026-02-01 23:30:22.853214
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '48f0a96fe2a1'
-down_revision = '3a4f7b2c6d9e'
+down_revision = '2d8cf3fb689f'
 branch_labels = None
 depends_on = None
 
