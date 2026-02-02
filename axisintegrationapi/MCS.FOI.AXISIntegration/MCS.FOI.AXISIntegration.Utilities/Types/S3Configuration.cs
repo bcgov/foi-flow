@@ -13,8 +13,5 @@ namespace MCS.FOI.AXISIntegration.Utilities.Types
         public  string S3_Attachements_BasePath { get; set; }
         public string S3_Attachements_Bucket { get; set; }
         public string AttachmentTag { get; set; }
-        public string SyncfusionLicense { get; set; }
-        public  string CorrespondenceLogMigration { get; set; }
-        public  string RecordsMigration { get; set; }
     }
 }

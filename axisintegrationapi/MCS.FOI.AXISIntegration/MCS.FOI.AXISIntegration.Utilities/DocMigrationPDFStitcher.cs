@@ -1,13 +1,8 @@
 ﻿using PdfSharpCore;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.IO;
-using SyncfusionPDF = Syncfusion.Pdf;
-using SyncfusionPDFGraphics = Syncfusion.Pdf.Graphics;
 using TheArtOfDev.HtmlRenderer.PdfSharp;
-using Syncfusion.Pdf.Graphics;
-using Syncfusion.Drawing;
 using Amazon.S3.Model;
-using Syncfusion.Pdf.Parsing;
 
 namespace MCS.FOI.AXISIntegration.Utilities
 {
