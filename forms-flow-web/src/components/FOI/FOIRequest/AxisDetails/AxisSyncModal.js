@@ -29,7 +29,8 @@ import { createRequestDetailsObjectFunc,
          getUniqueIdentifier } from "../utils";
 import { formatDate } from "../../../../helper/FOI/helper";
 import MANDATORY_FOI_REQUEST_FIELDS from '../../../../constants/FOI/mandatoryFOIRequestFields';
-
+import {useSelector } from "react-redux";
+import { syncCorrespondenceLogs } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 
 const useStyles = makeStyles({
  
@@ -45,8 +46,11 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
   hasStatusRequestSaved, requestState, requestId, ministryId, axisSyncedData
 }) => {
 
+    const user = useSelector((reduxState) => reduxState.user.userDetail);
     const classes = useStyles();
     const [displayedReqObj, setDisplayedReqObj] = React.useState({});
+    const [correspondenceObjects, setCorrespondenceObjects] = React.useState(axisSyncedData?.correspondenceLogs || []);
+    const [selectedCorrespondence, setSelectedCorrespondence] = React.useState([]);
     const [updatedSaveReqObj, setUpdatedSaveReqObj] = React.useState({});
     let requestDetailsFromAxis ={...axisSyncedData};
     const [axisExtensions, setAxisExtension] = React.useState([]);
@@ -56,8 +60,10 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
 
     useEffect(()=>{
         if(Object.entries(requestDetailsFromAxis).length !== 0){
-          setAxisExtension(requestDetailsFromAxis?.Extensions); 
-          compareFields();  
+          setAxisExtension(requestDetailsFromAxis?.Extensions);
+          setCorrespondenceObjects(axisSyncedData?.correspondenceLogs || []);
+          compareFields();
+          console.log('axisSyncedData', axisSyncedData);  
         }
     },[axisSyncedData])
 
@@ -166,6 +172,9 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
             updatedObj[key] = extensionsArr;
             setUpdateExtensions(true);
           }
+          break;
+        case 'correspondenceLogs':
+          //skip as handled separately
           break;
         default:
           updatedObj[updatedField] = requestDetailsFromAxis[key];
@@ -325,9 +334,25 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
                 draggable: true,
                 progress: undefined,
               });
+
               if(updateExtensions){
                 saveExtensions();
               }
+
+              //Sync correspondence logs if any selected
+              if (selectedCorrespondence.length > 0) {
+                // Filter the full objects based on user's checkbox selections
+                const selectedLogs = correspondenceObjects.filter(obj => 
+                  selectedCorrespondence.includes(obj.CorrespondenceID)
+                );
+
+                dispatch(syncCorrespondenceLogs(selectedLogs, user?.preferred_username, (logErr, logRes) => {
+                  if (logErr) {
+                    toast.error("Main request saved, but correspondence sync failed.");
+                  }
+                }));
+              }
+
               const _state = getRequestState({
                 currentSelectedStatus,
                 requestState,
@@ -356,6 +381,24 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
       );
     };
 
+    const handleSelectAll = (e) => {
+        if (e.target.checked) {
+            // Select all IDs
+            const allIds = correspondenceObjects.map(val => val.CorrespondenceID);
+            setSelectedCorrespondence(allIds);
+        } else {
+            // Clear selection
+            setSelectedCorrespondence([]);
+        }
+    };
+
+    const handleSelectOne = (id) => {
+        if (selectedCorrespondence.includes(id)) {
+            setSelectedCorrespondence(selectedCorrespondence.filter(item => item !== id));
+        } else {
+            setSelectedCorrespondence([...selectedCorrespondence, id]);
+        }
+    };
 
     return  Object.entries(displayedReqObj).length > 0 && (
         <>
@@ -379,17 +422,66 @@ const AxisSyncModal = ({ axisSyncModalOpen, setAxisSyncModalOpen, saveRequestObj
             <Typography className={classes.heading}>Review Changes from AXIS</Typography>
             </AccordionSummary>
             <AccordionDetails>
-            <div className='axis-accordian-detail'>
-                <Table bordered className='updated-contents-table'>
-                <tbody>
-                {Object.entries(displayedReqObj).map(([key, val]) => 
-                <tr key= {key}>
-                    <td className='axis-updated-fields'>{key}</td>
-                    <td>{val}</td>
-                  </tr>
-                )}
-                </tbody>
-                </Table>
+            <div className='axis-accordian-detail' style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{ width: '100%' }}>
+                  <Table bordered className='updated-contents-table'>
+                  <tbody>
+                  {Object.entries(displayedReqObj).map(([key, val]) => 
+                  <tr key= {key}>
+                      <td className='axis-updated-fields'>{key}</td>
+                      <td>{val}</td>
+                    </tr>
+                  )}
+                  </tbody>
+                  </Table>
+                </div>
+
+                {correspondenceObjects.length > 0 && (
+                  <div style={{ width: '100%', marginTop: '25px' }}>
+                      <Typography 
+                          className={classes.heading} 
+                          style={{ marginTop: '20px', marginBottom: '10px' }}
+                      >
+                          Correspondence Logs to Sync
+                      </Typography>
+                      <Table bordered className='updated-contents-table'>
+                          <thead>
+                              <tr style={{ backgroundColor: '#f5f5f5' }}>
+                                  <th style={{ width: '50px', textAlign: 'center' }}>
+                                      <input 
+                                          type="checkbox"
+                                          onChange={handleSelectAll}
+                                          checked={selectedCorrespondence.length === correspondenceObjects.length && correspondenceObjects.length > 0}
+                                      />
+                                  </th>
+                                  <th>File / Subject</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {correspondenceObjects.map((val, index) => {
+                                  const isChecked = selectedCorrespondence.includes(val.CorrespondenceID);
+                                  return (
+                                      <tr key={val?.CorrespondenceID || index} style={isChecked ? { backgroundColor: '#f0f7ff' } : {}}>
+                                          <td style={{ textAlign: 'center' }}>
+                                              <input 
+                                                  type="checkbox"
+                                                  checked={isChecked}
+                                                  onChange={() => handleSelectOne(val.CorrespondenceID)}
+                                              />
+                                          </td>
+                                          <td>
+                                              {val?.FileName 
+                                                  ? String(val.FileName) 
+                                                  : `${String(val?.EmailSubject || '')}_${String(val?.CorrespondenceID || '')}`
+                                              }
+                                          </td>
+                                      </tr>
+                                  );
+                              })}
+                          </tbody>
+                      </Table>
+                  </div>
+              )}
             </div>
             </AccordionDetails>
           </Accordion>

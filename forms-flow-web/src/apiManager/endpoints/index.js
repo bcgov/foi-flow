@@ -218,6 +218,8 @@ const API = {
   FOI_GET_EMAIL_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/GetCorrespondenceByName`,
   FOI_EXPORT_SFDT: `${FOI_TEMPLATE_API_URL}/api/documenteditor/ExportSFDT`,
   FOI_EXPORT_PDF: `${FOI_TEMPLATE_API_URL}/api/documenteditor/ExportPdf`,
-  FOI_REFRESH_REDIS_CACHE_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/UpdateTemplateCache`
+  FOI_REFRESH_REDIS_CACHE_TEMPLATE: `${FOI_TEMPLATE_API_URL}/api/Template/UpdateTemplateCache`,
+
+  FOI_POST_AXIS_CORRESPONDENCE_SYNC: `${AXIS_API_URL}/api/DocumentsSync`,
 };
 export default API;

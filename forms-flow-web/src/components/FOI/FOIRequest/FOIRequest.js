@@ -645,6 +645,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       if (linkedRequestsChanged(axisData, key) > 0) {
         return true;
       }
+    } else if (key === "correspondenceLogs") {
+      if (axisData[key] && axisData[key].length > 0) {
+        return true;
+      }
     } else if (
       key !== "compareReceivedDate" &&
       ((mandatoryField && axisData[key]) || !mandatoryField)

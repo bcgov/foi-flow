@@ -44,7 +44,8 @@ const AXIS_SYNC_DISPLAY_FIELDS = {
     linkedRequests: "Linked Requests",
     identityVerified:"Identity Verified",
 
-    axisApplicantID:"AXIS Applicant ID"
+    axisApplicantID:"AXIS Applicant ID",
+    correspondenceLogs: "Correspondence Logs"
   };
   
   export default AXIS_SYNC_DISPLAY_FIELDS;

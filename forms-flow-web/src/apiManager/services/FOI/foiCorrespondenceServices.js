@@ -457,3 +457,21 @@ export const exportPDF = (
     }
   });
 };
+
+// Sync correspondence from AXIS to FOIMOD records
+export const syncCorrespondenceLogs = (selectedCorrespondence, userId, callback) => {
+  const data = {
+    UserId: userId,
+    CorrespondenceLogs: selectedCorrespondence
+  };
+
+  httpPOSTRequest(API.FOI_POST_AXIS_CORRESPONDENCE_SYNC, data)
+    .then((res) => {
+      if (res.data) {
+        callback(null, res.data);
+      }
+    })
+    .catch((error) => {
+      callback(error);
+    });
+};
