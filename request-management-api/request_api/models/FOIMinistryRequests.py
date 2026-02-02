@@ -797,13 +797,6 @@ class FOIMinistryRequest(db.Model):
                     axispagecount),
                 ],
                 else_= literal("0")).label('requestpagecount')
-        # publicationStatus = cast(
-        #         case(
-        #             [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
-        #             else_=OpenInformationStatuses.name
-        #         ),
-        #         String
-        #     )
 
         return {
             'firstName': FOIRequestApplicant.firstname,
@@ -839,7 +832,6 @@ class FOIMinistryRequest(db.Model):
             'subjectcode': SubjectCode.name,
             'isoipcreview': FOIMinistryRequest.isoipcreview,
             'isphasedrelease': FOIMinistryRequest.isphasedrelease,
-            # 'publicationStatus': publicationStatus
         }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
