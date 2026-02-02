@@ -138,11 +138,11 @@ export const fetchApplicantRequests = (applicantid, ...rest) => {
   }
 };
 
-export const saveApplicantInfo = (applicant, ...rest) => {
+export const createNewApplicantProfile = (payload, ...rest) => {
   const done = fnDone(rest);
-  const apiUrlgetRequestDetails = API.FOI_SAVE_REQUEST_APPLICANT_INFO;
+  const apiUrlgetRequestDetails = API.FOI_CREATE_REQUEST_APPLICANT_PROFILE;
   return (dispatch) => {
-    httpPOSTRequest(apiUrlgetRequestDetails, applicant, UserService.getToken())
+    httpPOSTRequest(apiUrlgetRequestDetails, payload, UserService.getToken())
       .then((res) => {
         if (res.data) {
           dispatch(setRestrictedReqTaglist(res.data));
@@ -150,7 +150,70 @@ export const saveApplicantInfo = (applicant, ...rest) => {
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
-          throw new Error(`Error in saving applicant`);
+          throw new Error(`Error in creating new applicant profile`);
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  }
+};
+
+export const updateApplicantProfile = (payload, ...rest) => {
+  const done = fnDone(rest);
+  const apiUrlgetRequestDetails = API.FOI_UPDATE_REQUEST_APPLICANT_INFO;
+  return (dispatch) => {
+    httpPOSTRequest(apiUrlgetRequestDetails, payload, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setRestrictedReqTaglist(res.data));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in updating applicant profile`);
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  }
+};
+
+export const reassignApplicantProfile = (payload, ...rest) => {
+  const done = fnDone(rest);
+  const apiUrlgetRequestDetails = API.FOI_REASSIGN_REQUEST_APPLICANT_PROFILE;
+  return (dispatch) => {
+    httpPOSTRequest(apiUrlgetRequestDetails, payload, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setRestrictedReqTaglist(res.data));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in reassigning applicant profile`);
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  }
+};
+
+export const unassignApplicantProfile = (payload, ...rest) => {
+  const done = fnDone(rest);
+  const apiUrlgetRequestDetails = API.FOI_UNASSIGN_REQUEST_APPLICANT_PROFILE;
+  return (dispatch) => {
+    httpPOSTRequest(apiUrlgetRequestDetails, payload, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          dispatch(setRestrictedReqTaglist(res.data));
+          dispatch(setFOILoader(false));
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in unassigning applicant profile`);
         }
       })
       .catch((error) => {

@@ -8,6 +8,7 @@ const FOI_COMPONENT_CONSTANTS = {
     FOI_SELECTED_CATEGORY: "selectedCategory",
     APPLICANT_EMAIL: "email",
     ORGANIZATION: "businessName",
+    OTHER_NOTES: "otherNotes",
 
     CHILD_FIRST_NAME: "childFirstName",
     CHILD_LAST_NAME: "childLastName",

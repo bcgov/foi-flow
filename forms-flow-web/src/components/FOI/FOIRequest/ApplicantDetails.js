@@ -13,6 +13,7 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
+import { isBeforeOpen } from "./utils";
 
 const ApplicantDetails = React.memo(
   ({
@@ -24,7 +25,9 @@ const ApplicantDetails = React.memo(
     requestStatus,
     defaultExpanded,
     showHistory,
-    warning
+    warning,
+    openApplicantProfileModal,
+    displayOtherNotes = false
   }) => {
 
     const useStyles = makeStyles({
@@ -120,6 +123,9 @@ const ApplicantDetails = React.memo(
     const [alsoKnownAsText, setAlsoKnownAs] = React.useState(
       validateFields(requestDetails?.additionalPersonalInfo, FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS)
     );
+    const [otherNotes, setOtherNotes] = React.useState(
+      validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.OTHER_NOTES)
+    );
 
     //handle initial value for required field validation
     React.useEffect(() => {
@@ -149,6 +155,9 @@ const ApplicantDetails = React.memo(
           dateFormat: false,
           defaultValue: "Select Category",
         })
+      );
+      setOtherNotes(
+        validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.OTHER_NOTES)
       );
 
       const applicantDetailsObject = {
@@ -245,6 +254,14 @@ const ApplicantDetails = React.memo(
       );
     };
 
+    const handleOtherNotesChange = (e) => {
+      setOtherNotes(e.target.value);
+      createSaveRequestObject(
+        FOI_COMPONENT_CONSTANTS.OTHER_NOTES,
+        e.target.value
+      );
+    };
+
     //generate the menu items for the category
     const menuItems = category.map((item) => {
       return (
@@ -295,6 +312,18 @@ const ApplicantDetails = React.memo(
             {showHistory && <button type="button" className={`btn btn-link btn-description-history`} onClick={showHistory}>
                 Applicant Contact History
             </button>}
+          </div>
+          <div>
+            {openApplicantProfileModal &&
+              <button
+                type="button"
+                className={`btn btn-link btn-description-history`}
+                onClick={openApplicantProfileModal}
+                style={(isBeforeOpen(requestDetails) && !requestDetails.foiRequestApplicantID) ? {color: "#9E2929"} : {}}
+              >
+                {(isBeforeOpen(requestDetails) && !requestDetails.foiRequestApplicantID) && 'Search' } Applicant Profiles
+              </button>
+            }
           </div>
           <div className="row foi-details-row">
             <div className="col-lg-6 foi-details-col">
@@ -387,6 +416,22 @@ const ApplicantDetails = React.memo(
                 fullWidth
                 disabled={disableInput}
                 onChange={handleAlsoKnownAsChange}
+              />}
+            </div>
+            <div className="col-lg-12 foi-details-col">
+              {displayOtherNotes && <TextField
+                id="otherNotes"
+                label="Other Applicant Notes"
+                inputProps={{ "aria-labelledby": "alsoKnownAs-label"}}
+                InputLabelProps={{ shrink: true }}
+                value={otherNotes}
+                variant="outlined"
+                className={warning && warning(FOI_COMPONENT_CONSTANTS.OTHER_NOTES) && classes.warning}
+                fullWidth
+                disabled={disableInput}
+                onChange={handleOtherNotesChange}
+                multiline
+                minRows={4}
               />}
             </div>
           </div>
