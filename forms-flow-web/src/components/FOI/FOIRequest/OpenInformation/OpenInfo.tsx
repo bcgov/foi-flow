@@ -211,7 +211,7 @@ const OpenInfo = ({
     const isDoNotPublish = oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish;
     const hasExemption = oiPublicationData?.oiexemption_id;
     const isMissingApproval = isOITeam && oiPublicationData?.oiexemptionapproved === null;
-    const isMissingRequiredFields = !oiPublicationData?.iaorationale || !oiPublicationData?.pagereference || isMissingApproval;
+    const isMissingRequiredFields = !oiPublicationData?.pagereference || isMissingApproval;
     const hasOutOfScopeExemption = oiPublicationData?.oiexemption_id === OIExemptions.OutsideScopeOfPublication;
     if (isDoNotPublish && hasOutOfScopeExemption) {
       return false;
