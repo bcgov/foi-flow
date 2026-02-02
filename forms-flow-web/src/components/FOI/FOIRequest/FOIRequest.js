@@ -1518,9 +1518,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           handleApplicantDetailsValue
                         }
                         createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput || isHistoricalRequest || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
+                        disableInput={disableInput || isHistoricalRequest || requestDetails?.axisApplicantID || requestDetails?.foiRequestApplicantID > 0}
                         defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}                        
                         userDetail={userDetail}
+                        openApplicantProfileModal={openApplicantProfileModal}
                       />
                       {requiredRequestDetailsValues.requestType.toLowerCase() ===
                         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
@@ -1552,7 +1553,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           handleContactDetailsInitialValue
                         }
                         handleContanctDetailsValue={handleContanctDetailsValue}
-                        disableInput={disableInput || isHistoricalRequest /* || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
+                        disableInput={disableInput || isHistoricalRequest || requestDetails?.axisApplicantID || requestDetails?.foiRequestApplicantID > 0}
                         handleEmailValidation={handleEmailValidation}
                         defaultExpanded={!closeContactInfo(userDetail,requestDetails)}
                         moreInfoAction={openApplicantProfileModal}
