@@ -1,22 +1,23 @@
 
-from os import stat, path,getenv
-from re import VERBOSE
+from os import path,getenv
+
+from request_api.models.FOIRequestRecordHistory import FOIRequestRecordHistory
+from request_api.utils import json_utils
 from request_api.utils.constants import FILE_CONVERSION_FILE_TYPES, DEDUPE_FILE_TYPES, NONREDACTABLE_FILE_TYPES
 from request_api.models.FOIRequestRecords import FOIRequestRecord
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.HistoricalRecords import HistoricalRecords
-from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDivision
 from request_api.services.external.eventqueueservice import eventqueueservice
 from request_api.models.default_method_result import DefaultMethodResult
-from request_api.auth import auth, AuthHelper
+from request_api.auth import AuthHelper
 import json
 from datetime import datetime
 import maya
 import uuid
-import requests
 import logging
 from request_api.services.records.recordservicegetter import recordservicegetter 
-from request_api.services.records.recordservicebase import recordservicebase 
+from request_api.services.records.recordservicebase import recordservicebase
+from sqlalchemy import inspect
 
 class recordservice(recordservicebase):
     """ FOI record management service
@@ -40,79 +41,222 @@ class recordservice(recordservicebase):
     
     s3host = getenv('OSS_S3_HOST')
 
+    DOC_REVIEWER_API_ERROR = 'Error in contacting Doc Reviewer API'
+
     def create(self, requestid, ministryrequestid, recordschema, userid):
         """Creates a record for a user with document details passed in for an opened request.
         """
-        return self.__bulkcreate(requestid, ministryrequestid, recordschema.get("records"), userid)
+        records_list = recordschema.get("records", [])
+        return self.__bulkcreate(requestid, ministryrequestid, records_list, userid)
 
     def fetch(self, requestid, ministryrequestid):
         return recordservicegetter().fetch(requestid, ministryrequestid)
 
     def get_all_records_by_divisionid(self, divisionid):
-        return FOIRequestRecord.get_all_records_by_divisionid(divisionid)  
-            
-    def update(self, requestid, ministryrequestid, requestdata, userid):
-        newrecords = []
-        recordids = [r['recordid'] for r in requestdata['records'] if r.get('recordid') is not None]
-        response = DefaultMethodResult(True, 'No recordids')
-        if(len(recordids) > 0):
-            records = FOIRequestRecord.getrecordsbyid(recordids)
-            for record in records:
-                record['attributes'] = json.loads(record['attributes'])
-                if not requestdata['isdelete']:
-                    record['attributes']['divisions'] = requestdata['divisions']
-                record.update({'updated_at': datetime.now(), 'updatedby': userid, 'isactive': not requestdata['isdelete']})
-                record['version'] += 1
-                newrecord = FOIRequestRecord()
-                newrecord.__dict__.update(record)
-                newrecords.append(newrecord)
-            response = FOIRequestRecord.create(newrecords)
-        if response.success:
-            if requestdata['isdelete']:
-                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [record['filepath'] for record in requestdata['records']]})
-            else:
-                _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/update', {'ministryrequestid': ministryrequestid, 'documentmasterids': [record['documentmasterid'] for record in requestdata['records']], 'divisions': requestdata['divisions']})
-            if err:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1,  [record['documentmasterid'] for record in requestdata['records']])
-            return DefaultMethodResult(True,'Record updated in Doc Reviewer DB', -1, [record['documentmasterid'] for record in requestdata['records']])
+        return FOIRequestRecord.get_all_records_by_divisionid(divisionid)
+
+    def _create_historical_record(self, record):
+        """
+        Creates and returns a detached FOIRequestRecordHistory instance
+        by copying column values from the current FOIRequestRecord.
+        """
+
+        # 1. Create the new history instance
+        history_record = FOIRequestRecordHistory()
+
+        # 2. Copy data using a dictionary comprehension over mapped attributes
+        #    We copy all column data from the source record.
+        source_data = {
+            column.key: getattr(record, column.key)
+            for column in inspect(record.__class__).columns
+        }
+
+        history_record.__dict__.update(source_data)
+
+        # 3. Explicitly reset the history table's primary key (id)
+        history_record.id = None
+
+        # 4. Set history-specific audit fields
+        history_record.isactive = False
+        history_record.updated_at = datetime.now()
+
+        return history_record
+
+    def _prepare_record_update(self, record, requestdata, userid):
+        """Applies updates and version increment to the main ORM record."""
+
+
+        # 1. Load the JSON string from the ORM object into a dictionary
+        attributes_dict = json_utils.safe_json_loads(record.attributes)
+
+        # 2. Update attributes
+        if not requestdata['isdelete']:
+            attributes_dict['divisions'] = [requestdata['divisions']]
+
+        # 3. Save the modified dictionary back to the ORM object as a JSON string
+        record.attributes = json.dumps(attributes_dict)
+
+        # 4. Update core metadata
+        record.updated_at = datetime.now()
+        record.updatedby = userid
+        record.isactive = not requestdata['isdelete']
+        record.version += 1
+
+        return record
+
+    def _handle_doc_reviewer_api(self, ministryrequestid, records_data, requestdata):
+        """Handles the external API call to the Doc Reviewer service."""
+
+        if requestdata['isdelete']:
+            endpoint = '/api/document/delete'
+            payload = {
+                'ministryrequestid': ministryrequestid,
+                'filepaths': [r['filepath'] for r in records_data]
+            }
         else:
-            return DefaultMethodResult(False,'Error in updating Record', -1, [record['documentmasterid'] for record in requestdata['records']])
+            endpoint = '/api/document/update'
+            payload = {
+                'ministryrequestid': ministryrequestid,
+                'documentmasterids': [r['documentmasterid'] for r in records_data],
+                'divisions': requestdata['divisions']
+            }
+
+        _apiresponse, err = self.makedocreviewerrequest('POST', endpoint, payload)
+
+        if err:
+            doc_ids = [r['documentmasterid'] for r in records_data]
+            return DefaultMethodResult(False, self.DOC_REVIEWER_API_ERROR, -1, doc_ids)
+
+        success_msg = 'Record deleted in Doc Reviewer DB' if requestdata['isdelete'] else 'Record updated in Doc Reviewer DB'
+
+        return DefaultMethodResult(True, success_msg, -1, [r['documentmasterid'] for r in records_data])
+
+    def update(self, requestid, ministryrequestid, requestdata, userid):
+        # 1. Input Validation and Retrieval
+        records_data = requestdata['records']
+        recordids = [r['recordid'] for r in records_data if r.get('recordid') is not None]
+
+        if not recordids:
+            return DefaultMethodResult(True, 'No records to update', -1, [])
+
+        logging.debug(f"Updating records for ministry: {requestdata}")
+
+        # 2. Preparation: History and Update Lists
+        updated_orm_records = []
+        historical_records = []
+
+        if recordids:
+            records = FOIRequestRecord.getrecordsbyid(recordids)
+
+            for record in records:
+                # History capture must occur BEFORE modification (version increment)
+                historical_records.append(self._create_historical_record(record))
+
+                # Apply all updates to the main record
+                updated_record = self._prepare_record_update(record, requestdata, userid)
+                updated_orm_records.append(updated_record)
+
+            # 3. Database Transaction (Atomic Save)
+            response = FOIRequestRecord.create(updated_orm_records, historical_records)
+
+            if not response.success:
+                doc_ids = [r['documentmasterid'] for r in records_data]
+                return DefaultMethodResult(False, 'Error in updating Record', -1, doc_ids)
+
+        # 4. External API Call
+        return self._handle_doc_reviewer_api(ministryrequestid, records_data, requestdata)
+
+    def _update_personal_attributes_dict(self, attributes_dict, new_personal_attributes):
+        """
+        Safely updates nested 'personalattributes' within the attributes dictionary.
+        """
+        if 'personalattributes' not in attributes_dict:
+            attributes_dict['personalattributes'] = {}
+
+        for attr, value in new_personal_attributes.items():
+            # Check if the attribute value is valid (non-None and non-empty list/string)
+            if value is not None and (isinstance(value, str) or isinstance(value, list)) and len(value) > 0:
+                attributes_dict['personalattributes'][attr] = value
+
+        return attributes_dict
+
+    def _handle_doc_reviewer_api_personal(self, ministryrequestid, records_data, new_personal_attributes):
+        """Handles the external API call to the Doc Reviewer service for personal attributes."""
+
+        endpoint = '/api/document/update/personal'
+        payload = {
+            'ministryrequestid': ministryrequestid,
+            'documentmasterids': [r['documentmasterid'] for r in records_data],
+            'personalattributes': new_personal_attributes
+        }
+
+        _apiresponse, err = self.makedocreviewerrequest('POST', endpoint, payload)
+
+        doc_ids = [r['documentmasterid'] for r in records_data]
+
+        if err:
+            return DefaultMethodResult(False, self.DOC_REVIEWER_API_ERROR, -1, doc_ids)
+
+        return DefaultMethodResult(True, 'Record updated in Doc Reviewer DB', -1, doc_ids)
 
     def updatepersonalattributes(self, requestid, ministryrequestid, requestdata, userid):
-        newrecords = []
-        recordids = [r['recordid'] for r in requestdata['records'] if r.get('recordid') is not None]
-        response = DefaultMethodResult(True, 'No recordids')
-        # divisions = []
-        if(len(recordids) > 0):
-            records = FOIRequestRecord.getrecordsbyid(recordids)
-            for record in records:
-                record['attributes'] = json.loads(record['attributes'])
-                for attribute in requestdata['newpersonalattributes']:
-                    if (requestdata['newpersonalattributes'][attribute] is not None and len(requestdata['newpersonalattributes'][attribute]) > 0):
-                        if 'attributes' in record:
-                            if 'personalattributes' in record['attributes']:
-                                record['attributes']['personalattributes'][attribute] = requestdata['newpersonalattributes'][attribute]
-                            else:
-                                record['attributes']['personalattributes'] = {}
-                        else:
-                            record['attributes'] = {}
-                            record['attributes']['personalattributes'] = {}
-                        record['attributes']['personalattributes'][attribute] = requestdata['newpersonalattributes'][attribute]
-                # divisions = divisions + [div for div in record['attributes']['divisions'] if div not in divisions]
-                record.update({'updated_at': datetime.now(), 'updatedby': userid})
-                record['version'] += 1
-                newrecord = FOIRequestRecord()
-                newrecord.__dict__.update(record)
-                newrecords.append(newrecord)
-            response = FOIRequestRecord.create(newrecords)
-        if response.success:
-            # _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/update', {'ministryrequestid': ministryrequestid, 'documentmasterids': [record['documentmasterid'] for record in requestdata['records']], 'divisions': divisions, 'personalattributes': requestdata['newpersonalattributes']})
-            _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/update/personal', {'ministryrequestid': ministryrequestid, 'documentmasterids': [record['documentmasterid'] for record in requestdata['records']], 'personalattributes': requestdata['newpersonalattributes']})
-            if err:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1,  [record['documentmasterid'] for record in requestdata['records']])
-            return DefaultMethodResult(True,'Record updated in Doc Reviewer DB', -1, [record['documentmasterid'] for record in requestdata['records']])
-        else:
-            return DefaultMethodResult(False,'Error in updating Record', -1, [record['documentmasterid'] for record in requestdata['records']])
+        # 1. Initialization and Validation
+        updated_orm_records = []
+        historical_records = []
+        records_data = requestdata['records']
+        recordids = [r['recordid'] for r in records_data if r.get('recordid') is not None]
+
+        if not recordids:
+            return DefaultMethodResult(True, 'No records to update', -1, [])
+
+        logging.info(f"Updating personal attributes for ministry: {requestdata}")
+
+        # 2. Retrieval, History Capture, and Update
+        records = FOIRequestRecord.getrecordsbyid(recordids)
+
+        for record in records:
+            # --- A. CAPTURE OLD STATE FOR HISTORY ---
+            history_record = FOIRequestRecordHistory()
+            mapper = inspect(record.__class__)
+            for column in mapper.columns:
+                if column.name != 'id':
+                    setattr(history_record, column.name, getattr(record, column.name))
+
+            history_record.isactive = False
+            history_record.updated_at = datetime.now()
+            historical_records.append(history_record)
+
+            # Load, update, and save attributes
+            attributes_dict = json_utils.safe_json_loads(record.attributes)
+
+            attributes_dict = self._update_personal_attributes_dict(
+                attributes_dict,
+                requestdata['newpersonalattributes']
+            )
+            record.attributes = json.dumps(attributes_dict)  # Save modified dict back to ORM
+
+            # Update core metadata fields
+            record.updated_at = datetime.now()
+            record.updatedby = userid
+            record.version += 1
+
+            # The record is modified; it's ready for merge.
+            updated_orm_records.append(record)
+
+        # 3. Database Transaction (Atomic Save)
+        response = FOIRequestRecord.create(updated_orm_records, historical_records)
+
+        if not response.success:
+            doc_ids = [r['documentmasterid'] for r in records_data]
+            return DefaultMethodResult(False, 'Error in updating Record', -1, doc_ids)
+
+        # 4. External API Call
+        return self._handle_doc_reviewer_api_personal(
+            ministryrequestid,
+            records_data,
+            requestdata['newpersonalattributes']
+        )
+
 
     def retry(self, _requestid, ministryrequestid, data):
         _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
@@ -166,7 +310,7 @@ class recordservice(recordservicebase):
             print("\njobids:",jobids)
             #print("\nERROR:",err)
             if err and err is not None:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
+                return DefaultMethodResult(False,self.DOC_REVIEWER_API_ERROR, -1, ministryrequestid)
             streamobject = {
                 "s3filepath": record['s3uripath'],
                 "requestnumber": _ministryrequest['axisrequestid'],
@@ -197,7 +341,7 @@ class recordservice(recordservicebase):
             _delteeapiresponse, err = self.makedocreviewerrequest('POST', '/api/document/delete', {'ministryrequestid': ministryrequestid, 'filepaths': [replacingrecord['s3uripath']]})
             
             if err:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, recordid)
+                return DefaultMethodResult(False,self.DOC_REVIEWER_API_ERROR, -1, recordid)
             record = FOIRequestRecord(foirequestid=_requestid, replacementof = recordid if _record['replacementof'] is None else _record['replacementof'], ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
                                 version = 1, createdby = userid, created_at = datetime.now())
             batch = str(uuid.uuid4())
@@ -205,7 +349,7 @@ class recordservice(recordservicebase):
             _record['attributes']['lastmodified'] = json.loads(replacingrecord['attributes'])['lastmodified']
             _filepath, extension = path.splitext(_record['filename'])
             _record['attributes']['extension'] = extension            
-            _record['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES 
+            _record['attributes']['incompatible'] = extension.lower() in NONREDACTABLE_FILE_TYPES
             record.__dict__.update(_record)
             recordlist.append(record)
         dbresponse = FOIRequestRecord.replace(recordid,recordlist)
@@ -219,7 +363,7 @@ class recordservice(recordservicebase):
                 'ministryrequestid': ministryrequestid
             })
             if err:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
+                return DefaultMethodResult(False,self.DOC_REVIEWER_API_ERROR, -1, ministryrequestid)
             # send message to redis stream for each file
             for entry in processingrecords:
                 _filename, extension = path.splitext(entry['s3uripath'])
@@ -310,7 +454,7 @@ class recordservice(recordservicebase):
                     "category": message["category"]
                 })
             if err:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
+                return DefaultMethodResult(False,self.DOC_REVIEWER_API_ERROR, -1, ministryrequestid)
             streamobject = {
                 "jobid": job.get("id"),
                 "category": message["category"],
@@ -331,22 +475,55 @@ class recordservice(recordservicebase):
             return DefaultMethodResult(False,'pdfstitch stream key is missing. Message is not pushed to the stream.', -1, ministryrequestid)
 
     def __bulkcreate(self, requestid, ministryrequestid, records, userid):
-        """Creates bulk records for a user with document details passed in for an opened request.
         """
+        Creates bulk records for a user with document details passed in for an opened request.
+        Records are always created with version 1.
+        """
+
+        # 1. Retrieve necessary metadata
         _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
         _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
+        foirequestid = _ministryrequest.get('foirequest_id')
+
         recordlist = []
         batch = str(uuid.uuid4())
+        now = datetime.now()
+
+        # 2. Loop through entries and instantiate ORM objects safely
         for entry in records:
+            # Prepare file-specific attributes
             entry['attributes']['batch'] = batch
             _filepath, extension = path.splitext(entry['filename'])
             entry['attributes']['extension'] = extension
-            entry['attributes']['incompatible'] =  extension.lower() in NONREDACTABLE_FILE_TYPES
-            record = FOIRequestRecord(foirequestid=_ministryrequest['foirequest_id'], ministryrequestid = ministryrequestid, ministryrequestversion=_ministryversion,
-                            version = 1, createdby = userid, created_at = datetime.now())
-            record.__dict__.update(entry)
-            recordlist.append(record)
-        dbresponse = FOIRequestRecord.create(recordlist)
+            entry['attributes']['incompatible'] = extension.lower() in NONREDACTABLE_FILE_TYPES
+
+            # 3. Define all ORM parameters, overriding defaults with dynamic data
+            full_data = {
+                # Dynamic data from 'entry' (filename, s3uripath, attributes, etc.)
+                **entry,
+                # Base metadata
+                'foirequestid': foirequestid,
+                'ministryrequestid': ministryrequestid,
+                'ministryrequestversion': _ministryversion,
+                'version': 1,
+                'createdby': userid,
+                'created_at': now,
+                'isactive': True,  # Explicitly set status for new record
+            }
+
+            # 4. Instantiate the ORM object using safe keyword arguments
+            try:
+                record = FOIRequestRecord(**full_data)
+                recordlist.append(record)
+            except TypeError as e:
+                logging.error(
+                    f"Failed to create FOIRequestRecord instance for entry: {entry.get('filename')}. Error: {e}")
+                raise
+
+        # 5. Bulk Creation
+        # Assumes FOIRequestRecord.create handles db.session.add_all(recordlist)
+        dbresponse = FOIRequestRecord.bulk_create(recordlist)
+
         if (dbresponse.success):
             #processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records if not record['attributes'].get('incompatible', False)]
             processingrecords = [{**record, **{"recordid": dbresponse.args[0][record['s3uripath']]['recordid']}} for record in records]
@@ -359,7 +536,7 @@ class recordservice(recordservicebase):
                 'ministryrequestid': ministryrequestid
             })
             if err:
-                return DefaultMethodResult(False,'Error in contacting Doc Reviewer API', -1, ministryrequestid)
+                return DefaultMethodResult(False,self.DOC_REVIEWER_API_ERROR, -1, ministryrequestid)
             # send message to redis stream for each file
             for entry in processingrecords:
                 _filename, extension = path.splitext(entry['s3uripath'])

@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import { useParams } from 'react-router-dom';
 import { useSelector } from "react-redux";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -24,8 +23,8 @@ const RequestDetails = React.memo(
     handleRequestDetailsValue,
     handleRequestDetailsInitialValue,
     createSaveRequestObject,
-    disableInput,
-    isHistoricalRequest
+    isHistoricalRequest,
+    requestExtensions
   }) => {    /**
      *  Request details box in the UI
      *  All fields are mandatory here
@@ -43,7 +42,7 @@ const RequestDetails = React.memo(
     });
     const classes = useStyles();
     const disableFieldForMinistryRequest = shouldDisableFieldForMinistryRequests(requestStatus)
-    const {ministryId} = useParams();
+    const disableInput = isHistoricalRequest || StateEnum.closed.name.toLowerCase() === requestDetails?.currentState?.toLowerCase()
     const validateFields = (request, name, value) => {
       if (request !== undefined) {
         const startDate = !!request.requestProcessStart ? formatDate(request.requestProcessStart) : "";
@@ -63,7 +62,7 @@ const RequestDetails = React.memo(
           return "Select Received Mode";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.DELIVERY_MODE) {
-          return !!request.deliveryMode ? request.deliveryMode : "Select Delivery Mode";
+          return !!request.deliveryMode ? request.deliveryMode : "";
         }
         else if (name === FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF) {
           return !!request.receivedDateUF ? request.receivedDateUF : "";
@@ -127,13 +126,14 @@ const RequestDetails = React.memo(
         receivedDate: !!receivedDate ? formatDate(receivedDate): "",
         requestStartDate: startDate ? formatDate(startDate): "",
         dueDate:  validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, startDate ? formatDate(startDate): ""),
-        requestState: findRequestState(requestDetails?.requeststatuslabel)
+        requestState: findRequestState(requestDetails?.requeststatuslabel),
       }
+      if (requestDetails?.cfrDueDate) requestDetailsObject["recordsDueDate"] = formatDate(requestDetails.cfrDueDate);
       //event bubble up - sets the initial value to validate the required fields
       handleRequestDetailsInitialValue(requestDetailsObject);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES, requestDetailsObject);
     },[requestDetails, handleRequestDetailsInitialValue])
-    
+
     const prevConsultFlag = React.useRef(requestDetails?.isconsultflag);
 
     React.useEffect(() => {
@@ -181,6 +181,8 @@ const RequestDetails = React.memo(
     const [selectedRequestType, setSelectedRequestType] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE));
     const [selectedReceivedMode, setSelectedReceivedMode] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE));
     const [selectedDeliveryMode, setSelectedDeliveryMode] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE));
+    const [originalDueDate, setOriginlaDueDate] = React.useState(requestDetails?.originalDueDate ? formatDate(requestDetails.originalDueDate) : "N/A");
+    const [cfrDueDate, setCfrDueDate] = React.useState(requestDetails?.cfrDueDate ? formatDate(requestDetails.cfrDueDate) : "N/A");
 
     //generating the menuItems for RequestTypes, ReceivedModes and DeliveryModes
     const requestTypes = requestType.map((item) => {
@@ -190,7 +192,7 @@ const RequestDetails = React.memo(
       return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select") || (item.name === FOI_COMPONENT_CONSTANTS.ONLINE_FORM && ((!requestDetails.receivedMode) || (requestDetails.receivedMode && requestDetails.receivedMode.toLowerCase() !== FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase())))}>{item.name}</MenuItem> )
     });
     const deliveryModes = deliveryMode.map((item) => {
-      return ( <MenuItem key={item.name} value={item.name} disabled={item.name.toLowerCase().includes("select")}>{item.name}</MenuItem> )
+      return ( <MenuItem key={item.name} value={item.name} >{item.name}</MenuItem> )
     });
     //handling the received date change
     const handleReceivedDateChange = (e) => {
@@ -202,7 +204,13 @@ const RequestDetails = React.memo(
     }
     const handleStartDateChange = (e) => {
       setStartDate(e.target.value);
-      const dueDate = dueDateCalculation(e.target.value);
+      let dueDate = dueDateCalculation(e.target.value);
+      if (requestDetails?.originalDueDate) setOriginlaDueDate(dueDate);
+      // Add extensions to dueDate when start date changed
+      if (requestExtensions) {
+        const extDays = requestExtensions.reduce((acc, ext) => acc + (ext.extensionstatus === "Approved" ? parseInt(ext.extendedduedays) : 0), 0);
+        dueDate = addBusinessDays(dueDate, extDays)
+      }
       setDueDate(dueDate);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, dueDate);
@@ -223,17 +231,26 @@ const RequestDetails = React.memo(
     const handleDeliveryModeChange = (e) => {
       setSelectedDeliveryMode(e.target.value);
       //event bubble up - for required feild validation
+      let delMode="";
       handleRequestDetailsValue(e.target.value, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE);
-      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, e.target.value);
+      if (!e.target.value.toLowerCase().includes("no delivery mode") && e.target.value !="" ){
+        delMode=e.target.value
+      }
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DELIVERY_MODE, delMode);
     }
-
     const handleDueDateChange = (e) => {
-      const newDueDate = requestDetails?.isconsultflag ? e.target.value : dueDateCalculation(startDateText);
+      const newDueDate = e.target.value;
       setDueDate(newDueDate);
       handleRequestDetailsValue(newDueDate, FOI_COMPONENT_CONSTANTS.DUE_DATE);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DUE_DATE, newDueDate);
     }
-    
+    const handleRecordsDueDate = (e) => {
+      const newRecordsDueDate = e.target.value;
+      setCfrDueDate(newRecordsDueDate);
+      handleRequestDetailsValue(newRecordsDueDate, FOI_COMPONENT_CONSTANTS.RECORDS_DUE_DATE);
+      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECORDS_DUE_DATE, newRecordsDueDate);
+    }
+
      return (
 
       <div className='request-accordian' >
@@ -243,11 +260,11 @@ const RequestDetails = React.memo(
         </AccordionSummary>
         <AccordionDetails>
           <div>
-              <button type="button" className={`btn btn-link btn-description-history`} onClick={() => setModal(true)} 
+              <button type="button" className={`btn btn-link btn-description-history`} onClick={() => setModal(true)}
                 disabled={!(!!requestDetails.linkedRequests) || (!!requestDetails.linkedRequests && !requestDetails.linkedRequests?.length >0)}>
                 Linked Requests
               </button>
-              <MinistriesCanvassed  openModal={openModal} selectedMinistries={(typeof requestDetails.linkedRequests == 'string' ? JSON.parse(requestDetails.linkedRequests) : requestDetails.linkedRequests)} 
+              <MinistriesCanvassed  openModal={openModal} selectedMinistries={(typeof requestDetails.linkedRequests == 'string' ? JSON.parse(requestDetails.linkedRequests) : requestDetails.linkedRequests)}
               setModal={setModal} isLinkedRequest={true} />
           </div>
           <div className="row foi-details-row foi-details-row-break">
@@ -267,13 +284,13 @@ const RequestDetails = React.memo(
                   required
                   error={receivedDateText === undefined || receivedDateText === ""}
                   fullWidth
-                  disabled={!!ministryId || disableInput}
+                  disabled={requestDetails.receivedMode?.toLowerCase() === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase() || disableInput}
                 />
                 <TextField
                   id="originalDueDate"
                   label="Original Due Date"
                   type={requestDetails?.originalDueDate ? "date" : "text"}
-                  value={requestDetails?.originalDueDate || 'N/A'}
+                  value={originalDueDate}
                   inputProps={{ "aria-labelledby": "dueDate-label"}}
                   InputLabelProps={{
                   shrink: true,
@@ -294,8 +311,10 @@ const RequestDetails = React.memo(
                   shrink: true,
                   }}
                   variant="outlined"
+                  InputProps={{inputProps: { min: startDateText} }}
                   required
-                  disabled={!requestDetails?.isconsultflag || requestDetails?.currentState?.toLowerCase() === StateEnum.closed.name.toLowerCase()}
+                  error={dueDateText === undefined || dueDateText === ""}
+                  disabled={(requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || requestDetails?.currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) || disableInput}
                   fullWidth
                 />
             </div>
@@ -315,22 +334,24 @@ const RequestDetails = React.memo(
                     required
                     error={startDateText === undefined || startDateText === ""}
                     fullWidth
-                    disabled={!!ministryId || disableInput}
+                    disabled={disableInput}
                 />
                 <TextField
                     id="recordsDueDate"
                     label="Records Due Date"
-                    value={requestDetails?.cfrDueDate || 'N/A'}
+                    type={requestDetails?.cfrDueDate ? "date" : "text"}
+                    value={cfrDueDate}
                     inputProps={{ "aria-labelledby": "startDate-label"}}
                     InputLabelProps={{
                     shrink: true,
                     }}
-                    InputProps={{inputProps: { min: receivedDateText, max: formatDate(new Date())} }}
+                    onChange={handleRecordsDueDate}
+                    InputProps={{inputProps: { min: receivedDateText} }}
                     variant="outlined"
                     required
-                    error={startDateText === undefined || startDateText === ""}
+                    error={startDateText === undefined || startDateText === "" || cfrDueDate === undefined || cfrDueDate === ""}
                     fullWidth
-                    disabled
+                    disabled={!requestDetails?.cfrDueDate || disableInput}
                 />
                 <TextField
                     id="closedDate"
@@ -400,11 +421,13 @@ const RequestDetails = React.memo(
                         input={<Input />}
                         variant="outlined"
                         fullWidth
-                        required
-                        disabled={disableInput || disableFieldForMinistryRequest}
-                        error={selectedDeliveryMode.toLowerCase().includes("select")}
+                        disabled={disableInput}
+                        SelectProps={{ displayEmpty: true }}
                     >
-                    {deliveryModes}
+                      <MenuItem value="">
+                        No Delivery Mode
+                      </MenuItem>
+                     {deliveryModes}
                   </TextField>
                   :
                   <TextField
@@ -437,11 +460,7 @@ const RequestDetails = React.memo(
                         fullWidth
                         required
                         error={selectedReceivedMode.toLowerCase().includes("select")}
-                        disabled={disableInput ||
-                          requestDetails.receivedMode?.toLowerCase() === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase() ||
-                          requestDetails.currentState?.toLowerCase() === StateEnum.unopened.name.toLowerCase() ||
-                          disableFieldForMinistryRequest
-                        }
+                        disabled={requestDetails.receivedMode?.toLowerCase() === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase() || disableInput}
                     >
                     {receivedModes}
                   </TextField>

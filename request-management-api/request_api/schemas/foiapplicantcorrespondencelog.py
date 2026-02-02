@@ -7,7 +7,7 @@ class AttachmentSchema(Schema):
         """Exclude unknown fields in the deserialized output."""
 
         unknown = EXCLUDE    
-    filename = fields.Str(data_key="filename",required=True,allow_none=False, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
+    filename = fields.Str(data_key="filename",required=True,allow_none=False, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])
     url = fields.Str(data_key="url",required=True,allow_none=False, validate=[validate.Length(max=1000, error=MAX_EXCEPTION_MESSAGE)])
     applicantcorrespondenceattachmentid = fields.Integer(data_key="applicantcorrespondenceattachmentid", required=False, allow_none=False)
    

@@ -89,7 +89,7 @@ const FOIRequestHeader = React.memo(
         return requestDetails?.isiaorestricted;
     }
 
-    const [disableHeaderInput, setDisableHeaderInput] = useState(disableInput || (isRestricted() && !isIAORestrictedFileManager()));
+    const [disableHeaderInput, setDisableHeaderInput] = useState((isRestricted() && !isIAORestrictedFileManager()));
     //handle default value for the validation of required fields
     React.useEffect(() => {
       let _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
@@ -99,7 +99,7 @@ const FOIRequestHeader = React.memo(
         : "";
       handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
       setIsIAORestrictedRequest(isRestricted());
-      setDisableHeaderInput(disableInput || (isRestricted() && !isIAORestrictedFileManager()));
+      setDisableHeaderInput((isRestricted() && !isIAORestrictedFileManager()));
     }, [requestDetails, handleAssignedToInitialValue, handlestatusudpate]);
     useEffect(() => {
       setAssignedTo(getAssignedTo(assigneeObj));
@@ -341,7 +341,7 @@ const FOIRequestHeader = React.memo(
                         requestId={requestId}
                         ministryId={ministryId}
                         userDetail={userDetail}
-                        disableInput={disableHeaderInput}
+                        disableInput={disableInput || disableHeaderInput}
                         isIAORestrictedRequest={isIAORestrictedRequest}
                         setIsLoaded={setIsLoaded}
                       />

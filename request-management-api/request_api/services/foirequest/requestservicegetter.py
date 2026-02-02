@@ -13,6 +13,7 @@ from request_api.services.oipcservice import oipcservice
 from dateutil.parser import parse
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.paymentservice import paymentservice
+from request_api.services.records.recordgroupservice import recordgroupservice
 from request_api.services.subjectcodeservice import subjectcodeservice
 from request_api.services.programareaservice import programareaservice
 from request_api.utils.commons.datetimehandler import datetimehandler
@@ -80,7 +81,7 @@ class requestservicegetter:
                 additionalpersonalinfodetails.update(attribute)
         return baserequestdetails, additionalpersonalinfodetails
 
-    def getrequestdetailsforministry(self,foirequestid,foiministryrequestid, authmembershipgroups):
+    def getrequestdetailsforministry(self,foirequestid,foiministryrequestid, authmembershipgroups, documentsetid=None):
         request = FOIRequest.getrequest(foirequestid)
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
@@ -102,22 +103,30 @@ class requestservicegetter:
                 requestortypeid = applicant['requestortypeid']
                 businessname = None
                 axisapplicantid = applicant['axisapplicantid']
+                alsoknownas = applicant['alsoknownas']
 
                 if requestortypeid == 1:
                     baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, axisapplicantid))
-                additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob))
+                additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob, alsoknownas))
             baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
             baserequestinfo.update(baserequestdetails)
             additionalpersonalinfo.update(additionalpersonalinfodetails)
             baserequestinfo['additionalPersonalInfo'] = additionalpersonalinfo
         baserequestinfo['ministryrestricteddetails'] = ministryrestrictrequestdetails
+        if documentsetid is not None:
+            record_groups = recordgroupservice().fetch_records_by_documentsetid(documentsetid)
+            baserequestinfo['recordgroups'] = record_groups
         return baserequestinfo
     
-    def getrequestdetails(self,foirequestid, foiministryrequestid):
+    def getrequestdetails(self,foirequestid, foiministryrequestid, documentsetid=None):
         requestdetails = self.getrequest(foirequestid, foiministryrequestid)
         approvedcfrfee = cfrfeeservice().getapprovedcfrfee(foiministryrequestid)
         cfrfee = cfrfeeservice().getcfrfee(foiministryrequestid)
         payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
+        if documentsetid is not None:
+            record_groups = recordgroupservice().fetch_records_by_documentsetid(documentsetid)
+            requestdetails['recordgroups'] = record_groups
+        
         if approvedcfrfee is not None and approvedcfrfee != {}:
             requestdetails['cfrfee'] = approvedcfrfee
 
@@ -158,13 +167,16 @@ class requestservicegetter:
         assignedgroupemail = OperatingTeamEmail.getoperatingteamemail(requestministry["assignedgroup"])
         if assignedgroupemail is None:
             assignedgroupemail = KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"])
+        print("\nrequest in __preparebaseinfo:", request)
         baserequestinfo = {
             'id': request['foirequestid'],
             'requestType': request['requesttype'],
             'receivedDate': _receiveddate.strftime('%Y %b, %d'),
             'receivedDateUF': parse(request['receiveddate']).strftime('%Y-%m-%d %H:%M:%S.%f'),
-            'deliverymodeid':request['deliverymode.deliverymodeid'],
-            'deliveryMode':request['deliverymode.name'],
+            'deliverymodeid':request['deliverymode.deliverymodeid'] if 'deliverymode' in request or 'deliverymode.deliverymodeid' in request and
+              request["deliverymode.deliverymodeid"] is not None else None,
+            'deliveryMode':request['deliverymode.name'] if 'deliverymode' in request or 'deliverymode.name' in request and
+              request["deliverymode.name"] is not None else "",
             'receivedmodeid':request['receivedmode.receivedmodeid'],
             'receivedMode':request['receivedmode.name'],
             'assignedGroup': requestministry["assignedgroup"],

@@ -23,7 +23,7 @@ class FOIRequestApplicant(db.Model):
     middlename = db.Column(db.String(50), unique=False, nullable=True)
     lastname = db.Column(db.String(50), unique=False, nullable=True)
 
-    alsoknownas = db.Column(db.String(50), unique=False, nullable=True)
+    alsoknownas = db.Column(db.String(255), unique=False, nullable=True)
     dob = db.Column(db.DateTime, unique=False, nullable=True)
     businessname = db.Column(db.String(255), unique=False, nullable=True)
 
@@ -108,7 +108,7 @@ class FOIRequestApplicant(db.Model):
     def getlatestprofilebyapplicantid(cls, applicantid):
         schema = FOIRequestApplicantSchema(many=False)
         sq = db.session.query(FOIRequestApplicant).filter_by(foirequestapplicantid=applicantid).first()
-        if not sq.applicantprofileid:
+        if sq is None or (not sq.applicantprofileid):
             return schema.dump(sq)
         query = db.session.query(FOIRequestApplicant).filter(FOIRequestApplicant.applicantprofileid == sq.applicantprofileid).order_by(FOIRequestApplicant.foirequestapplicantid.desc()).first()
         return schema.dump(query)
@@ -1262,7 +1262,7 @@ class FOIRequestApplicant(db.Model):
 
 class FOIRequestApplicantSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestapplicantid','firstname','middlename','lastname','alsoknownas','dob','businessname','axisapplicantid')
+        fields = ('foirequestapplicantid','firstname','middlename','lastname','alsoknownas','dob','businessname','applicantprofileid','axisapplicantid')
 
 class ApplicantProfileSchema(ma.Schema):
     class Meta:

@@ -1,6 +1,6 @@
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from "../../../constants/FOI/statusEnum";
-import { formatDate, isProcessingTeam, isFlexTeam } from "../../../helper/FOI/helper";
+import { formatDate, isProcessingTeam, isFlexTeam, addBusinessDays } from "../../../helper/FOI/helper";
 import { extensionStatusId, KCProcessingTeams } from "../../../constants/FOI/enum";
 import MANDATORY_FOI_REQUEST_FIELDS from '../../../constants/FOI/mandatoryFOIRequestFields';
 import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
@@ -55,8 +55,8 @@ const getDaysRemainingText = (_daysRemaining) => {
     : `${Math.abs(_daysRemaining)} Days Overdue`;
 };
 
-const getcfrDaysRemainingText = (_cfrDaysRemaining) => {  
-     return`CFR Due in ${_cfrDaysRemaining} Days`    
+const getcfrDaysRemainingText = (_cfrDaysRemaining) => {
+     return`CFR Due in ${_cfrDaysRemaining} Days`
 };
 
 export const isBeforeOpen = (requestDetails) => {
@@ -135,11 +135,11 @@ export const getTabBG = (_tabStatus, _requestState) => {
     case StateEnum.peerreview.name:
       return "foitabheadercollection foitabheaderPeerreviewBG";
     case StateEnum.tagging.name:
-        return "foitabheadercollection foitabheaderTaggingBG"; 
+        return "foitabheadercollection foitabheaderTaggingBG";
     case StateEnum.readytoscan.name:
         return "foitabheadercollection foitabheaderReadytoScanBG";
     case StateEnum.section5pending.name:
-      return "foitabheadercollection foitabheaderSection5Pending";            
+      return "foitabheadercollection foitabheaderSection5Pending";
     case StateEnum.appfeeowing.name:
         return "foitabheadercollection foitabheaderAppFeeOwingBG";
     case StateEnum.recordsreadyforreview.name:
@@ -173,7 +173,7 @@ export const getOITabBG = (OIRequestStatusId, OIStatuses) => {
         return "foitabheadercollection foitabheaderDoNotPublishBG";
       case "Exemption Request":
         return "foitabheadercollection foitabheaderExemptionBG";
-      
+
 
       default:
         return "foitabheadercollection foitabheaderdefaultBG";
@@ -272,7 +272,8 @@ export const createRequestDetailsObjectFunc = (
       requestObject.requestProcessStart = value.requestStartDate;
       requestObject.dueDate = value.dueDate;
       requestObject.receivedMode = value.receivedMode;
-      requestObject.deliveryMode = value.deliveryMode;
+      requestObject.deliveryMode = value.deliveryMode?.toLowerCase()?.includes("select")?"":value.deliveryMode;
+      if ("cfrDueDate" in requestObject) requestObject.cfrDueDate = value.recordsDueDate;
       break;
     case FOI_COMPONENT_CONSTANTS.ASSIGNED_TO:
       const assigneeDetails = createAssigneeDetails(value, value2);
@@ -292,6 +293,7 @@ export const createRequestDetailsObjectFunc = (
     case FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE:
       requestObject.requestProcessStart = value;
       requestObject.dueDate = value2;
+      if ("originalDueDate" in requestObject) requestObject.originalDueDate = addBusinessDays(formatDate(value, "yyyy MMM, dd"), 30);
       break;
     case FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST:
       requestObject.selectedMinistries = [];
@@ -312,8 +314,12 @@ export const createRequestDetailsObjectFunc = (
     case FOI_COMPONENT_CONSTANTS.IDENTITY_VERIFIED:
       requestObject.identityVerified = value;
       break;
+    case FOI_COMPONENT_CONSTANTS.RECORDS_DUE_DATE:
+      requestObject.cfrDueDate = value;
+      break;
     case FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER:
     case FOI_COMPONENT_CONSTANTS.DOB:
+    case FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS:
     case FOI_COMPONENT_CONSTANTS.CHILD_NICKNAME:
     case FOI_COMPONENT_CONSTANTS.CHILD_FIRST_NAME:
     case FOI_COMPONENT_CONSTANTS.CHILD_MIDDLE_NAME:
@@ -362,17 +368,22 @@ export const checkValidationError = (
   currentrequestStatus,
   oipcData,
   isOipcReview,
-  isconsultflag
+  isconsultflag,
+  requiredContactDetails
 ) => {
   return (
     (!isconsultflag && (
       requiredApplicantDetails.firstName === "" ||
-      requiredApplicantDetails.lastName === ""
+      requiredApplicantDetails.lastName === "" ||
+      requiredApplicantDetails.firstName.length > 50 ||
+      requiredApplicantDetails.lastName.length > 50 ||
+      requiredApplicantDetails.middleName.length > 50
     )) ||
+    requiredApplicantDetails.businessName.length > 255 ||
     requiredApplicantDetails.category.toLowerCase().includes("select") ||
     contactDetailsNotGiven ||
     requiredRequestDescriptionValues.description === "" ||
-    (!requiredRequestDescriptionValues.isProgramAreaSelected 
+    (!requiredRequestDescriptionValues.isProgramAreaSelected
       && ([StateEnum.unopened.name.toLowerCase(), StateEnum.intakeinprogress.name.toLowerCase()].includes(currentrequestStatus?.toLowerCase()) || isAddRequest)) ||
     (requiredRequestDetailsValues.requestType.toLowerCase() ===
       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
@@ -383,18 +394,27 @@ export const checkValidationError = (
     requiredRequestDetailsValues.receivedMode
       .toLowerCase()
       .includes("select") ||
-    requiredRequestDetailsValues.deliveryMode
-      .toLowerCase()
-      .includes("select") ||
+    requiredContactDetails.address.length > 120 ||
+    requiredContactDetails.city.length > 120 ||
+    requiredContactDetails.addressSecondary.length > 120 ||
+    requiredContactDetails.province.length > 120 ||
+    requiredContactDetails.country.length > 120 ||
+    requiredContactDetails.postal.length > 10 ||
+    requiredContactDetails.phonePrimary.length > 50 ||
+    requiredContactDetails.phoneSecondary.length > 50 ||
+    requiredContactDetails.workPhonePrimary.length > 50 ||
+    requiredContactDetails.workPhoneSecondary.length > 50 ||
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
-    !requiredAxisDetails.axisRequestId || 
+    !requiredRequestDetailsValues.dueDate ||
+    ("recordsDueDate" in requiredRequestDetailsValues  && !requiredRequestDetailsValues.recordsDueDate) ||
+    !requiredAxisDetails.axisRequestId ||
     (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
       if (oipc.inquiryattributes?.inquirydate) {
-        return oipc.inquiryattributes.orderno === ""; 
+        return oipc.inquiryattributes.orderno === "";
       }
       if (oipc.inquiryattributes?.orderno) {
-        return oipc.inquiryattributes?.inquirydate === null || oipc.inquiryattributes?.inquirydate === ""; 
+        return oipc.inquiryattributes?.inquirydate === null || oipc.inquiryattributes?.inquirydate === "";
       }
       return oipc.oipcno === "" || oipc.receiveddate === null || oipc.receiveddate === "" || oipc.reviewtypeid === null || oipc.reasonid === null || oipc.statusid === null;
     }))
