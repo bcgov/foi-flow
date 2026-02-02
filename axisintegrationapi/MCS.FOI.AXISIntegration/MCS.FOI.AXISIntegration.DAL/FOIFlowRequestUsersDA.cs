@@ -192,8 +192,8 @@ namespace MCS.FOI.AXISIntegration.DAL
                             ?, True, 'applicant', 1)
                         RETURNING foiministrydocumentid
                     )
-                    INSERT INTO public.""AXISCorrespondence"" (foiministrydocumentid, axiscorrespondenceid, type)
-                    SELECT foiministrydocumentid, ?, ? FROM inserted_doc;";
+                    INSERT INTO public.""AXISCorrespondence"" (foiministrydocumentid, axiscorrespondenceid, type, created_at, createdby)
+                    SELECT foiministrydocumentid, ?, ?, NOW(), ? FROM inserted_doc;";
 
                 using (OdbcCommand comm = new OdbcCommand(cmdString, (OdbcConnection)dbConnection))
                 {
@@ -205,6 +205,7 @@ namespace MCS.FOI.AXISIntegration.DAL
                     comm.Parameters.AddWithValue("@filename", actualfilename);
                     comm.Parameters.AddWithValue("@axiscorr", axiscorrespondenceid);
                     comm.Parameters.AddWithValue("@t", type);
+                    comm.Parameters.AddWithValue("@uid2", userid);
 
                     comm.ExecuteNonQuery();
                     result = true;
@@ -226,7 +227,7 @@ namespace MCS.FOI.AXISIntegration.DAL
         public List<AXISFile> GetAttachments(string axisRequestId)
         {
             ConnectionString = SettingsManager.FOIFlowConnectionString;
-            List<AXISFile> Attachments= null;
+            List<AXISFile> Attachments= [];
             string query = @"SELECT
                                 fm.axisrequestid as AXISRequestID,
                                 ac.axiscorrespondenceid as CorresponcenceID,
