@@ -29,7 +29,6 @@ import { createRequestDetailsObjectFunc,
          getUniqueIdentifier } from "../utils";
 import { formatDate } from "../../../../helper/FOI/helper";
 import MANDATORY_FOI_REQUEST_FIELDS from '../../../../constants/FOI/mandatoryFOIRequestFields';
-import {useSelector } from "react-redux";
 import { syncCorrespondenceLogs } from "../../../../apiManager/services/FOI/foiCorrespondenceServices";
 
 const useStyles = makeStyles({
