@@ -146,6 +146,7 @@ class requestservicecreate:
                 selfalsoknownas,
                 selfdob,
                 foirequestschema.get('axisapplicantid', None),
+                foirequestschema.get('other_notes', None),
                 userid
             )
             # applicant = FOIRequestApplicant().getlatestprofilebyapplicantid(foirequestschema['foiRequestApplicantID']) comment back in after axis decommission
