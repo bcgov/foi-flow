@@ -48,8 +48,10 @@ const API = {
   FOI_POST_OSS_HEADER: `${FOI_BASE_API_URL}/api/foiflow/oss/authheader`,
   
   FOI_GET_REQUEST_APPLICANTS: `${FOI_BASE_API_URL}/api/foiapplicants/<email>`,
-  FOI_SAVE_REQUEST_APPLICANT_INFO: `${FOI_BASE_API_URL}/api/foiapplicants/save`,
-  FOI_CHANGE_REQUEST_APPLICANT_PROFILE: `${FOI_BASE_API_URL}/api/foiapplicants/changeprofile`,
+  FOI_UPDATE_REQUEST_APPLICANT_INFO: `${FOI_BASE_API_URL}/api/foiapplicants/update`,
+  FOI_CREATE_REQUEST_APPLICANT_PROFILE: `${FOI_BASE_API_URL}/api/foiapplicants/create`,
+  FOI_REASSIGN_REQUEST_APPLICANT_PROFILE: `${FOI_BASE_API_URL}/api/foiapplicants/reassign`,
+  FOI_UNASSIGN_REQUEST_APPLICANT_PROFILE: `${FOI_BASE_API_URL}/api/foiapplicants/unassign`,
   FOI_REQUEST_APPLICANTS_SEARCH_KEYWORDS: `${FOI_BASE_API_URL}/api/foiapplicants/search`,
   FOI_GET_APPLICANT_HISTORY: `${FOI_BASE_API_URL}/api/foiapplicants/history/<applicantid>`,
   FOI_GET_APPLICANT_REQUEST_HISTORY: `${FOI_BASE_API_URL}/api/foiapplicants/requests/<applicantid>`,
