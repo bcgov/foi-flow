@@ -10,7 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import { ButtonBase } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
-import { fetchPotentialApplicants, fetchApplicantInfo, changeApplicantProfile, fetchApplicantContactHistory, saveApplicantInfo, fetchApplicantProfileByKeyword, fetchApplicantRequests } from "../../../apiManager/services/FOI/foiApplicantProfileService";
+import { fetchPotentialApplicants, fetchApplicantInfo, fetchApplicantContactHistory, fetchApplicantProfileByKeyword, fetchApplicantRequests, createNewApplicantProfile, updateApplicantProfile, reassignApplicantProfile, unassignApplicantProfile} from "../../../apiManager/services/FOI/foiApplicantProfileService";
 import AddressContactDetails from "./AddressContanctInfo";
 import ApplicantDetails from "./ApplicantDetails"
 import AdditionalApplicantDetails from "./AdditionalApplicantDetails";
@@ -28,6 +28,7 @@ import { toast } from "react-toastify";
 import Loading from "../../../containers/Loading";
 import { isBeforeOpen } from "./utils";
 import { ApplicantProfileSearchView } from "./ApplicantProfileSearchView";
+import Alert from "@mui/material/Alert";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -106,7 +107,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const [confirmationMessage, setConfirmationMessage] = useState(false);
     const [createConfirmation, setCreateConfirmation] = useState(false);
     const [isProfileDifferent, setIsProfileDifferent] = useState(false);
-    const [isUnlinkProfile, setIsUnlinkProfile] = useState(false);
+    const [isUnassignProfile, setIsUnassignProfile] = useState(false);
     const [isChangeToDifferentProfile, setIsChangeToDifferentProfile] = useState(false);
     const [applicantHistory, setApplicantHistory] = useState(false);
     const [requestHistory, setRequestHistory] = useState(false);
@@ -213,77 +214,77 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         setConfirmationMessage(false);
         setCreateConfirmation(false);
         setIsProfileDifferent(false);
-        setIsUnlinkProfile(false);
+        setIsUnassignProfile(false);
         setApplicantHistory(false);
         setRequestHistory(false);
         handleModalClose();
     }
 
+    const profilePayloadBuilder = () => {
+        const payload = {
+                "requestType": isBeforeOpen(requestDetails) ? "rawrequest" : "foirequest",
+                "foiRequestId": requestDetails?.id,
+                "rawRequestId": requestDetails?.rawRequestId,
+                "previousRequestApplicantId": requestDetails?.foiRequestApplicantID,
+                "applicant": saveApplicantObject
+            }
+        return payload
+    }
+
+    const executeProfileAction = (actionHandler) => {
+        const payload = profilePayloadBuilder();
+        handleClose();
+        dispatch(setFOILoader(true));
+        dispatch(actionHandler(payload, (err, res) => {
+            if (!err) {
+                dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
+            }
+        }));
+    };
+
     const createProfile = () => {
         if (!createConfirmation) {
             setCreateConfirmation(true);
-        } else {
-            // Create new profile here
-            const payload = {
-                "requestType": isBeforeOpen(requestDetails) ? "rawrequest" : "foirequest",
-                "foiRequestId": requestDetails?.id,
-                "rawRequestId": requestDetails?.rawRequestId,
-                "previousRequestApplicantId": requestDetails?.foiRequestApplicantID,
-            }
-            dispatch(setFOILoader(true));
-            const newApplicant = {...saveApplicantObject, foiRequestApplicantID: -1 }
-            dispatch(changeApplicantProfile(newApplicant, payload, (err, res) => {
-                if (!err) {
-                    // unset loading screen
-                    dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
-                }
-            }));
-            handleClose();
+            return;
         }
-    }
+
+        executeProfileAction(createNewApplicantProfile);
+    };
 
     const updateProfile = () => {
-        if (confirmationMessage) {
-            handleClose();
-            // set loading screen
-            dispatch(setFOILoader(true));
-            dispatch(saveApplicantInfo(saveApplicantObject, (err, res) => {
-                if (!err) {
-                    // unset loading screen
-                    dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
-                }
-            }));
-        } else if (_.isEqual(selectedApplicant, saveApplicantObject) && !isChangeToDifferentProfile) {
+        if (_.isEqual(selectedApplicant, saveApplicantObject) && !isChangeToDifferentProfile) {
             handleClose();
             dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
-        } else {
-            setConfirmationMessage(true);
+            return;
         }
-    }
+        if (!confirmationMessage) {
+            setConfirmationMessage(true);
+            return;
+        }
+        executeProfileAction(updateApplicantProfile);
+    };
 
-    const changeProfile = () => {
-        if (confirmationMessage) {
-            handleClose();
-            dispatch(setFOILoader(true));
-            const payload = {
-                "requestType": isBeforeOpen(requestDetails) ? "rawrequest" : "foirequest",
-                "foiRequestId": requestDetails?.id,
-                "rawRequestId": requestDetails?.rawRequestId,
-                "previousRequestApplicantId": requestDetails?.foiRequestApplicantID,
-            }
-            dispatch(changeApplicantProfile(saveApplicantObject, payload, (err, res) => {
-                if (!err) {
-                    // unset loading screen
-                    dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
-                }
-            }));
-        } else if (!isChangeToDifferentProfile) {
+    const reassignProfileToRequest = () => {
+        if (!isChangeToDifferentProfile) {
             handleClose();
             dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
-        } else {
-            setConfirmationMessage(true);
+            return;
         }
-    }
+        if (!confirmationMessage) {
+            setConfirmationMessage(true);
+            return;
+        }
+        executeProfileAction(reassignApplicantProfile);
+    };
+
+    const unassignProfileFromRequest = () => {
+        if (!confirmationMessage) {
+            setIsUnassignProfile(true);
+            setConfirmationMessage(true);
+            return;
+        }
+        executeProfileAction(unassignApplicantProfile);
+    };
 
     const copyInfo = () => {
         let updatedApplicant = {...selectedApplicant}
@@ -309,7 +310,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     }
 
     const back = () => {
-        setIsUnlinkProfile(false);
+        setIsUnassignProfile(false);
         if (confirmationMessage) {
             setConfirmationMessage(false);
         } else if (applicantHistory) {
@@ -360,11 +361,11 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                 </h3>
             );
         };
-        if (confirmationMessage && !isUnlinkProfile)
+        if (confirmationMessage && !isUnassignProfile)
             return <FormattedHeader text={"Saving Changes to Applicant Profile"} />;
         if (applicantHistory) return <FormattedHeader text={"Applicant History"} />;
-        if (isUnlinkProfile)
-            return <FormattedHeader text={"Unlink Applicant Profile"} />;
+        if (isUnassignProfile)
+            return <FormattedHeader text={"Unassign Applicant Profile"} />;
         if (!selectedApplicant) return <FormattedHeader text={"Search Applicants"} />;
         if (createConfirmation)
             return <FormattedHeader text={"Create New Profile"} />;
@@ -451,27 +452,16 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
 
         if (confirmationMessage && isChangeToDifferentProfile) return (
             <>
-                <div style={{ textAlign: "center" }}>
+  
+                <Alert severity="warning" sx={{ fontSize: '1.2rem' }}>
+                    Just a heads up:<br></br>
+                    Previous information on this request will be overwritten by the applicant profile information, and won't be retrievable.<br></br>
                     Are you sure you would like to change the applicant profile linked to this request?
-                    <br />
-                    <i>The following profile will be linked: </i>
-                </div>
-                <ApplicantDetailsSections
-                    requestDetails={saveApplicantObject}
-                    contactDetailsNotGiven={false}
-                    createSaveRequestObject={createSaveApplicantObject}
-                    handleApplicantDetailsInitialValue={() => {}}
-                    handleApplicantDetailsValue={() => {}}
-                    disableInput={true}
-                    defaultExpanded={true}
-                    showHistory={showApplicantHistory}
-                    warning={null}
-                    displayOtherNotes={true}
-                />
+                </Alert>
             </>
             
         )
-        if (confirmationMessage && isUnlinkProfile) return (
+        if (confirmationMessage && isUnassignProfile) return (
             <div style={{ textAlign: "center" }}>
                 The linked applicant profile will be removed, but the information for this request will stay the same.
                 You can make updates to the request, and when the request is moved into the Open state, the correspondening
@@ -656,34 +646,34 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
 
     const renderApplicantProfileModalActions = () => {
     // Buttons
-    const changeProfileButton = (
+    const reassignProfileButton = (
         <button
         className={`btn-bottom btn-save btn`}
-        onClick={changeProfile}
+        onClick={reassignProfileToRequest}
         disabled={isSaveDisabled()}
         >
-        Change Profile
+        Reassign Profile
         </button>
     );
     const selectProfileButton = (
         <button
         className={`btn-bottom btn-save btn`}
-        onClick={changeProfile}
+        onClick={reassignProfileToRequest}
         disabled={isSaveDisabled()}
         >
         Select Profile
         </button>
     );
 
-    const confirmChangeProfileButton = (
-        <button className={`btn-bottom btn-save btn`} onClick={changeProfile}>
-        Confirm Change Profile
+    const confirmReassignProfileButton = (
+        <button className={`btn-bottom btn-save btn`} onClick={reassignProfileToRequest}>
+        Confirm Reassign Profile
         </button>
     );
 
     const confirmSelectedProfileButton = (
-        <button className={`btn-bottom btn-save btn`} onClick={changeProfile}>
-        Confirm Selected Profile
+        <button className={`btn-bottom btn-save btn`} onClick={reassignProfileToRequest}>
+        Confirm Reassigned Profile
         </button>
     );
 
@@ -713,9 +703,9 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         </button>
     );
 
-    const unlinkProfileButton = (
-        <button className={`btn-bottom btn-save btn`} onClick={unlinkProfile}>
-        Unlink Profile
+    const unassignProfileButton = (
+        <button className={`btn-bottom btn-save btn`} onClick={unassignProfileFromRequest}>
+        Unassign Profile
         </button>
     );
 
@@ -744,10 +734,10 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     );
 
     // Rendering logic
-    if (isUnlinkProfile && confirmationMessage) {
+    if (isUnassignProfile && confirmationMessage) {
         return (
         <>
-            {unlinkProfileButton}
+            {unassignProfileButton}
             {backButton}
         </>
         );
@@ -773,14 +763,14 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         if (confirmationMessage) {
         return (
             <>
-                {confirmChangeProfileButton}
+                {confirmReassignProfileButton}
                 {confirmBackButton}
             </>
         );
         } else {
         return (
             <>
-                {!applicantHistory && changeProfileButton}
+                {!applicantHistory && reassignProfileButton}
                 {backButton}
             </>
         );
@@ -813,7 +803,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                 {!applicantHistory && (
                 <>
                     {updateProfileButton}
-                    {unlinkProfileButton}
+                    {unassignProfileButton}
                 </>
                 )}
                 {backButton}
