@@ -1677,6 +1677,12 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getlinkedrequestdetails(cls, linkedrequests):
+        print("SNAKEE")
+        # WHAT IS THIS? - honestly u dont need it ... or adjust ur code so u can use the current set up of both lnked requests and this linkedreuest info (use this function to get status)
+        # OR JUST GET RID OF IT ENTIRELY... NO NEED FOR HTIS ANYMORE AS I HAVE ALL THE DATA I NEED
+        # Major issue is i need the status right when i add the linkereqiest -> rn you dont need it cause we just show/store on save the reqid and govcode
+        #addtioanly complicaton is the status, which i need on original search... 
+        #can still use this table and no need to return status here as i already have it, It can return the other info... . Ya just keep this table..
         linkedrequestsinfo = []
         try:
             if not linkedrequests:

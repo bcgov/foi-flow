@@ -23,21 +23,21 @@ import {
   InputAdornment,
   IconButton,
   Autocomplete,
-  InputBase,
   Link,
-  CircularProgress
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
 import {linkedRequestsLists} from "../../../apiManager/services/FOI/foiRequestServices";
 
 const LinkedRequests = React.memo(
   ({
     requestDetails,
-    requestStatus,
-    handleRequestDetailsValue,
-    handleRequestDetailsInitialValue,
     createSaveRequestObject,
-    disableInput,
-    isHistoricalRequest,
   }) => {
     const useStyles = makeStyles({
       heading: {
@@ -56,6 +56,8 @@ const LinkedRequests = React.memo(
     const [linkedRequests, setLinkedRequests] = useState(requestDetails?.linkedRequests)
     const [linkedRequestsInfo, setLinkedRequestsInfo] = useState(requestDetails?.linkedRequestsInfo)
     const [loading, setLoading] = useState(false);
+
+    //use pagination for table... confirm with biz (pagination of 10)
  
     const dispatch = useDispatch();
 
@@ -65,8 +67,7 @@ const LinkedRequests = React.memo(
     const [options, setOptions] = useState([]);
 
     const getRequestId = (item) => {
-      if (typeof item === "string") return item;
-      if (item && typeof item === "object") return Object.keys(item)[0];
+      if (typeof item.requestid === "string") return item.requestid;
       return null;
     };
 
@@ -91,6 +92,9 @@ const LinkedRequests = React.memo(
       setLinkedRequests(updatedLinkedRequests);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS, updatedLinkedRequests);
     }
+    console.log("INFO", linkedRequestsInfo)
+    console.log("LINK", linkedRequests)
+    console.log("alloptions", options)
 
     const renderReviewRequest = (e, reqItem) => {
       e.preventDefault();
@@ -110,6 +114,7 @@ const LinkedRequests = React.memo(
     };
     
     const fetchSuggestions = (value) => {
+      //HERE
       const ministryCode = requestDetails?.selectedMinistries?.length > 0
         ? requestDetails.selectedMinistries[0].code
         : "";
@@ -138,6 +143,7 @@ const LinkedRequests = React.memo(
       if (!selectedValue) {
         return;
       }
+      console.log("SELECTION", selectedValue)
 
       // Create a new array to avoid mutation issues
       const updatedLinkedRequests = [...(linkedRequests || [])];
@@ -173,8 +179,45 @@ const LinkedRequests = React.memo(
           </AccordionSummary>
           <AccordionDetails>
             <div className="linked-requests">
-            
-              <ul className="linked-request-list">
+              <TableContainer>
+                <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>MIN</TableCell>
+                      <TableCell align="right">Request ID</TableCell>
+                      <TableCell align="right">Request State</TableCell>
+                      <TableCell align="right">Remove</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {linkedRequests?.map((reqObj, idx) => {
+                    return (
+                    <TableRow
+                      key={idx}
+                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                    >
+                      <TableCell component="th" scope="row">{reqObj.govcode}</TableCell>
+                      <TableCell align="right">{reqObj.requestid}</TableCell>
+                      <TableCell align="right">{reqObj.requeststatus}</TableCell>
+                      <TableCell>
+                        <button
+                          className="btn btn-link text-danger"
+                          aria-label={`Remove linked request ${reqObj.requestid}`}
+                          onClick={() => removeLinkedRequest(reqObj)}
+                        >
+                        <CancelIcon
+                          fontSize="small"
+                          sx={{ color: "#038 !important" }}
+                        />
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                    )})}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              {/* <ul className="linked-request-list">
                 {linkedRequests?.map((reqItem, index) => {
                   const reqId = getRequestId(reqItem);
                   return (
@@ -200,7 +243,7 @@ const LinkedRequests = React.memo(
                     </li>
                   );
                 })}
-              </ul>
+              </ul> */}
 
               {!showSearch && (
                 <button
@@ -231,10 +274,9 @@ const LinkedRequests = React.memo(
                     loading={loading}
                     options={options || []}
                     getOptionLabel={(option) => {
+                      const requestid = option.requestid
                       if (!option) return "";
-                      if (typeof option === "string") return option;
-                      const key = Object.keys(option)[0];
-                      return key || "";
+                      return requestid;
                     }}
                     inputValue={searchQuery}
                     onInputChange={(e, newValue) => {
