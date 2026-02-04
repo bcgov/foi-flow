@@ -34,9 +34,10 @@ class FOIRequestApplicant(db.Model):
     applicantprofileid = db.Column(db.String(120), unique=False, nullable=True)
 
     axisapplicantid = db.Column(db.Integer, unique=False, nullable=True)
+    other_notes = db.Column(db.Text, unique=False, nullable=True)
 
     @classmethod
-    def createapplicant(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid, userid):
+    def createapplicant(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid, other_notes, userid):
         applicant = FOIRequestApplicant()
         applicant.createdby = userid
         applicant.firstname = firstname
@@ -46,6 +47,7 @@ class FOIRequestApplicant(db.Model):
         applicant.alsoknownas = alsoknownas
         applicant.applicantprofileid = str(uuid.uuid4())
         applicant.axisapplicantid = axisapplicantid
+        applicant.other_notes = other_notes
         if dob is not None and dob != "":
             applicant.dob = datetime.strptime(dob, "%Y-%m-%d")
         else:
@@ -55,7 +57,7 @@ class FOIRequestApplicant(db.Model):
         return DefaultMethodResult(True,'Applicant added',applicant.foirequestapplicantid)
 
     @classmethod
-    def updateapplicantprofile(cls, foirequestapplicantid, firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid, userid):
+    def updateapplicantprofile(cls, foirequestapplicantid, firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid, other_notes, userid):
 
         applicantprofile = aliased(FOIRequestApplicant)
 
@@ -85,8 +87,8 @@ class FOIRequestApplicant(db.Model):
             db.session.commit()
 
         dob = datetime.strptime(dob, "%Y-%m-%d") if dob is not None and dob != '' else None
-        applicantfromform = FOIRequestApplicant().prepareapplicantforcomparing(firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid)
-        applicantfromdb = FOIRequestApplicant().prepareapplicantforcomparing(applicant.firstname, applicant.lastname, applicant.middlename, applicant.businessname, applicant.alsoknownas, applicant.dob, applicant.axisapplicantid)
+        applicantfromform = FOIRequestApplicant().prepareapplicantforcomparing(firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid, other_notes)
+        applicantfromdb = FOIRequestApplicant().prepareapplicantforcomparing(applicant.firstname, applicant.lastname, applicant.middlename, applicant.businessname, applicant.alsoknownas, applicant.dob, applicant.axisapplicantid, applicant.other_notes)
         if applicantfromform != applicantfromdb:
             _applicant = FOIRequestApplicant()
             _applicant.createdby = userid
@@ -98,6 +100,7 @@ class FOIRequestApplicant(db.Model):
             _applicant.dob = applicantfromform['dob']
             _applicant.applicantprofileid = applicant.applicantprofileid
             _applicant.axisapplicantid = applicantfromform['axisapplicantid']
+            _applicant.other_notes = applicantfromform['other_notes']
             db.session.add(_applicant)
             db.session.commit()
             return DefaultMethodResult(True,'Applicant profile updated',_applicant.foirequestapplicantid)
@@ -187,7 +190,8 @@ class FOIRequestApplicant(db.Model):
             personalemployeenumber.attributevalue.label('employeenumber'),
             personalcorrectionnumber.attributevalue.label('correctionnumber'),
             personalhealthnumber.attributevalue.label('phn'),
-            FOIRequestApplicant.axisapplicantid.label('axisapplicantid')
+            FOIRequestApplicant.axisapplicantid.label('axisapplicantid'),
+            FOIRequestApplicant.other_notes.label('other_notes')
         ]
 
         subquery_all = _session.query(
@@ -374,7 +378,8 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.employeenumber).label('employeenumber'),
             func.array_agg(subquery_all.c.correctionnumber).label('correctionnumber'),
             func.array_agg(subquery_all.c.phn).label('phn'),
-            func.array_agg(subquery_all.c.axisapplicantid).label('axisapplicantid')
+            func.array_agg(subquery_all.c.axisapplicantid).label('axisapplicantid'),
+            func.array_agg(subquery_all.c.other_notes).label('other_notes')
         ).group_by(subquery_all.c.foirequestapplicantid)
 
         applicantprofile_schema = ApplicantProfileSchema()
@@ -448,7 +453,8 @@ class FOIRequestApplicant(db.Model):
             personalemployeenumber.attributevalue.label('employeenumber'),
             personalcorrectionnumber.attributevalue.label('correctionnumber'),
             personalhealthnumber.attributevalue.label('phn'),
-            FOIRequestApplicant.axisapplicantid.label('axisapplicantid')
+            FOIRequestApplicant.axisapplicantid.label('axisapplicantid'),
+            FOIRequestApplicant.other_notes.label('other_notes')
         ]
 
         subquery_all = _session.query(
@@ -643,7 +649,8 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.employeenumber).label('employeenumber'),
             func.array_agg(subquery_all.c.correctionnumber).label('correctionnumber'),
             func.array_agg(subquery_all.c.phn).label('phn'),
-            func.array_agg(subquery_all.c.axisapplicantid).label('axisapplicantid')
+            func.array_agg(subquery_all.c.axisapplicantid).label('axisapplicantid'),
+            func.array_agg(subquery_all.c.other_notes).label('other_notes')
         ).group_by(subquery_all.c.foirequestapplicantid)
 
         applicantprofile_schema = ApplicantProfileSchema(many=True)
@@ -718,7 +725,8 @@ class FOIRequestApplicant(db.Model):
             personalemployeenumber.attributevalue.label('employeenumber'),
             personalcorrectionnumber.attributevalue.label('correctionnumber'),
             personalhealthnumber.attributevalue.label('phn'),
-            FOIRequestApplicant.axisapplicantid.label('axisapplicantid')
+            FOIRequestApplicant.axisapplicantid.label('axisapplicantid'),
+            FOIRequestApplicant.other_notes.label('other_notes')
         ]
 
         subquery_all = _session.query(
@@ -878,7 +886,7 @@ class FOIRequestApplicant(db.Model):
                                 searchcontactinfo,
                                 and_(
                                     searchcontactinfo.foirequest_id == FOIRequest.foirequestid,
-                                    contacthomephone.contactinformation is not None),
+                                    searchcontactinfo.contactinformation is not None),
                                 isouter=True
                             ).filter(
                                 # FOIMinistryRequest.requeststatusid != 3,
@@ -914,7 +922,8 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.employeenumber).label('employeenumber'),
             func.array_agg(subquery_all.c.correctionnumber).label('correctionnumber'),
             func.array_agg(subquery_all.c.phn).label('phn'),
-            func.array_agg(subquery_all.c.axisapplicantid).label('axisapplicantid')
+            func.array_agg(subquery_all.c.axisapplicantid).label('axisapplicantid'),
+            func.array_agg(subquery_all.c.other_notes).label('other_notes')
         ).group_by(subquery_all.c.foirequestapplicantid)
 
         applicantprofile_schema = ApplicantProfileSchema(many=True)
@@ -986,12 +995,12 @@ class FOIRequestApplicant(db.Model):
             FOIRequestApplicant.middlename.label('middlename'),
             FOIRequestApplicant.lastname.label('lastname'),
             FOIRequestApplicant.alsoknownas.label('alsoknownas'),
+            FOIRequestApplicant.createdby.label('createdby'),
             func.to_char(FOIRequestApplicant.dob, 'YYYY-MM-DD').label('dob'),
             FOIRequestApplicant.businessname.label('businessname'),
             FOIRequest.foirequestid.label('foirequestid'),
             FOIRequest.version.label('foirequestversion'),
             FOIRequest.requesttype.label('requesttype'),
-            FOIRequest.createdby.label('createdby'),
             ApplicantCategory.name.label('applicantcategory'),
             contactemail.contactinformation.label('email'),
             contactaddress.contactinformation.label('address'),
@@ -1008,7 +1017,8 @@ class FOIRequestApplicant(db.Model):
             personalemployeenumber.attributevalue.label('employeenumber'),
             personalcorrectionnumber.attributevalue.label('correctionnumber'),
             personalhealthnumber.attributevalue.label('phn'),
-            FOIRequestApplicant.axisapplicantid.label('axisapplicantid')
+            FOIRequestApplicant.axisapplicantid.label('axisapplicantid'),
+            FOIRequestApplicant.other_notes.label('other_notes')
         ]
 
         query_all = _session.query(
@@ -1248,7 +1258,7 @@ class FOIRequestApplicant(db.Model):
         return applicantrequest_schema.dump(query_all.all())
 
     @classmethod
-    def prepareapplicantforcomparing(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid):
+    def prepareapplicantforcomparing(cls, firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid, other_notes):
         return {
             'firstname': firstname if firstname is not None and firstname != '' else None,
             'lastname': lastname if lastname is not None and lastname != '' else None,
@@ -1257,6 +1267,7 @@ class FOIRequestApplicant(db.Model):
             'alsoknownas': alsoknownas if alsoknownas is not None and alsoknownas != '' else None,
             'dob': dob if dob is not None and dob != '' else None,
             'axisapplicantid': axisapplicantid if axisapplicantid is not None and axisapplicantid != 0 else None,
+            'other_notes': other_notes if other_notes is not None and other_notes != '' else None
         }
 
 
@@ -1269,7 +1280,7 @@ class ApplicantProfileSchema(ma.Schema):
         fields = ('applicantprofileid','updatedat','createdby','foirequestapplicantid','firstname','middlename','lastname',
                   'alsoknownas','dob','businessname','foirequestid','foirequestversion','requesttype','applicantcategory',
                   'email','address','city','province','postal','country','homephone','workphone',
-                  'workphone2','mobilephone','othercontactinfo','employeenumber','correctionnumber','phn','axisapplicantid')
+                  'workphone2','mobilephone','othercontactinfo','employeenumber','correctionnumber','phn','axisapplicantid','other_notes')
 
 class ApplicantRequestSchema(ma.Schema):
     class Meta:

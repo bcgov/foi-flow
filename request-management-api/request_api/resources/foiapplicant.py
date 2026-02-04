@@ -27,7 +27,7 @@ import json
 from flask_cors import cross_origin
 import request_api
 from request_api.utils.cache import cache_filter, response_filter
-from request_api.schemas.foiapplicant import FOIRequestApplicantSchema
+from request_api.schemas.foiapplicant import FOIRequestApplicantSchema, ApplicantProfilePayloadSchema
 
 API = Namespace('FOIAssignee', description='Endpoints for FOI assignee management')
 TRACER = Tracer.get_instance()
@@ -89,11 +89,10 @@ class EventPagination(Resource):
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
-
 @cors_preflight('POST,OPTIONS')
-@API.route('/foiapplicants/save')
+@API.route('/foiapplicants/create')
 class EventPagination(Resource):
-    """ Saves applicant info and request specific contact info for all open requests associated to an applicant
+    """ Creates a new applicant profile
     """
     @staticmethod
     @TRACER.trace()
@@ -103,12 +102,74 @@ class EventPagination(Resource):
     @cors_preflight('POST,OPTIONS')
     def post():
         try:
-            applicant = FOIRequestApplicantSchema().load(request.get_json())
-            result = applicantservice().saveapplicantinfo(applicant, AuthHelper.getuserid())                
-            if result.success:
-                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
-            else:
-                return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404  
+            payload = request.get_json()
+            applicant = FOIRequestApplicantSchema().load(payload.get("applicant"))
+            applicantpayload = ApplicantProfilePayloadSchema().load(payload)
+            result = applicantservice().createnewapplicant(applicant, applicantpayload, AuthHelper.getuserid()) 
+            return _handle_result(result)
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiapplicants/update')
+class EventPagination(Resource):
+    """ Updates an applicant profile and request specific contact info for all open requests associated to an applicant
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isiao
+    @cors_preflight('POST,OPTIONS')
+    def post():
+        try:
+            payload = request.get_json()
+            applicant = FOIRequestApplicantSchema().load(payload.get("applicant"))
+            changeapplicantpayload = ApplicantProfilePayloadSchema().load(payload)
+            result = applicantservice().updateapplicantprofile(applicant, changeapplicantpayload, AuthHelper.getuserid())             
+            return _handle_result(result)
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiapplicants/reassign')
+class EventPagination(Resource):
+    """ Reassigns applicant profile to a request and updates request specific applicant info on the request
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isiao
+    @cors_preflight('POST,OPTIONS')
+    def post():
+        try:
+            payload = request.get_json()
+            applicant = FOIRequestApplicantSchema().load(payload.get("applicant"))
+            changeapplicantpayload = ApplicantProfilePayloadSchema().load(payload)
+            result = applicantservice().reassignapplicantprofilelinkedtorequest(applicant, changeapplicantpayload, AuthHelper.getuserid())
+            return _handle_result(result)
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500 
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiapplicants/unassign')
+class EventPagination(Resource):
+    """ Unassigns an applicant profile for a given raw request id
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isiao
+    @cors_preflight('POST,OPTIONS')
+    def post():
+        try:
+            payload = request.get_json()
+            changeapplicantpayload = ApplicantProfilePayloadSchema().load(payload)
+            rawrequestid = changeapplicantpayload['rawrequestid']
+            result = applicantservice().unassignapplicantprofilefromrequest(rawrequestid, AuthHelper.getuserid())
+            return _handle_result(result)
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
@@ -182,3 +243,8 @@ class FOIApplicants(Resource):
                 return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+        
+def _handle_result(result, error_status=404, error_message=EXCEPTION_MESSAGE_NOT_FOUND):
+    if result.success:
+        return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+    return {'status': False, 'message':error_message}, error_status
