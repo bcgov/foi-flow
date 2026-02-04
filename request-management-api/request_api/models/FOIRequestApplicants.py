@@ -1273,7 +1273,7 @@ class FOIRequestApplicant(db.Model):
 
 class FOIRequestApplicantSchema(ma.Schema):
     class Meta:
-        fields = ('foirequestapplicantid','firstname','middlename','lastname','alsoknownas','dob','businessname','applicantprofileid','axisapplicantid')
+        fields = ('foirequestapplicantid','firstname','middlename','lastname','alsoknownas','dob','businessname','applicantprofileid','axisapplicantid', 'other_notes')
 
 class ApplicantProfileSchema(ma.Schema):
     class Meta:
