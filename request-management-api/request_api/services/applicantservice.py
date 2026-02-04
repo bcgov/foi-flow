@@ -67,9 +67,14 @@ class applicantservice:
             )
             if not responseschema.success:
                 return responseschema
+
         rawrequests = FOIRawRequest.getrawrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
         for rawrequest in rawrequests:
-            additionalPersonalInfo = rawrequest['requestrawdata'].get('additionalPersonalInfo', {}).update(applicantschema.get('additionalPersonalInfo', {}))
+            additionalPersonalInfo = rawrequest['requestrawdata'].get('additionalPersonalInfo', {})
+            if additionalPersonalInfo is not None:
+                additionalPersonalInfo.update(applicantschema.get('additionalPersonalInfo', {}))
+            else:
+                additionalPersonalInfo = applicantschema.get('additionalPersonalInfo', None)
             rawrequest['requestrawdata'].update(applicantschema)
             rawrequest['requestrawdata']['additionalPersonalInfo'] = additionalPersonalInfo
             rawrequestservice().saverawrequestversion(
