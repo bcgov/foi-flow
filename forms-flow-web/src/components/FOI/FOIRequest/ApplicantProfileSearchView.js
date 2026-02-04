@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -30,6 +30,10 @@ export const ApplicantProfileSearchView = ({
 }) => {
   const [searchText, setSearchText] = useState("");
   const [searchMode, setSearchMode] = useState(initialSearchMode);
+
+ useEffect(() => {
+    if (searchText && searchText.length > 0) setSearchMode("manual")
+  }, [searchText])
 
   const columns = [
     {
@@ -140,13 +144,14 @@ export const ApplicantProfileSearchView = ({
   };
 
   const selectApplicantRow = (e) => {
+    const applicant = e.row;
+    const applicantID = applicant.foiRequestApplicantID;
     dispatch(
-      fetchApplicantRequests(e.row.foiRequestApplicantID, (err, res) => {
-        setSelectedApplicant(e.row);
-        setShowApplicantProfileTab(true);
-        setShowSearchApplicantsTab(false);
+      fetchApplicantRequests(applicantID, (err, res) => {
+        setSelectedApplicant(applicant);
         setRequestHistory(res);
         setIsLoading(false);
+        setShowSearchApplicantsTab(false);
       }),
     );
   };

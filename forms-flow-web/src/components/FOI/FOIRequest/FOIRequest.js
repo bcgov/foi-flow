@@ -104,6 +104,7 @@ import {
   getUniqueIdentifier,
   closeContactInfo,
   closeApplicantDetails,
+  getIsAddRequest
 } from "./utils";
 import {
   ConditionalComponent,
@@ -178,7 +179,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
   const isHistoricalRequest =
     url.indexOf(FOI_COMPONENT_CONSTANTS.HISTORICAL_REQUEST) > -1;
-  const [isAddRequest, setIsAddRequest] = useState(urlIndexCreateRequest > -1);
+  const [isAddRequest, setIsAddRequest] = useState(getIsAddRequest());
   //gets the request detail from the store
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
@@ -1840,13 +1841,12 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             }
                             disableInput={
                               disableInput ||
-                              isHistoricalRequest /* || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/
+                              isHistoricalRequest || requestDetails?.axisApplicantID || requestDetails?.foiRequestApplicantID > 0
                             }
                             handleEmailValidation={handleEmailValidation}
                             defaultExpanded={
                               !closeContactInfo(userDetail, requestDetails)
                             }
-                            moreInfoAction={openApplicantProfileModal}
                             userDetail={userDetail}
                           />
 
