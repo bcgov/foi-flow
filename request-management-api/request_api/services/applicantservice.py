@@ -43,8 +43,8 @@ class applicantservice:
                 applicantqueue.append(self.__prepareapplicant(applicant))
 
         return applicantqueue
-    
-    def saveapplicantinfo(self, applicantschema, userid):
+
+    def updateapplicantprofile(self, applicantschema, applicantpayload, userid):
         applicant = FOIRequestApplicant.updateapplicantprofile(
             applicantschema['foiRequestApplicantID'],
             applicantschema['firstName'],
@@ -54,9 +54,9 @@ class applicantservice:
             applicantschema.get('additionalPersonalInfo', None).get('alsoKnownAs', None),
             applicantschema.get('additionalPersonalInfo', None).get('birthDate', None),
             applicantschema['axisapplicantid'],
+            applicantschema['other_notes'],
             userid
         ) # replace with applicant id once new save function is written
-        # requests = FOIMinistryRequest.getopenrequestsbyrequestId(applicantschema['foirequestID'])
         applicantschema['foiRequestApplicantID'] = applicant.identifier
         requests = FOIMinistryRequest.getopenrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
         for request in requests:
@@ -86,9 +86,98 @@ class applicantservice:
                 userid,
                 rawrequest['assignee.firstname'],
                 rawrequest['assignee.middlename'],
-                rawrequest['assignee.lastname']
+                rawrequest['assignee.lastname'],
+                rawrequest['requeststatuslabel']
             )
-        return DefaultMethodResult(True,'Applicant Info Updated',applicantschema['foiRequestApplicantID'])
+        return DefaultMethodResult(True,'Applicant profile updated',applicantschema['foiRequestApplicantID'])
+    
+    def reassignapplicantprofilelinkedtorequest(self, applicantschema, applicantpayload, userid):
+        if applicantpayload['requesttype'] == 'foirequest':
+            ministryrequest = FOIMinistryRequest.getopenrequestsbyrequestId([applicantpayload['foirequestid']])
+            foirequestid = applicantpayload['foirequestid']
+            foiministryrequestid = ministryrequest[0]['foiministryrequestid']
+            requestschema = requestservicegetter().getrequest(foirequestid, foiministryrequestid)
+            requestschema.update(applicantschema)
+            responseschema = requestservicecreate().saverequestversion(
+                requestschema, foirequestid, foiministryrequestid, userid
+            )
+            if not responseschema.success:
+                return responseschema
+        elif applicantpayload['requesttype'] == 'rawrequest':
+            rawrequest = FOIRawRequest.get_request(applicantpayload['rawrequestid'])
+            additionalPersonalInfo = rawrequest['requestrawdata'].get('additionalPersonalInfo', {})
+            if additionalPersonalInfo is not None:
+                additionalPersonalInfo.update(applicantschema.get('additionalPersonalInfo', {}))
+            else:
+                additionalPersonalInfo = applicantschema.get('additionalPersonalInfo', None)
+            rawrequest['requestrawdata'].update(applicantschema)
+            rawrequest['requestrawdata']['additionalPersonalInfo'] = additionalPersonalInfo
+            rawrequestservice().saverawrequestversion(
+                rawrequest['requestrawdata'],
+                rawrequest['requestid'],
+                rawrequest['assignedgroup'],
+                rawrequest['assignedto'],
+                rawrequest['status'], 
+                userid,
+                rawrequest['assignee.firstname'],
+                rawrequest['assignee.middlename'],
+                rawrequest['assignee.lastname'],
+                rawrequest['requeststatuslabel']
+            )
+        return DefaultMethodResult(True,
+                                   f"""Applicant Profile reassigned for {applicantpayload['requesttype']}""",
+                                   applicantschema['foiRequestApplicantID'])
+    
+    def unassignapplicantprofilefromrequest(self, rawrequestid, userid):
+        # For raw requests only
+        rawrequest = FOIRawRequest.get_request(rawrequestid)
+        updatedrawrequestdata = rawrequest['requestrawdata']
+        for key, value in list(updatedrawrequestdata.items()):
+            attributestoremove = ('firstName',
+                                  'middleName',
+                                  'lastName',
+                                  'businessName',
+                                  'category',
+                                  'foiRequestApplicantID',
+                                  'email',
+                                  'otherNotes',
+                                  'phonePrimary',
+                                  'phoneSecondary',
+                                  'workPhonePrimary',
+                                  'workPhoneSecondary',
+                                  'address',
+                                  'addressSecondary',
+                                  'city',
+                                  'province',
+                                  'country',
+                                  'postal',
+                                  'correctionalServiceNumber',
+                                  'publicServiceEmployeeNumber')
+            if key in attributestoremove and value is not None:
+                del rawrequest['requestrawdata'][key]
+            if key == 'additionalPersonalInfo':
+                additionalpersonalinfo = rawrequest['requestrawdata']['additionalPersonalInfo']
+                if 'alsoKnownAs' in additionalpersonalinfo:
+                    del rawrequest['requestrawdata']['additionalPersonalInfo']['alsoKnownAs']
+                if 'birthDate' in additionalpersonalinfo:
+                    del rawrequest['requestrawdata']['additionalPersonalInfo']['birthDate']
+                if 'personalHealthNumber' in additionalpersonalinfo:
+                    del rawrequest['requestrawdata']['additionalPersonalInfo']['personalHealthNumber']
+
+        rawrequest['requestrawdata'].update(updatedrawrequestdata)
+        rawrequestservice().saverawrequestversion(
+            rawrequest['requestrawdata'],
+            rawrequest['requestid'],
+            rawrequest['assignedgroup'],
+            rawrequest['assignedto'],
+            rawrequest['status'], 
+            userid,
+            rawrequest['assignee.firstname'],
+            rawrequest['assignee.middlename'],
+            rawrequest['assignee.lastname'],
+            rawrequest['requeststatuslabel']
+        )
+        return DefaultMethodResult(True,'Applicant profile unassigned from request',rawrequestid)
 
     def __validateandtransform(self, filterfields):
         return self.__transformfilteringfields(filterfields)
@@ -134,6 +223,7 @@ class applicantservice:
             'publicServiceEmployeeNumber': self.__first_not_null(applicant["employeenumber"]),
             'correctionalServiceNumber': self.__first_not_null(applicant["correctionnumber"]),           
             'axisapplicantid': self.__first_not_null(applicant["axisapplicantid"]),
+            'otherNotes': self.__first_not_null(applicant["other_notes"]),
         }
 
     def getapplicanthistory(self, applicantid):
@@ -143,17 +233,32 @@ class applicantservice:
         applicants = FOIRequestApplicant.getapplicanthistory(applicantid)
         if applicants is not None:
             newer = self.__prepareapplicantforcomparing(applicants[0])
-            updatedat = applicants[0]['updatedat']
-            createdby = applicants[0]['createdby']
-            for applicant in applicants:
+            for idx, applicant in enumerate(applicants):
                 cur = self.__prepareapplicantforcomparing(applicant)
                 if(cur != newer):
-                    applicantqueue.append({ "updatedat": updatedat, "createdby": createdby, "fields": dict(set(cur.items()) - set(newer.items()))})
+                    updatedfields = dict(set(cur.items()) - set(newer.items()))
+                    previousvalues = {} # store previous values for display
+                    falsepositives = [] # store false positives where both values are None to remove after iteration
+                    for key in updatedfields.keys():
+                        previousvalues[key] = self.__getpreviousvalues(applicants, updatedfields[key], idx, key)
+                        if previousvalues[key] is None and updatedfields[key] is None:
+                            falsepositives.append(key)
+                    for key in falsepositives:
+                        del previousvalues[key]
+                        del updatedfields[key]
+                    if updatedfields != {}:
+                        applicantqueue.append({ "updatedat": applicant['updatedat'], "createdby": applicant['createdby'], "fields": updatedfields, "previousvalues": previousvalues})
                     newer = cur
-                updatedat = applicant['updatedat']
-                createdby = applicant['createdby']
-
         return applicantqueue
+
+    def __getpreviousvalues(self, applicants, updated_value, idx, key):
+        n = 1
+        while (idx + n) < len(applicants):
+            older = self.__prepareapplicantforcomparing(applicants[idx + n])
+            if older.get(key) != updated_value:
+                return older.get(key)
+            n += 1
+        return None
 
     def __prepareapplicantforcomparing(self, applicant):
         return {
@@ -164,6 +269,7 @@ class applicantservice:
             'Middle Name': applicant["middlename"],
             'Last Name': applicant["lastname"],
             'Organization': applicant["businessname"],
+            'Other Notes': applicant["other_notes"],
             'Email': applicant["email"],
             'Address': applicant["address"],
             'City': applicant["city"],
