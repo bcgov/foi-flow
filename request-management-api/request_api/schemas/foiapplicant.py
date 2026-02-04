@@ -31,3 +31,16 @@ class FOIRequestApplicantSchema(Schema):
     foirequestID = fields.List(fields.Int(),data_key="foirequestID",required=False,allow_none=False)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema,required=False,allow_none=True)
     axisapplicantid = fields.Int(data_key="axisapplicantid",required=False,allow_none=True)
+    other_notes = fields.Str(data_key="otherNotes", required=False, allow_none=True)
+
+class ApplicantProfilePayloadSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+
+        unknown = EXCLUDE
+    requesttype = fields.Str(data_key="requestType", required=True, allow_none=False)
+    createnewprofile = fields.Bool(data_key="createNewProfile", required=False, allow_none=True)
+    foirequestid = fields.Int(data_key="foiRequestId", required=False, allow_none=True)
+    rawrequestid = fields.Int(data_key="rawRequestId", required=False, allow_none=True)
+    previousrequestapplicantid = fields.Int(data_key="previousRequestApplicantId", required=False, allow_none=True)
+    # applicant = fields.Nested(FOIRequestApplicantSchema, required=True, allow_none=False)
