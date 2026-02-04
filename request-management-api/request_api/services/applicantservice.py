@@ -29,7 +29,8 @@ class applicantservice:
         return applicantqueue
     
     def getapplicantbyid(self, applicantid):
-        applicant = FOIRequestApplicant.getapplicantbyid(applicantid)
+        latestprofile = FOIRequestApplicant.getlatestprofilebyapplicantid(applicantid)
+        applicant = FOIRequestApplicant.getapplicantbyid(latestprofile['foirequestapplicantid'])
         applicant = self.__prepareapplicant(applicant)
         applicant['requestHistory'] = self.getapplicantrequests(applicantid)
         return applicant
