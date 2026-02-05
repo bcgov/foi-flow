@@ -77,10 +77,7 @@ class applicantservice:
             applicant_additional = applicantschema.get("additionalPersonalInfo")
 
             if applicant_additional:
-                if "additionalPersonalInfo" in raw_data:
-                    raw_data["additionalPersonalInfo"].update(applicant_additional)
-                else:
-                    raw_data["additionalPersonalInfo"] = dict(applicant_additional)
+                raw_data.setdefault("additionalPersonalInfo", {}).update(applicant_additional)
             rawrequestservice().saverawrequestversion(
                 rawrequest['requestrawdata'],
                 rawrequest['requestid'],
@@ -109,13 +106,14 @@ class applicantservice:
                 return responseschema
         elif applicantpayload['requesttype'] == 'rawrequest':
             rawrequest = FOIRawRequest.get_request(applicantpayload['rawrequestid'])
-            additionalPersonalInfo = rawrequest['requestrawdata'].get('additionalPersonalInfo', {})
-            if additionalPersonalInfo is not None:
-                additionalPersonalInfo.update(applicantschema.get('additionalPersonalInfo', {}))
-            else:
-                additionalPersonalInfo = applicantschema.get('additionalPersonalInfo', None)
-            rawrequest['requestrawdata'].update(applicantschema)
-            rawrequest['requestrawdata']['additionalPersonalInfo'] = additionalPersonalInfo
+            raw_data = rawrequest["requestrawdata"]
+            for key, value in applicantschema.items():
+                if key != "additionalPersonalInfo":
+                    raw_data[key] = value
+            applicant_additional = applicantschema.get("additionalPersonalInfo")
+
+            if applicant_additional:
+                raw_data.setdefault("additionalPersonalInfo", {}).update(applicant_additional)
             rawrequestservice().saverawrequestversion(
                 rawrequest['requestrawdata'],
                 rawrequest['requestid'],
