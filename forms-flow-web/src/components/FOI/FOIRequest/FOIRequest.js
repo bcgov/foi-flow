@@ -1556,7 +1556,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         disableInput={disableInput || isHistoricalRequest || requestDetails?.axisApplicantID || requestDetails?.foiRequestApplicantID > 0}
                         handleEmailValidation={handleEmailValidation}
                         defaultExpanded={!closeContactInfo(userDetail,requestDetails)}
-                        moreInfoAction={openApplicantProfileModal}
                         userDetail={userDetail}
                       />
 

@@ -43,7 +43,6 @@ const AddressContactDetails = memo(
     handleEmailValidation,
     disableInput,
     defaultExpanded,
-    moreInfoAction,
     warning
   }) => {
     const classes = useStyles();
