@@ -314,11 +314,11 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         if (confirmationMessage) {
             setConfirmationMessage(false);
         } else if (applicantHistory) {
-            setApplicantHistory(false);            
-        } else if (!isBeforeOpen(requestDetails)) {
-            handleClose();
+            setApplicantHistory(false);
         } else if (createConfirmation) {
             setCreateConfirmation(false)
+        } else if (!isBeforeOpen(requestDetails)) {
+            handleClose();
         } else if (requestDetails?.foiRequestApplicantID) {
             handleClose();
         } else {
