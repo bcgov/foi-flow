@@ -8,55 +8,38 @@ import {
 import Grid from "@mui/material/Grid";
 import Tooltip from "@mui/material/Tooltip";
 import AttachmentModal from "../Attachments/AttachmentModal";
-import {makeStyles} from "@material-ui/core/styles";
 import clsx from "clsx";
 
-export default function RedactRecordsButton({records, groups, ministryrequestid}) {
-
-  const useStyles = makeStyles((_theme) => ({
-    createButton: {
-      margin: 0,
-      width: "100%",
-      height: "50%",
-      backgroundColor: "#38598A",
-      color: "#FFFFFF",
-      fontWeight: 700,
-      fontFamily: "BCSans-Bold, sans-serif ",
-      textTransform: "none",
-      whiteSpace: "nowrap",
-
-      "&:hover": {
-        backgroundColor: "#38598A",
-      },
-      "&:active": {
-        backgroundColor: "#38598A",
-      },
-    },
-  }));
-
-  const classes = useStyles();
+export default function RedactRecordsButton({
+  records,
+  groups,
+  ministryrequestid,
+  buttonClassName,
+}) {
   const [anchorEl, setAnchorEl] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
-  const isDisableRedactRecords = (allRecords = [], {strict = true} = {}) => {
-    if (!Array.isArray(allRecords) || allRecords.length === 0) {
-      return true;
-    }
+  const isDisableRedactRecords = (allRecords) => {
 
-    if (!strict) {
-      // Only block explicitly incompatible records
-      return allRecords.some(
-        r => r.attributes?.incompatible === true
-      );
-    }
+    const isInvalid = (record) =>
+      !record.isredactionready &&
+      !record.attributes?.incompatible &&
+      !record.selectedfileprocessversion &&
+      !record.ocrfilepath;
 
-    // Strict mode: require processing readiness
-    return allRecords.some(r =>
-      !r.isredactionready &&
-      !r.selectedfileprocessversion &&
-      !r.ocrfilepath
-    );
-  };
+    const isInvalidAttachment = (record) =>
+      !record.isredactionready &&
+      !record.attributes?.incompatible
+
+    return allRecords.some(record =>{
+      if(isInvalid(record)) return true;
+
+      if (Array.isArray(record.attachments)) {
+        return record.attachments.some(isInvalidAttachment);
+      }
+      return false;
+    });
+  }
 
   const isThereAnyUngroupedRecord = (allRecords = []) => {
     if (!Array.isArray(allRecords) || allRecords.length === 0) {
@@ -84,20 +67,9 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
     if (!Array.isArray(recordGroup) || recordGroup.length === 0) {
       return true;
     }
-
-    return recordGroup.some(r => {
-      const isIncompatible = r.attributes?.incompatible === true;
-      const isDuplicate = r.isduplicate === true;
-
-      const isNotReady =
-        !r.isredactionready &&
-        !r.selectedfileprocessversion &&
-        !r.ocrfilepath;
-
-      return isIncompatible || isDuplicate || isNotReady;
-    });
+    console.log(JSON.parse(JSON.stringify(recordGroup)));
+    return isDisableRedactRecords(recordGroup);
   };
-
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -144,9 +116,10 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
             variant="contained"
             color="primary"
             onClick={handleMenuOpen}
+            style={{ minWidth: "100px" }}
             className={clsx(
               "btn",
-              classes.createButton
+              buttonClassName
             )}
 
 
@@ -227,20 +200,19 @@ export default function RedactRecordsButton({records, groups, ministryrequestid}
             }
             disableHoverListener={!isDisableRedactRecords(records)}
           >
-    <div style={{display: "flex", minWidth: "130px", width: "100%", justifyContent: "revert" , whiteSpace: "nowrap"}}>
         <Button
           variant="contained"
           color="primary"
           onClick={handleRedactAll}
           disabled={isDisableRedactRecords(records)}
+          style={{ minWidth: "100px" }}
           className={clsx(
             "btn",
-            classes.createButton
+            buttonClassName
           )}
         >
           Redact Records
         </Button>
-      </div>
           </Tooltip>
         </Grid>
 
