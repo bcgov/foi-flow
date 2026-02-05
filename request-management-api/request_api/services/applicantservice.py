@@ -133,40 +133,21 @@ class applicantservice:
     def unassignapplicantprofilefromrequest(self, rawrequestid, userid):
         # For raw requests only
         rawrequest = FOIRawRequest.get_request(rawrequestid)
-        updatedrawrequestdata = rawrequest['requestrawdata']
-        for key, value in list(updatedrawrequestdata.items()):
-            attributestoremove = ('firstName',
-                                  'middleName',
-                                  'lastName',
-                                  'businessName',
-                                  'category',
-                                  'foiRequestApplicantID',
-                                  'email',
-                                  'other_notes',
-                                  'phonePrimary',
-                                  'phoneSecondary',
-                                  'workPhonePrimary',
-                                  'workPhoneSecondary',
-                                  'address',
-                                  'addressSecondary',
-                                  'city',
-                                  'province',
-                                  'country',
-                                  'postal',
-                                  'correctionalServiceNumber',
-                                  'publicServiceEmployeeNumber')
-            if key in attributestoremove and value is not None:
-                del rawrequest['requestrawdata'][key]
-            if key == 'additionalPersonalInfo':
-                additionalpersonalinfo = rawrequest['requestrawdata']['additionalPersonalInfo']
-                if 'alsoKnownAs' in additionalpersonalinfo:
-                    del rawrequest['requestrawdata']['additionalPersonalInfo']['alsoKnownAs']
-                if 'birthDate' in additionalpersonalinfo:
-                    del rawrequest['requestrawdata']['additionalPersonalInfo']['birthDate']
-                if 'personalHealthNumber' in additionalpersonalinfo:
-                    del rawrequest['requestrawdata']['additionalPersonalInfo']['personalHealthNumber']
-
-        rawrequest['requestrawdata'].update(updatedrawrequestdata)
+        ATTRIBUTES_TO_REMOVE = {
+            'firstName', 'middleName', 'lastName', 'businessName', 'category',
+            'foiRequestApplicantID', 'email', 'other_notes', 'phonePrimary', 'phoneSecondary',
+            'workPhonePrimary', 'workPhoneSecondary', 'address', 'addressSecondary',
+            'city', 'province', 'country', 'postal', 'correctionalServiceNumber',
+            'publicServiceEmployeeNumber'
+        }
+        ADDITIONAL_INFO_FIELDS_TO_REMOVE = {'alsoKnownAs', 'birthDate', 'personalHealthNumber'}
+        raw_data = rawrequest['requestrawdata']
+        for key in ATTRIBUTES_TO_REMOVE:
+            raw_data.pop(key, None)  # pop safely, no KeyError if missing
+        additional_info = raw_data.get('additionalPersonalInfo')
+        if additional_info:
+            for key in ADDITIONAL_INFO_FIELDS_TO_REMOVE:
+                additional_info.pop(key, None)
         rawrequestservice().saverawrequestversion(
             rawrequest['requestrawdata'],
             rawrequest['requestid'],
