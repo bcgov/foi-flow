@@ -1211,38 +1211,27 @@ class FOIRawRequest(db.Model):
             axis_ids = [key for item in linked_requests for key in item.keys()]
             axis_ids.append(axisrequestid)
 
-            latest_rawrequest = (
-                db.session.query(FOIRawRequest)
+            # latest_rawrequest = (
+            #     db.session.query(FOIRawRequest)
+            #     .order_by(FOIRawRequest.axisrequestid, FOIRawRequest.version.desc())
+            #     .distinct(FOIRawRequest.axisrequestid)
+            # ).subquery()
+            results = (
+                db.session.query(FOIRawRequest.axisrequestid, FOIRawRequest.requestrawdata, FOIRawRequest.status)
                 .order_by(FOIRawRequest.axisrequestid, FOIRawRequest.version.desc())
                 .distinct(FOIRawRequest.axisrequestid)
-            ).subquery()
-            results = (
-                db.session.query(
-                    latest_rawrequest.c.axisrequestid,
-                    latest_rawrequest.c.requestrawdata,
-                    latest_rawrequest.c.requeststatuslabel,
-                    FOIMinistryRequest.requeststatuslabel.label("foiministry_requeststatuslabel"),
-                )
-                .outerjoin(
-                    FOIMinistryRequest,
-                    and_(
-                        FOIMinistryRequest.axisrequestid == latest_rawrequest.c.axisrequestid,
-                        FOIMinistryRequest.isactive.is_(True)
-                    )
-                )
                 .filter(
-                    latest_rawrequest.c.axisrequestid.ilike(f"%{search_text}%"),
-                    ~latest_rawrequest.c.axisrequestid.in_(axis_ids)
+                    FOIRawRequest.axisrequestid.ilike(f"%{search_text}%"),
+                    ~FOIRawRequest.axisrequestid.in_(axis_ids)
                 )
                 .limit(limit)
                 .all()
             )
             result_list=[]
-            for axisrequestid, requestrawdata, foirawrequest_status, foiministryrequest_status in results:
+            for axisrequestid, requestrawdata, status in results:
                 if "selectedMinistries" in requestrawdata and len(requestrawdata["selectedMinistries"]) > 0:
                     ministry_code = requestrawdata["selectedMinistries"][0]["code"]
-                    formattedresult= {axisrequestid:ministry_code}
-                    formattedresult= {"requestid": axisrequestid, 'govcode': ministry_code, "requeststatus": foiministryrequest_status if foiministryrequest_status is not None else foirawrequest_status}
+                    formattedresult= {"axisrequestid": axisrequestid, 'govcode': ministry_code, "requeststatus": status}
                     result_list.append(formattedresult)
 
             print("Results:", result_list)
@@ -1256,12 +1245,10 @@ class FOIRawRequest(db.Model):
     @classmethod
     def getlinkedrawrequestdetails(cls, linkedrequests):
         linkedrequestsinfo = []
-        print("WAHT?")
-        print("LIQUIDDD")
         try:
             if not linkedrequests:
                 return linkedrequestsinfo
-            axis_ids = [key for item in linkedrequests for key in item.keys()]
+            axis_ids = [req['axisrequestid'] for req in linkedrequests]
             sql = """
                 SELECT DISTINCT ON (axisrequestid) requestid, axisrequestid
                 FROM public."FOIRawRequests"

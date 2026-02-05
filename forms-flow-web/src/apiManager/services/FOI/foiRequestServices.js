@@ -650,7 +650,6 @@ export const linkedRequestsLists = (queryParams,axisrequestid, ministrycode, ...
   const done = fnDone(rest);
   const serializedQueryParams = new URLSearchParams(queryParams).toString();
   const fixedQueryParams = serializedQueryParams.replace(/\+/g, '%20');
-  //let url=  API.FOI_GET_LINKED_REQUESTS_LIST+`?${fixedQueryParams}`
   let url= replaceUrl(replaceUrl(
       API.FOI_GET_LINKED_REQUESTS_LIST+`?${fixedQueryParams}`,
       "<ministrycode>",
@@ -673,3 +672,23 @@ export const linkedRequestsLists = (queryParams,axisrequestid, ministrycode, ...
   }
 };
 
+export const getCurrentFOIMinistryRequestStatus = (axisid) => async (dispatch) => {
+  const apiUrl= replaceUrl(replaceUrl(
+    API.FOI_REQUEST_GET_FIELD_BY_AXISID,
+    "<axisrequestid>",
+    axisid),"<field>","requeststatus"
+  );
+
+  try {
+    const res = await httpGETRequest(apiUrl, {}, UserService.getToken());
+    if (res.data) {
+      return res.data;
+    } else {
+      console.error("API returned incomplete requeststatus data:", res);
+      dispatch(serviceActionError(res));
+    }
+  } catch (error) {
+    console.error("Error in fetching requeststatus data:", error);
+    dispatch(serviceActionError(error));
+  }
+};

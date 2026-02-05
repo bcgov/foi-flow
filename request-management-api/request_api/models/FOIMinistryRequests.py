@@ -1677,17 +1677,12 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getlinkedrequestdetails(cls, linkedrequests):
-        print("SNAKEE")
-        # WHAT IS THIS? - honestly u dont need it ... or adjust ur code so u can use the current set up of both lnked requests and this linkedreuest info (use this function to get status)
-        # OR JUST GET RID OF IT ENTIRELY... NO NEED FOR HTIS ANYMORE AS I HAVE ALL THE DATA I NEED
-        # Major issue is i need the status right when i add the linkereqiest -> rn you dont need it cause we just show/store on save the reqid and govcode
-        #addtioanly complicaton is the status, which i need on original search... 
-        #can still use this table and no need to return status here as i already have it, It can return the other info... . Ya just keep this table..
         linkedrequestsinfo = []
         try:
+            print("MID", linkedrequests)
             if not linkedrequests:
                 return linkedrequestsinfo
-            axis_ids = [key for item in linkedrequests for key in item.keys()]
+            axis_ids = [req['axisrequestid'] for req in linkedrequests]
             sql = """
                 SELECT DISTINCT ON (axisrequestid) foirequest_id, foiministryrequestid, axisrequestid
                 FROM public."FOIMinistryRequests"
@@ -1705,6 +1700,24 @@ class FOIMinistryRequest(db.Model):
         finally:
             db.session.close()
         return linkedrequestsinfo
+    
+    @classmethod
+    def get_requeststatuslabel_by_axisid(cls, axisid):
+        try:
+            sql='''
+            SELECT DISTINCT ON (axisrequestid) requeststatuslabel 
+            FROM public."FOIMinistryRequests" 
+            WHERE axisrequestid = :axisid
+            ORDER BY axisrequestid, version DESC;
+            '''
+            params={"axisid": axisid}
+            res = db.session.execute(text(sql), params).first()[0]
+            return res
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
 
 
 class FOIMinistryRequestSchema(ma.Schema):

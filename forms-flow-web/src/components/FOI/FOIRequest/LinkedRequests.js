@@ -32,7 +32,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import {linkedRequestsLists} from "../../../apiManager/services/FOI/foiRequestServices";
+import {getCurrentFOIMinistryRequestStatus, linkedRequestsLists} from "../../../apiManager/services/FOI/foiRequestServices";
 
 const LinkedRequests = React.memo(
   ({
@@ -56,8 +56,6 @@ const LinkedRequests = React.memo(
     const [linkedRequests, setLinkedRequests] = useState(requestDetails?.linkedRequests)
     const [linkedRequestsInfo, setLinkedRequestsInfo] = useState(requestDetails?.linkedRequestsInfo)
     const [loading, setLoading] = useState(false);
-
-    //use pagination for table... confirm with biz (pagination of 10)
  
     const dispatch = useDispatch();
 
@@ -67,7 +65,7 @@ const LinkedRequests = React.memo(
     const [options, setOptions] = useState([]);
 
     const getRequestId = (item) => {
-      if (typeof item.requestid === "string") return item.requestid;
+      if (typeof item.axisrequestid === "string") return item.axisrequestid;
       return null;
     };
 
@@ -114,7 +112,6 @@ const LinkedRequests = React.memo(
     };
     
     const fetchSuggestions = (value) => {
-      //HERE
       const ministryCode = requestDetails?.selectedMinistries?.length > 0
         ? requestDetails.selectedMinistries[0].code
         : "";
@@ -139,12 +136,11 @@ const LinkedRequests = React.memo(
       }
     };
 
-    const linkRequest = (selectedValue) => {
+    const linkRequest = async (selectedValue) => {
       if (!selectedValue) {
         return;
       }
       console.log("SELECTION", selectedValue)
-
       // Create a new array to avoid mutation issues
       const updatedLinkedRequests = [...(linkedRequests || [])];
       
@@ -155,6 +151,11 @@ const LinkedRequests = React.memo(
       const alreadyExists = updatedLinkedRequests.some(
         item => getRequestId(item) === newRequestId
       );
+
+      // Get FOIMinistryRequest Status if FOIRawRequest Status is Archived
+      if (selectedValue.requeststatus === "Archived" && !alreadyExists) {
+        selectedValue.requeststatus = await dispatch(getCurrentFOIMinistryRequestStatus(selectedValue.axisrequestid));
+      }
 
       if (!alreadyExists && newRequestId) {
         // Push the entire object (format: {"CTZ-324342-3422":"CTZ"})
@@ -197,12 +198,21 @@ const LinkedRequests = React.memo(
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                     >
                       <TableCell component="th" scope="row">{reqObj.govcode}</TableCell>
-                      <TableCell align="right">{reqObj.requestid}</TableCell>
+                      <TableCell align="right">
+                        <Link
+                          component="button"
+                          sx={{ color: "#38598A", cursor: "pointer", textDecoration: "underline"}}
+                          onClick={(e) => renderReviewRequest(e, reqObj)}
+                          className="linked-request-link"
+                        >
+                        {reqObj.axisrequestid}
+                        </Link>
+                      </TableCell>
                       <TableCell align="right">{reqObj.requeststatus}</TableCell>
                       <TableCell>
                         <button
                           className="btn btn-link text-danger"
-                          aria-label={`Remove linked request ${reqObj.requestid}`}
+                          aria-label={`Remove linked request ${reqObj.axisrequestid}`}
                           onClick={() => removeLinkedRequest(reqObj)}
                         >
                         <CancelIcon
@@ -274,7 +284,7 @@ const LinkedRequests = React.memo(
                     loading={loading}
                     options={options || []}
                     getOptionLabel={(option) => {
-                      const requestid = option.requestid
+                      const requestid = option.axisrequestid
                       if (!option) return "";
                       return requestid;
                     }}

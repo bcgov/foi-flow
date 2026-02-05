@@ -348,5 +348,14 @@ class requestservice:
         return requestdetails
     
     def findrequestids(self, search_text, axisrequestid, ministrycode):
+        print("searcj text", search_text)
+        print("axisid", axisrequestid)
         raw_results = FOIRawRequest().getautofilllinkedrequestids(search_text, axisrequestid, ministrycode, 10)
         return raw_results
+    
+    def get_foiministryrequest_status_by_axisid(self, axisid):
+        try:
+            status = FOIMinistryRequest().get_requeststatuslabel_by_axisid(axisid)
+            return StateName[status].value
+        except Exception as e:
+            raise Exception("FOIMinistryRequest Status not valid or does not exist in Status Enum") from e

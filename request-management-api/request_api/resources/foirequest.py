@@ -145,12 +145,12 @@ class FOIRequestsById(Resource):
             foirequestschema = FOIRequestWrapperSchema().load(request_json)  
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:                             
-                event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()), event_loop)
-                if IAOTeamWithKeycloackGroup.oi.value in AuthHelper.getusergroups():
-                    eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
-                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
-                requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
+                # event_loop = asyncio.get_running_loop()
+                # asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()), event_loop)
+                # if IAOTeamWithKeycloackGroup.oi.value in AuthHelper.getusergroups():
+                #     eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
+                # metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
+                # requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
@@ -188,10 +188,10 @@ class FOIRequestsByIdAndType(Resource):
                 ministryrequestschema = FOIRequestMinistrySchema().load(request_json)
             result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid(), usertype)
             if result.success == True:
-                event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(), AuthHelper.isministrymember(),assigneename), event_loop)
-                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
-                requestservice().posteventtoworkflow(foiministryrequestid, ministryrequestschema, json.loads(metadata),usertype)
+                # event_loop = asyncio.get_running_loop()
+                # asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(), AuthHelper.isministrymember(),assigneename), event_loop)
+                # metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
+                # requestservice().posteventtoworkflow(foiministryrequestid, ministryrequestschema, json.loads(metadata),usertype)
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
@@ -312,14 +312,14 @@ class FOIRequestsById(Resource):
             foirequestschema = FOIRequestWrapperSchema().load(foirequest)
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
-                event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()), event_loop)
-                if (section == 'oistatusid'):
-                    eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
-                    if(request_json['oistatusid'] == OIStatusEnum.EXEMPTION_REQUEST.value):
-                        eventservice().postopeninfoexemptionevent(foiministryrequestid, foirequestid, AuthHelper.getuserid(),AuthHelper.getusername(), OpenInfoNotificationType.EXEMPTION_REQUEST.value, None)
-                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
-                requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
+                # event_loop = asyncio.get_running_loop()
+                # asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()), event_loop)
+                # if (section == 'oistatusid'):
+                #     eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
+                #     if(request_json['oistatusid'] == OIStatusEnum.EXEMPTION_REQUEST.value):
+                #         eventservice().postopeninfoexemptionevent(foiministryrequestid, foirequestid, AuthHelper.getuserid(),AuthHelper.getusername(), OpenInfoNotificationType.EXEMPTION_REQUEST.value, None)
+                # metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
+                # requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
                 return {'success': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
@@ -394,3 +394,21 @@ class LinkedRequests(Resource):
         except Exception as ex:
             print(ex)
             return {'status': 500, 'message':"Invalid Request Id"}, 500
+        
+@cors_preflight('GET,OPTIONS')
+@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/field/<string:field>')
+@API.route('/foirequests/<string:axisrequestid>/field/<string:field>')
+class FOIRequestsById(Resource):
+    """Retrieve specific foirequest data based on params (field)"""
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(axisrequestid, field):
+        try:
+            if (field == "requeststatus"):
+                results = requestservice().get_foiministryrequest_status_by_axisid(axisrequestid)
+                return results, 200
+        except Exception as ex:
+            print(ex)
+            return {'status': 500, 'message': ex}, 500
