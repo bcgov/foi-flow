@@ -1795,7 +1795,6 @@ export const RecordsLog = ({
       case "documentSet":
         setOpenDocumentSetModal(true);
         if (_record && _record.length > 0) {
-          console.log(JSON.stringify(_record));
           setRetrieveSelectedRecords(
             _record
               .filter(record => record.isselected)
@@ -1899,8 +1898,6 @@ export const RecordsLog = ({
   };
 
   function countTotalPages(records) {
-    console.log("countTotalPages", records);
-    console.log(JSON.stringify(user, null, 2))
     return records.reduce((total, record) => {
       // pages on the main record (if present)
       const recordPages = record.pagecount || 0;
