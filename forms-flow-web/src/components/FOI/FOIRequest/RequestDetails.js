@@ -42,7 +42,6 @@ const RequestDetails = React.memo(
     });
     const classes = useStyles();
     const disableFieldForMinistryRequest = shouldDisableFieldForMinistryRequests(requestStatus)
-    const {ministryId} = useParams();
     const disableInput = isHistoricalRequest || StateEnum.closed.name.toLowerCase() === requestDetails?.currentState?.toLowerCase()
     const validateFields = (request, name, value) => {
       if (request !== undefined) {
