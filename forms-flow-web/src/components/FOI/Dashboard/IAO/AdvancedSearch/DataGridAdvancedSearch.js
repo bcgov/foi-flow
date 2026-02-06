@@ -429,7 +429,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
 
   const OITeamColumns = [
     {
-      field: "receivedDate",
+      field: "oiReceivedDate",
       headerName: "RECEIVED DATE",
       flex: 1,
       renderCell: hyperlinkRenderCell,
@@ -453,7 +453,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerAlign: "left",
     },
     {
-      field: "recordspagecount",
+      field: "requestpagecount",
       headerName: "PAGES",
       flex: 1,
       renderCell: hyperlinkRenderCell,
@@ -469,7 +469,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerAlign: "left",
     },
     {
-      field: "fromClosed",
+      field: "closedate",
       headerName: "FROM CLOSED",
       flex: 1,
       renderCell: hyperlinkRenderCell,
@@ -485,7 +485,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerAlign: "left",
     },
     {
-      field: "assignedTo",
+      field: "oiAssignedTo",
       headerName: "ASSIGNEE",
       flex: 1,
       renderCell: hyperlinkRenderCell,
@@ -493,7 +493,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerAlign: "left",
     },
     {
-      field: "applicantType",
+      field: "applicantcategory",
       headerName: "APPLICANT TYPE",
       flex: 1,
       renderCell: hyperlinkRenderCell,
