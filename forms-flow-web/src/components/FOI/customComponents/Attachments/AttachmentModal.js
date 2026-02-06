@@ -28,6 +28,11 @@ import {
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import { ClickableChip } from "../../Dashboard/utils";
+import Box from "@mui/material/Box";
+import Alert from "react-bootstrap/Alert";
+import Typography from "@mui/material/Typography";
+import WarningAmberOutlinedIcon from "@mui/icons-material/WarningAmberOutlined";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -125,7 +130,7 @@ export default function AttachmentModal({
           : uploadFor === "record" &&
             (modalFor === "replace" || modalFor === "replaceattachment")
           ? replacementfiletypes
-          : uploadFor === "additionalFiles" ? MimeTypeList.openInfo : recordFormats 
+          : uploadFor === "additionalFiles" ? MimeTypeList.openInfo : recordFormats
         : MimeTypeList.stateTransition
     );
   }, [recordFormats]);
@@ -136,7 +141,7 @@ export default function AttachmentModal({
         : uploadFor === "record" &&
           (modalFor === "replace" || modalFor === "replaceattachment")
         ? replacementfiletypes
-        : uploadFor === "additionalFiles" ? MimeTypeList.openInfo : recordFormats 
+        : uploadFor === "additionalFiles" ? MimeTypeList.openInfo : recordFormats
       : MimeTypeList.stateTransition
   );
   const maxFileSize =
@@ -158,11 +163,11 @@ export default function AttachmentModal({
     const timePart = parts[1];
     const date = new Date(`${datePart} ${timePart}`);
     if (isNaN(date.getTime())) return dateStr; // ensure valid Date object created
-  
+
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
     const day = String(date.getDate()).padStart(2, '0');
-  
+
     return `${year}-${month}-${day}`;
   }
 
@@ -352,7 +357,7 @@ export default function AttachmentModal({
       handleModal(true, null, null);
     } else if(modalFor.toLowerCase() === "retrieve_uncompressed"){
       handleModal(true, null, retrieveSelectedRecords);
-    } 
+    }
     else {
       let _tagValue = tagValue;
       let fileInfoList = [];
@@ -618,15 +623,52 @@ export default function AttachmentModal({
                 Are you sure you want to retrieve the uncompressed file?<br></br>
                 <br></br>
                 <i>
-                  The file will not be compressed, and may not have OCR. Work completed on this specific record in the Redaction App will be preserved, 
+                  The file will not be compressed, and may not have OCR. Work completed on this specific record in the Redaction App will be preserved,
                   but please review and ensure it is accurate.
                 </i>
                 <br></br><br></br>
-                <i>After retrieving the uncompressed file, you will be unable to compress the file again. 
+                <i>After retrieving the uncompressed file, you will be unable to compress the file again.
                   If you wish to have the file compressed again, please use the 'Replace Manually' feature to reupload the file.</i>
               </>
             ),
           };
+      case "ungrouped_records":
+        return {
+          title: "Reviewing Your Files",
+          body: (
+            <Box textAlign="left" marginLeft={5}>
+              <Typography variant="h5">
+                Some files haven’t been assigned to a set yet.
+              </Typography>
+              <Typography variant="h5" mb={3}>
+                They may not load.
+              </Typography>
+
+              <Alert
+                variant="outlined"
+                severity="warning"
+                className="customWarningAlert"
+              >
+                <div className="warningContent">
+                  <WarningAmberOutlinedIcon className="warningIcon" />
+
+                  <div>
+                    <Typography variant="h5">
+                      Just a heads-up:
+                    </Typography>
+                    <Typography variant="h5" >
+                      Only files that have been assigned to a document set will load.
+                    </Typography>
+                    <Typography variant="h5" >
+                      If you're missing something, check that all your files are
+                      assigned to a set before finishing your review.
+                    </Typography>
+                  </div>
+                </div>
+              </Alert>
+            </Box>
+          ),
+        };
       default:
         return { title: "", body: "" };
     }
@@ -634,7 +676,7 @@ export default function AttachmentModal({
   let message = getMessage();
 
   const isSaveDisabled = () => {
-    if (modalFor === "delete" || modalFor === "retrieve_uncompressed") {
+    if (modalFor === "delete" || modalFor === "retrieve_uncompressed" || modalFor === "ungrouped_records"){
       return false;
     } else if (files.length === 0 && existingDocuments?.length === 0) {
       return true;
@@ -733,10 +775,10 @@ export default function AttachmentModal({
                 //error={responseTitle === ""}
               />
               </div>
-              
+
               </div>
             )}
-            
+
             {["replaceattachment", "replace", "add"].includes(modalFor) ? (
               requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL ? (
                 bcgovcode == "MCF" ? (

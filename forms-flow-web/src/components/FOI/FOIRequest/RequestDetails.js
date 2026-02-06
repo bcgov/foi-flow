@@ -135,7 +135,7 @@ const RequestDetails = React.memo(
       handleRequestDetailsInitialValue(requestDetailsObject);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES, requestDetailsObject);
     },[requestDetails, handleRequestDetailsInitialValue])
-    
+
     const prevConsultFlag = React.useRef(requestDetails?.isconsultflag);
 
     React.useEffect(() => {
@@ -252,7 +252,7 @@ const RequestDetails = React.memo(
       handleRequestDetailsValue(newRecordsDueDate, FOI_COMPONENT_CONSTANTS.RECORDS_DUE_DATE);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.RECORDS_DUE_DATE, newRecordsDueDate);
     }
-    
+
      return (
 
       <div className='request-accordian' >
@@ -262,11 +262,11 @@ const RequestDetails = React.memo(
         </AccordionSummary>
         <AccordionDetails>
           <div>
-              <button type="button" className={`btn btn-link btn-description-history`} onClick={() => setModal(true)} 
+              <button type="button" className={`btn btn-link btn-description-history`} onClick={() => setModal(true)}
                 disabled={!(!!requestDetails.linkedRequests) || (!!requestDetails.linkedRequests && !requestDetails.linkedRequests?.length >0)}>
                 Linked Requests
               </button>
-              <MinistriesCanvassed  openModal={openModal} selectedMinistries={(typeof requestDetails.linkedRequests == 'string' ? JSON.parse(requestDetails.linkedRequests) : requestDetails.linkedRequests)} 
+              <MinistriesCanvassed  openModal={openModal} selectedMinistries={(typeof requestDetails.linkedRequests == 'string' ? JSON.parse(requestDetails.linkedRequests) : requestDetails.linkedRequests)}
               setModal={setModal} isLinkedRequest={true} />
           </div>
           <div className="row foi-details-row foi-details-row-break">
