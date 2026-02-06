@@ -359,7 +359,6 @@ class FOIRequestForDocReviewer(Resource):
                     jsondata = {}
                     statuscode = 401
             elif usertype is not None and usertype == "ministry" and AuthHelper.getusertype() == "ministry":
-                print("User type ministry")
                 jsondata = requestservice().getrequestdetailsforministry(foirequestid,ministryrequestid,AuthHelper.getministrygroups(), documentsetid)
                 assignee = jsondata['assignedministryperson']
                 isrestricted = jsondata['ministryrestricteddetails']['isrestricted'] if ('isrestricted' in jsondata['ministryrestricteddetails']) else False
