@@ -396,19 +396,18 @@ class LinkedRequests(Resource):
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         
 @cors_preflight('GET,OPTIONS')
-@API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/field/<string:field>')
-@API.route('/foirequests/<string:axisrequestid>/field/<string:field>')
-class FOIRequestsById(Resource):
-    """Retrieve specific foirequest data based on params (field)"""
+@API.route('/linkrequest/foiministryinfo/axisrequestid/<string:axisrequestid>')
+class LinkedRequestsInfo(Resource):
+    """Retrieve additional information for FOIMinistry linked requests"""
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def get(axisrequestid, field):
+    def get(axisrequestid):
+        print("BRAH")
         try:
-            if (field == "requeststatus"):
-                results = requestservice().get_foiministryrequest_status_by_axisid(axisrequestid)
-                return results, 200
+            results = requestservice().get_linkedfoiministryrequest_info_by_axisid(axisrequestid)
+            return results, 200
         except Exception as ex:
             print(ex)
             return {'status': 500, 'message': ex}, 500

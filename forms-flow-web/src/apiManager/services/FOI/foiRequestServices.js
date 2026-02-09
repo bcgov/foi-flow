@@ -672,16 +672,12 @@ export const linkedRequestsLists = (queryParams,axisrequestid, ministrycode, ...
   }
 };
 
-export const getCurrentFOIMinistryRequestStatus = (axisid) => async (dispatch) => {
-  const apiUrl= replaceUrl(replaceUrl(
-    API.FOI_REQUEST_GET_FIELD_BY_AXISID,
-    "<axisrequestid>",
-    axisid),"<field>","requeststatus"
-  );
-
+export const getFOIMinistryLinkedRequestInfo = (axisid) => async (dispatch) => {
+  const apiUrl= replaceUrl(API.FOI_MINISTRY_REQUEST_LINKEDREQUESTINFO, "<axisrequestid>", axisid);
   try {
     const res = await httpGETRequest(apiUrl, {}, UserService.getToken());
     if (res.data) {
+      console.log("RES", res)
       return res.data;
     } else {
       console.error("API returned incomplete requeststatus data:", res);

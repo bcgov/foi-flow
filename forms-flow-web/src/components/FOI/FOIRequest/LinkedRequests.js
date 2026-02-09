@@ -32,7 +32,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
-import {getCurrentFOIMinistryRequestStatus, linkedRequestsLists} from "../../../apiManager/services/FOI/foiRequestServices";
+import {getFOIMinistryLinkedRequestInfo, linkedRequestsLists} from "../../../apiManager/services/FOI/foiRequestServices";
 
 const LinkedRequests = React.memo(
   ({
@@ -86,8 +86,10 @@ const LinkedRequests = React.memo(
 
     const removeLinkedRequest = (reqItem) => {
       const reqId = getRequestId(reqItem);
-      let updatedLinkedRequests = linkedRequests?.filter(item => getRequestId(item) !== reqId);
+      const updatedLinkedRequests = linkedRequests?.filter(item => getRequestId(item) !== reqId);
+      const updatedLinkedInfoRequests = linkedRequestsInfo?.filter(item => getRequestId(item) !== reqId);
       setLinkedRequests(updatedLinkedRequests);
+      setLinkedRequestsInfo(updatedLinkedInfoRequests);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS, updatedLinkedRequests);
     }
     console.log("INFO", linkedRequestsInfo)
@@ -95,11 +97,13 @@ const LinkedRequests = React.memo(
     console.log("alloptions", options)
 
     const renderReviewRequest = (e, reqItem) => {
+      //REIVSE THIS COMPLETELTY TO USE NEW PEROPERTIES.
       e.preventDefault();
       const reqId = getRequestId(reqItem);
       const item = linkedRequestsInfo.find(
         obj => obj.axisrequestid === reqId
       );
+      console.log("item", item)
       const requestId = item ? item.requestid : null;
       const ministryId = item ? item.ministryid : null;
       let url = '';
@@ -152,15 +156,29 @@ const LinkedRequests = React.memo(
         item => getRequestId(item) === newRequestId
       );
 
-      // Get FOIMinistryRequest Status if FOIRawRequest Status is Archived
+      // Get FOIMinistryRequest Status annd MinistryId if FOIRawRequest Status is Archived
       if (selectedValue.requeststatus === "Archived" && !alreadyExists) {
-        selectedValue.requeststatus = await dispatch(getCurrentFOIMinistryRequestStatus(selectedValue.axisrequestid));
+        const res = await dispatch(getFOIMinistryLinkedRequestInfo(selectedValue.axisrequestid));
+        selectedValue.requeststatus = res.requeststatus;
+        selectedValue.foiministryrequestid = res.foiministryrequestid;
       }
 
       if (!alreadyExists && newRequestId) {
-        // Push the entire object (format: {"CTZ-324342-3422":"CTZ"})
-        updatedLinkedRequests.push(selectedValue);
+        // Push the entire object (format: {requstid: int, axisrequestid: string, ministryid: null || int})
+        // ONLY NEED TO SAVE BBELOW TO DB, DONT NEED REQUEST STATUS OR GOV CODE -> ADDITIONAL INFO WILL HAVE THAT. SO NEED TWO ARRAYS.... ONE FOR STATE AND ONE FOR DB..
+        const linkedReqObj = {
+          "axisrequestid": selectedValue.axisrequestid, 
+          "foiministryrequestid": selectedValue.foiministryrequestid || null, 
+          "requestid": selectedValue.requestid, 
+        };
+        const linkedReqInfoObj = {
+          "axisrequestid": selectedValue.axisrequestid,
+          "requeststatus": selectedValue.requeststatus,
+          "govcode": selectedValue.govcode
+        };
+        updatedLinkedRequests.push(linkedReqObj);
         setLinkedRequests(updatedLinkedRequests);
+        setLinkedRequestsInfo(prev => ([...prev, linkedReqInfoObj]));
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS, updatedLinkedRequests);
       }
       
@@ -191,7 +209,7 @@ const LinkedRequests = React.memo(
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {linkedRequests?.map((reqObj, idx) => {
+                    {linkedRequestsInfo?.map((reqObj, idx) => {
                     return (
                     <TableRow
                       key={idx}
@@ -284,9 +302,9 @@ const LinkedRequests = React.memo(
                     loading={loading}
                     options={options || []}
                     getOptionLabel={(option) => {
-                      const requestid = option.axisrequestid
+                      const axisrequestid = option.axisrequestid
                       if (!option) return "";
-                      return requestid;
+                      return axisrequestid;
                     }}
                     inputValue={searchQuery}
                     onInputChange={(e, newValue) => {

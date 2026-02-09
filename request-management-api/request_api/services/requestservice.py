@@ -353,9 +353,12 @@ class requestservice:
         raw_results = FOIRawRequest().getautofilllinkedrequestids(search_text, axisrequestid, ministrycode, 10)
         return raw_results
     
-    def get_foiministryrequest_status_by_axisid(self, axisid):
+    def get_linkedfoiministryrequest_info_by_axisid(self, axisid):
         try:
-            status = FOIMinistryRequest().get_requeststatuslabel_by_axisid(axisid)
-            return StateName[status].value
+            linkedrequestinfo = FOIMinistryRequest().get_linkedfoiministryrequest_info(axisid)
+            print("GAHHHH", linkedrequestinfo)
+            linkedrequestinfo["requeststatus"] = StateName[linkedrequestinfo["requeststatus"]].value
+            print("FINAL", linkedrequestinfo)
+            return linkedrequestinfo
         except Exception as e:
-            raise Exception("FOIMinistryRequest Status not valid or does not exist in Status Enum") from e
+            raise Exception("Error when gathering additional foiministryrequest linked request info") from e

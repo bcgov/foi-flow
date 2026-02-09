@@ -1677,12 +1677,15 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def getlinkedrequestdetails(cls, linkedrequests):
+        print("NANI?", linkedrequests)
         linkedrequestsinfo = []
         try:
-            print("MID", linkedrequests)
+            print("SNAKEE", linkedrequests)
+            #THIS WILL GET requeststatus and axisrewquestid/foiministryrequestid and MAYBE programarea.bcgovcode
             if not linkedrequests:
                 return linkedrequestsinfo
             axis_ids = [req['axisrequestid'] for req in linkedrequests]
+            print("foiministryrequestid", axis_ids)
             sql = """
                 SELECT DISTINCT ON (axisrequestid) foirequest_id, foiministryrequestid, axisrequestid
                 FROM public."FOIMinistryRequests"
@@ -1702,17 +1705,18 @@ class FOIMinistryRequest(db.Model):
         return linkedrequestsinfo
     
     @classmethod
-    def get_requeststatuslabel_by_axisid(cls, axisid):
+    def get_linkedfoiministryrequest_info(cls, axisid):
         try:
             sql='''
-            SELECT DISTINCT ON (axisrequestid) requeststatuslabel 
+            SELECT DISTINCT ON (axisrequestid) requeststatuslabel, foiministryrequestid
             FROM public."FOIMinistryRequests" 
             WHERE axisrequestid = :axisid
             ORDER BY axisrequestid, version DESC;
             '''
             params={"axisid": axisid}
-            res = db.session.execute(text(sql), params).first()[0]
-            return res
+            row = db.session.execute(sql,params).first()
+            requeststatus, foiministryrequestid = row
+            return {"requeststatus": requeststatus,"foiministryrequestid": foiministryrequestid}
         except Exception as ex:
             logging.error(ex)
             raise ex

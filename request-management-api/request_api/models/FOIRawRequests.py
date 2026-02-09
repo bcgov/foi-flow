@@ -1217,7 +1217,7 @@ class FOIRawRequest(db.Model):
             #     .distinct(FOIRawRequest.axisrequestid)
             # ).subquery()
             results = (
-                db.session.query(FOIRawRequest.axisrequestid, FOIRawRequest.requestrawdata, FOIRawRequest.status)
+                db.session.query(FOIRawRequest.axisrequestid, FOIRawRequest.requestrawdata, FOIRawRequest.status, FOIRawRequest.requestid)
                 .order_by(FOIRawRequest.axisrequestid, FOIRawRequest.version.desc())
                 .distinct(FOIRawRequest.axisrequestid)
                 .filter(
@@ -1228,10 +1228,10 @@ class FOIRawRequest(db.Model):
                 .all()
             )
             result_list=[]
-            for axisrequestid, requestrawdata, status in results:
+            for axisrequestid, requestrawdata, status, requestid in results:
                 if "selectedMinistries" in requestrawdata and len(requestrawdata["selectedMinistries"]) > 0:
                     ministry_code = requestrawdata["selectedMinistries"][0]["code"]
-                    formattedresult= {"axisrequestid": axisrequestid, 'govcode': ministry_code, "requeststatus": status}
+                    formattedresult= {"axisrequestid": axisrequestid, 'govcode': ministry_code, "requeststatus": status, "requestid": requestid}
                     result_list.append(formattedresult)
 
             print("Results:", result_list)
@@ -1246,9 +1246,12 @@ class FOIRawRequest(db.Model):
     def getlinkedrawrequestdetails(cls, linkedrequests):
         linkedrequestsinfo = []
         try:
+            print("LIQUIDD", linkedrequests)
+            #THIS WILL GET requeststatus and axisrewquestid/rawrequesid and MAYBE requestrawdata["selectedMinistries"][0]["code"]
             if not linkedrequests:
                 return linkedrequestsinfo
             axis_ids = [req['axisrequestid'] for req in linkedrequests]
+            print("rawrequest_ids", axis_ids)
             sql = """
                 SELECT DISTINCT ON (axisrequestid) requestid, axisrequestid
                 FROM public."FOIRawRequests"
