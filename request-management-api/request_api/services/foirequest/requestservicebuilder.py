@@ -95,7 +95,7 @@ class requestservicebuilder(requestserviceconfigurator):
             # Create a new FOIOpenInfoRequest (as publish or do not publish) after FOIMinistryRequest has been closed and if no other FOIOpenInfoRequest exists in DB (ie. through OI exemption flow)
             if current_foiopeninforequest == {}:
                 result = openinfoservice().createopeninforequest(requestschema, userid, foiministryrequest, is_publish_request)
-                if result.success:
+                if result is not None and result.success:
                     if not is_publish_request: foiministryrequest.oistatus_id = 7
             else:
                 if current_foiopeninforequest["oipublicationstatus_id"] == 2:
