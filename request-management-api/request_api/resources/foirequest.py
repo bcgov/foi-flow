@@ -405,7 +405,6 @@ class LinkedRequestsInfo(Resource):
     @cross_origin(origins=allowedorigins())
     @auth.require
     def get(axisrequestid):
-        print("BRAH")
         try:
             results = linkedrequestservice().get_linkedfoiministryrequest_info_by_axisid(axisrequestid)
             return results, 200
