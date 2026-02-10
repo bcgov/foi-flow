@@ -7,7 +7,8 @@ export const getMinistryBottomTextMap = (
   requestDetails,
   requestState,
   _cfrDaysRemaining,
-  requestExtensions
+  requestExtensions,
+  isProactiveDisclosure,
 ) => {
   const _daysRemaining = calculateDaysRemaining(requestDetails.dueDate);
 
@@ -31,8 +32,9 @@ export const getMinistryBottomTextMap = (
   if (!hideCFRDaysRemaining.includes(requestState?.toLowerCase())) {
     bottomTexts.push(_cfrDaysRemainingText);
   }
-  bottomTexts.push(_daysRemainingText);
-  bottomTexts.push(getExtensionsCountText(requestExtensions));
+  if (!isProactiveDisclosure) {
+    bottomTexts.push(_daysRemainingText, getExtensionsCountText(requestExtensions));
+  }
 
   return bottomTexts;
 };

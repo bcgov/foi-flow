@@ -136,8 +136,8 @@ const IntakeTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       params.row.requestType == "proactive disclosure"
-        ? "N/A":
-      getFullName(params.row.firstName, params.row.lastName),
+        ? "N/A" :
+        getFullName(params.row.firstName, params.row.lastName),
     width: 180,
   },
   {
@@ -146,7 +146,7 @@ const IntakeTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       params.row.onBehalfFormatted === undefined ||
-      params.row.onBehalfFormatted === null
+        params.row.onBehalfFormatted === null
         ? "N/A"
         : params.row.onBehalfFormatted,
     width: 120,
@@ -240,8 +240,8 @@ const FlexTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       params.row.requestType == "proactive disclosure"
-        ? "N/A":
-      getFullName(params.row.firstName, params.row.lastName),
+        ? "N/A" :
+        getFullName(params.row.firstName, params.row.lastName),
     width: 180,
   },
   {
@@ -309,6 +309,14 @@ const OITeamColumns = [
     headerName: "ID NUMBER",
     flex: 1,
     headerAlign: "left",
+    valueGetter: (params) => params.row.requestType == "PD" ?
+      params.row.idNumber : params.row.axisRequestId
+  },
+  {
+    field: "currentState",
+    headerName: "CURRENT STATE",
+    headerAlign: "left",
+    flex: 1,
   },
   {
     field: "requestType",
@@ -335,6 +343,12 @@ const OITeamColumns = [
     headerAlign: "left",
   },
   {
+    field: "cfrduedate",
+    headerName: "CFR DUE DATE",
+    flex: 1,
+    headerAlign: "left",
+  },
+  {
     field: "publicationDate",
     headerName: "PUBLICATION DATE",
     flex: 1,
@@ -347,8 +361,8 @@ const OITeamColumns = [
     headerAlign: "left",
   },
   {
-    field: "applicantType",
-    headerName: "APPLICANT TYPE",
+    field: "proactivedisclosurecategory",
+    headerName: "CATEGORY",
     flex: 1,
     headerAlign: "left",
   },

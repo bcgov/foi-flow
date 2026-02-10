@@ -179,7 +179,7 @@ const RequestHeader = React.memo(({
                             <Grid>
                                 {watcherBox}
                                 {
-                                    (isLoaded && (isRequestWatcherOrMinistryAssignee(requestWatchers, ministryAssigneeValue, userDetail?.preferred_username) ||
+                                    (isLoaded && !isProactiveDisclosure && (isRequestWatcherOrMinistryAssignee(requestWatchers, ministryAssigneeValue, userDetail?.preferred_username) ||
                                         isMinistryRestrictedFileManager())) &&
                                     <RequestMinistryRestriction
                                         isministryrestricted={isRestricted()}

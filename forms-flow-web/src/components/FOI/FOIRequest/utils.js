@@ -10,6 +10,7 @@ export const getTabBottomText = ({
   _cfrDaysRemaining,
   _status,
   requestExtensions,
+  isProactiveDisclosure = false,
 }) => {
   const _daysRemainingText = getDaysRemainingText(_daysRemaining);
   const _cfrDaysRemainingText = getcfrDaysRemainingText(_cfrDaysRemaining);
@@ -26,9 +27,8 @@ export const getTabBottomText = ({
     StateEnum.onholdother.name,
   ];
 
-  if (!statusesToNotAppearIn.includes(_status)) {
-    bottomTextArray.push(_daysRemainingText);
-    bottomTextArray.push(_extensionsCountText);
+  if (!statusesToNotAppearIn.includes(_status) && !isProactiveDisclosure) {
+    bottomTextArray.push(_daysRemainingText, _extensionsCountText);
   }
 
   const cfrStates = [
@@ -107,7 +107,10 @@ export const getRedirectAfterSaveUrl = (ministryId, requestId) => {
   return null;
 };
 
-export const getTabBG = (_tabStatus, _requestState) => {
+export const getTabBG = (_tabStatus, _requestState, PDstatusid, PDStatuses) => {
+  if (PDstatusid && PDStatuses) {
+    return getOITabBG(PDstatusid, PDStatuses);
+  }
   if (!_tabStatus && _requestState) _tabStatus = _requestState;
   switch (_tabStatus) {
     case StateEnum.intakeinprogress.name:
@@ -159,7 +162,7 @@ export const getTabBG = (_tabStatus, _requestState) => {
 
 export const getOITabBG = (OIRequestStatusId, OIStatuses) => {
   if (OIStatuses) {
-    var OIStatusName = OIStatuses.find(
+    let OIStatusName = OIStatuses.find(
       (s) => s.oistatusid === OIRequestStatusId
     )?.name;
     switch (OIStatusName) {
@@ -185,6 +188,7 @@ export const getOITabBG = (OIRequestStatusId, OIStatuses) => {
     }
   }
 };
+
 
 export const assignValue = (jsonObj, value, name) => {
   let _obj = { ...jsonObj };
@@ -282,8 +286,8 @@ export const createRequestDetailsObjectFunc = (
       requestObject.requestProcessStart = value.requestStartDate;
       requestObject.dueDate = value.dueDate;
       requestObject.receivedMode = value.receivedMode;
-      requestObject.deliveryMode = value.deliveryMode?.toLowerCase()?.includes("select")?"":value.deliveryMode;
-      if (requestObject.requestType != "proactive disclosure" && "cfrDueDate" in requestObject) 
+      requestObject.deliveryMode = value.deliveryMode?.toLowerCase()?.includes("select") ? "" : value.deliveryMode;
+      if (requestObject.requestType != "proactive disclosure" && "cfrDueDate" in requestObject)
         requestObject.cfrDueDate = value.recordsDueDate;
       break;
     case FOI_COMPONENT_CONSTANTS.ASSIGNED_TO:
@@ -439,7 +443,7 @@ export const checkValidationError = (
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
     !requiredRequestDetailsValues.dueDate ||
-    ("recordsDueDate" in requiredRequestDetailsValues  && !requiredRequestDetailsValues.recordsDueDate) ||
+    ("recordsDueDate" in requiredRequestDetailsValues && !requiredRequestDetailsValues.recordsDueDate) ||
     !requiredAxisDetails.axisRequestId ||
     (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
       if (oipc.inquiryattributes?.inquirydate) {

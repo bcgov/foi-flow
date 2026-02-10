@@ -3,7 +3,7 @@ from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
 from .db import  db, ma
 from datetime import datetime
 from sqlalchemy.orm import relationship, backref, aliased
-from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc
+from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc, literal_column
 from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.sql.sqltypes import Date, Integer
 from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup, OICloseReason, ExcludedProgramArea, OIStatusEnum
@@ -210,13 +210,16 @@ class FOIOpenInformationRequests(db.Model):
             cls.receiveddate.label('receivedDate'),
             cls.publicationdate,
             cls.created_at, 
-            assignedToFormatted, 
+            assignedToFormatted.label('assignedToFormatted'), 
+            FOIMinistryRequest.oistatus_id.label('oistatus_id'),
             cls.version,
-            cls.foiopeninforequestid,
+            cls.foiopeninforequestid.label('foiopeninforequestid'),
             FOIRequestStatus.name.label('currentState'),
             FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
             SubjectCode.name.label('subjectcode'),
-            FOIMinistryRequest.closedate
+            FOIMinistryRequest.closedate,
+            FOIMinistryRequest.cfrduedate,
+            literal(None).label('proactivedisclosurecategory'),
         ]   
 
         basequery = (
@@ -309,13 +312,13 @@ class FOIOpenInformationRequests(db.Model):
         return subquery_oirequest_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
 
     @classmethod
-    def getsorting(cls, sortingitems, sortingorders):
+    def getsorting(cls, sortingitems, sortingorders, isunion=False):
         sortingcondition = []
         if len(sortingitems) > 0 and len(sortingorders) > 0 and len(sortingitems) == len(sortingorders):
             for field in sortingitems:
                 if cls.validatefield(field):
                     order = sortingorders.pop(0)
-                    sortfield = cls.findfield(field)
+                    sortfield = cls.findsortfield(field) if isunion else cls.findfield(field)
                     if order == 'desc':
                         sortingcondition.append(nullslast(desc(sortfield)))
                     else:
@@ -323,10 +326,10 @@ class FOIOpenInformationRequests(db.Model):
         
         #default sorting
         if(len(sortingcondition) == 0):
-            default_sort = cls.findfield('defaultSorting')
+            default_sort = cls.findsortfield('defaultSorting') if isunion else cls.findfield('defaultSorting')
 
             sortingcondition.append(default_sort)
-            sortingcondition.append(cls.findfield('receivedDate').desc())
+            sortingcondition.append(cls.findsortfield('receivedDate').desc() if isunion else cls.findfield('receivedDate').desc())
         
         return sortingcondition
 
@@ -380,7 +383,7 @@ class FOIOpenInformationRequests(db.Model):
                 String
             )
         elif (field == 'closedDate' or field == 'from_closed'):
-            return FOIMinistryRequest.closedate if FOIMinistryRequest.closedate is not None else text('N/A')
+            return FOIMinistryRequest.closedate
         elif field == 'applicantType':
             return ApplicantCategory.name
         elif (field == 'publicationdate' or field == 'publicationDate'):
@@ -415,6 +418,49 @@ class FOIOpenInformationRequests(db.Model):
             return SubjectCode.name
         else:
             return text(field)
+
+    @classmethod
+    def findsortfield(cls, field):
+
+        defaultsorting = case(
+                [(literal_column('oistatus_id') == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
+                else_=1
+            )
+
+        if field == 'receivedDateUF':
+            return literal_column('"receivedDate"')
+        elif field == 'receivedDate':
+            return literal_column('"receivedDate"')
+        elif field == 'defaultSorting':      
+            return defaultsorting
+        elif field == 'requestType':
+            return literal_column('"requestType"')
+        elif field == 'pageCount':
+            return literal_column('recordspagecount')
+        elif field == 'recordspagecount':
+            return literal_column('recordspagecount')
+        elif field == 'publicationStatus':
+            return literal_column('"oiStatusName"')
+        elif (field == 'closedDate' or field == 'from_closed'):
+            return literal_column('closedate')
+        elif field == 'applicantType':
+            return literal_column('applicantcategory')
+        elif (field == 'publicationdate' or field == 'publicationDate'):
+            return literal_column('publicationdate')
+        elif field == 'assignee':
+            return literal_column('"assignedToFormatted"')
+        elif field == 'assignedTo':
+            return literal_column('"assignedToFormatted"')
+        elif field == 'idNumber':
+            return literal_column('"idNumber"')
+        elif field == 'axisRequestId':
+            return literal_column('"axisRequestId"')
+        elif field == 'currentState':   
+            return literal_column('currentState')
+        elif field == 'subjectcode':
+            return literal_column('subjectcode')
+        else:
+            return literal_column(field)
 
     @classmethod
     def getfilterforrequestssubquery(cls, filterfields, keyword):

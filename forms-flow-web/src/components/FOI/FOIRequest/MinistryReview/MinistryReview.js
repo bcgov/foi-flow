@@ -365,6 +365,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
     requestState,
     _cfrDaysRemaining,
     requestExtensions,
+    isProactiveDisclosure,
   );
 
   //gets the latest ministry assigned to value

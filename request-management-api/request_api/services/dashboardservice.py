@@ -20,7 +20,8 @@ LONG_DATEFORMAT = '%Y-%m-%d %H:%M:%S.%f'
 REQUEST_TYPE_MAPPING = {
     'general': 'G',
     'personal': 'P',
-    'proactivedisclosure': 'PD'
+    'proactivedisclosure': 'PD',
+    'proactive disclosure': 'PD'
 }
 
 class dashboardservice:
@@ -67,7 +68,11 @@ class dashboardservice:
         isoipcreview = request.isoipcreview if request.isoipcreview == True else False
         baserequestinfo.update({'isoipcreview': isoipcreview})
         baserequestinfo.update({'isphasedrelease': request.isphasedrelease if request.isphasedrelease == True else False})
-        baserequestinfo.update({'proactivedisclosurecategory': request.proactivedisclosurecategory if request.requestType == 'proactive disclosure' else ""})
+        
+        proactivecategory = ""
+        if request.requestType == 'proactive disclosure':
+            proactivecategory = getattr(request, 'proactivedisclosurecategory', "")
+        baserequestinfo.update({'proactivedisclosurecategory': proactivecategory})
         return baserequestinfo
     
     
@@ -304,7 +309,7 @@ class dashboardservice:
 
         return jsonify({'data': requestqueue, 'meta': meta})
 
-    def __preparefoioirequestinfo(self, request, receivedDate, publicationDate, fromClosed):
+    def __preparefoioirequestinfo(self, request, receivedDate, publicationDate, fromClosed, cfrDueDate):
         return {
             'id': request.id,
             'idNumber': request.idNumber,
@@ -320,7 +325,9 @@ class dashboardservice:
             'version': request.version,
             'foiopeninforequestid': request.foiopeninforequestid,
             'currentState': request.currentState,
-            'closedDate': fromClosed
+            'closedDate': fromClosed,
+            'cfrduedate': cfrDueDate,
+            'proactivedisclosurecategory': request.proactivedisclosurecategory if request.requestType == 'proactive disclosure' else None
         }
 
     def __calculate_from_closed(self, closedate):
@@ -361,5 +368,8 @@ class dashboardservice:
         
         # Calculate business days
         _from_closed = self.__calculate_from_closed(request.closedate)
+
+        # Handle CFR Due Date
+        _cfrduedate = request.cfrduedate.strftime("%b %d %Y") if request.cfrduedate else None
             
-        return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed)
+        return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed, _cfrduedate)

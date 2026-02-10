@@ -26,7 +26,8 @@ const StateDropDown = ({
   isHistoricalRequest,
   disabled,
   isOITeam,
-  consultflag
+  consultflag,
+  isProactiveDisclosure
 }) => {
   const _isMinistryCoordinator = isMinistryCoordinator;
 
@@ -62,9 +63,9 @@ const StateDropDown = ({
     const stateArray = [
       ...new Set(
         stateTransition &&
-          stateTransition.map((_state) =>
-            JSON.stringify({ status: _state.status })
-          )
+        stateTransition.map((_state) =>
+          JSON.stringify({ status: _state.status })
+        )
       ),
     ].map((s) => JSON.parse(s));
     const isCFR = stateArray.some(
@@ -94,8 +95,8 @@ const StateDropDown = ({
   };
 
   const getStatusList = () => {
-    if (isOITeam) {
-      var list = openInfoStates.map(s => {return { status: s.name, isSelected: false }});
+    if (isOITeam && !isProactiveDisclosure) {
+      let list = openInfoStates.map(s => { return { status: s.name, isSelected: false } });
       if (requestState === StateEnum.unopened.name) {
         list.unshift({ status: 'Unopened', isSelected: false })
       }
@@ -124,7 +125,7 @@ const StateDropDown = ({
     const appendRecordsReadyForReview = (stateList) => {
       const recordsreadyforreview = { status: "Records Ready for Review", isSelected: false };
       let appendedList = stateList.slice();
-      if(previousState === StateEnum.open.name || previousState === StateEnum.response.name)
+      if (previousState === StateEnum.open.name || previousState === StateEnum.response.name)
         appendedList.splice(-2, 0, recordsreadyforreview);
       else appendedList.splice(-1, 0, recordsreadyforreview);
       return appendedList;
@@ -173,8 +174,8 @@ const StateDropDown = ({
       case StateEnum.redirect.name.toLowerCase():
         return _stateList.redirect;
       case StateEnum.callforrecords.name.toLowerCase():
-        if (consultflag) { 
-          return _stateList.callforrecordsForConsult; 
+        if (consultflag) {
+          return _stateList.callforrecordsForConsult;
         }
         if (_isMinistryCoordinator) {
           if (personalRequest && isMCFMinistryTeam) {
@@ -193,8 +194,8 @@ const StateDropDown = ({
       case StateEnum.recordsreadyforreview.name.toLowerCase():
         return consultflag ? _stateList.recordsreadyforreviewforConsult : _stateList.recordsreadyforreview;
       case StateEnum.review.name.toLowerCase():
-        if (consultflag) { 
-          return _stateList.reviewforConsult; 
+        if (consultflag) {
+          return _stateList.reviewforConsult;
         }
         if (
           personalIAO &&
@@ -223,8 +224,8 @@ const StateDropDown = ({
       case StateEnum.signoff.name.toLowerCase():
         return consultflag ? _stateList.signoffforConsult : _stateList.signoff;
       case StateEnum.feeassessed.name.toLowerCase():
-        if (consultflag) { 
-          return _stateList.feeassessedforConsult; 
+        if (consultflag) {
+          return _stateList.feeassessedforConsult;
         }
         if (personalIAO) return _stateList.feeassessedforpersonal;
         return _stateList.feeassessed;
@@ -233,8 +234,8 @@ const StateDropDown = ({
       case StateEnum.harms.name.toLowerCase():
         return consultflag ? _stateList.harmsforConsult : _stateList.harms;
       case StateEnum.response.name.toLowerCase():
-        if (consultflag) { 
-          return _stateList.responseforConsult; 
+        if (consultflag) {
+          return _stateList.responseforConsult;
         }
         if (personalIAO) return _stateList.responseforpersonal;
         else if (cfrFeeData?.balanceremaining > 0 && cfrStatus === "approved") {
@@ -274,11 +275,11 @@ const StateDropDown = ({
       return false;
     }
 
-    return isValidationError || requestState === StateEnum.unopened.name 
-      //   || (isBeforeOpen(requestDetails) ////comment back in after axis decomission
-      //   && status === 'Open'
-      //   && !requestDetails.foiRequestApplicantID 
-      // );
+    return isValidationError || requestState === StateEnum.unopened.name
+    //   || (isBeforeOpen(requestDetails) ////comment back in after axis decomission
+    //   && status === 'Open'
+    //   && !requestDetails.foiRequestApplicantID 
+    // );
   };
   const statusList = getStatusList();
   const menuItems =
@@ -318,7 +319,7 @@ const StateDropDown = ({
       >
         {menuItems}
       </TextField>
-    :
+      :
       <TextField
         id="foi-status-dropdown"
         label="Status"
@@ -333,8 +334,8 @@ const StateDropDown = ({
         disabled
       >
       </TextField>
-    
-    
+
+
   );
 };
 

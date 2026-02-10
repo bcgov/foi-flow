@@ -740,10 +740,10 @@ class FOIRawRequest(db.Model):
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
         subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-        print("\n-------subquery_ministry_queue:",subquery_ministry_queue)
+        #print("\n-------subquery_ministry_queue:",subquery_ministry_queue)
         #sorting
         if is_oi_team:
-            sortingcondition = FOIOpenInformationRequests.getsorting(sortingitems, sortingorders)
+            sortingcondition = FOIOpenInformationRequests.getsorting(sortingitems, sortingorders, True)
         else:
             sortingcondition = FOIRawRequest.getsorting(sortingitems, sortingorders)
 

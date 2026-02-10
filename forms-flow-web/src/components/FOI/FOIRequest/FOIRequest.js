@@ -142,6 +142,7 @@ import { Fees } from "../customComponents/Fees";
 import OpenInfo from "./OpenInformation/OpenInfo";
 import ProactiveDisclosureDetails from "./ProactiveDisclosureDetails";
 import ProactiveDisclosureDescription from "./ProactiveDisclosureDescription";
+import ProactiveDisclosureRequestPublication from "./ProactiveDisclosure/Publication/ProactiveDisclosureRequestPublication";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -219,6 +220,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let requestApplicantProfile = useSelector(
     (state) => state.foiRequests.foiRequestApplicantProfile
   );
+  const [isProactiveDisclosure, setIsProactiveDisclosure] = useState(
+    requestDetails?.requestType ==
+    FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE
+  );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
   const [requestState, setRequestState] = useState(StateEnum.unopened.name);
@@ -226,12 +231,22 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     requestState?.toLowerCase() === StateEnum.closed.name.toLowerCase() &&
     !requestDetails?.isoipcreview
   );
-  const [_tabStatus, settabStatus] = React.useState(requestState);
-  const isOITeam = userDetail.groups.includes("/OI Team");
+  const [tabStatus, settabStatus] = React.useState(requestState);
+  const isOITeam = userDetail.groups?.includes("/OI Team");
   const openInfoStates = useSelector((state) => state.foiRequests.oiStatuses);
-  let foitabheaderBG = isOITeam
-    ? getOITabBG(requestDetails?.oistatusid, openInfoStates)
-    : getTabBG(_tabStatus, requestState);
+  let foitabheaderBG;
+  if (isOITeam && !isProactiveDisclosure) {
+    foitabheaderBG = getOITabBG(requestDetails?.oistatusid, openInfoStates);
+  } else if (isProactiveDisclosure) {
+    foitabheaderBG = getTabBG(
+      tabStatus,
+      requestState,
+      requestDetails?.oistatusid,
+      openInfoStates
+    );
+  } else {
+    foitabheaderBG = getTabBG(tabStatus, requestState);
+  }
 
   const [unsavedPrompt, setUnsavedPrompt] = useState(false);
   const [unsavedMessage, setUnsavedMessage] = useState(<></>);
@@ -239,16 +254,15 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     (state) => state.foiRequests.foiCommentTypes
   );
   const activePublicationRequest =
-    !SKIP_OPENINFO_MINISTRIES.split(",").includes(
+    (!SKIP_OPENINFO_MINISTRIES.split(",").includes(
       requestDetails?.bcgovcode?.toUpperCase()
     ) &&
+      requestDetails?.requestType ===
+      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL) ||
     requestDetails?.requestType ===
-    FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL;
+    FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE;
 
-  const [isProactiveDisclosure, setIsProactiveDisclosure] = useState(
-    requestDetails?.requestType ==
-    FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE
-  );
+
 
   let isMinistry = false;
   const userGroups =
@@ -1147,12 +1161,13 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     setStateChanged(true);
   };
 
-  const handlestatusudpate = (_daysRemaining, _status, _cfrDaysRemaining) => {
+  const handlestatusudpate = (_daysRemaining, _status, _cfrDaysRemaining, isProactiveDisclosure) => {
     const mappedBottomText = getTabBottomText({
       _daysRemaining,
       _cfrDaysRemaining,
       _status,
       requestExtensions,
+      isProactiveDisclosure
     });
 
     setRequestStatus(mappedBottomText);
@@ -1311,7 +1326,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     );
   };
 
-  const showOpenInformationTab = () => {
+  const showPublicationTab = () => {
     return (
       activePublicationRequest &&
       requestState !== StateEnum.intakeinprogress.name &&
@@ -1370,7 +1385,16 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const visibleCorrespondence =
     applicantCorrespondence?.filter((c) => c.category !== "draft") || [];
 
-  const getOIRequestState = () => {
+  const getOIRequestState = (requestState) => {
+    if (requestDetails?.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE) {
+      if (requestDetails?.oistatusid) {
+        return openInfoStates?.find(
+          (s) => s.oistatusid === requestDetails?.oistatusid
+        )?.name;
+      } else {
+        return requestState;
+      }
+    }
     if (requestDetails?.oistatusid) {
       return openInfoStates?.find(
         (s) => s.oistatusid === requestDetails?.oistatusid
@@ -1395,7 +1419,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           <h4 className="foileftpanelrequestno">{headerText}</h4>
           <div className="foileftpaneldropdown">
             <StateDropDown
-              requestState={isOITeam ? getOIRequestState() : requestState}
+              requestState={isOITeam ? getOIRequestState(requestState) : requestState}
               updateStateDropDown={updateStateDropDown}
               stateTransition={stateTransition}
               requestStatus={_requestStatus}
@@ -1407,6 +1431,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               isDivisionalCoordinator={false}
               isHistoricalRequest={isHistoricalRequest}
               consultflag={requestDetails?.isconsultflag}
+              isProactiveDisclosure={isProactiveDisclosure}
             />
           </div>
 
@@ -1484,7 +1509,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                       : ""}
                   </div>
                 }
-                {showOpenInformationTab() && (
+                {showPublicationTab() && (
                   <div
                     className={clsx("tablinks", {
                       active: tabLinksStatuses.OpenInformation.active,
@@ -1497,15 +1522,17 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 )}
               </>
             )}
-            <div
-              className={clsx("tablinks", {
-                active: tabLinksStatuses.RequestHistory.active,
-              })}
-              name="RequestHistory"
-              onClick={() => tabclick("RequestHistory")}
-            >
-              Request History {getHistoryCount()}
-            </div>
+            {!isProactiveDisclosure && (
+              <div
+                className={clsx("tablinks", {
+                  active: tabLinksStatuses.RequestHistory.active,
+                })}
+                name="RequestHistory"
+                onClick={() => tabclick("RequestHistory")}
+              >
+                Request History {getHistoryCount()}
+              </div>
+            )}
           </div>
 
           <div className="foileftpanelstatus">
@@ -2143,7 +2170,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               </>
             )}
           </div>
-          {showOpenInformationTab() && (
+          {showPublicationTab() && (
             <div
               id="OpenInformation"
               className={clsx("tabcontent", {
@@ -2152,16 +2179,29 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 [classes.hidden]: !tabLinksStatuses.OpenInformation.display,
               })}
             >
-              <OpenInfo
-                toast={toast}
-                requestNumber={requestNumber}
-                requestDetails={requestDetails}
-                currentOIRequestState={getOIRequestState()}
-                foirequestid={requestId}
-                isOITeam={isOITeam}
-                foiministryrequestid={ministryId}
-                bcgovcode={bcgovcode ? JSON.parse(bcgovcode) : bcgovcode}
-              />
+              {isProactiveDisclosure ? (
+                <ProactiveDisclosureRequestPublication
+                  toast={toast}
+                  requestNumber={requestNumber}
+                  requestDetails={requestDetails}
+                  currentOIRequestState={getOIRequestState()}
+                  foirequestid={requestId}
+                  isOITeam={isOITeam}
+                  foiministryrequestid={ministryId}
+                  bcgovcode={bcgovcode ? JSON.parse(bcgovcode) : bcgovcode}
+                />
+              ) : (
+                <OpenInfo
+                  toast={toast}
+                  requestNumber={requestNumber}
+                  requestDetails={requestDetails}
+                  currentOIRequestState={getOIRequestState()}
+                  foirequestid={requestId}
+                  isOITeam={isOITeam}
+                  foiministryrequestid={ministryId}
+                  bcgovcode={bcgovcode ? JSON.parse(bcgovcode) : bcgovcode}
+                />
+              )}
             </div>
           )}
           {
@@ -2188,52 +2228,54 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               )}
             </div>
           }
-          <div
-            id="RequestHistory"
-            className={clsx("tabcontent", {
-              active: tabLinksStatuses.RequestHistory.active,
-              [classes.displayed]: tabLinksStatuses.RequestHistory?.display,
-              [classes.hidden]: !tabLinksStatuses.RequestHistory?.display,
-            })}
-          >
-            {!isLoading && (requestNotes || applicantCorrespondence) ? (
-              <RequestHistorySection
-                requestHistoryArray={getMergedHistory(
-                  visibleCorrespondence,
-                  requestNotes
-                )}
-                currentUser={
-                  userId && {
-                    userId: userId,
-                    avatarUrl: avatarUrl,
-                    name: fullName,
+          {!isProactiveDisclosure && (
+            <div
+              id="RequestHistory"
+              className={clsx("tabcontent", {
+                active: tabLinksStatuses.RequestHistory.active,
+                [classes.displayed]: tabLinksStatuses.RequestHistory?.display,
+                [classes.hidden]: !tabLinksStatuses.RequestHistory?.display,
+              })}
+            >
+              {!isLoading && (requestNotes || applicantCorrespondence) ? (
+                <RequestHistorySection
+                  requestHistoryArray={getMergedHistory(
+                    visibleCorrespondence,
+                    requestNotes
+                  )}
+                  currentUser={
+                    userId && {
+                      userId: userId,
+                      avatarUrl: avatarUrl,
+                      name: fullName,
+                    }
                   }
-                }
-                bcgovcode={bcgovcode}
-                requestid={requestId}
-                iaoassignedToList={iaoassignedToList}
-                ministryAssignedToList={ministryAssignedToList}
-                requestNumber={requestNumber}
-                isRestricted={isRequestRestricted(requestDetails, ministryId)}
-                isMinistry={false}
-                commentTypes={commentTypes}
-                ministryId={ministryId}
-                applicantCorrespondenceTemplates={
-                  applicantCorrespondenceTemplates
-                }
-                setComment={setComment}
-                requestDetails={requestDetails}
-                requestState={requestState}
-                foiRequestCFRFormHistory={foiRequestCFRFormHistory}
-                foiRequestCFRForm={foiRequestCFRForm}
-                applicantCorrespondence={applicantCorrespondence}
-                requestNotes={requestNotes}
-                isProactiveDisclosure={isProactiveDisclosure}
-              />
-            ) : (
-              <Loading />
-            )}
-          </div>
+                  bcgovcode={bcgovcode}
+                  requestid={requestId}
+                  iaoassignedToList={iaoassignedToList}
+                  ministryAssignedToList={ministryAssignedToList}
+                  requestNumber={requestNumber}
+                  isRestricted={isRequestRestricted(requestDetails, ministryId)}
+                  isMinistry={false}
+                  commentTypes={commentTypes}
+                  ministryId={ministryId}
+                  applicantCorrespondenceTemplates={
+                    applicantCorrespondenceTemplates
+                  }
+                  setComment={setComment}
+                  requestDetails={requestDetails}
+                  requestState={requestState}
+                  foiRequestCFRFormHistory={foiRequestCFRFormHistory}
+                  foiRequestCFRForm={foiRequestCFRForm}
+                  applicantCorrespondence={applicantCorrespondence}
+                  requestNotes={requestNotes}
+                  isProactiveDisclosure={isProactiveDisclosure}
+                />
+              ) : (
+                <Loading />
+              )}
+            </div>
+          )}
           <UnsavedModal
             modalOpen={unsavedPrompt}
             handleClose={() => setUnsavedPrompt(false)}

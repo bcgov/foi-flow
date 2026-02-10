@@ -100,10 +100,10 @@ const FOIRequestHeader = React.memo(
       const _cfrDaysRemaining = requestDetails.cfrDueDate
         ? calculateDaysRemaining(requestDetails.cfrDueDate)
         : "";
-      handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining);
+      handlestatusudpate(_daysRemaining, _status, _cfrDaysRemaining, isProactiveDisclosure);
       setIsIAORestrictedRequest(isRestricted());
       setDisableHeaderInput((isRestricted() && !isIAORestrictedFileManager()));
-    }, [requestDetails, handleAssignedToInitialValue, handlestatusudpate]);
+    }, [requestDetails, handleAssignedToInitialValue, handlestatusudpate, isProactiveDisclosure]);
     useEffect(() => {
       setAssignedTo(getAssignedTo(assigneeObj));
     }, [assigneeObj]);
@@ -370,8 +370,10 @@ const FOIRequestHeader = React.memo(
                           setIsLoaded={setIsLoaded}
                         />
                       )}
-                    {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (isIAORestrictedFileManager() ||
-                      (isLoaded && isRequestWatcherOrAssignee(requestWatchers, assigneeObj, userDetail?.preferred_username))) &&
+                    {!isAddRequest && status.toLowerCase() !== StateEnum.unopened.name.toLowerCase() &&
+                      !isProactiveDisclosure &&
+                      (isIAORestrictedFileManager() ||
+                        (isLoaded && isRequestWatcherOrAssignee(requestWatchers, assigneeObj, userDetail?.preferred_username))) &&
                       <RequestRestriction
                         isiaorestricted={isRestricted()}
                         isIAORestrictedFileManager={isIAORestrictedFileManager()}

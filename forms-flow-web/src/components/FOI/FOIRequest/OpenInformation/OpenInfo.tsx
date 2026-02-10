@@ -3,6 +3,7 @@ import { saveFOIOpenInfoRequest, fetchFOIOpenInfoRequest } from "../../../../api
 import { useDispatch, useSelector } from "react-redux";
 import IAOOpenInfoPublishing from "./Exemption/IAOOpenInfoPublishing";
 import OpenInfoPublication from "./Publication/OpenInfoPublication";
+
 import OpenInfoHeader from "./OpenInfoHeader";
 import OpenInfoTab from "./OpenInfoTab";
 import "./openinfo.scss";
@@ -20,6 +21,7 @@ const OpenInfo = ({
   toast,
   currentOIRequestState,
   isOITeam,
+
 }: any) => {
   const dispatch = useDispatch();
 
@@ -41,9 +43,9 @@ const OpenInfo = ({
   const [oiPublicationData, setOiPublicationData] =
     useState<OITransactionObject>(foiOITransactionData);
   const [confirmationModal, setConfirmationModal] = useState({
-    show: false, 
-    title: "", 
-    message: "", 
+    show: false,
+    title: "",
+    message: "",
     description: "",
     confirmButtonTitle: "",
     confirmationData: null,
@@ -52,7 +54,7 @@ const OpenInfo = ({
   const [isDataEdited, setIsDataEdited] = useState(false);
 
   useEffect(() => {
-    setOiPublicationData({...foiOITransactionData, oipublicationstatus_id: foiOITransactionData?.oipublicationstatus_id || OIPublicationStatuses.Publish});
+    setOiPublicationData({ ...foiOITransactionData, oipublicationstatus_id: foiOITransactionData?.oipublicationstatus_id || OIPublicationStatuses.Publish });
     if (isOITeam) {
       if (foiOITransactionData.oipublicationstatus_id === findOIPublicationState('Do Not Publish')?.oipublicationstatusid) {
         setTabValue(1)
@@ -83,12 +85,12 @@ const OpenInfo = ({
         receiveddate: null,
         oiexemption_id: null
       }));
-    } else if (oiDataKey === "publicationdate" && requestDetails.closedate 
-      && typeof(value) === "string") {
+    } else if (oiDataKey === "publicationdate" && requestDetails.closedate
+      && typeof (value) === "string") {
       const daysBetween = calculateBusinessDaysBetween(requestDetails.closedate, value);
       if (daysBetween >= 0 && daysBetween < 10) {
-        setConfirmationModal((prev : any) => ({
-          ...prev, 
+        setConfirmationModal((prev: any) => ({
+          ...prev,
           show: true,
           title: "Change Publication Date",
           description: "The date you have chosen falls within 10 business days of the closed date. Are you sure you want to continue?",
@@ -120,7 +122,7 @@ const OpenInfo = ({
           ...prev,
           show: true,
           title: oiPublicationData.oiexemptionapproved ? "Exemption Approved" : "Exemption Denied",
-          description: oiPublicationData.oiexemptionapproved 
+          description: oiPublicationData.oiexemptionapproved
             ? "Are you sure you want to approve this exemption?"
             : "Are you sure you want to deny this exemption? ",
           message: oiPublicationData.oiexemptionapproved ? "The request will not be eligible for publication and will be removed from the OI queue." : "The request will still be eligible for publication. The request will temporarily be removed from the OI queue. When the request is closed, the request will reappear in the OI queue for publication review.",
@@ -142,8 +144,8 @@ const OpenInfo = ({
   };
   const saveData = (publicationdate?: any) => {
     const toastID = toast.loading("Saving FOI OpenInformation request...");
-    publicationdate = publicationdate || (oiPublicationData.publicationdate ? 
-      new Date(oiPublicationData.publicationdate).toISOString().split('T')[0] : 
+    publicationdate = publicationdate || (oiPublicationData.publicationdate ?
+      new Date(oiPublicationData.publicationdate).toISOString().split('T')[0] :
       null)
     const formattedData = {
       ...oiPublicationData,
@@ -227,7 +229,7 @@ const OpenInfo = ({
     }
     return true;
   };
-  const disablePublish = (oiPublicationData: OITransactionObject) : boolean => {    
+  const disablePublish = (oiPublicationData: OITransactionObject): boolean => {
     const responseLetterRegex = /Response[_\-\s]*Letter/i;
     const isMissingRequiredInput = oiPublicationData?.copyrightsevered === null || oiPublicationData?.publicationdate === null || !foiOpenInfoAdditionalFiles?.some((f: any) => responseLetterRegex.test(f.filename));
     const isOIReadyToPublish = currentOIRequestState === "Ready to Publish";
@@ -242,15 +244,15 @@ const OpenInfo = ({
   const handleTabSelect = (value: number): void => {
     setTabValue(value);
   };
-  const handleDateConfirmation = (value : Date) => {
+  const handleDateConfirmation = (value: Date) => {
     setOiPublicationData((prev: any) => ({
       ...prev,
       publicationdate: value,
     }));
   }
   const handlePublishNow = () => {
-    setConfirmationModal((prev : any) => ({
-      ...prev, 
+    setConfirmationModal((prev: any) => ({
+      ...prev,
       show: true,
       title: "Publish Now",
       description: "Are you sure you want to Publish this request now?",
@@ -296,7 +298,7 @@ const OpenInfo = ({
             saveData={saveData}
             currentOIRequestState={currentOIRequestState}
             ministryId={foiministryrequestid}
-            requestId={foirequestid} 
+            requestId={foirequestid}
             bcgovcode={bcgovcode}
             requestNumber={requestNumber}
             handlePublishNow={handlePublishNow}
