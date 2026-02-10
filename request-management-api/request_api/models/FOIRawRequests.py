@@ -1231,7 +1231,7 @@ class FOIRawRequest(db.Model):
             for axisrequestid, requestrawdata, status, requestid in results:
                 if "selectedMinistries" in requestrawdata and len(requestrawdata["selectedMinistries"]) > 0:
                     ministry_code = requestrawdata["selectedMinistries"][0]["code"]
-                    formattedresult= {"axisrequestid": axisrequestid, 'govcode': ministry_code, "requeststatus": status, "requestid": requestid}
+                    formattedresult= {"axisrequestid": axisrequestid, 'govcode': ministry_code, "requeststatus": status, "rawrequestid": requestid}
                     result_list.append(formattedresult)
 
             print("Results:", result_list)
@@ -1243,25 +1243,34 @@ class FOIRawRequest(db.Model):
             db.session.close()   
 
     @classmethod
-    def getlinkedrawrequestdetails(cls, linkedrequests):
+    def getlinkedrequestdetails(cls, linkedrequests):
         linkedrequestsinfo = []
         try:
             print("LIQUIDD", linkedrequests)
-            #THIS WILL GET requeststatus and axisrewquestid/rawrequesid and MAYBE requestrawdata["selectedMinistries"][0]["code"]
             if not linkedrequests:
                 return linkedrequestsinfo
             axis_ids = [req['axisrequestid'] for req in linkedrequests]
-            print("rawrequest_ids", axis_ids)
+            print("id", axis_ids)
             sql = """
-                SELECT DISTINCT ON (axisrequestid) requestid, axisrequestid
-                FROM public."FOIRawRequests"
-                WHERE axisrequestid IN :axis_ids
-                ORDER BY axisrequestid, version DESC;
+            SELECT DISTINCT ON (axisrequestid) axisrequestid, requestid, foiministryrequestid, requeststatuslabel, version 
+            FROM (
+                SELECT foimin.axisrequestid, NULL::bigint AS requestid, foimin.foiministryrequestid, foimin.requeststatuslabel, foimin.version, 1 AS src
+                FROM public."FOIMinistryRequests" foimin
+                WHERE foimin.axisrequestid IN :axis_ids
+
+                UNION ALL
+
+                SELECT foiraw.axisrequestid, foiraw.requestid, NULL::bigint AS foiministryrequestid, foiraw.requeststatuslabel, foiraw.version, 2 AS src
+                FROM public."FOIRawRequests" foiraw
+                WHERE foiraw.axisrequestid IN :axis_ids
+            ) foilinkreq
+            ORDER BY axisrequestid, src, version DESC;
             """
             params = {"axis_ids": tuple(axis_ids)}
             rs = db.session.execute(text(sql), params)
             for row in rs:
-                linkedrequestsinfo.append({"requestid": row["requestid"],  "axisrequestid": row["axisrequestid"]})
+                linkedrequestsinfo.append({"rawrequestid": row["requestid"],  "axisrequestid": row["axisrequestid"], "foiministryrequestid": row["foiministryrequestid"],
+                                           "requeststatus": StateName[row["requeststatuslabel"]].value})
         except Exception as ex:
             logging.error(ex)
             raise ex

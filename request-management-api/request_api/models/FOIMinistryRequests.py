@@ -1674,35 +1674,6 @@ class FOIMinistryRequest(db.Model):
         finally:
             db.session.close()
         return requestdetails
-
-    @classmethod
-    def getlinkedrequestdetails(cls, linkedrequests):
-        print("NANI?", linkedrequests)
-        linkedrequestsinfo = []
-        try:
-            print("SNAKEE", linkedrequests)
-            #THIS WILL GET requeststatus and axisrewquestid/foiministryrequestid and MAYBE programarea.bcgovcode
-            if not linkedrequests:
-                return linkedrequestsinfo
-            axis_ids = [req['axisrequestid'] for req in linkedrequests]
-            print("foiministryrequestid", axis_ids)
-            sql = """
-                SELECT DISTINCT ON (axisrequestid) foirequest_id, foiministryrequestid, axisrequestid
-                FROM public."FOIMinistryRequests"
-                WHERE axisrequestid IN :axis_ids
-                ORDER BY axisrequestid, version DESC;
-            """
-            params = {"axis_ids": tuple(axis_ids)}
-            rs1 = db.session.execute(text(sql), params)
-            for row in rs1:
-                linkedrequestsinfo.append({"axisrequestid": row["axisrequestid"], "requestid": row["foirequest_id"], 
-                                           "ministryid":row["foiministryrequestid"] })
-        except Exception as ex:
-            logging.error(ex)
-            raise ex
-        finally:
-            db.session.close()
-        return linkedrequestsinfo
     
     @classmethod
     def get_linkedfoiministryrequest_info(cls, axisid):

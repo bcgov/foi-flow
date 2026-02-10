@@ -20,6 +20,7 @@ from request_api.utils.commons.datetimehandler import datetimehandler
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.utils.enums import StateName
 from request_api.models.OperatingTeamEmails import OperatingTeamEmail
+from request_api.services.linkedrequestservice import linkedrequestservice
 
 class requestservicegetter:
     """ This class consolidates retrival of FOI request for actors: iao and ministry. 
@@ -218,7 +219,7 @@ class requestservicegetter:
             'subjectCode': subjectcodeservice().getministrysubjectcodename(foiministryrequestid),
             'isofflinepayment': FOIMinistryRequest.getofflinepaymentflag(foiministryrequestid),
             'linkedRequests' : linkedministryrequests,
-            'linkedRequestsInfo' : FOIMinistryRequest.getlinkedrequestdetails(linkedministryrequests),
+            'linkedRequestsInfo' : linkedrequestservice().getlinkedrequestinfo(linkedministryrequests),
             'identityVerified':requestministry['identityverified'],
             'oistatusid':requestministry['oistatus_id'],
             'estimatedpagecount':requestministry['estimatedpagecount'],
@@ -232,6 +233,7 @@ class requestservicegetter:
         return baserequestinfo
     
     def __assignministrynames(self, linkedrequests):
+        # NOTE REMOVE THIS FUNC?
         areas = programareaservice().getprogramareas()
         if linkedrequests is not None:
             for entry in linkedrequests:

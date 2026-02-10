@@ -156,25 +156,24 @@ const LinkedRequests = React.memo(
         item => getRequestId(item) === newRequestId
       );
 
-      // Get FOIMinistryRequest Status annd MinistryId if FOIRawRequest Status is Archived
+      // Get FOIMinistryRequest Status and MinistryId if FOIRawRequest Status is Archived
       if (selectedValue.requeststatus === "Archived" && !alreadyExists) {
         const res = await dispatch(getFOIMinistryLinkedRequestInfo(selectedValue.axisrequestid));
         selectedValue.requeststatus = res.requeststatus;
         selectedValue.foiministryrequestid = res.foiministryrequestid;
       }
 
+      // Add the new linkedrequest object to linkedrequest and linkedrequstinfo
       if (!alreadyExists && newRequestId) {
-        // Push the entire object (format: {requstid: int, axisrequestid: string, ministryid: null || int})
-        // ONLY NEED TO SAVE BBELOW TO DB, DONT NEED REQUEST STATUS OR GOV CODE -> ADDITIONAL INFO WILL HAVE THAT. SO NEED TWO ARRAYS.... ONE FOR STATE AND ONE FOR DB..
         const linkedReqObj = {
-          "axisrequestid": selectedValue.axisrequestid, 
-          "foiministryrequestid": selectedValue.foiministryrequestid || null, 
-          "requestid": selectedValue.requestid, 
+          "axisrequestid": selectedValue.axisrequestid,
+          "govcode": selectedValue.govcode
         };
         const linkedReqInfoObj = {
           "axisrequestid": selectedValue.axisrequestid,
           "requeststatus": selectedValue.requeststatus,
-          "govcode": selectedValue.govcode
+          "foiministryrequestid": selectedValue.foiministryrequestid || null, 
+          "rawrequestid": selectedValue.rawrequestid
         };
         updatedLinkedRequests.push(linkedReqObj);
         setLinkedRequests(updatedLinkedRequests);
@@ -215,7 +214,7 @@ const LinkedRequests = React.memo(
                       key={idx}
                       sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                     >
-                      <TableCell component="th" scope="row">{reqObj.govcode}</TableCell>
+                      <TableCell component="th" scope="row">{linkedRequests[idx]?.govcode}</TableCell>
                       <TableCell align="right">
                         <Link
                           component="button"

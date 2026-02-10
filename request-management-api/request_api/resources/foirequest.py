@@ -34,6 +34,7 @@ from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 from request_api.utils.enums import OIStatusEnum
 from request_api.services.events.openinfo import openinfoevent
 from request_api.utils.enums import OpenInfoNotificationType
+from request_api.services.linkedrequestservice import linkedrequestservice
 import json
 import asyncio
 import traceback
@@ -389,7 +390,7 @@ class LinkedRequests(Resource):
         try:
             search_text = request.args.get('q', '').strip()
             print("search_text:",search_text)
-            results = requestservice().findrequestids(search_text, axisrequestid,ministrycode)
+            results = linkedrequestservice().findrequestids(search_text, axisrequestid,ministrycode)
             return results, 200
         except Exception as ex:
             print(ex)
@@ -406,7 +407,7 @@ class LinkedRequestsInfo(Resource):
     def get(axisrequestid):
         print("BRAH")
         try:
-            results = requestservice().get_linkedfoiministryrequest_info_by_axisid(axisrequestid)
+            results = linkedrequestservice().get_linkedfoiministryrequest_info_by_axisid(axisrequestid)
             return results, 200
         except Exception as ex:
             print(ex)
