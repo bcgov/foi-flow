@@ -194,6 +194,7 @@ class applicantservice:
             'category': self.__first_not_null(applicant["applicantcategory"]),
             'email': self.__first_not_null(applicant["email"]),
             'address': self.__first_not_null(applicant["address"]),
+            'addressSecondary': self.__first_not_null(applicant["address2"]),
             'city': self.__first_not_null(applicant["city"]),
             'province': self.__first_not_null(applicant["province"]),
             'postal': self.__first_not_null(applicant["postal"]),

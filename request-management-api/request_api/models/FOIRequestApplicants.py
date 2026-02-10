@@ -366,6 +366,7 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.applicantcategory).label('applicantcategory'),
             func.array_agg(subquery_all.c.email).label('email'),
             func.array_agg(subquery_all.c.address).label('address'),
+            func.array_agg(subquery_all.c.address2).label('address2'),
             func.array_agg(subquery_all.c.city).label('city'),
             func.array_agg(subquery_all.c.province).label('province'),
             func.array_agg(subquery_all.c.postal).label('postal'),
@@ -637,6 +638,7 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.applicantcategory).label('applicantcategory'),
             func.array_agg(subquery_all.c.email).label('email'),
             func.array_agg(subquery_all.c.address).label('address'),
+            func.array_agg(subquery_all.c.address2).label('address2'),
             func.array_agg(subquery_all.c.city).label('city'),
             func.array_agg(subquery_all.c.province).label('province'),
             func.array_agg(subquery_all.c.postal).label('postal'),
@@ -668,6 +670,7 @@ class FOIRequestApplicant(db.Model):
         #aliase for getting contact info
         contactemail = aliased(FOIRequestContactInformation)
         contactaddress = aliased(FOIRequestContactInformation)
+        contactaddress2 = aliased(FOIRequestContactInformation)
         contacthomephone = aliased(FOIRequestContactInformation)
         contactworkphone = aliased(FOIRequestContactInformation)
         contactworkphone2 = aliased(FOIRequestContactInformation)
@@ -713,6 +716,7 @@ class FOIRequestApplicant(db.Model):
             ApplicantCategory.name.label('applicantcategory'),
             contactemail.contactinformation.label('email'),
             contactaddress.contactinformation.label('address'),
+            contactaddress2.contactinformation.label('address2'),
             city.contactinformation.label('city'),
             province.contactinformation.label('province'),
             postal.contactinformation.label('postal'),
@@ -770,7 +774,17 @@ class FOIRequestApplicant(db.Model):
                                     contactaddress.foirequest_id == FOIRequest.foirequestid,
                                     contactaddress.foirequestversion_id == FOIRequest.version,
                                     contactaddress.contacttypeid == 2,
-                                    contactaddress.contactinformation is not None),
+                                    contactaddress.contactinformation is not None,
+                                    contactaddress.dataformat == "address"),
+                                isouter=True
+                            ).join(
+                                contactaddress2,
+                                and_(
+                                    contactaddress2.foirequest_id == FOIRequest.foirequestid,
+                                    contactaddress2.foirequestversion_id == FOIRequest.version,
+                                    contactaddress2.contacttypeid == 2,
+                                    contactaddress2.contactinformation is not None,
+                                    contactaddress2.dataformat == 'addressSecondary'),
                                 isouter=True
                             ).join(
                                 contacthomephone,
@@ -910,6 +924,7 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.applicantcategory).label('applicantcategory'),
             func.array_agg(subquery_all.c.email).label('email'),
             func.array_agg(subquery_all.c.address).label('address'),
+            func.array_agg(subquery_all.c.address2).label('address2'),
             func.array_agg(subquery_all.c.city).label('city'),
             func.array_agg(subquery_all.c.province).label('province'),
             func.array_agg(subquery_all.c.postal).label('postal'),
@@ -1279,7 +1294,7 @@ class ApplicantProfileSchema(ma.Schema):
     class Meta:
         fields = ('applicantprofileid','updatedat','createdby','foirequestapplicantid','firstname','middlename','lastname',
                   'alsoknownas','dob','businessname','foirequestid','foirequestversion','requesttype','applicantcategory',
-                  'email','address','city','province','postal','country','homephone','workphone',
+                  'email','address','address2','city','province','postal','country','homephone','workphone',
                   'workphone2','mobilephone','othercontactinfo','employeenumber','correctionnumber','phn','axisapplicantid','other_notes')
 
 class ApplicantRequestSchema(ma.Schema):
