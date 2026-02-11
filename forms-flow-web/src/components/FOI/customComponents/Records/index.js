@@ -2346,7 +2346,12 @@ export const RecordsLog = ({
 
   const isBulkEditDisabled = () => {
     if (isBulkEdit) {
-    return false;
+      for (let record of records) {
+        if (record.isselected && !record.isdedupecomplete) {
+          return true;
+        }
+      }
+      return false;
     } else {
       return true;
     }
