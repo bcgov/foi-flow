@@ -20,7 +20,6 @@ const LinkedRequests = React.memo((requestDetails) => {
     const classes = useStyles();
     const _requestDetails = requestDetails.requestDetails;
     const [linkedRequestObjs, setLinkedRequestObjs] = useState(_requestDetails.linkedRequests);
-    const [linkedRequestIds, setLinkedRequestIds] = useState([]);
 
     useEffect(() => {
       
@@ -38,10 +37,9 @@ const LinkedRequests = React.memo((requestDetails) => {
         <div>
             <ul className="linked-request-list">
                 {linkedRequestObjs?.map((reqObj, index) => {
-                  const key = Object.keys(reqObj)[0]; 
                     return (
                     <li key={index} className="linked-request-item">
-                      {key}
+                      {reqObj.axisrequestid}
                     </li>
                   );
                 })}

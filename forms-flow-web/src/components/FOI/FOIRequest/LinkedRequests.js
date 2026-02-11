@@ -1,12 +1,6 @@
 import React, { useEffect, useContext, useState } from "react";
-import { useParams } from "react-router-dom";
 import { useSelector,useDispatch } from "react-redux";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
-import { StateEnum } from "../../../constants/FOI/statusEnum";
-import {
-  shouldDisableFieldForMinistryRequests,
-  findRequestState,
-} from "./utils";
 import { makeStyles } from "@material-ui/styles";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
@@ -61,10 +55,9 @@ const LinkedRequests = React.memo(
 
     const [showSearch, setShowSearch] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
-    const [searchResults, setSearchResults] = useState([]);
     const [options, setOptions] = useState([]);
 
-    const getRequestId = (item) => {
+    const getAxisRequestId = (item) => {
       if (typeof item.axisrequestid === "string") return item.axisrequestid;
       return null;
     };
@@ -85,9 +78,9 @@ const LinkedRequests = React.memo(
     }
 
     const removeLinkedRequest = (reqItem) => {
-      const reqId = getRequestId(reqItem);
-      const updatedLinkedRequests = linkedRequests?.filter(item => getRequestId(item) !== reqId);
-      const updatedLinkedInfoRequests = linkedRequestsInfo?.filter(item => getRequestId(item) !== reqId);
+      const reqId = getAxisRequestId(reqItem);
+      const updatedLinkedRequests = linkedRequests?.filter(item => getAxisRequestId(item) !== reqId);
+      const updatedLinkedInfoRequests = linkedRequestsInfo?.filter(item => getAxisRequestId(item) !== reqId);
       setLinkedRequests(updatedLinkedRequests);
       setLinkedRequestsInfo(updatedLinkedInfoRequests);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS, updatedLinkedRequests);
@@ -97,20 +90,19 @@ const LinkedRequests = React.memo(
     console.log("alloptions", options)
 
     const renderReviewRequest = (e, reqItem) => {
-      //REIVSE THIS COMPLETELTY TO USE NEW PEROPERTIES.
       e.preventDefault();
-      const reqId = getRequestId(reqItem);
+      const reqId = getAxisRequestId(reqItem);
       const item = linkedRequestsInfo.find(
         obj => obj.axisrequestid === reqId
       );
-      console.log("item", item)
-      const requestId = item ? item.requestid : null;
-      const ministryId = item ? item.ministryid : null;
+      console.log("foundItem", item)
+      const rawrequestId = item?.rawrequestid;
+      const ministryId = item?.foiministryrequestid;
       let url = '';
       if (ministryId) {
-        url = `/foi/foirequests/${requestId}/ministryrequest/${ministryId}`
+        url = `/foi/foirequests/${ministryId}/ministryrequest/${ministryId}`
       } else {
-        url = `/foi/reviewrequest/${requestId}`;
+        url = `/foi/reviewrequest/${rawrequestId}`;
       }
       window.open(url, "_blank", "noopener,noreferrer");
     };
@@ -149,11 +141,11 @@ const LinkedRequests = React.memo(
       const updatedLinkedRequests = [...(linkedRequests || [])];
       
       // Get the request ID from the selected value
-      const newRequestId = getRequestId(selectedValue);
+      const newRequestId = getAxisRequestId(selectedValue);
       
       // Check if this request ID already exists in the array
       const alreadyExists = updatedLinkedRequests.some(
-        item => getRequestId(item) === newRequestId
+        item => getAxisRequestId(item) === newRequestId
       );
 
       // Get FOIMinistryRequest Status and MinistryId if FOIRawRequest Status is Archived
@@ -243,35 +235,6 @@ const LinkedRequests = React.memo(
                   </TableBody>
                 </Table>
               </TableContainer>
-
-              {/* <ul className="linked-request-list">
-                {linkedRequests?.map((reqItem, index) => {
-                  const reqId = getRequestId(reqItem);
-                  return (
-                    <li key={reqId || index} className="linked-request-item">
-                      <Link
-                        component="button"
-                        sx={{ color: "#38598A", cursor: "pointer", textDecoration: "underline"}}
-                        onClick={(e) => renderReviewRequest(e, reqItem)}
-                        className="linked-request-link"
-                      >
-                        {reqId}
-                      </Link>
-                      <button
-                        className="btn btn-link text-danger"
-                        aria-label={`Remove linked request ${reqId}`}
-                        onClick={() => removeLinkedRequest(reqItem)}
-                      >
-                        <CancelIcon
-                          fontSize="small"
-                          sx={{ color: "#038 !important" }}
-                        />
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul> */}
-
               {!showSearch && (
                 <button
                   type="button"
