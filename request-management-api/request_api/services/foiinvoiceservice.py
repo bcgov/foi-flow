@@ -5,6 +5,7 @@ from request_api.auth import AuthHelper
 from datetime import datetime as datetime2
 
 INVOICE_MEMO = "You have 20 business days to respond to this fee statement or your file will be closed as Abandoned. If the total estimate is over $200 you are only required to pay a 50% deposit, otherwise you are required to pay the full amount."
+OUTSTANDING_INVOICE_MEMO = "You have 20 business days to respond to this fee statement or your file will be closed as Abandoned."
 
 class foiinvoiceservice:
     def generate_invoice(self, invoice, userid):
@@ -39,7 +40,7 @@ class foiinvoiceservice:
             "axisRequestId": foiministryrequest['axisrequestid'],
             "applicant_name": invoice["applicant_name"],
             "applicant_address": invoice["applicant_address"],
-            "invoice_memo": INVOICE_MEMO,
+            "invoice_memo": OUTSTANDING_INVOICE_MEMO if is_actual_hours else INVOICE_MEMO,
             "waivedAmount": estimated_waived_amt if not is_actual_hours else actual_waived_amt,
             "locatinghrs": feedata["actuallocatinghrs"] if is_actual_hours else feedata["estimatedlocatinghrs"],
             "producinghrs": feedata["actualproducinghrs"] if is_actual_hours else feedata["estimatedproducinghrs"],
@@ -47,4 +48,5 @@ class foiinvoiceservice:
             "ministrypreparinghrs": feedata["actualministrypreparinghrs"] if is_actual_hours else feedata["estimatedministrypreparinghrs"],
             "hardcopypages": feedata["actualhardcopypages"] if is_actual_hours else feedata["estimatedhardcopypages"],
             "totaldue": feedata["actualtotaldue"] if is_actual_hours else feedata["estimatedtotaldue"],
+            "addWaivedAmount": f"{float(feedata['feewaiveramount']):.2f}",
         }

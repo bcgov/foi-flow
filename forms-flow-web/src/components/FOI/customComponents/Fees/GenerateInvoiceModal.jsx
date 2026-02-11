@@ -14,7 +14,7 @@ export const GenerateInvoiceModal = ({
 }) => {
     const isAcutalFees = cfrFees?.actualtotaldue > 0;
     const modalTitle = isAcutalFees ? "Oustanding Fee Invoice" : "Fee Estimate Invoice";
-    const modalMessage = `By selecting generate invoice, you will be creating a new invoice (and new invoice #) based on ${isAcutalFees ? "actual" : "estimated"} hours. Are you sure you want to generate a new invoice?`;
+    const modalMessage = `Would you like to generate an invoice? This will generate ${isAcutalFees ? 'an outstanding fee' : 'a fee estimate'} invoice, which will be based on your ${isAcutalFees ? "actual" : "estimated"} hours. Please ensure your ${isAcutalFees ? "actual" : "estimated"} hours are correct prior to creating the invoice.`;
     return (
         <>
         <div className="state-change-dialog">
@@ -45,7 +45,7 @@ export const GenerateInvoiceModal = ({
                 className={`btn-bottom btn-save btn`}
                 onClick={handleSave}
               >
-                Generate Invoice
+                Continue
               </button>
               <button className="btn-bottom btn-cancel" onClick={handleClose}>
                 Cancel

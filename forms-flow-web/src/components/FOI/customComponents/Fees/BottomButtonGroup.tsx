@@ -42,7 +42,7 @@ export const BottomButtonGroup = ({
         title={
           generateInvoiceDisabled && 
           <div style={{ fontSize: "10px" }}>
-            CFR Fees do not exist, or are currently pending approval
+            Invoice generation disabled. Please change the 'Processing Fee Status' field to 'Approved'
           </div>
         }
         enterDelay={1000}

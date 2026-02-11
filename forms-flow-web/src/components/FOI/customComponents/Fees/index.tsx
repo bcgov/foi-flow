@@ -750,7 +750,7 @@ export const Fees = ({
                 {filepath: res},
                 (_err: any, response: any) => {
                   const blob = new Blob([response.data], {type: "application/octet-stream"});
-                  saveAs(blob, `Invoice - ${requestDetails.axisRequestId}.pdf`);
+                  saveAs(blob, `${requestDetails.axisRequestId} - Invoice.pdf`);
                   toast.update(toastID, {
                     render: "Download complete",
                     type: "success",
