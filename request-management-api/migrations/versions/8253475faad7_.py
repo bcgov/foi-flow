@@ -1,7 +1,7 @@
 """New Table: FOIRequestInvoices
 
 Revision ID: 8253475faad7
-Revises: 05dee3d60a8c
+Revises: 2d8cf3fb689f
 Create Date: 2025-12-19 14:28:29.852354
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '8253475faad7'
-down_revision = '05dee3d60a8c'
+down_revision = '2d8cf3fb689f'
 branch_labels = None
 depends_on = None
 
