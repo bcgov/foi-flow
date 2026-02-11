@@ -193,13 +193,7 @@ const IAOOpenInfoMain = ({
               label="Analyst Rationale"
               InputLabelProps={{ shrink: true }}
               value={oiPublicationData?.iaorationale}
-              required={!isOIUser}
               disabled={disableIAOField}
-              error={
-                oiPublicationData?.oipublicationstatus_id !== OIPublicationStatuses.Publish &&
-                oiPublicationData?.oiexemption_id !== OIExemptions.OutsideScopeOfPublication &&
-                !oiPublicationData?.iaorationale
-              }
               style={{ paddingBottom: "2%" }}
               onChange={(event) =>
                 handleOIDataChange(event.target.value, event.target.name)

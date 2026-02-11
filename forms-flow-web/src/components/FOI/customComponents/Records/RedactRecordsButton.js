@@ -43,20 +43,25 @@ export default function RedactRecordsButton({ records, groups, ministryrequestid
       return true;
     }
 
-    if (!strict) {
-      // Only block explicitly incompatible records
-      return allRecords.some(
-        r => r.attributes?.incompatible === true
-      );
-    }
+    const isInvalid = (record) =>
+      !record.isredactionready &&
+      !record.attributes?.incompatible &&
+      !record.selectedfileprocessversion &&
+      !record.ocrfilepath;
 
-    // Strict mode: require processing readiness
-    return allRecords.some(r =>
-      !r.isredactionready &&
-      !r.selectedfileprocessversion &&
-      !r.ocrfilepath
-    );
-  };
+    const isInvalidAttachment = (record) =>
+      !record.isredactionready &&
+      !record.attributes?.incompatible
+
+    return allRecords.some(record =>{
+      if(isInvalid(record)) return true;
+
+      if (Array.isArray(record.attachments)) {
+        return record.attachments.some(isInvalidAttachment);
+      }
+      return false;
+    });
+  }
 
   const isThereAnyUngroupedRecord = (allRecords = []) => {
     if (!Array.isArray(allRecords) || allRecords.length === 0) {
@@ -84,20 +89,9 @@ export default function RedactRecordsButton({ records, groups, ministryrequestid
     if (!Array.isArray(recordGroup) || recordGroup.length === 0) {
       return true;
     }
-
-    return recordGroup.some(r => {
-      const isIncompatible = r.attributes?.incompatible === true;
-      const isDuplicate = r.isduplicate === true;
-
-      const isNotReady =
-        !r.isredactionready &&
-        !r.selectedfileprocessversion &&
-        !r.ocrfilepath;
-
-      return isIncompatible || isDuplicate || isNotReady;
-    });
+    console.log(JSON.parse(JSON.stringify(recordGroup)));
+    return isDisableRedactRecords(recordGroup);
   };
-
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -144,9 +138,10 @@ export default function RedactRecordsButton({ records, groups, ministryrequestid
             variant="contained"
             color="primary"
             onClick={handleMenuOpen}
+            style={{ minWidth: "100px" }}
             className={clsx(
               "btn",
-              classes.createButton
+              //buttonClassName
             )}
 
 
