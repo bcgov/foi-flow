@@ -4351,7 +4351,7 @@ const AttachmentPopup = React.memo(
           <MenuList>
             {isMCFPersonal && (
               <MenuItem
-                disabled={lockRecords || disableMinistryUser}
+                disabled={lockRecords || disableMinistryUser || !record.isdedupecomplete}
                 onClick={() => {
                   setEditTagModalOpen(true);
                   setPopoverOpen(false);
