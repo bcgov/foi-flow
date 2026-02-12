@@ -845,7 +845,11 @@ const MinistryReview = React.memo(({ userDetail }) => {
                         <ChildDetails requestDetails={requestDetails} />
                         <OnBehalfDetails requestDetails={requestDetails} />
                         <RequestDescription requestDetails={requestDetails} />
-                        <LinkedRequests requestDetails={requestDetails} />
+                        <LinkedRequests 
+                          isMinistry={isMinistry}
+                          linkedRequests={requestDetails?.linkedRequests}
+                          linkedRequestsInfo={requestDetails?.linkedRequestsInfo}
+                        />
                         <RequestDetails requestDetails={requestDetails} />
                         <AdditionalApplicantDetails
                           requestDetails={requestDetails}

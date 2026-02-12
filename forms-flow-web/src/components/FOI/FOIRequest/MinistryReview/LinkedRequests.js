@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Card from '@material-ui/core/Card';
-import { useSelector } from "react-redux";
 import { makeStyles } from '@material-ui/core/styles';
 import './LinkedRequests.scss'
+import { LinkedRequestsTable } from '../LinkedRequestsTable';
 
 const useStyles = makeStyles((_theme) => ({
     headingError: {
@@ -16,17 +16,7 @@ const useStyles = makeStyles((_theme) => ({
     }
 }));
 
-const LinkedRequests = React.memo((requestDetails) => {
-    const classes = useStyles();
-    const _requestDetails = requestDetails.requestDetails;
-    const [linkedRequestObjs, setLinkedRequestObjs] = useState(_requestDetails.linkedRequests);
-
-    useEffect(() => {
-      
-
-    }, [linkedRequestObjs]);
-
-
+const LinkedRequests = ({isMinistry, linkedRequests, linkedRequestsInfo}) => {
     return (
       <Card id="linkedrequestMinistry" className="foi-details-card">
         <div className="row foi-details-row">
@@ -35,20 +25,14 @@ const LinkedRequests = React.memo((requestDetails) => {
           </div>
         </div>
         <div>
-            <ul className="linked-request-list">
-                {linkedRequestObjs?.map((reqObj, index) => {
-                    return (
-                    <li key={index} className="linked-request-item">
-                      {reqObj.axisrequestid}
-                    </li>
-                  );
-                })}
-            </ul>
+          <LinkedRequestsTable
+            isMinistry={isMinistry}
+            linkedRequests={linkedRequests}
+            linkedRequestsInfo={linkedRequestsInfo}
+          />
         </div>
       </Card>
     );
-
-})
-
+}
 
 export default LinkedRequests;
