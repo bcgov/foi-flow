@@ -25,6 +25,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
 } from "@mui/material";
 import {getFOIMinistryLinkedRequestInfo, linkedRequestsLists} from "../../../apiManager/services/FOI/foiRequestServices";
 
@@ -56,6 +57,10 @@ const LinkedRequests = React.memo(
     const [showSearch, setShowSearch] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
     const [options, setOptions] = useState([]);
+
+    //Table pagination data
+    const [page, setPage] = useState(0);
+    const MAX_ROWS_PER_PAGE = 7;
 
     const getAxisRequestId = (item) => {
       if (typeof item.axisrequestid === "string") return item.axisrequestid;
@@ -189,25 +194,25 @@ const LinkedRequests = React.memo(
           </AccordionSummary>
           <AccordionDetails>
             <div className="linked-requests">
-              <TableContainer>
-                <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+              <TableContainer sx={{display:"flex", flexDirection: "row", justifyContent: "center"}}>
+                <Table sx={{width: "75%", border: 2, borderColor: 'divider', '& td, & th': {border: 2, borderColor: 'divider'}, borderCollapse: 'collapse'}} size="small">
                   <TableHead>
                     <TableRow>
-                      <TableCell>MIN</TableCell>
-                      <TableCell align="right">Request ID</TableCell>
-                      <TableCell align="right">Request State</TableCell>
-                      <TableCell align="right">Remove</TableCell>
+                      <TableCell sx={{backgroundColor: "#003366", fontWeight: "bold",  color: "#FFF",}} align="center">MIN</TableCell>
+                      <TableCell sx={{backgroundColor: "#003366", fontWeight: "bold",  color: "#FFF",}} align="center">Request ID</TableCell>
+                      <TableCell sx={{backgroundColor: "#003366", fontWeight: "bold",  color: "#FFF",}} align="center">Request State</TableCell>
+                      <TableCell sx={{backgroundColor: "#003366", fontWeight: "bold",  color: "#FFF",}} align="center">Remove</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {linkedRequestsInfo?.map((reqObj, idx) => {
+                    {linkedRequestsInfo?.slice(page * MAX_ROWS_PER_PAGE, page * MAX_ROWS_PER_PAGE + MAX_ROWS_PER_PAGE)
+                    .map((reqObj, idx) => {
                     return (
                     <TableRow
                       key={idx}
-                      sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                     >
-                      <TableCell component="th" scope="row">{linkedRequests[idx]?.govcode}</TableCell>
-                      <TableCell align="right">
+                      <TableCell align="center" component="th" scope="row">{linkedRequests[idx]?.govcode}</TableCell>
+                      <TableCell align="center">
                         <Link
                           component="button"
                           sx={{ color: "#38598A", cursor: "pointer", textDecoration: "underline"}}
@@ -217,8 +222,8 @@ const LinkedRequests = React.memo(
                         {reqObj.axisrequestid}
                         </Link>
                       </TableCell>
-                      <TableCell align="right">{reqObj.requeststatus}</TableCell>
-                      <TableCell>
+                      <TableCell align="center">{reqObj.requeststatus}</TableCell>
+                      <TableCell align="center">
                         <button
                           className="btn btn-link text-danger"
                           aria-label={`Remove linked request ${reqObj.axisrequestid}`}
@@ -235,6 +240,15 @@ const LinkedRequests = React.memo(
                   </TableBody>
                 </Table>
               </TableContainer>
+              <TablePagination
+                component="div"
+                count={linkedRequests?.length}
+                rowsPerPage={MAX_ROWS_PER_PAGE}
+                rowsPerPageOptions={[]}
+                page={page}
+                onPageChange={(e, newPage) => setPage(newPage)}
+                sx={{display: "flex", flexDirection: "row", justifyContent: "center"}}
+              />
               {!showSearch && (
                 <button
                   type="button"
@@ -248,7 +262,6 @@ const LinkedRequests = React.memo(
                   Add Linked Request
                 </button>
               )}
-
               {showSearch && (
                 <Grid
                   item
