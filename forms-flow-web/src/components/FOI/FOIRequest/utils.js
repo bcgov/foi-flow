@@ -520,3 +520,8 @@ export const isReadyForPublishing = (openinfo, additionalfiles) => {
   return !(openinfo?.copyrightsevered === null || !additionalfiles?.some(f => responseLetterRegex.test(f.filename)))
 }
 
+export const getIsAddRequest = () => {
+  const url = window.location.href;
+  const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
+  return urlIndexCreateRequest > -1;
+}
