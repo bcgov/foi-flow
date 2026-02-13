@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Stack from "@mui/material/Stack";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -30,6 +30,10 @@ export const ApplicantProfileSearchView = ({
 }) => {
   const [searchText, setSearchText] = useState("");
   const [searchMode, setSearchMode] = useState(initialSearchMode);
+
+ useEffect(() => {
+    if (searchText && searchText.length > 0) setSearchMode("manual")
+  }, [searchText])
 
   const columns = [
     {
