@@ -39,6 +39,7 @@ EXCEPTION_MESSAGE_NOT_FOUND='Not Found'
 
 
 @cors_preflight('GET,OPTIONS')
+@API.route('/foiapplicants/', defaults={'email': None})
 @API.route('/foiapplicants/<email>')
 class FOIApplicants(Resource):
     """Resource for retriving all FOI assignees."""
@@ -51,9 +52,11 @@ class FOIApplicants(Resource):
     @cors_preflight('GET,OPTIONS')
     def get(email=None):
         if email is None or email == "":
+            return []
             return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400
         try:
-            result = applicantservice().getapplicantbyemail(email)
+            keywords = {'email': email}
+            result = applicantservice().searchapplicant(keywords)
             if result is not None:
                 return json.dumps(result), 200
             else:
