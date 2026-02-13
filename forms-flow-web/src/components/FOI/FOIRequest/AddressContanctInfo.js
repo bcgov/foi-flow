@@ -130,10 +130,14 @@ const AddressContactDetails = memo(
           requestDetails,
           FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY
         ),
+        addressSecondary: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY
+        ),
         city: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CITY),
         province: validateFields(
           requestDetails,
-          FOI_COMPONENT_CONSTANTS.POSTALCODE
+          FOI_COMPONENT_CONSTANTS.PROVINCE
         ),
         country: validateFields(
           requestDetails,
@@ -147,11 +151,22 @@ const AddressContactDetails = memo(
           requestDetails,
           FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL
         ),
-        phonePrimary: "",
-        phoneSecondary: "",
-        workPhonePrimary: "",
-        workPhoneSecondary: "",
-        addressSecondary: ""
+        phonePrimary: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.HOME_PHONE
+        ),
+        phoneSecondary: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.MOBILE_PHONE
+        ),
+        workPhonePrimary: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY
+        ),
+        workPhoneSecondary: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY
+        )
       };
       handleContactDetailsInitialValue(contanctDetailsObject);
     }, [requestDetails, handleContactDetailsInitialValue]);

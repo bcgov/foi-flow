@@ -163,6 +163,10 @@ const ApplicantDetails = React.memo(
           requestDetails,
           FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME
         ),
+        middleName: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME
+        ),
         lastName: validateFields(
           requestDetails,
           FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME
@@ -175,8 +179,10 @@ const ApplicantDetails = React.memo(
             defaultValue: "Select Category",
           }
         ),
-        middleName: "",
-        businessName: ""
+        businessName: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.ORGANIZATION
+        )
       };
       handleApplicantDetailsInitialValue(applicantDetailsObject);
     }, [requestDetails, handleApplicantDetailsInitialValue]);
@@ -390,7 +396,7 @@ const ApplicantDetails = React.memo(
                 className={warning && warning(FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) && classes.warning}
                 fullWidth
                 required
-                disabled={StateEnum.closed.name.toLowerCase() === requestDetails?.currentState?.toLowerCase()}
+                disabled={StateEnum.closed.name.toLowerCase() === requestDetails?.currentState?.toLowerCase() || !openApplicantProfileModal}
                 error={selectedCategory.toLowerCase().includes("select")}
               >
                 {menuItems}
