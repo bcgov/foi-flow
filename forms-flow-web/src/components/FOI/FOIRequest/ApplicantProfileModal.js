@@ -52,6 +52,8 @@ const ApplicantDetailsSections = ({
     showHistory,
     warning,
     displayOtherNotes,
+    isAddRequest,
+    requestType = "general"
 }) => {
     return (
         <>
@@ -81,9 +83,9 @@ const ApplicantDetailsSections = ({
             <AdditionalApplicantDetails
                 requestDetails={requestDetails}
                 createSaveRequestObject={createSaveRequestObject}
-                disableInput={disableInput}
+                disableInput={disableInput || requestType == "general"}
                 defaultExpanded={defaultExpanded}
-                warning={warning}
+                warning={requestType != "general" || isAddRequest ? warning : null}
             />
         </>
     )
@@ -182,7 +184,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         }
                     }
                 }
-            } else if (requestDetails[field] && selectedApplicant[field] !== requestDetails[field]) {
+            } else if (selectedApplicant[field] !== requestDetails[field]) {
                 setIsProfileDifferent(true);
                 break;
             }
@@ -231,13 +233,18 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         return payload
     }
 
-    const executeProfileAction = (actionHandler) => {
+    const executeProfileAction = (actionHandler, options = { shouldClear: false }) => {
+        const { shouldClear = false } = options;
         const payload = profilePayloadBuilder();
         handleClose();
         dispatch(setFOILoader(true));
         dispatch(actionHandler(payload, (err, res) => {
             if (!err) {
-                dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
+                if (shouldClear) {
+                    dispatch(setFOIRequestApplicantProfile({}));
+                } else {
+                    dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
+                }
             }
         }));
     };
@@ -265,6 +272,11 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     };
 
     const reassignProfileToRequest = () => {
+        if (isAddRequest) {
+            handleClose();
+            dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
+            return;
+        }
         if (!isChangeToDifferentProfile) {
             handleClose();
             dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
@@ -277,13 +289,31 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         executeProfileAction(reassignApplicantProfile);
     };
 
+    const clearObject = (obj) => {
+        return Object.fromEntries(
+            Object.entries(obj)
+            .map(([key, value]) => {
+            if (value && typeof value === "object" && !Array.isArray(value)) {
+                return [key, clearObject(value)];
+            }
+            return [key, null];
+            })
+        );
+    };
+
     const unassignProfileFromRequest = () => {
         if (!confirmationMessage) {
             setIsUnassignProfile(true);
             setConfirmationMessage(true);
             return;
         }
-        executeProfileAction(unassignApplicantProfile);
+        if (isAddRequest) {
+            handleClose();
+            const clearedSaveApplicantObject = clearObject(saveApplicantObject)
+            dispatch(setFOIRequestApplicantProfile({...clearedSaveApplicantObject}));
+            return;
+        }
+        executeProfileAction(unassignApplicantProfile, {shouldClear: true});
     };
 
     const copyInfo = () => {
@@ -348,9 +378,10 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const warning = (field) => {
         const hasAtributes = Object.keys(saveApplicantObject).length !== 0
         if (hasAtributes && [FOI_COMPONENT_CONSTANTS.DOB, FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER, FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS].includes(field)) {
+            if (!requestDetails.additionalPersonalInfo?.[field] && saveApplicantObject?.additionalPersonalInfo[field]) return true;
             return requestDetails.additionalPersonalInfo?.[field] && requestDetails.additionalPersonalInfo[field] !== saveApplicantObject?.additionalPersonalInfo[field]
         } else {
-            return requestDetails[field] && requestDetails[field] !== saveApplicantObject?.[field]
+            return requestDetails[field] != saveApplicantObject?.[field]
         }
     }
 
@@ -504,6 +535,8 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                     showHistory={showApplicantHistory}
                     warning={null}
                     displayOtherNotes={true}
+                    isAddRequest={isAddRequest}
+                    requestType={requestDetails?.requestType}
                 />
             </>
         );
@@ -588,6 +621,8 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         showHistory={showApplicantHistory}
                         warning={warning}
                         displayOtherNotes={true}
+                        isAddRequest={isAddRequest}
+                        requestType={requestDetails?.requestType}
                     />
                 </>);
             } else {
