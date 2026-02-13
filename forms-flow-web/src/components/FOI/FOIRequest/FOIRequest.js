@@ -102,7 +102,8 @@ import {
   isAxisSyncDisplayField,
   getUniqueIdentifier,
   closeContactInfo,
-  closeApplicantDetails
+  closeApplicantDetails,
+  getIsAddRequest
 } from "./utils";
 import {
   ConditionalComponent,
@@ -163,7 +164,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
   const isHistoricalRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.HISTORICAL_REQUEST) > -1;
-  const [isAddRequest, setIsAddRequest] = useState(urlIndexCreateRequest > -1);
+  const [isAddRequest, setIsAddRequest] = useState(getIsAddRequest());
   //gets the request detail from the store
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
@@ -1561,7 +1562,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
                       <RequestDescriptionBox
                         programAreaList={programAreaList}
-                        urlIndexCreateRequest={urlIndexCreateRequest}
+                        // urlIndexCreateRequest={urlIndexCreateRequest}
                         requestDetails={requestDetails}
                         requiredRequestDetailsValues={
                           requiredRequestDetailsValues
@@ -1602,7 +1603,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         <AdditionalApplicantDetails
                           requestDetails={requestDetails}
                           createSaveRequestObject={createSaveRequestObject}
-                          disableInput={disableInput /* || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
+                          disableInput={disableInput || requestDetails?.axisApplicantID || requestDetails?.foiRequestApplicantID > 0}
                           defaultExpanded={true}
                         />
                       )}
