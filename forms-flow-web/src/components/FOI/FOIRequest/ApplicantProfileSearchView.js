@@ -140,13 +140,14 @@ export const ApplicantProfileSearchView = ({
   };
 
   const selectApplicantRow = (e) => {
+    const applicant = e.row;
+    const applicantID = applicant.foiRequestApplicantID;
     dispatch(
-      fetchApplicantRequests(e.row.foiRequestApplicantID, (err, res) => {
-        setSelectedApplicant(e.row);
-        setShowApplicantProfileTab(true);
-        setShowSearchApplicantsTab(false);
+      fetchApplicantRequests(applicantID, (err, res) => {
+        setSelectedApplicant(applicant);
         setRequestHistory(res);
         setIsLoading(false);
+        setShowSearchApplicantsTab(false);
       }),
     );
   };

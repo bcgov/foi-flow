@@ -10,7 +10,7 @@ import IconButton from "@mui/material/IconButton";
 import { ButtonBase } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
-import { fetchPotentialApplicants, fetchApplicantInfo, fetchApplicantContactHistory, fetchApplicantProfileByKeyword, fetchApplicantRequests, createNewApplicantProfile, updateApplicantProfile, reassignApplicantProfile, unassignApplicantProfile} from "../../../apiManager/services/FOI/foiApplicantProfileService";
+import { fetchPotentialApplicants, fetchApplicantInfo, fetchApplicantContactHistory, createNewApplicantProfile, updateApplicantProfile, reassignApplicantProfile, unassignApplicantProfile} from "../../../apiManager/services/FOI/foiApplicantProfileService";
 import AddressContactDetails from "./AddressContanctInfo";
 import ApplicantDetails from "./ApplicantDetails"
 import AdditionalApplicantDetails from "./AdditionalApplicantDetails";
