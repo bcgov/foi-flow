@@ -22,6 +22,7 @@ export const LinkedRequestsTable = ({
     const [page, setPage] = useState(0);
     const MAX_ROWS_PER_PAGE = 7;
     const sortedlinkedRequestsInfo = linkedRequestsInfo?.sort((a,b) => a.axisrequestid.localeCompare(b.axisrequestid));
+    console.log("LIQUIDD", sortedlinkedRequestsInfo)
 
     return (
         <>
@@ -108,13 +109,13 @@ export const LinkedRequestsTable = ({
                 sx={{
                     // Increase arrow size
                     '& .MuiTablePagination-actions .MuiIconButton-root svg': {
-                    fontSize: 32, // try 24–32
+                    fontSize: 32,
                     },
-                    // Optional: make the buttons stand out more
+                    // Make the buttons stand out more
                     '& .MuiTablePagination-actions .MuiIconButton-root': {
-                    color: 'text.primary', // or a brand color
+                    color: 'text.primary',
                     },
-                    // Optional: slight drop-shadow to "thicken" appearance
+                    // Slight drop-shadow to "thicken" appearance
                     '& .MuiTablePagination-actions .MuiIconButton-root svg': {
                     filter: 'drop-shadow(0 0 0 currentColor)',
                     },
