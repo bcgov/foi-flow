@@ -59,6 +59,7 @@ const LinkedRequests = React.memo(
     const handleSearch = (value) => {
       if (!value || value?.trim() === "") {
         setOptions([]);
+        setSearchQuery("");
         return;
       }
       setSearchQuery(value);
@@ -151,13 +152,13 @@ const LinkedRequests = React.memo(
       if (!alreadyExists && newRequestId) {
         const linkedReqObj = {
           "axisrequestid": selectedValue.axisrequestid,
-          "govcode": selectedValue.govcode
         };
         const linkedReqInfoObj = {
           "axisrequestid": selectedValue.axisrequestid,
           "requeststatus": selectedValue.requeststatus,
           "foiministryrequestid": selectedValue.foiministryrequestid || null, 
-          "rawrequestid": selectedValue.rawrequestid
+          "rawrequestid": selectedValue.rawrequestid,
+          "govcode": selectedValue.govcode
         };
         updatedLinkedRequests.push(linkedReqObj);
         setLinkedRequests(updatedLinkedRequests);

@@ -1579,18 +1579,20 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         createSaveRequestObject={createSaveRequestObject}
                         disableInput={disableInput || isHistoricalRequest}
                       />
-                      <LinkedRequests
-                        requestDetails={requestDetails}
-                        requestStatus={_requestStatus}
-                        handleRequestDetailsValue={handleRequestDetailsValue}
-                        handleRequestDetailsInitialValue={
-                          handleRequestDetailsInitialValue
-                        }
-                        createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput || isHistoricalRequest}
-                        isHistoricalRequest={isHistoricalRequest}
-                        isMinistry={isMinistry}
-                      />
+                      {requestDetails?.axisRequestId && 
+                        <LinkedRequests
+                          requestDetails={requestDetails}
+                          requestStatus={_requestStatus}
+                          handleRequestDetailsValue={handleRequestDetailsValue}
+                          handleRequestDetailsInitialValue={
+                            handleRequestDetailsInitialValue
+                          }
+                          createSaveRequestObject={createSaveRequestObject}
+                          disableInput={disableInput || isHistoricalRequest}
+                          isHistoricalRequest={isHistoricalRequest}
+                          isMinistry={isMinistry}
+                        />
+                      }
                       <RequestDetails
                         requestDetails={requestDetails}
                         requestStatus={_requestStatus}
