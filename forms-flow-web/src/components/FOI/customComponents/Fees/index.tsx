@@ -925,6 +925,7 @@ export const Fees = ({
                   disableNewCfrFormBtn={disableNewCfrFormBtn}
                   handleGenerateInvoice={handleGenerateInvoice}
                   cfrStatus={initialCFRState.status}
+                  isProcessingFeeSubTab={selectedSubtab == FeesSubtabValues.PROCESSINGFEE}
                 />
               </div>
           </div>
