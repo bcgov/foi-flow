@@ -12,6 +12,7 @@ export const BottomButtonGroup = ({
   disableNewCfrFormBtn,
   handleGenerateInvoice,
   cfrStatus,
+  isProcessingFeeSubTab,
 }: any) => {
   const generateInvoiceDisabled: boolean = cfrStatus !== "approved";
   return (
@@ -37,7 +38,7 @@ export const BottomButtonGroup = ({
       >
         + Create New Processing Fee Form
       </button>}
-      {!isMinistry && 
+      {isProcessingFeeSubTab && !isMinistry && 
       <Tooltip
         title={
           generateInvoiceDisabled && 
