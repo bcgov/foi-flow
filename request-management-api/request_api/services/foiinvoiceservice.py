@@ -4,8 +4,8 @@ from .document_generation_service import DocumentGenerationService
 from request_api.auth import AuthHelper
 from datetime import datetime as datetime2
 
-INVOICE_MEMO = "You have 20 business days to respond to this fee statement or your file will be closed as Abandoned. If the total estimate is over $200 you are only required to pay a 50% deposit, otherwise you are required to pay the full amount. The first 3 hours of 'Location & Retrieving' are free and is represented as $90 in the 'Waived $' column."
-OUTSTANDING_INVOICE_MEMO = "You have 20 business days to respond to this fee statement or your file will be closed as Abandoned. The first 3 hours of 'Location & Retrieving' are free and is represented as $90 in the 'Waived $' column."
+INVOICE_MEMO = "You have 20 business days to respond to this fee statement or your file will be closed as Abandoned. If the total estimate is over $200 you are only required to pay a 50% deposit, otherwise you are required to pay the full amount. The first 3 hours of 'Locating & Retrieving' are free and is represented as $90 in the 'Waived $' column."
+OUTSTANDING_INVOICE_MEMO = "You have 20 business days to respond to this fee statement or your file will be closed as Abandoned. The first 3 hours of 'Locating & Retrieving' are free and is represented as $90 in the 'Waived $' column."
 
 class foiinvoiceservice:
     def generate_invoice(self, invoice, userid):
