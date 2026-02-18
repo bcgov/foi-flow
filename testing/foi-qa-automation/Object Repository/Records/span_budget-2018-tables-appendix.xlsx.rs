@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>span_budget-2018-tables-appendix.xlsx</name>
+   <tag></tag>
+   <elementGuidId>888959d6-c0f9-4195-8884-3de6bbf0140a</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='Records']/div/div[2]/div[7]/div[4]/div/span</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value></value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>span</value>
+      <webElementGuid>4d21f85f-71ae-4f4b-abc1-1d511c393a50</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>jss56</value>
+      <webElementGuid>41781ff3-43ed-4c21-b230-f159ced99dfc</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>budget-2018-tables-appendix.xlsx </value>
+      <webElementGuid>fb5cd227-2b3b-4e6e-8f3d-fe4950de5b9a</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;Records&quot;)/div[@class=&quot;jss49&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root jss51 MuiGrid-container MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6&quot;]/span[@class=&quot;jss56&quot;]</value>
+      <webElementGuid>873ca789-7093-4534-8c54-a1195c1f09b6</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='Records']/div/div[2]/div[7]/div[4]/div/span</value>
+      <webElementGuid>fb728cf2-078c-4fb1-ba5d-0dae9d148201</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='foiedu, foiedu'])[2]/following::span[1]</value>
+      <webElementGuid>4d61aa6f-07a4-4c6d-b86c-2376b9e82bdd</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)=concat('Minister', &quot;'&quot;, 's Office')])[2]/following::span[1]</value>
+      <webElementGuid>a7571166-8c87-41fe-a949-0eb6db62bb6b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Deduplication &amp; file conversion in progress'])[1]/preceding::span[2]</value>
+      <webElementGuid>1dcbaa14-a5e9-46bd-b5b2-8aeddd3594d6</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)=concat('Minister', &quot;'&quot;, 's Office')])[3]/preceding::span[5]</value>
+      <webElementGuid>4bb3164a-42c5-4d3a-a5b9-c80aea3bbd93</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='budget-2018-tables-appendix.xlsx']/parent::*</value>
+      <webElementGuid>cb509c59-dce4-4ee4-9259-712cab990301</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[4]/div/span</value>
+      <webElementGuid>cf076bf4-2042-40db-a1e9-fc4c3fceb5e1</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//span[(text() = 'budget-2018-tables-appendix.xlsx ' or . = 'budget-2018-tables-appendix.xlsx ')]</value>
+      <webElementGuid>7b665128-e34b-405a-9d06-6988826e2a87</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

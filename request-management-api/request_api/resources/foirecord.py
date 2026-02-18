@@ -16,8 +16,9 @@
 
 from flask import g, request
 from flask_restx import Namespace, Resource, cors
-from flask_expects_json import expects_json
 from request_api.auth import auth, AuthHelper
+from request_api.schemas.foirequestrecord import FOIRequestCreateGroupSchema, FOIRequestUpdateGroupSchema
+from request_api.services.records.recordgroupservice import recordgroupservice
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships
 from request_api.exceptions import BusinessException, Error
@@ -28,6 +29,7 @@ import json
 from flask_cors import cross_origin
 import asyncio
 import traceback
+import logging
 
 
 API = Namespace('FOIWatcher', description='Endpoints for FOI record management')
@@ -355,3 +357,160 @@ class RetrieveFOIDocument(Resource):
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('GET,POST,OPTIONS')
+@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups')
+class FOIRequestRecordGroupList(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def get(requestid, ministryrequestid):
+        documentsetid = request.args.get('documentsetid', type=int)
+
+        try:
+            result = recordgroupservice().fetch(requestid, ministryrequestid, documentsetid)
+            return {
+                "success": result.success,
+                "message": result.message,
+                "code": result.code,
+                "data": result.data,
+            }, 200
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except Exception as exception:
+            return {'status': False, 'message': str(exception)}, 500
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def post(requestid, ministryrequestid):
+        try:
+            request_json = request.get_json(silent=False, force=False)
+            payload = FOIRequestCreateGroupSchema().load(request_json)
+            username = AuthHelper.getusername()
+
+            response = recordgroupservice().create(
+                int(requestid),
+                int(ministryrequestid),
+                payload,
+                username
+            )
+
+            return {
+                'status': response.success,
+                'message': response.message,
+                'data': response.data,
+            }, response.code
+
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message': exception.message}, 500
+
+
+@cors_preflight('GET,POST,OPTIONS')
+@API.route('/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups/<documentsetid>')
+class FOIRequestRecordGroups(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def put(requestid, ministryrequestid, documentsetid):
+        try:
+            request_json = request.get_json(silent=False, force=False)
+            payload = FOIRequestUpdateGroupSchema().load(request_json)
+            username = AuthHelper.getusername()
+
+            payload["documentsetid"] = int(documentsetid)
+
+            response = recordgroupservice().update(
+                int(requestid),
+                int(ministryrequestid),
+                payload,
+                username
+            )
+
+            return {
+                'status': response.success,
+                'message': response.message,
+                'data': response.data,
+            }, response.code
+
+        except KeyError as error:
+            return {
+                'status': False,
+                'message': CUSTOM_KEYERROR_MESSAGE + str(error)
+            }, 400
+
+        except BusinessException as exception:
+            return {
+                'status': exception.status_code,
+                'message': exception.message
+            }, 500
+
+@cors_preflight('DELETE,OPTIONS')
+@API.route(
+    '/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups/<documentsetid>/records/<recordid>'
+)
+class FOIRequestRecordGroupRecord(Resource):
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.ismemberofgroups(getrequiredmemberships())
+    def delete(requestid, ministryrequestid, documentsetid, recordid):
+        try:
+            request_id = int(requestid)
+            ministry_request_id = int(ministryrequestid)
+            document_set_id = int(documentsetid)
+            record_id = int(recordid)
+
+            response = recordgroupservice().delete(
+                request_id,
+                ministry_request_id,
+                document_set_id,
+                record_id,
+            )
+
+            return {
+                "success": response.success,
+                "message": response.message,
+                "data": response.data,
+            }, response.code
+
+        except ValueError:
+            return {
+                "success": False,
+                "message": "Invalid path parameters.",
+            }, 400
+
+        except BusinessException as exc:
+            return {
+                "success": False,
+                "message": exc.message,
+            }, exc.status_code
+
+        except Exception:
+            logging.exception(
+                "Failed to delete record from document set",
+                extra={
+                    "requestid": requestid,
+                    "ministryrequestid": ministryrequestid,
+                    "documentsetid": documentsetid,
+                    "recordid": recordid,
+                },
+            )
+            return {
+                "success": False,
+                "message": "Unexpected error.",
+            }, 500
+

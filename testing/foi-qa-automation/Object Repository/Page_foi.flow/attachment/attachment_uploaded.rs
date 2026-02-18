@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>attachment_uploaded</name>
+   <tag></tag>
+   <elementGuidId>8170f3cf-ab4c-40aa-9869-560fbb7b2e7f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'download.png' or . = 'download.png')]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value></value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>span.file-name</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>CSS</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>download.png</value>
+      <webElementGuid>401a879c-e8a9-49e4-903c-8aee58034809</webElementGuid>
+   </webElementProperties>
+</WebElementEntity>
