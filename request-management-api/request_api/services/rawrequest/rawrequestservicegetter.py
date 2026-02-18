@@ -128,7 +128,7 @@ class rawrequestservicegetter:
         assignee = None
         if ("assignedto" in request and request["assignedto"] not in (None,'')):
             assignee = FOIAssignee.getassignee(request["assignedto"])
-        assignedgroup = request["assignedGroup"] if "assignedGroup" in request else "Unassigned"
+        assignedgroup = request["assignedgroup"] if "assignedgroup" in request else "Unassigned"
         assignedgroupemail = self.__getassignedgroupemail(assignedgroup)
         return {'id': request['requestid'],
                                'wfinstanceid': request['wfinstanceid'],

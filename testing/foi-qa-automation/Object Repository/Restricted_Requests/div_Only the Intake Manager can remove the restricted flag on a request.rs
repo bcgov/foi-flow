@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_Only the Intake Manager can remove the restricted flag on a request</name>
+   <tag></tag>
+   <elementGuidId>b16a1328-74ff-4236-91e9-95261d0c31a0</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//span[@id='restricted-modal-text']/div/div</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>div.confirmation-message</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>2fa32693-da1f-40f3-a90e-78a825002b79</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>confirmation-message</value>
+      <webElementGuid>1b0aa01b-f2f8-4b7b-8725-c1fe16c1b60f</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Only the Intake Manager can remove the restricted flag on a request</value>
+      <webElementGuid>36afbd67-d0c4-4945-9a45-5fcb04f16bbc</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;restricted-modal-text&quot;)/div[@class=&quot;modal-msg&quot;]/div[@class=&quot;confirmation-message&quot;]</value>
+      <webElementGuid>e3566fba-7444-4116-8565-3c37e95d7e43</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//span[@id='restricted-modal-text']/div/div</value>
+      <webElementGuid>da59d24f-96d8-4b5a-85d8-cc34af5d4a76</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Close'])[1]/following::div[3]</value>
+      <webElementGuid>a12ac669-c918-4ace-be3f-3f4bb573662a</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Unrestrict File'])[1]/following::div[3]</value>
+      <webElementGuid>08e202b0-aeb2-4f06-a325-5c43ad245b39</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Intake Manager'])[1]/preceding::div[1]</value>
+      <webElementGuid>05f93942-5521-45d5-8053-12d5277399c0</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Save Change'])[1]/preceding::div[2]</value>
+      <webElementGuid>cf2ead70-8296-4318-8f52-b209666c5190</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='Only the Intake Manager can remove the restricted flag on a request']/parent::*</value>
+      <webElementGuid>0057d059-0feb-4a46-94f4-3304b817a3d2</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//span/div/div</value>
+      <webElementGuid>045a9fb6-a89f-4832-a5aa-e91d7ab53312</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'Only the Intake Manager can remove the restricted flag on a request' or . = 'Only the Intake Manager can remove the restricted flag on a request')]</value>
+      <webElementGuid>2e167838-d141-494d-a8ba-2f91bca75319</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

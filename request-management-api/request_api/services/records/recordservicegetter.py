@@ -25,7 +25,6 @@ class recordservicegetter(recordservicebase):
             resultrecords = []
             if len(uploadedrecords) > 0:
                 computingresponses, err = self.getdatafromdocreviewer(uploadedrecords, ministryrequestid)
-                #print("computingresponses:",computingresponses)
                 if err is None:
                     (
                         _convertedfiles,
@@ -37,12 +36,10 @@ class recordservicegetter(recordservicebase):
                         _computingresponse = self.__getcomputingresponse(
                             computingresponses, "recordid", record
                         )
-                        #print("\n_computingresponse:",_computingresponse)
 
                         _record = self.__preparerecord(
                             record, _computingresponse, computingresponses, divisions
                         )
-                        #print("\n__record:",_record)
 
                         if not _record["attributes"].get("isportfolio", False):
                             resultrecords.append(_record)
@@ -59,18 +56,40 @@ class recordservicegetter(recordservicebase):
                     result["removedfiles"] = _removedfiles
             result["batchcount"] = len(batchids)
             result["records"] = resultrecords
-        except Exception as exp:
-            print("ERROR Happened while fetching records :.{0}".format(exp))
-            logging.info(exp)
-            raise exp
+        except Exception as exc:
+            logging.exception("Error while fetching records")
+            raise RuntimeError("Failed to fetch records") from exc
         return result
-    
+
     def getdatafromdocreviewer(self, uploadedrecords, ministryrequestid):
-        if len(uploadedrecords) > 0:
-                computingresponses, err = self.makedocreviewerrequest(
-                    "GET", "/api/dedupestatus/{0}".format(ministryrequestid)
-                )
-        return computingresponses, err
+        if not uploadedrecords:
+            return [], None
+
+        computingresponses, err = self.makedocreviewerrequest(
+            "GET",
+            f"/api/dedupestatus/{ministryrequestid}"
+        )
+
+        if err:
+            return [], err
+
+        if isinstance(computingresponses, list):
+            records = computingresponses
+        elif isinstance(computingresponses, dict):
+            records = computingresponses.get("records", [])
+        else:
+            raise TypeError(
+                f"Unexpected DocReviewer response type: {type(computingresponses)}"
+            )
+
+        for record in records:
+            attrs = record.get("attributes")
+            if isinstance(attrs, (str, bytes)):
+                while isinstance(attrs, (str, bytes)):
+                    attrs = json.loads(attrs)
+                record["attributes"] = attrs
+
+        return records, None
 
     def __preparerecord(
         self, record, _computingresponse, computingresponses, divisions
@@ -137,14 +156,28 @@ class recordservicegetter(recordservicebase):
         return _record
 
     def __formatrecordattributes(self, attributes, divisions):
-        if isinstance(attributes, str):
+        # Unwrap JSON until dict
+        while isinstance(attributes, (str, bytes)):
             attributes = json.loads(attributes)
-        attribute_divisions = attributes.get("divisions", [])
+
+        if not isinstance(attributes, dict):
+            raise TypeError(f"Expected dict after parsing, got {type(attributes)}")
+
+        attribute_divisions = attributes.get("divisions") or []
+
         for division in attribute_divisions:
-            _divisionname = self.__getdivisionname(divisions, division["divisionid"])
+            if not isinstance(division, dict):
+                continue
+
+            division_id = division.get("divisionid")
+            if not division_id:
+                continue
+
+            _divisionname = self.__getdivisionname(divisions, division_id)
             division["divisionname"] = (
-                _divisionname.replace("’", "'") if _divisionname is not None else ""
+                _divisionname.replace("’", "'") if _divisionname else ""
             )
+
         return attributes
 
     def __handleduplicate(self, resultrecords):
@@ -219,20 +252,23 @@ class recordservicegetter(recordservicebase):
                 merged.append(entry)
         return merged
 
-    def __getcomputingresponse(self, response, filterby, data: any):
+    def __getcomputingresponse(self, response, filterby, data: dict):
+        if not response:
+            return None
+
         if filterby == "recordid":
-            filtered_response = [
-                x
-                for x in response
-                if x["recordid"] == data["recordid"]
-                and x["filename"] == data["filename"]
-            ]
-            return filtered_response[0] if len(filtered_response) > 0 else []
+            for x in response:
+                if (x.get("recordid") == data.get("recordid") and x.get("filename") == data.get("filename")):
+                    return x
+            return None
+
         elif filterby == "parentid":
-            filtered_response = [x for x in response if x["isattachment"] == True]
-            return self.__getattachments(filtered_response, [], data)
+            attachments = [x for x in response if x.get("isattachment") is True]
+            return self.__getattachments(attachments, [], data)
+
         else:
-            logging.info("not matched")
+            logging.info("Filter not matched: %s", filterby)
+            return None
 
     def __getattachments(self, response, result, data):
         filtered, result = self.__attachments2(response, result, data)
@@ -267,12 +303,6 @@ class recordservicegetter(recordservicebase):
         if _computingresponse["deduplicationstatus"] == "completed":
             return True
         return False
-    
-    # def __getisocrcompleted(self, _computingresponse):
-    #     if _computingresponse["compressionstatus"] == "completed":
-    #         return True
-    #     return False
-    
 
     def __getcomputingerror(self, computingresponse):
         if computingresponse["conversionstatus"] == "error":

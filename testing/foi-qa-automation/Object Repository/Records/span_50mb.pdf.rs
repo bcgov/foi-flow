@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>span_50mb.pdf</name>
+   <tag></tag>
+   <elementGuidId>00f738b6-7985-4ee0-8793-9cd96885921f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='Records']/div/div[2]/div[6]/div/div/span</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>span.jss66</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>span</value>
+      <webElementGuid>492cacc5-d1ae-422a-ae49-cf196057dcb4</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>jss66</value>
+      <webElementGuid>a76717b1-353d-4326-9fc2-5a8da04a8d2d</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>50mb.pdf </value>
+      <webElementGuid>f361601d-e67c-49aa-bf47-9ba8700b54dd</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;Records&quot;)/div[@class=&quot;jss59&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 MuiGrid-align-items-xs-flex-start&quot;]/div[@class=&quot;MuiGrid-root jss61 MuiGrid-container MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-align-items-xs-flex-start MuiGrid-grid-xs-12&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6&quot;]/span[@class=&quot;jss66&quot;]</value>
+      <webElementGuid>faf06cfd-e87e-4865-9775-6a34d7220c79</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='Records']/div/div[2]/div[6]/div/div/span</value>
+      <webElementGuid>cfff5580-9282-43d6-85e1-27489b2b4947</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='INCOMPATIBLE'])[1]/following::span[2]</value>
+      <webElementGuid>1f1d1c8d-e05d-45f0-8093-327a80bf0ca4</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='ERRORS'])[1]/following::span[4]</value>
+      <webElementGuid>5ca31aec-aea1-44f3-98d5-e179dda3ed59</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)=concat('Deputy Minister', &quot;'&quot;, 's Office')])[2]/preceding::span[5]</value>
+      <webElementGuid>edbab0b2-f465-4bcf-b5c6-efae30ee6ed3</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='50mb.pdf']/parent::*</value>
+      <webElementGuid>9e637db9-172f-4087-8599-fb7196fe5e44</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[6]/div/div/span</value>
+      <webElementGuid>0cda6ea0-ba87-4b18-a8de-f99944401615</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//span[(text() = '50mb.pdf ' or . = '50mb.pdf ')]</value>
+      <webElementGuid>460467fb-ea36-419d-b037-b6f0dc7cddfb</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

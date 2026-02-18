@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>li_Flex, Intake</name>
+   <tag></tag>
+   <elementGuidId>d251f163-c2fe-463b-b25a-5261a921c489</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value></value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='menu-']/div[3]/ul/li[9]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>li</value>
+      <webElementGuid>61359926-23fe-46f6-a857-cb0b4c9c9f68</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiButtonBase-root MuiListItem-root MuiMenuItem-root jss21 MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button</value>
+      <webElementGuid>e1883ec9-812b-433e-a71f-a0c2ac852bd0</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tabindex</name>
+      <type>Main</type>
+      <value>-1</value>
+      <webElementGuid>6727e73a-3879-42ae-ab08-1eb86e44ccc0</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>role</name>
+      <type>Main</type>
+      <value>option</value>
+      <webElementGuid>2ab953dc-f3be-4b91-9e2b-c0bf680baa15</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>aria-disabled</name>
+      <type>Main</type>
+      <value>false</value>
+      <webElementGuid>18191a23-436e-4209-8935-366f0b93f61e</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>data-value</name>
+      <type>Main</type>
+      <value>Intake Team|foiintakeflex@idir|Intake|Flex</value>
+      <webElementGuid>cdc89585-566b-4a63-ab91-c90dee1629aa</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Flex, Intake</value>
+      <webElementGuid>120b1a71-a967-4f97-aeb9-816b8234c04f</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;menu-&quot;)/div[@class=&quot;MuiPaper-root MuiMenu-paper MuiPopover-paper MuiPaper-elevation8 MuiPaper-rounded&quot;]/ul[@class=&quot;MuiList-root MuiMenu-list MuiList-padding&quot;]/li[@class=&quot;MuiButtonBase-root MuiListItem-root MuiMenuItem-root jss21 MuiMenuItem-gutters MuiListItem-gutters MuiListItem-button&quot;]</value>
+      <webElementGuid>e94569d2-33e3-40e2-b83c-889a7940da15</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='menu-']/div[3]/ul/li[9]</value>
+      <webElementGuid>d4eb03c1-33b6-4c04-a8ee-dc5291389048</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='FOI, foiIntake2'])[1]/following::li[1]</value>
+      <webElementGuid>62cf885d-34ce-40b5-b10f-4eb563197e02</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Eggleston, Kyle'])[1]/following::li[2]</value>
+      <webElementGuid>d2b96fa2-f476-4502-b67f-6b8079a75cf5</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Harrietha, Jacklyn'])[1]/preceding::li[1]</value>
+      <webElementGuid>7122896c-c8c5-410e-bc3f-1b24ae578b8b</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Intake, FOI'])[1]/preceding::li[2]</value>
+      <webElementGuid>397ffc8a-e328-4744-9ea7-168cf2059f7f</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='Flex, Intake']/parent::*</value>
+      <webElementGuid>f039a8c3-6737-47f2-bf99-16ff65d59bd0</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//li[9]</value>
+      <webElementGuid>0f2f06d3-8351-4289-b40b-de0a0be5a842</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//li[(text() = 'Flex, Intake' or . = 'Flex, Intake')]</value>
+      <webElementGuid>55ccd472-1d06-422e-aa0f-a072e9e09b52</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

@@ -107,5 +107,5 @@ jobs:
       - name: Rollout Restart Deployment
         shell: bash
         run: |
-          oc project d7abee-test
+          oc project d7abee-dev
           oc rollout restart deployment/forms-flow-web

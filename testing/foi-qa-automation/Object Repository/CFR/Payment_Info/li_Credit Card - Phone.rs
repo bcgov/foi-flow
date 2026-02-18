@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>li_Credit Card - Phone</name>
+   <tag></tag>
+   <elementGuidId>dfd097fc-95af-4195-8a4f-9d7de0f0ce21</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='menu-balancePaymentMethod']/div[3]/ul/li[3]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>li.MuiMenuItem-root.MuiMenuItem-gutters.MuiButtonBase-root.Mui-focusVisible.css-1km1ehz</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>li</value>
+      <webElementGuid>9d84e92a-c40c-44f1-97a0-12d4355c6b52</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiMenuItem-root MuiMenuItem-gutters MuiButtonBase-root Mui-focusVisible css-1km1ehz</value>
+      <webElementGuid>75bfd888-3382-400d-b737-4f15d00ca4d5</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tabindex</name>
+      <type>Main</type>
+      <value>0</value>
+      <webElementGuid>90b5461e-162c-48fd-8a64-5c71399781b1</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>role</name>
+      <type>Main</type>
+      <value>option</value>
+      <webElementGuid>6b644bea-ae54-4e71-a385-7095c2aea2be</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>aria-selected</name>
+      <type>Main</type>
+      <value>false</value>
+      <webElementGuid>cef6d6eb-2d8d-46cc-8e8c-0449ce5fd10a</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>data-value</name>
+      <type>Main</type>
+      <value>creditcardphone</value>
+      <webElementGuid>721ea101-2280-4567-880f-cf834b288f2d</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Credit Card - Phone</value>
+      <webElementGuid>0d49b633-e598-4ff4-a55f-8faa5618cda4</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;menu-balancePaymentMethod&quot;)/div[@class=&quot;MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiMenu-paper MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation8 MuiPopover-paper css-177ic5c&quot;]/ul[@class=&quot;MuiList-root MuiList-padding MuiMenu-list css-r8u8y9&quot;]/li[@class=&quot;MuiMenuItem-root MuiMenuItem-gutters MuiButtonBase-root Mui-focusVisible css-1km1ehz&quot;]</value>
+      <webElementGuid>ce66dbb7-0f86-499f-b901-f853235fe923</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='menu-balancePaymentMethod']/div[3]/ul/li[3]</value>
+      <webElementGuid>16e8d444-abe1-4eb7-a6b6-1aaf99da39f3</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Credit Card - Online'])[2]/following::li[1]</value>
+      <webElementGuid>099b8aed-bb83-4528-be1c-d0b085511dfb</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Select Payment Method'])[2]/following::li[2]</value>
+      <webElementGuid>9ce29914-818f-4b8a-8261-0aca853b0ec8</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Cheque'])[1]/preceding::li[1]</value>
+      <webElementGuid>dd1be6c4-612a-4b43-b8f1-7389ea5bdfb8</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Money Order'])[1]/preceding::li[2]</value>
+      <webElementGuid>6a5a7371-cfed-46e5-b6cd-59c6df8763e1</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='Credit Card - Phone']/parent::*</value>
+      <webElementGuid>2c4211a9-b835-4475-9225-d5498548b64e</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[3]/ul/li[3]</value>
+      <webElementGuid>29f95249-ebf3-42c6-a464-33b224d91f6e</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//li[(text() = 'Credit Card - Phone' or . = 'Credit Card - Phone')]</value>
+      <webElementGuid>538fbbb1-9796-46f5-b01b-195c2cc3c9ed</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>
