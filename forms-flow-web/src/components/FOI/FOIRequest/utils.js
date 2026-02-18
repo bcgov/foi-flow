@@ -369,7 +369,8 @@ export const checkValidationError = (
   oipcData,
   isOipcReview,
   isconsultflag,
-  requiredContactDetails
+  requiredContactDetails,
+  personalRequestDetailsErrors
 ) => {
   return (
     (!isconsultflag && (
@@ -410,6 +411,7 @@ export const checkValidationError = (
     !requiredRequestDetailsValues.dueDate ||
     ("recordsDueDate" in requiredRequestDetailsValues  && !requiredRequestDetailsValues.recordsDueDate) ||
     !requiredAxisDetails.axisRequestId ||
+    (Object.values(personalRequestDetailsErrors).some(personalReqestError => personalReqestError)) ||
     (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
       if (oipc.inquiryattributes?.inquirydate) {
         return oipc.inquiryattributes.orderno === "";
