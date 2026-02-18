@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Box, Fade } from "@mui/material";
 
-const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput}) => {
+const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput, setError}) => {
     
      /**
      *  On Behalf of details box in the UI
@@ -76,14 +76,17 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
     }, [additionalInfo]);
     
     const handleFirtNameChange = (e) => {
+        setError(prev => ({...prev, onBehalfFirstName: validateTextFieldError(e.target.value)}));
         setAnotherFirstName(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ANOTHER_FIRST_NAME, e.target.value);
     }
     const handleMiddleNameChange = (e) => {
+        setError(prev => ({...prev, onBehalfMiddleName: validateTextFieldError(e.target.value)}));
         setAnotherMiddleName(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ANOTHER_MIDDLE_NAME, e.target.value);
     }
     const handleLastNameChange = (e) => {
+        setError(prev => ({...prev, onBehalfLastName: validateTextFieldError(e.target.value)}));
         setAnotherLastName(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ANOTHER_LAST_NAME, e.target.value);
     }
@@ -94,7 +97,12 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
     const handleDOBChange = (e) => {
         setAnotherDOB(e.target.value);
         createSaveRequestObject(FOI_COMPONENT_CONSTANTS.ANOTHER_DOB, e.target.value);
-    }   
+    }
+    const TEXTFIELD_LENGTH_ERROR = "Text field length must not exceed 50 characters";
+    const validateTextFieldError = (value) => {
+        return value.length > 50;
+    }
+
      return (
         
         <div className='request-accordian' id="onBehalfOfDetails">
@@ -116,6 +124,8 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
                             onChange={handleFirtNameChange}
                             fullWidth
                             disabled={disableInput}
+                            error={validateTextFieldError(anotherFirstNameText)}
+                            helperText={validateTextFieldError(anotherFirstNameText) ? TEXTFIELD_LENGTH_ERROR : null}
                         />
                         <TextField       
                             id='onBehalfOfMiddleName'                    
@@ -127,6 +137,8 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
                             onChange={handleMiddleNameChange}
                             fullWidth
                             disabled={disableInput}
+                            error={validateTextFieldError(anotherMiddleNameText)}
+                            helperText={validateTextFieldError(anotherMiddleNameText) ? TEXTFIELD_LENGTH_ERROR : null}
                         />
                         <TextField      
                             id='onBehalfOfLastName'                     
@@ -138,6 +150,8 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
                             onChange={handleLastNameChange}
                             fullWidth
                             disabled={disableInput}
+                            error={validateTextFieldError(anotherLastNameText)}
+                            helperText={validateTextFieldError(anotherLastNameText) ? TEXTFIELD_LENGTH_ERROR : null}
                         />                                                
                     </div>
                     <div className="col-lg-6 foi-details-col"> 

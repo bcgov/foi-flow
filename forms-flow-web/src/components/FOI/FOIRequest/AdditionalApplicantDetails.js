@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Box, Fade } from "@mui/material";
 
-const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveRequestObject, disableInput, defaultExpanded, warning}) => {
+const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveRequestObject, disableInput, defaultExpanded, warning, setError}) => {
     /**
      *  Addition Applicant details box in the UI
      *  No mandatory fields here
@@ -117,6 +117,7 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
     },[requestDetails]) 
 
   const handlePersonalHealthNumber = (e) => {
+    setError(prev => ({...prev, additionalApplicantPHN: validateTextFieldError(e.target.value)}));
     setPersonalHealthNumber(e.target.value);
     createSaveRequestObject(FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER, e.target.value);
   }
@@ -127,11 +128,13 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
   }
 
   const handleCorrectionsNumber = (e) => {
+    setError(prev => ({...prev, additionalApplicantCorrectionsNum: validateTextFieldError(e.target.value)}));
     setCorrectionsNumber(e.target.value);
     createSaveRequestObject(FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER, e.target.value);
   }
 
   const handleEmployeeNumber = (e) => {
+    setError(prev => ({...prev, additionalApplicantEmployerNumber: validateTextFieldError(e.target.value)}));
     setEmployeeNumber(e.target.value);
     createSaveRequestObject(FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER, e.target.value);
   }
@@ -146,6 +149,10 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
   const handleBirthDate = (e) => {
     setDOB(e.target.value);
     createSaveRequestObject(FOI_COMPONENT_CONSTANTS.DOB, e.target.value);
+  }
+  const TEXTFIELD_LENGTH_ERROR = "Text field length must not exceed 50 characters";
+  const validateTextFieldError = (value) => {
+    return value.length > 50;
   }
 
      return (
@@ -169,6 +176,8 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                       onChange={handlePersonalHealthNumber}
                       fullWidth
                       disabled={disableInput}
+                      error={validateTextFieldError(personalHealthNumberText)}
+                      helperText={validateTextFieldError(personalHealthNumberText) ? TEXTFIELD_LENGTH_ERROR : null}
                   />                 
                   <TextField        
                     id='DOB'
@@ -210,6 +219,8 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                     onChange={handleCorrectionsNumber}
                     fullWidth
                     disabled={disableInput}
+                    error={validateTextFieldError(correctionsNumberText)}
+                    helperText={validateTextFieldError(correctionsNumberText) ? TEXTFIELD_LENGTH_ERROR : null}
                   /> 
                   <TextField   
                       id='employeeNumber'                         
@@ -222,6 +233,8 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
                       onChange={handleEmployeeNumber}
                       fullWidth
                       disabled={disableInput}
+                      error={validateTextFieldError(employeeNumberText)}
+                      helperText={validateTextFieldError(employeeNumberText) ? TEXTFIELD_LENGTH_ERROR : null}
                   />
                   <Box sx={{
                         ".MuiInputBase-multiline.Mui-disabled": {
