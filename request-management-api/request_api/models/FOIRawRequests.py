@@ -686,6 +686,7 @@ class FOIRawRequest(db.Model):
     @classmethod
     def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups):
         unopened_request_restriction = getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") if getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") not in (None, "") else datetime.now()
+        print("UNOPENED_REQUEST_DATE", unopened_request_restriction)
         basequery = FOIRawRequest.getbasequery(additionalfilter, userid, isiaorestrictedfilemanager, groups)
         basequery = basequery.filter(FOIRawRequest.status != 'Closed').filter(or_(FOIRawRequest.status != 'Unopened', FOIRawRequest.created_at >= unopened_request_restriction))
         #filter/search
