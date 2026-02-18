@@ -2346,7 +2346,12 @@ export const RecordsLog = ({
 
   const isBulkEditDisabled = () => {
     if (isBulkEdit) {
-    return false;
+      for (let record of records) {
+        if (record.isselected && !record.isdedupecomplete) {
+          return true;
+        }
+      }
+      return false;
     } else {
       return true;
     }
@@ -2463,11 +2468,13 @@ export const RecordsLog = ({
                     },
                     (err, _res) => {
                       dispatchRequestAttachment(err);
+                      if (!err) dispatch(checkForRecordsChange(requestId, ministryId));
                     }
                   )
                 );
               } else {
                 dispatchRequestAttachment(err);
+                if (!err) dispatch(checkForRecordsChange(requestId, ministryId));
               }
             }
           )
@@ -2485,6 +2492,7 @@ export const RecordsLog = ({
               },
               (err, _res) => {
                 dispatchRequestAttachment(err);
+                if (!err) dispatch(checkForRecordsChange(requestId, ministryId));
               }
             )
           );
@@ -4343,7 +4351,7 @@ const AttachmentPopup = React.memo(
           <MenuList>
             {isMCFPersonal && (
               <MenuItem
-                disabled={lockRecords || disableMinistryUser}
+                disabled={lockRecords || disableMinistryUser || !record.isdedupecomplete}
                 onClick={() => {
                   setEditTagModalOpen(true);
                   setPopoverOpen(false);

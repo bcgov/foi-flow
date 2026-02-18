@@ -29,6 +29,7 @@ from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .SubjectCodes import SubjectCode
 from request_api.utils.enums import StateName
 from .FOIRequestOIPC import FOIRequestOIPC
+from .OpenInformationStatuses import OpenInformationStatuses
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -110,6 +111,7 @@ class FOIMinistryRequest(db.Model):
     subjectcode = relationship('FOIMinistryRequestSubjectCode', primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIMinistryRequestSubjectCode.foiministryrequestid, "
                         "FOIMinistryRequest.version==FOIMinistryRequestSubjectCode.foiministryrequestversion)") 
     isofflinepayment = db.Column(db.Boolean, unique=False, nullable=True,default=False)
+    
 
     isoipcreview = db.Column(db.Boolean, unique=False, nullable=True,default=False)
     oistatus_id = db.Column(db.Integer, ForeignKey('OpenInformationStatuses.oistatusid'), unique=False, nullable=True)
@@ -769,6 +771,8 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def findfield(cls, x, iaoassignee, ministryassignee):
         #add more fields here if need sort/filter/search more columns
+        from .FOIOpenInformationRequests import FOIOpenInformationRequests
+        foiopeninfo=aliased(FOIOpenInformationRequests)
         axispagecount = case ([
             (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
             ],
@@ -804,6 +808,7 @@ class FOIMinistryRequest(db.Model):
             'rawRequestNumber': FOIMinistryRequest.filenumber,
             'currentState': FOIRequestStatus.name,
             'assignedTo': FOIMinistryRequest.assignedto,
+            'oiAssignedTo': foiopeninfo.oiassignedto,
             'receivedDate': FOIRequest.receiveddate,
             'receivedDateUF': FOIRequest.receiveddate,
             'applicantcategory': ApplicantCategory.name,
@@ -826,7 +831,7 @@ class FOIMinistryRequest(db.Model):
             'closedate': FOIMinistryRequest.closedate,
             'subjectcode': SubjectCode.name,
             'isoipcreview': FOIMinistryRequest.isoipcreview,
-            'isphasedrelease': FOIMinistryRequest.isphasedrelease
+            'isphasedrelease': FOIMinistryRequest.isphasedrelease,
         }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
@@ -1060,10 +1065,15 @@ class FOIMinistryRequest(db.Model):
         return axisids 
 
     @classmethod
-    def getbasequery(cls, iaoassignee, ministryassignee, userid=None, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
+    def getbasequery(cls, iaoassignee, ministryassignee, params, userid=None, requestby='IAO', isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
         #for advanced search
 
         _session = db.session
+        
+        #OI Advanced Search Implementation
+        is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
+        from .FOIOpenInformationRequests import FOIOpenInformationRequests
+        foiopeninfo=aliased(FOIOpenInformationRequests)
 
         #ministry filter for group/team
         ministryfilter = and_(FOIMinistryRequest.isactive == True, FOIRequestStatus.isactive == True)
@@ -1225,8 +1235,29 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.isoipcreview.label('isoipcreview'),
             FOIMinistryRequest.isphasedrelease.label('isphasedrelease'),
             literal(None).label('oipc_number'),
-            CloseReason.name.label('closereason')
+            CloseReason.name.label('closereason'),
         ]
+        if is_oi_team:
+            oiAssignedToFormatted = case([
+                (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
+                func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
+                (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
+                FOIAssignee.lastname),
+                (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
+                FOIAssignee.firstname),
+                (foiopeninfo.oiassignedto.is_(None),
+                'Unassigned'),
+            ],
+            else_ = foiopeninfo.oiassignedto).label('oiAssignedTo')
+            publicationStatus = case(
+                [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
+                else_=OpenInformationStatuses.name
+            ).label('publicationStatus')
+
+            selectedcolumns.append(publicationStatus)
+            selectedcolumns.append(foiopeninfo.publicationdate.label('publicationDate'))
+            selectedcolumns.append(foiopeninfo.receiveddate.label('oiReceivedDate'))
+            selectedcolumns.append(oiAssignedToFormatted)
 
         basequery = _session.query(
                                 *selectedcolumns
@@ -1301,8 +1332,15 @@ class FOIMinistryRequest(db.Model):
                                 CloseReason.closereasonid == FOIMinistryRequest.closereasonid,
                                 isouter=True
                             )
-                            
-
+        
+        if is_oi_team:
+            basequery = basequery.join(
+                foiopeninfo, 
+                and_(
+                    foiopeninfo.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid, 
+                    foiopeninfo.foiministryrequestversion_id == FOIMinistryRequest.version, 
+                    foiopeninfo.isactive == True), 
+                isouter=True).join(FOIAssignee, FOIAssignee.username == foiopeninfo.oiassignedto, isouter=True).join(OpenInformationStatuses, OpenInformationStatuses.oistatusid == FOIMinistryRequest.oistatus_id, isouter=True)
         if(isiaorestrictedfilemanager == True or isministryrestrictedfilemanager == True):
             dbquery = basequery.filter(ministryfilter)
         else:
@@ -1356,7 +1394,7 @@ class FOIMinistryRequest(db.Model):
 
     @classmethod
     def advancedsearchsubquery(cls, params, iaoassignee, ministryassignee, userid, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager=False):
-        basequery = FOIMinistryRequest.getbasequery(iaoassignee, ministryassignee, userid, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
+        basequery = FOIMinistryRequest.getbasequery(iaoassignee, ministryassignee, params, userid, requestby, isiaorestrictedfilemanager, isministryrestrictedfilemanager)
 
         #filter/search
         filtercondition = FOIMinistryRequest.getfilterforadvancedsearch(params, iaoassignee, ministryassignee)

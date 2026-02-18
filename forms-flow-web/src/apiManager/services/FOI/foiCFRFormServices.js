@@ -89,3 +89,23 @@ export const saveCFRForm = (
     });
 };
 
+export const saveInvoice = (invoiceData, isMinistry, dispatch) => {
+  if (isMinistry) {
+    dispatch(serviceActionError("Ministry User cannot generate invoice"));
+    return Promise.reject(new Error("Ministry User cannot generate invoice"));
+  }
+  const baseUrl = API.FOI_POST_CFR_INVOICE;
+  const apiUrl = replaceUrl(baseUrl, "<foicfrfeeid>", invoiceData.cfrFeeData.cfrfeeid);
+  return httpPOSTRequest(apiUrl, invoiceData)
+    .then((res) => {
+      if (!res.data) {
+        dispatch(serviceActionError("Empty response body"));
+        throw new Error("Empty response body");
+      }
+      return res.data;
+    })
+    .catch((error) => {
+      console.error("An error occured while trying to save and generate CFR Fee Invoice", error);
+      catchError(error, dispatch);
+    });
+}

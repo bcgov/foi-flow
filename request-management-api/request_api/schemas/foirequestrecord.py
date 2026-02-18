@@ -32,8 +32,8 @@ class FOIRequestCreateGroupSchema(Schema):
         required=False,
         description="List of record IDs to add to the group",
         validate=[validate.Length(
-            max=20,
-            error="List of records must contain no more than 20 items."
+            max=60,
+            error="List of records must contain no more than 60 items."
         )],
         example=[1, 2, 3, 4]
     )
