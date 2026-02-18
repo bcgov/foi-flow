@@ -31,6 +31,8 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.requeststatuslabel = requestschema.get("requeststatuslabel")        
         foiministryrequest.isactive = True
         foiministryrequest.axisrequestid = requestschema.get("axisRequestId")
+        # If we decide to keep populating axisrequestid field, replace line above with the line below
+        # foiministryrequest.axisrequestid = requestschema.get("axisRequestId", self.__generateRequestId(requestschema, ministry))
         foiministryrequest.axissyncdate = requestschema.get("axisSyncDate")
         foiministryrequest.axispagecount = requestschema.get("axispagecount")
         foiministryrequest.axislanpagecount = requestschema.get("axislanpagecount")
@@ -230,9 +232,5 @@ class requestservicebuilder(requestserviceconfigurator):
                 return True
         return False          
     
-            
-
-    
-
-
-
+    def __generateRequestId(self, requestschema, ministry):
+        return f'{ministry["code"]}-{datetime2.now().year}-{str(requestschema.get("foirawrequestid")).zfill(6)}'
