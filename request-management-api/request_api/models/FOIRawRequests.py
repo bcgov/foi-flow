@@ -22,6 +22,7 @@ from dateutil import parser
 import json
 from request_api.utils.enums import StateName
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
+from os import getenv
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -684,8 +685,9 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups):
+        unopened_request_restriction = getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") if getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") not in (None, "") else datetime.now()
         basequery = FOIRawRequest.getbasequery(additionalfilter, userid, isiaorestrictedfilemanager, groups)
-        basequery = basequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
+        basequery = basequery.filter(FOIRawRequest.status != 'Closed').filter(or_(FOIRawRequest.status != 'Unopened', FOIRawRequest.created_at >= unopened_request_restriction))
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = FOIRawRequest.getfilterforrequestssubquery(filterfields, keyword)
