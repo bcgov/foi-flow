@@ -53,6 +53,7 @@ const ApplicantDetailsSections = ({
     warning,
     displayOtherNotes,
     isAddRequest,
+    isUnopenedRequest,
     requestType = "general"
 }) => {
     return (
@@ -85,7 +86,7 @@ const ApplicantDetailsSections = ({
                 createSaveRequestObject={createSaveRequestObject}
                 disableInput={disableInput || requestType == "general"}
                 defaultExpanded={defaultExpanded}
-                warning={requestType != "general" || isAddRequest ? warning : null}
+                warning={requestType != "general" || isAddRequest || isUnopenedRequest ? warning : null}
             />
         </>
     )
@@ -94,10 +95,10 @@ const ApplicantDetailsSections = ({
 const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {    
     const classes = useStyles();
 
-    const isAddRequest = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1;
-
     let requestDetails = useSelector((state) => state.foiRequests.foiRequestDetail);
     const dispatch = useDispatch();
+    const isAddRequest = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1;
+    const isUnopenedRequest = requestDetails?.currentState == "Unopened"
 
     const [isLoading, setIsLoading] = useState(true);
     const [rows, setRows] = useState([]);
@@ -272,7 +273,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     };
 
     const reassignProfileToRequest = () => {
-        if (isAddRequest) {
+        if (isAddRequest || isUnopenedRequest) {
             handleClose();
             dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
             return;
@@ -307,7 +308,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
             setConfirmationMessage(true);
             return;
         }
-        if (isAddRequest) {
+        if (isAddRequest || isUnopenedRequest) {
             handleClose();
             const clearedSaveApplicantObject = clearObject(saveApplicantObject)
             dispatch(setFOIRequestApplicantProfile({...clearedSaveApplicantObject}));
@@ -536,6 +537,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                     warning={null}
                     displayOtherNotes={true}
                     isAddRequest={isAddRequest}
+                    isUnopenedRequest={isUnopenedRequest}
                     requestType={requestDetails?.requestType}
                 />
             </>
@@ -622,6 +624,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         warning={warning}
                         displayOtherNotes={true}
                         isAddRequest={isAddRequest}
+                        isUnopenedRequest={isUnopenedRequest}
                         requestType={requestDetails?.requestType}
                     />
                 </>);
@@ -636,7 +639,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         setRequestHistory={setRequestHistory}
                         dispatch={dispatch}
                         toast={toast}
-                        initialSearchMode={isAddRequest ? "manual" : "auto"}
+                        initialSearchMode={isAddRequest || isUnopenedRequest ? "manual" : "auto"}
                     />
                 )
             }
