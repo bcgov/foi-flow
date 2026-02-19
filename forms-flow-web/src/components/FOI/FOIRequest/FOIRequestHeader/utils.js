@@ -95,16 +95,20 @@ export const getHeaderText = ({requestDetails, ministryId, status}) => {
   if (window.location.href.includes(FOI_COMPONENT_CONSTANTS.ADDREQUEST)) {
     return FOI_COMPONENT_CONSTANTS.ADD_REQUEST;
   }
-  
-  if(status?.toLowerCase() === StateEnum.unopened.name.toLowerCase()){
-    return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
-  }
 
   if(requestDetails.axisRequestId)
     return requestDetails.axisRequestId;
 
   if (requestDetails.idNumber && ministryId) {
     return requestDetails.idNumber;
+  }
+  
+  if (requestDetails.rawRequestId) {
+    return 'U-' + String(requestDetails.rawRequestId).padStart(6, '0')
+  }
+
+  if(status?.toLowerCase() === StateEnum.unopened.name.toLowerCase()){
+    return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
   }
 
   return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
