@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -8,20 +9,66 @@ import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import Popover from "@material-ui/core/Popover";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import InputAdornment from "@material-ui/core/InputAdornment";
 import { formatDate } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
 import { fetchFOIProactiveDisclosureCategoryList } from "../../../apiManager/services/FOI/foiMasterDataServices";
+import QuarterSelector from "./QuarterSelector";
+import MonthSelector from "./MonthSelector";
+import YearSelector from "./YearSelector";
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   heading: {
     color: "#FFF",
     fontSize: "16px !important",
     fontWeight: "bold !important",
   },
+
   accordionSummary: {
     flexDirection: "row-reverse",
   },
-});
+
+  popoverContent: {
+    padding: 10,
+  },
+
+  tabs: {
+    borderBottom: "1px solid #e8e8e8",
+  },
+
+  tabIndicator: {
+    backgroundColor: "#000 !important",
+    height: "3px",
+  },
+
+  tabRoot: {
+    textTransform: "none",
+    minWidth: 0,
+    fontWeight: 400,
+    flex: 1,
+    maxWidth: "none",
+    marginRight: 0,
+    marginLeft: 0,
+
+    "&:hover": {
+      color: "#000",
+      opacity: 1,
+    },
+
+    "&.tabSelected": {
+      color: "#000",
+      fontWeight: "bold",
+    },
+
+    "&:focus": {
+      color: "#000",
+    }
+  }
+}));
+
 
 const ProactiveDisclosureDetails = React.memo(
   ({
@@ -34,9 +81,8 @@ const ProactiveDisclosureDetails = React.memo(
     disableInput,
     saveRequestObject,
   }) => {
-    const classes = useStyles();
     const dispatch = useDispatch();
-
+    const classes = useStyles();
     // Get master data from Redux store
     const requestTypes = useSelector(
       (state) => state.foiRequests.foiRequestTypeList || []
@@ -53,7 +99,7 @@ const ProactiveDisclosureDetails = React.memo(
     }, []);
 
     // Validation helper
-    const validateField = (request, fieldName, value) => {
+    const validateField = (request, fieldName, value?) => {
       if (!request) return value || "";
       switch (fieldName) {
         case "requestType":
@@ -159,6 +205,44 @@ const ProactiveDisclosureDetails = React.memo(
     const [cfrDueDate, setCfrDueDate] = useState("");
     const [publicationDate, setPublicationDate] = useState("");
 
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [tabValue, setTabValue] = useState(0);
+
+    const handleReportPeriodClick = (event) => {
+      if (disableInput || !startDate) return;
+      setAnchorEl(event.currentTarget);
+      const isQuarter = selectedReportPeriod && selectedReportPeriod.toLowerCase().includes("quarter");
+      const isYearly = selectedReportPeriod &&
+        (/^\d{4}$/.test(selectedReportPeriod) || selectedReportPeriod.toLowerCase().includes("fiscal year"));
+      let initialTab = 0;
+      if (isQuarter) initialTab = 1;
+      if (isYearly) initialTab = 2;
+      setTabValue(initialTab);
+    };
+
+    const handlePopoverClose = () => {
+      setAnchorEl(null);
+    };
+
+    const handleTabChange = (event, newValue) => {
+      setTabValue(newValue);
+    };
+
+    const handlePeriodUpdate = (date, period) => {
+      if (date) handleStartDateChange({ target: { value: date } });
+      if (period) handleReportPeriodChange({ target: { value: period } });
+      handlePopoverClose();
+    };
+
+    const getReportPeriodDisplay = (period) => {
+      if (!period) return "";
+      if (period.toLowerCase().includes("select")) return "";
+      if (period.toLowerCase().includes("n/a")) return period;
+      if (/\d{4}/.test(period)) return period;
+      const year = startDate ? startDate.split("-")[0] : "";
+      return year ? `${period} ${year}` : period;
+    };
+
     // Event handlers
     const handleRequestTypeChange = (e) => {
       const value = e.target.value;
@@ -249,11 +333,11 @@ const ProactiveDisclosureDetails = React.memo(
       <div className="request-accordian">
         <Accordion defaultExpanded={true}>
           <AccordionSummary
-            className={classes.accordionSummary}
+            className="accordionSummary"
             expandIcon={<ExpandMoreIcon />}
             id="proactiveDisclosureDetails-header"
           >
-            <Typography className={classes.heading}>
+            <Typography className="heading">
               PROACTIVE DISCLOSURE DETAILS
             </Typography>
           </AccordionSummary>
@@ -283,9 +367,9 @@ const ProactiveDisclosureDetails = React.memo(
                     label="Report Period"
                     inputProps={{ "aria-labelledby": "reportPeriod-label" }}
                     InputLabelProps={{ shrink: true }}
-                    select
-                    value={selectedReportPeriod}
-                    onChange={handleReportPeriodChange}
+                    // select // Removed select to use custom Popover
+                    value={getReportPeriodDisplay(selectedReportPeriod)}
+                    // onChange={handleReportPeriodChange} // Controlled by Popover
                     variant="outlined"
                     fullWidth
                     required
@@ -293,9 +377,80 @@ const ProactiveDisclosureDetails = React.memo(
                     error={selectedReportPeriod
                       ?.toLowerCase()
                       ?.includes("select")}
+                    InputProps={{
+                      readOnly: true,
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <ExpandMoreIcon style={{ color: disableInput || !startDate ? "rgba(0, 0, 0, 0.26)" : "#757575", cursor: "pointer", pointerEvents: "auto" }} />
+                        </InputAdornment>
+                      ),
+                    }}
+                    onClick={handleReportPeriodClick}
+                  />
+
+                  <Popover
+                    open={Boolean(anchorEl)}
+                    anchorEl={anchorEl}
+                    onClose={handlePopoverClose}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'left',
+                    }}
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'left',
+                    }}
+                    PaperProps={{
+                      style: { width: '590px', padding: '0px' }
+                    }}
                   >
-                    {reportPeriodMenuItems}
-                  </TextField>
+                    <Tabs
+                      value={tabValue}
+                      onChange={handleTabChange}
+                      variant="fullWidth"
+                      aria-label="report period tabs"
+                      className={classes.tabs}
+                      classes={{ indicator: classes.tabIndicator }}
+                      indicatorColor="primary"
+                      textColor="inherit"
+                    >
+                      <Tab
+                        label="Monthly"
+                        classes={{ root: classes.tabRoot, selected: classes.tabSelected }}
+                      />
+                      <Tab
+                        label="Quarterly"
+                        classes={{ root: classes.tabRoot, selected: classes.tabSelected }}
+                      />
+                      <Tab
+                        label="Yearly"
+                        classes={{ root: classes.tabRoot, selected: classes.tabSelected }}
+                      />
+                    </Tabs>
+                    <div className="tabContent" style={{ padding: '10px', height: '400px' }}>
+                      {tabValue === 0 && (
+                        <MonthSelector
+                          date={startDate}
+                          selectedMonth={selectedReportPeriod}
+                          onUpdate={handlePeriodUpdate}
+                        />
+                      )}
+                      {tabValue === 1 && (
+                        <QuarterSelector
+                          date={startDate}
+                          selectedQuarter={selectedReportPeriod}
+                          onUpdate={handlePeriodUpdate}
+                        />
+                      )}
+                      {tabValue === 2 && (
+                        <YearSelector
+                          date={startDate}
+                          selectedYear={selectedReportPeriod}
+                          onUpdate={handlePeriodUpdate}
+                        />
+                      )}
+                    </div>
+                  </Popover>
 
                   <TextField
                     id="cfrDueDate"
@@ -370,6 +525,9 @@ const ProactiveDisclosureDetails = React.memo(
                   />
                 </div>
               </div>
+
+
+
             </div>
           </AccordionDetails>
         </Accordion>
@@ -377,5 +535,16 @@ const ProactiveDisclosureDetails = React.memo(
     );
   }
 );
+
+ProactiveDisclosureDetails.propTypes = {
+  requestDetails: PropTypes.object,
+  handleRequestDetailsValue: PropTypes.func,
+  handleRequestDetailsInitialValue: PropTypes.func,
+  handleProactiveDetailsValue: PropTypes.func,
+  handleProactiveDetailsInitialValue: PropTypes.func,
+  createSaveRequestObject: PropTypes.func,
+  disableInput: PropTypes.bool,
+  saveRequestObject: PropTypes.object,
+};
 
 export default ProactiveDisclosureDetails;

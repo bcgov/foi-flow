@@ -1711,6 +1711,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             }
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput || isHistoricalRequest}
+
                           />
                         </>
                       ) : (
@@ -1909,6 +1910,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         attachmentsArray={requestAttachments}
                         oipcData={oipcData}
                         validLockRecordsState={validLockRecordsState}
+                        isProactiveDisclosure={isProactiveDisclosure}
                       />
                     </>
                   </ConditionalComponent>

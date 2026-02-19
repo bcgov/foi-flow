@@ -29,7 +29,7 @@ import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import clsx from "clsx";
 import AxisSyncModal from "../AxisDetails/AxisSyncModal";
 
-import { PAYMENT_EXPIRY_DAYS} from "../../../../constants/FOI/constants";
+import { PAYMENT_EXPIRY_DAYS } from "../../../../constants/FOI/constants";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -79,6 +79,7 @@ const BottomButtonGroup = React.memo(
     attachmentsArray,
     oipcData,
     validLockRecordsState,
+    isProactiveDisclosure,
   }) => {
     /**
      * Bottom Button Group of Review request Page
@@ -101,7 +102,7 @@ const BottomButtonGroup = React.memo(
     const assignedToList = useSelector(
       (state) => state.foiRequests.foiAssignedToList
     );
-    
+
     const user = useSelector((reduxState) => reduxState.user.userDetail);
     const userGroups = user?.groups?.map(group => group.slice(1));
 
@@ -117,7 +118,7 @@ const BottomButtonGroup = React.memo(
       setClosingReasonId(cReasonId);
     };
 
-    const [saveConfirmationModal, setSaveConfirmationModal]= useState(false);
+    const [saveConfirmationModal, setSaveConfirmationModal] = useState(false);
 
     useEffect(() => {
       if (stateChanged) {
@@ -154,7 +155,7 @@ const BottomButtonGroup = React.memo(
           urlIndexCreateRequest,
           requestId,
           ministryId,
-          (err, res) => {            
+          (err, res) => {
             if (!err) {
               toast.success("The request has been saved successfully.", {
                 position: "top-right",
@@ -209,7 +210,7 @@ const BottomButtonGroup = React.memo(
         saveRequestObject.currentState
       ) {
         //scanning team - MSD/CFD personal
-        if(currentSelectedStatus === StateEnum.readytoscan.name) {
+        if (currentSelectedStatus === StateEnum.readytoscan.name) {
           saveRequestObject.assignedGroup = KCScanningTeam;
 
           if (assignedToList && assignedToList.length > 0) {
@@ -232,13 +233,13 @@ const BottomButtonGroup = React.memo(
         saveRequestObject.requeststatuslabel = StateEnum.open.label;
         if (currentSelectedStatus === StateEnum.open.name && ministryId) {
           saveRequestModal();
-        } 
+        }
         // else if(saveRequestObject.currentState === StateEnum.intakeinprogress.name) { //open a request
         //   const previousState = saveRequestObject.stateTransition[0].status;  
 
         //   openRequest();
         // }
-        else if(currentSelectedStatus &&
+        else if (currentSelectedStatus &&
           currentSelectedStatus === StateEnum.open.name)
           openRequest();
       }
@@ -318,7 +319,7 @@ const BottomButtonGroup = React.memo(
     const [documents, setDocuments] = useState([]);
 
     const saveStatusId = () => {
-      if (userGroups.includes("OI Team")) {
+      if (userGroups.includes("OI Team") && !isProactiveDisclosure) {
         saveRequestObject.oistatusid = openInfoStates.find(s => s.name === currentSelectedStatus).oistatusid;
       } else if (currentSelectedStatus) {
         switch (currentSelectedStatus) {
@@ -327,7 +328,7 @@ const BottomButtonGroup = React.memo(
             saveRequestObject.closedate = closingDate;
             saveRequestObject.closereasonid = closingReasonId;
             break;
-  
+
           case StateEnum.callforrecords.name:
             saveRequestObject.paymentExpiryDate = ""
             saveRequestObject.requeststatuslabel = StateEnum.callforrecords.label;
@@ -365,7 +366,7 @@ const BottomButtonGroup = React.memo(
               saveRequestObject.dueDate = calculatedRequestDueDate;
             }*/
             break;
-  
+
           case StateEnum.redirect.name:
           case StateEnum.open.name:
           case StateEnum.intakeinprogress.name:
@@ -478,36 +479,36 @@ const BottomButtonGroup = React.memo(
 
         {saveConfirmationModal &&
           <ConfirmSaveModal
-          //   modalMessage={""}
-          //   modalDescription={""}
-          //   showModal={true}
-          // //  saveAssigneeDetails={}
-          //   assigneeVal={""}
-          //   assigneeName={""}
-          //   resetModal={false}
+            //   modalMessage={""}
+            //   modalDescription={""}
+            //   showModal={true}
+            // //  saveAssigneeDetails={}
+            //   assigneeVal={""}
+            //   assigneeName={""}
+            //   resetModal={false}
             showModal={true}
-            selectedMinistries = {[]}
-            allMinistries = {[]}
+            selectedMinistries={[]}
+            allMinistries={[]}
             onProceed={true}
-            />
+          />
 
         }
 
         <div className="foi-bottom-button-group">
           {urlIndexCreateRequest < 0 &&
             (requestState?.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() &&
-            requestState?.toLowerCase() !== StateEnum.unopened.name.toLowerCase()) &&
-              <button
-                type="button"
-                className="btn btn-bottom"
-                disabled={Object.entries(axisSyncedData)?.length === 0 || axisMessage !== "WARNING"}
-                onClick={() => {
-                  setAxisSyncModalOpen(true);
-                }}
-              >
-                Sync with AXIS
-              </button>
-            }
+              requestState?.toLowerCase() !== StateEnum.unopened.name.toLowerCase()) &&
+            <button
+              type="button"
+              className="btn btn-bottom"
+              disabled={Object.entries(axisSyncedData)?.length === 0 || axisMessage !== "WARNING"}
+              onClick={() => {
+                setAxisSyncModalOpen(true);
+              }}
+            >
+              Sync with AXIS
+            </button>
+          }
           <button
             type="button"
             className={clsx("btn", "btn-bottom", {

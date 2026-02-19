@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 import "./requestdescriptionbox.scss";
 import TextField from "@material-ui/core/TextField";
@@ -17,7 +18,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import {
   isValidMinistryCode,
   countOfMinistrySelected,
-} from "../FOIRequest/utils";
+} from "./utils";
 
 const useStyles = makeStyles({
   headingError: {
@@ -40,6 +41,11 @@ const useStyles = makeStyles({
   ministrySection: {
     marginTop: "24px",
   },
+  textField: {
+    "& .MuiOutlinedInput-root": {
+      backgroundColor: "#fff",
+    },
+  },
 });
 
 const ProactiveDisclosureDescription = React.memo(
@@ -55,17 +61,17 @@ const ProactiveDisclosureDescription = React.memo(
   }) => {
     const classes = useStyles();
     const { ministryId } = useParams();
-    
+
     // Get master data - use const, not let
     const masterProgramAreas = useSelector(
       (state) => state.foiRequests.foiProgramAreaList
     );
-    
+
     // Filter once - use const
     const proactiveProgramAreaList = masterProgramAreas?.filter(
       (value) => !["OCC", "TIC", "CLB", "CFD", "COR", "IIO", "LDB", "LSB", "MGC", "OBC"].includes(value?.iaocode)
     );
-    
+
     const requestDescriptionHistoryList = useSelector(
       (state) => state.foiRequests.foiRequestDescriptionHistoryList
     );
@@ -74,45 +80,45 @@ const ProactiveDisclosureDescription = React.memo(
 
     // Component state management for startDate, endDate and Description
     const [startDate, setStartDate] = React.useState(
-      !!requestDetails.fromDate
+      requestDetails.fromDate
         ? formatDate(new Date(requestDetails.fromDate))
         : ""
     );
     const [endDate, setEndDate] = React.useState(
-      !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)) : ""
+      requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)) : ""
     );
-    const [requestDescriptionText, setRequestDescription] = React.useState(
-      !!requestDetails.description ? requestDetails.description : ""
+    const [requestDescriptionText, setRequestDescriptionText] = React.useState(
+      requestDetails.description ? requestDetails.description : ""
     );
 
     // Updates the default values from the request description box
     useEffect(() => {
       setStartDate(
-        !!requestDetails.fromDate
+        requestDetails.fromDate
           ? formatDate(new Date(requestDetails.fromDate))
           : ""
       );
       setEndDate(
-        !!requestDetails.toDate
+        requestDetails.toDate
           ? formatDate(new Date(requestDetails.toDate))
           : ""
       );
-      setRequestDescription(
-        !!requestDetails.description ? requestDetails.description : ""
+      setRequestDescriptionText(
+        requestDetails.description ? requestDetails.description : ""
       );
-      
+
       if (Object.entries(requestDetails).length !== 0) {
         setSelectedMinistries();
       }
-      
+
       const descriptionObject = {
-        startDate: !!requestDetails.fromDate
+        startDate: requestDetails.fromDate
           ? formatDate(new Date(requestDetails.fromDate))
           : "",
-        endDate: !!requestDetails.toDate
+        endDate: requestDetails.toDate
           ? formatDate(new Date(requestDetails.toDate))
           : "",
-        description: !!requestDetails.description
+        description: requestDetails.description
           ? requestDetails.description
           : "",
         isProgramAreaSelected:
@@ -132,25 +138,23 @@ const ProactiveDisclosureDescription = React.memo(
 
     const setSelectedMinistries = () => {
       let updatedList = [...proactiveProgramAreaList]; // Create a copy, don't reassign
-      
+
       // If updated program area list not exists then, update the master list with selected ministries
       if (Object.entries(programAreaList)?.length === 0) {
-        const selectedMinistries = !!requestDetails.selectedMinistries
+        const selectedMinistries = requestDetails.selectedMinistries
           ? requestDetails.selectedMinistries
           : "";
-        
+
         if (
           selectedMinistries !== "" &&
           Object.entries(proactiveProgramAreaList).length !== 0
         ) {
-          const selectedList = selectedMinistries.map(
+          const selectedList = new Set(selectedMinistries.map(
             (element) => element.code
-          );
+          ));
           updatedList = updatedList.map((programArea) => ({
             ...programArea,
-            isChecked: !!selectedList.find(
-              (selectedMinistry) => selectedMinistry === programArea.bcgovcode
-            )
+            isChecked: selectedList.has(programArea.bcgovcode)
           }));
         } else {
           // If it is add request then keep all check boxes unchecked
@@ -163,7 +167,7 @@ const ProactiveDisclosureDescription = React.memo(
         // If updated program area list exists then use that list instead of master data
         updatedList = programAreaList;
       }
-      
+
       setLocalProgramAreaList(updatedList);
     };
 
@@ -172,7 +176,7 @@ const ProactiveDisclosureDescription = React.memo(
       setStartDate(event.target.value);
       if (endDate === "" || new Date(event.target.value) > new Date(endDate))
         setEndDate(event.target.value);
-      
+
       handleOnChangeRequiredRequestDescriptionValues(
         event.target.value,
         FOI_COMPONENT_CONSTANTS.FROM_DATE
@@ -198,7 +202,7 @@ const ProactiveDisclosureDescription = React.memo(
 
     // Handle onchange of description and set state with latest value
     const handleRequestDescriptionChange = (event) => {
-      setRequestDescription(event.target.value);
+      setRequestDescriptionText(event.target.value);
       handleOnChangeRequiredRequestDescriptionValues(
         event.target.value,
         FOI_COMPONENT_CONSTANTS.DESCRIPTION
@@ -213,11 +217,11 @@ const ProactiveDisclosureDescription = React.memo(
     const handleUpdatedMasterProgramAreaList = (updatedProgramAreaList) => {
       handleOnChangeRequiredRequestDescriptionValues(
         countOfMinistrySelected(updatedProgramAreaList) === 1 &&
-          updatedProgramAreaList?.some(
-            (programArea) =>
-              programArea.isChecked &&
-              isValidMinistryCode(programArea.bcgovcode, proactiveProgramAreaList)
-          ),
+        updatedProgramAreaList?.some(
+          (programArea) =>
+            programArea.isChecked &&
+            isValidMinistryCode(programArea.bcgovcode, proactiveProgramAreaList)
+        ),
         FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED
       );
       handleUpdatedProgramAreaList(updatedProgramAreaList);
@@ -228,17 +232,17 @@ const ProactiveDisclosureDescription = React.memo(
     };
 
     const [openModal, setOpenModal] = React.useState(false);
-    
+
     const handleDescriptionHistoryClick = () => {
       setOpenModal(true);
     };
-    
+
     const handleModalClose = () => {
       setOpenModal(false);
     };
 
-    const sortedList = requestDescriptionHistoryList.sort((a, b) => {
-      return new Date(a.createdAt) - new Date(b.createdAt);
+    const sortedList = [...requestDescriptionHistoryList].sort((a, b) => {
+      return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
     });
 
     const filteredList = sortedList.filter(
@@ -275,9 +279,8 @@ const ProactiveDisclosureDescription = React.memo(
               <div>
                 <button
                   type="button"
-                  className={`btn btn-link btn-description-history ${
-                    filteredList.length <= 1 ? classes.btndisabled : ""
-                  }`}
+                  className={`btn btn-link btn-description-history ${filteredList.length <= 1 ? classes.btndisabled : ""
+                    }`}
                   disabled={filteredList.length <= 1}
                   onClick={handleDescriptionHistoryClick}
                 >
@@ -289,7 +292,7 @@ const ProactiveDisclosureDescription = React.memo(
                 openModal={openModal}
                 handleModalClose={handleModalClose}
               />
-              
+
               <div className="row foi-details-row foi-request-description-row">
                 <div className="col-lg-6 foi-details-col">
                   <h5 className="foi-date-range-h5">
@@ -333,7 +336,7 @@ const ProactiveDisclosureDescription = React.memo(
                   />
                 </div>
               </div>
-              
+
               <div className="row foi-details-row">
                 <div className="col-lg-12">
                   <div className="foi-request-description-textbox">
@@ -376,5 +379,16 @@ const ProactiveDisclosureDescription = React.memo(
     );
   }
 );
+
+ProactiveDisclosureDescription.propTypes = {
+  programAreaList: PropTypes.array,
+  requestDetails: PropTypes.object,
+  requiredRequestDetailsValues: PropTypes.object,
+  handleOnChangeRequiredRequestDescriptionValues: PropTypes.func,
+  handleInitialRequiredRequestDescriptionValues: PropTypes.func,
+  handleUpdatedProgramAreaList: PropTypes.func,
+  createSaveRequestObject: PropTypes.func,
+  disableInput: PropTypes.bool,
+};
 
 export default ProactiveDisclosureDescription;
