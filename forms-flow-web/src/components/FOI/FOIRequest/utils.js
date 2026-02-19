@@ -369,7 +369,8 @@ export const checkValidationError = (
   oipcData,
   isOipcReview,
   isconsultflag,
-  requiredContactDetails
+  requiredContactDetails,
+  personalRequestDetailsErrors
 ) => {
   return (
     (!isconsultflag && (
@@ -388,8 +389,9 @@ export const checkValidationError = (
     (requiredRequestDetailsValues.requestType.toLowerCase() ===
       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
       !requiredRequestDescriptionValues.ispiiredacted) ||
-    !!validation.helperTextValue ||
+    // !!validation.helperTextValue ||
     assignedToValue.toLowerCase().includes("unassigned") ||
+    (assignedToValue === "Intake Team|Intake Team" && currentrequestStatus.toLowerCase() === StateEnum.unopened.name.toLowerCase()) || 
     requiredRequestDetailsValues.requestType.toLowerCase().includes("select") ||
     requiredRequestDetailsValues.receivedMode
       .toLowerCase()
@@ -408,7 +410,8 @@ export const checkValidationError = (
     !requiredRequestDetailsValues.requestStartDate ||
     !requiredRequestDetailsValues.dueDate ||
     ("recordsDueDate" in requiredRequestDetailsValues  && !requiredRequestDetailsValues.recordsDueDate) ||
-    !requiredAxisDetails.axisRequestId ||
+    // !requiredAxisDetails.axisRequestId ||
+    (Object.values(personalRequestDetailsErrors).some(personalReqestError => personalReqestError)) ||
     (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
       if (oipc.inquiryattributes?.inquirydate) {
         return oipc.inquiryattributes.orderno === "";

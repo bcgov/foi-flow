@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import AttachmentModal from "../Attachments/AttachmentModal";
 import Loading from "../../../../containers/Loading";
 import {
-  getOSSHeaderDetails,
   saveFilesinS3,
   getFileFromS3,
   postFOIS3DocumentPreSignedUrl,
@@ -14,10 +13,7 @@ import {
   downloadFileFromS3,
 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import {
-  saveFOIRequestAttachmentsList,
-  replaceFOIRequestAttachment,
   saveNewFilename,
-  deleteFOIRequestAttachment,
 } from "../../../../apiManager/services/FOI/foiAttachmentServices";
 import {
   fetchFOIRecords,
@@ -46,7 +42,6 @@ import {
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import {
   StateTransitionCategories,
-  AttachmentCategories,
 } from "../../../../constants/FOI/statusEnum";
 import {
   RecordsDownloadList,
@@ -57,9 +52,7 @@ import {
 import {
   addToFullnameList,
   getFullnameList,
-  ConditionalComponent,
   isrecordtimeout,
-  isMinistryCoordinator,
 } from "../../../../helper/FOI/helper";
 import Grid from "@material-ui/core/Grid";
 import { makeStyles } from "@material-ui/core/styles";
@@ -71,9 +64,6 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
-import Menu from "@material-ui/core/Menu";
-import Button from "@material-ui/core/Button";
-
 import TextField from "@mui/material/TextField";
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
@@ -111,7 +101,6 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import CloseIcon from "@material-ui/icons/Close";
 import _ from "lodash";
 import {
-  DOC_REVIEWER_WEB_URL,
   RECORD_PROCESSING_HRS,
   OSS_S3_CHUNK_SIZE,
   DISABLE_REDACT_WEBLINK,
@@ -126,13 +115,11 @@ import {
   calculateDivisionFileSize,
   calculateTotalFileSize,
   calculateTotalUploadedFileSizeInKB,
-  getReadableFileSize,
+  getReadableFileSize, formatBytes,
 } from "./util";
 import { readUploadedFileAsBytes } from "../../../../helper/FOI/helper";
 import { TOTAL_RECORDS_UPLOAD_LIMIT } from "../../../../constants/constants";
 import { isScanningTeam, isNotMinistryGroup } from "../../../../helper/FOI/helper";
-import { MinistryNeedsScanning } from "../../../../constants/FOI/enum";
-//import {convertBytesToMB} from "../../../../components/FOI/customComponents/FileUpload/util";
 import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import MCFPersonal from "./MCFPersonal";
 import MSDPersonal from "./MSDPersonal";
@@ -147,9 +134,21 @@ const useStyles = makeStyles((_theme) => ({
   createButton: {
     margin: 0,
     width: "100%",
+    minWidth: "100px",
     backgroundColor: "#38598A",
     color: "#FFFFFF",
     fontFamily: " BCSans-Bold, sans-serif !important",
+    fontWeight: "bold",
+    textTransform: "none",
+    "&:hover": {
+      backgroundColor: "#38598A",
+    },
+    "&:active": {
+      backgroundColor: "#38598A",
+    },
+    "&.Mui-focusVisible": {
+      backgroundColor: "#38598A",
+    },
   },
   chip: {
     fontWeight: "bold",
@@ -350,7 +349,6 @@ export const RecordsLog = ({
   );
   const [retrieveSelectedRecords, setRetrieveSelectedRecords] = useState({});
   useEffect(() => {
-    // console.log(JSON.stringify(recordsObj, null, 2))
     setRecords(recordsObj?.records);
     let nonDuplicateRecords = recordsObj?.records?.filter(
       (record) => !record.isduplicate
@@ -1728,9 +1726,7 @@ export const RecordsLog = ({
       return sum + size;
     }, 0);
 
-    const mb = totalBytes / 1024;
-
-    return `${mb.toFixed(2)} KB`;
+    return formatBytes(totalBytes);
   }
 
   const hasDocumentsToExport =
@@ -1799,7 +1795,6 @@ export const RecordsLog = ({
       case "documentSet":
         setOpenDocumentSetModal(true);
         if (_record && _record.length > 0) {
-          console.log(JSON.stringify(_record));
           setRetrieveSelectedRecords(
             _record
               .filter(record => record.isselected)
@@ -1903,8 +1898,6 @@ export const RecordsLog = ({
   };
 
   function countTotalPages(records) {
-    console.log("countTotalPages", records);
-    console.log(JSON.stringify(user, null, 2))
     return records.reduce((total, record) => {
       // pages on the main record (if present)
       const recordPages = record.pagecount || 0;
@@ -2021,9 +2014,9 @@ export const RecordsLog = ({
       if (record.isattachment) {
         if (r.documentmasterid === record.rootdocumentmasterid) {
           var newAttachments = r.attachments.map((a, j) => {
-            if (a.documentmasterid === record.documentmasterid) {
-              record.isselected = e.target.checked;
-              return record;
+            if (a.recordid === record.recordid) {
+              a.isselected = e.target.checked;
+              return a;
             } else {
               if (a.parentid === record.documentmasterid) {
                 if (e.target.checked) {
@@ -2047,14 +2040,14 @@ export const RecordsLog = ({
           return r;
         }
       } else {
-        if (r.documentmasterid === record.documentmasterid) {
-          record.isselected = e.target.checked;
-          if (e.target.checked && record.attachments) {
-            for (let attachment of record.attachments) {
+        if (r.recordid === record.recordid) {
+          r.isselected = e.target.checked;
+          if (e.target.checked && r.attachments) {
+            for (let attachment of r.attachments) {
               attachment.isselected = e.target.checked;
             }
           }
-          return record;
+          return r;
         } else {
           return r;
         }
@@ -2353,7 +2346,12 @@ export const RecordsLog = ({
 
   const isBulkEditDisabled = () => {
     if (isBulkEdit) {
-    return false;
+      for (let record of records) {
+        if (record.isselected && !record.isdedupecomplete) {
+          return true;
+        }
+      }
+      return false;
     } else {
       return true;
     }
@@ -2470,11 +2468,13 @@ export const RecordsLog = ({
                     },
                     (err, _res) => {
                       dispatchRequestAttachment(err);
+                      if (!err) dispatch(checkForRecordsChange(requestId, ministryId));
                     }
                   )
                 );
               } else {
                 dispatchRequestAttachment(err);
+                if (!err) dispatch(checkForRecordsChange(requestId, ministryId));
               }
             }
           )
@@ -2492,6 +2492,7 @@ export const RecordsLog = ({
               },
               (err, _res) => {
                 dispatchRequestAttachment(err);
+                if (!err) dispatch(checkForRecordsChange(requestId, ministryId));
               }
             )
           );
@@ -2666,6 +2667,7 @@ export const RecordsLog = ({
                       records={records}
                       groups={groups}
                       ministryrequestid={ministryId}
+                      buttonClassName={classes.createButton}
                     />
 
                   </Grid>
@@ -3829,7 +3831,7 @@ const Attachment = React.memo(
               type="checkbox"
               style={{ position: "relative", top: 18, marginRight: 15 }}
               className="checkmark record-checkmark"
-              id={"selectchk" + record.documentmasterid}
+              id={"selectchk" + record.recordid}
               key={record.recordid + indexValue}
               data-iaocode={record.recordid}
               onChange={handleSelect}
@@ -4349,7 +4351,7 @@ const AttachmentPopup = React.memo(
           <MenuList>
             {isMCFPersonal && (
               <MenuItem
-                disabled={lockRecords || disableMinistryUser}
+                disabled={lockRecords || disableMinistryUser || !record.isdedupecomplete}
                 onClick={() => {
                   setEditTagModalOpen(true);
                   setPopoverOpen(false);

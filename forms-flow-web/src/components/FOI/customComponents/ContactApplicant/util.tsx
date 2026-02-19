@@ -379,7 +379,7 @@ const displayApplicantConsentSection = (requestExtensions:any, requestDetails:an
           <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
           <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
           <p><span style='font-size:13px;font-family:"BC Sans";'></span><span style='font-size:13px;font-family:"BC Sans";'>${requestDetails.firstName}&nbsp;${requestDetails.lastName},&nbsp;</span><span style='font-size:13px;font-family:"BC Sans";'>IAO Position Title</span><span style="font-size:11px;">&nbsp;</span></p>
-          <p><span style='font-size:13px;font-family:"BC Sans";'>Information Access Operations</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>FOI Operations</span></p>
           <p><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;</span></p>
           <p><span style='font-size:13px;font-family:"BC Sans";'>Enclosure</span></p><strong><span style='font-size:13px;font-family:"BC Sans";'><br>&nbsp;</span></strong>
           <p><strong><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;</span></strong></p>
@@ -408,7 +408,7 @@ const displayApplicantConsentSection = (requestExtensions:any, requestDetails:an
           <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
           <p style="text-align: center;"><span style="font-size: 13px; ">&nbsp;</span></p>
           <p><span style='font-size:13px;font-family:"BC Sans";'></span><span style='font-size:13px;font-family:"BC Sans";'>${requestDetails.firstName}&nbsp;${requestDetails.lastName},&nbsp;</span><span style='font-size:13px;font-family:"BC Sans";'>IAO Position Title</span><span style="font-size:11px;">&nbsp;</span></p>
-          <p><span style='font-size:13px;font-family:"BC Sans";'>Information Access Operations</span></p>
+          <p><span style='font-size:13px;font-family:"BC Sans";'>FOI Operations</span></p>
           <p><span style='font-size:13px;font-family:"BC Sans";'>&nbsp;</span></p>
           <p><span style='font-size:13px;font-family:"BC Sans";'>Enclosure</span></p><strong><span style='font-size:13px;font-family:"BC Sans";'><br>&nbsp;</span></strong>
         `;

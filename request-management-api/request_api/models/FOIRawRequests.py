@@ -22,6 +22,7 @@ from dateutil import parser
 import json
 from request_api.utils.enums import StateName
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
+from os import getenv
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -684,8 +685,10 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups):
+        unopened_request_restriction = getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") if getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") not in (None, "") else datetime.now()
+        print("UNOPENED_REQUEST_DATE", unopened_request_restriction)
         basequery = FOIRawRequest.getbasequery(additionalfilter, userid, isiaorestrictedfilemanager, groups)
-        basequery = basequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
+        basequery = basequery.filter(FOIRawRequest.status != 'Closed').filter(or_(FOIRawRequest.status != 'Unopened', FOIRawRequest.created_at >= unopened_request_restriction))
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = FOIRawRequest.getfilterforrequestssubquery(filterfields, keyword)
@@ -803,7 +806,13 @@ class FOIRawRequest(db.Model):
             'applicantcategory',
             'onBehalfFormatted',
             'extensions',
-            'isiaorestricted'
+            'isiaorestricted',
+            'closedate',
+            'closereason',
+            'publicationDate',
+            'oiReceivedDate',
+            'oiAssignedTo',
+            'publicationStatus'
         ]
         if x in validfields:
             return True
@@ -835,6 +844,13 @@ class FOIRawRequest(db.Model):
     def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
         basequery = FOIRawRequest.getbasequery(None, userid, isiaorestrictedfilemanager)
         basequery = basequery.add_columns(literal(None).label('closereason'))
+
+        is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
+        if is_oi_team:
+            basequery  = basequery.add_columns(literal("unopened").label('publicationStatus'))
+            basequery  = basequery.add_columns(literal(None).label('publicationDate'))
+            basequery  = basequery.add_columns(literal(None).label('oiReceivedDate'))
+            basequery  = basequery.add_columns(literal("ZZZ").label('oiAssignedTo'))
 
         #filter/search
         filtercondition = FOIRawRequest.getfilterforadvancedsearch(params)

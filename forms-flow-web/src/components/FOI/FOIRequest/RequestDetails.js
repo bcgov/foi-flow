@@ -413,6 +413,7 @@ const RequestDetails = React.memo(
                         input={<Input />}
                         variant="outlined"
                         fullWidth
+                        //required
                         disabled={disableInput}
                         SelectProps={{ displayEmpty: true }}
                     >
