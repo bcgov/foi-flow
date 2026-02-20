@@ -537,6 +537,8 @@ class FOIRawRequest(db.Model):
         axisrequestid = case([
             (FOIRawRequest.axisrequestid.is_(None),
             'U-00' + cast(FOIRawRequest.requestid, String)),
+            #FOIMOD-4172 - update here
+            # 'U-' + func.lpad(cast(FOIRawRequest.requestid, String), 6, '0')),
             ],
             else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
 
