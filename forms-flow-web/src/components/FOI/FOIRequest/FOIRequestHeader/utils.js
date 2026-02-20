@@ -104,7 +104,7 @@ export const getHeaderText = ({requestDetails, ministryId, status}) => {
   }
   
   if (requestDetails.rawRequestId) {
-    return 'U-' + String(requestDetails.rawRequestId).padStart(6, '0')
+    return 'U-00' + String(requestDetails.rawRequestId)//.padStart(6, '0')
   }
 
   if(status?.toLowerCase() === StateEnum.unopened.name.toLowerCase()){
