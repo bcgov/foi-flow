@@ -39,7 +39,7 @@ class requestserviceconfigurator:
             subjectcode = SubjectCode().getsubjectcodebyname(key)
             return subjectcode["subjectcodeid"] if subjectcode is not None else None
 
-    def getprogramareaiaocode(self, programareaid):
+    def getprogramareaiaocodebyid(self, programareaid):
         programarea = ProgramArea().getprogramareabyid(programareaid)
         return programarea['iaocode']
 
