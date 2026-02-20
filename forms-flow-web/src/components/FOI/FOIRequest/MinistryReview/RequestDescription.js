@@ -97,7 +97,7 @@ const RequestDescription = React.memo((requestDetails) => {
               <Typography className="ministry-bottom-request-description-header ministry-heading">
                 <b>Request Description</b>
               </Typography>
-              <Typography>{_requestDetails.description}</Typography>
+              <Typography component="span" className="long-text">{_requestDetails.description}</Typography>
             </div>
           </div>
         </CardContent>
