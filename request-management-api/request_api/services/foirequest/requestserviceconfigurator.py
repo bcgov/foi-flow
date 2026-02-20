@@ -46,12 +46,6 @@ class requestserviceconfigurator:
     def getpropertyvaluefromschema(self,requestschema,property):
         return requestschema.get(property) if property in requestschema  else None
 
-    def generaterequestid(self, foirawrequestid: int, programareaiaocode: str, isconsultflag: bool):
-        baserequestid = f'{programareaiaocode}-{datetime.datetime.now().year}-{str(foirawrequestid).zfill(6)}'
-        if isconsultflag:
-            return baserequestid + '-CON'
-        return baserequestid
-    
     def contacttypemapping(self):
         return [{"name": ContactType.email.value, "key" : "email"},
             {"name": ContactType.homephone.value, "key" : "phonePrimary"},

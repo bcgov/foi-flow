@@ -10,6 +10,7 @@ from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMa
 from request_api.models.FOIRequestTeams import FOIRequestTeam
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.FOIRequestOIPC import FOIRequestOIPC
+from request_api.models.FOIRawRequests import FOIRawRequest
 
 from datetime import datetime as datetime2
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, StateName
@@ -25,7 +26,7 @@ class requestservicebuilder(requestserviceconfigurator):
 
     def createministry(self, requestschema, ministry, activeversion, userid, filenumber=None, ministryid=None):
         programareaiaocode = self.getprogramareaiaocode(self.getvalueof("programArea",ministry["code"]))
-        axisrequestid = requestschema.get("axisRequestId", self.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("isconsultflag")))
+        axisrequestid = requestschema.get("axisRequestId", FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("isconsultflag")))
         current_foiministryrequest = FOIMinistryRequest.getrequest(ministryid)
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.__dict__.update(ministry)
