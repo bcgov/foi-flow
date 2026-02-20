@@ -5,9 +5,7 @@ from request_api.utils.enums import StateName
 class linkedrequestservice:
 
     def getlinkedrequestinfo(self, linkedrequests):
-        print("linkedrequests", linkedrequests)
         linkedrequestinfo = FOIRawRequest.getlinkedrequestdetails(linkedrequests)
-        print("OVER", linkedrequestinfo)
         return linkedrequestinfo
 
     def findrequestids(self, search_text, axisrequestid, ministrycode):

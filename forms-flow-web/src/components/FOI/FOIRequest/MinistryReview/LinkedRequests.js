@@ -20,7 +20,7 @@ const LinkedRequests = ({isMinistry, linkedRequests, linkedRequestsInfo}) => {
     return (
       <Card id="linkedrequestMinistry" className="foi-details-card">
         <div className="row foi-details-row">
-          <div className="col-lg-8 foi-details-col">
+          <div style={{paddingBottom: "7px"}} className="col-lg-8 foi-details-col">
             <label className="foi-details-label">LINKED REQUESTS</label>
           </div>
         </div>

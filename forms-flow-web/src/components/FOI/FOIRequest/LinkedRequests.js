@@ -80,9 +80,7 @@ const LinkedRequests = React.memo(
       setLinkedRequestsInfo(updatedLinkedInfoRequests);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS, updatedLinkedRequests);
     }
-    console.log("INFO", linkedRequestsInfo)
-    console.log("LINK", linkedRequests)
-    console.log("alloptions", options)
+
     const renderReviewRequest = (e, reqItem) => {
       e.preventDefault();
       const reqId = getAxisRequestId(reqItem);
@@ -129,7 +127,6 @@ const LinkedRequests = React.memo(
       if (!selectedValue) {
         return;
       }
-      console.log("SELECTION", selectedValue)
       // Create a new array to avoid mutation issues
       const updatedLinkedRequests = [...(linkedRequests || [])];
       

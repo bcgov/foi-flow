@@ -22,7 +22,6 @@ export const LinkedRequestsTable = ({
     const [page, setPage] = useState(0);
     const MAX_ROWS_PER_PAGE = 7;
     const sortedlinkedRequestsInfo = linkedRequestsInfo?.sort((a,b) => a.axisrequestid.localeCompare(b.axisrequestid));
-    console.log("LIQUIDD", sortedlinkedRequestsInfo)
 
     return (
         <>

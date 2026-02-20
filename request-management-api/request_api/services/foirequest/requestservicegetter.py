@@ -163,6 +163,8 @@ class requestservicegetter:
         _receiveddate = parse(request['receiveddate'])
         axissyncdatenoneorempty =  self.__noneorempty(requestministry["axissyncdate"]) 
         linkedministryrequests= []
+        if "linkedrequests" in requestministry and requestministry["linkedrequests"] is not None:
+            linkedministryrequests = requestministry["linkedrequests"]
         assignedgroupemail = OperatingTeamEmail.getoperatingteamemail(requestministry["assignedgroup"])
         if assignedgroupemail is None:
             assignedgroupemail = KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"])

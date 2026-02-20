@@ -1249,8 +1249,6 @@ class FOIRawRequest(db.Model):
                     ministry_code = requestrawdata["selectedMinistries"][0]["code"]
                     formattedresult= {"axisrequestid": axisrequestid, 'govcode': ministry_code, "requeststatus": status, "rawrequestid": requestid}
                     result_list.append(formattedresult)
-
-            print("Results:", result_list)
             return result_list
         except Exception as ex:
             logging.error(f"Error fetching linked request IDs: {ex}")

@@ -388,7 +388,6 @@ class LinkedRequests(Resource):
     def get(ministrycode, axisrequestid):
         try:
             search_text = request.args.get('q', '').strip()
-            print("search_text:",search_text)
             results = linkedrequestservice().findrequestids(search_text, axisrequestid,ministrycode)
             return results, 200
         except Exception as ex:

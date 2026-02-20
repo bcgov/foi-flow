@@ -677,7 +677,6 @@ export const getFOIMinistryLinkedRequestInfo = (axisid) => async (dispatch) => {
   try {
     const res = await httpGETRequest(apiUrl, {}, UserService.getToken());
     if (res.data) {
-      console.log("RES", res)
       return res.data;
     } else {
       console.error("API returned incomplete requeststatus data:", res);
