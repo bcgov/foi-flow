@@ -160,6 +160,8 @@ const AxisDetails = React.memo(({
                       type="button" 
                       onClick={() => setEnableAxisSync((prev) => {
                         setAxisRequestId("")
+                        handleAxisDetailsValue("", FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID);
+                        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID, "");
                         return !prev
                       })} 
                       style={{float: "left"}}
