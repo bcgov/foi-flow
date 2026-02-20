@@ -36,6 +36,7 @@ const AxisDetails = React.memo(({
     const dispatch = useDispatch();
     const [axisRequestId, setAxisRequestId] = React.useState("");
     const [validation, setValidation] = React.useState({});
+    const [enableAxisSync, setEnableAxisSync] = React.useState(false)
     let axisIdValidation = {};
 
 
@@ -149,12 +150,24 @@ const AxisDetails = React.memo(({
                         value={axisRequestId}
                         fullWidth
                         onChange={handleAxisIdChange}
-                        error={(validation.helperTextValue !== "" && validation.helperTextValue !== undefined) || axisRequestId === ""}
+                        error={(validation.helperTextValue !== "" && validation.helperTextValue !== undefined)}
                         helperText={validation.helperTextValue}
-                        required
+                        disabled={!enableAxisSync}
                     />
                 </div>
-                <div className="col-lg-6 foi-details-col">                       
+                <div className="col-lg-3 foi-details-col">
+                    <button 
+                      type="button" 
+                      onClick={() => setEnableAxisSync((prev) => {
+                        setAxisRequestId("")
+                        handleAxisDetailsValue("", FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID);
+                        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.AXIS_REQUEST_ID, "");
+                        return !prev
+                      })} 
+                      style={{float: "left"}}
+                      className='btn-enable-axis-sync'>{!enableAxisSync ? "Enable Sync" : "Disable Sync"}</button>
+                </div>
+                <div className="col-lg-3 foi-details-col">
                     <button type="button" onClick={() => syncWithAxis()} style={{float: "right"}} disabled={!axisRequestId || validation.helperTextValue !== ""}
                     className='btn-axis-sync'>Sync with AXIS</button>
                 </div>

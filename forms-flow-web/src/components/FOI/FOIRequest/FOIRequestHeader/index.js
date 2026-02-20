@@ -157,8 +157,9 @@ const FOIRequestHeader = React.memo(
     }
 
     const saveAssigneeDetails = (assigneeVal, assigneeName) => {
+      const isOnlineFormUnopenedReq = requestDetails?.currentState?.toLowerCase() === StateEnum.unopened.name.toLowerCase() && requestDetails?.sourceOfSubmission === "onlineform";
       setAssignedTo(assigneeVal);
-      if (isAddRequest) {
+      if (isAddRequest || isOnlineFormUnopenedReq) {
         //event bubble up - to validate required fields
         handleAssignedToValue(assigneeVal);
         createSaveRequestObject(
@@ -307,7 +308,7 @@ const FOIRequestHeader = React.memo(
                   fullWidth
                   required
                   disabled={disableHeaderInput}
-                  error={selectedAssignedTo.toLowerCase().includes("unassigned")}
+                  error={selectedAssignedTo.toLowerCase().includes("unassigned") || (requestDetails?.currentState?.toLowerCase() === StateEnum.unopened.name.toLowerCase() && requestDetails?.sourceOfSubmission === "onlineform" && requestDetails?.assignedGroup === "Intake Team")}
                 >
                   {menuItems}
                 </TextField>
