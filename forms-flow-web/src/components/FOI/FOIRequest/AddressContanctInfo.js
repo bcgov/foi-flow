@@ -9,7 +9,6 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { isBeforeOpen } from "./utils";
 
 const useStyles = makeStyles((_theme) => ({
   row: {
@@ -44,7 +43,6 @@ const AddressContactDetails = memo(
     handleEmailValidation,
     disableInput,
     defaultExpanded,
-    moreInfoAction,
     warning
   }) => {
     const classes = useStyles();
@@ -132,10 +130,14 @@ const AddressContactDetails = memo(
           requestDetails,
           FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_PRIMARY
         ),
+        addressSecondary: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.STREET_ADDRESS_SECONDARY
+        ),
         city: validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.CITY),
         province: validateFields(
           requestDetails,
-          FOI_COMPONENT_CONSTANTS.POSTALCODE
+          FOI_COMPONENT_CONSTANTS.PROVINCE
         ),
         country: validateFields(
           requestDetails,
@@ -149,11 +151,22 @@ const AddressContactDetails = memo(
           requestDetails,
           FOI_COMPONENT_CONSTANTS.APPLICANT_EMAIL
         ),
-        phonePrimary: "",
-        phoneSecondary: "",
-        workPhonePrimary: "",
-        workPhoneSecondary: "",
-        addressSecondary: ""
+        phonePrimary: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.HOME_PHONE
+        ),
+        phoneSecondary: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.MOBILE_PHONE
+        ),
+        workPhonePrimary: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.WORK_PHONE_PRIMARY
+        ),
+        workPhoneSecondary: validateFields(
+          requestDetails,
+          FOI_COMPONENT_CONSTANTS.WORK_PHONE_SECONDARY
+        )
       };
       handleContactDetailsInitialValue(contanctDetailsObject);
     }, [requestDetails, handleContactDetailsInitialValue]);
@@ -352,18 +365,6 @@ const AddressContactDetails = memo(
           <Typography className={classes.heading}>ADDRESS AND CONTACT INFORMATION</Typography>
       </AccordionSummary>
       <AccordionDetails>        
-          <div>
-              {/* {moreInfoAction && // comment back in after axis decommission
-                <button
-                  type="button"
-                  className={`btn btn-link btn-description-history`}
-                  onClick={moreInfoAction}
-                  style={(isBeforeOpen(requestDetails) && !requestDetails.foiRequestApplicantID) ? {color: "#9E2929"} : {}}
-                >
-                  {(isBeforeOpen(requestDetails)) && 'Search' } Applicant Profiles
-                </button>
-              } */}
-          </div>
           <div className={clsx("row", "foi-details-row", classes.row)}>
             <div className="col-lg-6 foi-details-col">
               <TextField

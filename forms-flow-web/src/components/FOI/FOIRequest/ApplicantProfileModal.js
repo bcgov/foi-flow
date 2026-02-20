@@ -1,29 +1,20 @@
 import React, { useState, memo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { makeStyles } from "@material-ui/core/styles";
-import TextField from "@material-ui/core/TextField";
 import ReactModal from "react-modal-resizable-draggable";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import { ButtonBase } from "@mui/material";
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
-import SearchIcon from "@material-ui/icons/Search";
-import InputAdornment from "@mui/material/InputAdornment";
-import InputBase from "@mui/material/InputBase";
-import Grid from "@mui/material/Grid";
-import { fetchPotentialApplicants, fetchApplicantInfo, fetchApplicantContactHistory, saveApplicantInfo, fetchApplicantProfileByKeyword, fetchApplicantRequests } from "../../../apiManager/services/FOI/foiApplicantProfileService";
+import { fetchPotentialApplicants, fetchApplicantInfo, fetchApplicantContactHistory, createNewApplicantProfile, updateApplicantProfile, reassignApplicantProfile, unassignApplicantProfile} from "../../../apiManager/services/FOI/foiApplicantProfileService";
 import AddressContactDetails from "./AddressContanctInfo";
 import ApplicantDetails from "./ApplicantDetails"
 import AdditionalApplicantDetails from "./AdditionalApplicantDetails";
 import Divider from "@mui/material/Divider";
-import Stack from "@mui/material/Stack";
-import Paper from "@mui/material/Paper";
-import { ClickableChip } from "../Dashboard/utils";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
 import clsx from "clsx";
 import _ from 'lodash';
@@ -32,11 +23,12 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { setFOIRequestApplicantProfile, setFOILoader } from "../../../actions/FOI/foiRequestActions";
 import { toast } from "react-toastify";
 import Loading from "../../../containers/Loading";
 import { isBeforeOpen } from "./utils";
+import { ApplicantProfileSearchView } from "./ApplicantProfileSearchView";
+import Alert from "@mui/material/Alert";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -49,61 +41,79 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const ApplicantDetailsSections = ({
+    requestDetails,
+    contactDetailsNotGiven,
+    createSaveRequestObject,
+    handleApplicantDetailsInitialValue,
+    handleApplicantDetailsValue,
+    disableInput,
+    defaultExpanded,
+    showHistory,
+    warning,
+    displayOtherNotes,
+    isAddRequest,
+    isUnopenedRequest,
+    requestType = "general"
+}) => {
+    return (
+        <>
+            <ApplicantDetails
+                requestDetails={requestDetails}
+                contactDetailsNotGiven={contactDetailsNotGiven}
+                createSaveRequestObject={createSaveRequestObject}
+                handleApplicantDetailsInitialValue={handleApplicantDetailsInitialValue}
+                handleApplicantDetailsValue={handleApplicantDetailsValue}
+                disableInput={disableInput}
+                defaultExpanded={true}
+                showHistory={showHistory}
+                warning={warning}
+                displayOtherNotes={displayOtherNotes}
+            />
+            <AddressContactDetails
+                requestDetails={requestDetails}
+                contactDetailsNotGiven={contactDetailsNotGiven}
+                createSaveRequestObject={createSaveRequestObject}
+                handleContactDetailsInitialValue={handleApplicantDetailsInitialValue}
+                handleContanctDetailsValue={handleApplicantDetailsValue}
+                handleEmailValidation={() => {}}
+                disableInput={disableInput}
+                defaultExpanded={defaultExpanded}
+                warning={warning}
+            />
+            <AdditionalApplicantDetails
+                requestDetails={requestDetails}
+                createSaveRequestObject={createSaveRequestObject}
+                disableInput={disableInput || requestType == "general"}
+                defaultExpanded={defaultExpanded}
+                warning={requestType != "general" || isAddRequest || isUnopenedRequest ? warning : null}
+            />
+        </>
+    )
+}
+
 const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {    
     const classes = useStyles();
 
-    const isAddRequest = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1;
-
     let requestDetails = useSelector((state) => state.foiRequests.foiRequestDetail);
     const dispatch = useDispatch();
+    const isAddRequest = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1;
+    const isUnopenedRequest = requestDetails?.currentState == "Unopened"
 
-    const [searchText, setSearchText] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [rows, setRows] = useState([]);
     const [selectedApplicant, setSelectedApplicant] = useState(false)
-    const [searchMode, setSearchMode] = useState(isAddRequest ? "manual" : "auto")
     const [saveApplicantObject, setSaveApplicantObject] = React.useState({})
-    const [showRequestHistory, setShowRequestHistory] = useState(false);
+    const [showApplicantProfileTab, setShowApplicantProfileTab] = useState(true)
+    const [showRequestHistoryTab, setShowRequestHistoryTab] = useState(false);
+    const [showSearchApplicantsTab, setShowSearchApplicantsTab] = useState(false);
     const [confirmationMessage, setConfirmationMessage] = useState(false);
     const [createConfirmation, setCreateConfirmation] = useState(false);
     const [isProfileDifferent, setIsProfileDifferent] = useState(false);
+    const [isUnassignProfile, setIsUnassignProfile] = useState(false);
+    const [isChangeToDifferentProfile, setIsChangeToDifferentProfile] = useState(false);
     const [applicantHistory, setApplicantHistory] = useState(false);
     const [requestHistory, setRequestHistory] = useState(false);
-
-    const columns = [
-        {
-          field: 'firstName',
-          headerName: 'FIRST NAME',
-          flex: 1,
-        },
-        {
-          field: 'middleName',
-          headerName: 'MIDDLE NAME',
-          flex: 1,
-        },
-        {
-          field: 'lastName',
-          headerName: 'LAST NAME',
-          flex: 1,
-        },
-        {
-          field: 'birthDate',
-          headerName: 'DATE OF BIRTH',
-          flex: 1,
-          valueGetter: (params) => params.row?.additionalPersonalInfo?.birthDate 
-        },
-        {
-          field: 'email',
-          headerName: 'EMAIL',
-          flex: 1,
-        },
-        {
-          field: 'primaryPhone',
-          headerName: 'PRIMARY PHONE',
-          flex: 1,
-        },
-    ];
-
     
     const requestHistoryColumns = [
         {
@@ -141,7 +151,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     useEffect(() => {
         if (modalOpen) {
             setIsLoading(true);
-            if (isBeforeOpen(requestDetails)) {
+            if (!requestDetails?.foiRequestApplicantID) {
                 dispatch(fetchPotentialApplicants(
                     requestDetails.firstName,
                     requestDetails.lastName,
@@ -175,10 +185,15 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         }
                     }
                 }
-            } else if (requestDetails[field] && selectedApplicant[field] !== requestDetails[field]) {
+            } else if (selectedApplicant[field] !== requestDetails[field]) {
                 setIsProfileDifferent(true);
                 break;
             }
+        }
+        if (requestDetails?.foiRequestApplicantID != selectedApplicant?.foiRequestApplicantID) {
+            setIsChangeToDifferentProfile(true)
+        } else {
+            setIsChangeToDifferentProfile(false)
         }
     }, [selectedApplicant])
 
@@ -194,121 +209,113 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         setSaveApplicantObject(newApplicantObj)
     }
 
-    const selectApplicantRow = (e) => {
-        dispatch(fetchApplicantRequests(e.row.foiRequestApplicantID, (err, res) => {
-            setSelectedApplicant(e.row)
-            setRequestHistory(res);
-            setIsLoading(false);
-        }))
-    }
-
     const handleClose = () => {
-        setSearchText("");
         setIsLoading(true);
         setRows([]);
         setSelectedApplicant(false);
-        setSearchMode(isAddRequest ? "manual" : "auto")
         setSaveApplicantObject({})
-        setShowRequestHistory(false);
         setConfirmationMessage(false);
         setCreateConfirmation(false);
         setIsProfileDifferent(false);
+        setIsUnassignProfile(false);
         setApplicantHistory(false);
         setRequestHistory(false);
         handleModalClose();
     }
 
-    const search = (rows) => {
-        return rows.filter(r => (r.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) || 
-            (r.middleName?.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-            (r.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-            (r.birthDate?.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-            (r.email?.toLowerCase().indexOf(searchText.toLowerCase()) > -1) ||
-            (r.primaryPhone?.toLowerCase().indexOf(searchText.toLowerCase()) > -1) 
-        )
+    const profilePayloadBuilder = () => {
+        const payload = {
+                "requestType": isBeforeOpen(requestDetails) ? "rawrequest" : "foirequest",
+                "foiRequestId": requestDetails?.id,
+                "rawRequestId": requestDetails?.rawRequestId,
+                "previousRequestApplicantId": requestDetails?.foiRequestApplicantID,
+                "applicant": saveApplicantObject
+            }
+        return payload
     }
 
-    const onSearchChange = (e) => {
-        if (searchMode === 'auto') {
-            setSearchText(e.target.value)
-        }
-    }
-
-    const createKeywordJSON = (keyword) => {
-        const keywordJSON = {
-            "keywords": {}
-        }
-        const mobileNumberRegex = /^(\+\d{1,3}[-.●]?)?\(?\d{3}\)?[-.●]?\d{3}[-.●]?\d{4}$/;
-        const stringRegex = /^[A-Za-z0-9\s.@!#$%^&*()\-_=+[\]{};:'",<.>/?\\|]+$/;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const isValidEmail = emailRegex.test(keyword);
-        const isValidNumber = mobileNumberRegex.test(keyword);
-        const isValidString = stringRegex.test(keyword)
-        if (isValidEmail) {
-            keywordJSON.keywords["email"] = keyword;
-        }            
-        if (isValidNumber) {
-            keywordJSON.keywords["homephone"] = keyword;
-            keywordJSON.keywords["workphone"] = keyword;
-            keywordJSON.keywords["workphone2"] = keyword;
-            keywordJSON.keywords["mobilephone"] = keyword;
-        }            
-        if (isValidString) {
-            keywordJSON.keywords["firstname"] = keyword;
-            keywordJSON.keywords["lastname"] = keyword;
-            keywordJSON.keywords["email"] = keyword;
-        }
-        return keywordJSON;
-    }
-
-    const onSearchEnter = (e) => {
-        if (searchMode === 'manual' && e.key === 'Enter') {
-            const keywordJSON = createKeywordJSON(e.target.value)
-            setIsLoading(true);
-                dispatch(fetchApplicantProfileByKeyword(
-                    keywordJSON,
-                    (err, res) => {
-                        if (!err) {
-                            setRows(res);
-                            setIsLoading(false);
-                        }
-                        else {
-                            toast.error(
-                                "Temporarily unable to fetch applicant profiles. Please try again in a few minutes.",
-                                {
-                                  position: "top-right",
-                                  autoClose: 3000,
-                                  hideProgressBar: true,
-                                  closeOnClick: true,
-                                  pauseOnHover: true,
-                                  draggable: true,
-                                  progress: undefined,
-                                }
-                              );
-                        }
-                        
-                    }))
-        }
-    }
-
-    const selectProfile = () => {
-        if (confirmationMessage) {
-            handleClose();
-            // set loading screen
-            dispatch(setFOILoader(true));
-            dispatch(saveApplicantInfo(saveApplicantObject, (err, res) => {
-                if (!err) {
-                    // unset loading screen
+    const executeProfileAction = (actionHandler, options = { shouldClear: false }) => {
+        const { shouldClear = false } = options;
+        const payload = profilePayloadBuilder();
+        handleClose();
+        dispatch(setFOILoader(true));
+        dispatch(actionHandler(payload, (err, res) => {
+            if (!err) {
+                if (shouldClear) {
+                    dispatch(setFOIRequestApplicantProfile({}));
+                } else {
                     dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
                 }
-            }));
-        } else if (_.isEqual(selectedApplicant, saveApplicantObject)) {
+            }
+        }));
+    };
+
+    const createProfile = () => {
+        if (!createConfirmation) {
+            setCreateConfirmation(true);
+            return;
+        }
+
+        executeProfileAction(createNewApplicantProfile);
+    };
+
+    const updateProfile = () => {
+        if (_.isEqual(selectedApplicant, saveApplicantObject) && !isChangeToDifferentProfile) {
             handleClose();
             dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
-        } else {
-            setConfirmationMessage(true);
+            return;
         }
-    }
+        if (!confirmationMessage) {
+            setConfirmationMessage(true);
+            return;
+        }
+        executeProfileAction(updateApplicantProfile);
+    };
+
+    const reassignProfileToRequest = () => {
+        if (isAddRequest || isUnopenedRequest) {
+            handleClose();
+            dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
+            return;
+        }
+        if (!isChangeToDifferentProfile) {
+            handleClose();
+            dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
+            return;
+        }
+        if (!confirmationMessage) {
+            setConfirmationMessage(true);
+            return;
+        }
+        executeProfileAction(reassignApplicantProfile);
+    };
+
+    const clearObject = (obj) => {
+        return Object.fromEntries(
+            Object.entries(obj)
+            .map(([key, value]) => {
+            if (value && typeof value === "object" && !Array.isArray(value)) {
+                return [key, clearObject(value)];
+            }
+            return [key, null];
+            })
+        );
+    };
+
+    const unassignProfileFromRequest = () => {
+        if (!confirmationMessage) {
+            setIsUnassignProfile(true);
+            setConfirmationMessage(true);
+            return;
+        }
+        if (isAddRequest || isUnopenedRequest) {
+            handleClose();
+            const clearedSaveApplicantObject = clearObject(saveApplicantObject)
+            dispatch(setFOIRequestApplicantProfile({...clearedSaveApplicantObject}));
+            return;
+        }
+        executeProfileAction(unassignApplicantProfile, {shouldClear: true});
+    };
 
     const copyInfo = () => {
         let updatedApplicant = {...selectedApplicant}
@@ -334,13 +341,20 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     }
 
     const back = () => {
-        if (applicantHistory) {
-            setApplicantHistory(false);            
+        setIsUnassignProfile(false);
+        if (confirmationMessage) {
+            setConfirmationMessage(false);
+        } else if (applicantHistory) {
+            setApplicantHistory(false);
+        } else if (createConfirmation) {
+            setCreateConfirmation(false)
         } else if (!isBeforeOpen(requestDetails)) {
+            handleClose();
+        } else if (requestDetails?.foiRequestApplicantID) {
             handleClose();
         } else {
             setSelectedApplicant(false);
-            setShowRequestHistory(false);
+            setShowRequestHistoryTab(false);
             setIsProfileDifferent(false);
         }
     }
@@ -353,36 +367,513 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         }
     }
 
-    const createProfile = () => {
-        if (!createConfirmation) {
-            setCreateConfirmation(true);
-        } else {
-            dispatch(setFOIRequestApplicantProfile({foiRequestApplicantID: -1}));
-            handleClose();
-        }
-    }
-
     const isSaveDisabled = () => {
-        if (isBeforeOpen(requestDetails)) {
+        if (isBeforeOpen(requestDetails) && !requestDetails?.foiRequestApplicantID) {
             return false
         } else {
+            if (isChangeToDifferentProfile) return false
             return _.isEqual(selectedApplicant, saveApplicantObject)
         }
     }
 
     const warning = (field) => {
-        if ([FOI_COMPONENT_CONSTANTS.DOB, FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER, FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS].includes(field)) {
+        const hasAtributes = Object.keys(saveApplicantObject).length !== 0
+        if (hasAtributes && [FOI_COMPONENT_CONSTANTS.DOB, FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER, FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS].includes(field)) {
+            if (!requestDetails.additionalPersonalInfo?.[field] && saveApplicantObject?.additionalPersonalInfo[field]) return true;
             return requestDetails.additionalPersonalInfo?.[field] && requestDetails.additionalPersonalInfo[field] !== saveApplicantObject?.additionalPersonalInfo[field]
         } else {
-            return requestDetails[field] && requestDetails[field] !== saveApplicantObject?.[field]
+            return requestDetails[field] != saveApplicantObject?.[field]
         }
     }
 
+    const renderApplicantProfileModalHeaders = () => {
+        const FormattedHeader = ({ text }) => {
+            return (
+                <h3 className="request-history-header search-applicants-header applicant-profile-header">
+                    {text}
+                </h3>
+            );
+        };
+        if (confirmationMessage && !isUnassignProfile)
+            return <FormattedHeader text={"Saving Changes to Applicant Profile"} />;
+        if (applicantHistory) return <FormattedHeader text={"Applicant History"} />;
+        if (isUnassignProfile)
+            return <FormattedHeader text={"Unassign Applicant Profile"} />;
+        if (!selectedApplicant) return <FormattedHeader text={"Search Applicants"} />;
+        if (createConfirmation)
+            return <FormattedHeader text={"Create New Profile"} />;
+
+        // Renders the tab options if none of the above conditions are met
+        return (
+            <>
+            <ButtonBase
+                onClick={() => {
+                setShowApplicantProfileTab(true);
+                setShowRequestHistoryTab(false);
+                setShowSearchApplicantsTab(false);
+                }}
+                disableRipple
+                className={clsx("request-history-header applicant-profile-header", {
+                [classes.disabledTitle]: !showApplicantProfileTab,
+                })}
+            >
+                Applicant Profile
+            </ButtonBase>
+            <Divider
+                sx={{
+                mr: 2,
+                ml: 2,
+                borderRightWidth: 3,
+                height: 28,
+                borderColor: "black",
+                display: "inline-flex",
+                top: 8,
+                position: "relative",
+                }}
+                flexItem
+                orientation="vertical"
+            />
+            <ButtonBase
+                onClick={() => {
+                setShowRequestHistoryTab(true);
+                setShowApplicantProfileTab(false);
+                setShowSearchApplicantsTab(false);
+                }}
+                disableRipple
+                className={clsx("request-history-header applicant-profile-header", {
+                [classes.disabledTitle]: !showRequestHistoryTab,
+                })}
+            >
+                Request History ({requestHistory?.length})
+            </ButtonBase>
+            <Divider
+                sx={{
+                mr: 2,
+                ml: 2,
+                borderRightWidth: 3,
+                height: 28,
+                borderColor: "black",
+                display: "inline-flex",
+                top: 8,
+                position: "relative",
+                }}
+                flexItem
+                orientation="vertical"
+            />
+            <ButtonBase
+                onClick={() => {
+                setShowSearchApplicantsTab(true);
+                setShowRequestHistoryTab(false);
+                setShowApplicantProfileTab(false);
+                }}
+                disableRipple
+                className={clsx("request-history-header applicant-profile-header", {
+                [classes.disabledTitle]: !showSearchApplicantsTab,
+                })}
+            >
+                Search Applicants
+            </ButtonBase>
+            </>
+        );
+    };
+
+
+    const renderApplicantProfileModalContent = () => {
+        if (isLoading) {
+            return <Loading />;
+        }
+
+        if (confirmationMessage && isChangeToDifferentProfile) return (
+            <>
+  
+                <Alert severity="warning" sx={{ fontSize: '1.2rem' }}>
+                    Just a heads up:<br></br>
+                    Previous information on this request will be overwritten by the applicant profile information, and won't be retrievable.<br></br>
+                    Are you sure you would like to change the applicant profile linked to this request?
+                </Alert>
+            </>
+            
+        )
+        if (confirmationMessage && isUnassignProfile) return (
+            <div style={{ textAlign: "center" }}>
+                The linked applicant profile will be removed, but the information for this request will stay the same.
+                You can make updates to the request, and when the request is moved into the Open state, the correspondening
+                applicant profile will be automatically created.
+            </div>
+        );
+
+        if (confirmationMessage) return (
+            <div style={{ textAlign: "center" }}>
+                Are you sure you would like to save changes for all active requests associated with this profile?
+                <br />
+                <i>Please ensure you have checked the Request History to see the request(s) that will be affected.</i>
+            </div>
+        );
+
+        if (createConfirmation && isBeforeOpen(requestDetails)) {
+            return (
+            <div style={{ textAlign: "center" }}>
+                New Profile will be created automatically when request is moved to open state.
+                <br />
+                <i>Please make any additional changes in Request Details.</i>
+            </div>
+            );
+        } 
+        if (createConfirmation) return (
+            <>
+                <div style={{ textAlign: "center" }}>
+                    A new Profile will be created from the following information. The old profile will 
+                    not be connected to this request anymore.
+                </div>
+                <ApplicantDetailsSections
+                    requestDetails={saveApplicantObject}
+                    contactDetailsNotGiven={false}
+                    createSaveRequestObject={createSaveApplicantObject}
+                    handleApplicantDetailsInitialValue={() => {}}
+                    handleApplicantDetailsValue={() => {}}
+                    disableInput={true}
+                    defaultExpanded={true}
+                    showHistory={showApplicantHistory}
+                    warning={null}
+                    displayOtherNotes={true}
+                    isAddRequest={isAddRequest}
+                    isUnopenedRequest={isUnopenedRequest}
+                    requestType={requestDetails?.requestType}
+                />
+            </>
+        );
+
+        if (applicantHistory) {
+            return (
+            <>
+                {applicantHistory.map((entry, index) => (
+                <Accordion key={index} defaultExpanded={index === 0}>
+                    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                    <Typography className="acc-request-description">
+                        APPLICANT CONTACT DETAILS
+                    </Typography>
+                    <Typography className="acc-username-date">
+                        {entry.createdby} - {entry.updatedat}
+                    </Typography>
+                    </AccordionSummary>
+
+                    <AccordionDetails className="acc-details">
+                    <div className="acc-details-1">
+                        {Object.keys(entry.fields).map((field) => (
+                        <React.Fragment key={field}>
+                            <div className="acc-applicant-profile-history-row">
+                            <Typography className="acc-start-date">
+                                <b>{field}: </b>{entry.fields[field]}
+                            </Typography>
+                            </div>
+                            <div className="acc-applicant-profile-history-row">
+                            <Typography className="acc-start-date">
+                                <b>Previous {field}: </b>{entry.previousvalues[field]}
+                            </Typography>
+                            </div>
+                        </React.Fragment>
+                        ))}
+                    </div>
+                    </AccordionDetails>
+                </Accordion>
+                ))}
+            </>
+            );
+        }
+
+        const renderApplicantProfileTabMessage = () => {
+            if (isChangeToDifferentProfile) return (
+                    <span style={{ fontSize: "13px" }}>
+                    You are changing the applicant profile that is linked to this request. 
+                    </span>
+                )
+            if (isProfileDifferent) return (
+                <span style={{ fontSize: "13px" }}>
+                Some of the fields in this profile do not match your original request.
+                <button
+                    type="button"
+                    className="btn-link btn-update-profile"
+                    onClick={copyInfo}
+                >
+                    UPDATE ALL
+                </button>
+                </span>
+            )
+            return (
+                <span style={{ fontSize: "13px" }}>
+                All of the fields in the applicant profile match your original request.
+                </span>
+            )
+        }
+
+        if (showApplicantProfileTab) {
+            if (selectedApplicant) {
+                return (
+                <>
+                    {renderApplicantProfileTabMessage()}
+
+                    <ApplicantDetailsSections
+                        requestDetails={saveApplicantObject}
+                        contactDetailsNotGiven={false}
+                        createSaveRequestObject={createSaveApplicantObject}
+                        handleApplicantDetailsInitialValue={() => {}}
+                        handleApplicantDetailsValue={() => {}}
+                        disableInput={isChangeToDifferentProfile ? true : false}
+                        defaultExpanded={isChangeToDifferentProfile ? true : false}
+                        showHistory={showApplicantHistory}
+                        warning={warning}
+                        displayOtherNotes={true}
+                        isAddRequest={isAddRequest}
+                        isUnopenedRequest={isUnopenedRequest}
+                        requestType={requestDetails?.requestType}
+                    />
+                </>);
+            } else {
+                return (
+                    <ApplicantProfileSearchView
+                        isLoading={isLoading}
+                        setIsLoading={setIsLoading}
+                        rows={rows}
+                        setRows={setRows}
+                        setSelectedApplicant={setSelectedApplicant}
+                        setRequestHistory={setRequestHistory}
+                        dispatch={dispatch}
+                        toast={toast}
+                        initialSearchMode={isAddRequest || isUnopenedRequest ? "manual" : "auto"}
+                    />
+                )
+            }
+        }
+
+        if (showRequestHistoryTab) {
+            return <>
+                        <Box sx={{ height: "100%", width: "100%" }}>
+                        <DataGrid
+                            className="foi-data-grid foi-request-history-grid"
+                            rows={requestHistory}
+                            columns={requestHistoryColumns}
+                            rowHeight={30}
+                            headerHeight={50}
+                            hideFooter={true}
+                            loading={isLoading}                
+                            // onRowClick={selectApplicantRow}
+                            getRowHeight={() => 'auto'} 
+                            getRowId={(row) => row.filenumber}
+                        />
+                        </Box>
+                    </>
+        }
+
+        if (showSearchApplicantsTab) {
+            return (
+                <ApplicantProfileSearchView 
+                    setShowSearchApplicantsTab={setShowSearchApplicantsTab}
+                    setShowApplicantProfileTab={setShowApplicantProfileTab}
+                    isLoading={isLoading}
+                    setIsLoading={setIsLoading}
+                    rows={rows}
+                    setRows={setRows}
+                    setSelectedApplicant={setSelectedApplicant}
+                    setRequestHistory={setRequestHistory}
+                    dispatch={dispatch}
+                    toast={toast}
+                    initialSearchMode={"manual"}
+                />
+            )
+        }
+    };
+
+    const renderApplicantProfileModalActions = () => {
+    // Buttons
+    const reassignProfileButton = (
+        <button
+        className={`btn-bottom btn-save btn`}
+        onClick={reassignProfileToRequest}
+        disabled={isSaveDisabled()}
+        >
+        Reassign Profile
+        </button>
+    );
+    const selectProfileButton = (
+        <button
+        className={`btn-bottom btn-save btn`}
+        onClick={reassignProfileToRequest}
+        disabled={isSaveDisabled()}
+        >
+        Select Profile
+        </button>
+    );
+
+    const confirmReassignProfileButton = (
+        <button className={`btn-bottom btn-save btn`} onClick={reassignProfileToRequest}>
+        Confirm Reassign Profile
+        </button>
+    );
+
+    const confirmSelectedProfileButton = (
+        <button className={`btn-bottom btn-save btn`} onClick={reassignProfileToRequest}>
+        Confirm Reassigned Profile
+        </button>
+    );
+
+
+    const confirmBackButton = (
+        <button
+        className="btn-bottom btn-cancel"
+        onClick={() => setConfirmationMessage(false)}
+        >
+        Back
+        </button>
+    );
+
+    const backButton = (
+        <button className="btn-bottom btn-cancel" onClick={back}>
+        Back
+        </button>
+    );
+
+    const updateProfileButton = (
+        <button
+        className={`btn-bottom btn-save btn`}
+        onClick={updateProfile}
+        disabled={isSaveDisabled()}
+        >
+        Update Profile
+        </button>
+    );
+
+    const unassignProfileButton = (
+        <button className={`btn-bottom btn-save btn`} onClick={unassignProfileFromRequest}>
+        Unassign Profile
+        </button>
+    );
+
+    const confirmUpdateProfileButton = (
+        <button className={`btn-bottom btn-save btn`} onClick={updateProfile}>
+        Save Changes
+        </button>
+    );
+
+    const createNewProfileButton = (
+        <button className={`btn-bottom btn-save btn`} onClick={createProfile}>
+        Create New Profile
+        </button>
+    );
+
+    const confirmCreateNewProfileButton = (
+        <button className={`btn-bottom btn-save btn`} onClick={createProfile}>
+        Confirm New Profile
+        </button>
+    );
+
+    const cancelButton = (
+        <button className="btn-bottom btn-cancel" onClick={cancel}>
+        Cancel
+        </button>
+    );
+
+    // Rendering logic
+    if (isUnassignProfile && confirmationMessage) {
+        return (
+        <>
+            {unassignProfileButton}
+            {backButton}
+        </>
+        );
+    }
+    if (createConfirmation && isBeforeOpen(requestDetails)) {
+        return <>{backButton}</>
+    }
+
+    if (isChangeToDifferentProfile && !confirmationMessage) return (
+        <>
+            {!applicantHistory && selectProfileButton}
+            {backButton}
+        </>
+    )
+    if (isChangeToDifferentProfile && confirmationMessage) return (
+       <>
+        {confirmSelectedProfileButton}
+        {backButton}
+       </>
+    )
+
+    if (isChangeToDifferentProfile) {
+        if (confirmationMessage) {
+        return (
+            <>
+                {confirmReassignProfileButton}
+                {confirmBackButton}
+            </>
+        );
+        } else {
+        return (
+            <>
+                {!applicantHistory && reassignProfileButton}
+                {backButton}
+            </>
+        );
+        }
+    }
+
+    if (selectedApplicant) {
+        if (confirmationMessage) {
+        return (
+            <>
+            {confirmUpdateProfileButton}
+            {confirmBackButton}
+            </>
+        );
+        } else if (createConfirmation) {
+        return (
+            <>
+            {!applicantHistory && (
+                <>
+                {confirmCreateNewProfileButton}
+                </>
+            )}
+            {backButton}
+            </>
+        );
+        } else {
+        if (isBeforeOpen(requestDetails)) {
+            return (
+            <>
+                {!applicantHistory && (
+                <>
+                    {updateProfileButton}
+                    {unassignProfileButton}
+                </>
+                )}
+                {backButton}
+            </>
+            );
+        }
+        return (
+            <>
+            {!applicantHistory && (
+                <>
+                {createNewProfileButton}
+                {updateProfileButton}
+                </>
+            )}
+            {backButton}
+            </>
+        );
+        }
+    }
+    return (
+        <>
+            {createNewProfileButton}
+            {cancelButton}
+        </>
+        );
+    };
     
     return (
       <div className={"applicant-profile-modal-div"}>
         <ReactModal
-          initWidth={800}
+          initWidth={900}
           initHeight={600}
           minWidth={400}
           minHeight={200}
@@ -391,50 +882,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
           isOpen={modalOpen}
         >
           <DialogTitle disableTypography id="request-history-dialog-title">
-            {selectedApplicant ? 
-                <h3 className="request-history-header search-applicants-header applicant-profile-header">
-                    {confirmationMessage ?
-                    <>Saving Changes to Applicant Profile</> :                    
-                    applicantHistory ?
-                    <>Applicant History</> :
-                    <><ButtonBase
-                        onClick={() => setShowRequestHistory(false)}
-                        disableRipple
-                        className={clsx("request-history-header applicant-profile-header", {
-                            [classes.disabledTitle]: showRequestHistory
-                        })}
-                    >
-                        Applicant Profile
-                    </ButtonBase>
-                    <Divider
-                        sx={{
-                        mr: 2,
-                        ml: 2,
-                        borderRightWidth: 3,
-                        height: 28,
-                        borderColor: "black",
-                        display: "inline-flex",
-                        top: 8,
-                        position: "relative"
-                        }}
-                        flexItem
-                        orientation="vertical"
-                    />
-                    <ButtonBase
-                        onClick={() => setShowRequestHistory(true)}
-                        disableRipple
-                        className={clsx("request-history-header applicant-profile-header", {
-                            [classes.disabledTitle]: !showRequestHistory
-                        })}
-                    >
-                        Request History ({requestHistory?.length})
-                    </ButtonBase></>}
-                </h3>
-                :
-                <h2 className="request-history-header search-applicants-header">
-                {createConfirmation ? <>Create New Profile</> : <>Search Applicants</>}
-                </h2>
-            }
+            {renderApplicantProfileModalHeaders()}
             <IconButton onClick={handleClose} value="close">
               <i className="dialog-close-button">Close</i>
               <CloseIcon />
@@ -442,220 +890,11 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
           </DialogTitle>
         <div style={{ overflowY: "scroll", height: "calc(100% - 181px)" }}>
           <DialogContent sx={{padding: "15px 50px 0 50px", height: "100%"}}>
-                {selectedApplicant ?
-                    confirmationMessage ? 
-                    <div style={{textAlign: "center"}}>Are you sure you would like to save changes for all open and intake in progress requests associated with this profile?<br></br> <i>Please ensure you have checked the Request History to see the request(s) that will be affected.</i></div>
-                    :
-                    (showRequestHistory ?
-                        <>
-                            <Box sx={{ height: "100%", width: "100%" }}>
-                            <DataGrid
-                                className="foi-data-grid foi-request-history-grid"
-                                rows={requestHistory}
-                                columns={requestHistoryColumns}
-                                rowHeight={30}
-                                headerHeight={50}
-                                hideFooter={true}
-                                loading={isLoading}                
-                                // onRowClick={selectApplicantRow}
-                                getRowHeight={() => 'auto'} 
-                                getRowId={(row) => row.filenumber}
-                            />
-                            </Box>
-                        </>:
-                        applicantHistory ? 
-                        <>
-                        {applicantHistory.map((entry, index) => {
-                        return (<Accordion defaultExpanded={index === 0}>
-                            <AccordionSummary
-                            expandIcon={<ExpandMoreIcon />}
-                            aria-controls="panel1a-content"         
-                            >
-                                <Typography className="acc-request-description">{`APPLICANT CONTACT DETAILS`}</Typography>
-                                <Typography className="acc-username-date">{entry.createdby} - {entry.updatedat}</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails className="acc-details">
-                                <div className="acc-details-1">
-                                    {Object.keys(entry.fields).map((field) => 
-                                        <div className="acc-request-description-row">
-                                            <Typography className="acc-start-date"><b>{field}: </b>{entry.fields[field]}</Typography>                                        
-                                        </div>
-                                    )}
-                                </div>
-                            </AccordionDetails>
-                        </Accordion>)   
-                        })} 
-                        </>
-                        :
-                        isLoading ? <Loading /> : <>
-                        {isProfileDifferent && 
-                            <span style={{ fontSize: "13px" }}>
-                                Some of the fields in this profile do not match your original request. 
-                                <button type="button" class="btn-link btn-update-profile" onClick={copyInfo}>UPDATE ALL</button>
-                            </span>
-                        }
-                        <ApplicantDetails
-                            requestDetails={saveApplicantObject}
-                            contactDetailsNotGiven={false}
-                            createSaveRequestObject={createSaveApplicantObject}
-                            handleApplicantDetailsInitialValue={() => {}}
-                            handleApplicantDetailsValue={() => {}}
-                            disableInput={false}
-                            defaultExpanded={true}
-                            showHistory={showApplicantHistory}
-                            warning={warning}
-                        />
-                        <AddressContactDetails
-                            requestDetails={saveApplicantObject}
-                            contactDetailsNotGiven={false}
-                            createSaveRequestObject={createSaveApplicantObject}
-                            handleContactDetailsInitialValue={() => {}}
-                            handleContanctDetailsValue={() => {}}
-                            handleEmailValidation={() => {}}
-                            disableInput={false}
-                            defaultExpanded={false}
-                            warning={warning}
-                        />
-                        <AdditionalApplicantDetails
-                            requestDetails={saveApplicantObject}
-                            createSaveRequestObject={createSaveApplicantObject}
-                            disableInput={false}
-                            defaultExpanded={false}
-                            warning={warning}
-                        />
-                    </>)
-                        :
-                    createConfirmation ? 
-                    <div style={{textAlign: "center"}}>New Profile will be created automatically when request is moved to open state.<br></br> <i>Please make any additional changes in Request Details.</i></div>
-                    :
-                    <>
-                    <div style={{ fontSize: "13px" }}>
-                    Select an applicant to view their details. Or create a new profile
-                    if applicant cannot be found.
-                    </div>
-                    <Paper
-                    component={Grid}
-                    sx={{
-                        border: "1px solid #38598A",
-                        color: "#38598A",
-                        margin: "20px 0",
-                    }}
-                    alignItems="center"
-                    justifyContent="center"
-                    direction="row"
-                    container
-                    item
-                    xs={12}
-                    elevation={0}
-                    >
-                    <Grid
-                    item
-                    container
-                    alignItems="center"
-                    direction="row"
-                    xs={true}
-                    sx={{
-                        borderRight: "2px solid #38598A",
-                        backgroundColor: "rgba(56,89,138,0.1)",                        
-                    }}
-                    >
-                    <InputBase
-                        id="filter"
-                        placeholder="Search..."
-                        defaultValue={searchText}
-                        onChange={onSearchChange}
-                        onKeyDown={onSearchEnter}
-                        sx={{
-                        color: "#38598A",
-                        }}
-                        startAdornment={
-                        <InputAdornment position="start">
-                            <IconButton sx={{ color: "#38598A" }}>
-                            <span className="hideContent">Search</span>
-                            <SearchIcon />
-                            </IconButton>
-                        </InputAdornment>
-                        }
-                        fullWidth
-                    />
-                    </Grid>                    
-                    <Grid
-                        item
-                        container
-                        alignItems="flex-start"
-                        justifyContent="center"
-                        xs={2.5}
-                        minWidth="100px"
-                    >
-                        <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
-                        <ClickableChip
-                            label={"MANUAL"}
-                            color="primary"
-                            size="small"
-                            onClick={() => setSearchMode("manual")}
-                            clicked={searchMode === "manual"}
-                        />
-                        <ClickableChip
-                            label={"AUTO"}
-                            color="primary"
-                            size="small"
-                            onClick={() => setSearchMode("auto")}
-                            clicked={searchMode === "auto"}
-                        />
-                        </Stack>
-                    </Grid>
-                    </Paper>
-                    <Box sx={{ height: "calc(100% - 100px)", width: "100%" }}>
-                    <DataGrid
-                        className="foi-data-grid foi-applicant-data-grid"
-                        rows={search(rows)}
-                        columns={columns}
-                        hideFooter={true}
-                        pageSizeOptions={[5]}
-                        rowHeight={30}
-                        headerHeight={50}
-                        loading={isLoading}                
-                        onRowClick={selectApplicantRow}
-                        getRowId={(row) => row.foiRequestApplicantID}
-                    />
-                    </Box>
-                    </>                
-                }
+            {renderApplicantProfileModalContent()}
           </DialogContent>
         </div>
           <DialogActions sx={{padding: 30}}>
-            {selectedApplicant ? 
-                (confirmationMessage ?
-                    <><button
-                        className={`btn-bottom btn-save btn`}
-                        onClick={selectProfile}
-                    >
-                    Save Changes
-                    </button>
-                    <button className="btn-bottom btn-cancel" onClick={() => setConfirmationMessage(false)} >
-                    Back
-                    </button></>:                    
-                    <>{!applicantHistory && <button
-                    className={`btn-bottom btn-save btn`}
-                      onClick={selectProfile}
-                      disabled={isSaveDisabled()}
-                    >
-                    Select & Save
-                    </button>}
-                    <button className="btn-bottom btn-cancel" onClick={back} >
-                    Back
-                    </button></>
-                ):
-                <><button
-                    className={`btn-bottom btn-save btn`}
-                    onClick={createProfile}
-                >
-                Create New Profile
-                </button>
-                <button className="btn-bottom btn-cancel" onClick={cancel} >
-                Cancel
-                </button></>
-            }
+            {renderApplicantProfileModalActions()}
           </DialogActions>
         </ReactModal>
       </div>

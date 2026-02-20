@@ -102,7 +102,8 @@ import {
   isAxisSyncDisplayField,
   getUniqueIdentifier,
   closeContactInfo,
-  closeApplicantDetails
+  closeApplicantDetails,
+  getIsAddRequest
 } from "./utils";
 import {
   ConditionalComponent,
@@ -163,7 +164,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const url = window.location.href;
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
   const isHistoricalRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.HISTORICAL_REQUEST) > -1;
-  const [isAddRequest, setIsAddRequest] = useState(urlIndexCreateRequest > -1);
+  const [isAddRequest, setIsAddRequest] = useState(getIsAddRequest());
   //gets the request detail from the store
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
@@ -1536,9 +1537,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           handleApplicantDetailsValue
                         }
                         createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput || isHistoricalRequest || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
-                        defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}
+                        disableInput={disableInput || isHistoricalRequest || requestDetails?.axisApplicantID || requestDetails?.foiRequestApplicantID > 0}
+                        defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}                        
                         userDetail={userDetail}
+                        openApplicantProfileModal={openApplicantProfileModal}
                       />
                       {requiredRequestDetailsValues.requestType.toLowerCase() ===
                         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
@@ -1572,16 +1574,15 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           handleContactDetailsInitialValue
                         }
                         handleContanctDetailsValue={handleContanctDetailsValue}
-                        disableInput={disableInput || isHistoricalRequest /* || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
+                        disableInput={disableInput || isHistoricalRequest || requestDetails?.axisApplicantID || requestDetails?.foiRequestApplicantID > 0}
                         handleEmailValidation={handleEmailValidation}
                         defaultExpanded={!closeContactInfo(userDetail,requestDetails)}
-                        moreInfoAction={openApplicantProfileModal}
                         userDetail={userDetail}
                       />
 
                       <RequestDescriptionBox
                         programAreaList={programAreaList}
-                        urlIndexCreateRequest={urlIndexCreateRequest}
+                        // urlIndexCreateRequest={urlIndexCreateRequest}
                         requestDetails={requestDetails}
                         requiredRequestDetailsValues={
                           requiredRequestDetailsValues
@@ -1622,7 +1623,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         <AdditionalApplicantDetails
                           requestDetails={requestDetails}
                           createSaveRequestObject={createSaveRequestObject}
-                          disableInput={disableInput /* || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/}
+                          disableInput={disableInput || requestDetails?.axisApplicantID || requestDetails?.foiRequestApplicantID > 0}
                           defaultExpanded={true}
                           setError={setPersonalRequestDetailErrors}
                         />
