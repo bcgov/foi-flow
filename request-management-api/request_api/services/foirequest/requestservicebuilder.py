@@ -25,7 +25,7 @@ class requestservicebuilder(requestserviceconfigurator):
     """
 
     def createministry(self, requestschema, ministry, activeversion, userid, filenumber=None, ministryid=None):
-        programareaiaocode = self.getprogramareaiaocode(self.getvalueof("programArea",ministry["code"]))
+        programareaiaocode = self.getprogramareaiaocodebyid(self.getvalueof("programArea",ministry["code"]))
         axisrequestid = requestschema.get("axisRequestId", FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("isconsultflag")))
         current_foiministryrequest = FOIMinistryRequest.getrequest(ministryid)
         foiministryrequest = FOIMinistryRequest()

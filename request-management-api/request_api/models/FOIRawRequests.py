@@ -23,6 +23,7 @@ import json
 import copy
 from request_api.utils.enums import StateName
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
+from request_api.models.ProgramAreas import ProgramArea
 from os import getenv
 
 class FOIRawRequest(db.Model):
@@ -77,8 +78,10 @@ class FOIRawRequest(db.Model):
         db.session.add(newrawrequest)
         if not axisrequestid:
             db.session.flush() # Force insert to generate PK, but do not commit yet
-            selectedministry = _requestrawdata.get('selectedMinistries')[0].get('code')
-            newaxisrequestid = cls.generaterequestid(newrawrequest.requestid, selectedministry, newrawrequest.isconsultflag)
+            bcgovcode = _requestrawdata.get('selectedMinistries')[0].get('code')
+            programarea = ProgramArea.getprogramarea(bcgovcode)
+            iaocode = programarea['iaocode']
+            newaxisrequestid = cls.generaterequestid(newrawrequest.requestid, iaocode, newrawrequest.isconsultflag)
             updated_rawdata = copy.deepcopy(_requestrawdata)
             updated_rawdata["axisRequestId"] = newaxisrequestid
             newrawrequest.axisrequestid = newaxisrequestid
