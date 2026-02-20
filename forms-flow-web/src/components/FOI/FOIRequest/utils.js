@@ -370,7 +370,8 @@ export const checkValidationError = (
   isOipcReview,
   isconsultflag,
   requiredContactDetails,
-  personalRequestDetailsErrors
+  personalRequestDetailsErrors,
+  sourceOfSubmission,
 ) => {
   return (
     (!isconsultflag && (
@@ -391,7 +392,7 @@ export const checkValidationError = (
       !requiredRequestDescriptionValues.ispiiredacted) ||
     // !!validation.helperTextValue ||
     assignedToValue.toLowerCase().includes("unassigned") ||
-    (assignedToValue === "Intake Team|Intake Team" && currentrequestStatus.toLowerCase() === StateEnum.unopened.name.toLowerCase()) || 
+    (assignedToValue === "Intake Team|Intake Team" && currentrequestStatus.toLowerCase() === StateEnum.unopened.name.toLowerCase() && sourceOfSubmission === "onlineform") || 
     requiredRequestDetailsValues.requestType.toLowerCase().includes("select") ||
     requiredRequestDetailsValues.receivedMode
       .toLowerCase()

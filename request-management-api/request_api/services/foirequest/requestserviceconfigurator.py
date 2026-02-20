@@ -39,12 +39,13 @@ class requestserviceconfigurator:
             subjectcode = SubjectCode().getsubjectcodebyname(key)
             return subjectcode["subjectcodeid"] if subjectcode is not None else None
 
+    def getprogramareaiaocodebyid(self, programareaid):
+        programarea = ProgramArea().getprogramareabyid(programareaid)
+        return programarea['iaocode']
+
     def getpropertyvaluefromschema(self,requestschema,property):
         return requestschema.get(property) if property in requestschema  else None
 
-    def generatefilenumber(self, code, id):
-        return f'{code}-{datetime.datetime.now().year}-{str(id).zfill(6)}'
-    
     def contacttypemapping(self):
         return [{"name": ContactType.email.value, "key" : "email"},
             {"name": ContactType.homephone.value, "key" : "phonePrimary"},

@@ -966,6 +966,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     requestDetails.isconsultflag,
     requiredContactDetails,
     personalRequestDetailErrors,
+    requestDetails?.sourceOfSubmission,
   );
 
   const classes = useStyles();

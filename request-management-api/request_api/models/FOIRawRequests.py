@@ -20,8 +20,10 @@ from .FOIOpenInformationRequests import FOIOpenInformationRequests
 import logging
 from dateutil import parser
 import json
+import copy
 from request_api.utils.enums import StateName
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
+from request_api.models.ProgramAreas import ProgramArea
 from os import getenv
 
 class FOIRawRequest(db.Model):
@@ -60,6 +62,13 @@ class FOIRawRequest(db.Model):
     assignee = relationship('FOIAssignee', foreign_keys="[FOIRawRequest.assignedto]")
 
     @classmethod
+    def generaterequestid(cls, foirawrequestid: int, programareaiaocode: str, isconsultflag: bool):
+        baserequestid = f'{programareaiaocode}-{datetime.now().year}-{str(foirawrequestid).zfill(6)}'
+        if isconsultflag:
+            return baserequestid + '-CON'
+        return baserequestid
+
+    @classmethod
     def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, axisrequestid, axissyncdate, linkedrequests, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None, isconsultflag=False)->DefaultMethodResult:
         version = 1
         newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = StateName.unopened.value if sourceofsubmission != "intake" else StateName.intakeinprogress.value, requeststatuslabel = StateName.unopened.name if sourceofsubmission != "intake" else StateName.intakeinprogress.name, createdby=userid, version=version, sourceofsubmission=sourceofsubmission, assignedgroup=assigneegroup, assignedto=assignee, ispiiredacted=ispiiredacted, notes=notes, requirespayment=requirespayment, axisrequestid=axisrequestid, axissyncdate=axissyncdate, linkedrequests=linkedrequests, isconsultflag=isconsultflag)
@@ -67,6 +76,16 @@ class FOIRawRequest(db.Model):
             FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
 
         db.session.add(newrawrequest)
+        if not axisrequestid:
+            db.session.flush() # Force insert to generate PK, but do not commit yet
+            bcgovcode = _requestrawdata.get('selectedMinistries')[0].get('code')
+            programarea = ProgramArea.getprogramarea(bcgovcode)
+            iaocode = programarea['iaocode']
+            newaxisrequestid = cls.generaterequestid(newrawrequest.requestid, iaocode, newrawrequest.isconsultflag)
+            updated_rawdata = copy.deepcopy(_requestrawdata)
+            updated_rawdata["axisRequestId"] = newaxisrequestid
+            newrawrequest.axisrequestid = newaxisrequestid
+            newrawrequest.requestrawdata = updated_rawdata
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
@@ -125,7 +144,7 @@ class FOIRawRequest(db.Model):
             return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid,request.wfinstanceid,assignee)    
         else:
             return DefaultMethodResult(True,'No request foound')
-    
+
 
     @classmethod
     def saveiaorestrictedrawrequest(cls,requestid,_isiaorestricted=False, _updatedby=None)->DefaultMethodResult:
@@ -537,6 +556,8 @@ class FOIRawRequest(db.Model):
         axisrequestid = case([
             (FOIRawRequest.axisrequestid.is_(None),
             'U-00' + cast(FOIRawRequest.requestid, String)),
+            #FOIMOD-4172 - update here
+            # 'U-' + func.lpad(cast(FOIRawRequest.requestid, String), 6, '0')),
             ],
             else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
 
