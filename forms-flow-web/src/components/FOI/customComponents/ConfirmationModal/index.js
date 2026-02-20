@@ -402,10 +402,10 @@ const CloseForm = React.memo(({saveRequestObject, handleClosingDateChange, handl
     <>
     <div className="row foi-details-row confirm-modal-row first-row">
       <div className="col-lg-6 foi-details-col">
-        <div className="confirm-label-area"><b>Applicant: </b><span className="confirm-label-content">{_requestDetails.firstName+" "+_requestDetails.lastName}</span></div>
+        <div className="confirm-label-area"><b>Applicant: </b><span className="long-text">{_requestDetails.firstName+" "+_requestDetails.lastName}</span></div>
       </div>
       <div className="col-lg-6 foi-details-col confirm-label-area">
-        <div className="confirm-label-area"><b>Organization: </b><span className="confirm-label-content">{_requestDetails.businessName}</span></div>
+        <div className="confirm-label-area"><b>Organization: </b><span className="long-text">{_requestDetails.businessName}</span></div>
       </div>
     </div>
     <div className="row foi-details-row confirm-modal-row">

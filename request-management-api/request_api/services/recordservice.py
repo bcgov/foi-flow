@@ -547,6 +547,9 @@ class recordservice(recordservicebase):
                     streamobject = {
                         "s3filepath": entry['s3uripath'],
                         "requestnumber": _ministryrequest['axisrequestid'],
+                        # If we stop populating axisrequestid field, make sure to replace line above with line below
+                        # Also look through the rest of the app to see where else this needs to be updated
+                        # "requestnumber": _ministryrequest['axisrequestid'] or _ministryrequest['filenumber'],
                         "bcgovcode": _ministryrequest['programarea.bcgovcode'],
                         "filename": entry['filename'],
                         "ministryrequestid": ministryrequestid,

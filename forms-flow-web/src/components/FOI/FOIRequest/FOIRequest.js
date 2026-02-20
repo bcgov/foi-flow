@@ -779,6 +779,21 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     axisRequestId: "",
   };
 
+  const personalRequestDetailErrorsInit = {
+    additionalApplicantPHN: false,
+    additionalApplicantCorrectionsNum: false,
+    additionalApplicantEmployerNumber: false,
+    additionalApplicantAKA: false,
+    childDetailFirstName: false,
+    childDetailMiddleName: false,
+    childDetailLastName: false,
+    childDetailAKA: false,
+    onBehalfFirstName: false,
+    onBehalfMiddleName: false,
+    onBehalfLastName: false,
+    onBehalfAKA: false
+  }
+
   //below states are used to find if required fields are set or not
   const [
     requiredRequestDescriptionValues,
@@ -800,6 +815,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [requiredAxisDetails, setRequiredAxisDetails] = React.useState(
     requiredAxisDetailsValue
   );
+  const [personalRequestDetailErrors, setPersonalRequestDetailErrors] = React.useState(personalRequestDetailErrorsInit);
   //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
   const handleInitialRequiredRequestDescriptionValues = React.useCallback(
     (requestDescriptionObject) => {
@@ -949,6 +965,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     requestDetails.isoipcreview,
     requestDetails.isconsultflag,
     requiredContactDetails,
+    personalRequestDetailErrors,
+    requestDetails?.sourceOfSubmission,
   );
 
   const classes = useStyles();
@@ -1535,6 +1553,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             disableInput={disableInput || isHistoricalRequest}
                             userDetail={userDetail}
                             requestType={requestDetails?.requestType}
+                            setError={setPersonalRequestDetailErrors}
                           />
                           <OnBehalfOfDetails
                             additionalInfo={
@@ -1542,6 +1561,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             }
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput || isHistoricalRequest}
+                            setError={setPersonalRequestDetailErrors}
                           />
                         </>
                       )}
@@ -1605,6 +1625,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           createSaveRequestObject={createSaveRequestObject}
                           disableInput={disableInput || requestDetails?.axisApplicantID || requestDetails?.foiRequestApplicantID > 0}
                           defaultExpanded={true}
+                          setError={setPersonalRequestDetailErrors}
                         />
                       )}
                       {showDivisionalTracking && (
