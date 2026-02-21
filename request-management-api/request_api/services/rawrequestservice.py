@@ -27,8 +27,8 @@ class rawrequestservice:
     """
 
     def saverawrequest(self, requestdatajson, sourceofsubmission, userid,notes):
-        if not requestdatajson.get("axisRequestId"):
-            requestdatajson.pop("axisRequestId", None) # Remove axisRequestId if value is empty
+        # if not requestdatajson.get("axisRequestId"):
+        #     requestdatajson.pop("axisRequestId", None) # Remove axisRequestId if value is empty
         assigneegroup = requestdatajson["assignedGroup"] if requestdatajson.get("assignedGroup") != None else None
         assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") not in (None,'') else None
         assigneefirstname = requestdatajson["assignedToFirstName"] if requestdatajson.get("assignedToFirstName") != None else None
