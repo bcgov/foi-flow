@@ -1230,6 +1230,91 @@ class FOIRawRequest(db.Model):
         return requests
 
 
+    @classmethod
+    def getautofilllinkedrequestids(cls, search_text, axisrequestid, ministrycode,limit):
+        try:
+            linked_request_data = (
+            db.session.query(FOIRawRequest.linkedrequests)
+            .filter_by(axisrequestid=axisrequestid)
+            .order_by(FOIRawRequest.version.desc())
+            .first()
+            )
+            linked_requests = []
+            if linked_request_data:
+                if isinstance(linked_request_data, str):
+                    linked_requests = json.loads(linked_request_data)
+                elif isinstance(linked_request_data, list):
+                    linked_requests = linked_request_data
+            axis_ids = [key for item in linked_requests for key in item.keys()]
+            axis_ids.append(axisrequestid)
+
+            # latest_rawrequest = (
+            #     db.session.query(FOIRawRequest)
+            #     .order_by(FOIRawRequest.axisrequestid, FOIRawRequest.version.desc())
+            #     .distinct(FOIRawRequest.axisrequestid)
+            # ).subquery()
+            results = (
+                db.session.query(FOIRawRequest.axisrequestid, FOIRawRequest.requestrawdata, FOIRawRequest.status, FOIRawRequest.requestid)
+                .order_by(FOIRawRequest.axisrequestid, FOIRawRequest.version.desc())
+                .distinct(FOIRawRequest.axisrequestid)
+                .filter(
+                    FOIRawRequest.axisrequestid.ilike(f"%{search_text}%"),
+                    ~FOIRawRequest.axisrequestid.in_(axis_ids)
+                )
+                .limit(limit)
+                .all()
+            )
+            result_list=[]
+            for axisrequestid, requestrawdata, status, requestid in results:
+                if "selectedMinistries" in requestrawdata and len(requestrawdata["selectedMinistries"]) > 0:
+                    ministry_code = requestrawdata["selectedMinistries"][0]["code"]
+                    formattedresult= {"axisrequestid": axisrequestid, 'govcode': ministry_code, "requeststatus": status, "rawrequestid": requestid}
+                    result_list.append(formattedresult)
+            return result_list
+        except Exception as ex:
+            logging.error(f"Error fetching linked request IDs: {ex}")
+            raise ex
+        finally:
+            db.session.close()   
+
+    @classmethod
+    def getlinkedrequestdetails(cls, linkedrequests):
+        linkedrequestsinfo = []
+        try:
+            if not linkedrequests:
+                return linkedrequestsinfo
+            axis_ids = [req['axisrequestid'] for req in linkedrequests]
+            # Union Statement to get either FOIMINISTRYREQUEST data if axisrequestid exists in FOIMINISTRYREQUEST OR FOIRAWREQUEST data if axisrequestid does not exist in FOIMINISTRYREQUEST
+            sql = """
+            SELECT DISTINCT ON (axisrequestid) axisrequestid, requestid, foiministryrequestid, requeststatuslabel, requestrawdata, iaocode, version 
+            FROM (
+                SELECT foimin.axisrequestid, NULL::bigint AS requestid, foimin.foiministryrequestid, foimin.requeststatuslabel, NULL::json AS requestrawdata, programarea.iaocode AS iaocode, foimin.version, 1 AS src
+                FROM public."FOIMinistryRequests" foimin
+                LEFT JOIN public."ProgramAreas" programarea ON programarea.programareaid = foimin.programareaid
+                WHERE foimin.axisrequestid IN :axis_ids
+
+                UNION ALL
+
+                SELECT foiraw.axisrequestid, foiraw.requestid, NULL::bigint AS foiministryrequestid, foiraw.requeststatuslabel, requestrawdata, NULL::text AS iaocode, foiraw.version, 2 AS src
+                FROM public."FOIRawRequests" foiraw
+                WHERE foiraw.axisrequestid IN :axis_ids
+            ) foilinkreq
+            ORDER BY axisrequestid, src, version DESC;
+            """
+            params = {"axis_ids": tuple(axis_ids)}
+            rs = db.session.execute(text(sql), params)
+            for row in rs:
+                requeststatus = StateName[row["requeststatuslabel"]].value
+                govcode = row["iaocode"] if row["iaocode"] is not None else row["requestrawdata"]["selectedMinistries"][0]["code"]
+                linkedrequestsinfo.append({"rawrequestid": row["requestid"],  "axisrequestid": row["axisrequestid"], "foiministryrequestid": row["foiministryrequestid"],
+                                           "requeststatus": requeststatus, "govcode": govcode})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return linkedrequestsinfo
+
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:

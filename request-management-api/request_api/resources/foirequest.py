@@ -34,6 +34,7 @@ from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 from request_api.utils.enums import OIStatusEnum
 from request_api.services.events.openinfo import openinfoevent
 from request_api.utils.enums import OpenInfoNotificationType
+from request_api.services.linkedrequestservice import linkedrequestservice
 import json
 import asyncio
 import traceback
@@ -376,3 +377,35 @@ class FOIRequestForDocReviewer(Resource):
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
 
+@cors_preflight('GET,OPTIONS')
+@API.route('/linkrequests/<string:ministrycode>/axisrequestid/<string:axisrequestid>')
+class LinkedRequests(Resource):
+    
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(ministrycode, axisrequestid):
+        try:
+            search_text = request.args.get('q', '').strip()
+            results = linkedrequestservice().findrequestids(search_text, axisrequestid,ministrycode)
+            return results, 200
+        except Exception as ex:
+            print(ex)
+            return {'status': 500, 'message':"Invalid Request Id"}, 500
+        
+@cors_preflight('GET,OPTIONS')
+@API.route('/linkrequest/foiministryinfo/axisrequestid/<string:axisrequestid>')
+class LinkedRequestsInfo(Resource):
+    """Retrieve additional information for FOIMinistry linked requests"""
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def get(axisrequestid):
+        try:
+            results = linkedrequestservice().get_linkedfoiministryrequest_info_by_axisid(axisrequestid)
+            return results, 200
+        except Exception as ex:
+            print(ex)
+            return {'status': 500, 'message': ex}, 500

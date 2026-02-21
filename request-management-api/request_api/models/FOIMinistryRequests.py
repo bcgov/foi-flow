@@ -1712,6 +1712,27 @@ class FOIMinistryRequest(db.Model):
         finally:
             db.session.close()
         return requestdetails
+    
+    @classmethod
+    def get_linkedfoiministryrequest_info(cls, axisid):
+        try:
+            sql='''
+            SELECT DISTINCT ON (axisrequestid) requeststatuslabel, foiministryrequestid
+            FROM public."FOIMinistryRequests" 
+            WHERE axisrequestid = :axisid
+            ORDER BY axisrequestid, version DESC;
+            '''
+            params={"axisid": axisid}
+            row = db.session.execute(sql,params).first()
+            requeststatus, foiministryrequestid = row
+            return {"requeststatus": requeststatus,"foiministryrequestid": foiministryrequestid}
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+
+
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:
         fields = ('foiministryrequestid','version','filenumber','description','recordsearchfromdate','recordsearchtodate',

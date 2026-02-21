@@ -20,6 +20,7 @@ from request_api.utils.commons.datetimehandler import datetimehandler
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.utils.enums import StateName
 from request_api.models.OperatingTeamEmails import OperatingTeamEmail
+from request_api.services.linkedrequestservice import linkedrequestservice
 
 class requestservicegetter:
     """ This class consolidates retrival of FOI request for actors: iao and ministry. 
@@ -163,7 +164,7 @@ class requestservicegetter:
         axissyncdatenoneorempty =  self.__noneorempty(requestministry["axissyncdate"]) 
         linkedministryrequests= []
         if "linkedrequests" in requestministry and requestministry["linkedrequests"] is not None:
-            linkedministryrequests = self.__assignministrynames(requestministry["linkedrequests"])
+            linkedministryrequests = requestministry["linkedrequests"]
         assignedgroupemail = OperatingTeamEmail.getoperatingteamemail(requestministry["assignedgroup"])
         if assignedgroupemail is None:
             assignedgroupemail = KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"])
@@ -218,6 +219,7 @@ class requestservicegetter:
             'subjectCode': subjectcodeservice().getministrysubjectcodename(foiministryrequestid),
             'isofflinepayment': FOIMinistryRequest.getofflinepaymentflag(foiministryrequestid),
             'linkedRequests' : linkedministryrequests,
+            'linkedRequestsInfo' : linkedrequestservice().getlinkedrequestinfo(linkedministryrequests),
             'identityVerified':requestministry['identityverified'],
             'oistatusid':requestministry['oistatus_id'],
             'estimatedpagecount':requestministry['estimatedpagecount'],

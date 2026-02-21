@@ -236,3 +236,25 @@ height: fit-content;
         position: static
     }
 }
+
+.linked-request-link {
+  color: #38598A;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.linked-request-link:hover {
+  text-decoration: underline;
+}
+
+.MuiAutocomplete-popper {
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.MuiAutocomplete-option {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+

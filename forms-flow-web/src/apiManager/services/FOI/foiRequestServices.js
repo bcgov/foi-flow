@@ -645,3 +645,45 @@ export const updateSpecificRequestSection = (data, field, requestId, ministryId,
       });
   };
 }
+
+export const linkedRequestsLists = (queryParams,axisrequestid, ministrycode, ...rest) => {
+  const done = fnDone(rest);
+  const serializedQueryParams = new URLSearchParams(queryParams).toString();
+  const fixedQueryParams = serializedQueryParams.replace(/\+/g, '%20');
+  let url= replaceUrl(replaceUrl(
+      API.FOI_GET_LINKED_REQUESTS_LIST+`?${fixedQueryParams}`,
+      "<ministrycode>",
+      ministrycode),"<axisrequestid>",
+      axisrequestid
+    );
+  return (dispatch) => {
+    httpGETRequest(url, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error(`Error in fetching axis request ids.`);
+        }
+      })
+      .catch((error) => {
+        catchError(error, dispatch);
+      });
+  }
+};
+
+export const getFOIMinistryLinkedRequestInfo = (axisid) => async (dispatch) => {
+  const apiUrl= replaceUrl(API.FOI_MINISTRY_REQUEST_LINKEDREQUESTINFO, "<axisrequestid>", axisid);
+  try {
+    const res = await httpGETRequest(apiUrl, {}, UserService.getToken());
+    if (res.data) {
+      return res.data;
+    } else {
+      console.error("API returned incomplete requeststatus data:", res);
+      dispatch(serviceActionError(res));
+    }
+  } catch (error) {
+    console.error("Error in fetching requeststatus data:", error);
+    dispatch(serviceActionError(error));
+  }
+};
