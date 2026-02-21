@@ -1,20 +1,5 @@
-import React, { useState } from 'react';
 import Card from '@material-ui/core/Card';
-import { makeStyles } from '@material-ui/core/styles';
-import './LinkedRequests.scss'
 import { LinkedRequestsTable } from '../LinkedRequestsTable';
-
-const useStyles = makeStyles((_theme) => ({
-    headingError: {
-        color: "#ff0000"
-    },
-    headingNormal: {
-        color: "000000"
-    },
-    btndisabled: {
-        color: "#808080"
-    }
-}));
 
 const LinkedRequests = ({isMinistry, linkedRequests, linkedRequestsInfo}) => {
     return (
