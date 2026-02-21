@@ -27,8 +27,8 @@ class rawrequestservice:
     """
 
     def saverawrequest(self, requestdatajson, sourceofsubmission, userid,notes):
-        # if not requestdatajson.get("axisRequestId"):
-        #     requestdatajson.pop("axisRequestId", None) # Remove axisRequestId if value is empty
+        if not requestdatajson.get("axisRequestId"):
+            requestdatajson.pop("axisRequestId", None) # Remove axisRequestId if value is empty
         assigneegroup = requestdatajson["assignedGroup"] if requestdatajson.get("assignedGroup") != None else None
         assignee = requestdatajson["assignedTo"] if requestdatajson.get("assignedTo") not in (None,'') else None
         assigneefirstname = requestdatajson["assignedToFirstName"] if requestdatajson.get("assignedToFirstName") != None else None
@@ -38,9 +38,11 @@ class rawrequestservice:
         axisrequestid = requestdatajson["axisRequestId"] if 'axisRequestId' in requestdatajson  else None
         isconsultflag = requestdatajson["isconsultflag"] if 'isconsultflag' in requestdatajson  else False
         if sourceofsubmission == "onlineform":
+            print("NEW UNOPENED REQUEST CODE START")
             assigneegroup =  "Intake Team"
             requestdatajson["assignedGroup"] = assigneegroup
             requestdatajson["assignedTo"] = None
+        print("NEW UNOPENED REQUEST CODE END")
         if axisrequestid is not None:
             isaxisrequestidpresent = self.isaxisrequestidpresent(axisrequestid)
         axissyncdate = requestdatajson["axisSyncDate"] if 'axisSyncDate' in requestdatajson  else None
