@@ -37,10 +37,10 @@ class rawrequestservice:
         ispiiredacted = requestdatajson["ispiiredacted"] if 'ispiiredacted' in requestdatajson  else False        
         axisrequestid = requestdatajson["axisRequestId"] if 'axisRequestId' in requestdatajson  else None
         isconsultflag = requestdatajson["isconsultflag"] if 'isconsultflag' in requestdatajson  else False
-        # if sourceofsubmission == "onlineform":
-        #     assigneegroup =  "Intake Team"
-        #     requestdatajson["assignedGroup"] = assigneegroup
-        #     requestdatajson["assignedTo"] = None
+        if sourceofsubmission == "onlineform":
+            assigneegroup =  "Intake Team"
+            requestdatajson["assignedGroup"] = assigneegroup
+            requestdatajson["assignedTo"] = None
         if axisrequestid is not None:
             isaxisrequestidpresent = self.isaxisrequestidpresent(axisrequestid)
         axissyncdate = requestdatajson["axisSyncDate"] if 'axisSyncDate' in requestdatajson  else None
