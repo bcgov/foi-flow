@@ -308,7 +308,7 @@ const FOIRequestHeader = React.memo(
                   fullWidth
                   required
                   disabled={disableHeaderInput}
-                  error={selectedAssignedTo.toLowerCase().includes("unassigned") || (requestDetails?.currentState?.toLowerCase() === StateEnum.unopened.name.toLowerCase() && requestDetails?.sourceOfSubmission === "onlineform" && requestDetails?.assignedGroup === "Intake Team")}
+                  error={selectedAssignedTo.toLowerCase().includes("unassigned")}
                 >
                   {menuItems}
                 </TextField>
