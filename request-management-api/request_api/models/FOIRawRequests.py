@@ -78,14 +78,15 @@ class FOIRawRequest(db.Model):
         db.session.add(newrawrequest)
         if not axisrequestid:
             db.session.flush() # Force insert to generate PK, but do not commit yet
-            bcgovcode = _requestrawdata.get('selectedMinistries')[0].get('code')
-            programarea = ProgramArea.getprogramarea(bcgovcode)
-            iaocode = programarea['iaocode']
-            newaxisrequestid = cls.generaterequestid(newrawrequest.requestid, iaocode, newrawrequest.isconsultflag)
-            updated_rawdata = copy.deepcopy(_requestrawdata)
-            updated_rawdata["axisRequestId"] = newaxisrequestid
-            newrawrequest.axisrequestid = newaxisrequestid
-            newrawrequest.requestrawdata = updated_rawdata
+            bcgovcode = cls.getbcgovcodefromrawdata(_requestrawdata)
+            if bcgovcode:
+                programarea = ProgramArea.getprogramarea(bcgovcode)
+                iaocode = programarea['iaocode']
+                newaxisrequestid = cls.generaterequestid(newrawrequest.requestid, iaocode, newrawrequest.isconsultflag)
+                updated_rawdata = copy.deepcopy(_requestrawdata)
+                updated_rawdata["axisRequestId"] = newaxisrequestid
+                newrawrequest.axisrequestid = newaxisrequestid
+                newrawrequest.requestrawdata = updated_rawdata
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
@@ -111,6 +112,16 @@ class FOIRawRequest(db.Model):
             axissyncdate = _requestrawdata["axisSyncDate"] if 'axisSyncDate' in _requestrawdata  else None   
             linkedrequests = _requestrawdata["linkedRequests"] if 'linkedRequests' in _requestrawdata  else None 
             isconsultflag = _requestrawdata["isconsultflag"] if 'isconsultflag' in _requestrawdata  else False
+
+            if not axisrequestid:
+                bcgovcode = cls.getbcgovcodefromrawdata(_requestrawdata)
+                if bcgovcode:
+                    programarea = ProgramArea.getprogramarea(bcgovcode)
+                    iaocode = programarea['iaocode']
+                    axisrequestid = cls.generaterequestid(request.requestid, iaocode, isconsultflag)
+                    updated_rawdata = copy.deepcopy(_requestrawdata)
+                    updated_rawdata["axisRequestId"] = axisrequestid
+                    _requestrawdata = updated_rawdata
 
             _version = request.version+1           
             insertstmt =(
@@ -1228,6 +1239,26 @@ class FOIRawRequest(db.Model):
         finally:
             db.session.close()
         return requests
+
+    @classmethod
+    def getbcgovcodefromrawdata(cls, requestrawdata: dict) -> str | None:
+        if not isinstance(requestrawdata, dict):
+            return None
+        # For onlineform submissions
+        # ministry = requestrawdata.get("ministry")
+        # if isinstance(ministry, dict):
+        #     selected = ministry.get("selectedMinistry")
+        #     if isinstance(selected, list) and selected:
+        #         code = selected[0].get("code")
+        #         if isinstance(code, str):
+        #             return code
+
+        selected = requestrawdata.get("selectedMinistries")
+        if isinstance(selected, list) and selected:
+            code = selected[0].get("code")
+            if isinstance(code, str):
+                return code
+        return None
 
 
 
