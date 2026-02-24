@@ -77,7 +77,7 @@ git checkout -b FOIMOD-XXXX_description
 
 ### **Phase B: Integrate into Dev**
 
-* Ensure `feature/*` is rebased onto latest dev (avoid merge commits)
+* Ensure `feature/*` is rebased onto latest dev (avoid merge commits, and do not rebase any shared branches)
 ```bash
 git checkout feature/*
 git rebase origin/dev
