@@ -19,6 +19,8 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import InputAdornment from "@mui/material/InputAdornment";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
 
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
@@ -146,7 +148,7 @@ const AdvancedSearch = ({ userDetail }) => {
     overdue: false,
     ontime: false,
   };
-  
+
   const [requestStatus, setRequestStatus] = useState(() => {
     if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestStatus.length > 0) {
       let savedRequestStatus = { ...intitialRequestStatus }
@@ -167,7 +169,7 @@ const AdvancedSearch = ({ userDetail }) => {
 
   const [requestTypes, setRequestTypes] = useState(() => {
     if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestType.length > 0) {
-      let savedRequestType = {...initialRequestTypes}
+      let savedRequestType = { ...initialRequestTypes }
       advancedSearchParams.requestType.forEach(type => {
         savedRequestType[type] = true;
       });
@@ -181,13 +183,13 @@ const AdvancedSearch = ({ userDetail }) => {
   });
 
   const initialRequestFlags = {
-      restricted: false,
-      oipc: false,
-      phased: false
-    };
+    restricted: false,
+    oipc: false,
+    phased: false
+  };
   const [requestFlags, setRequestFlags] = useState(() => {
     if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestFlags.length > 0) {
-      let savedRequestFlags = {...initialRequestFlags}
+      let savedRequestFlags = { ...initialRequestFlags }
       advancedSearchParams.requestFlags.forEach(type => {
         savedRequestFlags[type] = true;
       });
@@ -209,16 +211,16 @@ const AdvancedSearch = ({ userDetail }) => {
     setToDate("");
   }
   const resetMaxFromDate = (dateRangeType) => {
-    if(dateRangeType == 'receivedDate' || dateRangeType == 'closedate') {
+    if (dateRangeType == 'receivedDate' || dateRangeType == 'closedate') {
       setMaxFromDate(formatDate(new Date()));
-    }else{
+    } else {
       setMaxFromDate(oneYearFromNow);
     }
   }
   const resetMaxToDate = (dateRangeType) => {
-    if(dateRangeType == 'receivedDate' || dateRangeType == 'closedate') {
+    if (dateRangeType == 'receivedDate' || dateRangeType == 'closedate') {
       setMaxToDate(formatDate(new Date()));
-    }else{
+    } else {
       setMaxToDate(oneYearFromNow);
     }
   }
@@ -262,26 +264,26 @@ const AdvancedSearch = ({ userDetail }) => {
 
   useEffect(() => {
     if (Object.keys(advancedSearchParams).length > 0) {
-        if (!advancedSearchComponentLoading) {
-          setAdvancedSearchComponentLoading(true);
-        }
-        setSearchLoading(true);
-        handleUpdateSearchFilter(advancedSearchParams)
-      } 
+      if (!advancedSearchComponentLoading) {
+        setAdvancedSearchComponentLoading(true);
+      }
+      setSearchLoading(true);
+      handleUpdateSearchFilter(advancedSearchParams)
+    }
   }, []);
 
   const noSearchCriteria = () => {
     let selectedRequestTypes = getTrueKeysFromCheckboxObject(requestTypes);
     let selectedRequestFlags = getTrueKeysFromCheckboxObject(requestFlags);
     let selectedRequestStatus = getTrueKeysFromCheckboxObject(requestStatus);
-    return ((keywords.length===0 && keywordsMode) || (!searchText && !keywordsMode))
-              && !fromDate
-              && !toDate
-              && selectedPublicBodies.length===0
-              && requestState.length===0
-              && selectedRequestTypes.length===0
-              && selectedRequestFlags.length===0
-              && selectedRequestStatus.length===0;
+    return ((keywords.length === 0 && keywordsMode) || (!searchText && !keywordsMode))
+      && !fromDate
+      && !toDate
+      && selectedPublicBodies.length === 0
+      && requestState.length === 0
+      && selectedRequestTypes.length === 0
+      && selectedRequestFlags.length === 0
+      && selectedRequestStatus.length === 0;
   };
 
   const handleResetSearchFilters = () => {
@@ -315,8 +317,8 @@ const AdvancedSearch = ({ userDetail }) => {
   const clickSearchFilter = (SearchFilterType) => {
     if (SearchFilterType === SearchFilter.APPLICANT_NAME) {
       setRequestTypes({
-        personal:true,
-        general:false,
+        personal: true,
+        general: false,
         generaldisabled: true
       });
     }
@@ -346,7 +348,7 @@ const AdvancedSearch = ({ userDetail }) => {
       } else {
         setRequestState(event.target.value);
       }
-    } 
+    }
   };
 
   const handleRequestStatusChange = (event) => {
@@ -546,73 +548,102 @@ const AdvancedSearch = ({ userDetail }) => {
                   }}
                   variant="h6"
                 >
-                  Filter by
+                  Filter your search by:
                 </Typography>
               </Grid>
-              <Grid container xs={12}>
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-request-description`}
-                    label={"REQUEST DESCRIPTION"}
-                    color="primary"
-                    onClick={() =>
-                      clickSearchFilter(SearchFilter.REQUEST_DESCRIPTION)
+              <Grid container xs={12} sx={{ mt: 1 }}>
+                <RadioGroup
+                  row
+                  name="search-filter-radio-group"
+                  value={searchFilterSelected}
+                  onChange={(e) => clickSearchFilter(e.target.value)}
+                  sx={{
+                    width: "100%",
+                    columnGap: "40px",
+                    "& .MuiFormControlLabel-label": {
+                      color: "#013366",
+                    },
+                  }}
+                >
+                  <FormControlLabel
+                    value={SearchFilter.ID_NUM}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
                     }
-                    clicked={
-                      searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION
+                    label="ID Number"
+                  />
+                  <FormControlLabel
+                    value={SearchFilter.REQUEST_DESCRIPTION}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
                     }
+                    label="Request Description"
                   />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-raw-request`}
-                    label={"ID NUMBER"}
-                    color="primary"
-                    onClick={() => clickSearchFilter(SearchFilter.ID_NUM)}
-                    clicked={searchFilterSelected === SearchFilter.ID_NUM}
+                  <FormControlLabel
+                    value={SearchFilter.APPLICANT_NAME}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
+                    }
+                    label="Applicant Name"
                   />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-applicant-name`}
-                    label={"APPLICANT NAME"}
-                    color="primary"
-                    onClick={() => clickSearchFilter(SearchFilter.APPLICANT_NAME)}
-                    clicked={searchFilterSelected === SearchFilter.APPLICANT_NAME}
+                  <FormControlLabel
+                    value={SearchFilter.ASSIGNEE_NAME}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
+                    }
+                    label="Assignee Name"
                   />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-assignee-name`}
-                    label={"ASSIGNEE NAME"}
-                    color="primary"
-                    onClick={() => clickSearchFilter(SearchFilter.ASSIGNEE_NAME)}
-                    clicked={searchFilterSelected === SearchFilter.ASSIGNEE_NAME}
+                  <FormControlLabel
+                    value={SearchFilter.SUBJECT_CODE}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
+                    }
+                    label="Subject Code"
                   />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-search-filter`}
-                    label={"SUBJECT CODE"}
-                    color="primary"
-                    onClick={() => clickSearchFilter(SearchFilter.SUBJECT_CODE)}
-                    clicked={searchFilterSelected === SearchFilter.SUBJECT_CODE}
+                  <FormControlLabel
+                    value={SearchFilter.OIPC_NUMBER}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
+                    }
+                    label="OIPC Number"
                   />
-                </Grid>
-                
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-oipc-number`}
-                    label={"OIPC NUMBER"}
-                    color="primary"
-                    onClick={() => clickSearchFilter(SearchFilter.OIPC_NUMBER)}
-                    clicked={searchFilterSelected === SearchFilter.OIPC_NUMBER}
-                  />
-                </Grid>
+                </RadioGroup>
               </Grid>
 
               <Grid item xs={6} container direction="row" spacing={2}>
@@ -652,12 +683,12 @@ const AdvancedSearch = ({ userDetail }) => {
                       }}
                     >
                       <MenuItem value="All" key="request-state-all">
-                          <Checkbox
-                            checked={
-                              requestState.indexOf("All") > -1
-                            }
-                            color="success"
-                          />
+                        <Checkbox
+                          checked={
+                            requestState.indexOf("All") > -1
+                          }
+                          color="success"
+                        />
                         <em>All</em>
                       </MenuItem>
                       {Object.entries(StateEnum).filter(([key, value]) => ![
@@ -777,7 +808,7 @@ const AdvancedSearch = ({ userDetail }) => {
                     >
                       Request Flags
                     </Typography>
-                  </Grid>                  
+                  </Grid>
                   <Grid item xs={12}>
                     <FormGroup>
                       <FormControlLabel
@@ -848,7 +879,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       displayEmpty
                       value={selectedDateRangeType}
                       onChange={handleSelectedDateRangeTypeChange}
-                      inputProps={{ "aria-labelledby": "date-type-label"}}
+                      inputProps={{ "aria-labelledby": "date-type-label" }}
                       input={<OutlinedInput label="Type of Date Range" notched />}
                     >
                       <MenuItem disabled value="" key="date-range-type-default">
@@ -955,7 +986,7 @@ const AdvancedSearch = ({ userDetail }) => {
                       displayEmpty
                       value={selectedPublicBodies}
                       onChange={handleSelectedPublicBodiesChange}
-                      inputProps={{ "aria-labelledby": "public-body-label"}}
+                      inputProps={{ "aria-labelledby": "public-body-label" }}
                       input={<OutlinedInput label="Public Body" notched />}
                       renderValue={(selected) => {
                         if (programAreaList?.length === 1) {
@@ -997,16 +1028,16 @@ const AdvancedSearch = ({ userDetail }) => {
                 </Grid>
                 <Grid item xs={12}>
                   <Typography
-                      sx={{
-                        color: "#ff0000",
-                        fontSize: "0.8rem",
-                        lineHeight: "1.6",
-                      }}
-                      visibility={!requestTypes.generaldisabled ? "hidden" : "visible"}
-                    >
-                      * You are unable to search General Requests with Applicant Name Selected. <br/>
-                      Deselect Applicant Name Search Filter if you wish to search General Requests.
-                    </Typography>
+                    sx={{
+                      color: "#ff0000",
+                      fontSize: "0.8rem",
+                      lineHeight: "1.6",
+                    }}
+                    visibility={!requestTypes.generaldisabled ? "hidden" : "visible"}
+                  >
+                    * You are unable to search General Requests with Applicant Name Selected. <br />
+                    Deselect Applicant Name Search Filter if you wish to search General Requests.
+                  </Typography>
                 </Grid>
               </Grid>
 
@@ -1022,7 +1053,7 @@ const AdvancedSearch = ({ userDetail }) => {
                     }}
                     variant="contained"
                     onClick={handleApplySearchFilters}
-                    disabled={searchLoading || noSearchCriteria() || ((searchText || keywords.length>0) && !searchFilterSelected ) }
+                    disabled={searchLoading || noSearchCriteria() || ((searchText || keywords.length > 0) && !searchFilterSelected)}
                     disableElevation
                   >
                     Apply Search
@@ -1048,7 +1079,7 @@ const AdvancedSearch = ({ userDetail }) => {
         </Grid>
       </Grid>
       <Grid className="floatAboveEverythingLeft">
-        <Tooltip content={tooltipContentLeft} position={"bottom right"}/>
+        <Tooltip content={tooltipContentLeft} position={"bottom right"} />
         <p className="hideContent" id="popup-6">Information1</p>
       </Grid>
       <Grid className="floatAboveEverything">

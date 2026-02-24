@@ -619,6 +619,7 @@ class FOIRawRequest(db.Model):
             literal(None).label('isoipcreview'),
             literal(None).label('isphasedrelease'),
             literal(None).label('oipc_number'),
+            literal(None).label('closereason'),
             proactivedisclosurecategory
         ]
 
@@ -883,7 +884,6 @@ class FOIRawRequest(db.Model):
     @classmethod
     def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
         basequery = FOIRawRequest.getbasequery(None, userid, isiaorestrictedfilemanager)
-        basequery = basequery.add_columns(literal(None).label('closereason'))
 
         is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
         if is_oi_team:
@@ -906,6 +906,7 @@ class FOIRawRequest(db.Model):
 
         #rawrequests
         query_full_queue = searchquery.union(subquery_ministry_queue)
+        print("\n\nFull Query:\n", query_full_queue)
         return query_full_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
 
     @classmethod
@@ -931,7 +932,7 @@ class FOIRawRequest(db.Model):
             else:
                 filtercondition.append(FOIRawRequest.status != StateName.closed.value)
         
-        #request type: personal, general
+        #request type: personal, general, proactive disclosure
         if(len(params['requesttype']) > 0):
             requesttypecondition = FOIRawRequest.getfilterforrequesttype(params)
             filtercondition.append(or_(*requesttypecondition))
@@ -1015,13 +1016,17 @@ class FOIRawRequest(db.Model):
         #request type: personal, general
         requesttypecondition = []
         for type in params['requesttype']:
+            print("\n******type: ", type)
             if type == 'proactivedisclosure':
                 requesttypecondition.append(FOIRawRequest.findfield('requestType') == 'proactive disclosure')
+                requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == 'proactive disclosure')
+                requesttypecondition.append(FOIRawRequest.findfield('requestType') == 'proactivedisclosure')
+                requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == 'proactivedisclosure')
             else:
                 requesttypecondition.append(FOIRawRequest.findfield('requestType') == type)
                 requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == type)
-
-        return or_(*requesttypecondition)
+        print("\n******requesttypecondition: ", requesttypecondition)
+        return requesttypecondition
 
     @classmethod
     def getfilterforrequestflags(cls, params):
@@ -1061,6 +1066,7 @@ class FOIRawRequest(db.Model):
         else:
             searchcondition = []
             for keyword in params['keywords']:
+                keyword = keyword.strip()
                 searchcondition.append(FOIRawRequest.findfield(params['search']).ilike('%'+keyword+'%'))
             return and_(*searchcondition)
     
@@ -1069,6 +1075,7 @@ class FOIRawRequest(db.Model):
         searchcondition1 = []
         searchcondition2 = []
         for keyword in params['keywords']:
+            keyword = keyword.strip()
             searchcondition1.append(FOIRawRequest.findfield('description').ilike('%'+keyword+'%'))
             searchcondition2.append(FOIRawRequest.findfield('descriptionDescription').ilike('%'+keyword+'%'))
         return or_(and_(*searchcondition1), and_(*searchcondition2))    
@@ -1080,6 +1087,7 @@ class FOIRawRequest(db.Model):
         searchcondition3 = []
         searchcondition4 = []
         for keyword in params['keywords']:
+            keyword = keyword.strip()
             searchcondition1.append(FOIRawRequest.findfield('firstName').ilike('%'+keyword+'%'))
             searchcondition2.append(FOIRawRequest.findfield('lastName').ilike('%'+keyword+'%'))
             searchcondition3.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
@@ -1092,6 +1100,7 @@ class FOIRawRequest(db.Model):
         searchcondition2 = []
         searchcondition3 = []
         for keyword in params['keywords']:
+            keyword = keyword.strip()
             searchcondition1.append(FOIRawRequest.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
             searchcondition2.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
             searchcondition3.append(FOIRawRequest.assignedgroup.ilike('%'+keyword+'%'))
@@ -1102,6 +1111,7 @@ class FOIRawRequest(db.Model):
         searchcondition1 = []
         searchcondition2 = []
         for keyword in params['keywords']:
+            keyword = keyword.strip()
             keyword = keyword.lower()
             keyword = keyword.replace('u-00', '')
             searchcondition1.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))

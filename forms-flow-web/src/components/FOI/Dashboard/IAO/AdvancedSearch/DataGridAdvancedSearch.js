@@ -13,7 +13,10 @@ import {
   getRecordsDue,
   LightTooltip,
   displayQueueFlagIcons,
-  pagecountcellTooltipRender, 
+  pagecountcellTooltipRender,
+  getIDNumber,
+  getOIReceivedDate,
+  getOIApplicantCategory,
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
 import {
@@ -30,7 +33,7 @@ import Link from "@mui/material/Link";
 
 import Stack from "@mui/material/Stack";
 import {
-  ClickableChip,  
+  ClickableChip,
 } from "../../utils";
 import { setAdvancedSearchFilter } from "../../../../../actions/FOI/foiRequestActions";
 
@@ -66,7 +69,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     if (filter === foiadvsearchfilter) {
       return;
     }
-    
+
     dispatch(setAdvancedSearchFilter(filter));
   };
 
@@ -82,10 +85,10 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       dispatch(push(`/foi/reviewrequest/${row.id}`));
     }
   };
-  
+
   const hyperlinkTooltipRenderCell = (params) => {
     let link;
-    if (params.row.ministryrequestid) { 
+    if (params.row.ministryrequestid) {
       link = "./foirequests/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
     } else {
       link = "./reviewrequest/" + params.row.id;
@@ -95,21 +98,21 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       description += "\n(" + (new Date(params.row.fromdate)).toLocaleDateString() + " to " + (new Date(params.row.todate)).toLocaleDateString() + ")"
     }
     return (<LightTooltip placement="bottom-start" title={
-      <div style={{whiteSpace: "pre-line"}}>
+      <div style={{ whiteSpace: "pre-line" }}>
         {description}
       </div>
     }>
       <span className="table-cell-truncate">
         <Link href={link} target="_blank" onClick={(e) => renderReviewRequest(e, params.row)}>
-        <div className="MuiDataGrid-cellContent">{params.value}</div>
-      </Link></span>
+          <div className="MuiDataGrid-cellContent">{params.value}</div>
+        </Link></span>
     </LightTooltip>
     )
   };
 
   const hyperlinkRenderCell = (params) => {
     let link;
-    if (params.row.ministryrequestid) { 
+    if (params.row.ministryrequestid) {
       link = "./foirequests/" + params.row.id + "/ministryrequest/" + params.row.ministryrequestid;
     } else {
       link = "./reviewrequest/" + params.row.id;
@@ -130,7 +133,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     )
   };
 
-  
+
 
   const ProcessingTeamColumns = [
     {
@@ -145,6 +148,10 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerAlign: "left",
       renderCell: hyperlinkTooltipRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: (params) =>
+        params.row.requestType === "proactive disclosure"
+          ? params.row.idNumber
+          : params.row.axisRequestId,
       width: 160,
     },
     {
@@ -229,7 +236,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       flex: 0.5,
     },
   ];
-  
+
   const IntakeTeamColumns = [
     {
       field: "flags",
@@ -261,6 +268,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerAlign: "left",
       renderCell: hyperlinkTooltipRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: getIDNumber,
       flex: 1,
     },
     {
@@ -296,7 +304,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       renderCell: (_params) => <span></span>,
     },
   ];
-  
+
   const FlexTeamColumns = [
     {
       field: "flags",
@@ -310,6 +318,10 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerAlign: "left",
       renderCell: hyperlinkTooltipRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: (params) =>
+        params.row.requestType === "proactive disclosure"
+          ? params.row.idNumber
+          : params.row.axisRequestId,
       width: 160,
     },
     {
@@ -375,13 +387,13 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     },
   ];
 
-  const HistoricalSearchResultsColumns = [    
+  const HistoricalSearchResultsColumns = [
     {
       field: "applicantname",
       headerName: "APPLICANT NAME",
       headerAlign: "left",
       renderCell: historicalRenderCell,
-      cellClassName: 'foi-advanced-search-result-cell',     
+      cellClassName: 'foi-advanced-search-result-cell',
       width: 180,
     },
     {
@@ -421,10 +433,10 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "RECEIVED DATE",
       headerAlign: "left",
       renderCell: historicalRenderCell,
-      cellClassName: 'foi-advanced-search-result-cell',      
+      cellClassName: 'foi-advanced-search-result-cell',
       flex: 1,
     },
-          
+
   ];
 
   const OITeamColumns = [
@@ -434,7 +446,8 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       flex: 1,
       renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
-      headerAlign: "left"
+      headerAlign: "left",
+      valueGetter: getOIReceivedDate,
     },
     {
       field: "axisRequestId",
@@ -442,6 +455,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       flex: 1,
       renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
+      valueGetter: getIDNumber,
       headerAlign: "left"
     },
     {
@@ -494,14 +508,16 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     },
     {
       field: "applicantcategory",
-      headerName: "APPLICANT TYPE",
+      //headerName: "APPLICANT TYPE",
+      headerName: "CATEGORY",
       flex: 1,
       renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       headerAlign: "left",
+      valueGetter: getOIApplicantCategory,
     }
   ];
-  
+
   const defaultTableInfo = {
     columns: IntakeTeamColumns,
     sort: [
@@ -515,23 +531,23 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
 
   const defaultHistoricalResultsTableInfo = {
     columns: HistoricalSearchResultsColumns,
-    sort: [     
+    sort: [
       { field: "receiveddate", sort: "desc" },
     ],
     stateClassName: {
       open: "flex-open",
     },
   };
-  
+
 
   const getTableInfo = (userGroups) => {
     var tableInfo = defaultTableInfo;
     if (!userGroups || isIntakeTeam(userGroups)) {
       tableInfo = defaultTableInfo;
     }
-  
+
     if (isProcessingTeam(userGroups)) {
-      tableInfo =  {
+      tableInfo = {
         columns: ProcessingTeamColumns,
         sort: [
           { field: "currentState", sort: "desc" },
@@ -539,9 +555,9 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
         ],
       };
     }
-  
+
     if (isFlexTeam(userGroups)) {
-      tableInfo =  {
+      tableInfo = {
         columns: FlexTeamColumns,
         sort: [
           { field: "currentState", sort: "desc" },
@@ -560,9 +576,10 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       ];
       tableInfo = defaultTableInfo;
     }
-    
+
     if (searchResults?.data.filter(r => r.currentState === 'Closed').length > 0) {
-      return {...tableInfo, columns: [...tableInfo.columns, {
+      return {
+        ...tableInfo, columns: [...tableInfo.columns, {
           field: "closereason",
           headerName: "CLOSE REASON",
           headerAlign: "left",
@@ -572,23 +589,23 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
         }]
       }
     }
-  
+
     return tableInfo;
   };
   const tableInfo = getTableInfo(user.groups);
-  
+
   const classes = useStyles();
 
   const defaultRowsState = { page: 0, pageSize: 100 };
   const [rowsState, setRowsState] = useState(
-    Object.keys(advancedSearchParams).length > 0 ? 
-      {page: advancedSearchParams.page - 1, pageSize: advancedSearchParams.size} : 
+    Object.keys(advancedSearchParams).length > 0 ?
+      { page: advancedSearchParams.page - 1, pageSize: advancedSearchParams.size } :
       defaultRowsState
   );
 
   const [historicrowsState, sethistoricRowsState] = useState(
-    Object.keys(historicSearchParams).length > 0 ? 
-      {page: historicSearchParams.page - 1, pageSize: historicSearchParams.size} : 
+    Object.keys(historicSearchParams).length > 0 ?
+      { page: historicSearchParams.page - 1, pageSize: historicSearchParams.size } :
       defaultRowsState
   );
 
@@ -607,7 +624,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   useEffect(() => {
     if (searchResults) {
       setSearchLoading(true);
-      
+
       // page+1 here, because initial page value is 0 for mui-data-grid
       handleUpdateSearchFilter({
         page: rowsState.page + 1,
@@ -616,12 +633,11 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
         userId: userDetail.preferred_username,
       });
 
-      
+
 
     }
 
-    if(searchHistoricalSearchResults)
-    {
+    if (searchHistoricalSearchResults) {
 
       setHistoricalSearchLoading(true);
 
@@ -633,8 +649,8 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       });
 
     }
-    
-  }, [rowsState,historicrowsState, sortModel,sortHistoricsearchSortModel]);
+
+  }, [rowsState, historicrowsState, sortModel, sortHistoricsearchSortModel]);
 
   const columnsRef = tableInfo?.columns || [];
   const historiccolumnsRef = React.useRef(defaultHistoricalResultsTableInfo?.columns || []);
@@ -662,113 +678,113 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
         </Grid>
         <Grid item xs={3}>
           <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
-          <ClickableChip
-                  id="advancedsearchresults"
-                  key={`foimod`}
-                  label={"FOI MOD"}
-                  color="primary"
-                  size="small"
-                  onClick={() => {advancedFilterChange("foimod"); console.log(`Value of advanced search filter on advancedsearchresults is ${foiadvsearchfilter}`)}}
-                  clicked={foiadvsearchfilter === "foimod"}
-                />
             <ClickableChip
-                  id="historicalsearchresults"
-                  key={`historicalsearchresults`}
-                  label={"Historical AXIS Results"}
-                  color="primary"
-                  size="small"
-                  onClick={() => { advancedFilterChange("historicalsearchresults"); console.log(`Value of advanced search filter on advancedsearchresults is ${foiadvsearchfilter}`)}}
-                  clicked={foiadvsearchfilter === "historicalsearchresults"}
-                />
+              id="advancedsearchresults"
+              key={`foimod`}
+              label={"FOI MOD"}
+              color="primary"
+              size="small"
+              onClick={() => { advancedFilterChange("foimod"); console.log(`Value of advanced search filter on advancedsearchresults is ${foiadvsearchfilter}`) }}
+              clicked={foiadvsearchfilter === "foimod"}
+            />
+            <ClickableChip
+              id="historicalsearchresults"
+              key={`historicalsearchresults`}
+              label={"Historical AXIS Results"}
+              color="primary"
+              size="small"
+              onClick={() => { advancedFilterChange("historicalsearchresults"); console.log(`Value of advanced search filter on advancedsearchresults is ${foiadvsearchfilter}`) }}
+              clicked={foiadvsearchfilter === "historicalsearchresults"}
+            />
           </Stack>
         </Grid>
         <Grid item xs={12} style={{ minHeight: 300 }}>
-         {  (foiadvsearchfilter === "foimod") ?
-         // FOI MOD Search results
-          <DataGrid
-            autoHeight
-            className="foi-data-grid"
-            getRowId={(row) => row.idNumber}
-            rows={searchResults?.data || []}
-            columns={columnsRef}
-            rowHeight={30}
-            headerHeight={50}
-            rowCount={searchResults?.meta?.total || 0}
-            pageSize={rowsState.pageSize}
-            // rowsPerPageOptions={[10]}
-            hideFooterSelectedRowCount={true}
-            disableColumnMenu={true}
-            pagination
-            paginationMode="server"
-            initialState={{
-              pagination: rowsState
-            }}
-            onPageChange={(newPage) => setRowsState((prev) => ({ ...prev, page: newPage }))}
-            onPageSizeChange={(newpageSize) =>
-              setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
-            }
-            components={{
-              Footer: ()=> <CustomFooter rowCount={searchResults?.meta?.total || 0} defaultSortModel={tableInfo.sort} footerFor={"advancedsearch"}></CustomFooter>
-            }}
-            sortingOrder={["desc", "asc"]}
-            sortModel={[sortModel[0]]}
-            sortingMode={"server"}
-            onSortModelChange={(model) => {
-              if (model.length > 0) {
-                setSortModel(model)
+          {(foiadvsearchfilter === "foimod") ?
+            // FOI MOD Search results
+            <DataGrid
+              autoHeight
+              className="foi-data-grid"
+              getRowId={(row) => row.idNumber}
+              rows={searchResults?.data || []}
+              columns={columnsRef}
+              rowHeight={30}
+              headerHeight={50}
+              rowCount={searchResults?.meta?.total || 0}
+              pageSize={rowsState.pageSize}
+              // rowsPerPageOptions={[10]}
+              hideFooterSelectedRowCount={true}
+              disableColumnMenu={true}
+              pagination
+              paginationMode="server"
+              initialState={{
+                pagination: rowsState
+              }}
+              onPageChange={(newPage) => setRowsState((prev) => ({ ...prev, page: newPage }))}
+              onPageSizeChange={(newpageSize) =>
+                setRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
               }
-            }}
-            getRowClassName={(params) =>
-              clsx(
-                `super-app-theme--${params.row.currentState?.toLowerCase().replace(/ +/g, "")}`,
-                tableInfo?.stateClassName?.[
+              components={{
+                Footer: () => <CustomFooter rowCount={searchResults?.meta?.total || 0} defaultSortModel={tableInfo.sort} footerFor={"advancedsearch"}></CustomFooter>
+              }}
+              sortingOrder={["desc", "asc"]}
+              sortModel={[sortModel[0]]}
+              sortingMode={"server"}
+              onSortModelChange={(model) => {
+                if (model.length > 0) {
+                  setSortModel(model)
+                }
+              }}
+              getRowClassName={(params) =>
+                clsx(
+                  `super-app-theme--${params.row.currentState?.toLowerCase().replace(/ +/g, "")}`,
+                  tableInfo?.stateClassName?.[
                   params.row.currentState?.toLowerCase().replace(/ +/g, "")
-                ]
-              )
-            }
-            loading={searchLoading}
-            
-          /> : 
-          // Historical Search results
-          <DataGrid
-            autoHeight
-            className="foi-data-grid"
-            getRowId={(row) => row.axisrequestid}            
-            rows={searchHistoricalSearchResults?.results || []}            
-            columns={historiccolumnsRef?.current}
-            rowHeight={30}
-            headerHeight={50}
-            rowCount={searchHistoricalSearchResults?.count || 0}
-            pageSize={historicrowsState.pageSize}
-            // rowsPerPageOptions={[10]}
-            hideFooterSelectedRowCount={true}
-            disableColumnMenu={true}
-            pagination
-            paginationMode="server"
-            initialState={{
-              pagination: historicrowsState
-            }}            
-            onPageChange={(newPage) => sethistoricRowsState((prev) => ({ ...prev, page: newPage }))}
-            onPageSizeChange={(newpageSize) =>
-              sethistoricRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
-            }
-            components={{
-              Footer: ()=> <CustomFooter rowCount={searchHistoricalSearchResults?.count || 0} defaultSortModel={defaultHistoricalResultsTableInfo.sort} footerFor={"advancedsearch"}></CustomFooter>
-            }}
-            sortingOrder={["desc", "asc"]}
-            sortModel={[sortHistoricsearchSortModel[0]]}
-            sortingMode={"server"}
-            onSortModelChange={(model) => {
-              if (model.length > 0) {
-                setHistoricsearchSortModel(model)
+                  ]
+                )
               }
-            }}
-            
-                        
-            loading={searchHistoricalDataLoading}
-            
-          />
-}
+              loading={searchLoading}
+
+            /> :
+            // Historical Search results
+            <DataGrid
+              autoHeight
+              className="foi-data-grid"
+              getRowId={(row) => row.axisrequestid}
+              rows={searchHistoricalSearchResults?.results || []}
+              columns={historiccolumnsRef?.current}
+              rowHeight={30}
+              headerHeight={50}
+              rowCount={searchHistoricalSearchResults?.count || 0}
+              pageSize={historicrowsState.pageSize}
+              // rowsPerPageOptions={[10]}
+              hideFooterSelectedRowCount={true}
+              disableColumnMenu={true}
+              pagination
+              paginationMode="server"
+              initialState={{
+                pagination: historicrowsState
+              }}
+              onPageChange={(newPage) => sethistoricRowsState((prev) => ({ ...prev, page: newPage }))}
+              onPageSizeChange={(newpageSize) =>
+                sethistoricRowsState((prev) => ({ ...prev, pageSize: newpageSize }))
+              }
+              components={{
+                Footer: () => <CustomFooter rowCount={searchHistoricalSearchResults?.count || 0} defaultSortModel={defaultHistoricalResultsTableInfo.sort} footerFor={"advancedsearch"}></CustomFooter>
+              }}
+              sortingOrder={["desc", "asc"]}
+              sortModel={[sortHistoricsearchSortModel[0]]}
+              sortingMode={"server"}
+              onSortModelChange={(model) => {
+                if (model.length > 0) {
+                  setHistoricsearchSortModel(model)
+                }
+              }}
+
+
+              loading={searchHistoricalDataLoading}
+
+            />
+          }
         </Grid>
       </Grid>
     </ConditionalComponent>

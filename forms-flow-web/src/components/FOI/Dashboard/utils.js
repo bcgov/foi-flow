@@ -8,7 +8,7 @@ import { StateEnum } from "../../../constants/FOI/statusEnum";
 import { MinistryNeedsLANPages, RequestTypes } from "../../../constants/FOI/enum";
 import Chip from "@mui/material/Chip";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFlag } from '@fortawesome/free-solid-svg-icons'; 
+import { faFlag } from '@fortawesome/free-solid-svg-icons';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 
@@ -34,6 +34,9 @@ export const getAssigneeValue = (row) => {
 };
 
 export const getReceivedDate = (params) => {
+  if (params.row.requestType == "proactive disclosure") {
+    return "N/A";
+  }
   let receivedDateString = params.row.receivedDateUF;
   const dateString = receivedDateString
     ? receivedDateString.substring(0, 10)
@@ -52,12 +55,32 @@ export const getReceivedDate = (params) => {
   return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
 };
 
+export const getIDNumber = (params) => {
+  return params.row.requestType === "proactive disclosure"
+    ? params.row.idNumber
+    : params.row.axisRequestId;
+};
+
+export const getOIReceivedDate = (params) => {
+  if (params.row.requestType === "proactive disclosure") {
+    return "N/A";
+  }
+  return params.row.oiReceivedDate;
+};
+
+export const getOIApplicantCategory = (params) => {
+  if (params.row.requestType === "proactive disclosure") {
+    return params.row.proactivedisclosurecategory ? params.row.proactivedisclosurecategory : "N/A";
+  }
+  return params.row.applicantcategory;
+};
+
 export const getClosedDate = (params) => {
   let closedDateString = params.row.closedate;
   const dateString = closedDateString
     ? closedDateString.substring(0, 10)
     : "";
-    closedDateString = closedDateString ? new Date(closedDateString) : "";
+  closedDateString = closedDateString ? new Date(closedDateString) : "";
   if (
     closedDateString !== "" &&
     (closedDateString.getHours() > 16 ||
@@ -120,7 +143,7 @@ export const updateEventSortModel = (sortModel, isMinistry) => {
   if (smodel) {
     let field = smodel[0]?.field;
     let order = smodel[0]?.sort;
-    
+
     //add createdat to default sorting
     if (smodel.length == 1 && field == "defaultSorting") {
       smodel.push(
@@ -143,16 +166,15 @@ export const onBehalfFullName = (params) => {
   if (!params.row.onBehalfFirstName && !params.row.onBehalfLastName) {
     return "N/A";
   }
-  return `${params.row.onBehalfFirstName || ""} ${
-    params.row.onBehalfLastName || ""
-  }`;
+  return `${params.row.onBehalfFirstName || ""} ${params.row.onBehalfLastName || ""
+    }`;
 };
 
 export const formatRequestType = (requeststatus) => {
   if (!requeststatus) {
     return "";
   }
-  let formattedRequestState= Object.values(StateEnum).find(state => state.label === requeststatus).name
+  let formattedRequestState = Object.values(StateEnum).find(state => state.label === requeststatus).name
   return formattedRequestState;
 };
 
@@ -162,7 +184,7 @@ export const getRecordsDue = (params) => {
   const currentStatus = params.row.currentState;
   if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || currentStatus.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) {
     return "N/A";
-  } else if(!receivedDateString) {
+  } else if (!receivedDateString) {
     return "";
   } else {
     return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
@@ -172,9 +194,9 @@ export const getRecordsDue = (params) => {
 export const getLDD = (params) => {
   let receivedDateString = params.row.duedate;
   const currentStatus = params.row.currentState;
-  if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase()||currentStatus.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) {
+  if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || currentStatus.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) {
     return "N/A";
-  } else if(!receivedDateString) {
+  } else if (!receivedDateString) {
     return "";
   } else {
     return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
@@ -188,25 +210,25 @@ export const getDaysLeft = (params) => {
     [StateEnum.onhold.name.toLowerCase(), StateEnum.closed.name.toLowerCase(), StateEnum.onholdother.name.toLowerCase()].includes(params.row.currentState.toLowerCase())
   ) {
     return "N/A";
-  } else if(!receivedDateString) {
+  } else if (!receivedDateString) {
     return "";
   } else {
     return `${calculateDaysRemaining(receivedDateString)}`;
   }
 };
 
-export const ClickableChip = ({ clicked, sx={}, color, ...rest }) => {
+export const ClickableChip = ({ clicked, sx = {}, color, ...rest }) => {
   return (
     <Chip
       sx={[
         {
-        ...(clicked
-          ? {
+          ...(clicked
+            ? {
               backgroundColor: (color === 'primary' ? "#38598A" : color),
               color: "white",
               width: "100%",
             }
-          : {
+            : {
               color: (color === 'primary' ? "#38598A" : color),
               border: ("1px solid " + (color === 'primary' ? "#38598A" : color)),
               width: "100%",
@@ -233,17 +255,17 @@ export const addYears = (n) => {
 
 export const displayIcon = (params) => {
   return (
-    params?.row?.isiaorestricted ? 
-    <><FontAwesomeIcon icon={faFlag} size='2x' className='restrict-icon' />
-    </> : ""
+    params?.row?.isiaorestricted ?
+      <><FontAwesomeIcon icon={faFlag} size='2x' className='restrict-icon' />
+      </> : ""
   );
 };
 
 export const displayIconMinistry = (params) => {
   return (
-    params?.row?.isministryrestricted ? 
-    <><FontAwesomeIcon icon={faFlag} size='2x' className='restrict-icon' />
-    </> : ""
+    params?.row?.isministryrestricted ?
+      <><FontAwesomeIcon icon={faFlag} size='2x' className='restrict-icon' />
+      </> : ""
   );
 };
 
@@ -252,7 +274,7 @@ export const displayQueueFlagIcons = (params) => {
 
   if (params?.row?.isiaorestricted || params?.row?.isministryrestricted) {
     restricted = <LightTooltip placement="top-end" title={
-      <div style={{whiteSpace: "pre-line"}}>
+      <div style={{ whiteSpace: "pre-line" }}>
         Restricted
       </div>
     }>
@@ -263,34 +285,34 @@ export const displayQueueFlagIcons = (params) => {
   }
 
   const oipcreview = params?.row?.isoipcreview ?
-  <LightTooltip placement="top-end" title={
-    <div style={{whiteSpace: "pre-line"}}>
-      OIPC
-    </div>
-  }><span className="dashboard-flag-oipcreview"><FontAwesomeIcon icon={faFlag} size='2x' /></span>
-  </LightTooltip> :
-  <span className="dashboard-flag-placeholder"><FontAwesomeIcon icon={faFlag} size='2x' /></span>
+    <LightTooltip placement="top-end" title={
+      <div style={{ whiteSpace: "pre-line" }}>
+        OIPC
+      </div>
+    }><span className="dashboard-flag-oipcreview"><FontAwesomeIcon icon={faFlag} size='2x' /></span>
+    </LightTooltip> :
+    <span className="dashboard-flag-placeholder"><FontAwesomeIcon icon={faFlag} size='2x' /></span>
 
   const phasedrelease = params?.row?.isphasedrelease ?
-  <LightTooltip placement="top-end" title={
-    <div style={{whiteSpace: "pre-line"}}>
-      Phased Release
-    </div>
-  }><span className="dashboard-flag-phasedrelease"><FontAwesomeIcon icon={faFlag} size='2x' /></span>
-  </LightTooltip> :
-  <span className="dashboard-flag-placeholder"><FontAwesomeIcon icon={faFlag} size='2x' /></span>
+    <LightTooltip placement="top-end" title={
+      <div style={{ whiteSpace: "pre-line" }}>
+        Phased Release
+      </div>
+    }><span className="dashboard-flag-phasedrelease"><FontAwesomeIcon icon={faFlag} size='2x' /></span>
+    </LightTooltip> :
+    <span className="dashboard-flag-placeholder"><FontAwesomeIcon icon={faFlag} size='2x' /></span>
 
-  return  <div>
-            {restricted}
-            {oipcreview}
-            {phasedrelease}
-          </div>
+  return <div>
+    {restricted}
+    {oipcreview}
+    {phasedrelease}
+  </div>
 }
 
 export const displayHeaderIcon = (params) => {
   return (
     <span className="dashboard-flag-restricted"><FontAwesomeIcon icon={faFlag} size='2x' className='restrict-icon' />
-    </span> 
+    </span>
   );
 };
 
@@ -310,14 +332,10 @@ export const cellTooltipRender = (params) => {
   if (params.row.fromdate && params.row.todate) {
     description += "\n(" + (new Date(params.row.fromdate)).toLocaleDateString() + " to " + (new Date(params.row.todate)).toLocaleDateString() + ")"
   }
-  let idNumber = "";
-  if (params.row.requestType == "proactive disclosure")
-    idNumber = params.row.idNumber
-  else 
-    idNumber = params.row.axisRequestId
+  let idNumber = getIDNumber(params);
 
   return <LightTooltip placement="bottom-start" title={
-    <div style={{whiteSpace: "pre-line"}}>
+    <div style={{ whiteSpace: "pre-line" }}>
       {description}
     </div>
   }>
@@ -352,12 +370,12 @@ export const eventCellTooltipRender = (params) => {
 
   let notification = params.row?.notification;
   if (notification?.length > 25) {
-  const truncatedNotification = notification?.length > 25 ? notification?.slice(0, 25) + '...' : notification;
+    const truncatedNotification = notification?.length > 25 ? notification?.slice(0, 25) + '...' : notification;
 
-  return (
-    <LightTooltip placement="bottom-start" title={<div style={{ whiteSpace: 'pre-line' }}>{notification}</div>}>
-      <span className="table-cell-truncate">{truncatedNotification}</span>
-    </LightTooltip>
-  );
+    return (
+      <LightTooltip placement="bottom-start" title={<div style={{ whiteSpace: 'pre-line' }}>{notification}</div>}>
+        <span className="table-cell-truncate">{truncatedNotification}</span>
+      </LightTooltip>
+    );
   }
 };

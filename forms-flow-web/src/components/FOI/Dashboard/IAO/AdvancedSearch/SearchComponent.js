@@ -19,6 +19,8 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import InputAdornment from "@mui/material/InputAdornment";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
 
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
@@ -633,81 +635,104 @@ const AdvancedSearch = ({ userDetail }) => {
                   }}
                   variant="h6"
                 >
-                  Filter by
+                  Filter your search by:
                 </Typography>
               </Grid>
-              <Grid container xs={12}>
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-request-description`}
-                    label={"REQUEST DESCRIPTION"}
-                    color="primary"
-                    onClick={() =>
-                      clickSearchFilter(SearchFilter.REQUEST_DESCRIPTION)
+              <Grid container xs={12} sx={{ mt: 1, paddingLeft: "16px" }}>
+                <RadioGroup
+                  row
+                  name="search-filter-radio-group"
+                  value={searchFilterSelected}
+                  onChange={(e) => clickSearchFilter(e.target.value)}
+                  sx={{
+                    width: "100%",
+                    columnGap: "40px",
+                    "& .MuiFormControlLabel-label": {
+                      color: "#013366",
+                      //fontWeight: 500,
+                      //fontSize: "15px",
+                    },
+                  }}
+                >
+                  <FormControlLabel
+                    value={SearchFilter.ID_NUM}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
                     }
-                    clicked={
-                      searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION
+                    label="ID Number"
+                  />
+                  <FormControlLabel
+                    value={SearchFilter.REQUEST_DESCRIPTION}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
                     }
+                    label="Request Description"
                   />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-raw-request`}
-                    label={"ID NUMBER"}
-                    color="primary"
-                    onClick={() => clickSearchFilter(SearchFilter.ID_NUM)}
-                    clicked={searchFilterSelected === SearchFilter.ID_NUM}
-                  />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-applicant-name`}
-                    label={"APPLICANT NAME"}
-                    color="primary"
-                    onClick={() =>
-                      clickSearchFilter(SearchFilter.APPLICANT_NAME)
+                  <FormControlLabel
+                    value={SearchFilter.APPLICANT_NAME}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
                     }
-                    clicked={
-                      searchFilterSelected === SearchFilter.APPLICANT_NAME
+                    label="Applicant Name"
+                  />
+                  <FormControlLabel
+                    value={SearchFilter.ASSIGNEE_NAME}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
                     }
+                    label="Assignee Name"
                   />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-assignee-name`}
-                    label={"ASSIGNEE NAME"}
-                    color="primary"
-                    onClick={() =>
-                      clickSearchFilter(SearchFilter.ASSIGNEE_NAME)
+                  <FormControlLabel
+                    value={SearchFilter.SUBJECT_CODE}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
                     }
-                    clicked={
-                      searchFilterSelected === SearchFilter.ASSIGNEE_NAME
+                    label="Subject Code"
+                  />
+                  <FormControlLabel
+                    value={SearchFilter.OIPC_NUMBER}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
                     }
+                    label="OIPC Number"
                   />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-search-filter`}
-                    label={"SUBJECT CODE"}
-                    color="primary"
-                    onClick={() => clickSearchFilter(SearchFilter.SUBJECT_CODE)}
-                    clicked={searchFilterSelected === SearchFilter.SUBJECT_CODE}
-                  />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-oipc-number`}
-                    label={"OIPC NUMBER"}
-                    color="primary"
-                    onClick={() => clickSearchFilter(SearchFilter.OIPC_NUMBER)}
-                    clicked={searchFilterSelected === SearchFilter.OIPC_NUMBER}
-                  />
-                </Grid>
+                </RadioGroup>
               </Grid>
 
               <Grid item xs={6} container direction="row" spacing={2}>

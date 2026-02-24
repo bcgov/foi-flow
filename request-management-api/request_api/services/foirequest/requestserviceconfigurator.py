@@ -48,10 +48,13 @@ class requestserviceconfigurator:
     def getpropertyvaluefromschema(self,requestschema,property):
         return requestschema.get(property) if property in requestschema  else None
 
-    def generatefilenumber(self, code, id):
+    def generatefilenumber(self, code, id, requesttype):
         tmp = str(id)
         randomnum = secrets.randbits(32)
-        return code + "-" + str(datetime.date.today().year) + "-" + tmp + str(randomnum)[:5]
+        if requesttype == "proactive disclosure":
+            return "PD-" + code + "-" + str(datetime.date.today().year) + "-" + tmp + str(randomnum)[:5]
+        else:
+            return code + "-" + str(datetime.date.today().year) + "-" + tmp + str(randomnum)[:5]
     
     def generatepdfilenumber(self, code, foirequestschema):
         file_number = ""

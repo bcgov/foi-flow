@@ -303,6 +303,8 @@ const OITeamColumns = [
     headerName: "RECEIVED DATE",
     flex: 1,
     headerAlign: "left",
+    valueGetter: (params) => params.row.requestType == "proactive disclosure" ?
+      "N/A" : params.row.receivedDate
   },
   {
     field: "axisRequestId",

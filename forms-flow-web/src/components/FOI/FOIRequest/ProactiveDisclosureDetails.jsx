@@ -99,7 +99,7 @@ const ProactiveDisclosureDetails = React.memo(
     }, []);
 
     // Validation helper
-    const validateField = (request, fieldName, value?) => {
+    const validateField = (request, fieldName, value) => {
       if (!request) return value || "";
       switch (fieldName) {
         case "requestType":

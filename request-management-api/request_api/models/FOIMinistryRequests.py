@@ -622,6 +622,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.isoipcreview.label('isoipcreview'),
             FOIMinistryRequest.isphasedrelease.label('isphasedrelease'),
             literal(None).label('oipc_number'),
+            literal(None).label('closereason'),
             ProactiveDisclosureCategory.name.label('proactivedisclosurecategory'),
             #latest_proactive.foiministryrequestversion_id.label(""),
         ]
@@ -1330,10 +1331,12 @@ class FOIMinistryRequest(db.Model):
                                 FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
                             ).join(
                                 FOIRequestApplicantMapping,
-                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value)
+                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value),
+                                isouter=True
                             ).join(
                                 FOIRequestApplicant,
-                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
+                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
+                                isouter=True
                             ).join(
                                 onbehalf_applicantmapping,
                                 and_(
@@ -1551,7 +1554,11 @@ class FOIMinistryRequest(db.Model):
         #request type: personal, general
         requesttypecondition = []
         for type in params['requesttype']:
-            requesttypecondition.append(FOIMinistryRequest.findfield('requestType', iaoassignee, ministryassignee) == type)
+            if type == 'proactivedisclosure':
+                requesttypecondition.append(FOIMinistryRequest.findfield('requestType', iaoassignee, ministryassignee) == 'proactive disclosure')
+                requesttypecondition.append(FOIMinistryRequest.findfield('requestType', iaoassignee, ministryassignee) == 'proactivedisclosure')
+            else:
+                requesttypecondition.append(FOIMinistryRequest.findfield('requestType', iaoassignee, ministryassignee) == type)
         return or_(*requesttypecondition)
 
     @classmethod
@@ -1590,6 +1597,7 @@ class FOIMinistryRequest(db.Model):
                 searchcondition1 = []
                 searchcondition2 = []
                 for keyword in params['keywords']:
+                    keyword = keyword.strip()
                     searchcondition1.append(FOIMinistryRequest.findfield('firstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition2.append(FOIMinistryRequest.findfield('lastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 return or_(and_(*searchcondition1), and_(*searchcondition2))
@@ -1598,6 +1606,7 @@ class FOIMinistryRequest(db.Model):
                 searchcondition2 = []
                 searchcondition3 = []
                 for keyword in params['keywords']:
+                    keyword = keyword.strip()
                     searchcondition1.append(FOIMinistryRequest.findfield('assignedToFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition2.append(FOIMinistryRequest.findfield('assignedToLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition3.append(FOIMinistryRequest.assignedgroup.ilike('%'+keyword+'%'))
@@ -1606,13 +1615,23 @@ class FOIMinistryRequest(db.Model):
                 searchcondition1 = []
                 searchcondition2 = []
                 for keyword in params['keywords']:
+                    keyword = keyword.strip()
                     searchcondition1.append(FOIMinistryRequest.findfield('assignedministrypersonFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition2.append(FOIMinistryRequest.findfield('assignedministrypersonLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                return or_(and_(*searchcondition1), and_(*searchcondition2))
+            elif(params['search'] == 'idnumber' or params['search'] == 'axisrequest_number'):
+                searchcondition1 = []
+                searchcondition2 = []
+                for keyword in params['keywords']:
+                    keyword = keyword.strip()
+                    searchcondition1.append(FOIMinistryRequest.findfield('idNumber', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                    searchcondition2.append(FOIMinistryRequest.findfield('axisRequestId', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 return or_(and_(*searchcondition1), and_(*searchcondition2))
             elif(params['search'] == 'oipc_number'):
                 searchcondition1 = []
                 searchcondition2 = []
                 for keyword in params['keywords']:
+                    keyword = keyword.strip()
                     oipccondition = FOIRequestOIPC.getrequestidsbyoipcno(keyword)
                     searchcondition1.append(oipccondition.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid)
                     searchcondition2.append(oipccondition.c.foiministryrequestversion_id == FOIMinistryRequest.version) 
@@ -1620,6 +1639,7 @@ class FOIMinistryRequest(db.Model):
             else:
                 searchcondition = []
                 for keyword in params['keywords']:
+                    keyword = keyword.strip()
                     searchcondition.append(FOIMinistryRequest.findfield(params['search'], iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 return and_(*searchcondition)
     @classmethod
