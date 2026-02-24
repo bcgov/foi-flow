@@ -77,10 +77,18 @@ git checkout -b FOIMOD-XXXX_description
 
 ### **Phase B: Integrate into Dev**
 
+* Ensure `feature/*` is rebased onto latest dev (avoid merge commits)
+```bash
+git checkout feature/*
+git rebase origin/dev
+git add . # Resolve conflicts and then stage them
+git rebase --continue # Continue with rebase after staging
+git push --force-with-lease # Push the rebase safely
+```
 * Open a PR from `feature/*` → `dev`
 * CI must pass
 * Required approvals must be obtained
-* Merge into `dev`
+* Merge into `dev`using **rebase/fast-forward** (avoid merge commits)
 * Perform a **smoke test**
 
 > **Smoke Test**
