@@ -70,16 +70,29 @@ const YearSelector = ({ date, selectedYear, onUpdate }) => {
         return Number(dateStr.slice(0, 4));
     };
 
-    const [startYear, setStartYear] = useState(getYearFromDate(date) - 5);
+    const getInitialStartYear = (currentDate, currentSelected) => {
+        let y = getYearFromDate(currentDate);
+        if (currentSelected && /^\d{4}$/.test(currentSelected)) {
+            y = Number(currentSelected);
+        }
+        return y - 5;
+    };
+
+    const [startYear, setStartYear] = useState(getInitialStartYear(date, selectedYear));
 
     useEffect(() => {
-        if (date) {
+        if (selectedYear && /^\d{4}$/.test(selectedYear)) {
+            const y = Number(selectedYear);
+            if (y < startYear || y > startYear + 11) {
+                setStartYear(y - 5);
+            }
+        } else if (date) {
             const y = getYearFromDate(date);
             if (y < startYear || y > startYear + 11) {
                 setStartYear(y - 5);
             }
         }
-    }, [date]);
+    }, [date, selectedYear]);
 
     const handleRangeChange = (increment) => {
         setStartYear(startYear + (increment * 12));

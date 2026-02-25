@@ -6,7 +6,7 @@ import Chip from '@mui/material/Chip';
 import { errorToast, isMinistryLogin, readUploadedFileAsBytes } from "../../../../helper/FOI/helper";
 import type { params, CFRFormData, ApplicationFeeFormData } from './types';
 import foiFees from '../../../../constants/FOI/foiFees.json';
-import { fetchCFRForm, saveCFRForm } from "../../../../apiManager/services/FOI/foiCFRFormServices";
+import { fetchCFRForm, saveCFRForm, saveInvoice} from "../../../../apiManager/services/FOI/foiCFRFormServices";
 import _ from 'lodash';
 import { toast } from "react-toastify";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
@@ -19,10 +19,12 @@ import { BottomButtonGroup } from './BottomButtonGroup';
 import { CFRFormStatus } from './CFRFormStatus';
 import { FeesSubtabValues } from './types';
 import { fetchApplicationFeeForm, saveApplicationFeeForm } from '../../../../apiManager/services/FOI/foiApplicationFeeFormServices';
-import { completeMultiPartUpload, postFOIS3DocumentPreSignedUrl, saveFilesinS3 } from '../../../../apiManager/services/FOI/foiOSSServices';
+import { completeMultiPartUpload, postFOIS3DocumentPreSignedUrl, saveFilesinS3, downloadFileFromS3, getFOIS3DocumentPreSignedUrl } from '../../../../apiManager/services/FOI/foiOSSServices';
 import FOI_COMPONENT_CONSTANTS from '../../../../constants/FOI/foiComponentConstants';
 import { StatusChangeDialog } from './StatusChangeDialog';
 import { OSS_S3_CHUNK_SIZE } from "../../../../constants/constants";
+import { saveAs } from "file-saver";
+import { GenerateInvoiceModal } from './GenerateInvoiceModal';
 
 export const Fees = ({
     requestNumber,
@@ -647,6 +649,11 @@ export const Fees = ({
     const handleStatusChangeModalClose = () => {
       setStatusChangeModalOpen(false);
     }
+
+    const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
+    const handleInvoiceModalClose = () => {
+      setInvoiceModalOpen(false);
+    }
   
     const disableNewCfrFormBtn = () => {
       return(CFRFormData?.formStatus !== 'approved' || requestState === StateEnum.peerreview.name || (requestState !== StateEnum.callforrecords.name &&
@@ -699,6 +706,106 @@ export const Fees = ({
       requestState !== StateEnum.appfeeowing.name &&
       requestDetails?.requestType ===
         FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL)
+    }
+    const formatApplicantAddress = (requestDetails : any) => {
+      if (!requestDetails) {
+        console.error("requestDetails do not exist.");
+      }
+      const primaryAddress = requestDetails.address? requestDetails.address : "";
+      const secondaryAddress = requestDetails.addressSecondary ? requestDetails.addressSecondary : "";
+      const city = requestDetails.city ? requestDetails.city : "";
+      const province = requestDetails.province ? requestDetails.province : "";
+      const country = requestDetails.country ? requestDetails.country : "";
+      const postalCode = requestDetails.postal ? requestDetails.postal : "";
+      
+      if (secondaryAddress) {
+        return `${primaryAddress}\n${secondaryAddress}\n${city} ${province} ${country} ${postalCode}`;
+      }
+      return `${primaryAddress}\n${city} ${province} ${country} ${postalCode}`;
+    }
+    
+    const handleGenerateInvoice = () => {
+      setInvoiceModalOpen(true);
+    }
+    const handleInvoiceSave = () => {
+      genreateInvoice();
+      setInvoiceModalOpen(false);
+    }
+    const genreateInvoice = async () => {
+      const toastID = toast.loading("Downloading Invoice (0%)");
+      const invoiceData = {
+        applicantName: `${requestDetails.firstName} ${requestDetails.lastName}`,
+        applicantAddress: formatApplicantAddress(requestDetails),
+        cfrFeeData: initialCFRState
+      };
+      const apiResponse = await saveInvoice(invoiceData, isMinistry, dispatch);
+      if (apiResponse?.status === 201) {
+        getFOIS3DocumentPreSignedUrl(
+          apiResponse.invoice.split("/").slice(4).join("/"),
+          ministryId,
+          dispatch,
+          (err: any, res: any) => {
+            if (!err) {
+              downloadFileFromS3(
+                {filepath: res},
+                (_err: any, response: any) => {
+                  const blob = new Blob([response.data], {type: "application/octet-stream"});
+                  saveAs(blob, `${requestDetails.axisRequestId} - Invoice.pdf`);
+                  toast.update(toastID, {
+                    render: "Download complete",
+                    type: "success",
+                    className: "file-upload-toast",
+                    isLoading: false,
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    closeButton: true,
+                  });
+                },
+                (progressEvent : any) => {
+                  if(progressEvent.total > 0){
+                    toast.update(toastID, {
+                      render:
+                      "Downloading file (" +Math.floor(
+                      (progressEvent.loaded / progressEvent.total) * 100) +"%)",
+                      isLoading: true,
+                    });
+                  }
+                }
+              )
+            } else {
+              toast.update(toastID, {
+              render: "Invoice download failed",
+              type: "error",
+              className: "file-upload-toast",
+              isLoading: false,
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              closeButton: true,
+            });
+            return;
+          }
+        })
+      } else {
+          toast.update(toastID, {
+          render: "Invoice upload failed",
+          type: "error",
+          className: "file-upload-toast",
+          isLoading: false,
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          closeButton: true,
+        });
+        return;
+      }
     }
 
     return (
@@ -816,10 +923,19 @@ export const Fees = ({
                   isMinistry={isMinistry}
                   setCreateModalOpen={setCreateModalOpen}
                   disableNewCfrFormBtn={disableNewCfrFormBtn}
+                  handleGenerateInvoice={handleGenerateInvoice}
+                  cfrStatus={initialCFRState.status}
+                  isProcessingFeeSubTab={selectedSubtab == FeesSubtabValues.PROCESSINGFEE}
                 />
               </div>
           </div>
         </Box>
+        <GenerateInvoiceModal
+          modalOpen={invoiceModalOpen}
+          handleClose={handleInvoiceModalClose}
+          handleSave={handleInvoiceSave}
+          cfrFees={initialCFRState.feedata}
+        />
         <StateChangeDialog   
           modalOpen={modalOpen}
           handleClose={handleClose}

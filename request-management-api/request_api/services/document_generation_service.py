@@ -64,7 +64,8 @@ class DocumentGenerationService:
             logging.info("Upload status for payload"+ json.dumps(_response))
             if _response["success"] == True:
                 _documentschema = {"documents": [{"filename": _response["filename"], "documentpath": _response["documentpath"], "category": templateconfig().getattachmentcategory(attachmentcategory)}]}
-                documentservice().createrequestdocument(ministryrequestid, _documentschema, "SYSTEM", "ministryrequest")
+                if attachmentcategory != "FEE-INVOICE":
+                    documentservice().createrequestdocument(ministryrequestid, _documentschema, "SYSTEM", "ministryrequest")
             return _response
         except Exception as ex:
             logging.exception(ex)

@@ -385,9 +385,11 @@ export const checkValidationError = (
   oipcData,
   isOipcReview,
   isconsultflag,
+  requiredContactDetails,
+  personalRequestDetailsErrors,
+  sourceOfSubmission,
   isProactiveDisclosure,
   requiredProactiveDetailsValues,
-  requiredContactDetails
 ) => {
   if (isProactiveDisclosure) {
     return (
@@ -395,7 +397,7 @@ export const checkValidationError = (
         ?.toLowerCase()
         ?.includes("select") ||
       !requiredProactiveDetailsValues.requestStartDate ||
-      !requiredProactiveDetailsValues.cfrDueDate ||
+
       !requiredProactiveDetailsValues.publicationDate ||
       requiredRequestDescriptionValues.description === "" ||
       assignedToValue.toLowerCase().includes("unassigned") ||
@@ -424,7 +426,7 @@ export const checkValidationError = (
     (requiredRequestDetailsValues.requestType.toLowerCase() ===
       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL &&
       !requiredRequestDescriptionValues.ispiiredacted) ||
-    !!validation.helperTextValue ||
+    // !!validation.helperTextValue ||
     assignedToValue.toLowerCase().includes("unassigned") ||
     requiredRequestDetailsValues.requestType.toLowerCase().includes("select") ||
     requiredRequestDetailsValues.receivedMode
@@ -443,8 +445,9 @@ export const checkValidationError = (
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
     !requiredRequestDetailsValues.dueDate ||
-    ("recordsDueDate" in requiredRequestDetailsValues && !requiredRequestDetailsValues.recordsDueDate) ||
-    !requiredAxisDetails.axisRequestId ||
+    ("recordsDueDate" in requiredRequestDetailsValues  && !requiredRequestDetailsValues.recordsDueDate) ||
+    // !requiredAxisDetails.axisRequestId ||
+    (Object.values(personalRequestDetailsErrors).some(personalReqestError => personalReqestError)) ||
     (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
       if (oipc.inquiryattributes?.inquirydate) {
         return oipc.inquiryattributes.orderno === "";

@@ -90,6 +90,8 @@ class templateconfig:
             return "Fee Balance Outstanding - Payment Success"
         elif key == "OUTSTANDING-PAYMENT-RECEIPT-FAILED":
             return "Fee Balance Outstanding - Payment Success - Correspondence Failed"
+        elif key == "FEE-INVOICE":
+            return "Fee Balance - Invoice"
         return None
 
     

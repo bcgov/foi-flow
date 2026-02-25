@@ -61,6 +61,7 @@ class rawrequestservicegetter:
             baserequestinfo = self.__preparebaserequestinfo(requestid, request, requesttype, requestrawdata)
             if self.__ispersonalrequest(requesttype):
                 baserequestinfo['additionalPersonalInfo'] = self.__prepareadditionalpersonalinfo(requestrawdata)
+            request['requestrawdata']['rawRequestId'] = request['requestid']
             return baserequestinfo
         elif request != {} and request['version'] != 1 and  request['sourceofsubmission'] != "intake":    
             request['requestrawdata']['currentState'] = request['status']
@@ -70,6 +71,7 @@ class rawrequestservicegetter:
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
             request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
             request['requestrawdata']['isiaorestricted']= request['isiaorestricted'] if request['isiaorestricted'] is not None else False
+            request['requestrawdata']['rawRequestId'] = request['requestid']
             return request['requestrawdata']
         elif request != {} and request['sourceofsubmission'] == "intake":
             requestrawdata = request['requestrawdata']
@@ -90,6 +92,7 @@ class rawrequestservicegetter:
             request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
             request['requestrawdata']['isiaorestricted']= request['isiaorestricted'] if request['isiaorestricted'] is not None else False
             request['requestrawdata']['assignedGroupEmail'] = self.__getassignedgroupemail(assignedgroup)
+            request['requestrawdata']['rawRequestId'] = request['requestid']
             return request['requestrawdata']
         else:
             return None
@@ -128,7 +131,7 @@ class rawrequestservicegetter:
         assignee = None
         if ("assignedto" in request and request["assignedto"] not in (None,'')):
             assignee = FOIAssignee.getassignee(request["assignedto"])
-        assignedgroup = request["assignedGroup"] if "assignedGroup" in request else "Unassigned"
+        assignedgroup = request["assignedgroup"] if "assignedgroup" in request else "Unassigned"
         assignedgroupemail = self.__getassignedgroupemail(assignedgroup)
         return {'id': request['requestid'],
                                'wfinstanceid': request['wfinstanceid'],

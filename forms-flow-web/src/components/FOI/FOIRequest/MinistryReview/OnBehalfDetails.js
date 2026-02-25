@@ -45,7 +45,7 @@ const OnBehalfDetails = React.memo((requestDetails) => {
                 <b>First Name</b>
               </div>
               <div>
-                <span>{onBehalfDetails.firstName}</span>
+                <span className="long-text">{onBehalfDetails.firstName}</span>
               </div>
             </div>
             <div className="col-lg-3 foi-details-col">
@@ -53,7 +53,7 @@ const OnBehalfDetails = React.memo((requestDetails) => {
                 <b>Middle Name</b>
               </div>
               <div>
-                <span>{onBehalfDetails.middleName}</span>
+                <span className="long-text">{onBehalfDetails.middleName}</span>
               </div>
             </div>
             <div className="col-lg-3 foi-details-col">
@@ -61,7 +61,7 @@ const OnBehalfDetails = React.memo((requestDetails) => {
                 <b>Last Name</b>
               </div>
               <div>
-                <span>{onBehalfDetails.lastName}</span>
+                <span className="long-text">{onBehalfDetails.lastName}</span>
               </div>
             </div>
         </div>

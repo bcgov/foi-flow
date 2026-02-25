@@ -105,6 +105,8 @@ const API = {
   FOI_GET_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>`,
   FOI_POST_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
   FOI_POST_CFR_FORM_IAO: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>/sanction`,
+  
+  FOI_POST_CFR_INVOICE: `${FOI_BASE_API_URL}/api/foirequestinvoice/foicfrfee/<foicfrfeeid>`,
 
   FOI_GET_APPLICATION_FEES_FORM: `${FOI_BASE_API_URL}/api/foiapplicationfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
   FOI_POST_APPLICATION_FEES_FORM: `${FOI_BASE_API_URL}/api/foiapplicationfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,

@@ -20,9 +20,12 @@ from .FOIOpenInformationRequests import FOIOpenInformationRequests
 import logging
 from dateutil import parser
 import json
+import copy
 from request_api.utils.enums import StateName
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 from .FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
+from request_api.models.ProgramAreas import ProgramArea
+from os import getenv
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -60,6 +63,15 @@ class FOIRawRequest(db.Model):
     assignee = relationship('FOIAssignee', foreign_keys="[FOIRawRequest.assignedto]")
 
     @classmethod
+    def generaterequestid(cls, foirawrequestid: int, programareaiaocode: str, requesttype: str, isconsultflag: bool):
+        baserequestid = f'{programareaiaocode}-{datetime.now().year}-{str(foirawrequestid).zfill(6)}'
+        if requesttype == "proactive disclosure":
+            return 'PD-'+baserequestid
+        if isconsultflag:
+            return baserequestid + '-CON'
+        return baserequestid
+
+    @classmethod
     def saverawrequest(cls, _requestrawdata, sourceofsubmission, ispiiredacted, userid, notes, requirespayment, axisrequestid, axissyncdate, linkedrequests, assigneegroup=None, assignee=None, assigneefirstname=None, assigneemiddlename=None, assigneelastname=None, isconsultflag=False)->DefaultMethodResult:
         version = 1
         newrawrequest = FOIRawRequest(requestrawdata=_requestrawdata, status = StateName.unopened.value if sourceofsubmission != "intake" else StateName.intakeinprogress.value, requeststatuslabel = StateName.unopened.name if sourceofsubmission != "intake" else StateName.intakeinprogress.name, createdby=userid, version=version, sourceofsubmission=sourceofsubmission, assignedgroup=assigneegroup, assignedto=assignee, ispiiredacted=ispiiredacted, notes=notes, requirespayment=requirespayment, axisrequestid=axisrequestid, axissyncdate=axissyncdate, linkedrequests=linkedrequests, isconsultflag=isconsultflag)
@@ -67,6 +79,18 @@ class FOIRawRequest(db.Model):
             FOIAssignee.saveassignee(assignee, assigneefirstname, assigneemiddlename, assigneelastname)
 
         db.session.add(newrawrequest)
+        if not axisrequestid:
+            db.session.flush() # Force insert to generate PK, but do not commit yet
+            bcgovcode = cls.getbcgovcodefromrawdata(_requestrawdata)
+            if bcgovcode:
+                programarea = ProgramArea.getprogramarea(bcgovcode)
+                iaocode = programarea['iaocode']
+                requesttype = _requestrawdata.get("requestType")
+                newaxisrequestid = cls.generaterequestid(newrawrequest.requestid, iaocode, requesttype, newrawrequest.isconsultflag)
+                updated_rawdata = copy.deepcopy(_requestrawdata)
+                updated_rawdata["axisRequestId"] = newaxisrequestid
+                newrawrequest.axisrequestid = newaxisrequestid
+                newrawrequest.requestrawdata = updated_rawdata
         db.session.commit()               
         return DefaultMethodResult(True,'Request added',newrawrequest.requestid)
 
@@ -92,6 +116,16 @@ class FOIRawRequest(db.Model):
             axissyncdate = _requestrawdata["axisSyncDate"] if 'axisSyncDate' in _requestrawdata  else None   
             linkedrequests = _requestrawdata["linkedRequests"] if 'linkedRequests' in _requestrawdata  else None 
             isconsultflag = _requestrawdata["isconsultflag"] if 'isconsultflag' in _requestrawdata  else False
+
+            if not axisrequestid:
+                bcgovcode = cls.getbcgovcodefromrawdata(_requestrawdata)
+                if bcgovcode:
+                    programarea = ProgramArea.getprogramarea(bcgovcode)
+                    iaocode = programarea['iaocode']
+                    axisrequestid = cls.generaterequestid(request.requestid, iaocode, isconsultflag)
+                    updated_rawdata = copy.deepcopy(_requestrawdata)
+                    updated_rawdata["axisRequestId"] = axisrequestid
+                    _requestrawdata = updated_rawdata
 
             _version = request.version+1           
             insertstmt =(
@@ -125,7 +159,7 @@ class FOIRawRequest(db.Model):
             return DefaultMethodResult(True,'Request versioned - {0}'.format(str(_version)),requestid,request.wfinstanceid,assignee)    
         else:
             return DefaultMethodResult(True,'No request foound')
-    
+
 
     @classmethod
     def saveiaorestrictedrawrequest(cls,requestid,_isiaorestricted=False, _updatedby=None)->DefaultMethodResult:
@@ -537,6 +571,8 @@ class FOIRawRequest(db.Model):
         axisrequestid = case([
             (FOIRawRequest.axisrequestid.is_(None),
             'U-00' + cast(FOIRawRequest.requestid, String)),
+            #FOIMOD-4172 - update here
+            # 'U-' + func.lpad(cast(FOIRawRequest.requestid, String), 6, '0')),
             ],
             else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
 
@@ -693,8 +729,10 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups):
+        unopened_request_restriction = getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") if getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") not in (None, "") else datetime.now()
+        print("UNOPENED_REQUEST_DATE", unopened_request_restriction)
         basequery = FOIRawRequest.getbasequery(additionalfilter, userid, isiaorestrictedfilemanager, groups)
-        basequery = basequery.filter(FOIRawRequest.status != 'Unopened').filter(FOIRawRequest.status != 'Closed')
+        basequery = basequery.filter(FOIRawRequest.status != 'Closed').filter(or_(FOIRawRequest.status != 'Unopened', FOIRawRequest.created_at >= unopened_request_restriction))
         #filter/search
         if(len(filterfields) > 0 and keyword is not None):
             filtercondition = FOIRawRequest.getfilterforrequestssubquery(filterfields, keyword)
@@ -1260,6 +1298,26 @@ class FOIRawRequest(db.Model):
         finally:
             db.session.close()
         return requests
+
+    @classmethod
+    def getbcgovcodefromrawdata(cls, requestrawdata: dict) -> str | None:
+        if not isinstance(requestrawdata, dict):
+            return None
+        # For onlineform submissions
+        # ministry = requestrawdata.get("ministry")
+        # if isinstance(ministry, dict):
+        #     selected = ministry.get("selectedMinistry")
+        #     if isinstance(selected, list) and selected:
+        #         code = selected[0].get("code")
+        #         if isinstance(code, str):
+        #             return code
+
+        selected = requestrawdata.get("selectedMinistries")
+        if isinstance(selected, list) and selected:
+            code = selected[0].get("code")
+            if isinstance(code, str):
+                return code
+        return None
 
 
 

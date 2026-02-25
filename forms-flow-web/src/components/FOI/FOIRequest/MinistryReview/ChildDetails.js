@@ -44,7 +44,7 @@ const ChildDetails = React.memo((requestDetails) => {
               <b>First Name</b>
             </div>
             <div>
-              <span>{childDetails.firstName}</span>
+              <span className="long-text">{childDetails.firstName}</span>
             </div>
           </div>
           <div className="col-lg-3 foi-details-col">
@@ -52,7 +52,7 @@ const ChildDetails = React.memo((requestDetails) => {
               <b>Middle Name</b>
             </div>
             <div>
-              <span>{childDetails.middleName}</span>
+              <span className="long-text">{childDetails.middleName}</span>
             </div>
           </div>
           <div className="col-lg-3 foi-details-col">
@@ -60,7 +60,7 @@ const ChildDetails = React.memo((requestDetails) => {
               <b>Last Name</b>
             </div>
             <div>
-              <span>{childDetails.lastName}</span>
+              <span className="long-text">{childDetails.lastName}</span>
             </div>
           </div>
           </div>

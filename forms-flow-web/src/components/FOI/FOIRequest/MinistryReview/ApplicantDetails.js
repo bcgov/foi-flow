@@ -29,7 +29,7 @@ const ApplicantDetails = React.memo((requestDetails) => {
                 <b>First Name</b>
               </div>
               <div>
-                <span>{_requestDetails.firstName}</span>
+                <span className="long-text">{_requestDetails.firstName}</span>
               </div>
             </div>
             <div className="col-lg-3 foi-details-col">
@@ -37,7 +37,7 @@ const ApplicantDetails = React.memo((requestDetails) => {
                 <b>Middle Name</b>
               </div>
               <div>
-                <span>{_requestDetails.middleName}</span>
+                <span className="long-text">{_requestDetails.middleName}</span>
               </div>
             </div>
             <div className="col-lg-3 foi-details-col">
@@ -45,7 +45,7 @@ const ApplicantDetails = React.memo((requestDetails) => {
                 <b>Last Name</b>
               </div>
               <div>
-                <span>{_requestDetails.lastName}</span>
+                <span className="long-text">{_requestDetails.lastName}</span>
               </div>
             </div>
           </div>

@@ -85,13 +85,19 @@ const MonthSelector = ({ date, selectedMonth, onUpdate }) => {
         return Number(dateStr.slice(0, 4))
     };
 
-    const [year, setYear] = useState(getYearFromDate(date));
+    const getInitialYear = () => {
+        if (selectedMonth) {
+            const match = selectedMonth.match(/\d{4}/);
+            if (match) return Number(match[0]);
+        }
+        return getYearFromDate(date);
+    };
+
+    const [year, setYear] = useState(getInitialYear());
 
     useEffect(() => {
-        if (date) {
-            setYear(getYearFromDate(date));
-        }
-    }, [date]);
+        setYear(getInitialYear());
+    }, [date, selectedMonth]);
 
     const handleYearChange = (increment) => {
         const newYear = year + increment;

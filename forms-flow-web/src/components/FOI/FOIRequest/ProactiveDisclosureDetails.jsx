@@ -98,7 +98,6 @@ const ProactiveDisclosureDetails = React.memo(
       dispatch(fetchFOIProactiveDisclosureCategoryList());
     }, []);
 
-    // Validation helper
     const validateField = (request, fieldName, value) => {
       if (!request) return value || "";
       switch (fieldName) {
@@ -181,7 +180,6 @@ const ProactiveDisclosureDetails = React.memo(
       );
     }, [requestDetails, handleRequestDetailsInitialValue]);
 
-    // Local state management
     const [selectedRequestType, setSelectedRequestType] = useState(
       validateField(saveRequestObject, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE)
     );
@@ -212,8 +210,7 @@ const ProactiveDisclosureDetails = React.memo(
       if (disableInput || !startDate) return;
       setAnchorEl(event.currentTarget);
       const isQuarter = selectedReportPeriod && selectedReportPeriod.toLowerCase().includes("quarter");
-      const isYearly = selectedReportPeriod &&
-        (/^\d{4}$/.test(selectedReportPeriod) || selectedReportPeriod.toLowerCase().includes("fiscal year"));
+      const isYearly = selectedReportPeriod && (/^\d{4}$/.test(selectedReportPeriod));
       let initialTab = 0;
       if (isQuarter) initialTab = 1;
       if (isYearly) initialTab = 2;
@@ -235,12 +232,14 @@ const ProactiveDisclosureDetails = React.memo(
     };
 
     const getReportPeriodDisplay = (period) => {
-      if (!period) return "";
-      if (period.toLowerCase().includes("select")) return "";
-      if (period.toLowerCase().includes("n/a")) return period;
-      if (/\d{4}/.test(period)) return period;
-      const year = startDate ? startDate.split("-")[0] : "";
-      return year ? `${period} ${year}` : period;
+      // if (!period) return "";
+      // if (period.toLowerCase().includes("select")) return "";
+      // if (period.toLowerCase().includes("n/a")) return period;
+      // if (/\d{4}/.test(period)) return period;
+      // const year = startDate ? startDate.split("-")[0] : "";
+      // return year ? `${period} ${year}` : period;
+      if (!period || period.toLowerCase().includes("select")) return "";
+      return period;
     };
 
     // Event handlers
@@ -295,7 +294,6 @@ const ProactiveDisclosureDetails = React.memo(
       createSaveRequestObject?.("publicationDate", value);
     };
 
-    // Generate menu items
     const requestTypeMenuItems = requestTypes.map((item) => (
       <MenuItem
         key={item.name}
@@ -316,18 +314,6 @@ const ProactiveDisclosureDetails = React.memo(
       </MenuItem>
     ));
 
-    const reportPeriodMenuItems = reportPeriods.map((item) => {
-      const year = startDate ? startDate.split("-")[0] : "";
-      return (
-        <MenuItem
-          key={item.name}
-          value={item.name}
-          disabled={item.name.toLowerCase().includes("n/a")}
-        >
-          {year && !item.name.toLowerCase().includes("n/a") ? `${item.name} ${year}` : item.name}
-        </MenuItem>
-      );
-    });
 
     return (
       <div className="request-accordian">

@@ -10,6 +10,7 @@ from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMa
 from request_api.models.FOIRequestTeams import FOIRequestTeam
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.FOIRequestOIPC import FOIRequestOIPC
+from request_api.models.FOIRawRequests import FOIRawRequest
 
 from datetime import datetime as datetime2
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, StateName
@@ -25,19 +26,21 @@ class requestservicebuilder(requestserviceconfigurator):
     """
 
     def createministry(self, requestschema, ministry, activeversion, userid, filenumber=None, ministryid=None):
-        print("\n-------requestschema-",requestschema)
+        #print("\n-------requestschema-",requestschema)
+        programareaiaocode = self.getprogramareaiaocodebyid(self.getvalueof("programArea",ministry["code"]))
+        axisrequestid = requestschema.get("axisRequestId", FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("isconsultflag")))
         current_foiministryrequest = FOIMinistryRequest.getrequest(ministryid)
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.__dict__.update(ministry)
         foiministryrequest.requeststatusid = self.__getrequeststatusid(requestschema.get("requeststatuslabel"))
         foiministryrequest.requeststatuslabel = requestschema.get("requeststatuslabel")        
         foiministryrequest.isactive = True
-        foiministryrequest.axisrequestid = requestschema.get("axisRequestId")
+        foiministryrequest.axisrequestid = axisrequestid
         foiministryrequest.axissyncdate = requestschema.get("axisSyncDate")
         foiministryrequest.axispagecount = requestschema.get("axispagecount")
         foiministryrequest.axislanpagecount = requestschema.get("axislanpagecount")
         foiministryrequest.recordspagecount = current_foiministryrequest["recordspagecount"] if current_foiministryrequest not in (None, {}) else 0
-        foiministryrequest.filenumber = self.generatefilenumber(ministry["code"], requestschema.get("foirawrequestid"), requestschema.get("requestType")) if filenumber is None else filenumber
+        foiministryrequest.filenumber = axisrequestid if filenumber is None else filenumber
         foiministryrequest.programareaid = self.getvalueof("programArea",ministry["code"])
         foiministryrequest.description = requestschema.get("description")
         foiministryrequest.duedate = requestschema.get("dueDate")
@@ -48,8 +51,6 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.estimatedtaggedpagecount = requestschema.get("estimatedtaggedpagecount")
         if requestschema.get("isoipcreview") is not None and requestschema.get("isoipcreview")  != "":
             foiministryrequest.isoipcreview = requestschema.get("isoipcreview")
-            print("\n--------->???", requestschema.get("isoipcreview"))
-        print("\nafter oipc")
         if requestschema.get("isphasedrelease") is not None and requestschema.get("isphasedrelease")  != "":
             foiministryrequest.isphasedrelease = requestschema.get("isphasedrelease")
         if requestschema.get("isconsultflag") is not None and requestschema.get("isconsultflag")  != "":
@@ -258,10 +259,3 @@ class requestservicebuilder(requestserviceconfigurator):
             if dataschema.get(location) is not None and key in dataschema.get(location) and dataschema.get(location)[key] and dataschema.get(location)[key] is not None and dataschema.get(location)[key] !="":
                 return True
         return False          
-    
-            
-
-    
-
-
-

@@ -40,6 +40,12 @@ class ProgramArea(db.Model):
         query = db.session.query(ProgramArea).filter_by(iaocode=iaocode.upper()).first()
         return programarea_schema.dump(query)
 
+    @classmethod
+    def getprogramareabyid(cls, programareaid):
+        programarea_schema = ProgramAreaSchema()
+        query = db.session.query(ProgramArea).filter_by(programareaid=programareaid).first()
+        return programarea_schema.dump(query)
+
 class ProgramAreaSchema(ma.Schema):
     class Meta:
         fields = ('programareaid', 'name', 'iaocode','bcgovcode','type','isactive')

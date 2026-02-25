@@ -106,6 +106,14 @@ export const getHeaderText = ({ requestDetails, ministryId, status }) => {
   if (requestDetails.idNumber && ministryId) {
     return requestDetails.idNumber;
   }
+  
+  if (requestDetails.rawRequestId) {
+    return 'U-00' + String(requestDetails.rawRequestId)//.padStart(6, '0')
+  }
+
+  if(status?.toLowerCase() === StateEnum.unopened.name.toLowerCase()){
+    return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
+  }
 
   return FOI_COMPONENT_CONSTANTS.REVIEW_REQUEST;
 };

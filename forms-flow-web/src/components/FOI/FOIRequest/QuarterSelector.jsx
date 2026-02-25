@@ -5,7 +5,6 @@ import IconButton from '@material-ui/core/IconButton';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import Card from '@material-ui/core/Card';
-import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 
@@ -116,13 +115,19 @@ const QuarterSelector = ({ date, selectedQuarter, onUpdate }) => {
         return month < 4 ? year - 1 : year;
     };
 
-    const [fiscalYear, setFiscalYear] = useState(getFiscalYearFromDate(date));
+    const getInitialFiscalYear = () => {
+        if (selectedQuarter) {
+            const match = selectedQuarter.match(/\d{4}/);
+            if (match) return Number(match[0]);
+        }
+        return getFiscalYearFromDate(date);
+    };
+
+    const [fiscalYear, setFiscalYear] = useState(getInitialFiscalYear());
 
     useEffect(() => {
-        if (date) {
-            setFiscalYear(getFiscalYearFromDate(date));
-        }
-    }, [date]);
+        setFiscalYear(getInitialFiscalYear());
+    }, [date, selectedQuarter]);
 
     const handleYearChange = (increment) => {
         const newYear = fiscalYear + increment;

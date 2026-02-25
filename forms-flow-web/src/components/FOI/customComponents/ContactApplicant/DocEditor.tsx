@@ -216,7 +216,7 @@ export const DocEditor = ({
             container.documentEditor.editor.toggleTextAlignment('Left');
             container.documentEditor.selection.cellFormat.preferredWidthType = 'Point';
             container.documentEditor.selection.cellFormat.preferredWidth = 105;
-            container.documentEditor.editor.insertText("Mailing Address:\nPO Box 9569 Stn Prov Govt\nVictoria, BC V8W 9K1");
+            container.documentEditor.editor.insertText("Mailing Address:\nPO Box 9569 Stn Prov Govt\nVictoria, BC V8W 9V1");
 
             container.documentEditor.selection.moveNextPosition();
             container.documentEditor.editor.applyBorders({type: 'NoBorder'});
