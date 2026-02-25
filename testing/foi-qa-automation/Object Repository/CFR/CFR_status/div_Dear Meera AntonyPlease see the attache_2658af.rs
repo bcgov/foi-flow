@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_Dear Meera AntonyPlease see the attache_2658af</name>
+   <tag></tag>
+   <elementGuidId>9bddd591-4434-4425-932c-eefa8aeba811</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>div.ql-editor</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='ContactApplicant']/div/div[3]/div[2]/div/div/div</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>1a4450c3-7d78-4ee7-8fcd-5f5c3114f1d4</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>ql-editor</value>
+      <webElementGuid>6a9e73b4-75ee-4247-aa8a-8b8e7e46a078</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>data-gramm</name>
+      <type>Main</type>
+      <value>false</value>
+      <webElementGuid>75c61616-5ea2-4be5-a425-77f572616fc7</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>contenteditable</name>
+      <type>Main</type>
+      <value>true</value>
+      <webElementGuid>48473405-2703-48df-9e01-28d694a4e067</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Dear Meera AntonyPlease see the attached regarding your FOI Request. Please review the attached letter, as you have additional options outside of paying the fee including narrowing your request, or requesting a fee waiver.If you would like to pay your estimate online, please click on this link: Pay Online Thank you,Flex Team</value>
+      <webElementGuid>25f0e2d1-63cd-445f-98c6-7db9660d3d9e</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;ContactApplicant&quot;)/div[@class=&quot;contact-applicant-container&quot;]/div[3]/div[@class=&quot;correspondence-editor&quot;]/div[@class=&quot;quill&quot;]/div[@class=&quot;ql-container ql-snow&quot;]/div[@class=&quot;ql-editor&quot;]</value>
+      <webElementGuid>344bd6bc-5db6-438b-9fbe-9c25ab6bc179</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='ContactApplicant']/div/div[3]/div[2]/div/div/div</value>
+      <webElementGuid>0fc9c882-1fbb-46f9-a4ad-a81678397b20</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='​'])[4]/following::div[4]</value>
+      <webElementGuid>a3a4f687-0abe-4f19-9f13-faae0fe45181</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Fee Estimate'])[1]/following::div[4]</value>
+      <webElementGuid>96818ce1-2fd2-4135-bb33-7dfe5e6da0b3</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Preview &amp; Send Email'])[1]/preceding::div[5]</value>
+      <webElementGuid>198374fd-2ecc-4501-9030-264532d8f28d</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[5]/div/div[3]/div[2]/div/div/div</value>
+      <webElementGuid>3345f7ab-5e20-41a9-a3a7-23c2c54bf942</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'Dear Meera AntonyPlease see the attached regarding your FOI Request. Please review the attached letter, as you have additional options outside of paying the fee including narrowing your request, or requesting a fee waiver.If you would like to pay your estimate online, please click on this link: Pay Online Thank you,Flex Team' or . = 'Dear Meera AntonyPlease see the attached regarding your FOI Request. Please review the attached letter, as you have additional options outside of paying the fee including narrowing your request, or requesting a fee waiver.If you would like to pay your estimate online, please click on this link: Pay Online Thank you,Flex Team')]</value>
+      <webElementGuid>22aeace3-f53d-4bc2-afa1-66b36afe434e</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

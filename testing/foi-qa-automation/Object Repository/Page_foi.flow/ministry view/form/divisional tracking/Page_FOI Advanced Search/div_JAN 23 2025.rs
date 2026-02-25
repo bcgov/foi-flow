@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_JAN 23 2025</name>
+   <tag></tag>
+   <elementGuidId>72c62cb3-2891-4d39-97ac-a6d289411c33</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='app']/div/div[3]/div/div[2]/div[4]/div[3]/div/div[2]/div[2]/div/div/div/div/div[7]/a/div</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value></value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorCollection>
+      <entry>
+         <key>SMART_LOCATOR</key>
+         <value>internal:role=link[name=&quot;JAN 23 2025&quot;i] >> nth=0</value>
+      </entry>
+   </smartLocatorCollection>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>5da5e15b-d5ab-4da1-8a43-9bfe984f0c29</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiDataGrid-cellContent</value>
+      <webElementGuid>c22b9f57-6bee-4379-adfc-d1de40f542bf</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>JAN 23 2025</value>
+      <webElementGuid>f82fd5e2-0ffa-45c9-8be5-47de4442ae51</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 foi-grid-container css-tuxzvu&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-p4ki1t&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-spacing-xs-1 MuiGrid-grid-xs-12 jss328 css-q0oq2u&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-15j76c0&quot;]/div[@class=&quot;foi-data-grid MuiDataGrid-root MuiDataGrid-autoHeight MuiDataGrid-root--densityStandard css-iclwpf&quot;]/div[@class=&quot;MuiDataGrid-main css-opb0c2&quot;]/div[2]/div[@class=&quot;MuiDataGrid-virtualScroller css-1grl8tv&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerContent css-0&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerRenderZone css-1inm7gi&quot;]/div[@class=&quot;super-app-theme--unopened MuiDataGrid-row&quot;]/div[@class=&quot;foi-advanced-search-result-cell MuiDataGrid-cell--withRenderer MuiDataGrid-cell MuiDataGrid-cell--textLeft&quot;]/a[@class=&quot;MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-z4r21k&quot;]/div[@class=&quot;MuiDataGrid-cellContent&quot;]</value>
+      <webElementGuid>a91a87b6-1aa9-4564-9e1b-abb33b80931d</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='app']/div/div[3]/div/div[2]/div[4]/div[3]/div/div[2]/div[2]/div/div/div/div/div[7]/a/div</value>
+      <webElementGuid>e297daab-817c-4588-b192-1e6e3cc625c8</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Unassigned'])[1]/following::div[2]</value>
+      <webElementGuid>d22bb3c5-c601-4d89-ba52-adbebe810354</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Unopened'])[2]/following::div[4]</value>
+      <webElementGuid>87252d18-8a5f-4b1f-863a-193405b7e188</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Lastname, Firstname'])[2]/preceding::div[3]</value>
+      <webElementGuid>62eb44e4-1616-4328-94d5-45f4c6dd0233</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='general'])[2]/preceding::div[5]</value>
+      <webElementGuid>1ebde39d-707d-4d6f-ae74-d836165cac40</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='JAN 23 2025']/parent::*</value>
+      <webElementGuid>ecb78ebb-6ac2-47cd-87e4-d65e53e7e3c3</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[7]/a/div</value>
+      <webElementGuid>262e3f48-38e6-497b-9398-c2a42fb733ae</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'JAN 23 2025' or . = 'JAN 23 2025')]</value>
+      <webElementGuid>59385ee1-addb-46cb-9d57-c532e5fe7076</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

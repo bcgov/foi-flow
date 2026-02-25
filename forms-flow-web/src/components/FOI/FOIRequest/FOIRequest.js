@@ -143,6 +143,7 @@ import OpenInfo from "./OpenInformation/OpenInfo";
 import ProactiveDisclosureDetails from "./ProactiveDisclosureDetails";
 import ProactiveDisclosureDescription from "./ProactiveDisclosureDescription";
 import ProactiveDisclosureRequestPublication from "./ProactiveDisclosure/Publication/ProactiveDisclosureRequestPublication";
+import LinkedRequests from "./LinkedRequests";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -1729,6 +1730,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             }
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput || isHistoricalRequest}
+                            setError={setPersonalRequestDetailErrors}
                           />
                         </>
                       ) : (

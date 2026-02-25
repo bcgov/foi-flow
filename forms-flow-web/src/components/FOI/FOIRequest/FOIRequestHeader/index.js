@@ -287,8 +287,6 @@ const FOIRequestHeader = React.memo(
 
     return (
       <>
-
-
         {!isProactiveDisclosure ? (
           <div className='row'>
             <div className="col-lg-6">

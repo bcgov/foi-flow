@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>button_Comment edit_postBtn</name>
+   <tag></tag>
+   <elementGuidId>6c9875bc-aab5-40a7-8770-8ada5676e5d1</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>button.postBtn</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//*[@id='Comments']//div[contains(@class,'commentsection')][.//form]&#xd;
+       //button[contains(@class,'postBtn') and not(@disabled)]&#xd;
+</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>17601983-188c-4641-8d8e-7095872506ec</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>postBtn</value>
+      <webElementGuid>f330ee91-8e54-4eb6-957e-e52c9623c9e3</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>type</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>4eb54bc3-4fbf-4b52-b1d9-fe1a2c4d3c42</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;inputActions&quot;]/div[@class=&quot;col-lg-1 paperplanecontainer&quot;]/button[@class=&quot;postBtn&quot;]</value>
+      <webElementGuid>377790a6-611c-41e4-887b-27fc67e392b6</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:attributes</name>
+      <type>Main</type>
+      <value>(//button[@type='button'])[13]</value>
+      <webElementGuid>36891912-26f7-412a-9c0e-c44f435ea6ef</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='Comments']/div/div[3]/div[2]/div/div/div[2]/button</value>
+      <webElementGuid>6db982f8-33ec-41a9-b269-0ca89405bfff</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='test 2'])[1]/following::button[1]</value>
+      <webElementGuid>f1944ada-0f2a-47e9-a279-56cbc2babc20</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='User Comments'])[1]/following::button[7]</value>
+      <webElementGuid>843e4ea2-5592-4084-834b-d4ded4bfdd1c</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='User, Super'])[1]/preceding::button[1]</value>
+      <webElementGuid>5b5bd2e8-87e4-4876-ad76-d5ba8620b748</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[3]/div[2]/div/div/div[2]/button</value>
+      <webElementGuid>b975421e-3b37-4776-be47-a57b1c779696</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//button[@type = 'button']</value>
+      <webElementGuid>16af4f78-9398-4a23-9578-19475e4d6be2</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

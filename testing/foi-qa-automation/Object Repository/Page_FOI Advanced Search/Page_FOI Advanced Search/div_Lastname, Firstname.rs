@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_Lastname, Firstname</name>
+   <tag></tag>
+   <elementGuidId>38f29de7-29d0-4082-8e0d-4608a4b2ab44</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='app']/div/div[3]/div/div[2]/div[4]/div[3]/div/div[2]/div[2]/div/div/div/div/div[2]/a/div</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>div.MuiDataGrid-cellContent</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorCollection>
+      <entry>
+         <key>SMART_LOCATOR</key>
+         <value>.foi-advanced-search-result-cell > .MuiTypography-root >> nth=0</value>
+      </entry>
+   </smartLocatorCollection>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>070ee63c-1c3c-4b41-9e13-6eb9829500c1</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiDataGrid-cellContent</value>
+      <webElementGuid>7bf44905-2ead-4c6d-885c-4c4a19ff48f5</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Lastname, Firstname</value>
+      <webElementGuid>4b8a8d0c-af8d-4293-9963-bff3c8c60842</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 foi-grid-container css-tuxzvu&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-p4ki1t&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-spacing-xs-1 MuiGrid-grid-xs-12 jss315 css-q0oq2u&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-15j76c0&quot;]/div[@class=&quot;foi-data-grid MuiDataGrid-root MuiDataGrid-autoHeight MuiDataGrid-root--densityStandard css-iclwpf&quot;]/div[@class=&quot;MuiDataGrid-main css-opb0c2&quot;]/div[2]/div[@class=&quot;MuiDataGrid-virtualScroller css-1grl8tv&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerContent css-0&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerRenderZone css-1inm7gi&quot;]/div[@class=&quot;super-app-theme--unopened MuiDataGrid-row&quot;]/div[@class=&quot;foi-advanced-search-result-cell MuiDataGrid-cell--withRenderer MuiDataGrid-cell MuiDataGrid-cell--textLeft&quot;]/a[@class=&quot;MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-z4r21k&quot;]/div[@class=&quot;MuiDataGrid-cellContent&quot;]</value>
+      <webElementGuid>ad33e21d-ecc0-4af3-a99b-a54b1f507fc3</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='app']/div/div[3]/div/div[2]/div[4]/div[3]/div/div[2]/div[2]/div/div/div/div/div[2]/a/div</value>
+      <webElementGuid>5e30f229-aece-49c5-b240-de4fbc435a67</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='RECEIVED DATE'])[1]/following::div[11]</value>
+      <webElementGuid>3176a522-338c-4cf7-be96-6f90c1e3c00f</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='ASSIGNED TO'])[1]/following::div[18]</value>
+      <webElementGuid>63046496-7798-47f9-8ba4-39a989d52c82</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='general'])[1]/preceding::div[1]</value>
+      <webElementGuid>b0c1c423-c2de-49bd-8b4e-c6193692e2fe</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='U-0045582'])[1]/preceding::div[3]</value>
+      <webElementGuid>32a7c6f4-f050-4e08-91b3-270f6b60f048</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='Lastname, Firstname']/parent::*</value>
+      <webElementGuid>65407d5a-0de3-4c16-86b8-081070f918ce</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//a/div</value>
+      <webElementGuid>11b9b2ab-17e4-4695-a2da-cf7899ea54bb</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'Lastname, Firstname' or . = 'Lastname, Firstname')]</value>
+      <webElementGuid>ebd87aaf-71e6-45f4-b5cb-226442eff653</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

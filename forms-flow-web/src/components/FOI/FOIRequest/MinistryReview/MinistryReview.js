@@ -74,6 +74,7 @@ import { isMinistryLogin } from "../../../../helper/FOI/helper";
 import OIPCDetails from "../OIPCDetails/Index";
 import { Fees } from "../../customComponents/Fees";
 import ProactiveDisclosureDetails from "./ProactiveDisclosureDetails";
+import LinkedRequests from "./LinkedRequests";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -888,6 +889,11 @@ const MinistryReview = React.memo(({ userDetail }) => {
                             <RequestDescription
                               requestDetails={requestDetails}
                             />
+                            <LinkedRequests 
+                            isMinistry={isMinistry}
+                            linkedRequests={requestDetails?.linkedRequests}
+                            linkedRequestsInfo={requestDetails?.linkedRequestsInfo}
+                          />
                             <RequestDetails requestDetails={requestDetails} />
                             <AdditionalApplicantDetails
                               requestDetails={requestDetails}

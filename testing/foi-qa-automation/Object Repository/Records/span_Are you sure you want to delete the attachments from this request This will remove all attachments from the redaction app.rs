@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>span_Are you sure you want to delete the attachments from this request This will remove all attachments from the redaction app</name>
+   <tag></tag>
+   <elementGuidId>ad39140b-6e79-443f-9f07-aa0cb237defa</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//span[@id='state-change-dialog-description']/span</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'Are you sure you want to delete the attachments from this request? This will remove all attachments from the redaction app.' or . = 'Are you sure you want to delete the attachments from this request? This will remove all attachments from the redaction app.')]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>span.confirmation-message</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>span</value>
+      <webElementGuid>0101d7cd-46b5-4d26-9490-93aad6c70adf</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>confirmation-message</value>
+      <webElementGuid>572db833-e128-4ad3-87e3-69ec6db5b173</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Are you sure you want to delete the attachments from this request? This will remove all attachments from the redaction app.</value>
+      <webElementGuid>302ec934-34a4-4c64-9904-e35910358c41</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;state-change-dialog-description&quot;)/span[@class=&quot;confirmation-message&quot;]</value>
+      <webElementGuid>cd1ec92f-45ac-46f2-8e94-207b81d81436</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//span[@id='state-change-dialog-description']/span</value>
+      <webElementGuid>06e40bac-5a21-458e-aadb-5acf840be243</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Close'])[1]/following::span[3]</value>
+      <webElementGuid>c312b5fd-356e-4539-a46f-841b26ff6ae7</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Remove Attachments'])[2]/following::span[4]</value>
+      <webElementGuid>4db73792-472b-4294-94a8-a2fcca122b15</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Continue'])[1]/preceding::span[1]</value>
+      <webElementGuid>5cafcc82-655c-412f-9c68-8d84adb24ddd</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='Are you sure you want to delete the attachments from this request?']/parent::*</value>
+      <webElementGuid>a8ef3d05-0019-4398-8a9c-8be205626746</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[2]/span/span</value>
+      <webElementGuid>e6c6170a-e828-4e7e-aa31-5b120d6a5ba1</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//span[(text() = 'Are you sure you want to delete the attachments from this request? This will remove all attachments from the redaction app.' or . = 'Are you sure you want to delete the attachments from this request? This will remove all attachments from the redaction app.')]</value>
+      <webElementGuid>b8f4d38c-3a40-4d13-bcde-9eab944cf470</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

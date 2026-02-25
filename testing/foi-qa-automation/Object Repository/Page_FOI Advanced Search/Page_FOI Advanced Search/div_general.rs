@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_general</name>
+   <tag></tag>
+   <elementGuidId>183e453f-629d-408f-8de0-81411b9e3507</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>IMAGE</key>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'general' or . = 'general')]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@role='row' and @data-id='${ROW_ID}']//div[@data-field='axisRequestId']//a&#xd;
+&#xd;
+</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorCollection>
+      <entry>
+         <key>SMART_LOCATOR</key>
+         <value>div:nth-child(3) > .MuiTypography-root >> nth=1</value>
+      </entry>
+   </smartLocatorCollection>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>0cf81e53-4ffc-42d5-8f3b-2ebf38d8e4e6</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiDataGrid-cellContent</value>
+      <webElementGuid>fb322237-58f4-4ef1-a8e8-a7bc7a7527e5</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>general</value>
+      <webElementGuid>a67586cd-c7e1-4c61-9f3c-c687299840c7</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 foi-grid-container css-tuxzvu&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2 css-p4ki1t&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-item MuiGrid-spacing-xs-1 MuiGrid-grid-xs-12 jss315 css-q0oq2u&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 css-15j76c0&quot;]/div[@class=&quot;foi-data-grid MuiDataGrid-root MuiDataGrid-autoHeight MuiDataGrid-root--densityStandard css-iclwpf&quot;]/div[@class=&quot;MuiDataGrid-main css-opb0c2&quot;]/div[2]/div[@class=&quot;MuiDataGrid-virtualScroller css-1grl8tv&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerContent css-0&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerRenderZone css-1inm7gi&quot;]/div[@class=&quot;super-app-theme--unopened MuiDataGrid-row Mui-selected&quot;]/div[@class=&quot;foi-advanced-search-result-cell MuiDataGrid-cell--withRenderer MuiDataGrid-cell MuiDataGrid-cell--textLeft&quot;]/a[@class=&quot;MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineAlways css-z4r21k&quot;]/div[@class=&quot;MuiDataGrid-cellContent&quot;]</value>
+      <webElementGuid>a303f1b1-f3db-4e3d-81a6-68c1cad36347</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='app']/div/div[3]/div/div[2]/div[4]/div[3]/div/div[2]/div[2]/div/div/div/div/div[3]/a/div</value>
+      <webElementGuid>62dc22a5-d66a-43a9-a5f5-4455f72dbc81</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Lastname, Firstname'])[1]/following::div[2]</value>
+      <webElementGuid>f7e31e17-e6c1-464a-a384-956e68a8a7d2</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='RECEIVED DATE'])[1]/following::div[13]</value>
+      <webElementGuid>cb697400-6cc8-4bc1-a5a3-65169fc9142f</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value></value>
+      <webElementGuid>53dc57bd-290b-4111-be5e-f0ee6f247a85</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Unopened'])[2]/preceding::div[3]</value>
+      <webElementGuid>2f0cfd31-f874-4d88-9d83-33dc7ead25b4</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='general']/parent::*</value>
+      <webElementGuid>e8272110-5e52-411c-ade7-7214e84c273d</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[3]/a/div</value>
+      <webElementGuid>10b12548-ca32-4dd9-9784-d0034c1c83d3</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'general' or . = 'general')]</value>
+      <webElementGuid>ddd8aada-ff47-4268-97ed-bcb08baf9656</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

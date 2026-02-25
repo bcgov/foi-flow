@@ -63,7 +63,6 @@ class requestservicebuilder(requestserviceconfigurator):
             startdate = requestschema.get("startDate")
         elif (requestschema.get("requestProcessStart") is not None):
             startdate = requestschema.get("requestProcessStart")
-        print("\nstartdate:",startdate)
         
         foiministryrequest.startdate = startdate
         foiministryrequest.createdby = userid
@@ -83,7 +82,7 @@ class requestservicebuilder(requestserviceconfigurator):
             foiministryrequest.duedate = requestschema.get("cfrDueDate")
             foiministryrequest.proactivedisclosures = self._prepareproactivedisclosuredetails(requestschema, userid, ministryid, activeversion)
 
-        print("foiministryrequest-proactivedisclosures",foiministryrequest.proactivedisclosures)
+        #print("foiministryrequest-proactivedisclosures",foiministryrequest.proactivedisclosures)
         if ministryid is not None:
             foiministryrequest.foiministryrequestid = ministryid
             activeversion = FOIMinistryRequest.getversionforrequest(ministryid)[0]+1
@@ -96,10 +95,9 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.version = activeversion
         oistatusid = self.getpropertyvaluefromschema(requestschema, 'oistatusid')
         foiministryrequest.oistatus_id = oistatusid
-        foiministryrequest_dict = foiministryrequest.__dict__
-        print("foiministryrequest in createministry:",foiministryrequest_dict)
-        # First instance of FOIOpeninformation data is created either when: A) An exemption request is created via "Publication Tab" B) 
-        # A request is closed and no exemption request has been made previously
+        #foiministryrequest_dict = foiministryrequest.__dict__
+        #print("foiministryrequest in createministry:",foiministryrequest_dict)
+        # First instance of FOIOpeninformation data is created either when: A) An exemption request is created via "Publication Tab" B) A request is closed and no exemption request has been made previously
         if 'closereasonid' in requestschema and ministryid is not None:
             current_foiopeninforequest = openinfoservice().getcurrentfoiopeninforequest(ministryid)
             foiopeninforequest = current_foiopeninforequest
@@ -226,7 +224,6 @@ class requestservicebuilder(requestserviceconfigurator):
                 oipcreview.createdby=userid
                 oipcreview.created_at= datetime2.now().isoformat()
                 oipcarr.append(oipcreview)
-            print("\noipcarr",oipcarr)
         return oipcarr
         
     

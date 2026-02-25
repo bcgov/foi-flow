@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_Restricted, Request</name>
+   <tag></tag>
+   <elementGuidId>c54b3e4d-6e5e-4d24-aae1-f306be23d0a5</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='app']/div/div[3]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/div/div[2]/div</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value></value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>620d74f5-ca25-43a7-925f-493fa00f784b</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiDataGrid-cellContent</value>
+      <webElementGuid>727f939f-4ea1-4edd-8c1f-a3f6a177a73f</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Restricted, Request</value>
+      <webElementGuid>5ac4687e-caf3-40ca-9cc5-6214f9d1cd45</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;app&quot;)/div[1]/div[@class=&quot;container foi-container&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 foi-grid-container css-tuxzvu&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-1 css-19o37pk&quot;]/div[@class=&quot;MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12 jss4 css-15j76c0&quot;]/div[@class=&quot;foi-data-grid MuiDataGrid-root MuiDataGrid-autoHeight css-1t75zoz&quot;]/div[@class=&quot;MuiDataGrid-main css-opb0c2&quot;]/div[2]/div[@class=&quot;MuiDataGrid-virtualScroller css-3enz1m&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerContent css-79elbk&quot;]/div[@class=&quot;MuiDataGrid-virtualScrollerRenderZone css-1inm7gi&quot;]/div[@class=&quot;super-app-theme--open MuiDataGrid-row MuiDataGrid-row--lastVisible&quot;]/div[@class=&quot;MuiDataGrid-cell MuiDataGrid-cell--textLeft&quot;]/div[@class=&quot;MuiDataGrid-cellContent&quot;]</value>
+      <webElementGuid>ca672e6c-320e-4573-aedd-daba1f181c8e</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='app']/div/div[3]/div/div[2]/div[2]/div/div[2]/div[2]/div/div/div/div/div[2]/div</value>
+      <webElementGuid>5bbf65b0-08f9-40c9-a001-f6e6460b89d0</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='ABC-2099-2854363'])[1]/following::div[2]</value>
+      <webElementGuid>408e1642-d7fc-41d8-9df5-d454903fc92d</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='DAYS LEFT'])[1]/following::div[17]</value>
+      <webElementGuid>efec2832-8c68-4ea8-905f-19aa2bfdb3c0</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Individual'])[1]/preceding::div[1]</value>
+      <webElementGuid>c437bc6d-1b51-403d-8851-88c081b4b6f7</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='personal'])[1]/preceding::div[3]</value>
+      <webElementGuid>0baa4c26-af31-4387-85d2-678206760292</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='Restricted, Request']/parent::*</value>
+      <webElementGuid>18617fba-ef8c-42df-945e-937ab7070f59</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[2]/div/div[2]/div[2]/div/div/div/div/div[2]/div</value>
+      <webElementGuid>08b11ef5-932c-4e05-80f2-2c266837ddc0</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'Restricted, Request' or . = 'Restricted, Request')]</value>
+      <webElementGuid>d0627a65-5a94-45d8-afee-6108b346d18d</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

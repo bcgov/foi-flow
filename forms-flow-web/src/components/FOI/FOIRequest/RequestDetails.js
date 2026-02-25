@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import { useParams } from 'react-router-dom';
 import { useSelector } from "react-redux";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -43,7 +42,6 @@ const RequestDetails = React.memo(
     });
     const classes = useStyles();
     const disableFieldForMinistryRequest = shouldDisableFieldForMinistryRequests(requestStatus)
-    const {ministryId} = useParams();
     const disableInput = isHistoricalRequest || StateEnum.closed.name.toLowerCase() === requestDetails?.currentState?.toLowerCase()
     const validateFields = (request, name, value) => {
       if (request !== undefined) {
@@ -261,14 +259,6 @@ const RequestDetails = React.memo(
           <Typography className={classes.heading}>REQUEST DETAILS</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <div>
-              <button type="button" className={`btn btn-link btn-description-history`} onClick={() => setModal(true)}
-                disabled={!(!!requestDetails.linkedRequests) || (!!requestDetails.linkedRequests && !requestDetails.linkedRequests?.length >0)}>
-                Linked Requests
-              </button>
-              <MinistriesCanvassed  openModal={openModal} selectedMinistries={(typeof requestDetails.linkedRequests == 'string' ? JSON.parse(requestDetails.linkedRequests) : requestDetails.linkedRequests)}
-              setModal={setModal} isLinkedRequest={true} />
-          </div>
           <div className="row foi-details-row foi-details-row-break">
             <div className="col-lg-6 foi-details-col">
                 <TextField
@@ -426,9 +416,7 @@ const RequestDetails = React.memo(
                         //required
                         disabled={disableInput}
                         SelectProps={{ displayEmpty: true }}
-                        //error={selectedDeliveryMode.toLowerCase().includes("select")}
                     >
-                    {/* {deliveryModes} */}
                       <MenuItem value="">
                         No Delivery Mode
                       </MenuItem>

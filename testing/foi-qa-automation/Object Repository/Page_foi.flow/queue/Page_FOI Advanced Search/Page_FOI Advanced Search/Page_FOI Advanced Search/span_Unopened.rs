@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>span_Unopened</name>
+   <tag></tag>
+   <elementGuidId>264bbeaf-934b-4b4e-b04b-7146bd560dac</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//ul[@id='mui-131']/li[6]/div/span</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>li.MuiButtonBase-root.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.MuiMenuItem-root.MuiMenuItem-gutters.Mui-selected.css-1km1ehz > div.MuiListItemText-root.css-1tsvksn > span.MuiTypography-root.MuiTypography-body1.MuiListItemText-primary.css-yb0lig</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <smartLocatorCollection>
+      <entry>
+         <key>SMART_LOCATOR</key>
+         <value>#mui-131 >> internal:text=&quot;Unopened&quot;i</value>
+      </entry>
+   </smartLocatorCollection>
+   <smartLocatorEnabled>false</smartLocatorEnabled>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>span</value>
+      <webElementGuid>8480108d-9d95-4988-aeee-1cc9b35b296a</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-yb0lig</value>
+      <webElementGuid>547d9a15-1ab3-43a3-afd1-01e7775f2374</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Unopened</value>
+      <webElementGuid>da4005e7-df84-43b1-bd71-836450fe8478</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;mui-131&quot;)/li[@class=&quot;MuiButtonBase-root MuiMenuItem-root MuiMenuItem-gutters Mui-selected MuiMenuItem-root MuiMenuItem-gutters Mui-selected css-1km1ehz&quot;]/div[@class=&quot;MuiListItemText-root css-1tsvksn&quot;]/span[@class=&quot;MuiTypography-root MuiTypography-body1 MuiListItemText-primary css-yb0lig&quot;]</value>
+      <webElementGuid>c1231d63-8533-493b-86fc-2390bab3f9bb</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//ul[@id='mui-131']/li[6]/div/span</value>
+      <webElementGuid>1e1dc37a-aaa3-4fa4-9fd7-6986718bd3df</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Redirect'])[1]/following::span[4]</value>
+      <webElementGuid>b99ac3c0-dfb3-4d64-9ef7-08ab4531dc00</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Closed'])[1]/following::span[8]</value>
+      <webElementGuid>be24c1fe-e968-402e-b01a-bbed4c4dc6e8</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Intake in Progress'])[1]/preceding::span[4]</value>
+      <webElementGuid>a9197b6b-eedb-4927-9f08-583cf69e89fe</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Records Review'])[1]/preceding::span[8]</value>
+      <webElementGuid>fb2bf4a1-684d-481c-8b77-794bacb0d4ff</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//li[6]/div/span</value>
+      <webElementGuid>7f7502d1-1c49-4367-ad3a-e647cb399662</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//span[(text() = 'Unopened' or . = 'Unopened')]</value>
+      <webElementGuid>58aa859a-f46f-4d48-892d-28ef4b541bff</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

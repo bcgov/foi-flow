@@ -428,6 +428,7 @@ export const checkValidationError = (
       !requiredRequestDescriptionValues.ispiiredacted) ||
     // !!validation.helperTextValue ||
     assignedToValue.toLowerCase().includes("unassigned") ||
+    (assignedToValue === "Intake Team|Intake Team" && currentrequestStatus.toLowerCase() === StateEnum.unopened.name.toLowerCase() && sourceOfSubmission === "onlineform") || 
     requiredRequestDetailsValues.requestType.toLowerCase().includes("select") ||
     requiredRequestDetailsValues.receivedMode
       .toLowerCase()

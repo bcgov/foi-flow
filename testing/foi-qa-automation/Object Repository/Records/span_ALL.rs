@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>span_ALL</name>
+   <tag></tag>
+   <elementGuidId>d64f7f3a-538d-47c9-abff-ec5f7fb58c2f</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>#-1Tag > span.MuiChip-label.MuiChip-labelSmall.css-1pjtbja</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='-1Tag']/span</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>span</value>
+      <webElementGuid>e676aedc-19cf-420d-94b9-d768f7b3a3db</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>MuiChip-label MuiChip-labelSmall css-1pjtbja</value>
+      <webElementGuid>f7c8ae20-0621-496d-9280-6732af4a6257</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>ALL</value>
+      <webElementGuid>7baa1fb4-2cbc-4842-897b-9d26bd39f39d</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;-1Tag&quot;)/span[@class=&quot;MuiChip-label MuiChip-labelSmall css-1pjtbja&quot;]</value>
+      <webElementGuid>c1a36599-11bd-4ff0-a35e-bb3b55dcc6ea</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='-1Tag']/span</value>
+      <webElementGuid>34addf4b-9015-4983-8fa7-0b0b5c39533a</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)=concat('DEPUTY MINISTER', &quot;'&quot;, 'S OFFICE')])[1]/following::span[2]</value>
+      <webElementGuid>cb7ad90c-0893-40bf-a500-65747d28e7be</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)=concat('MINISTER', &quot;'&quot;, 'S OFFICE')])[1]/following::span[4]</value>
+      <webElementGuid>76613ca4-18ba-4e42-8c3a-585caceb37a9</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='ERRORS'])[1]/preceding::span[2]</value>
+      <webElementGuid>c73ea55c-569d-4bde-9485-78a8cb591dcc</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='INCOMPATIBLE'])[1]/preceding::span[4]</value>
+      <webElementGuid>7af76d04-58a3-4270-8d25-fd9fd3efbe8e</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[5]/div[2]/div[3]/span</value>
+      <webElementGuid>b46766c9-4c44-4810-93bc-d6cb18303f4a</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//span[(text() = 'ALL' or . = 'ALL')]</value>
+      <webElementGuid>67cbc79a-8541-43d6-8f81-55866ea770c0</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>
