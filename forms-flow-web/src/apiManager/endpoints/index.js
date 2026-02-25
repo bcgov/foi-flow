@@ -11,7 +11,6 @@ const API = {
   FOI_GET_MINISTRY_REQUESTS_API: `${FOI_BASE_API_URL}/api/dashboard/ministry`,
   FOI_GET_REQUESTS_PAGE_API: `${FOI_BASE_API_URL}/api/dashboardpagination`,
   FOI_GET_MINISTRY_REQUESTS_PAGE_API: `${FOI_BASE_API_URL}/api/dashboardpagination/ministry`,
-  // FOI_GET_OI_REQUESTS_PAGE_API: `${FOI_BASE_API_URL}/api/dashboardpagination/oi`,
   FOI_GET_CATEGORIES_API: `${FOI_BASE_API_URL}/api/foiflow/applicantcategories`,
   FOI_GET_PROGRAMAREAS_API: `${FOI_BASE_API_URL}/api/foiflow/programareas`,
   FOI_GET_PROGRAMAREAS_FORUSER_API: `${FOI_BASE_API_URL}/api/foiflow/programareasforuser`,
@@ -30,6 +29,7 @@ const API = {
   FOI_POST_REQUEST_POST: `${FOI_BASE_API_URL}/api/foirequests`,
   FOI_REQUEST_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>`,
   FOI_REQUEST_SECTION_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>/section`,
+  FOI_MINISTRY_REQUEST_LINKEDREQUESTINFO: `${FOI_BASE_API_URL}/api/linkrequest/foiministryinfo/axisrequestid/<axisrequestid>`,
   FOI_MINISTRYVIEW_REQUEST_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>/ministry`,
   FOI_RAW_REQUEST_DESCRIPTION: `${FOI_BASE_API_URL}/api/foiaudit/rawrequest/<requestid>/description`,
   FOI_MINISTRY_REQUEST_DESCRIPTION: `${FOI_BASE_API_URL}/api/foiaudit/ministryrequest/<ministryid>/description`,
@@ -226,5 +226,6 @@ const API = {
   FOI_GET_RECORD_GROUP: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups`,
   FOI_DELETE_RECORD_GROUP: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups/<groupid>/records/<recordid>`,
 
+  FOI_GET_LINKED_REQUESTS_LIST: `${FOI_BASE_API_URL}/api/linkrequests/<ministrycode>/axisrequestid/<axisrequestid>`
 };
 export default API;

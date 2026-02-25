@@ -10,6 +10,7 @@ from dateutil.parser import parse
 import maya
 from request_api.models.FOIAssignees import FOIAssignee
 from request_api.utils.enums import StateName
+from request_api.services.linkedrequestservice import linkedrequestservice
 
 class rawrequestservicegetter:
     """ This class consolidates retrival of FOI raw request for actors: iao. 
@@ -71,6 +72,7 @@ class rawrequestservicegetter:
             request['requestrawdata']['wfinstanceid'] = request['wfinstanceid']
             request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
             request['requestrawdata']['isiaorestricted']= request['isiaorestricted'] if request['isiaorestricted'] is not None else False
+            request['requestrawdata']['linkedRequestsInfo'] = linkedrequestservice().getlinkedrequestinfo(request['linkedrequests'])
             request['requestrawdata']['rawRequestId'] = request['requestid']
             return request['requestrawdata']
         elif request != {} and request['sourceofsubmission'] == "intake":
@@ -92,6 +94,7 @@ class rawrequestservicegetter:
             request['requestrawdata']['closedate']= self.__getclosedate(request['closedate'])
             request['requestrawdata']['isiaorestricted']= request['isiaorestricted'] if request['isiaorestricted'] is not None else False
             request['requestrawdata']['assignedGroupEmail'] = self.__getassignedgroupemail(assignedgroup)
+            request['requestrawdata']['linkedRequestsInfo'] = linkedrequestservice().getlinkedrequestinfo(request['linkedrequests'])
             request['requestrawdata']['rawRequestId'] = request['requestid']
             return request['requestrawdata']
         else:
@@ -156,6 +159,7 @@ class rawrequestservicegetter:
                                'axisRequestId': request['axisrequestid'],
                                'axisSyncDate': request['axissyncdate'],
                                'linkedRequests': request['linkedrequests'],
+                               'linkedRequestsInfo': linkedrequestservice().getlinkedrequestinfo(request['linkedrequests']),
                                'email': contactinfooptions['email'],
                                'phonePrimary': contactinfooptions['phonePrimary'],
                                'phoneSecondary': contactinfooptions['phoneSecondary'],
