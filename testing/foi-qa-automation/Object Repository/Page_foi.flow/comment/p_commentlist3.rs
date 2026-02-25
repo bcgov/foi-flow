@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>p_commentlist3</name>
+   <tag></tag>
+   <elementGuidId>8f8f42f8-3341-42bd-b8ae-248aac1997de</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='Comments']/div/div[2]/div[2]/div[2]/div/div/div[2]/p</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;halfDiv&quot;]/div[@class=&quot;userInfo&quot;]/div[@class=&quot;commenttext&quot;]/p[1][count(. | //*[(text() = 'foiedu foiedu changed the state of the request to Ministry Sign Off' or . = 'foiedu foiedu changed the state of the request to Ministry Sign Off')]) = count(//*[(text() = 'foiedu foiedu changed the state of the request to Ministry Sign Off' or . = 'foiedu foiedu changed the state of the request to Ministry Sign Off')])]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>p</value>
+      <webElementGuid>82405421-756d-4e7d-b0a0-53fd62df2129</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>foiedu foiedu changed the state of the request to Ministry Sign Off</value>
+      <webElementGuid>7658ea62-cc2b-4be5-930f-e4f6422f13a2</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;Comments&quot;)/div[@class=&quot;section&quot;]/div[@class=&quot;displayComments&quot;]/div[2]/div[@class=&quot;commentsection&quot;]/div[@class=&quot;halfDiv&quot;]/div[@class=&quot;userInfo&quot;]/div[@class=&quot;commenttext&quot;]/p[1]</value>
+      <webElementGuid>855fccde-2826-4f9d-8dd7-78e68ec8355a</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='Comments']/div/div[2]/div[2]/div[2]/div/div/div[2]/p</value>
+      <webElementGuid>448eae80-b7e2-47ae-8286-59803a7fde72</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Request History'])[2]/following::p[1]</value>
+      <webElementGuid>6bbd2fe5-1312-4ab3-bc66-7d7766d6c009</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='FOI Intake changed the state of the request to Call For Records']/parent::*</value>
+      <webElementGuid>a2f1e1f5-437c-4bff-b849-027f23bf5445</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[2]/div/div/div[2]/p</value>
+      <webElementGuid>c90ba00c-b76f-48d5-8141-8ec97d80114d</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//p[(text() = 'FOI Intake changed the state of the request to Call For Records' or . = 'FOI Intake changed the state of the request to Call For Records')]</value>
+      <webElementGuid>861059b3-ef39-4abd-9785-e6e694217449</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

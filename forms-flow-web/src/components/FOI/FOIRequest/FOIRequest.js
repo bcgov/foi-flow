@@ -143,6 +143,7 @@ import OpenInfo from "./OpenInformation/OpenInfo";
 import ProactiveDisclosureDetails from "./ProactiveDisclosureDetails";
 import ProactiveDisclosureDescription from "./ProactiveDisclosureDescription";
 import ProactiveDisclosureRequestPublication from "./ProactiveDisclosure/Publication/ProactiveDisclosureRequestPublication";
+import LinkedRequests from "./LinkedRequests";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -1086,7 +1087,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     requestDetails.isconsultflag,
     requiredContactDetails,
     personalRequestDetailErrors,
-    requestDetails?.sourceOfSubmission,
     isProactiveDisclosure,
     requiredProactiveDetailsValues,
   );
@@ -1743,8 +1743,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                               handleRequestDetailsInitialValue
                             }
                             createSaveRequestObject={createSaveRequestObject}
-                            disableInput={disableInput || isHistoricalRequest}
                             isHistoricalRequest={isHistoricalRequest}
+                            requestExtensions={requestExtensions}
                           />
                           <ApplicantDetails
                             requestDetails={requestDetails}
@@ -1785,6 +1785,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                                   }
                                   userDetail={userDetail}
                                   requestType={requestDetails?.requestType}
+                                  setError={setPersonalRequestDetailErrors}
                                 />
                                 <OnBehalfOfDetails
                                   additionalInfo={
@@ -1796,6 +1797,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                                   disableInput={
                                     disableInput || isHistoricalRequest
                                   }
+                                  setError={setPersonalRequestDetailErrors}
                                 />
                               </>
                             )}
@@ -1841,6 +1843,20 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput || isHistoricalRequest}
                           />
+                        {requestDetails?.axisRequestId && 
+                          <LinkedRequests
+                          requestDetails={requestDetails}
+                            requestStatus={_requestStatus}
+                            handleRequestDetailsValue={handleRequestDetailsValue}
+                            handleRequestDetailsInitialValue={
+                              handleRequestDetailsInitialValue
+                            }
+                            createSaveRequestObject={createSaveRequestObject}
+                            disableInput={disableInput || isHistoricalRequest}
+                            isHistoricalRequest={isHistoricalRequest}
+                            isMinistry={isMinistry}
+                          />
+                        }
                           {redactedSections &&
                             Object.keys(redactedSections).length > 0 && (
                               <RedactionSummary
@@ -1888,23 +1904,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             )}
                         </>
                       )}
-                      {showDivisionalTracking && (
-                        <DivisionalTracking
-                          divisions={requestDetails.divisions}
-                        />
-                      )}
-                      <div ref={oipcSectionRef}></div>
-                      {isOIPCReview && requestState && requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
-                        <OIPCDetails
-                          oipcData={oipcData}
-                          updateOIPC={updateOIPC}
-                          addOIPC={addOIPC}
-                          removeOIPC={removeOIPC}
-                          isMinistry={false}
-                          isHistoricalRequest={isHistoricalRequest}
-                        />
-                      )}
-
                       <BottomButtonGroup
                         stateChanged={stateChanged}
                         isValidationError={isValidationError}

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>h2_FOI</name>
+   <tag></tag>
+   <elementGuidId>df6105d2-d22e-411b-8cd3-46a0d5c880c9</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='app']/div/div[2]/div/nav/div/div/div/div[2]/a/i/h2</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'FOI' or . = 'FOI')]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>h2</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>h2</value>
+      <webElementGuid>b122aec3-4706-4aac-bc00-f8d52279e370</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>FOI</value>
+      <webElementGuid>934943ba-a46a-4b68-a62f-9d5d5ff249e0</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;app&quot;)/div[1]/div[2]/div[@class=&quot;row&quot;]/nav[@class=&quot;navbar navbar-expand-sm navbar-dark bg-#036 fixed-top&quot;]/div[@class=&quot;MuiContainer-root foiContainer MuiContainer-maxWidthLg&quot;]/div[@class=&quot;ml-auto navbar-nav&quot;]/div[@class=&quot;col-md-12 col-sm-12&quot;]/div[@class=&quot;col-md-3 col-sm-4 foiheaderAppNamesection&quot;]/a[1]/i[@class=&quot;fa fa-home foihomebtn&quot;]/h2[1]</value>
+      <webElementGuid>b9bb82ba-4d46-40ee-9407-5cb5f3064e7d</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='app']/div/div[2]/div/nav/div/div/div/div[2]/a/i/h2</value>
+      <webElementGuid>f32048c5-3411-47e3-b3bb-982633fe2fe5</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Sign Out'])[1]/preceding::h2[1]</value>
+      <webElementGuid>96d08341-6a5a-4f65-b2b8-d238ff788239</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='FOI']/parent::*</value>
+      <webElementGuid>d3c1c6e4-d43e-4223-89d2-8b4b819d4446</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//h2</value>
+      <webElementGuid>30f43863-2a3f-46aa-8ae9-e5c50b6af517</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//h2[(text() = 'FOI' or . = 'FOI')]</value>
+      <webElementGuid>2e817ba8-b2ba-4c12-8918-dd3984a56d66</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

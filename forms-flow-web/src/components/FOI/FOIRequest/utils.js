@@ -387,7 +387,6 @@ export const checkValidationError = (
   isconsultflag,
   requiredContactDetails,
   personalRequestDetailsErrors,
-  sourceOfSubmission,
   isProactiveDisclosure,
   requiredProactiveDetailsValues,
 ) => {

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_watching notification list 1 request id</name>
+   <tag></tag>
+   <elementGuidId>b90ecefb-1e34-49a1-b21e-1f3e55bc5203</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='uncontrolled-tab-example-tabpane-watch-request']/div[2]/div[1]/div/div/h6/div[@class=&quot;redirect-url&quot;]</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>div.redirect-url</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>6507b60a-15b7-412e-9182-aa22c920a03e</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>redirect-url</value>
+      <webElementGuid>eea40e42-f221-4a18-b893-2e31d40d3edd</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>EDU-2022-340455790</value>
+      <webElementGuid>23097e4e-d9ea-4479-aa16-0e1b069d03b9</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;uncontrolled-tab-example-tabpane-my-request&quot;)/div[@class=&quot;notification-list list-group&quot;]/div[@class=&quot;list-group-item&quot;]/div[@class=&quot;row&quot;]/div[@class=&quot;col&quot;]/h6[@class=&quot;notification-heading&quot;]/div[@class=&quot;redirect-url&quot;]</value>
+      <webElementGuid>f3a3fe0c-b2a0-4607-b6f5-75c20ffefc69</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='uncontrolled-tab-example-tabpane-my-request']/div[2]/div/div/div/h6/div</value>
+      <webElementGuid>0a051ac7-ecec-4b5c-91d8-19c0aeb3e26e</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Dismiss All'])[1]/following::div[5]</value>
+      <webElementGuid>f3f37774-7822-4a43-ad56-47a66babd3c3</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='`'])[2]/following::div[15]</value>
+      <webElementGuid>b309482f-a9f6-4e18-a181-b819bef08c79</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Moved to Open State'])[1]/preceding::div[2]</value>
+      <webElementGuid>cf1c9a6b-7a37-4425-aaef-650b2f9076af</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Flex, Intake'])[1]/preceding::div[3]</value>
+      <webElementGuid>110b8b3e-6392-4e62-b9ed-a06a38387333</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='EDU-2022-340455790']/parent::*</value>
+      <webElementGuid>5fcb71f9-262b-479f-bdb2-a2d5984d9ba3</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//h6/div</value>
+      <webElementGuid>1d56de91-501b-43f7-a1d7-bda98878d6c3</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//div[(text() = 'EDU-2022-340455790' or . = 'EDU-2022-340455790')]</value>
+      <webElementGuid>a9da7fb3-c47c-4ccb-be79-74f3906408b4</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

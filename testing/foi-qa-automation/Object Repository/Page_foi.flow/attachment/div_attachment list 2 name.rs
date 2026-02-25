@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>div_attachment list 2 name</name>
+   <tag></tag>
+   <elementGuidId>16beafb9-6b5d-42f8-abed-ca09ef079625</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>id(&quot;Attachments&quot;)/div[1]/div[@class=&quot;section&quot;]/div[@class=&quot;displayAttachments&quot;]/div[@class=&quot;container-fluid&quot;][2]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;col-sm-12 foi-details-col&quot;]/div[@class=&quot;col-sm-10&quot;]/div[@class=&quot;attachment-name&quot;]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='Attachments']/div/div/div[5]/div[4]/div/div</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>div</value>
+      <webElementGuid>0e372ce5-439a-4019-9a82-5d61e67b2def</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>attachment-name </value>
+      <webElementGuid>847829a4-d312-47ad-9078-d96266f4ae21</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>test.docx</value>
+      <webElementGuid>27d61b7f-6b3f-496c-8c7a-c85d3e542e21</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;Attachments&quot;)/div[1]/div[@class=&quot;section&quot;]/div[@class=&quot;displayAttachments&quot;]/div[@class=&quot;container-fluid&quot;][2]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;row foi-details-row&quot;]/div[@class=&quot;col-sm-12 foi-details-col&quot;]/div[@class=&quot;col-sm-10&quot;]/div[@class=&quot;attachment-name&quot;]</value>
+      <webElementGuid>5b827485-2bf4-4038-a62d-ca581b07d897</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='Attachments']/div/div/div[4]/div[2]/div/div/div/div/div</value>
+      <webElementGuid>a9c0dbb1-cb62-49ae-835b-78bfa5bc9f17</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='User, Super'])[1]/following::div[8]</value>
+      <webElementGuid>47d6f25e-9ca4-40d7-9317-8d13437ee0fb</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='general'])[1]/following::div[14]</value>
+      <webElementGuid>4a8f108d-8755-4aea-9ac9-b4c506c55cbe</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='general'])[2]/preceding::div[1]</value>
+      <webElementGuid>609f6183-5275-4131-a085-cb1437a7407d</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Flex, Intake'])[1]/preceding::div[6]</value>
+      <webElementGuid>08d9256e-79c3-4aa5-a327-855b073ba0dd</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='test.docx']/parent::*</value>
+      <webElementGuid>9deffe44-54f0-4d28-8b67-5b789ba25a12</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[4]/div[2]/div/div/div/div/div</value>
+      <webElementGuid>837c91ef-4c2b-4553-a410-00762f5228b7</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

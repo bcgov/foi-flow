@@ -26,9 +26,9 @@ class requestservicebuilder(requestserviceconfigurator):
     """
 
     def createministry(self, requestschema, ministry, activeversion, userid, filenumber=None, ministryid=None):
-        #print("\n-------requestschema-",requestschema)
+        print("\n-------requestschema-",requestschema)
         programareaiaocode = self.getprogramareaiaocodebyid(self.getvalueof("programArea",ministry["code"]))
-        axisrequestid = requestschema.get("axisRequestId", FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("isconsultflag")))
+        axisrequestid = requestschema.get("axisRequestId", FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("requestType"), requestschema.get("isconsultflag")))
         current_foiministryrequest = FOIMinistryRequest.getrequest(ministryid)
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.__dict__.update(ministry)
@@ -63,7 +63,6 @@ class requestservicebuilder(requestserviceconfigurator):
             startdate = requestschema.get("startDate")
         elif (requestschema.get("requestProcessStart") is not None):
             startdate = requestschema.get("requestProcessStart")
-        print("\nstartdate:",startdate)
         
         foiministryrequest.startdate = startdate
         foiministryrequest.createdby = userid
@@ -79,7 +78,6 @@ class requestservicebuilder(requestserviceconfigurator):
         self.__updateministryassignedtoandgroup(foiministryrequest, requestschema, ministry, status)
 
         if requestschema.get("requestType") == "proactive disclosure":
-            print("\nInside proactive disclosure check!!")
             foiministryrequest.duedate = requestschema.get("cfrDueDate")
             foiministryrequest.proactivedisclosures = self._prepareproactivedisclosuredetails(requestschema, userid, ministryid, activeversion)
 
@@ -96,10 +94,9 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.version = activeversion
         oistatusid = self.getpropertyvaluefromschema(requestschema, 'oistatusid')
         foiministryrequest.oistatus_id = oistatusid
-        foiministryrequest_dict = foiministryrequest.__dict__
-        print("foiministryrequest in createministry:",foiministryrequest_dict)
-        # First instance of FOIOpeninformation data is created either when: A) An exemption request is created via "Publication Tab" B) 
-        # A request is closed and no exemption request has been made previously
+        # foiministryrequest_dict = foiministryrequest.__dict__
+        # print("foiministryrequest in createministry:",foiministryrequest_dict)
+        # First instance of FOIOpeninformation data is created either when: A) An exemption request is created via "Publication Tab" B) A request is closed and no exemption request has been made previously
         if 'closereasonid' in requestschema and ministryid is not None:
             current_foiopeninforequest = openinfoservice().getcurrentfoiopeninforequest(ministryid)
             foiopeninforequest = current_foiopeninforequest

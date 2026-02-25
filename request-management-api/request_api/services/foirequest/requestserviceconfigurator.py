@@ -49,6 +49,10 @@ class requestserviceconfigurator:
         programarea = ProgramArea().getprogramareabyid(programareaid)
         return programarea['iaocode']
 
+    def getprogramareaiaocodebyid(self, programareaid):
+        programarea = ProgramArea().getprogramareabyid(programareaid)
+        return programarea['iaocode']
+
     def getpropertyvaluefromschema(self,requestschema,property):
         return requestschema.get(property) if property in requestschema  else None
 

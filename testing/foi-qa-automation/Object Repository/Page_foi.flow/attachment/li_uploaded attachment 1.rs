@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>li_uploaded attachment 1</name>
+   <tag></tag>
+   <elementGuidId>d547f944-b2dc-4ecc-98a6-6f0597d7bc93</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'test2.docx' or . = 'test2.docx')]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside/span</value>
+      </entry>
+      <entry>
+         <key>CSS</key>
+         <value>aside</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>aside</value>
+      <webElementGuid>a1ee50eb-03fc-43e2-8b24-a35ad95a7fd8</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>test2.docx</value>
+      <webElementGuid>16635a81-a20d-461b-a5a0-8770a4e5f030</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside/span</value>
+      <webElementGuid>4b8331f2-2106-4e41-8f91-81c3417573e7</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//span[@id='state-change-dialog-description']/section/div/div/article/section/ol/li/section/div/div/aside</value>
+      <webElementGuid>257b68c6-9848-4503-b08e-a8c8c1fed1ad</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Add Attachment'])[1]/following::aside[1]</value>
+      <webElementGuid>826901f8-4bc7-4351-a0dc-d697c2ee46fb</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Option 4'])[2]/following::aside[1]</value>
+      <webElementGuid>057bd576-c9c8-42eb-a52d-6cb1088a2ef2</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='test2.docx'])[1]/preceding::aside[1]</value>
+      <webElementGuid>98336951-8823-4cd5-adda-6f1f67584166</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//aside</value>
+      <webElementGuid>c6348e53-72ad-49a7-b3a3-b79a5a3f91ac</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

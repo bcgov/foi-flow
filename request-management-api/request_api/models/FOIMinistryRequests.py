@@ -30,9 +30,9 @@ from .SubjectCodes import SubjectCode
 from request_api.utils.enums import StateName
 from .FOIRequestOIPC import FOIRequestOIPC
 from .ProactiveDisclosureCategories import ProactiveDisclosureCategory
-from .OpenInformationStatuses import OpenInformationStatuses
 from request_api.models import FOIProactiveDisclosureRequests
 from .FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
+from .OpenInformationStatuses import OpenInformationStatuses
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -1968,6 +1968,25 @@ class FOIMinistryRequest(db.Model):
                 filtercondition.append(literal(False))
 
         return and_(*filtercondition)
+    
+    @classmethod
+    def get_linkedfoiministryrequest_info(cls, axisid):
+        try:
+            sql='''
+            SELECT DISTINCT ON (axisrequestid) requeststatuslabel, foiministryrequestid
+            FROM public."FOIMinistryRequests" 
+            WHERE axisrequestid = :axisid
+            ORDER BY axisrequestid, version DESC;
+            '''
+            params={"axisid": axisid}
+            row = db.session.execute(sql,params).first()
+            requeststatus, foiministryrequestid = row
+            return {"requeststatus": requeststatus,"foiministryrequestid": foiministryrequestid}
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
 
 
 class FOIMinistryRequestSchema(ma.Schema):

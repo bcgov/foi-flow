@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>button_Add Attachment</name>
+   <tag></tag>
+   <elementGuidId>a6243a8d-c714-401a-9d1e-c56269356397</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>button.btn.foi-btn-create.addAttachment</value>
+      </entry>
+      <entry>
+         <key>BASIC</key>
+         <value>//button[(text() = '+ Add Attachment' or . = '+ Add Attachment')]</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>(//button[@type='button'])[6]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>a0c60a0d-efb4-4f83-905a-e3fac72dbda8</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>type</name>
+      <type>Main</type>
+      <value>button</value>
+      <webElementGuid>268e2f9e-dcbe-44b8-a594-d66cbd057bfb</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>btn foi-btn-create addAttachment</value>
+      <webElementGuid>c9258bc4-7f28-4da4-af88-dd6389d3c33e</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>+ Add Attachment</value>
+      <webElementGuid>5c766fe1-c440-4ed8-a18e-f5fa0ac3a795</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;Attachments&quot;)/div[1]/div[@class=&quot;section&quot;]/div[@class=&quot;addAttachmentBox&quot;]/button[@class=&quot;btn foi-btn-create addAttachment&quot;]</value>
+      <webElementGuid>9d37d035-b26e-4581-b719-8700b4f45fff</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:attributes</name>
+      <type>Main</type>
+      <value>(//button[@type='button'])[6]</value>
+      <webElementGuid>1498bd9a-283f-489e-a87f-17c1fff51067</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='Attachments']/div/div/div[2]/button</value>
+      <webElementGuid>cd06864a-8b16-4777-b17e-2f9204c9049e</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Request #EDU-2021-36897'])[1]/following::button[1]</value>
+      <webElementGuid>1db7c42a-3479-4a17-8015-1d7fd3bbb0bf</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Return to Queue'])[1]/following::button[1]</value>
+      <webElementGuid>6adb6efa-a0f5-43ba-b4ac-f4e1450e3ca4</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='test.docx'])[1]/preceding::button[1]</value>
+      <webElementGuid>2e766383-3a01-41eb-be99-165f87127955</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='general'])[1]/preceding::button[1]</value>
+      <webElementGuid>efaeabbd-8f48-4e3a-bf6a-f2b92c6b34ab</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='+ Add Attachment']/parent::*</value>
+      <webElementGuid>d51d4031-ddb1-46ff-8f4c-f9911f938571</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//div[2]/button</value>
+      <webElementGuid>82776e18-f3f8-46d2-8dfd-0cfa9fcbb11d</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>

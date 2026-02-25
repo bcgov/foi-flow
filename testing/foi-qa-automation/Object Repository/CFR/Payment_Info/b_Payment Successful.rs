@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>b_Payment Successful</name>
+   <tag></tag>
+   <elementGuidId>82926a44-c3ec-40d9-a34d-e1153603b88d</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>CSS</key>
+         <value>b</value>
+      </entry>
+      <entry>
+         <key>XPATH</key>
+         <value>//div[@id='ezf50qm']/h2/b</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>XPATH</selectorMethod>
+   <useRalativeImagePath>true</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>b</value>
+      <webElementGuid>b93a5dbe-9417-448a-a566-7a3d5c541dcd</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Payment Successful!</value>
+      <webElementGuid>3eba7983-e8f8-4957-bd9b-55f2485dc8d5</webElementGuid>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;ezf50qm&quot;)/h2[1]/b[1]</value>
+      <webElementGuid>e764a2f7-edb3-4d45-ad09-fb129834c959</webElementGuid>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='ezf50qm']/h2/b</value>
+      <webElementGuid>5dfe7203-11be-4eb7-a0ca-86e3f22bd861</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Transaction ID: FOID00001449'])[1]/preceding::b[1]</value>
+      <webElementGuid>a88746f4-a79e-49f2-93c4-a9ab01cf2fc2</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='You have received an email regarding your request details and a copy of your receipt.'])[1]/preceding::b[1]</value>
+      <webElementGuid>f0b69b50-b3d6-4250-a341-0058241cdb70</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>//*/text()[normalize-space(.)='Payment Successful!']/parent::*</value>
+      <webElementGuid>6e10b1c9-f794-4766-9115-72e91216e730</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//b</value>
+      <webElementGuid>28378846-7706-4805-bfc1-974b2f828194</webElementGuid>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:customAttributes</name>
+      <type>Main</type>
+      <value>//b[(text() = 'Payment Successful!' or . = 'Payment Successful!')]</value>
+      <webElementGuid>c6fc5d04-2209-42dc-ad4e-6a4db5c7b062</webElementGuid>
+   </webElementXpaths>
+</WebElementEntity>
