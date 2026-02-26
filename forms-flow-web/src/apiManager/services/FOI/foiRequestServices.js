@@ -14,11 +14,11 @@ import {
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
   setOpenedMinistries,
-  setRestrictedReqTaglist,  
+  setRestrictedReqTaglist,
   setRequestExtensions,
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList, fetchFOIProcessingTeamList } from "./foiMasterDataServices";
-import { catchError, fnDone} from './foiServicesUtil';
+import { catchError, fnDone } from './foiServicesUtil';
 import UserService from "../../../services/UserService";
 import { replaceUrl } from "../../../helper/FOI/helper";
 import { persistRequestFieldsNotInAxis } from "../../../components/FOI/FOIRequest/utils";
@@ -105,7 +105,7 @@ export const fetchFOIMinistryRequestList = () => {
           });
           dispatch(clearMinistryViewRequestDetails({}));
           if (foiRequests > 0)
-            dispatch(fetchFOIMinistryAssignedToList( foiRequests[0].bcgovcode.toLowerCase()));     
+            dispatch(fetchFOIMinistryAssignedToList(foiRequests[0].bcgovcode.toLowerCase()));
           dispatch(setFOIMinistryRequestList(data));
           dispatch(setFOILoader(false));
         } else {
@@ -113,41 +113,41 @@ export const fetchFOIMinistryRequestList = () => {
           throw new Error("Error in fetching dashboard data for Ministry");
         }
       })
-      .catch((error) => {        
+      .catch((error) => {
         catchError(error, dispatch);
       });
   };
 };
 
-export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{field:'defaultSorting', sort:'asc'}], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
+export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{ field: 'defaultSorting', sort: 'asc' }], filters = null, keyword = null, additionalFilter = 'All', userID = null) => {
   let sortingItems = [];
   let sortingOrders = [];
-  sort.forEach((item)=>{
+  sort.forEach((item) => {
     sortingItems.push(item.field);
     sortingOrders.push(item.sort);
   });
 
   return (dispatch) => {
     httpGETRequest(
-          API.FOI_GET_MINISTRY_REQUESTS_PAGE_API,
-          {
-            "page": page,
-            "size": size,
-            "sortingitems": sortingItems,
-            "sortingorders": sortingOrders,
-            "filters": filters,
-            "keyword": keyword,
-            "additionalfilter": additionalFilter,
-            "userid": userID
-          },
-          UserService.getToken())
+      API.FOI_GET_MINISTRY_REQUESTS_PAGE_API,
+      {
+        "page": page,
+        "size": size,
+        "sortingitems": sortingItems,
+        "sortingorders": sortingOrders,
+        "filters": filters,
+        "keyword": keyword,
+        "additionalfilter": additionalFilter,
+        "userid": userID
+      },
+      UserService.getToken())
       .then((res) => {
         if (res.data) {
           dispatch(clearMinistryViewRequestDetails({}));
           dispatch(setFOIMinistryRequestList(res.data));
           dispatch(setFOILoader(false));
           if (res.data?.data[0]?.bcgovcode)
-            dispatch(fetchFOIMinistryAssignedToList(res.data.data[0].bcgovcode));     
+            dispatch(fetchFOIMinistryAssignedToList(res.data.data[0].bcgovcode));
         } else {
           dispatch(serviceActionError(res));
           throw new Error("Error in fetching dashboard data for IAO");
@@ -161,7 +161,7 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
 
 export const fetchFOIRequestDetailsWrapper = (requestId, ministryId, userGroups) => {
   if (ministryId) {
-    return fetchFOIRequestDetails(requestId, ministryId);
+    return fetchFOIRequestDetails(requestId, ministryId, userGroups);
   } else {
     return fetchFOIRawRequestDetails(requestId, userGroups);
   }
@@ -182,7 +182,7 @@ export const fetchFOIRawRequestDetails = (requestId, userGroups) => {
           dispatch(setFOIRequestDetail(foiRequest));
           const ministryCode = (foiRequest.currentState !== StateEnum.redirect.name && foiRequest.requestType === 'personal') ? foiRequest.selectedMinistries[0].code.toLowerCase() : "";
           let isagbcpsteam = false;
-          if (!ministryCode && foiRequest.selectedMinistries[0].code.toLowerCase() == 'ag' && userGroups.includes('BCPS Team')) isagbcpsteam = true;
+          if (!ministryCode && foiRequest.selectedMinistries[0].code.toLowerCase() == 'ag' && userGroups && userGroups.includes('BCPS Team')) isagbcpsteam = true;
           dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ministryCode, isagbcpsteam));
           dispatch(fetchFOIProcessingTeamList(foiRequest.requestType.toLowerCase()));
           dispatch(setFOILoader(false));
@@ -197,8 +197,8 @@ export const fetchFOIRawRequestDetails = (requestId, userGroups) => {
   }
 };
 
-export const fetchFOIRequestDetails = (requestId, ministryId) => {
-  
+export const fetchFOIRequestDetails = (requestId, ministryId, userGroups) => {
+
   const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
     API.FOI_REQUEST_API,
     "<requestid>",
@@ -212,7 +212,9 @@ export const fetchFOIRequestDetails = (requestId, ministryId) => {
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
           const ministryCode = foiRequest.selectedMinistries[0].code.toLowerCase();
-          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ministryCode));
+          let isagbcpsteam = false;
+          if (ministryCode == 'ag' && userGroups && userGroups.includes('BCPS Team')) isagbcpsteam = true;
+          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ministryCode, isagbcpsteam));
           dispatch(fetchFOIMinistryAssignedToList(ministryCode));
           dispatch(fetchFOIProcessingTeamList(foiRequest.requestType.toLowerCase()));
           dispatch(setFOILoader(false));
@@ -325,7 +327,7 @@ export const saveMinistryRequestDetails = (data, requestId, ministryId, ...rest)
             done(null, res.data);
           } else {
             dispatch(serviceActionError(res));
-            throw new Error(`Error while saving the ministry request (request# ${requestId}, ministry# ${ministryId})`);            
+            throw new Error(`Error while saving the ministry request (request# ${requestId}, ministry# ${ministryId})`);
           }
         })
         .catch((error) => {
@@ -394,7 +396,7 @@ export const fetchOpenedMinistriesForNotification = (notification, ...rest) => {
   }
 };
 
-export const checkDuplicateAndFetchRequestDataFromAxis = (axisRequestId, isModal,requestDetails, ...rest) => {
+export const checkDuplicateAndFetchRequestDataFromAxis = (axisRequestId, isModal, requestDetails, ...rest) => {
   const done = fnDone(rest);
   const apiUrlCheckAxisIdExists = replaceUrl(
     API.FOI_CHECK_AXIS_REQUEST_ID,
@@ -405,19 +407,19 @@ export const checkDuplicateAndFetchRequestDataFromAxis = (axisRequestId, isModal
     httpGETRequest(apiUrlCheckAxisIdExists, {}, UserService.getToken())
       .then((res) => {
         if (res.data) {
-          if(!res.data.ispresent){
-            dispatch(fetchRequestDataFromAxis(axisRequestId, isModal,requestDetails,(err, data) => {
-              if(!err)
+          if (!res.data.ispresent) {
+            dispatch(fetchRequestDataFromAxis(axisRequestId, isModal, requestDetails, (err, data) => {
+              if (!err)
                 done(null, data);
               else {
-                  done(null,"Exception happened while fetching request from AXIS.");
-                  dispatch(serviceActionError(res));
-                  throw new Error(`Error in fetching request from AXIS.`);
+                done(null, "Exception happened while fetching request from AXIS.");
+                dispatch(serviceActionError(res));
+                throw new Error(`Error in fetching request from AXIS.`);
               }
             }));
           }
           else
-            done(null,"Axis Id exists");
+            done(null, "Axis Id exists");
         } else {
           dispatch(serviceActionError(res));
           throw new Error(`Error in fetching axis request ids.`);
@@ -429,7 +431,7 @@ export const checkDuplicateAndFetchRequestDataFromAxis = (axisRequestId, isModal
   }
 };
 
-export const fetchRequestDataFromAxis = (axisRequestId, isModal,requestDetails, ...rest) => {
+export const fetchRequestDataFromAxis = (axisRequestId, isModal, requestDetails, ...rest) => {
   const done = fnDone(rest);
   const apiUrlgetRequestDetails = replaceUrl(
     API.FOI_GET_AXIS_REQUEST_DATA,
@@ -441,45 +443,44 @@ export const fetchRequestDataFromAxis = (axisRequestId, isModal,requestDetails, 
       .then((res) => {
         if (res.data) {
           let newRequest = res.data;
-          if(!isModal && Object.entries(newRequest).length !== 0){
-            if(Object.entries(requestDetails).length !== 0 && requestDetails.currentState === "Unopened"){
-              newRequest= persistRequestFieldsNotInAxis(newRequest,requestDetails);
+          if (!isModal && Object.entries(newRequest).length !== 0) {
+            if (Object.entries(requestDetails).length !== 0 && requestDetails.currentState === "Unopened") {
+              newRequest = persistRequestFieldsNotInAxis(newRequest, requestDetails);
             }
             dispatch(setFOIRequestDetail(newRequest));
           }
           done(null, newRequest);
         } else {
-          done(null,"Exception happened while GET operations of request");
+          done(null, "Exception happened while GET operations of request");
           dispatch(serviceActionError(res));
           throw new Error(`Error in fetching request from AXIS.`);
         }
       })
       .catch((error) => {
         catchError(error, dispatch);
-        if (error.message.indexOf('401')> -1)
-        {
-          done(null,"Unauthorized-RestrictedAxisRequest");
+        if (error.message.indexOf('401') > -1) {
+          done(null, "Unauthorized-RestrictedAxisRequest");
         }
-        else{
-        
-        done(null,"Exception happened while GET operations of request");
+        else {
+
+          done(null, "Exception happened while GET operations of request");
         }
       });
   }
 };
 
-export const restrictRequest = (data, requestId, ministryId, type="iao", ...rest) => {
+export const restrictRequest = (data, requestId, ministryId, type = "iao", ...rest) => {
   const done = fnDone(rest);
   let apiUrl = "";
-  if (ministryId){
-    apiUrl= replaceUrl(replaceUrl(
+  if (ministryId) {
+    apiUrl = replaceUrl(replaceUrl(
       API.FOI_POST_MINISTRYREQUEST_RESTRICTION,
       "<ministryrequestid>",
-      ministryId),"<type>",type
-    ); 
+      ministryId), "<type>", type
+    );
   }
-  else{
-    apiUrl= replaceUrl(
+  else {
+    apiUrl = replaceUrl(
       API.FOI_POST_RAWREQUEST_RESTRICTION,
       "<requestid>",
       requestId
@@ -504,7 +505,7 @@ export const restrictRequest = (data, requestId, ministryId, type="iao", ...rest
 
 export const fetchRestrictedRequestCommentTagList = (requestid, ministryId, ...rest) => {
   const done = fnDone(rest);
-  const apiUrlgetRequestDetails = ministryId? replaceUrl(
+  const apiUrlgetRequestDetails = ministryId ? replaceUrl(
     API.FOI_GET_RESTRICTED_MINISTRYREQUEST_TAG_LIST,
     "<ministryrequestid>",
     ministryId
@@ -532,12 +533,12 @@ export const fetchRestrictedRequestCommentTagList = (requestid, ministryId, ...r
 
 export const deleteOIPCDetails = (requestId, ministryId, ...rest) => {
   const done = fnDone(rest);
-  let apiUrl= replaceUrl(replaceUrl(
+  let apiUrl = replaceUrl(replaceUrl(
     API.FOI_REQUEST_SECTION_API,
     "<ministryid>",
-    ministryId),"<requestid>",requestId
+    ministryId), "<requestid>", requestId
   );
-  const data = {isoipcreview: false, oipcdetails: []}
+  const data = { isoipcreview: false, oipcdetails: [] }
   return (dispatch) => {
     httpPOSTRequest(`${apiUrl}/oipc`, data)
       .then((res) => {
@@ -545,7 +546,7 @@ export const deleteOIPCDetails = (requestId, ministryId, ...rest) => {
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
-          throw new Error(`Error while saving the OIPC Details for the (request# ${requestId}, ministry# ${ministryId})`);            
+          throw new Error(`Error while saving the OIPC Details for the (request# ${requestId}, ministry# ${ministryId})`);
         }
       })
       .catch((error) => {
@@ -556,7 +557,7 @@ export const deleteOIPCDetails = (requestId, ministryId, ...rest) => {
 }
 
 export const fetchHistoricalRequestDetails = (requestId) => {
-  
+
   const apiUrlgetRequestDetails = API.FOI_HISTORICAL_REQUEST_API + "/" + requestId;
   return (dispatch) => {
     httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
@@ -606,28 +607,28 @@ export const fetchHistoricalExtensions = (
 
   return (dispatch) => {
     httpGETRequest(apiUrl, {}, UserService.getToken())
-    .then((res) => {
-      if (res.data) {
-        dispatch(setRequestExtensions(res.data));
-        dispatch(setFOILoader(false));
-      } else {
-        console.log("Error in fetching attachment list", res);
-        dispatch(serviceActionError(res));
-      }
-    })
-    .catch((error) => {
-      console.log("Error in fetching attachment list", error);
-      dispatch(serviceActionError(error));
-    });
+      .then((res) => {
+        if (res.data) {
+          dispatch(setRequestExtensions(res.data));
+          dispatch(setFOILoader(false));
+        } else {
+          console.log("Error in fetching attachment list", res);
+          dispatch(serviceActionError(res));
+        }
+      })
+      .catch((error) => {
+        console.log("Error in fetching attachment list", error);
+        dispatch(serviceActionError(error));
+      });
   }
 };
 
 export const updateSpecificRequestSection = (data, field, requestId, ministryId, ...rest) => {
   const done = fnDone(rest);
-  let apiUrl= replaceUrl(replaceUrl(
+  let apiUrl = replaceUrl(replaceUrl(
     API.FOI_REQUEST_SECTION_API,
     "<ministryid>",
-    ministryId),"<requestid>",requestId
+    ministryId), "<requestid>", requestId
   );
   return (dispatch) => {
     httpPOSTRequest(`${apiUrl}/${field}`, data)
@@ -636,7 +637,7 @@ export const updateSpecificRequestSection = (data, field, requestId, ministryId,
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
-          throw new Error(`Error while updating ${field} for the (request# ${requestId}, ministry# ${ministryId})`);            
+          throw new Error(`Error while updating ${field} for the (request# ${requestId}, ministry# ${ministryId})`);
         }
       })
       .catch((error) => {
@@ -646,16 +647,16 @@ export const updateSpecificRequestSection = (data, field, requestId, ministryId,
   };
 }
 
-export const linkedRequestsLists = (queryParams,axisrequestid, ministrycode, ...rest) => {
+export const linkedRequestsLists = (queryParams, axisrequestid, ministrycode, ...rest) => {
   const done = fnDone(rest);
   const serializedQueryParams = new URLSearchParams(queryParams).toString();
   const fixedQueryParams = serializedQueryParams.replace(/\+/g, '%20');
-  let url= replaceUrl(replaceUrl(
-      API.FOI_GET_LINKED_REQUESTS_LIST+`?${fixedQueryParams}`,
-      "<ministrycode>",
-      ministrycode),"<axisrequestid>",
-      axisrequestid
-    );
+  let url = replaceUrl(replaceUrl(
+    API.FOI_GET_LINKED_REQUESTS_LIST + `?${fixedQueryParams}`,
+    "<ministrycode>",
+    ministrycode), "<axisrequestid>",
+    axisrequestid
+  );
   return (dispatch) => {
     httpGETRequest(url, {}, UserService.getToken())
       .then((res) => {
@@ -673,7 +674,7 @@ export const linkedRequestsLists = (queryParams,axisrequestid, ministrycode, ...
 };
 
 export const getFOIMinistryLinkedRequestInfo = (axisid) => async (dispatch) => {
-  const apiUrl= replaceUrl(API.FOI_MINISTRY_REQUEST_LINKEDREQUESTINFO, "<axisrequestid>", axisid);
+  const apiUrl = replaceUrl(API.FOI_MINISTRY_REQUEST_LINKEDREQUESTINFO, "<axisrequestid>", axisid);
   try {
     const res = await httpGETRequest(apiUrl, {}, UserService.getToken());
     if (res.data) {
