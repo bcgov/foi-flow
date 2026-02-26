@@ -1,24 +1,27 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from "react";
 import "./ministrieslist.scss";
-import { makeStyles } from '@material-ui/core/styles';
-import { useParams } from 'react-router-dom';
-import clsx from 'clsx'
-import {isValidMinistryCode, countOfMinistrySelected} from '../FOIRequest/utils';
+import { makeStyles } from "@material-ui/core/styles";
+import { useParams } from "react-router-dom";
+import clsx from "clsx";
+import {
+  isValidMinistryCode,
+  countOfMinistrySelected,
+} from "../FOIRequest/utils";
 
-const useStyles = makeStyles((_theme) => ({  
+const useStyles = makeStyles((_theme) => ({
   headingError: {
-    color: "#9e2929"    
+    color: "#9e2929",
   },
   headingNormal: {
-    color: "000000"
+    color: "000000",
   },
   hideValidation: {
-    visibility: 'hidden'
+    visibility: "hidden",
   },
   showValidation: {
     color: "#9e2929",
-    marginTop: '12px'
-  }
+    marginTop: "12px",
+  },
 }));
 
 const MinistriesList = React.memo(
@@ -26,6 +29,7 @@ const MinistriesList = React.memo(
     masterProgramAreaList,
     handleUpdatedMasterProgramAreaList,
     disableInput,
+    isProactiveDisclosure = false,
   }) => {
     const classes = useStyles();
     const { ministryId } = useParams();
@@ -34,14 +38,18 @@ const MinistriesList = React.memo(
     );
     //required field validation error object
     const [isError, setError] = React.useState(false);
-
     //sets the isError to true if no program area selected by default
     useEffect(() => {
       setProgramAreaListItems(masterProgramAreaList);
       setError(
-        countOfMinistrySelected(programAreaList) !== 1 || !programAreaList.some((programArea) => (programArea.isChecked && isValidMinistryCode(programArea.bcgovcode, masterProgramAreaList)))
+        countOfMinistrySelected(programAreaList) !== 1 ||
+          !programAreaList?.some(
+            (programArea) =>
+              programArea.isChecked &&
+              isValidMinistryCode(programArea.bcgovcode, masterProgramAreaList)
+          )
       );
-    },[masterProgramAreaList, programAreaList])
+    }, [masterProgramAreaList, programAreaList]);
 
     //handle onChange event of checkbox
     const handleOnChangeProgramArea = (e) => {
@@ -63,21 +71,42 @@ const MinistriesList = React.memo(
     const countOfMinistry = countOfMinistrySelected(programAreaList);
     return (
       <div className="foi-ministries-container">
-        <h4
-          className={clsx({
-            [classes.headingError]: isError,
-            [classes.headingNormal]: !isError,
-          })}
-        >
-          Select Ministry Client *
-        </h4>
+        {isProactiveDisclosure ? (
+          <>
+            <h5
+              className={clsx({
+                [classes.headingError]: isError,
+                [classes.headingNormal]: !isError,
+              })}
+            >
+              Select Ministry Client and Public Bodies*
+            </h5>
+            <h6 className={classes.headingNormal}>
+              The ministries displayed have been compiled using data from prior
+              proactive disclosures.
+            </h6>
+          </>
+        ) : (
+          <h4
+            className={clsx({
+              [classes.headingError]: isError,
+              [classes.headingNormal]: !isError,
+            })}
+          >
+            Select Ministry Client *
+          </h4>
+        )}
         <div className="foi-ministries-checkboxes">
-          {programAreaList.map((programArea, index) => (
-            <label  id={"lbl"+programArea.iaocode}  key={index} className="check-item">
+          {programAreaList?.map((programArea, index) => (
+            <label
+              id={"lbl" + programArea.iaocode}
+              key={index}
+              className="check-item"
+            >
               <input
                 type="checkbox"
                 className="checkmark"
-                id={"selectchk"+programArea.iaocode}
+                id={"selectchk" + programArea.iaocode}
                 key={programArea.iaocode}
                 data-programareaid={programArea.programareaid}
                 onChange={handleOnChangeProgramArea}
@@ -85,7 +114,11 @@ const MinistriesList = React.memo(
                 required
                 disabled={!!ministryId || disableInput}
               />
-              <span id={"selectspan"+programArea.iaocode} key={index + 1} className="checkmark"></span>
+              <span
+                id={"selectspan" + programArea.iaocode}
+                key={index + 1}
+                className="checkmark"
+              ></span>
               {programArea.iaocode}
             </label>
           ))}
@@ -96,7 +129,8 @@ const MinistriesList = React.memo(
             [classes.hideValidation]: countOfMinistry <= 1,
           })}
         >
-          * Only Select 1 Ministry Client per request. Please deselect all expect 1 and open others as separate requests
+          * Only Select 1 Ministry Client per request. Please deselect all
+          expect 1 and open others as separate requests
         </h5>
       </div>
     );

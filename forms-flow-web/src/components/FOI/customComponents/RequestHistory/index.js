@@ -1,4 +1,4 @@
-import { useEffect, useState  } from 'react'
+import { useEffect, useState } from 'react'
 import './requesthistory.scss'
 import { getCommentTypeIdByName, getCommentTypeFromId } from "../../../../helper/FOI/helper";
 import RequestFilter from './RequestFilter';
@@ -9,6 +9,8 @@ import ExportHistory from './RequestHistoryExport/ExportHistory';
 import * as html2pdf from 'html-to-pdf-js';
 import { useDispatch } from "react-redux";
 import { saveRequestHistoryComment } from '../../../../apiManager/services/FOI/foiRequestNoteServices';
+
+import RequestHeaderRow from '../RequestHeaderRow';
 
 export const RequestHistorySection = ({
   requestHistoryArray,
@@ -28,6 +30,7 @@ export const RequestHistorySection = ({
   foiRequestCFRForm,
   applicantCorrespondence,
   requestNotes,
+  isProactiveDisclosure
 }) => {
 
   const dispatch = useDispatch();
@@ -40,70 +43,69 @@ export const RequestHistorySection = ({
   const [filterkeyValue, setfilterkeyValue] = useState("")
   const [showHistoryExportModal, setShowHistoryExportModal] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  
+
   const getTemplateName = (templateId) =>
     applicantCorrespondenceTemplates.find((obj) => obj.templateid === templateId)?.description;
-  
+
   useEffect(() => {
-    const _historybyCategory = filterHistory(); 
-    
+    const _historybyCategory = filterHistory();
+
     const _filteredHistory = filterkeyValue
       ? _historybyCategory.filter((c) => {
-          const textMatches = c.text?.toLowerCase().includes(filterkeyValue.toLowerCase());
-          const typeMatches = getCommentTypeFromId(commentTypes, c.commentTypeId)
-            ?.toLowerCase()
-            .includes(filterkeyValue.toLowerCase());
-          
-          const templateName = c.type === 'message' ? getTemplateName(c.templateid) : null;
-          const templateMatches = templateName
-            ?.toLowerCase()
-            .includes(filterkeyValue.toLowerCase());
-  
-          const responseMatches = c.category === 'response' &&
-            "applicant response".includes(filterkeyValue.toLowerCase());
-  
-          return textMatches || typeMatches || templateMatches || responseMatches;
-        })
+        const textMatches = c.text?.toLowerCase().includes(filterkeyValue.toLowerCase());
+        const typeMatches = getCommentTypeFromId(commentTypes, c.commentTypeId)
+          ?.toLowerCase()
+          .includes(filterkeyValue.toLowerCase());
+
+        const templateName = c.type === 'message' ? getTemplateName(c.templateid) : null;
+        const templateMatches = templateName
+          ?.toLowerCase()
+          .includes(filterkeyValue.toLowerCase());
+
+        const responseMatches = c.category === 'response' &&
+          "applicant response".includes(filterkeyValue.toLowerCase());
+
+        return textMatches || typeMatches || templateMatches || responseMatches;
+      })
       : _historybyCategory;
-  
+
     const filteredhistory = filterkeyinCommentsandReplies(_historybyCategory, _filteredHistory);
     sethistory(filteredhistory);
   }, [requestHistoryArray, filterkeyValue]);
-  
+
   const filterHistory = () => {
-    return requestHistoryArray.filter(c => c.commentTypeId !== getCommentTypeIdByName(commentTypes,"Ministry Internal") && 
+    return requestHistoryArray.filter(c => c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Internal") &&
       c.commentTypeId !== getCommentTypeIdByName(commentTypes, "Ministry Peer Review"))
   };
 
-  const filterkeyinCommentsandReplies = (_comments,filtercomments)=>{
-      _comments.forEach(_comment=>{
-            if(_comment.replies!=undefined && _comment.replies.length > 0 )
-            {
-                        let _filteredreply = _comment.replies.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1)
-                        let _parentcomments = filtercomments.filter(fp => fp.commentId == _comment.commentId)
+  const filterkeyinCommentsandReplies = (_comments, filtercomments) => {
+    _comments.forEach(_comment => {
+      if (_comment.replies != undefined && _comment.replies.length > 0) {
+        let _filteredreply = _comment.replies.filter(c => c.text.toLowerCase().indexOf(filterkeyValue.toLowerCase()) > -1)
+        let _parentcomments = filtercomments.filter(fp => fp.commentId == _comment.commentId)
 
-                        if(_filteredreply!=undefined && _filteredreply.length > 0 && _parentcomments.length === 0)
-                        {
-                          filtercomments.push(_comment)
-                        }
-                }
-          });
+        if (_filteredreply != undefined && _filteredreply.length > 0 && _parentcomments.length === 0) {
+          filtercomments.push(_comment)
+        }
+      }
+    });
 
     return filtercomments;
   }
 
-  const getRequestNumber = ()=>{
+  const getRequestNumber = (isProactiveDisclosure) => {
     let requestHeaderString = 'Request #'
-    if(requestNumber)
-      {
-        return requestHeaderString+requestNumber
-      }else
-      {
-        return requestHeaderString+`U-00${requestid}`
-      }  
+    if (requestNumber) {
+      if (isProactiveDisclosure)
+        return requestNumber;
+      else
+        return requestHeaderString + requestNumber
+    } else {
+      return isProactiveDisclosure ? requestid : requestHeaderString + `U-00${requestid}`
+    }
   }
 
-  const exportRequestHistory = async () =>{
+  const exportRequestHistory = async () => {
     setShowHistoryExportModal(true);
   }
   const exportSelectedHistory = async (exportOptions) => {
@@ -114,23 +116,23 @@ export const RequestHistorySection = ({
       isLoading: true,
       autoClose: 3000,
     })
-    
+
     let selectedCategory;
-    if(exportOptions.isApplicantCorrespondenceChecked && exportOptions.isCommentsChecked 
-      && exportOptions.isRequestDetailsChecked){
+    if (exportOptions.isApplicantCorrespondenceChecked && exportOptions.isCommentsChecked
+      && exportOptions.isRequestDetailsChecked) {
       selectedCategory = 'All';
     } else {
-        let tempCategory='';
-        if (exportOptions.isApplicantCorrespondenceChecked) {
-          tempCategory += 'Correspondence and ';
-        } 
-        if (exportOptions.isCommentsChecked) {
-          tempCategory += 'Comments and ';
-        }
-        if (exportOptions.isRequestDetailsChecked) {
-          tempCategory += 'Details and ';
-        }
-        selectedCategory= tempCategory.substring(0, tempCategory.length - 5);
+      let tempCategory = '';
+      if (exportOptions.isApplicantCorrespondenceChecked) {
+        tempCategory += 'Correspondence and ';
+      }
+      if (exportOptions.isCommentsChecked) {
+        tempCategory += 'Comments and ';
+      }
+      if (exportOptions.isRequestDetailsChecked) {
+        tempCategory += 'Details and ';
+      }
+      selectedCategory = tempCategory.substring(0, tempCategory.length - 5);
     }
     await exportToPDF(selectedCategory)
     toast.update(toastID, {
@@ -149,29 +151,31 @@ export const RequestHistorySection = ({
 
   // Utility function to "await" setState
   const setStateAsync = async (state) => {
-     setIsGeneratingPDF(state);
+    setIsGeneratingPDF(state);
   }
 
   const exportToPDF = async (selectedCategory) => {
     await setStateAsync(true)
-    const element =  document.getElementById("exportHistory");
-    let filenameSuffix = (requestNumber || `U-00${requestid}`)+ ' - ' + selectedCategory
+    const element = document.getElementById("exportHistory");
+    let filenameSuffix = (requestNumber || `U-00${requestid}`) + ' - ' + selectedCategory
     // Options for html2pdf
     const options = {
       margin: 5,
       filename: `Request History - ${filenameSuffix}.pdf`,
       image: { type: 'png', quality: 0.97 },
       html2canvas: { scale: 2 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress:true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
     };
-    
+
     await setStateAsync(false)
-  // Create and save the PDF
-    await html2pdf().from(element).set(options).save().then(()=>{
+    // Create and save the PDF
+    await html2pdf().from(element).set(options).save().then(() => {
       //create system generated comment
-      const res = dispatch(saveRequestHistoryComment({ "requestid": requestid, 
-        "comment": currentUser.name+" exported request history for "+selectedCategory+".", 
-        "ministryrequestid": ministryId }));
+      const res = dispatch(saveRequestHistoryComment({
+        "requestid": requestid,
+        "comment": currentUser.name + " exported request history for " + selectedCategory + ".",
+        "ministryrequestid": ministryId
+      }));
       // This set comment refreshes comments and request history section
       setComment(res)
     });
@@ -184,34 +188,34 @@ export const RequestHistorySection = ({
         closeModal={() => setShowHistoryExportModal(false)}
       />
       <div className="section">
-        <div className="foi-request-review-header-row1">
-          <div className="col-9 foi-request-number-header">
-            <h1 className="foi-review-request-text foi-ministry-requestheadertext">{getRequestNumber()}</h1>
+        <div className="row">
+          <div className={isProactiveDisclosure ? "col-12" : "col-9"}>
+            <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure} />
           </div>
-          <div className="col-2 addcommentBox">
-            <button type="button" style={{ display: 'block' }} className="btn foi-btn-create addcomment" onClick={exportRequestHistory}>Export All</button>
+          <div className={isProactiveDisclosure ? "col-3 ml-auto d-flex justify-content-end" : "col-3"}>
+            <button type="button" style={{ display: 'block' }} className="btn foi-btn-create exportAll" onClick={exportRequestHistory}>Export All</button>
           </div>
         </div>
         <div className="displayComments">
           <div className="filterComments" >
-            <RequestFilter oncommentfilterkeychange={(k)=>{setfilterkeyValue(k)}} />
+            <RequestFilter oncommentfilterkeychange={(k) => { setfilterkeyValue(k) }} />
           </div>
           <DisplayHistory requesthistory={requesthistory} bcgovcode={bcgovcode} currentUser={currentUser}
-            iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
+            iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}
             commentTypes={commentTypes} ministryId={ministryId} applicantCorrespondenceTemplates={applicantCorrespondenceTemplates} requestNumber={requestNumber}
           />
         </div>
-        {isGeneratingPDF ? 
+        {isGeneratingPDF ?
           <div id="exportHistory" className='exportHistory'>
-            <ExportHistory 
-                foiRequestCFRFormHistory={foiRequestCFRFormHistory} foiRequestCFRForm={foiRequestCFRForm} requestDetails={requestDetails} requestState={requestState} bcgovcode={bcgovcode} currentUser={currentUser}
-                iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList} 
-                commentTypes={commentTypes} ministryId={ministryId} applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
-                applicantCorrespondence={applicantCorrespondence} requestNotes={requestNotes}
-                selectedExportOptions={selectedExportOptions}
-              />
+            <ExportHistory
+              foiRequestCFRFormHistory={foiRequestCFRFormHistory} foiRequestCFRForm={foiRequestCFRForm} requestDetails={requestDetails} requestState={requestState} bcgovcode={bcgovcode} currentUser={currentUser}
+              iaoassignedToList={iaoassignedToList} ministryAssignedToList={ministryAssignedToList}
+              commentTypes={commentTypes} ministryId={ministryId} applicantCorrespondenceTemplates={applicantCorrespondenceTemplates}
+              applicantCorrespondence={applicantCorrespondence} requestNotes={requestNotes}
+              selectedExportOptions={selectedExportOptions}
+            />
           </div>
-           : null}
+          : null}
       </div>
     </>
   )

@@ -34,7 +34,8 @@ import {
     setOIPublicationStatuses,
     setOIStatuses,
     setFOICommentTypes,
-    setFOIEmailTemplates
+    setFOIEmailTemplates,
+    setFOIProactiveDisclosureCategoryList
   } from "../../../actions/FOI/foiRequestActions";
   import { fnDone, catchError } from "./foiServicesUtil";
   import UserService from "../../../services/UserService";
@@ -105,7 +106,7 @@ import {
       apiUrlGETAssignedToList = replaceUrl(replaceUrl(replaceUrl(
         API.FOI_GET_ASSIGNEDTOGROUPLIST_WITHGOVCODE_API,
         "<requesttype>",
-        requestType
+        requestType?.toLowerCase() == 'proactive disclosure'? 'general' : requestType
       ), "<curentstate>", status), "<bcgovcode>", bcgovcode);
       }     
     }
@@ -139,7 +140,7 @@ import {
       apiUrlGETAssignedToList = replaceUrl(
         API.FOI_GET_PROCESSINGTEAMLIST_API,
         "<requesttype>",
-        requestType
+        requestType?.toLowerCase() == 'proactive disclosure'? 'general' : requestType
       );
     }
     return (dispatch) => {
@@ -829,4 +830,31 @@ import {
         });
     };
   };
+
+  export const fetchFOIProactiveDisclosureCategoryList = () => {
+  const firstCategory = { "proactivedisclosurecategoryid": 0, "name": "Select a Category" };
+  return (dispatch) => {
+    httpGETRequest(API.FOI_GET_PROACTIVE_DISCLOSURE_CATEGORIES_API, {}, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          const foiRequestCategoryList = res.data;
+          let data = foiRequestCategoryList.map((category) => {
+            return { ...category };
+          });
+          data.unshift(firstCategory);
+          dispatch(setFOIProactiveDisclosureCategoryList(data));
+          dispatch(setFOILoader(false));
+        } else {
+          console.log("Error while fetching proactive disclosure category master data", res);
+          dispatch(serviceActionError(res));
+          dispatch(setFOILoader(false));
+        }
+      })
+      .catch((error) => {
+        console.log("Error while fetching proactive disclosure category master data", error);
+        dispatch(serviceActionError(error));
+        dispatch(setFOILoader(false));
+      });
+  };
+};
   

@@ -19,6 +19,8 @@ import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import InputAdornment from "@mui/material/InputAdornment";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
 
 import OutlinedInput from "@mui/material/OutlinedInput";
 import InputLabel from "@mui/material/InputLabel";
@@ -33,11 +35,9 @@ import {
 import { ActionContext } from "./ActionContext";
 import { StateEnum } from "../../../../../constants/FOI/statusEnum";
 
-import Tooltip from '../../../customComponents/Tooltip/Tooltip';
+import Tooltip from "../../../customComponents/Tooltip/Tooltip";
 
-import {
-  addYears
-} from "../../utils";
+import { addYears } from "../../utils";
 
 const DEFAULT_PAGE_SIZE = 100;
 
@@ -97,39 +97,50 @@ const AdvancedSearch = ({ userDetail }) => {
     setHistoricalSearchComponentLoading,
     setHistoricalSearchLoading,
     historicSearchParams,
-    defaultHistoricSearchSortModel
-
+    defaultHistoricSearchSortModel,
   } = useContext(ActionContext);
 
   const programAreaList = useSelector(
-    (state) => state.foiRequests.foiProgramAreaList
+    (state) => state.foiRequests.foiProgramAreaList,
   );
 
   const isLoading = useSelector((state) => state.foiRequests.isLoading);
 
   const tooltipContentRight = {
-    "title": "Advanced Search",
-    "content": "To conduct an Advanced Search using one of the seven filter buttons, you must also enter one or more key words."
+    title: "Advanced Search",
+    content:
+      "To conduct an Advanced Search using one of the seven filter buttons, you must also enter one or more key words.",
   };
 
   const tooltipContentLeft = {
-    "title": "Advanced Search",
-    "content": "Use one or more fields from the following sections on their own or to narrow your search: Request State/Status/Type/Flags, Date Range, or Public Body."
+    title: "Advanced Search",
+    content:
+      "Use one or more fields from the following sections on their own or to narrow your search: Request State/Status/Type/Flags, Date Range, or Public Body.",
   };
 
-
-  const [searchFilterSelected, setSearchFilterSelected] = useState(advancedSearchParams?.search || SearchFilter.ID_NUM);
-  const keywordsMode = searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION;
+  const [searchFilterSelected, setSearchFilterSelected] = useState(
+    advancedSearchParams?.search || SearchFilter.ID_NUM,
+  );
+  const keywordsMode =
+    searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION;
 
   const [searchText, setSearchText] = useState(() => {
-    if (!keywordsMode && Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.keywords.length > 0) {
-      return advancedSearchParams.keywords[0]
+    if (
+      !keywordsMode &&
+      Object.keys(advancedSearchParams).length > 0 &&
+      advancedSearchParams.keywords.length > 0
+    ) {
+      return advancedSearchParams.keywords[0];
     } else {
       return "";
     }
   });
   const [keywords, setKeywords] = useState(() => {
-    if (keywordsMode && Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.keywords.length > 0) {
+    if (
+      keywordsMode &&
+      Object.keys(advancedSearchParams).length > 0 &&
+      advancedSearchParams.keywords.length > 0
+    ) {
       return advancedSearchParams.keywords;
     } else {
       return [];
@@ -144,15 +155,18 @@ const AdvancedSearch = ({ userDetail }) => {
     [StateEnum.signoff.label]: false,
     [StateEnum.closed.label]: false,
     [StateEnum.callforrecordsoverdue.label]: false,
-    [StateEnum.onholdother.label]: false
+    [StateEnum.onholdother.label]: false,
   };
 
   const [requestState, setRequestState] = useState(() => {
-    if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestState.length > 0) {
-          return advancedSearchParams.requestState;
-        } else {
-          return [];
-        }
+    if (
+      Object.keys(advancedSearchParams).length > 0 &&
+      advancedSearchParams.requestState.length > 0
+    ) {
+      return advancedSearchParams.requestState;
+    } else {
+      return [];
+    }
   });
 
   const intitialRequestStatus = {
@@ -160,9 +174,12 @@ const AdvancedSearch = ({ userDetail }) => {
     ontime: false,
   };
   const [requestStatus, setRequestStatus] = useState(() => {
-    if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestStatus.length > 0) {
-      let savedRequestStatus = {...intitialRequestStatus}
-      advancedSearchParams.requestStatus.forEach(status => {
+    if (
+      Object.keys(advancedSearchParams).length > 0 &&
+      advancedSearchParams.requestStatus.length > 0
+    ) {
+      let savedRequestStatus = { ...intitialRequestStatus };
+      advancedSearchParams.requestStatus.forEach((status) => {
         savedRequestStatus[status] = true;
       });
       return savedRequestStatus;
@@ -174,11 +191,15 @@ const AdvancedSearch = ({ userDetail }) => {
   const initialRequestTypes = {
     personal: false,
     general: false,
+    proactivedisclosure: false,
   };
   const [requestTypes, setRequestTypes] = useState(() => {
-    if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestType.length > 0) {
-      let savedRequestType = {...initialRequestTypes}
-      advancedSearchParams.requestType.forEach(type => {
+    if (
+      Object.keys(advancedSearchParams).length > 0 &&
+      advancedSearchParams.requestType.length > 0
+    ) {
+      let savedRequestType = { ...initialRequestTypes };
+      advancedSearchParams.requestType.forEach((type) => {
         savedRequestType[type] = true;
       });
       return savedRequestType;
@@ -190,12 +211,15 @@ const AdvancedSearch = ({ userDetail }) => {
   const initialRequestFlags = {
     restricted: false,
     oipc: false,
-    phased: false
+    phased: false,
   };
   const [requestFlags, setRequestFlags] = useState(() => {
-    if (Object.keys(advancedSearchParams).length > 0 && advancedSearchParams.requestFlags.length > 0) {
-      let savedRequestFlags = {...initialRequestFlags}
-      advancedSearchParams.requestFlags.forEach(type => {
+    if (
+      Object.keys(advancedSearchParams).length > 0 &&
+      advancedSearchParams.requestFlags.length > 0
+    ) {
+      let savedRequestFlags = { ...initialRequestFlags };
+      advancedSearchParams.requestFlags.forEach((type) => {
         savedRequestFlags[type] = true;
       });
       return savedRequestFlags;
@@ -204,8 +228,12 @@ const AdvancedSearch = ({ userDetail }) => {
     }
   });
 
-  const [selectedDateRangeType, setSelectedDateRangeType] = useState(advancedSearchParams?.dateRangeType || "");
-  const [fromDate, setFromDate] = useState(advancedSearchParams?.fromDate || "");
+  const [selectedDateRangeType, setSelectedDateRangeType] = useState(
+    advancedSearchParams?.dateRangeType || "",
+  );
+  const [fromDate, setFromDate] = useState(
+    advancedSearchParams?.fromDate || "",
+  );
   const [toDate, setToDate] = useState(advancedSearchParams?.toDate || "");
   const oneYearFromNow = formatDate(addYears(1));
   //default max fromDate - now
@@ -215,23 +243,25 @@ const AdvancedSearch = ({ userDetail }) => {
   const resetDateFields = () => {
     setFromDate("");
     setToDate("");
-  }
+  };
   const resetMaxFromDate = (dateRangeType) => {
-    if(dateRangeType == 'receivedDate' || dateRangeType == 'closedate') {
+    if (dateRangeType == "receivedDate" || dateRangeType == "closedate") {
       setMaxFromDate(formatDate(new Date()));
-    }else{
+    } else {
       setMaxFromDate(oneYearFromNow);
     }
-  }
+  };
   const resetMaxToDate = (dateRangeType) => {
-    if(dateRangeType == 'receivedDate' || dateRangeType == 'closedate') {
+    if (dateRangeType == "receivedDate" || dateRangeType == "closedate") {
       setMaxToDate(formatDate(new Date()));
-    }else{
+    } else {
       setMaxToDate(oneYearFromNow);
     }
-  }
+  };
 
-  const [selectedPublicBodies, setSelectedPublicBodies] = useState(advancedSearchParams?.publicBodies || []);
+  const [selectedPublicBodies, setSelectedPublicBodies] = useState(
+    advancedSearchParams?.publicBodies || [],
+  );
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl) && Boolean(searchText);
@@ -247,7 +277,6 @@ const AdvancedSearch = ({ userDetail }) => {
       .filter((value) => value);
   };
   const handleApplySearchFilters = () => {
-
     if (!advancedSearchComponentLoading) {
       setAdvancedSearchComponentLoading(true);
     }
@@ -255,7 +284,7 @@ const AdvancedSearch = ({ userDetail }) => {
     handleUpdateSearchFilter({
       search: searchFilterSelected,
       keywords: keywordsMode ? keywords : [searchText.trim()],
-      requestState: requestState.filter(s => s !== 'All'),
+      requestState: requestState.filter((s) => s !== "All"),
       requestType: getTrueKeysFromCheckboxObject(requestTypes),
       requestFlags: getTrueKeysFromCheckboxObject(requestFlags),
       requestStatus: getTrueKeysFromCheckboxObject(requestStatus),
@@ -267,12 +296,10 @@ const AdvancedSearch = ({ userDetail }) => {
       size: advancedSearchParams?.size || DEFAULT_PAGE_SIZE,
       sort: defaultSortModel,
       userId: userDetail.preferred_username,
-    });    
-
+    });
   };
 
-  const handleApplyHistoricSearchFilters = () =>{
-
+  const handleApplyHistoricSearchFilters = () => {
     //HISTORICAL SEARCH
     if (!historicalSearchComponentLoading) {
       setHistoricalSearchComponentLoading(true);
@@ -281,7 +308,7 @@ const AdvancedSearch = ({ userDetail }) => {
     handleUpdateHistoricSearchFilter({
       search: searchFilterSelected,
       keywords: keywordsMode ? keywords : [searchText.trim()],
-      requestState: requestState.filter(s => s !== 'All'),
+      requestState: requestState.filter((s) => s !== "All"),
       requestType: getTrueKeysFromCheckboxObject(requestTypes),
       requestFlags: getTrueKeysFromCheckboxObject(requestFlags),
       requestStatus: getTrueKeysFromCheckboxObject(requestStatus),
@@ -294,46 +321,46 @@ const AdvancedSearch = ({ userDetail }) => {
       sort: defaultHistoricSearchSortModel,
       userId: userDetail.preferred_username,
     });
+  };
 
-  }
-
-   const handleSearch = () =>{
+  const handleSearch = () => {
     handleApplySearchFilters();
     handleApplyHistoricSearchFilters();
-   }
+  };
 
   useEffect(() => {
     if (Object.keys(advancedSearchParams).length > 0) {
-        if (!advancedSearchComponentLoading) {
-          setAdvancedSearchComponentLoading(true);
-        }
-        setSearchLoading(true);
-        handleUpdateSearchFilter(advancedSearchParams)
-      } 
+      if (!advancedSearchComponentLoading) {
+        setAdvancedSearchComponentLoading(true);
+      }
+      setSearchLoading(true);
+      handleUpdateSearchFilter(advancedSearchParams);
+    }
 
-      if (Object.keys(historicSearchParams).length > 0) {
-        if (!historicalSearchComponentLoading) {
-          setAdvancedSearchComponentLoading(true);
-        }
-        setHistoricalSearchLoading(true);
-        handleUpdateHistoricSearchFilter(historicSearchParams)
-      } 
-
-
+    if (Object.keys(historicSearchParams).length > 0) {
+      if (!historicalSearchComponentLoading) {
+        setAdvancedSearchComponentLoading(true);
+      }
+      setHistoricalSearchLoading(true);
+      handleUpdateHistoricSearchFilter(historicSearchParams);
+    }
   }, []);
 
   const noSearchCriteria = () => {
     let selectedRequestTypes = getTrueKeysFromCheckboxObject(requestTypes);
     let selectedRequestFlags = getTrueKeysFromCheckboxObject(requestFlags);
     let selectedRequestStatus = getTrueKeysFromCheckboxObject(requestStatus);
-    return ((keywords.length===0 && keywordsMode) || (!searchText && !keywordsMode))
-              && !fromDate
-              && !toDate
-              && selectedPublicBodies.length===0
-              && requestState.length===0
-              && selectedRequestTypes.length===0
-              && selectedRequestFlags.length===0
-              && selectedRequestStatus.length===0;
+    return (
+      ((keywords.length === 0 && keywordsMode) ||
+        (!searchText && !keywordsMode)) &&
+      !fromDate &&
+      !toDate &&
+      selectedPublicBodies.length === 0 &&
+      requestState.length === 0 &&
+      selectedRequestTypes.length === 0 &&
+      selectedRequestFlags.length === 0 &&
+      selectedRequestStatus.length === 0
+    );
   };
 
   const handleResetSearchFilters = () => {
@@ -349,7 +376,6 @@ const AdvancedSearch = ({ userDetail }) => {
     setToDate("");
     setSelectedPublicBodies([]);
   };
-
 
   const handleKeywordAdd = () => {
     if (!searchText) {
@@ -374,15 +400,26 @@ const AdvancedSearch = ({ userDetail }) => {
   const handleRequestStateChange = (event) => {
     if (event.target.value.includes("All")) {
       if (!requestState.includes("All")) {
-        setRequestState([...Object.entries(StateEnum).map(([key, value]) => value.label), "All"])
-      } else if (event.target.value.length < (Object.entries(StateEnum).length + 1)) {
-        setRequestState(event.target.value.filter(s => s !== 'All'))
+        setRequestState([
+          ...Object.entries(StateEnum).map(([key, value]) => value.label),
+          "All",
+        ]);
+      } else if (
+        event.target.value.length <
+        Object.entries(StateEnum).length + 1
+      ) {
+        setRequestState(event.target.value.filter((s) => s !== "All"));
       }
     } else if (!event.target.value.includes("All")) {
       if (requestState.includes("All")) {
-        setRequestState([])
-      } else if (event.target.value.length === (Object.entries(StateEnum).length)) {
-        setRequestState([...Object.entries(StateEnum).map(([key, value]) => value.label), "All"])
+        setRequestState([]);
+      } else if (
+        event.target.value.length === Object.entries(StateEnum).length
+      ) {
+        setRequestState([
+          ...Object.entries(StateEnum).map(([key, value]) => value.label),
+          "All",
+        ]);
       } else {
         setRequestState(event.target.value);
       }
@@ -424,20 +461,30 @@ const AdvancedSearch = ({ userDetail }) => {
     } = event;
     setSelectedPublicBodies(
       // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : getMappedMinistriesValue(value)
+      typeof value === "string"
+        ? value.split(",")
+        : getMappedMinistriesValue(value),
     );
   };
 
   const getMappedMinistriesValue = (ministries) => {
-    const selected = new Set(selectedPublicBodies)
-    const mapped = new Set(Object.keys(MappedMinistries))
-    var newministries = new Set(ministries)
-    const unselected = selected.difference(newministries)
+    const selected = new Set(selectedPublicBodies);
+    const mapped = new Set(Object.keys(MappedMinistries));
+    var newministries = new Set(ministries);
+    const unselected = selected.difference(newministries);
     if (unselected.size > 0 && mapped.intersection(unselected).size > 0) {
-      newministries = selected.difference(new Set(MappedMinistries[[...unselected][0]]))
+      newministries = selected.difference(
+        new Set(MappedMinistries[[...unselected][0]]),
+      );
     }
-    return [... new Set([...newministries].flatMap(ministry => MappedMinistries[ministry] || [ministry]))]
-  }
+    return [
+      ...new Set(
+        [...newministries].flatMap(
+          (ministry) => MappedMinistries[ministry] || [ministry],
+        ),
+      ),
+    ];
+  };
 
   const ClickableChip = ({ clicked, ...rest }) => {
     if (!clicked) {
@@ -588,82 +635,105 @@ const AdvancedSearch = ({ userDetail }) => {
                   }}
                   variant="h6"
                 >
-                  Filter by
+                  Filter your search by:
                 </Typography>
               </Grid>
-              <Grid container xs={12}>
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-request-description`}
-                    label={"REQUEST DESCRIPTION"}
-                    color="primary"
-                    onClick={() =>
-                      clickSearchFilter(SearchFilter.REQUEST_DESCRIPTION)
+              <Grid container xs={12} sx={{ mt: 1, paddingLeft: "16px" }}>
+                <RadioGroup
+                  row
+                  name="search-filter-radio-group"
+                  value={searchFilterSelected}
+                  onChange={(e) => clickSearchFilter(e.target.value)}
+                  sx={{
+                    width: "100%",
+                    columnGap: "40px",
+                    "& .MuiFormControlLabel-label": {
+                      color: "#013366",
+                      //fontWeight: 500,
+                      //fontSize: "15px",
+                    },
+                  }}
+                >
+                  <FormControlLabel
+                    value={SearchFilter.ID_NUM}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
                     }
-                    clicked={
-                      searchFilterSelected === SearchFilter.REQUEST_DESCRIPTION
+                    label="ID Number"
+                  />
+                  <FormControlLabel
+                    value={SearchFilter.REQUEST_DESCRIPTION}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
                     }
+                    label="Request Description"
                   />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-raw-request`}
-                    label={"ID NUMBER"}
-                    color="primary"
-                    onClick={() => clickSearchFilter(SearchFilter.ID_NUM)}
-                    clicked={searchFilterSelected === SearchFilter.ID_NUM}
-                  />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-applicant-name`}
-                    label={"APPLICANT NAME"}
-                    color="primary"
-                    onClick={() =>
-                      clickSearchFilter(SearchFilter.APPLICANT_NAME)
+                  <FormControlLabel
+                    value={SearchFilter.APPLICANT_NAME}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
                     }
-                    clicked={
-                      searchFilterSelected === SearchFilter.APPLICANT_NAME
+                    label="Applicant Name"
+                  />
+                  <FormControlLabel
+                    value={SearchFilter.ASSIGNEE_NAME}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
                     }
+                    label="Assignee Name"
                   />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-assignee-name`}
-                    label={"ASSIGNEE NAME"}
-                    color="primary"
-                    onClick={() =>
-                      clickSearchFilter(SearchFilter.ASSIGNEE_NAME)
+                  <FormControlLabel
+                    value={SearchFilter.SUBJECT_CODE}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
                     }
-                    clicked={
-                      searchFilterSelected === SearchFilter.ASSIGNEE_NAME
+                    label="Subject Code"
+                  />
+                  <FormControlLabel
+                    value={SearchFilter.OIPC_NUMBER}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
                     }
+                    label="OIPC Number"
                   />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-search-filter`}
-                    label={"SUBJECT CODE"}
-                    color="primary"
-                    onClick={() => clickSearchFilter(SearchFilter.SUBJECT_CODE)}
-                    clicked={searchFilterSelected === SearchFilter.SUBJECT_CODE}
-                  />
-                </Grid>
-
-                <Grid item xs>
-                  <ClickableChip
-                    key={`filter-oipc-number`}
-                    label={"OIPC NUMBER"}
-                    color="primary"
-                    onClick={() => clickSearchFilter(SearchFilter.OIPC_NUMBER)}
-                    clicked={searchFilterSelected === SearchFilter.OIPC_NUMBER}
-                  />
-                </Grid>
-              </Grid>              
+                </RadioGroup>
+              </Grid>
 
               <Grid item xs={6} container direction="row" spacing={2}>
                 <Grid item xs={12}>
@@ -690,43 +760,49 @@ const AdvancedSearch = ({ userDetail }) => {
                       value={requestState}
                       onChange={handleRequestStateChange}
                       inputProps={{ "aria-labelledby": "request-state-label" }}
-                      input={
-                        <OutlinedInput label="Request State" notched />
-                      }
+                      input={<OutlinedInput label="Request State" notched />}
                       renderValue={(selected) => {
                         if (selected.length === 0) {
                           return <em>All</em>;
                         }
 
-                        return selected.filter(s => s !== 'All').map(value => Object.values(StateEnum).find(state => state.label === value).name).join(", ");
+                        return selected
+                          .filter((s) => s !== "All")
+                          .map(
+                            (value) =>
+                              Object.values(StateEnum).find(
+                                (state) => state.label === value,
+                              ).name,
+                          )
+                          .join(", ");
                       }}
                     >
                       <MenuItem value="All" key="request-state-all">
-                          <Checkbox
-                            checked={
-                              requestState.indexOf("All") > -1
-                            }
-                            color="success"
-                          />
+                        <Checkbox
+                          checked={requestState.indexOf("All") > -1}
+                          color="success"
+                        />
                         <em>All</em>
                       </MenuItem>
-                      {Object.entries(StateEnum).filter(([key, value]) => key !== 'callforrecordsoverdue').map(([key, value]) => (
-                        <MenuItem
-                          key={`request-state-type-${key}`}
-                          value={value.label}
-                        >
-                          <Checkbox
-                            checked={
-                              requestState.indexOf(value.label) > -1
-                            }
-                            color="success"
-                          />
-                          <ListItemText
-                            primary={value.name}
-                            key={`request-state-label-${key}`}
-                          />
-                        </MenuItem>
-                      ))}
+                      {Object.entries(StateEnum)
+                        .filter(
+                          ([key, value]) => key !== "callforrecordsoverdue",
+                        )
+                        .map(([key, value]) => (
+                          <MenuItem
+                            key={`request-state-type-${key}`}
+                            value={value.label}
+                          >
+                            <Checkbox
+                              checked={requestState.indexOf(value.label) > -1}
+                              color="success"
+                            />
+                            <ListItemText
+                              primary={value.name}
+                              key={`request-state-label-${key}`}
+                            />
+                          </MenuItem>
+                        ))}
                     </Select>
                   </FormControl>
                 </Grid>
@@ -811,6 +887,19 @@ const AdvancedSearch = ({ userDetail }) => {
                           />
                         }
                         label="General"
+                      />
+                      <FormControlLabel
+                        className={classes.checkboxLabel}
+                        control={
+                          <Checkbox
+                            size="small"
+                            name="proactivedisclosure"
+                            onChange={handleRequestTypeChange}
+                            checked={requestTypes.proactivedisclosure}
+                            color="success"
+                          />
+                        }
+                        label="Proactive Disclosure"
                       />
                     </FormGroup>
                   </Grid>
@@ -1019,25 +1108,27 @@ const AdvancedSearch = ({ userDetail }) => {
                       <MenuItem disabled value="" key="program-area-all">
                         <em>All</em>
                       </MenuItem>
-                      {programAreaList.sort((a, b) => a.name.localeCompare(b.name)).map((programArea) => (
-                        <MenuItem
-                          key={`program-area-${programArea.programareaid}`}
-                          value={programArea.bcgovcode}
-                        >
-                          <Checkbox
-                            checked={
-                              selectedPublicBodies.indexOf(
-                                programArea.bcgovcode
-                              ) > -1
-                            }
-                            color="success"
-                          />
-                          <ListItemText
-                            primary={programArea.name}
-                            key={`program-area-label-${programArea.programareaid}`}
-                          />
-                        </MenuItem>
-                      ))}
+                      {programAreaList
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((programArea) => (
+                          <MenuItem
+                            key={`program-area-${programArea.programareaid}`}
+                            value={programArea.bcgovcode}
+                          >
+                            <Checkbox
+                              checked={
+                                selectedPublicBodies.indexOf(
+                                  programArea.bcgovcode,
+                                ) > -1
+                              }
+                              color="success"
+                            />
+                            <ListItemText
+                              primary={programArea.name}
+                              key={`program-area-label-${programArea.programareaid}`}
+                            />
+                          </MenuItem>
+                        ))}
                     </Select>
                   </FormControl>
                 </Grid>

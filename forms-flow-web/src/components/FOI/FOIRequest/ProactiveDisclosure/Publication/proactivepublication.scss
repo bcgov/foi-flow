@@ -1,0 +1,91 @@
+.pd-pdf-download-btn {
+    background-color: #013366 !important;
+    width: fit-content !important;
+    margin-bottom: 30px !important;
+    color: #FFFFFF !important;
+    border-radius: 5px !important;
+}
+
+.pd-pdf-download-btn:hover {
+    background-color: #013366 !important;
+    color: #FFFFFF !important;
+}
+
+.foi-publication-info-box {
+    background-color: #eef6fb;
+    padding: 15px;
+    border: 1px solid #38598a;
+    border-radius: 4px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+
+    .info-icon {
+        color: #38598a;
+        font-size: 20px;
+        margin-top: 2px;
+    }
+
+    .info-title {
+        font-weight: bold;
+        display: block;
+        color: #474543;
+        margin-bottom: 4px;
+    }
+
+    .info-description {
+        color: #474543;
+        font-size: 14px;
+    }
+}
+
+.pd-publication-files-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .files-heading {
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+
+    .files-description {
+        margin-bottom: 15px;
+    }
+
+    .download-icon {
+        margin-right: 8px;
+    }
+}
+
+.pd-file-upload-section {
+    padding: 20px;
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    background-color: #fafafa;
+
+    .file-upload-row {
+        margin: 0;
+        width: 100%;
+        display: flex;
+        align-items: center;
+
+        &.justify-start {
+            justify-content: flex-start;
+        }
+
+        &.justify-between {
+            justify-content: space-between;
+        }
+    }
+
+    .file-upload-col-grow {
+        flex-grow: 1;
+    }
+
+    .drag-drop-text {
+        color: #666;
+        font-style: italic;
+    }
+}

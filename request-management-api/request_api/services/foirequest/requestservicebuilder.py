@@ -17,6 +17,7 @@ from request_api.utils.enums import MinistryTeamWithKeycloackGroup, StateName
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
 from request_api.services.foirequest.requestserviceministrybuilder import requestserviceministrybuilder
 from request_api.services.openinfoservice import openinfoservice
+from request_api.models.FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 
 
 import json
@@ -25,8 +26,9 @@ class requestservicebuilder(requestserviceconfigurator):
     """
 
     def createministry(self, requestschema, ministry, activeversion, userid, filenumber=None, ministryid=None):
+        #print("\n-------requestschema-",requestschema)
         programareaiaocode = self.getprogramareaiaocodebyid(self.getvalueof("programArea",ministry["code"]))
-        axisrequestid = requestschema.get("axisRequestId", FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("isconsultflag")))
+        axisrequestid = requestschema.get("axisRequestId", FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("requestType"), requestschema.get("isconsultflag")))
         current_foiministryrequest = FOIMinistryRequest.getrequest(ministryid)
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.__dict__.update(ministry)
@@ -49,8 +51,6 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.estimatedtaggedpagecount = requestschema.get("estimatedtaggedpagecount")
         if requestschema.get("isoipcreview") is not None and requestschema.get("isoipcreview")  != "":
             foiministryrequest.isoipcreview = requestschema.get("isoipcreview")
-            foiministryrequest.oipcreviews = self.prepareoipc(requestschema, ministryid, activeversion, userid)
-
         if requestschema.get("isphasedrelease") is not None and requestschema.get("isphasedrelease")  != "":
             foiministryrequest.isphasedrelease = requestschema.get("isphasedrelease")
         if requestschema.get("isconsultflag") is not None and requestschema.get("isconsultflag")  != "":
@@ -63,6 +63,7 @@ class requestservicebuilder(requestserviceconfigurator):
             startdate = requestschema.get("startDate")
         elif (requestschema.get("requestProcessStart") is not None):
             startdate = requestschema.get("requestProcessStart")
+        
         foiministryrequest.startdate = startdate
         foiministryrequest.createdby = userid
         requeststatuslabel =  self.getpropertyvaluefromschema(requestschema, 'requeststatuslabel')
@@ -76,6 +77,11 @@ class requestservicebuilder(requestserviceconfigurator):
         self.__updateassignedtoandgroup(foiministryrequest, requestschema, ministry, status, filenumber, ministryid)
         self.__updateministryassignedtoandgroup(foiministryrequest, requestschema, ministry, status)
 
+        if requestschema.get("requestType") == "proactive disclosure":
+            foiministryrequest.duedate = requestschema.get("cfrDueDate")
+            foiministryrequest.proactivedisclosures = self._prepareproactivedisclosuredetails(requestschema, userid, ministryid, activeversion)
+
+        #print("foiministryrequest-proactivedisclosures",foiministryrequest.proactivedisclosures)
         if ministryid is not None:
             foiministryrequest.foiministryrequestid = ministryid
             activeversion = FOIMinistryRequest.getversionforrequest(ministryid)[0]+1
@@ -88,7 +94,8 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.version = activeversion
         oistatusid = self.getpropertyvaluefromschema(requestschema, 'oistatusid')
         foiministryrequest.oistatus_id = oistatusid
-
+        # foiministryrequest_dict = foiministryrequest.__dict__
+        # print("foiministryrequest in createministry:",foiministryrequest_dict)
         # First instance of FOIOpeninformation data is created either when: A) An exemption request is created via "Publication Tab" B) A request is closed and no exemption request has been made previously
         if 'closereasonid' in requestschema and ministryid is not None:
             current_foiopeninforequest = openinfoservice().getcurrentfoiopeninforequest(ministryid)
@@ -216,8 +223,25 @@ class requestservicebuilder(requestserviceconfigurator):
                 oipcreview.createdby=userid
                 oipcreview.created_at= datetime2.now().isoformat()
                 oipcarr.append(oipcreview)
-            return oipcarr
+            #print("\noipcarr",oipcarr)
+        return oipcarr
         
+    
+    def _prepareproactivedisclosuredetails(self, foirequestschema, userid,ministryid,version):
+        proactivedisclosurearr = []
+            #for pd in foirequestschema['proactivedisclosuredetails']:
+        proactivedisclosure = FOIProactiveDisclosureRequests()
+        proactivedisclosure.foiministryrequest_id = ministryid
+        proactivedisclosure.foiministryrequestversion_id=version
+        proactivedisclosure.created_at=datetime2.now().isoformat()
+        proactivedisclosure.createdby=userid
+        proactivedisclosure.publicationdate=foirequestschema["publicationdate"]
+        proactivedisclosure.reportperiod=foirequestschema["reportperiod"] if 'reportperiod' in foirequestschema else ""
+        if requestservicebuilder().isNotBlankorNone(foirequestschema,"proactivedisclosurecategory","main") == True:
+            proactivedisclosure.proactivedisclosurecategoryid = requestserviceconfigurator().getvalueof("proactiveDisclosureCategory",foirequestschema["proactivedisclosurecategory"])
+        proactivedisclosurearr.append(proactivedisclosure)
+        return proactivedisclosure 
+    
     def __formatoipcattributes(self, inquiryattributes):
         if inquiryattributes not in (None, "") and inquiryattributes["inquirydate"] in ("","null"):
             inquiryattributes["inquirydate"] = None

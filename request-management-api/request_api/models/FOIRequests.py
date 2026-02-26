@@ -16,7 +16,7 @@ class FOIRequest(db.Model):
     # Defining the columns
     foirequestid = db.Column(db.Integer, primary_key=True,autoincrement=True)
     version = db.Column(db.Integer, primary_key=True,nullable=False)
-    requesttype = db.Column(db.String(15), unique=False, nullable=False)
+    requesttype = db.Column(db.String(30), unique=False, nullable=False)
     receiveddate = db.Column(db.DateTime, default=datetime.now)
     isactive = db.Column(db.Boolean, unique=False, nullable=False,default=True)
 
@@ -53,10 +53,7 @@ class FOIRequest(db.Model):
                         "FOIRequest.version==FOIRequestPersonalAttribute.foirequestversion_id)")
     
     requestApplicants = relationship('FOIRequestApplicantMapping', primaryjoin="and_(FOIRequest.foirequestid==FOIRequestApplicantMapping.foirequest_id, "
-                        "FOIRequest.version==FOIRequestApplicantMapping.foirequestversion_id)")
-    
-
-
+                        "FOIRequest.version==FOIRequestApplicantMapping.foirequestversion_id)")  
    
     
     @classmethod

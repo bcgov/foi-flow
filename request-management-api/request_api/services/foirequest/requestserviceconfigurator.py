@@ -7,6 +7,7 @@ from request_api.models.ReceivedModes import ReceivedMode
 from request_api.models.ApplicantCategories import ApplicantCategory
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.SubjectCodes import SubjectCode
+from request_api.models.ProactiveDisclosureCategories import ProactiveDisclosureCategory
 from enum import Enum
 import datetime 
 import secrets
@@ -38,6 +39,13 @@ class requestserviceconfigurator:
         elif name == "subjectCode":
             subjectcode = SubjectCode().getsubjectcodebyname(key)
             return subjectcode["subjectcodeid"] if subjectcode is not None else None
+        elif name == "proactiveDisclosureCategory":
+            pdcategory = ProactiveDisclosureCategory().getproactivedisclosurecategory(key)
+            return pdcategory["proactivedisclosurecategoryid"]
+
+    def getprogramareaiaocodebyid(self, programareaid):
+        programarea = ProgramArea().getprogramareabyid(programareaid)
+        return programarea['iaocode']
 
     def getprogramareaiaocodebyid(self, programareaid):
         programarea = ProgramArea().getprogramareabyid(programareaid)

@@ -1,18 +1,18 @@
-
-
 .foi-request-review-header-row1 {
     display: flex;
 }
-.foi-request-review-header-col1{
+
+.foi-request-review-header-col1 {
     display: block;
-    
+
 }
+
 .foi-request-status {
-   //font-family: "BCSans-Regular", sans-serif;
+    //font-family: "BCSans-Regular", sans-serif;
     background-color: black;
     color: white;
     width: fit-content;
-    margin-top: 10px;    
+    margin-top: 10px;
     padding: 3px 25px;
     text-transform: capitalize;
 }
@@ -22,29 +22,32 @@
     width: fit-content;
     background-color: #008000;
     color: #FFFFFF;
-    margin-top: 10px;    
+    margin-top: 10px;
     padding: 3px 25px;
     text-transform: capitalize;
 }
+
 .foi-request-review-header-col1-row {
     display: inline-flex;
     height: fit-content;
 }
 
 .foi-review-request-text {
-   font-family: "BCSans-Bold", sans-serif!important;
-    color: #036 ;
+    font-family: "BCSans-Bold", sans-serif !important;
+    color: #036;
+    font-size: 25px;
 }
 
 .foi-period-text {
-   font-family: "BCSans-Bold", sans-serif!important;
-    color: #036 ;
+    font-family: "BCSans-Bold", sans-serif !important;
+    color: #036;
     padding-left: 10px;
     padding-right: 10px;
 
 }
+
 .foi-correspondence-text {
-   font-family: "BCSans-Bold", sans-serif!important;
+    font-family: "BCSans-Bold", sans-serif !important;
     color: #49648d;
 }
 
@@ -59,23 +62,84 @@
     min-width: 350px;
     //margin-right: 8px;
 }
+
 .foi-assigned-to-inner-container .makeStyles-item-35 {
     padding-right: 24px !important;
 }
 
 .foi-assignee-dropdown {
-    //display: inline-block;
-    margin-top: 5px;
     min-width: 350px;
     float: right;
+    //width: 100%;
+
+    &.stacked {
+        margin-top: 0;
+        float: none;
+    }
 }
 
 .axis-request-id {
     margin-top: 20px !important;
 }
 
+
 @media (max-width: 1242px) {
     .foi-request-review-header-col1-row {
-        display:block;
+        display: block;
     }
+}
+
+.foi-request-header-card {
+    background-color: #F1F8FE;
+    border-radius: 6px;
+    padding: 20px 30px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #1E5189;
+    margin-top: 15px;
+}
+
+.foi-request-number-header-pd {
+    margin: 0;
+}
+
+.foi-request-number-text {
+    font-family: "BCSans-Bold", sans-serif !important;
+    font-size: 2.2rem;
+    color: #2D2D2D;
+    margin: 0;
+    font-weight: 700;
+}
+
+.btn-calendar {
+    color: #003366;
+    border: 1px solid #003366;
+    text-transform: none;
+    font-family: "BCSans-Bold", sans-serif !important;
+    font-weight: bold;
+    background-color: white;
+    padding: 8px 20px;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background-color: #f0f5fa;
+    }
+
+    svg {
+        font-size: 1.2rem;
+    }
+}
+
+.foi-assigned-to-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }

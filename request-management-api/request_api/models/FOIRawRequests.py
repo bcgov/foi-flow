@@ -23,6 +23,7 @@ import json
 import copy
 from request_api.utils.enums import StateName
 from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
+from .FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 from request_api.models.ProgramAreas import ProgramArea
 from os import getenv
 
@@ -62,8 +63,10 @@ class FOIRawRequest(db.Model):
     assignee = relationship('FOIAssignee', foreign_keys="[FOIRawRequest.assignedto]")
 
     @classmethod
-    def generaterequestid(cls, foirawrequestid: int, programareaiaocode: str, isconsultflag: bool):
+    def generaterequestid(cls, foirawrequestid: int, programareaiaocode: str, requesttype: str, isconsultflag: bool):
         baserequestid = f'{programareaiaocode}-{datetime.now().year}-{str(foirawrequestid).zfill(6)}'
+        if requesttype == "proactive disclosure":
+            return 'PD-'+baserequestid
         if isconsultflag:
             return baserequestid + '-CON'
         return baserequestid
@@ -82,7 +85,8 @@ class FOIRawRequest(db.Model):
             if bcgovcode:
                 programarea = ProgramArea.getprogramarea(bcgovcode)
                 iaocode = programarea['iaocode']
-                newaxisrequestid = cls.generaterequestid(newrawrequest.requestid, iaocode, newrawrequest.isconsultflag)
+                requesttype = _requestrawdata.get("requestType")
+                newaxisrequestid = cls.generaterequestid(newrawrequest.requestid, iaocode, requesttype, newrawrequest.isconsultflag)
                 updated_rawdata = copy.deepcopy(_requestrawdata)
                 updated_rawdata["axisRequestId"] = newaxisrequestid
                 newrawrequest.axisrequestid = newaxisrequestid
@@ -118,7 +122,8 @@ class FOIRawRequest(db.Model):
                 if bcgovcode:
                     programarea = ProgramArea.getprogramarea(bcgovcode)
                     iaocode = programarea['iaocode']
-                    axisrequestid = cls.generaterequestid(request.requestid, iaocode, isconsultflag)
+                    requesttype = _requestrawdata.get("requestType")
+                    axisrequestid = cls.generaterequestid(request.requestid, iaocode, requesttype, isconsultflag)
                     updated_rawdata = copy.deepcopy(_requestrawdata)
                     updated_rawdata["axisRequestId"] = axisrequestid
                     _requestrawdata = updated_rawdata
@@ -530,27 +535,27 @@ class FOIRawRequest(db.Model):
                             (FOIRawRequest.status == StateName.unopened.value,
                              FOIRawRequest.requestrawdata['descriptionTimeframe']['fromDate'].astext),
                            ],
-                           else_ = FOIRawRequest.requestrawdata['fromDate'].astext).label('recordsearchfromdate')
+                           else_ = func.nullif(FOIRawRequest.requestrawdata['fromDate'].astext, '')).label('recordsearchfromdate')
         recordsearchtodate = case([
                             (FOIRawRequest.status == StateName.unopened.value,
                              FOIRawRequest.requestrawdata['descriptionTimeframe']['toDate'].astext),
                            ],
-                           else_ = FOIRawRequest.requestrawdata['toDate'].astext).label('recordsearchtodate')
+                           else_ = func.nullif(FOIRawRequest.requestrawdata['toDate'].astext, '')).label('recordsearchtodate')
         duedate = case([
                             (FOIRawRequest.status == StateName.unopened.value,
                              literal(None)),
                            ],
-                           else_ = FOIRawRequest.requestrawdata['dueDate'].astext).label('duedate')
+                           else_ = func.nullif(FOIRawRequest.requestrawdata['dueDate'].astext, '')).label('duedate')
         receiveddate = case([
                             (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['receivedDate'].is_(None)),
                              func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD')),
                            ],
-                           else_ = FOIRawRequest.requestrawdata['receivedDate'].astext).label('receivedDate')
+                           else_ = func.nullif(FOIRawRequest.requestrawdata['receivedDate'].astext, '')).label('receivedDate')
         receiveddateuf = case([
                             (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['receivedDateUF'].is_(None)),
                              func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD HH:MM:SS')),
                            ],
-                           else_ = FOIRawRequest.requestrawdata['receivedDateUF'].astext).label('receivedDateUF')
+                           else_ = func.nullif(FOIRawRequest.requestrawdata['receivedDateUF'].astext, '')).label('receivedDateUF')
 
         assignedtoformatted = case([
                             (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
@@ -582,7 +587,7 @@ class FOIRawRequest(db.Model):
                             (FOIRawRequest.assignedto == None, # Unassigned requests first
                              literal(None)),
                            ],
-                           else_ = cast(FOIRawRequest.requestrawdata['receivedDateUF'].astext, TIMESTAMP)).label('intakeSorting')
+                           else_ = cast(func.nullif(FOIRawRequest.requestrawdata['receivedDateUF'].astext, ''),TIMESTAMP)).label('intakeSorting')
 
         isiaorestricted = case([
                             (FOIRawRequest.isiaorestricted.is_(None),
@@ -595,6 +600,12 @@ class FOIRawRequest(db.Model):
             literal(None)),
             ],
             else_ = cast(FOIRawRequest.requestrawdata['subjectCode'], String)).label('subjectcode')
+        
+        proactivedisclosurecategory = case([
+            (FOIRawRequest.requestrawdata['proactiveDisclosureCategory'].is_(None),
+            literal(None)),
+            ],
+            else_ = cast(FOIRawRequest.requestrawdata['proactiveDisclosureCategory'], String)).label('proactivedisclosurecategory')
 
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
@@ -644,7 +655,9 @@ class FOIRawRequest(db.Model):
             subjectcode,
             literal(None).label('isoipcreview'),
             literal(None).label('isphasedrelease'),
-            literal(None).label('oipc_number')
+            literal(None).label('oipc_number'),
+            literal(None).label('closereason'),
+            proactivedisclosurecategory
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -767,10 +780,10 @@ class FOIRawRequest(db.Model):
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
         subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-
+        #print("\n-------subquery_ministry_queue:",subquery_ministry_queue)
         #sorting
         if is_oi_team:
-            sortingcondition = FOIOpenInformationRequests.getsorting(sortingitems, sortingorders)
+            sortingcondition = FOIOpenInformationRequests.getsorting(sortingitems, sortingorders, True)
         else:
             sortingcondition = FOIRawRequest.getsorting(sortingitems, sortingorders)
 
@@ -778,9 +791,13 @@ class FOIRawRequest(db.Model):
         if usertype == "iao" or groups is None:
             if is_oi_team:
                 subquery_oirequest_queue = FOIOpenInformationRequests.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, "OI", isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-                return subquery_oirequest_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
+                subquery_pdrequest_queue = FOIMinistryRequest.getpdrequestssubquery(groups, filterfields, keyword, additionalfilter, 
+                                                                userid, iaoassignee, ministryassignee, "OI", isiaorestrictedfilemanager, isministryrestrictedfilemanager)
+                query_full_queue = subquery_oirequest_queue.union(subquery_pdrequest_queue)
+                return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
             else:
                 subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups)
+                print("\n------IAO query:", subquery_rawrequest_queue)
                 query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
                 return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:
@@ -810,7 +827,8 @@ class FOIRawRequest(db.Model):
             'duedate': FOIRawRequest.requestrawdata['dueDate'].astext,
             'DueDateValue': FOIRawRequest.requestrawdata['dueDate'].astext,
             'DaysLeftValue': FOIRawRequest.requestrawdata['dueDate'].astext,
-            'subjectcode': FOIRawRequest.requestrawdata['subjectCode'].astext
+            'subjectcode': FOIRawRequest.requestrawdata['subjectCode'].astext,
+            'proactivedisclosurecategory': FOIRawRequest.requestrawdata['proactiveDisclosureCategory'].astext,
         }.get(x, cast(FOIRawRequest.requestid, String))
     
     @classmethod
@@ -872,10 +890,46 @@ class FOIRawRequest(db.Model):
         return sortingcondition
 
 
+
+    @classmethod
+    def getsorting1(cls, subq, sortingitems, sortingorders):
+        sortingcondition = []
+
+        if (
+            sortingitems and sortingorders and
+            len(sortingitems) == len(sortingorders)
+        ):
+            for field, order in zip(sortingitems, sortingorders):
+                # validate field name AND ensure it exists on subquery
+                if cls.validatefield(field) and hasattr(subq.c, field):
+                    col = getattr(subq.c, field)
+
+                    if order == 'desc':
+                        sortingcondition.append(col.desc().nullslast())
+                    else:
+                        sortingcondition.append(col.asc().nullsfirst())
+
+        # default sorting
+        if not sortingcondition and hasattr(subq.c, 'currentState'):
+            sortingcondition.append(subq.c.currentState.asc())
+
+        # always stabilize pagination
+        if hasattr(subq.c, 'created_at'):
+            sortingcondition.append(subq.c.created_at.asc())
+
+        return sortingcondition
+
+    
     @classmethod
     def advancedsearch(cls, params, userid, isiaorestrictedfilemanager=False):
         basequery = FOIRawRequest.getbasequery(None, userid, isiaorestrictedfilemanager)
-        basequery = basequery.add_columns(literal(None).label('closereason'))
+
+        is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
+        if is_oi_team:
+            basequery  = basequery.add_columns(literal("unopened").label('publicationStatus'))
+            basequery  = basequery.add_columns(literal(None).label('publicationDate'))
+            basequery  = basequery.add_columns(literal(None).label('oiReceivedDate'))
+            basequery  = basequery.add_columns(literal("ZZZ").label('oiAssignedTo'))
 
         is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
         if is_oi_team:
@@ -898,6 +952,7 @@ class FOIRawRequest(db.Model):
 
         #rawrequests
         query_full_queue = searchquery.union(subquery_ministry_queue)
+        print("\n\nFull Query:\n", query_full_queue)
         return query_full_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
 
     @classmethod
@@ -923,7 +978,7 @@ class FOIRawRequest(db.Model):
             else:
                 filtercondition.append(FOIRawRequest.status != StateName.closed.value)
         
-        #request type: personal, general
+        #request type: personal, general, proactive disclosure
         if(len(params['requesttype']) > 0):
             requesttypecondition = FOIRawRequest.getfilterforrequesttype(params)
             filtercondition.append(or_(*requesttypecondition))
@@ -1007,10 +1062,15 @@ class FOIRawRequest(db.Model):
         #request type: personal, general
         requesttypecondition = []
         for type in params['requesttype']:
-            requesttypecondition.append(FOIRawRequest.findfield('requestType') == type)
-            requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == type)
-
-        return or_(*requesttypecondition)
+            if type == 'proactivedisclosure':
+                requesttypecondition.append(FOIRawRequest.findfield('requestType') == 'proactive disclosure')
+                requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == 'proactive disclosure')
+                requesttypecondition.append(FOIRawRequest.findfield('requestType') == 'proactivedisclosure')
+                requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == 'proactivedisclosure')
+            else:
+                requesttypecondition.append(FOIRawRequest.findfield('requestType') == type)
+                requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == type)
+        return requesttypecondition
 
     @classmethod
     def getfilterforrequestflags(cls, params):
@@ -1050,6 +1110,7 @@ class FOIRawRequest(db.Model):
         else:
             searchcondition = []
             for keyword in params['keywords']:
+                keyword = keyword.strip()
                 searchcondition.append(FOIRawRequest.findfield(params['search']).ilike('%'+keyword+'%'))
             return and_(*searchcondition)
     
@@ -1058,6 +1119,7 @@ class FOIRawRequest(db.Model):
         searchcondition1 = []
         searchcondition2 = []
         for keyword in params['keywords']:
+            keyword = keyword.strip()
             searchcondition1.append(FOIRawRequest.findfield('description').ilike('%'+keyword+'%'))
             searchcondition2.append(FOIRawRequest.findfield('descriptionDescription').ilike('%'+keyword+'%'))
         return or_(and_(*searchcondition1), and_(*searchcondition2))    
@@ -1069,6 +1131,7 @@ class FOIRawRequest(db.Model):
         searchcondition3 = []
         searchcondition4 = []
         for keyword in params['keywords']:
+            keyword = keyword.strip()
             searchcondition1.append(FOIRawRequest.findfield('firstName').ilike('%'+keyword+'%'))
             searchcondition2.append(FOIRawRequest.findfield('lastName').ilike('%'+keyword+'%'))
             searchcondition3.append(FOIRawRequest.findfield('contactFirstName').ilike('%'+keyword+'%'))
@@ -1081,6 +1144,7 @@ class FOIRawRequest(db.Model):
         searchcondition2 = []
         searchcondition3 = []
         for keyword in params['keywords']:
+            keyword = keyword.strip()
             searchcondition1.append(FOIRawRequest.findfield('assignedToFirstName').ilike('%'+keyword+'%'))
             searchcondition2.append(FOIRawRequest.findfield('assignedToLastName').ilike('%'+keyword+'%'))
             searchcondition3.append(FOIRawRequest.assignedgroup.ilike('%'+keyword+'%'))
@@ -1091,6 +1155,7 @@ class FOIRawRequest(db.Model):
         searchcondition1 = []
         searchcondition2 = []
         for keyword in params['keywords']:
+            keyword = keyword.strip()
             keyword = keyword.lower()
             keyword = keyword.replace('u-00', '')
             searchcondition1.append(FOIRawRequest.findfield('idNumber').ilike('%'+keyword+'%'))

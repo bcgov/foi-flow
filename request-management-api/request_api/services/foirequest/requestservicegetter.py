@@ -20,6 +20,7 @@ from request_api.utils.commons.datetimehandler import datetimehandler
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from request_api.utils.enums import StateName
 from request_api.models.OperatingTeamEmails import OperatingTeamEmail
+from request_api.models.FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 from request_api.services.linkedrequestservice import linkedrequestservice
 
 class requestservicegetter:
@@ -33,8 +34,9 @@ class requestservicegetter:
         requestapplicants = FOIRequestApplicantMapping.getrequestapplicantinfos(foirequestid,request['version'])
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
         iaorestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(ministryrequestid=foiministryrequestid,type='iao')
-
-        baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
+        requestproactive = FOIProactiveDisclosureRequests.getcurrentfoiproactiverequest(foiministryrequestid)
+        baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions, requestproactive)
+        #print("baserequestinfo:",baserequestinfo)
         baserequestinfo['lastStatusUpdateDate'] = FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatuslabel']).strftime(self.__genericdateformat()),
         for contactinfo in requestcontactinformation:
             if contactinfo['contacttype.name'] == 'Email':
@@ -87,9 +89,11 @@ class requestservicegetter:
         requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
         ministryrestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(foiministryrequestid,type='ministry')
+        requestproactive = FOIProactiveDisclosureRequests.getcurrentfoiproactiverequest(foiministryrequestid)
+        #print("\n----requestproactive in getrequestdetailsforministry:",requestproactive)
         baserequestinfo = {}
         if requestministry["assignedministrygroup"] in authmembershipgroups:
-            baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions)
+            baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions, requestproactive)
 
         if request['requesttype'] == 'personal':
             requestapplicants = FOIRequestApplicantMapping.getrequestapplicantinfos(foirequestid,request['version'])
@@ -159,7 +163,7 @@ class requestservicegetter:
     def getrawrequestidbyfoirequestid(self, foirequestid):
         return FOIRequest.getrawrequestidbyfoirequestid(foirequestid)
 
-    def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions):
+    def __preparebaseinfo(self,request,foiministryrequestid,requestministry,requestministrydivisions, requestproactive=None):
         _receiveddate = parse(request['receiveddate'])
         axissyncdatenoneorempty =  self.__noneorempty(requestministry["axissyncdate"]) 
         linkedministryrequests= []
@@ -167,8 +171,7 @@ class requestservicegetter:
             linkedministryrequests = requestministry["linkedrequests"]
         assignedgroupemail = OperatingTeamEmail.getoperatingteamemail(requestministry["assignedgroup"])
         if assignedgroupemail is None:
-            assignedgroupemail = KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"])
-        print("\nrequest in __preparebaseinfo:", request)
+            assignedgroupemail = KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"])    
         baserequestinfo = {
             'id': request['foirequestid'],
             'requestType': request['requesttype'],
@@ -178,8 +181,10 @@ class requestservicegetter:
               request["deliverymode.deliverymodeid"] is not None else None,
             'deliveryMode':request['deliverymode.name'] if 'deliverymode' in request or 'deliverymode.name' in request and
               request["deliverymode.name"] is not None else "",
-            'receivedmodeid':request['receivedmode.receivedmodeid'],
-            'receivedMode':request['receivedmode.name'],
+            'receivedmodeid':request['receivedmode.receivedmodeid'] if 'receivedmode' in request or 'receivedmode.receivedmodeid' in request and
+              request["receivedmode.receivedmodeid"] is not None else None,
+            'receivedMode':request['receivedmode.name'] if 'receivedmode' in request or 'receivedmode.name' in request and
+              request["receivedmode.name"] is not None else "",
             'assignedGroup': requestministry["assignedgroup"],
             'assignedGroupEmail': assignedgroupemail,
             'assignedTo': requestministry["assignedto"],
@@ -199,8 +204,8 @@ class requestservicegetter:
             'originalDueDate':  parse(requestministry['originalldd']).strftime(self.__genericdateformat()) if requestministry['originalldd'] is not None else parse(requestministry['duedate']).strftime(self.__genericdateformat()),            
             'programareaid':requestministry['programarea.programareaid'],
             'bcgovcode':requestministry['programarea.bcgovcode'],
-            'category':request['applicantcategory.name'],
-            'categoryid':request['applicantcategory.applicantcategoryid'],
+            'category':request['applicantcategory.name'] if 'applicantcategory.name' in request else "",
+            'categoryid':request['applicantcategory.applicantcategoryid'] if 'applicantcategory' in request or 'applicantcategory.applicantcategoryid' in request else None,
             'assignedministrygroup':requestministry["assignedministrygroup"],
             'assignedministryperson':requestministry["assignedministryperson"],            
             'selectedMinistries':[{'code':requestministry['programarea.bcgovcode'],'id':requestministry['foiministryrequestid'],'name':requestministry['programarea.name'],'selected':'true'}],
@@ -225,8 +230,12 @@ class requestservicegetter:
             'estimatedpagecount':requestministry['estimatedpagecount'],
             'estimatedtaggedpagecount':requestministry['estimatedtaggedpagecount'],
             'userrecordslockstatus': requestministry['userrecordslockstatus'],
-            'isconsultflag': requestministry['isconsultflag']
-            
+            'isconsultflag': requestministry['isconsultflag'],  
+            'publicationDate': parse(requestproactive['publicationdate']).strftime(self.__genericdateformat()) if requestproactive != None and 'publicationdate' in requestproactive and requestproactive['publicationdate'] is not None else '',
+            'reportPeriod': requestproactive['reportperiod'] if requestproactive != None and 'reportperiod' in requestproactive else '',
+            #'proactivedisclosurecategoryid': requestproactive['proactivedisclosurecategoryid'] if requestproactive != None and 'proactivedisclosurecategoryid' in requestproactive else ''
+            'proactiveDisclosureCategory':requestproactive['proactivedisclosurecategory.name'] if requestproactive != None and 'proactivedisclosurecategory.name' in requestproactive else "",
+            'proactivedisclosurecategoryid':requestproactive['proactivedisclosurecategory.proactivedisclosurecategoryid'] if requestproactive != None and 'proactivedisclosurecategory.proactivedisclosurecategoryid' in requestproactive else None,
         }
         if requestministry['cfrduedate'] is not None:
             baserequestinfo.update({'cfrDueDate':parse(requestministry['cfrduedate']).strftime(self.__genericdateformat())})

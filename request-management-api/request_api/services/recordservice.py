@@ -300,15 +300,12 @@ class recordservice(recordservicebase):
                         streamkey= self.largefileocrstreamkey
             else:
                 streamkey = self.dedupestreamkey if extension in DEDUPE_FILE_TYPES else self.conversionstreamkey
-            print("!!!!!!!",[record])
             jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
                 'records': [record],
                 'batch': record['attributes']['batch'],
                 'trigger': record['trigger'],
                 'ministryrequestid': ministryrequestid
             })
-            print("\njobids:",jobids)
-            #print("\nERROR:",err)
             if err and err is not None:
                 return DefaultMethodResult(False,self.DOC_REVIEWER_API_ERROR, -1, ministryrequestid)
             streamobject = {

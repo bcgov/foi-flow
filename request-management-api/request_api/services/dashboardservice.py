@@ -21,7 +21,8 @@ LONG_DATEFORMAT = '%Y-%m-%d %H:%M:%S.%f'
 REQUEST_TYPE_MAPPING = {
     'general': 'G',
     'personal': 'P',
-    'proactivedisclosure': 'PD'
+    'proactivedisclosure': 'PD',
+    'proactive disclosure': 'PD'
 }
 
 class dashboardservice:
@@ -32,6 +33,7 @@ class dashboardservice:
     """
 
     def __preparefoirequestinfo(self, request, receiveddate, receiveddateuf, idnumberprefix = ''):
+        #print("\nrequest in __preparefoirequestinfo-dashboard",request)
         idnumber = self.__getidnumber(idnumberprefix, request.axisRequestId, request.idNumber)
         baserequestinfo = self.__preparebaserequestinfo(
             request.id, 
@@ -67,7 +69,15 @@ class dashboardservice:
         isoipcreview = request.isoipcreview if request.isoipcreview == True else False
         baserequestinfo.update({'isoipcreview': isoipcreview})
         baserequestinfo.update({'isphasedrelease': request.isphasedrelease if request.isphasedrelease == True else False})
+        
+        proactivecategory = ""
+        if request.requestType == 'proactive disclosure':
+            proactivecategory = getattr(request, 'proactivedisclosurecategory', "")
+        baserequestinfo.update({'proactivedisclosurecategory': proactivecategory})
         return baserequestinfo
+    
+    
+
         
     def __preparebaserequestinfo(self, id, requesttype, status, receiveddate, receiveddateuf, assignedgroup, assignedto, idnumber, axisrequestid, version, description, fromdate, todate):
         return {'id': id,
@@ -102,7 +112,6 @@ class dashboardservice:
                     _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
                 else:
                     _receiveddate = parser.parse(request.receivedDateUF)
-
                 if(request.ministryrequestid == None):                
                     unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
                     unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
@@ -128,7 +137,6 @@ class dashboardservice:
                     if isiaorestricted == True:
                         _openrequest.update({'lastName': 'Restricted'})
                         _openrequest.update({'firstName': 'Request'})
-
                     requestqueue.append(_openrequest)   
                    
 
@@ -173,6 +181,7 @@ class dashboardservice:
             isoipcreview = request.isoipcreview if request.isoipcreview == True else False
             _openrequest.update({'isoipcreview': isoipcreview})
             _openrequest.update({'isphasedrelease': request.isphasedrelease if request.isphasedrelease == True else False})
+            _openrequest.update({'proactivedisclosurecategory': request.proactivedisclosurecategory})
             requestqueue.append(_openrequest)
 
         meta = {
@@ -258,7 +267,7 @@ class dashboardservice:
             return idprefix + filenumber
         return ""
 
-    def __preparefoioirequestinfo(self, request, receivedDate, publicationDate, fromClosed):
+    def __preparefoioirequestinfo(self, request, receivedDate, publicationDate, fromClosed, cfrDueDate):
         return {
             'id': request.id,
             'idNumber': request.idNumber,
@@ -274,7 +283,9 @@ class dashboardservice:
             'version': request.version,
             'foiopeninforequestid': request.foiopeninforequestid,
             'currentState': request.currentState,
-            'closedDate': fromClosed
+            'closedDate': fromClosed,
+            'cfrduedate': cfrDueDate,
+            'proactivedisclosurecategory': request.proactivedisclosurecategory if request.requestType == 'proactive disclosure' else None
         }
 
     def __calculate_from_closed(self, closedate):
@@ -315,5 +326,8 @@ class dashboardservice:
         
         # Calculate business days
         _from_closed = self.__calculate_from_closed(request.closedate)
+
+        # Handle CFR Due Date
+        _cfrduedate = request.cfrduedate.strftime("%b %d %Y") if request.cfrduedate else None
             
-        return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed)
+        return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed, _cfrduedate)

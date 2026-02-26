@@ -631,3 +631,10 @@ export const setFOIOpenInfoAdditionalFiles = (data) => (dispatch) => {
     payload: data,
   });
 };
+
+export const setFOIProactiveDisclosureCategoryList = (data) => (dispatch) => {
+  dispatch({
+    type: FOI_ACTION_CONSTANTS.FOI_PROACTIVE_DISCLOSURE_CATEGORYLIST,
+    payload: data,
+  });
+};
