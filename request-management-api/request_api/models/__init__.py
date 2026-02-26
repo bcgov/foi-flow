@@ -57,7 +57,10 @@ from .FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAtt
 from .FOIApplicantCorrespondenceResponses import FOIApplicantCorrespondenceResponse
 
 from .FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
+
 from .FOIRequestRecords import FOIRequestRecord
 from .FOIRequestRecordGroup import FOIRequestRecordGroup
 from .FOIRequestRecordGroups import FOIRequestRecordGroups
+
+from .FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 #event.listen(Engine, 'before_cursor_execute', DBTracing.query_tracing)

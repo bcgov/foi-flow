@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import Button from "@material-ui/core/Button";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -8,18 +8,40 @@ import {
 import Grid from "@mui/material/Grid";
 import Tooltip from "@mui/material/Tooltip";
 import AttachmentModal from "../Attachments/AttachmentModal";
+import { makeStyles } from "@material-ui/core/styles";
 import clsx from "clsx";
 
-export default function RedactRecordsButton({
-  records,
-  groups,
-  ministryrequestid,
-  buttonClassName,
-}) {
+export default function RedactRecordsButton({ records, groups, ministryrequestid }) {
+
+  const useStyles = makeStyles((_theme) => ({
+    createButton: {
+      margin: 0,
+      width: "100%",
+      height: "50%",
+      backgroundColor: "#38598A",
+      color: "#FFFFFF",
+      fontWeight: 700,
+      fontFamily: "BCSans-Bold, sans-serif ",
+      textTransform: "none",
+      whiteSpace: "nowrap",
+
+      "&:hover": {
+        backgroundColor: "#38598A",
+      },
+      "&:active": {
+        backgroundColor: "#38598A",
+      },
+    },
+  }));
+
+  const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
   const [openModal, setOpenModal] = useState(false);
 
-  const isDisableRedactRecords = (allRecords) => {
+  const isDisableRedactRecords = (allRecords = [], { strict = true } = {}) => {
+    if (!Array.isArray(allRecords) || allRecords.length === 0) {
+      return true;
+    }
 
     const isInvalid = (record) =>
       !record.isredactionready &&
@@ -119,7 +141,7 @@ export default function RedactRecordsButton({
             style={{ minWidth: "100px" }}
             className={clsx(
               "btn",
-              buttonClassName
+              //buttonClassName
             )}
 
 
@@ -133,8 +155,8 @@ export default function RedactRecordsButton({
             open={Boolean(anchorEl) && !openModal}
             onClose={handleMenuClose}
             getContentAnchorEl={null}
-            anchorOrigin={{vertical: "bottom", horizontal: "left"}}
-            transformOrigin={{vertical: "top", horizontal: "left"}}
+            anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+            transformOrigin={{ vertical: "top", horizontal: "left" }}
             PaperProps={{
               sx: {
                 mt: 1, // small spacing below button
@@ -188,34 +210,32 @@ export default function RedactRecordsButton({
           </Menu>
         </div>
       ) : (
-        <Grid item xs={1}>
-          <Tooltip
-            title={
-              isDisableRedactRecords(records) ? (
-                <div style={{fontSize: "11px"}}>
-                  Some files are still processing or have errors.
-                  Please ensure that all files are successfully processed.
-                </div>
-              ) : ""
-            }
-            disableHoverListener={!isDisableRedactRecords(records)}
-          >
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleRedactAll}
-          disabled={isDisableRedactRecords(records)}
-          style={{ minWidth: "100px" }}
-          className={clsx(
-            "btn",
-            buttonClassName
-          )}
+        <Tooltip
+          title={
+            isDisableRedactRecords(records) ? (
+              <div style={{ fontSize: "11px" }}>
+                Some files are still processing or have errors.
+                Please ensure that all files are successfully processed.
+              </div>
+            ) : ""
+          }
+          disableHoverListener={!isDisableRedactRecords(records)}
         >
-          Redact Records
-        </Button>
-          </Tooltip>
-        </Grid>
-
+          <div style={{ display: "flex", minWidth: "130px", width: "100%", justifyContent: "revert", whiteSpace: "nowrap" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleRedactAll}
+              disabled={isDisableRedactRecords(records)}
+              className={clsx(
+                "btn",
+                classes.createButton
+              )}
+            >
+              Redact Records
+            </Button>
+          </div>
+        </Tooltip>
       )}
       <AttachmentModal
         modalFor="ungrouped_records"

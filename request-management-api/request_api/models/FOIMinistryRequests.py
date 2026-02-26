@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship, backref, aliased
 from .default_method_result import DefaultMethodResult
 from .FOIRequests import FOIRequest, FOIRequestsSchema
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc
+from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc, true
 from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.dialects.postgresql import JSON
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
@@ -29,6 +29,9 @@ from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .SubjectCodes import SubjectCode
 from request_api.utils.enums import StateName
 from .FOIRequestOIPC import FOIRequestOIPC
+from .ProactiveDisclosureCategories import ProactiveDisclosureCategory
+from request_api.models import FOIProactiveDisclosureRequests
+from .FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 from .OpenInformationStatuses import OpenInformationStatuses
 
 class FOIMinistryRequest(db.Model):
@@ -116,6 +119,9 @@ class FOIMinistryRequest(db.Model):
     isoipcreview = db.Column(db.Boolean, unique=False, nullable=True,default=False)
     oistatus_id = db.Column(db.Integer, ForeignKey('OpenInformationStatuses.oistatusid'), unique=False, nullable=True)
     isphasedrelease = db.Column(db.Boolean, unique=False, nullable=True,default=False)
+
+    proactivedisclosures = relationship('FOIProactiveDisclosureRequests', uselist=False, primaryjoin="and_(FOIMinistryRequest.foiministryrequestid==FOIProactiveDisclosureRequests.foiministryrequest_id, "
+                        "FOIMinistryRequest.version==FOIProactiveDisclosureRequests.foiministryrequestversion_id)")
 
     @classmethod
     def getrequest(cls,ministryrequestid):
@@ -437,6 +443,18 @@ class FOIMinistryRequest(db.Model):
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
 
+        latest_proactive_subq = (
+            _session.query(
+                FOIProactiveDisclosureRequests.foiministryrequest_id.label("foiministryrequest_id"),
+                func.max(FOIProactiveDisclosureRequests.foiministryrequestversion_id).label("max_version")
+            )
+            .group_by(FOIProactiveDisclosureRequests.foiministryrequest_id)
+            .subquery()
+        )
+
+        latest_proactive = aliased(FOIProactiveDisclosureRequests)
+
+
         #filter/search
         _keywords = []
         if(keyword is not None):
@@ -502,13 +520,13 @@ class FOIMinistryRequest(db.Model):
                             (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
-                           else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
+                           else_ = func.nullif(cast(FOIMinistryRequest.duedate, String), '')).label('duedate')
         
         cfrduedate = case([
                             (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
-                           else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
+                           else_ = func.nullif(cast(FOIMinistryRequest.cfrduedate, String),'')).label('cfrduedate')
 
         axispagecount = case ([
             (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
@@ -560,8 +578,10 @@ class FOIMinistryRequest(db.Model):
             FOIRequestApplicant.firstname.label('firstName'),
             FOIRequestApplicant.lastname.label('lastName'),
             FOIRequest.requesttype.label('requestType'),
-            cast(FOIRequest.receiveddate, String).label('receivedDate'),
-            cast(FOIRequest.receiveddate, String).label('receivedDateUF'),
+            # cast(FOIRequest.receiveddate, String).label('receivedDate'),
+            # cast(FOIRequest.receiveddate, String).label('receivedDateUF'),
+            func.nullif(cast(FOIRequest.receiveddate, String), '').label('receivedDate'),
+            func.nullif(cast(FOIRequest.receiveddate, String), '').label('receivedDateUF'),
             FOIRequestStatus.name.label('currentState'),
             FOIMinistryRequest.assignedgroup.label('assignedGroup'),
             FOIMinistryRequest.assignedto.label('assignedTo'),
@@ -584,8 +604,8 @@ class FOIMinistryRequest(db.Model):
             ministryassignee.firstname.label('assignedministrypersonFirstName'),
             ministryassignee.lastname.label('assignedministrypersonLastName'),
             FOIMinistryRequest.description,
-            cast(FOIMinistryRequest.recordsearchfromdate, String).label('recordsearchfromdate'),
-            cast(FOIMinistryRequest.recordsearchtodate, String).label('recordsearchtodate'),
+            func.nullif(cast(FOIMinistryRequest.recordsearchfromdate, String), '').label('recordsearchfromdate'),
+            func.nullif(cast(FOIMinistryRequest.recordsearchtodate, String), '').label('recordsearchtodate'),
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
             defaultsorting,
@@ -602,6 +622,9 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.isoipcreview.label('isoipcreview'),
             FOIMinistryRequest.isphasedrelease.label('isphasedrelease'),
             literal(None).label('oipc_number'),
+            literal(None).label('closereason'),
+            ProactiveDisclosureCategory.name.label('proactivedisclosurecategory'),
+            #latest_proactive.foiministryrequestversion_id.label(""),
         ]
 
         basequery = _session.query(
@@ -621,10 +644,12 @@ class FOIMinistryRequest(db.Model):
                                 FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
                             ).join(
                                 FOIRequestApplicantMapping,
-                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value)
+                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value),
+                                isouter=True
                             ).join(
                                 FOIRequestApplicant,
-                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
+                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
+                                isouter=True
                             ).join(
                                 onbehalf_applicantmapping,
                                 and_(
@@ -635,10 +660,11 @@ class FOIMinistryRequest(db.Model):
                             ).join(
                                 onbehalf_applicant,
                                 onbehalf_applicant.foirequestapplicantid == onbehalf_applicantmapping.foirequestapplicantid,  
-                                isouter=True
+                                isouter=True #Made it to left join to allow proactivedisclosure requests
                             ).join(
                                 ApplicantCategory,
-                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
+                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True),
+                                isouter=True
                             ).join(
                                 ProgramArea,
                                 FOIMinistryRequest.programareaid == ProgramArea.programareaid
@@ -681,7 +707,22 @@ class FOIMinistryRequest(db.Model):
                             ).filter(or_(FOIMinistryRequest.requeststatuslabel != StateName.closed.name, 
                                          and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3,subquery_with_oipc.c.outcomeid == None)))
 
-       
+        basequery = basequery.join(
+            latest_proactive_subq,
+            latest_proactive_subq.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid,
+            isouter=True
+        ).join(
+            latest_proactive,
+            (latest_proactive.foiministryrequest_id == latest_proactive_subq.c.foiministryrequest_id) &
+            (latest_proactive.foiministryrequestversion_id == latest_proactive_subq.c.max_version),
+            isouter=True
+        )
+
+        basequery = basequery.join(
+            ProactiveDisclosureCategory,
+            ProactiveDisclosureCategory.proactivedisclosurecategoryid == latest_proactive.proactivedisclosurecategoryid,
+            isouter=True
+        )
 
         if(additionalfilter == 'watchingRequests'):
             #watchby
@@ -832,6 +873,7 @@ class FOIMinistryRequest(db.Model):
             'subjectcode': SubjectCode.name,
             'isoipcreview': FOIMinistryRequest.isoipcreview,
             'isphasedrelease': FOIMinistryRequest.isphasedrelease,
+            'proactivedisclosurecategory': ProactiveDisclosureCategory.name
         }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
@@ -1095,6 +1137,18 @@ class FOIMinistryRequest(db.Model):
         #aliase for getting ministry restricted flag from FOIRestrictedMinistryRequest
         ministry_restricted_requests = aliased(FOIRestrictedMinistryRequest)
 
+        latest_proactive_subq = (
+            _session.query(
+                FOIProactiveDisclosureRequests.foiministryrequest_id.label("foiministryrequest_id"),
+                func.max(FOIProactiveDisclosureRequests.foiministryrequestversion_id).label("max_version")
+            )
+            .group_by(FOIProactiveDisclosureRequests.foiministryrequest_id)
+            .subquery()
+        )
+
+        latest_proactive = aliased(FOIProactiveDisclosureRequests)
+
+
         intakesorting = case([
                             (FOIMinistryRequest.assignedto == None, # Unassigned requests first
                              literal(None)),
@@ -1137,13 +1191,13 @@ class FOIMinistryRequest(db.Model):
                             (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
-                           else_ = cast(FOIMinistryRequest.duedate, String)).label('duedate')
+                           else_ = func.nullif(cast(FOIMinistryRequest.duedate, String), '')).label('duedate')
         
         cfrduedate = case([
                             (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
-                           else_ = cast(FOIMinistryRequest.cfrduedate, String)).label('cfrduedate')
+                           else_ = func.nullif(cast(FOIMinistryRequest.cfrduedate, String), '')).label('cfrduedate')
 
         axispagecount = case ([
             (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
@@ -1193,8 +1247,8 @@ class FOIMinistryRequest(db.Model):
             FOIRequestApplicant.firstname.label('firstName'),
             FOIRequestApplicant.lastname.label('lastName'),
             FOIRequest.requesttype.label('requestType'),
-            cast(FOIRequest.receiveddate, String).label('receivedDate'),
-            cast(FOIRequest.receiveddate, String).label('receivedDateUF'),
+            func.nullif(cast(FOIRequest.receiveddate, String),'').label('receivedDate'),
+            func.nullif(cast(FOIRequest.receiveddate, String),'').label('receivedDateUF'),
             FOIRequestStatus.name.label('currentState'),
             FOIMinistryRequest.assignedgroup.label('assignedGroup'),
             FOIMinistryRequest.assignedto.label('assignedTo'),
@@ -1217,8 +1271,8 @@ class FOIMinistryRequest(db.Model):
             ministryassignee.firstname.label('assignedministrypersonFirstName'),
             ministryassignee.lastname.label('assignedministrypersonLastName'),
             FOIMinistryRequest.description,
-            cast(FOIMinistryRequest.recordsearchfromdate, String).label('recordsearchfromdate'),
-            cast(FOIMinistryRequest.recordsearchtodate, String).label('recordsearchtodate'),
+            func.nullif(cast(FOIMinistryRequest.recordsearchfromdate, String),'').label('recordsearchfromdate'),
+            func.nullif(cast(FOIMinistryRequest.recordsearchtodate, String),'').label('recordsearchtodate'),
             onbehalf_applicant.firstname.label('onBehalfFirstName'),
             onbehalf_applicant.lastname.label('onBehalfLastName'),
             defaultsorting,
@@ -1236,6 +1290,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.isphasedrelease.label('isphasedrelease'),
             literal(None).label('oipc_number'),
             CloseReason.name.label('closereason'),
+            ProactiveDisclosureCategory.name.label('proactivedisclosurecategory'),
         ]
         if is_oi_team:
             oiAssignedToFormatted = case([
@@ -1276,10 +1331,12 @@ class FOIMinistryRequest(db.Model):
                                 FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
                             ).join(
                                 FOIRequestApplicantMapping,
-                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value)
+                                and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value),
+                                isouter=True
                             ).join(
                                 FOIRequestApplicant,
-                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid
+                                FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
+                                isouter=True
                             ).join(
                                 onbehalf_applicantmapping,
                                 and_(
@@ -1293,7 +1350,8 @@ class FOIMinistryRequest(db.Model):
                                 isouter=True
                             ).join(
                                 ApplicantCategory,
-                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True)
+                                and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True),
+                                isouter=True
                             ).join(
                                 ProgramArea,
                                 FOIMinistryRequest.programareaid == ProgramArea.programareaid
@@ -1332,6 +1390,24 @@ class FOIMinistryRequest(db.Model):
                                 CloseReason.closereasonid == FOIMinistryRequest.closereasonid,
                                 isouter=True
                             )
+                            
+        basequery = basequery.join(
+            latest_proactive_subq,
+            latest_proactive_subq.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid,
+            isouter=True
+        ).join(
+            latest_proactive,
+            (latest_proactive.foiministryrequest_id == latest_proactive_subq.c.foiministryrequest_id) &
+            (latest_proactive.foiministryrequestversion_id == latest_proactive_subq.c.max_version),
+            isouter=True
+        )
+
+        basequery = basequery.join(
+            ProactiveDisclosureCategory,
+            ProactiveDisclosureCategory.proactivedisclosurecategoryid == latest_proactive.proactivedisclosurecategoryid,
+            isouter=True
+        )
+
         
         if is_oi_team:
             basequery = basequery.join(
@@ -1478,7 +1554,11 @@ class FOIMinistryRequest(db.Model):
         #request type: personal, general
         requesttypecondition = []
         for type in params['requesttype']:
-            requesttypecondition.append(FOIMinistryRequest.findfield('requestType', iaoassignee, ministryassignee) == type)
+            if type == 'proactivedisclosure':
+                requesttypecondition.append(FOIMinistryRequest.findfield('requestType', iaoassignee, ministryassignee) == 'proactive disclosure')
+                requesttypecondition.append(FOIMinistryRequest.findfield('requestType', iaoassignee, ministryassignee) == 'proactivedisclosure')
+            else:
+                requesttypecondition.append(FOIMinistryRequest.findfield('requestType', iaoassignee, ministryassignee) == type)
         return or_(*requesttypecondition)
 
     @classmethod
@@ -1517,6 +1597,7 @@ class FOIMinistryRequest(db.Model):
                 searchcondition1 = []
                 searchcondition2 = []
                 for keyword in params['keywords']:
+                    keyword = keyword.strip()
                     searchcondition1.append(FOIMinistryRequest.findfield('firstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition2.append(FOIMinistryRequest.findfield('lastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 return or_(and_(*searchcondition1), and_(*searchcondition2))
@@ -1525,6 +1606,7 @@ class FOIMinistryRequest(db.Model):
                 searchcondition2 = []
                 searchcondition3 = []
                 for keyword in params['keywords']:
+                    keyword = keyword.strip()
                     searchcondition1.append(FOIMinistryRequest.findfield('assignedToFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition2.append(FOIMinistryRequest.findfield('assignedToLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition3.append(FOIMinistryRequest.assignedgroup.ilike('%'+keyword+'%'))
@@ -1533,13 +1615,23 @@ class FOIMinistryRequest(db.Model):
                 searchcondition1 = []
                 searchcondition2 = []
                 for keyword in params['keywords']:
+                    keyword = keyword.strip()
                     searchcondition1.append(FOIMinistryRequest.findfield('assignedministrypersonFirstName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                     searchcondition2.append(FOIMinistryRequest.findfield('assignedministrypersonLastName', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                return or_(and_(*searchcondition1), and_(*searchcondition2))
+            elif(params['search'] == 'idnumber' or params['search'] == 'axisrequest_number'):
+                searchcondition1 = []
+                searchcondition2 = []
+                for keyword in params['keywords']:
+                    keyword = keyword.strip()
+                    searchcondition1.append(FOIMinistryRequest.findfield('idNumber', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
+                    searchcondition2.append(FOIMinistryRequest.findfield('axisRequestId', iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 return or_(and_(*searchcondition1), and_(*searchcondition2))
             elif(params['search'] == 'oipc_number'):
                 searchcondition1 = []
                 searchcondition2 = []
                 for keyword in params['keywords']:
+                    keyword = keyword.strip()
                     oipccondition = FOIRequestOIPC.getrequestidsbyoipcno(keyword)
                     searchcondition1.append(oipccondition.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid)
                     searchcondition2.append(oipccondition.c.foiministryrequestversion_id == FOIMinistryRequest.version) 
@@ -1547,6 +1639,7 @@ class FOIMinistryRequest(db.Model):
             else:
                 searchcondition = []
                 for keyword in params['keywords']:
+                    keyword = keyword.strip()
                     searchcondition.append(FOIMinistryRequest.findfield(params['search'], iaoassignee, ministryassignee).ilike('%'+keyword+'%'))
                 return and_(*searchcondition)
     @classmethod
@@ -1712,6 +1805,169 @@ class FOIMinistryRequest(db.Model):
         finally:
             db.session.close()
         return requestdetails
+
+
+    @classmethod
+    def getpdrequestssubquery(cls, groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, requestby, 
+                            isiaorestrictedfilemanager=False, isministryrestrictedfilemanager=False):
+        pdbasequery = cls.getpdbasequery(iaoassignee, ministryassignee, additionalfilter, userid, isiaorestrictedfilemanager, groups, isadvancedsearch=False)
+        if len(filterfields) > 0 and keyword is not None:
+            filtercondition = cls.getfilterforrequestssubquery(filterfields, keyword, iaoassignee, ministryassignee)
+            return pdbasequery.filter(filtercondition)
+        else:
+            return pdbasequery  
+
+
+    @classmethod
+    def getpdbasequery(cls, iaoassignee, ministryassignee, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, 
+                        groups=[], isadvancedsearch=False):
+        _session = db.session
+        # subquery for getting the latest version of FOIProactiveDisclosureRequests
+        latest_proactive_subq = (
+            _session.query(
+                FOIProactiveDisclosureRequests.foiministryrequest_id,
+                func.max(FOIProactiveDisclosureRequests.foiministryrequestversion_id).label("max_version")
+            )
+            .group_by(FOIProactiveDisclosureRequests.foiministryrequest_id)
+            .subquery()
+        )
+        
+        latest_proactive = aliased(FOIProactiveDisclosureRequests)
+
+        recordspagecount = case ([
+            (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
+            ],
+            else_= literal("0").label("recordspagecount")
+        )
+
+        assignedtoformatted = case(
+            [
+                (
+                    and_(
+                        iaoassignee.lastname.isnot(None),
+                        iaoassignee.firstname.isnot(None)
+                    ),
+                    func.concat(iaoassignee.lastname, ', ', iaoassignee.firstname)
+                ),
+                (
+                    and_(
+                        iaoassignee.lastname.isnot(None),
+                        iaoassignee.firstname.is_(None)
+                    ),
+                    iaoassignee.lastname
+                ),
+                (
+                    and_(
+                        iaoassignee.lastname.is_(None),
+                        iaoassignee.firstname.isnot(None)
+                    ),
+                    iaoassignee.firstname
+                )
+            ],
+            else_=FOIMinistryRequest.assignedgroup
+        ).label('assignedtoformatted')
+
+        # subquery for getting latest version of FOIMinistryRequest #
+        subquery_ministry_maxversion = _session.query(FOIMinistryRequest.foiministryrequestid, func.max(FOIMinistryRequest.version).label('max_version')).group_by(FOIMinistryRequest.foiministryrequestid).subquery()
+        joincondition_ministry = [
+            subquery_ministry_maxversion.c.foiministryrequestid == FOIMinistryRequest.foiministryrequestid,
+            subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version,
+        ]
+
+        selectedcolumns = [
+            FOIRequest.foirequestid.label('id'), 
+            FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'), 
+            cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
+            FOIMinistryRequest.closedate, 
+            FOIRequest.requesttype.label('requestType'), 
+            cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
+            literal(None).label('applicantcategory'),
+            recordspagecount.label('recordspagecount'),  
+            literal(None).label('oiStatusName'),
+            FOIRequest.receiveddate.label('receivedDate'),
+            latest_proactive.publicationdate,
+            FOIMinistryRequest.created_at, 
+            assignedtoformatted.label('assignedToFormatted'), 
+            literal(None).label('oistatus_id'),
+            FOIMinistryRequest.version,
+            latest_proactive.proactivedisclosureid.label('foiopeninforequestid'),
+            FOIRequestStatus.name.label('currentState'),
+            literal(None).label('isiaorestricted'),
+            literal(None).label('subjectcode'),
+            FOIMinistryRequest.closedate,
+            FOIMinistryRequest.cfrduedate,
+            ProactiveDisclosureCategory.name.label('proactivedisclosurecategory'),
+        ]   
+        basequery = (
+            _session.query(*selectedcolumns)
+            .select_from(FOIMinistryRequest)
+            .join(subquery_ministry_maxversion, and_(*joincondition_ministry))
+            .join(FOIRequest, and_(
+                FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, 
+                FOIRequest.version == FOIMinistryRequest.foirequestversion_id, 
+                FOIRequest.isactive == True,
+                FOIRequest.requesttype.ilike('proactive disclosure')
+            ))
+            .join(FOIRequestStatus, FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid)
+            .outerjoin(latest_proactive_subq, latest_proactive_subq.c.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid)
+            .outerjoin(latest_proactive, and_(
+                latest_proactive.foiministryrequest_id == latest_proactive_subq.c.foiministryrequest_id,
+                latest_proactive.foiministryrequestversion_id == latest_proactive_subq.c.max_version
+            ))
+            .outerjoin(ProactiveDisclosureCategory, ProactiveDisclosureCategory.proactivedisclosurecategoryid == latest_proactive.proactivedisclosurecategoryid)
+            .outerjoin(iaoassignee, iaoassignee.username == FOIMinistryRequest.assignedto)
+            .filter(FOIMinistryRequest.isactive == True)
+        )
+        if additionalfilter == 'watchingRequests':
+            subquery_watchby = FOIRequestWatcher.getrequestidsbyuserid(userid)
+            basequery = basequery.join(
+                subquery_watchby, 
+                subquery_watchby.c.ministryrequestid == FOIMinistryRequest.foiministryrequestid
+            )
+        elif additionalfilter == 'myRequests':
+            basequery = basequery.filter(
+                and_(
+                    FOIMinistryRequest.assignedto == userid
+                )
+            )
+        elif additionalfilter == 'unassignedRequests':
+            basequery = basequery.filter(
+                    FOIMinistryRequest.assignedto.is_(None),                         
+            )
+        elif additionalfilter is not None and additionalfilter.lower() == 'all':
+            basequery = basequery.filter(FOIMinistryRequest.assignedto != None)
+        #print("\n\n\n" + str(basequery.statement))
+        return basequery
+
+
+
+        
+    @classmethod
+    def getfilterforrequestssubquery(cls, filterfields, keyword, iaoassignee, ministryassignee):
+        _keywords = []
+        if(keyword is not None):
+            _keywords = keyword.lower().replace(",", " ").split()
+
+        #filter/search
+        filtercondition = []
+        for _keyword in _keywords:
+            onekeywordfiltercondition = []
+            #if(_keyword != 'restricted'):
+            for field in filterfields:
+                if(field == 'idNumber'):
+                    _keyword = _keyword.replace('u-00', '')
+                field_value = cls.findfield(field, iaoassignee, ministryassignee)
+                condition = field_value.ilike('%'+_keyword+'%')
+                onekeywordfiltercondition.append(condition)            
+            # else:
+            #     filtercondition.append(FOIRestrictedMinistryRequest.isrestricted == True)
+
+            if onekeywordfiltercondition:
+                filtercondition.append(or_(*onekeywordfiltercondition))
+            elif _keyword != 'restricted':  
+                filtercondition.append(literal(False))
+
+        return and_(*filtercondition)
     
     @classmethod
     def get_linkedfoiministryrequest_info(cls, axisid):

@@ -17,6 +17,7 @@ import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import IconButton from "@material-ui/core/IconButton";
 import MenuList from "@material-ui/core/MenuList";
 import MenuItem from "@material-ui/core/MenuItem";
+import RequestHeaderRow from '../RequestHeaderRow';
 import { saveAs } from "file-saver";
 import { downloadZip } from "client-zip";
 import AttachmentFilter from './AttachmentFilter';
@@ -69,15 +70,16 @@ export const AttachmentSection = ({
   iaoassignedToList,
   ministryAssignedToList,
   isMinistryCoordinator,
-  isHistoricalRequest
+  isHistoricalRequest,
+  isProactiveDisclosure
 }) => {
   const classes = useStyles();
   const [attachments, setAttachments] = useState(attachmentsArray)
-  
+
   useEffect(() => {
     setAttachments(attachmentsArray);
   }, [attachmentsArray])
-  
+
 
   const [openModal, setModal] = useState(false);
   const [fileCount, setFileCount] = useState(0);
@@ -100,18 +102,18 @@ export const AttachmentSection = ({
 
   React.useEffect(() => {
     setAttachmentsForDisplay(searchAttachments(attachments, filterValue, keywordValue));
-  },[filterValue, keywordValue, attachments])
+  }, [filterValue, keywordValue, attachments])
 
-  const searchAttachments = (_attachments, _filterValue, _keywordValue) =>  {
-    return _attachments.filter( attachment => {
-              let onecategory = getCategory(attachment.category?.toLowerCase());
-              return (
-                (_filterValue==="ALL"?true:onecategory.tags.includes(_filterValue?.toLowerCase()))
-                && ( onecategory.tags.join('-').includes(_keywordValue?.toLowerCase())
-                      || attachment.category?.toLowerCase().includes(_keywordValue?.toLowerCase()) 
-                      || attachment.filename.toLowerCase().includes(_keywordValue?.toLowerCase()) 
-                      || attachment.createdby?.toLowerCase().includes(_keywordValue?.toLowerCase()) )
-              )
+  const searchAttachments = (_attachments, _filterValue, _keywordValue) => {
+    return _attachments.filter(attachment => {
+      let onecategory = getCategory(attachment.category?.toLowerCase());
+      return (
+        (_filterValue === "ALL" ? true : onecategory.tags.includes(_filterValue?.toLowerCase()))
+        && (onecategory.tags.join('-').includes(_keywordValue?.toLowerCase())
+          || attachment.category?.toLowerCase().includes(_keywordValue?.toLowerCase())
+          || attachment.filename.toLowerCase().includes(_keywordValue?.toLowerCase())
+          || attachment.createdby?.toLowerCase().includes(_keywordValue?.toLowerCase()))
+      )
     });
   }
 
@@ -123,7 +125,7 @@ export const AttachmentSection = ({
 
   const handleContinueModal = (value, fileInfoList, files) => {
     setModal(false);
-    if (modalFor === 'delete' && value) { 
+    if (modalFor === 'delete' && value) {
       const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
       dispatch(deleteFOIRequestAttachment(requestId, ministryId, documentId, {}));
     }
@@ -135,12 +137,12 @@ export const AttachmentSection = ({
       saveDocument(value, fileInfoList, files);
     }
   }
-  
+
   const saveDocument = (value, fileInfoList, files) => {
     if (value) {
       if (files.length !== 0) {
         // setAttachmentLoading(true);
-        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList.map(file => ({...file, multipart: true})), 'attachments', bcgovcode, dispatch, async (err, res) => {
+        postFOIS3DocumentPreSignedUrl(ministryId, fileInfoList.map(file => ({ ...file, multipart: true })), 'attachments', bcgovcode, dispatch, async (err, res) => {
           let _documents = [];
           if (!err) {
             let completed = 0;
@@ -149,25 +151,25 @@ export const AttachmentSection = ({
             for (let header of res) {
               const _file = files.find(file => file.filename === header.filename);
               const _fileInfo = fileInfoList.find(fileInfo => fileInfo.filename === header.filename);
-              const documentDetails = {documentpath: header.filepathdb, filename: header.filename, category: _fileInfo.filestatustransition};
-              let bytes = await readUploadedFileAsBytes(_file)              
+              const documentDetails = { documentpath: header.filepathdb, filename: header.filename, category: _fileInfo.filestatustransition };
+              let bytes = await readUploadedFileAsBytes(_file)
               const CHUNK_SIZE = OSS_S3_CHUNK_SIZE;
               const totalChunks = Math.ceil(bytes.byteLength / CHUNK_SIZE);
               let parts = [];
               for (let chunk = 0; chunk < totalChunks; chunk++) {
                 let CHUNK = bytes.slice(chunk * CHUNK_SIZE, (chunk + 1) * CHUNK_SIZE);
-                let response = await saveFilesinS3({filepath: header.filepaths[chunk]}, CHUNK, dispatch, (_err, _res) => {
+                let response = await saveFilesinS3({ filepath: header.filepaths[chunk] }, CHUNK, dispatch, (_err, _res) => {
                   if (_err) {
                     failed.push(header.filename);
                   }
                 })
                 if (response.status === 200) {
-                  parts.push({PartNumber: chunk + 1, ETag: response.headers.etag})
+                  parts.push({ PartNumber: chunk + 1, ETag: response.headers.etag })
                 } else {
                   failed.push(header.filename);
                 }
               }
-              await completeMultiPartUpload({uploadid: header.uploadid, filepath: header.filepathdb, parts: parts}, ministryId, 'attachments', bcgovcode, dispatch, (_err, _res) => {                
+              await completeMultiPartUpload({ uploadid: header.uploadid, filepath: header.filepathdb, parts: parts }, ministryId, 'attachments', bcgovcode, dispatch, (_err, _res) => {
                 if (!_err && _res.ResponseMetadata.HTTPStatusCode === 200) {
                   completed++;
                   toast.update(toastID, {
@@ -182,21 +184,21 @@ export const AttachmentSection = ({
             }
             if (_documents.length > 0) {
               if (modalFor === 'replace' && updateAttachment) {
-                const replaceDocumentObject = {filename: _documents[0].filename, documentpath: _documents[0].documentpath};
-                const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;      
-                dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject,(err, _res) => {
+                const replaceDocumentObject = { filename: _documents[0].filename, documentpath: _documents[0].documentpath };
+                const documentId = ministryId ? updateAttachment.foiministrydocumentid : updateAttachment.foidocumentid;
+                dispatch(replaceFOIRequestAttachment(requestId, ministryId, documentId, replaceDocumentObject, (err, _res) => {
                   dispatchRequestAttachment(err);
                 }));
               }
               else {
-                dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, {documents: _documents}, (err, _res) => {
+                dispatch(saveFOIRequestAttachmentsList(requestId, ministryId, { documents: _documents }, (err, _res) => {
                   dispatchRequestAttachment(err);
                 }));
               }
             }
             var toastOptions = {
               render: failed.length > 0 ?
-                "The following " + failed.length + " file uploads failed\n- " + failed.join("\n- ")  :
+                "The following " + failed.length + " file uploads failed\n- " + failed.join("\n- ") :
                 fileInfoList.length + ' Files successfully saved',
               type: failed.length > 0 ? "error" : "success",
             }
@@ -214,7 +216,7 @@ export const AttachmentSection = ({
             setAttachmentLoading(false)
           }
         })
-      }             
+      }
     }
   }
 
@@ -222,8 +224,8 @@ export const AttachmentSection = ({
     const toastID = toast.loading("Downloading file (0%)")
     getFOIS3DocumentPreSignedUrl(file.documentpath.split('/').slice(4).join('/'), ministryId, dispatch, (err, res) => {
       if (!err) {
-        getFileFromS3({filepath: res}, (_err, response) => {
-          let blob = new Blob([response.data], {type: "application/octet-stream"});
+        getFileFromS3({ filepath: res }, (_err, response) => {
+          let blob = new Blob([response.data], { type: "application/octet-stream" });
           saveAs(blob, file.filename)
           toast.update(toastID, {
             render: _err ? "File download failed" : "Download complete",
@@ -256,12 +258,12 @@ export const AttachmentSection = ({
       for (let attachment of attachmentsForDisplay) {
         const category = isHistoricalRequest ? 'historical' : 'attachments'
         const response = await getFOIS3DocumentPreSignedUrl(attachment.documentpath.split('/').slice(4).join('/'), ministryId, dispatch, null, category, bcgovcode)
-        await getFileFromS3({filepath: response.data}, (_err, res) => {
+        await getFileFromS3({ filepath: response.data }, (_err, res) => {
           if (_err) {
             failed++
           } else {
-            let blob = new Blob([res.data], {type: "application/octet-stream"});
-            blobs.push({name: attachment.filename, lastModified: res.headers['last-modified'], input: blob})
+            let blob = new Blob([res.data], { type: "application/octet-stream" });
+            blobs.push({ name: attachment.filename, lastModified: res.headers['last-modified'], input: blob })
           }
           toast.update(toastID, {
             render: "Downloading file " + 0 + "% (" + blobs.length + "/" + noOfFiles + ")",
@@ -359,46 +361,49 @@ export const AttachmentSection = ({
   const getFullname = (userId) => {
     let user;
 
-    if(fullnameList) {
+    if (fullnameList) {
       user = fullnameList.find(u => u.username === userId);
       return user && user.fullname ? user.fullname : userId;
     } else {
 
-      if(iaoassignedToList.length > 0) {
+      if (iaoassignedToList.length > 0) {
         addToFullnameList(iaoassignedToList, "iao");
         setFullnameList(getFullnameList());
       }
-  
-      if(ministryAssignedToList.length > 0) {
+
+      if (ministryAssignedToList.length > 0) {
         addToFullnameList(iaoassignedToList, bcgovcode);
         setFullnameList(getFullnameList());
       }
-  
+
       user = fullnameList.find(u => u.username === userId);
       return user && user.fullname ? user.fullname : userId;
     }
   };
 
-  const getRequestNumber = ()=> {
+  const getRequestNumber = (isProactiveDisclosure) => {
     if (requestNumber)
-      return `Request #${requestNumber}`;
-    return `Request #U-00${requestId}`;
+      if (isProactiveDisclosure)
+        return requestNumber;
+      else
+        return `Request #${requestNumber}`;
+    return isProactiveDisclosure ? requestId : `Request #U-00${requestId}`;
   }
 
   let attachmentsList = [];
-  for(let i=0; i<attachmentsForDisplay.length; i++) {
+  for (let i = 0; i < attachmentsForDisplay.length; i++) {
     attachmentsList.push(
-    <Attachment 
-      key={i}
-      indexValue={i} 
-      attachment={attachmentsForDisplay[i]} 
-      handlePopupButtonClick={handlePopupButtonClick} 
-      getFullname={getFullname} 
-      isMinistryCoordinator={isMinistryCoordinator}
-      ministryId={ministryId}
-      classes={classes} 
-      isHistoricalRequest={isHistoricalRequest}
-    />);
+      <Attachment
+        key={i}
+        indexValue={i}
+        attachment={attachmentsForDisplay[i]}
+        handlePopupButtonClick={handlePopupButtonClick}
+        getFullname={getFullname}
+        isMinistryCoordinator={isMinistryCoordinator}
+        ministryId={ministryId}
+        classes={classes}
+        isHistoricalRequest={isHistoricalRequest}
+      />);
   }
 
   const handleFilterChange = (_newFilterValue) => {
@@ -420,59 +425,67 @@ export const AttachmentSection = ({
           <Grid
             container
             direction="row"
-            justify="flex-start"
+            justify={isProactiveDisclosure ? "flex-end" : "flex-start"}
             alignItems="flex-start"
             spacing={1}
           >
-            <Grid item xs={6}>
-              <h1 className="foi-review-request-text foi-ministry-requestheadertext">
-                {getRequestNumber()}
-              </h1>
-            </Grid>
-            <Grid item xs={3}>
-              <ConditionalComponent condition={hasDocumentsToExport}>
-                <button
-                  className="btn addAttachment foi-export-button"
-                  variant="contained"
-                  onClick={downloadAllDocuments}
-                  color="primary"
-                >
-                  Export All
-                </button>
-              </ConditionalComponent>
-            </Grid>
-            <Grid item xs={3}>
-              {!isHistoricalRequest && <button
-                className={clsx("btn", "addAttachment", classes.createButton)}
-                variant="contained"
-                onClick={addAttachments}
-                color="primary"
-              >
-                + Add Attachment
-              </button>}
+            <Grid item xs={isProactiveDisclosure ? 12 : 6}>
+              <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure} />
             </Grid>
             <Grid
               container
+              item
               direction="row"
-              justify="flex-start"
+              justifyContent="flex-end"
               alignItems="flex-start"
-              spacing={1}
-              className={classes.attachmentLog}
+              xs={isProactiveDisclosure ? 12 : 6}
             >
-              <AttachmentFilter handleFilterChange={handleFilterChange} filterValue={filterValue} handleKeywordChange={handleKeywordChange} keyWordValue={keywordValue} isMinistryCoordinator={isMinistryCoordinator} />
-            </Grid>
-            <Grid
-              container
-              direction="row"
-              justify="flex-start"
-              alignItems="flex-start"
-              spacing={1}
-              className={classes.attachmentLog}
-            >
-              {attachmentsList}
+              <Grid item xs={3}>
+                <ConditionalComponent condition={hasDocumentsToExport}>
+                  <button
+                    className="btn addAttachment foi-export-button"
+                    variant="contained"
+                    onClick={downloadAllDocuments}
+                    color="primary"
+                  >
+                    Export All
+                  </button>
+                </ConditionalComponent>
+              </Grid>
+              <Grid item xs={3}>
+                {!isHistoricalRequest && (
+                  <button
+                    className={clsx("btn", "addAttachment", classes.createButton)}
+                    variant="contained"
+                    onClick={addAttachments}
+                    color="primary"
+                  >
+                    + Upload Records
+                  </button>
+                )}
+              </Grid>
             </Grid>
           </Grid>
-
+          <Grid
+            container
+            direction="row"
+            justify="flex-start"
+            alignItems="flex-start"
+            spacing={1}
+            className={classes.attachmentLog}
+          >
+            <AttachmentFilter handleFilterChange={handleFilterChange} filterValue={filterValue} handleKeywordChange={handleKeywordChange} keyWordValue={keywordValue} isMinistryCoordinator={isMinistryCoordinator} />
+          </Grid>
+          <Grid
+            container
+            direction="row"
+            justify="flex-start"
+            alignItems="flex-start"
+            spacing={1}
+            className={classes.attachmentLog}
+          >
+            {attachmentsList}
+          </Grid>
           <AttachmentModal
             modalFor={modalFor}
             openModal={openModal}
@@ -486,8 +499,7 @@ export const AttachmentSection = ({
             handleReclassify={handleReclassify}
             maxNoFiles={10}
             isMinistryCoordinator={isMinistryCoordinator}
-            retrieveRecordVersion={() => {}}
-
+            retrieveRecordVersion={() => { }}
           />
         </>
       )}
@@ -496,13 +508,13 @@ export const AttachmentSection = ({
 }
 
 
-const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, getFullname, isMinistryCoordinator,ministryId, isHistoricalRequest}) => {
-  
+const Attachment = React.memo(({ indexValue, attachment, handlePopupButtonClick, getFullname, isMinistryCoordinator, ministryId, isHistoricalRequest }) => {
+
   const classes = useStyles();
 
   const disableCategory = () => {
-    if (['personal', AttachmentLetterCategories.feeestimatefailed.name, AttachmentLetterCategories.feeestimatesuccessful.name, AttachmentLetterCategories.feeestimateletter.name, AttachmentLetterCategories.feeestimatepaymentreceipt.name, AttachmentLetterCategories.feeestimatepaymentcorrespondencesuccessful.name, AttachmentLetterCategories.feeestimatepaymentcorrespondencefailed.name].includes(attachment.category?.toLowerCase()) )
-      return true;      
+    if (['personal', AttachmentLetterCategories.feeestimatefailed.name, AttachmentLetterCategories.feeestimatesuccessful.name, AttachmentLetterCategories.feeestimateletter.name, AttachmentLetterCategories.feeestimatepaymentreceipt.name, AttachmentLetterCategories.feeestimatepaymentcorrespondencesuccessful.name, AttachmentLetterCategories.feeestimatepaymentcorrespondencefailed.name].includes(attachment.category?.toLowerCase()))
+      return true;
   }
   const disableAttachmentsTaggedBySystem = (attachment) => {
     let result = false;
@@ -519,7 +531,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
   const [disabled, setDisabled] = useState(isMinistryCoordinator && disableCategory());
   const [reclassifyIsDisabled, setReclassifyIsDisabled] = useState(false);
   useEffect(() => {
-    if(attachment && attachment.filename) {
+    if (attachment && attachment.filename) {
       setDisabled(isMinistryCoordinator && disableCategory())
     }
     if (attachment && attachment.category) {
@@ -528,12 +540,11 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
   }, [attachment])
 
 
-  const attachmenttitle = ()=>{
+  const attachmenttitle = () => {
 
-    if (disabled)
-    {
+    if (disabled) {
       return (
-        <div 
+        <div
           className="attachment-name attachment-disabled"
         >
           {attachment.filename}
@@ -541,21 +552,20 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
       )
     }
 
-    if(attachment.documentpath.toLowerCase().indexOf('.eml') > 0  || attachment.documentpath.toLowerCase().indexOf('.msg') > 0 || attachment.documentpath.toLowerCase().indexOf('.txt') > 0)
-    {
+    if (attachment.documentpath.toLowerCase().indexOf('.eml') > 0 || attachment.documentpath.toLowerCase().indexOf('.msg') > 0 || attachment.documentpath.toLowerCase().indexOf('.txt') > 0) {
       return (
-        <div 
-          className="attachment-name viewattachment" onClick={()=>handlePopupButtonClick("download", attachment)}
+        <div
+          className="attachment-name viewattachment" onClick={() => handlePopupButtonClick("download", attachment)}
         >
           {attachment.filename}
         </div>
       )
-     
-    }   
-    else{
+
+    }
+    else {
       return (
-        <div onClick={()=>{
-          opendocumentintab(attachment,ministryId);
+        <div onClick={() => {
+          opendocumentintab(attachment, ministryId);
         }}
           className="attachment-name viewattachment"
         >
@@ -564,7 +574,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
       )
     }
 
-    
+
   }
 
   return (
@@ -581,8 +591,8 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
         <Grid item xs={11}>
           {attachmenttitle()}
         </Grid>
-        <Grid 
-          item 
+        <Grid
+          item
           xs={1}
           container
           direction="row-reverse"
@@ -600,7 +610,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
           />
         </Grid>
       </Grid>
-      <Grid 
+      <Grid
         container
         direction="row"
         justify="flex-start"
@@ -614,14 +624,13 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
             className={clsx(classes.chip, {
               [classes.chipPrimary]: !disabled,
             })}
-            style={{backgroundColor: disabled?"#e0e0e0":getCategory(attachment.category).bgcolor, width: "130px"}}
+            style={{ backgroundColor: disabled ? "#e0e0e0" : getCategory(attachment.category).bgcolor, width: "130px" }}
           />
         </Grid>
         <Grid item xs={2}>
           <div
-            className={`attachment-owner ${
-              disabled ? "attachment-disabled" : ""
-            }`}
+            className={`attachment-owner ${disabled ? "attachment-disabled" : ""
+              }`}
           >
             {getFullname(attachment.createdby)}
           </div>
@@ -634,7 +643,7 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
           </div>
         </Grid>
       </Grid>
-      <Grid 
+      <Grid
         container
         direction="row"
         justify="flex-start"
@@ -649,19 +658,18 @@ const Attachment = React.memo(({indexValue, attachment, handlePopupButtonClick, 
   );
 })
 
-const opendocumentintab =(attachment,ministryId)=>
-{
+const opendocumentintab = (attachment, ministryId) => {
   let relativedocpath = attachment.documentpath.split('/').slice(4).join('/')
-  let url =`/foidocument?id=${ministryId || -1}&filepath=${relativedocpath}`;
+  let url = `/foidocument?id=${ministryId || -1}&filepath=${relativedocpath}`;
   window.open(url, '_blank').focus();
 }
 
-const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonClick, disabled, reclassifyIsDisabled, ministryId, isHistoricalRequest}) => {
+const AttachmentPopup = React.memo(({ indexValue, attachment, handlePopupButtonClick, disabled, reclassifyIsDisabled, ministryId, isHistoricalRequest }) => {
   const ref = React.useRef();
-  const closeTooltip = () => ref.current && ref ? ref.current.close():{};
+  const closeTooltip = () => ref.current && ref ? ref.current.close() : {};
 
   const handleRename = () => {
-    closeTooltip(); 
+    closeTooltip();
     handlePopupButtonClick("rename", attachment);
   }
 
@@ -671,22 +679,22 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
   }
 
   const handleReplace = () => {
-    closeTooltip(); 
+    closeTooltip();
     handlePopupButtonClick("replace", attachment);
   }
 
-  const handleDownload = () =>{
-    closeTooltip();   
+  const handleDownload = () => {
+    closeTooltip();
     handlePopupButtonClick("download", attachment);
   }
 
-  const handleView =()=>{
-    closeTooltip();    
-    opendocumentintab(attachment,ministryId);
+  const handleView = () => {
+    closeTooltip();
+    opendocumentintab(attachment, ministryId);
   }
 
   const handleDelete = () => {
-    closeTooltip(); 
+    closeTooltip();
     handlePopupButtonClick("delete", attachment);
   };
 
@@ -704,7 +712,7 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
 
   const emailCategories = [
     AttachmentLetterCategories.feeestimatefailed.name,
-    AttachmentLetterCategories.feeestimatesuccessful.name,    
+    AttachmentLetterCategories.feeestimatesuccessful.name,
     AttachmentLetterCategories.feeestimateletter.name,
     AttachmentLetterCategories.feeestimatepaymentreceipt.name,
     AttachmentLetterCategories.feeestimatepaymentcorrespondencesuccessful.name,
@@ -729,7 +737,7 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
         onClick={() => {
           handleReplace();
           setPopoverOpen(false);
-         }}
+        }}
       >
         Replace
       </MenuItem>
@@ -743,7 +751,7 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
         onClick={() => {
           handleDelete();
           setPopoverOpen(false);
-         }}
+        }}
       >
         Delete
       </MenuItem>
@@ -756,11 +764,11 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
       return (<ReplaceMenu />)
     } else if (!showDelete(attachment.category)) {
       return null;
-    }     
+    }
     return (<DeleteMenu />)
   }
 
-  const ActionsPopover = ({RestrictViewInBrowser, isHistoricalRequest}) => {
+  const ActionsPopover = ({ RestrictViewInBrowser, isHistoricalRequest }) => {
 
     return (
       <Popover
@@ -783,49 +791,49 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
         onClose={() => setPopoverOpen(false)}
       >
         <MenuList>
-{!RestrictViewInBrowser ?
-        <MenuItem
-            onClick={() => {
+          {!RestrictViewInBrowser ?
+            <MenuItem
+              onClick={() => {
                 handleView();
                 setPopoverOpen(false);
-            }}
-          >
-            View
-          </MenuItem>
-          :""}
+              }}
+            >
+              View
+            </MenuItem>
+            : ""}
           <MenuItem
             onClick={() => {
-                handleDownload();
-                setPopoverOpen(false);
+              handleDownload();
+              setPopoverOpen(false);
             }}
           >
             Download
           </MenuItem>
-          {!isHistoricalRequest && 
+          {!isHistoricalRequest &&
             <MenuItem
               onClick={() => {
-                  handleReclassify();
-                  setPopoverOpen(false);
+                handleReclassify();
+                setPopoverOpen(false);
               }}
               disabled={reclassifyIsDisabled}
             >
               Reclassify
             </MenuItem>
-          }          
-          {!isHistoricalRequest && 
+          }
+          {!isHistoricalRequest &&
 
             <MenuItem
               onClick={() => {
-                  handleRename();
-                  setPopoverOpen(false);
+                handleRename();
+                setPopoverOpen(false);
               }}
             >
               Rename
             </MenuItem>
           }
           {(attachment.category === "personal" || isHistoricalRequest) ? (
-          ""
-          ) : <AddMenuItems />}        
+            ""
+          ) : <AddMenuItems />}
         </MenuList>
       </Popover>
     );
@@ -834,7 +842,7 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
   return (
     <>
       <IconButton
-        aria-label= "actions"
+        aria-label="actions"
         id={`ellipse-icon-${indexValue}`}
         key={`ellipse-icon-${indexValue}`}
         color="primary"
@@ -844,12 +852,12 @@ const AttachmentPopup = React.memo(({indexValue, attachment, handlePopupButtonCl
           setAnchorPosition(
             e.currentTarget.getBoundingClientRect()
           );
-        }}                      
+        }}
       >
-      <MoreHorizIcon />
-    </IconButton>
-    <ActionsPopover RestrictViewInBrowser={attachment.documentpath.toLowerCase().indexOf('.eml') > 0 || attachment.documentpath.toLowerCase().indexOf('.msg') > 0 ? true:false } isHistoricalRequest={isHistoricalRequest}/>
-  </>
+        <MoreHorizIcon />
+      </IconButton>
+      <ActionsPopover RestrictViewInBrowser={attachment.documentpath.toLowerCase().indexOf('.eml') > 0 || attachment.documentpath.toLowerCase().indexOf('.msg') > 0 ? true : false} isHistoricalRequest={isHistoricalRequest} />
+    </>
   );
 })
 

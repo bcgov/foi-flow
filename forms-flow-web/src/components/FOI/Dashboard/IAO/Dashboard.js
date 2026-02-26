@@ -185,7 +185,7 @@ const Dashboard = ({ userDetail }) => {
             </ButtonBase>
           </Grid>
           <Grid item container lg={4} xs={6} justifyContent="flex-end">
-          {!isOITeam && (
+            {/* {!isOITeam && ( */}
             <button
               type="button"
               className="btn foi-btn-create"
@@ -193,68 +193,68 @@ const Dashboard = ({ userDetail }) => {
             >
               {FOI_COMPONENT_CONSTANTS.ADD_REQUEST}
             </button>
-          )}
+            {/* )} */}
           </Grid>
         </Grid>
-        { (!showAdvancedSearch && !showEventQueue && !showKeywordSearch) &&
-        <Grid
-          container
-          direction="row"
-          spacing={1}
-          // className={clsx({
-          //   [classes.hidden]: showAdvancedSearch || showEventQueue,
-          // })}
-          sx={{
-            marginTop: "2em",
-          }}
-        >
-          <Queue userDetail={userDetail} tableInfo={tableInfo} isOITeam={isOITeam} />
-        </Grid>
+        {(!showAdvancedSearch && !showEventQueue && !showKeywordSearch) &&
+          <Grid
+            container
+            direction="row"
+            spacing={1}
+            // className={clsx({
+            //   [classes.hidden]: showAdvancedSearch || showEventQueue,
+            // })}
+            sx={{
+              marginTop: "2em",
+            }}
+          >
+            <Queue userDetail={userDetail} tableInfo={tableInfo} isOITeam={isOITeam} />
+          </Grid>
         }
-        { showEventQueue &&
-        <Grid
-          container
-          direction="row"
-          spacing={2}
-          sx={{
-            marginTop: "2em",
-          }}
+        {showEventQueue &&
+          <Grid
+            container
+            direction="row"
+            spacing={2}
+            sx={{
+              marginTop: "2em",
+            }}
           // className={clsx({
           //   [classes.hidden]: !showEventQueue,
           // })}
-        >
-         <EventQueueSearch userDetail={userDetail} eventQueueTableInfo={eventQueueTableInfo}></EventQueueSearch>
-        </Grid>
+          >
+            <EventQueueSearch userDetail={userDetail} eventQueueTableInfo={eventQueueTableInfo}></EventQueueSearch>
+          </Grid>
         }
-        { showAdvancedSearch &&
-        <Grid
-          container
-          direction="row"
-          spacing={2}
-          sx={{
-            marginTop: "2em",
-          }}
+        {showAdvancedSearch &&
+          <Grid
+            container
+            direction="row"
+            spacing={2}
+            sx={{
+              marginTop: "2em",
+            }}
           // className={clsx({
           //   [classes.hidden]: !showAdvancedSearch,
           // })}
-        >
-          <AdvancedSearch userDetail={userDetail} />
-        </Grid>
+          >
+            <AdvancedSearch userDetail={userDetail} />
+          </Grid>
         }
         {showKeywordSearch &&
-        <Grid
-          container
-          direction="row"
-          spacing={2}
-          sx={{
-            marginTop: "2em",
-          }}
+          <Grid
+            container
+            direction="row"
+            spacing={2}
+            sx={{
+              marginTop: "2em",
+            }}
           // className={clsx({
           //   [classes.hidden]: !showAdvancedSearch,
           // })}
-        >
-          <KeywordSearch userDetail={userDetail} />
-        </Grid>
+          >
+            <KeywordSearch userDetail={userDetail} />
+          </Grid>
         }
       </Grid>
     </div>
