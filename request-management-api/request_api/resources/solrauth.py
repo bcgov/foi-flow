@@ -48,7 +48,6 @@ class FOISolrSearch(Resource):
     @auth.isiao
     def post():      
         try:
-            #print("\nArgs:",request.args)
             payload = request.get_json()
             if 'requestnumbers' in payload:
                 requestnumbers = payload["requestnumbers"]                      

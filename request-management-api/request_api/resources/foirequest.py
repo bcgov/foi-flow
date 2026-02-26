@@ -99,13 +99,12 @@ class FOIRequests(Resource):
         try:
             request_json = request.get_json()
             request_type = request_json.get('requestType', '').lower()
-            print("Request type in api /foirequests: ",request_type)
             if request_type == 'proactive disclosure':
                 foirequestschema = FOIPDRequestWrapperSchema().load(request_json)
             else:
                 foirequestschema = FOIRequestWrapperSchema().load(request_json)
 
-            print("foirequestschema: ",foirequestschema)
+            #print("foirequestschema: ",foirequestschema)
             assignedgroup = request_json['assignedGroup'] if 'assignedGroup' in foirequestschema  else None
             assignedto = request_json['assignedTo'] if 'assignedTo' in foirequestschema  else None
             assignedtofirstname = request_json["assignedToFirstName"] if request_json.get("assignedToFirstName") != None else None
@@ -150,7 +149,6 @@ class FOIRequestsById(Resource):
         try:
             request_json = request.get_json()
             request_type = request_json.get('requestType', '').lower()
-            print("Request type in api /foirequests: ",request_type)
             if request_type == 'proactive disclosure':
                 foirequestschema = FOIPDRequestWrapperSchema().load(request_json)
             else:

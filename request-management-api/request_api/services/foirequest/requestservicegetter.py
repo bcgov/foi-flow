@@ -90,7 +90,7 @@ class requestservicegetter:
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
         ministryrestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(foiministryrequestid,type='ministry')
         requestproactive = FOIProactiveDisclosureRequests.getcurrentfoiproactiverequest(foiministryrequestid)
-        print("\n----requestproactive in getrequestdetailsforministry:",requestproactive)
+        #print("\n----requestproactive in getrequestdetailsforministry:",requestproactive)
         baserequestinfo = {}
         if requestministry["assignedministrygroup"] in authmembershipgroups:
             baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions, requestproactive)
@@ -171,9 +171,7 @@ class requestservicegetter:
             linkedministryrequests = requestministry["linkedrequests"]
         assignedgroupemail = OperatingTeamEmail.getoperatingteamemail(requestministry["assignedgroup"])
         if assignedgroupemail is None:
-            assignedgroupemail = KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"])
-        print("\nrequest in __preparebaseinfo:", request)  
-        print("\nrequestministry:",requestministry)         
+            assignedgroupemail = KeycloakAdminService().processgroupEmail(requestministry["assignedgroup"])    
         baserequestinfo = {
             'id': request['foirequestid'],
             'requestType': request['requesttype'],

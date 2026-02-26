@@ -26,7 +26,7 @@ class requestservicebuilder(requestserviceconfigurator):
     """
 
     def createministry(self, requestschema, ministry, activeversion, userid, filenumber=None, ministryid=None):
-        print("\n-------requestschema-",requestschema)
+        #print("\n-------requestschema-",requestschema)
         programareaiaocode = self.getprogramareaiaocodebyid(self.getvalueof("programArea",ministry["code"]))
         axisrequestid = requestschema.get("axisRequestId", FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("requestType"), requestschema.get("isconsultflag")))
         current_foiministryrequest = FOIMinistryRequest.getrequest(ministryid)
@@ -81,7 +81,7 @@ class requestservicebuilder(requestserviceconfigurator):
             foiministryrequest.duedate = requestschema.get("cfrDueDate")
             foiministryrequest.proactivedisclosures = self._prepareproactivedisclosuredetails(requestschema, userid, ministryid, activeversion)
 
-        print("foiministryrequest-proactivedisclosures",foiministryrequest.proactivedisclosures)
+        #print("foiministryrequest-proactivedisclosures",foiministryrequest.proactivedisclosures)
         if ministryid is not None:
             foiministryrequest.foiministryrequestid = ministryid
             activeversion = FOIMinistryRequest.getversionforrequest(ministryid)[0]+1
@@ -223,7 +223,7 @@ class requestservicebuilder(requestserviceconfigurator):
                 oipcreview.createdby=userid
                 oipcreview.created_at= datetime2.now().isoformat()
                 oipcarr.append(oipcreview)
-            print("\noipcarr",oipcarr)
+            #print("\noipcarr",oipcarr)
         return oipcarr
         
     

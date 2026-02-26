@@ -1062,7 +1062,6 @@ class FOIRawRequest(db.Model):
         #request type: personal, general
         requesttypecondition = []
         for type in params['requesttype']:
-            print("\n******type: ", type)
             if type == 'proactivedisclosure':
                 requesttypecondition.append(FOIRawRequest.findfield('requestType') == 'proactive disclosure')
                 requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == 'proactive disclosure')
@@ -1071,7 +1070,6 @@ class FOIRawRequest(db.Model):
             else:
                 requesttypecondition.append(FOIRawRequest.findfield('requestType') == type)
                 requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == type)
-        print("\n******requesttypecondition: ", requesttypecondition)
         return requesttypecondition
 
     @classmethod

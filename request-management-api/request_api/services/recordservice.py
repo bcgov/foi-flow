@@ -300,15 +300,12 @@ class recordservice(recordservicebase):
                         streamkey= self.largefileocrstreamkey
             else:
                 streamkey = self.dedupestreamkey if extension in DEDUPE_FILE_TYPES else self.conversionstreamkey
-            print("!!!!!!!",[record])
             jobids, err = self.makedocreviewerrequest('POST', '/api/jobstatus', {
                 'records': [record],
                 'batch': record['attributes']['batch'],
                 'trigger': record['trigger'],
                 'ministryrequestid': ministryrequestid
             })
-            print("\njobids:",jobids)
-            #print("\nERROR:",err)
             if err and err is not None:
                 return DefaultMethodResult(False,self.DOC_REVIEWER_API_ERROR, -1, ministryrequestid)
             streamobject = {
@@ -544,7 +541,6 @@ class recordservice(recordservicebase):
                 if 'error' in jobids[entry['s3uripath']]:
                     logging.error("Doc Reviewer API was given an unsupported file type - no job triggered - Record ID: {0} File Name: {1} ".format(entry['recordid'], entry['filename']))
                 else:
-                    print("\n_ministryrequest:",_ministryrequest)
                     streamobject = {
                         "s3filepath": entry['s3uripath'],
                         "requestnumber": _ministryrequest['axisrequestid'],
@@ -570,12 +566,10 @@ class recordservice(recordservicebase):
                             assignedstreamkey =self.largefileconversionstreamkey
                         eventqueueservice().add(assignedstreamkey, streamobject)
                     if extension in DEDUPE_FILE_TYPES:
-                        print("\n------>Dedupe size limit:", int(self.dedupelargefilesizelimit))
                         if 'convertedfilesize' in entry['attributes'] and entry['attributes']['convertedfilesize'] < int(self.dedupelargefilesizelimit) or 'convertedfilesize' not in entry['attributes'] and entry['attributes']['filesize'] < int(self.dedupelargefilesizelimit):
                             assignedstreamkey= self.dedupestreamkey
                         else:
                             assignedstreamkey= self.largefilededupestreamkey
-                        print("\n------>Dedupe-streamobject:", streamobject)
                         eventqueueservice().add(assignedstreamkey, streamobject)
         return dbresponse
     

@@ -40,9 +40,7 @@ class requestserviceconfigurator:
             subjectcode = SubjectCode().getsubjectcodebyname(key)
             return subjectcode["subjectcodeid"] if subjectcode is not None else None
         elif name == "proactiveDisclosureCategory":
-            print("Key:",key)
             pdcategory = ProactiveDisclosureCategory().getproactivedisclosurecategory(key)
-            print("pdcategory:",pdcategory)
             return pdcategory["proactivedisclosurecategoryid"]
 
     def getprogramareaiaocodebyid(self, programareaid):

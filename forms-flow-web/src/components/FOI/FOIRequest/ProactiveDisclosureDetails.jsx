@@ -207,7 +207,7 @@ const ProactiveDisclosureDetails = React.memo(
     const [tabValue, setTabValue] = useState(0);
 
     const handleReportPeriodClick = (event) => {
-      if (disableInput || !startDate) return;
+      if (disableInput) return;
       setAnchorEl(event.currentTarget);
       const isQuarter = selectedReportPeriod && selectedReportPeriod.toLowerCase().includes("quarter");
       const isYearly = selectedReportPeriod && (/^\d{4}$/.test(selectedReportPeriod));
@@ -226,7 +226,6 @@ const ProactiveDisclosureDetails = React.memo(
     };
 
     const handlePeriodUpdate = (date, period) => {
-      if (date) handleStartDateChange({ target: { value: date } });
       if (period) handleReportPeriodChange({ target: { value: period } });
       handlePopoverClose();
     };
@@ -359,7 +358,7 @@ const ProactiveDisclosureDetails = React.memo(
                     variant="outlined"
                     fullWidth
                     required
-                    disabled={disableInput || !startDate}
+                    disabled={disableInput}
                     error={selectedReportPeriod
                       ?.toLowerCase()
                       ?.includes("select")}
@@ -367,7 +366,7 @@ const ProactiveDisclosureDetails = React.memo(
                       readOnly: true,
                       endAdornment: (
                         <InputAdornment position="end">
-                          <ExpandMoreIcon style={{ color: disableInput || !startDate ? "rgba(0, 0, 0, 0.26)" : "#757575", cursor: "pointer", pointerEvents: "auto" }} />
+                          <ExpandMoreIcon style={{ color: disableInput ? "rgba(0, 0, 0, 0.26)" : "#757575", cursor: "pointer", pointerEvents: "auto" }} />
                         </InputAdornment>
                       ),
                     }}

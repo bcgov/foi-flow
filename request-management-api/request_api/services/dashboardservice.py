@@ -33,7 +33,7 @@ class dashboardservice:
     """
 
     def __preparefoirequestinfo(self, request, receiveddate, receiveddateuf, idnumberprefix = ''):
-        print("\nrequest in __preparefoirequestinfo-dashboard",request)
+        #print("\nrequest in __preparefoirequestinfo-dashboard",request)
         idnumber = self.__getidnumber(idnumberprefix, request.axisRequestId, request.idNumber)
         baserequestinfo = self.__preparebaserequestinfo(
             request.id, 
@@ -103,8 +103,6 @@ class dashboardservice:
         is_oi_team = AuthHelper.getusertype() == "iao" and groups and 'OI Team' in groups     
 
         for request in requests.items:
-            # print("KEyssss-",request.keys())
-            # print("Fieldsss",request._fields)
             if is_oi_team:
                 # Handle OI requests format
                 requestqueue.append(self.__handle_oi_request(request))
@@ -114,7 +112,6 @@ class dashboardservice:
                     _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
                 else:
                     _receiveddate = parser.parse(request.receivedDateUF)
-                print("\nrequest:",request)
                 if(request.ministryrequestid == None):                
                     unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
                     unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
@@ -140,7 +137,6 @@ class dashboardservice:
                     if isiaorestricted == True:
                         _openrequest.update({'lastName': 'Restricted'})
                         _openrequest.update({'firstName': 'Request'})
-                    print("\n????proactivedisclosurecategory:",request.proactivedisclosurecategory)
                     requestqueue.append(_openrequest)   
                    
 
