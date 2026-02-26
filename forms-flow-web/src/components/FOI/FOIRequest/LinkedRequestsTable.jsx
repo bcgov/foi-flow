@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import CancelIcon from '@mui/icons-material/Cancel';
+import { useSelector } from "react-redux";
 
 export const LinkedRequestsTable = ({
     linkedRequestsInfo,
@@ -22,6 +23,11 @@ export const LinkedRequestsTable = ({
     const [page, setPage] = useState(0);
     const MAX_ROWS_PER_PAGE = 7;
     const sortedlinkedRequestsInfo = linkedRequestsInfo?.sort((a,b) => a.axisrequestid.localeCompare(b.axisrequestid));
+    const programAreaList = useSelector(state=> state.foiRequests.foiProgramAreaList);
+
+    const getIAOCode = (bcGovCode) => {
+        return programAreaList?.find(programAreaObj => programAreaObj.bcgovcode === bcGovCode)?.iaocode;
+    }
 
     return (
         <>
@@ -47,14 +53,14 @@ export const LinkedRequestsTable = ({
                         <col style={{ width: "15px" }} />
                         <col style={{ width: "50px" }} />
                         <col style={{ width: "50px" }} /> 
-                        {!isMinistry && <col style={{ width: "15px" }} />} 
+                        {!isMinistry && <col style={{ width: "18px" }} />} 
                     </colgroup>
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{backgroundColor: "#003366", fontWeight: "bold",  color: "#FFF",}} align="center">MIN</TableCell>
-                            <TableCell sx={{backgroundColor: "#003366", fontWeight: "bold",  color: "#FFF",}} align="center">Request ID</TableCell>
-                            <TableCell sx={{backgroundColor: "#003366", fontWeight: "bold",  color: "#FFF",}} align="center">Request State</TableCell>
-                            {!isMinistry && <TableCell sx={{backgroundColor: "#003366", fontWeight: "bold",  color: "#FFF",}} align="center">Remove</TableCell>}
+                            <TableCell sx={{backgroundColor: "#003366", fontWeight: "bold",  color: "#FFF", fontSize: "14px"}} align="center">MIN</TableCell>
+                            <TableCell sx={{backgroundColor: "#003366", fontWeight: "bold",  color: "#FFF", fontSize: "14px"}} align="center">Request ID</TableCell>
+                            <TableCell sx={{backgroundColor: "#003366", fontWeight: "bold",  color: "#FFF", fontSize: "14px"}} align="center">Request State</TableCell>
+                            {!isMinistry && <TableCell sx={{backgroundColor: "#003366", fontWeight: "bold",  color: "#FFF", fontSize: "14px"}} align="center">Remove</TableCell>}
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -63,8 +69,8 @@ export const LinkedRequestsTable = ({
                     .map((reqObj, idx) => {
                         return (
                         <TableRow key={idx}>
-                        <TableCell align="center" component="th" scope="row">{reqObj.govcode}</TableCell>
-                        <TableCell align="center">
+                        <TableCell sx={{fontSize: "14px"}} align="center" component="th" scope="row">{getIAOCode(reqObj.govcode)}</TableCell>
+                        <TableCell sx={{fontSize: "14px"}} align="center">
                             {!isMinistry ?
                                 <Link
                                     component="button"
@@ -77,9 +83,9 @@ export const LinkedRequestsTable = ({
                                 : <Typography>{reqObj.axisrequestid}</Typography>
                             }
                         </TableCell>
-                        <TableCell align="center">{reqObj.requeststatus}</TableCell>
+                        <TableCell sx={{fontSize: "14px"}} align="center">{reqObj.requeststatus}</TableCell>
                         {!isMinistry &&
-                            <TableCell align="center">
+                            <TableCell sx={{fontSize: "14px"}} align="center">
                                 <button
                                     type="button"
                                     className="btn btn-link text-danger"
