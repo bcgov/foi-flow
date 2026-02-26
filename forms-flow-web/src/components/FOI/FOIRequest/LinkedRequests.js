@@ -7,7 +7,8 @@ import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import SearchIcon from "@material-ui/icons/Search";
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -52,7 +53,8 @@ const LinkedRequests = React.memo(
     const [options, setOptions] = useState([]);
 
     const getAxisRequestId = (item) => {
-      if (typeof item.axisrequestid === "string") return item.axisrequestid;
+      const axisRequestId = Object.keys(item)[0];
+      if (typeof axisRequestId === "string") return axisRequestId;
       return null;
     };
 
@@ -73,9 +75,9 @@ const LinkedRequests = React.memo(
     }
 
     const removeLinkedRequest = (reqItem) => {
-      const reqId = getAxisRequestId(reqItem);
+      const reqId = reqItem.axisrequestid;
       const updatedLinkedRequests = linkedRequests?.filter(item => getAxisRequestId(item) !== reqId);
-      const updatedLinkedInfoRequests = linkedRequestsInfo?.filter(item => getAxisRequestId(item) !== reqId);
+      const updatedLinkedInfoRequests = linkedRequestsInfo?.filter(item => item.axisrequestid !== reqId);
       setLinkedRequests(updatedLinkedRequests);
       setLinkedRequestsInfo(updatedLinkedInfoRequests);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS, updatedLinkedRequests);
@@ -83,7 +85,7 @@ const LinkedRequests = React.memo(
 
     const renderReviewRequest = (e, reqItem) => {
       e.preventDefault();
-      const reqId = getAxisRequestId(reqItem);
+      const reqId = reqItem.axisrequestid;
       const item = linkedRequestsInfo.find(
         obj => obj.axisrequestid === reqId
       );
@@ -124,14 +126,16 @@ const LinkedRequests = React.memo(
     };
 
     const linkRequest = async (selectedValue) => {
+      // linkedrequestinfo = {"axisrequestid": str, requeststatus: str, bcgovcode: str}
+      // linkedrequests = {"axisrequestid": bcgovcode}
       if (!selectedValue) {
         return;
       }
       // Create a new array to avoid mutation issues
       const updatedLinkedRequests = [...(linkedRequests || [])];
       
-      // Get the request ID from the selected value
-      const newRequestId = getAxisRequestId(selectedValue);
+      // Get the axis request ID from the selected value
+      const newRequestId = selectedValue.axisrequestid;
       
       // Check if this request ID already exists in the array
       const alreadyExists = updatedLinkedRequests.some(
@@ -147,15 +151,17 @@ const LinkedRequests = React.memo(
 
       // Add the new linkedrequest object to linkedrequest and linkedrequstinfo
       if (!alreadyExists && newRequestId) {
+        const axisRequestId = selectedValue.axisrequestid;
+        const govCode = selectedValue.govcode;
         const linkedReqObj = {
-          "axisrequestid": selectedValue.axisrequestid,
+          [selectedValue.axisrequestid]: govCode,
         };
         const linkedReqInfoObj = {
-          "axisrequestid": selectedValue.axisrequestid,
+          "axisrequestid": axisRequestId,
           "requeststatus": selectedValue.requeststatus,
           "foiministryrequestid": selectedValue.foiministryrequestid || null, 
           "rawrequestid": selectedValue.rawrequestid,
-          "govcode": selectedValue.govcode
+          "govcode": govCode
         };
         updatedLinkedRequests.push(linkedReqObj);
         setLinkedRequests(updatedLinkedRequests);
@@ -187,17 +193,12 @@ const LinkedRequests = React.memo(
                 isMinistry={isMinistry}
               />
               {!showSearch && (
-                <button
-                  type="button"
-                  className={`btn ${classes.linkedRequests}`}
-                  onClick={() => setShowSearch(true)}
-                >
-                  <AddCircleIcon
-                    fontSize="small"
-                    sx={{ margin: "0 5px" }}
-                  />
-                  Add Linked Request
-                </button>
+              <div style={{display: "flex", flexDirection: "row", alignItems: "center", margin: "7px 0px 7px 0px"}}>
+                  <button onClick={() => setShowSearch(true)} style={{ border: "none", background: "none" }}>
+                      <FontAwesomeIcon icon={faCirclePlus}  size="lg" color="#38598A" />
+                  </button>
+                  <p onClick={() => setShowSearch(true)} style={{fontWeight: "bold", color: "#38598A", cursor: "pointer"}}>Add Linked Request</p>
+              </div>
               )}
               {showSearch && (
                 <Grid
