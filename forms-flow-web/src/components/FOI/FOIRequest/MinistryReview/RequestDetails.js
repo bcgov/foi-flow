@@ -3,13 +3,10 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { formatDate } from "../../../../helper/FOI/helper";
 import { StateEnum } from '../../../../constants/FOI/statusEnum';
-import MinistriesCanvassed from '../../customComponents/MinistriesCanvassed/MinistriesCanvassed';
-
 
 const RequestDetails = React.memo((requestDetails) => {
 
-    const _requestDetails = requestDetails.requestDetails;    
-    const [openModal, setModal] = useState(false);
+    const _requestDetails = requestDetails.requestDetails;
 
     return Object.entries(_requestDetails).length > 0 &&
       _requestDetails != undefined && (
@@ -18,15 +15,6 @@ const RequestDetails = React.memo((requestDetails) => {
           <div className="row foi-details-row">
             <div className="col-lg-8 foi-details-col ">
               <label className="foi-details-label">REQUEST DETAILS</label>
-            </div>
-            <div className="col-lg-4 foi-details-col ">
-              <button type="button" className={`btn btn-link btn-description-history`} onClick={() => setModal(true)} disabled={!(!!_requestDetails.linkedRequests) || (!!_requestDetails.linkedRequests &&!_requestDetails.linkedRequests.length >0)}>
-                Linked Requests
-              </button>
-              {/* <a href="#" className="foi-floatright foi-link" onClick={() => setModal(true)} disabled={!(!!_requestDetails.linkedRequests)}>
-                Ministries Canvassed
-              </a> */}
-              <MinistriesCanvassed openModal={openModal} selectedMinistries={_requestDetails?.linkedRequests} setModal={setModal} isLinkedRequest={true}/>
             </div>
           </div>
           <CardContent>

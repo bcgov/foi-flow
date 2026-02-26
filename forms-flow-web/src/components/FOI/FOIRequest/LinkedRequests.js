@@ -7,7 +7,8 @@ import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import SearchIcon from "@material-ui/icons/Search";
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -187,17 +188,12 @@ const LinkedRequests = React.memo(
                 isMinistry={isMinistry}
               />
               {!showSearch && (
-                <button
-                  type="button"
-                  className={`btn ${classes.linkedRequests}`}
-                  onClick={() => setShowSearch(true)}
-                >
-                  <AddCircleIcon
-                    fontSize="small"
-                    sx={{ margin: "0 5px" }}
-                  />
-                  Add Linked Request
-                </button>
+              <div style={{display: "flex", flexDirection: "row", alignItems: "center", margin: "7px 0px 7px 0px"}}>
+                  <button onClick={() => setShowSearch(true)} style={{ border: "none", background: "none" }}>
+                      <FontAwesomeIcon icon={faCirclePlus}  size="lg" color="#38598A" />
+                  </button>
+                  <p onClick={() => setShowSearch(true)} style={{fontWeight: "bold", color: "#38598A", cursor: "pointer"}}>Add Linked Request</p>
+              </div>
               )}
               {showSearch && (
                 <Grid
