@@ -53,7 +53,8 @@ const LinkedRequests = React.memo(
     const [options, setOptions] = useState([]);
 
     const getAxisRequestId = (item) => {
-      if (typeof item.axisrequestid === "string") return item.axisrequestid;
+      const axisRequestId = Object.keys(item)[0];
+      if (typeof axisRequestId === "string") return axisRequestId;
       return null;
     };
 
@@ -74,9 +75,9 @@ const LinkedRequests = React.memo(
     }
 
     const removeLinkedRequest = (reqItem) => {
-      const reqId = getAxisRequestId(reqItem);
+      const reqId = reqItem.axisrequestid;
       const updatedLinkedRequests = linkedRequests?.filter(item => getAxisRequestId(item) !== reqId);
-      const updatedLinkedInfoRequests = linkedRequestsInfo?.filter(item => getAxisRequestId(item) !== reqId);
+      const updatedLinkedInfoRequests = linkedRequestsInfo?.filter(item => item.axisrequestid !== reqId);
       setLinkedRequests(updatedLinkedRequests);
       setLinkedRequestsInfo(updatedLinkedInfoRequests);
       createSaveRequestObject(FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS, updatedLinkedRequests);
@@ -84,7 +85,7 @@ const LinkedRequests = React.memo(
 
     const renderReviewRequest = (e, reqItem) => {
       e.preventDefault();
-      const reqId = getAxisRequestId(reqItem);
+      const reqId = reqItem.axisrequestid;
       const item = linkedRequestsInfo.find(
         obj => obj.axisrequestid === reqId
       );
@@ -125,14 +126,16 @@ const LinkedRequests = React.memo(
     };
 
     const linkRequest = async (selectedValue) => {
+      // linkedrequestinfo = {"axisrequestid": str, requeststatus: str, bcgovcode: str}
+      // linkedrequests = {"axisrequestid": bcgovcode}
       if (!selectedValue) {
         return;
       }
       // Create a new array to avoid mutation issues
       const updatedLinkedRequests = [...(linkedRequests || [])];
       
-      // Get the request ID from the selected value
-      const newRequestId = getAxisRequestId(selectedValue);
+      // Get the axis request ID from the selected value
+      const newRequestId = selectedValue.axisrequestid;
       
       // Check if this request ID already exists in the array
       const alreadyExists = updatedLinkedRequests.some(
@@ -148,15 +151,17 @@ const LinkedRequests = React.memo(
 
       // Add the new linkedrequest object to linkedrequest and linkedrequstinfo
       if (!alreadyExists && newRequestId) {
+        const axisRequestId = selectedValue.axisrequestid;
+        const govCode = selectedValue.govcode;
         const linkedReqObj = {
-          "axisrequestid": selectedValue.axisrequestid,
+          [selectedValue.axisrequestid]: govCode,
         };
         const linkedReqInfoObj = {
-          "axisrequestid": selectedValue.axisrequestid,
+          "axisrequestid": axisRequestId,
           "requeststatus": selectedValue.requeststatus,
           "foiministryrequestid": selectedValue.foiministryrequestid || null, 
           "rawrequestid": selectedValue.rawrequestid,
-          "govcode": selectedValue.govcode
+          "govcode": govCode
         };
         updatedLinkedRequests.push(linkedReqObj);
         setLinkedRequests(updatedLinkedRequests);

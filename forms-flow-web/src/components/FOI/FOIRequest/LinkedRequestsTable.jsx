@@ -26,7 +26,11 @@ export const LinkedRequestsTable = ({
     const programAreaList = useSelector(state=> state.foiRequests.foiProgramAreaList);
 
     const getIAOCode = (bcGovCode) => {
-        return programAreaList?.find(programAreaObj => programAreaObj.bcgovcode === bcGovCode)?.iaocode;
+        const iaoCode = programAreaList?.find(programAreaObj => programAreaObj.bcgovcode === bcGovCode)?.iaocode;
+        if (iaoCode) {
+            return iaoCode;
+        }
+        return bcGovCode;
     }
 
     return (

@@ -1314,7 +1314,7 @@ class FOIRawRequest(db.Model):
         try:
             if not linkedrequests:
                 return linkedrequestsinfo
-            axis_ids = [req['axisrequestid'] for req in linkedrequests]
+            axis_ids = [axisid for req_obj in linkedrequests for axisid in req_obj.keys()]
             # Union Statement to get either FOIMINISTRYREQUEST data if axisrequestid exists in FOIMINISTRYREQUEST OR FOIRAWREQUEST data if axisrequestid does not exist in FOIMINISTRYREQUEST
             sql = """
             SELECT DISTINCT ON (axisrequestid) axisrequestid, requestid, foiministryrequestid, requeststatuslabel, requestrawdata, iaocode, version 
