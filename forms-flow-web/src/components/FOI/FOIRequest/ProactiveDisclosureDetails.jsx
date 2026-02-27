@@ -307,7 +307,6 @@ const ProactiveDisclosureDetails = React.memo(
       <MenuItem
         key={item.name}
         value={item.name}
-        disabled={!item.name.toLowerCase().includes("calendars")}
       >
         {item.name}
       </MenuItem>
