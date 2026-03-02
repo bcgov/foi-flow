@@ -212,7 +212,11 @@ export const fetchFOIRequestDetails = (requestId, ministryId, userGroups) => {
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestDetail(foiRequest));
           const ministryCode = foiRequest.selectedMinistries[0].code.toLowerCase();
-          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ministryCode));
+          let isagbcpsteam = false;
+          if (ministryCode === 'ag' && userGroups && userGroups.includes('BCPS Team')) {
+            isagbcpsteam = true;
+          }
+          dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ministryCode, isagbcpsteam));
           dispatch(fetchFOIMinistryAssignedToList(ministryCode));
           dispatch(fetchFOIProcessingTeamList(foiRequest.requestType.toLowerCase()));
           dispatch(setFOILoader(false));
