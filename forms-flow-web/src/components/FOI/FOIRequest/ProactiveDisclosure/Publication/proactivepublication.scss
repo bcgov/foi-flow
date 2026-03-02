@@ -78,10 +78,20 @@
         &.justify-between {
             justify-content: space-between;
         }
+
+        &.justify-center {
+            justify-content: center;
+            gap: 15px;
+        }
     }
 
     .file-upload-col-grow {
         flex-grow: 1;
+    }
+
+    .file-upload-column-empty {
+        flex-basis: auto !important;
+        flex-grow: 0 !important;
     }
 
     .drag-drop-text {

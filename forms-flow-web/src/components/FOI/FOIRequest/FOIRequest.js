@@ -133,6 +133,8 @@ import {
   setFOIRequestDetail,
   setFOIPDFStitchedOIPackage,
   setFOIPDFStitchStatusForOIPackage,
+  setFOIPDFStitchedRecordForResponsePackage,
+  setFOIPDFStitchStatusForResponsePackage,
 } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
@@ -472,26 +474,49 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     if (isOITeam) {
       dispatch(fetchOpenInfoStatuses());
       dispatch(fetchFOIOpenInfoAdditionalFiles(requestId, ministryId));
-      dispatch(
-        fetchPDFStitchedStatus(
-          requestId,
-          ministryId,
-          "openinfo",
-          (err, res) => {
-            dispatch(setFOIPDFStitchStatusForOIPackage(res));
-          }
-        )
-      );
-      dispatch(
-        fetchPDFStitchedPackage(
-          requestId,
-          ministryId,
-          "openinfo",
-          (err, res) => {
-            dispatch(setFOIPDFStitchedOIPackage(res));
-          }
-        )
-      );
+      if (isProactiveDisclosure) {
+        dispatch(
+          fetchPDFStitchedStatus(
+            requestId,
+            ministryId,
+            "responsepackage",
+            (err, res) => {
+              dispatch(setFOIPDFStitchStatusForResponsePackage(res));
+            }
+          )
+        );
+        dispatch(
+          fetchPDFStitchedPackage(
+            requestId,
+            ministryId,
+            "responsepackage",
+            (err, res) => {
+              dispatch(setFOIPDFStitchedRecordForResponsePackage(res));
+            }
+          )
+        );
+      } else {
+        dispatch(
+          fetchPDFStitchedStatus(
+            requestId,
+            ministryId,
+            "openinfo",
+            (err, res) => {
+              dispatch(setFOIPDFStitchStatusForOIPackage(res));
+            }
+          )
+        );
+        dispatch(
+          fetchPDFStitchedPackage(
+            requestId,
+            ministryId,
+            "openinfo",
+            (err, res) => {
+              dispatch(setFOIPDFStitchedOIPackage(res));
+            }
+          )
+        );
+      }
     }
 
     if (bcgovcode) dispatch(fetchFOIMinistryAssignedToList(bcgovcode));
@@ -888,7 +913,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     cfrDueDate: "",
     publicationDate: ""
   }
-  
+
   const personalRequestDetailErrorsInit = {
     additionalApplicantPHN: false,
     additionalApplicantCorrectionsNum: false,
@@ -1843,20 +1868,20 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput || isHistoricalRequest}
                           />
-                        {requestDetails?.axisRequestId && 
-                          <LinkedRequests
-                          requestDetails={requestDetails}
-                            requestStatus={_requestStatus}
-                            handleRequestDetailsValue={handleRequestDetailsValue}
-                            handleRequestDetailsInitialValue={
-                              handleRequestDetailsInitialValue
-                            }
-                            createSaveRequestObject={createSaveRequestObject}
-                            disableInput={disableInput || isHistoricalRequest}
-                            isHistoricalRequest={isHistoricalRequest}
-                            isMinistry={isMinistry}
-                          />
-                        }
+                          {requestDetails?.axisRequestId &&
+                            <LinkedRequests
+                              requestDetails={requestDetails}
+                              requestStatus={_requestStatus}
+                              handleRequestDetailsValue={handleRequestDetailsValue}
+                              handleRequestDetailsInitialValue={
+                                handleRequestDetailsInitialValue
+                              }
+                              createSaveRequestObject={createSaveRequestObject}
+                              disableInput={disableInput || isHistoricalRequest}
+                              isHistoricalRequest={isHistoricalRequest}
+                              isMinistry={isMinistry}
+                            />
+                          }
                           {redactedSections &&
                             Object.keys(redactedSections).length > 0 && (
                               <RedactionSummary
@@ -1959,6 +1984,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                 isMinistryCoordinator={false}
                 isHistoricalRequest={isHistoricalRequest}
                 isProactiveDisclosure={isProactiveDisclosure}
+                proactiveDisclosureCategory={requestDetails?.proactiveDisclosureCategory}
               />
             )}
           </div>
@@ -2086,6 +2112,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   isMinistry={false}
                   commentTypes={commentTypes}
                   isProactiveDisclosure={isProactiveDisclosure}
+                  proactiveDisclosureCategory={requestDetails?.proactiveDisclosureCategory}
                 />
               </>
             ) : (

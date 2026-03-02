@@ -795,6 +795,19 @@ const AdvancedSearch = ({ userDetail }) => {
                         }
                         label="General"
                       />
+                      <FormControlLabel
+                        className={classes.checkboxLabel}
+                        control={
+                          <Checkbox
+                            size="small"
+                            name="proactivedisclosure"
+                            onChange={handleRequestTypeChange}
+                            checked={requestTypes.proactivedisclosure}
+                            color="success"
+                          />
+                        }
+                        label="Proactive Disclosure"
+                      />
                     </FormGroup>
                   </Grid>
                 </Grid>

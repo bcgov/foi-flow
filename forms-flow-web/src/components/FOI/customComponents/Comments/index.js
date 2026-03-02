@@ -35,6 +35,7 @@ export const CommentSection = ({
   isMinistry,
   commentTypes,
   isProactiveDisclosure,
+  proactiveDisclosureCategory
 }) => {
   const requestWatchers = useSelector((state) => state.foiRequests.foiWatcherList);
   const [showaddbox, setshowaddbox] = useState(false)
@@ -136,7 +137,8 @@ export const CommentSection = ({
       <div className="section">
         <div className="row">
           <div className={isProactiveDisclosure ? "col-12" : "col-9 foi-request-number-header"}>
-            <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure} />
+            <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure}
+              proactiveDisclosureCategory={proactiveDisclosureCategory} />
           </div>
           <div className={isProactiveDisclosure ? "col-3 ml-auto d-flex justify-content-end" : "col-3 addcommentBox"}>
             <button type="button" style={{ display: !showaddbox ? 'block' : 'none' }} className="btn foi-btn-create addcomment"

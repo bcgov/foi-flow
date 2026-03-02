@@ -343,11 +343,17 @@ const FOIRequestHeader = React.memo(
                 <div className="foi-request-number-header-pd">
                   <h1 className="foi-request-number-text">{headerText}</h1>
                 </div>
-                <div className='foi-request-calendar'>
-                  <button type="button" className="btn-calendar">
-                    <FontAwesomeIcon icon={faCalendar} size="lg" /> Calendar
-                  </button>
-                </div>
+                {requestDetails?.proactiveDisclosureCategory &&
+                  <div className='foi-request-calendar'>
+                    <button type="button" className="btn-calendar">
+                      {requestDetails?.proactiveDisclosureCategory?.toLowerCase() == "calendar"
+                        ? <FontAwesomeIcon icon={faCalendar} size="lg" />
+                        : ""
+                      }
+                      {requestDetails?.proactiveDisclosureCategory}
+                    </button>
+                  </div>
+                }
               </div>
             </div>
           </div>

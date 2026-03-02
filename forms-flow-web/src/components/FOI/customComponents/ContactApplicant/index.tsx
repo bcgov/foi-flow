@@ -1609,7 +1609,8 @@ export const ContactApplicant = ({
           </h1>
         </Grid> */}
         <Grid item xs={isProactiveDisclosure ? 12 : 6}>
-          <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure} />
+          <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure}
+          proactiveDisclosureCategory={requestDetails?.proactiveDisclosureCategory} />
         </Grid>
         <Grid container xs={isProactiveDisclosure ? 12 : 6} direction="row" justifyContent='flex-end'>
           <ConditionalComponent condition={correspondenceFilter === "log"}>
