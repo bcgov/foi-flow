@@ -190,7 +190,7 @@ export const RequestHistorySection = ({
       <div className="section">
         <div className="row">
           <div className={isProactiveDisclosure ? "col-12" : "col-9"}>
-            <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure} />
+            <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure} pdCategory = {requestDetails.proactiveDisclosureCategory} />
           </div>
           <div className={isProactiveDisclosure ? "col-3 ml-auto d-flex justify-content-end" : "col-3"}>
             <button type="button" style={{ display: 'block' }} className="btn foi-btn-create exportAll" onClick={exportRequestHistory}>Export All</button>

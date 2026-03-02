@@ -106,11 +106,11 @@ const ProactiveDisclosureDetails = React.memo(
         case "proactiveDisclosureCategory":
           return request.proactiveDisclosureCategory || "Select a Category";
         case "reportPeriod":
-          return request.reportPeriod || "N/A";
+          return request.reportPeriod || "Select a Report Period";
         case "startDate":
           return request.startDate ? formatDate(request.startDate) : "";
         case "cfrDueDate":
-          return request.cfrDueDate || "N/A";
+          return request.cfrDueDate || "";
         case "publicationDate":
           return request.publicationDate
             ? formatDate(request.publicationDate)
@@ -146,7 +146,11 @@ const ProactiveDisclosureDetails = React.memo(
       );
       const initialReportPeriod = validateField(
         requestDetails,
-        FOI_COMPONENT_CONSTANTS.REPORT_PERIOD
+        FOI_COMPONENT_CONSTANTS.REPORT_PERIOD,
+        {
+          dateFormat: false,
+          defaultValue: "Select a Report Period",
+        }
       );
       //const startDate = !!requestDetails.requestProcessStart ? formatDate(request.requestProcessStart) : "";
       const initialStartDate = requestDetails?.requestProcessStart
@@ -196,7 +200,7 @@ const ProactiveDisclosureDetails = React.memo(
     const [selectedReportPeriod, setSelectedReportPeriod] = useState(
       validateField(requestDetails, FOI_COMPONENT_CONSTANTS.REPORT_PERIOD, {
         dateFormat: false,
-        defaultValue: "N/A",
+        defaultValue: "Select a Report Period",
       })
     );
     const [startDate, setStartDate] = useState("");
@@ -360,7 +364,7 @@ const ProactiveDisclosureDetails = React.memo(
                     disabled={disableInput}
                     error={selectedReportPeriod
                       ?.toLowerCase()
-                      ?.includes("select")}
+                      ?.includes("select") || selectedReportPeriod === "N/A"}
                     InputProps={{
                       readOnly: true,
                       endAdornment: (
@@ -450,6 +454,7 @@ const ProactiveDisclosureDetails = React.memo(
                     variant="outlined"
                     fullWidth
                     disabled={disableInput}
+                    error={cfrDueDate == undefined || cfrDueDate === ""}
                     required
                   />
                 </div>
@@ -488,6 +493,7 @@ const ProactiveDisclosureDetails = React.memo(
                     variant="outlined"
                     fullWidth
                     disabled={disableInput}
+                    error={startDate == undefined || startDate === ""}
                     required
                   />
 
@@ -505,6 +511,7 @@ const ProactiveDisclosureDetails = React.memo(
                     variant="outlined"
                     fullWidth
                     disabled={disableInput}
+                    error={publicationDate == undefined || publicationDate === ""}
                     required
                   />
                 </div>

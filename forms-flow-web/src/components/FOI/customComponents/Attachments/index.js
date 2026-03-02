@@ -71,7 +71,8 @@ export const AttachmentSection = ({
   ministryAssignedToList,
   isMinistryCoordinator,
   isHistoricalRequest,
-  isProactiveDisclosure
+  isProactiveDisclosure,
+  proactiveDisclosureCategory
 }) => {
   const classes = useStyles();
   const [attachments, setAttachments] = useState(attachmentsArray)
@@ -430,7 +431,9 @@ export const AttachmentSection = ({
             spacing={1}
           >
             <Grid item xs={isProactiveDisclosure ? 12 : 6}>
-              <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure} />
+              <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure}
+                proactiveDisclosureCategory={proactiveDisclosureCategory}
+              />
             </Grid>
             <Grid
               container
