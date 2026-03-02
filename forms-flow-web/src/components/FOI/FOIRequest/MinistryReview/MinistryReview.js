@@ -880,7 +880,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                               requestDetails={requestDetails}
                             />
                             {divisionsBox}
-                            <LinkedRequests 
+                            <LinkedRequests
                               isMinistry={isMinistry}
                               linkedRequests={requestDetails?.linkedRequests}
                               linkedRequestsInfo={requestDetails?.linkedRequestsInfo}
@@ -894,7 +894,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                             <RequestDescription
                               requestDetails={requestDetails}
                             />
-                            <LinkedRequests 
+                            <LinkedRequests
                               isMinistry={isMinistry}
                               linkedRequests={requestDetails?.linkedRequests}
                               linkedRequestsInfo={requestDetails?.linkedRequestsInfo}
@@ -986,6 +986,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   ministryAssignedToList={ministryAssignedToList}
                   isMinistryCoordinator={true}
                   isProactiveDisclosure={isProactiveDisclosure}
+                  proactiveDisclosureCategory={requestDetails?.proactiveDisclosureCategory}
                 />
               </>
             ) : (
@@ -1098,6 +1099,7 @@ const MinistryReview = React.memo(({ userDetail }) => {
                   isMinistry={isMinistry}
                   commentTypes={commentTypes}
                   isProactiveDisclosure={isProactiveDisclosure}
+                  proactiveDisclosureCategory={requestDetails?.proactiveDisclosureCategory}
                 />
               </>
             ) : (

@@ -58,30 +58,49 @@ const ProactiveDisclosureRequestPublicationMain = ({
     (state: any) => state.foiRequests.foiOpenInfoAdditionalFiles,
   );
 
-  let foiPDFStitchedOIPackage = useSelector(
-    (state: any) => state.foiRequests.foiPDFStitchedOIPackage,
+  let foiPDFStitchedRecordForResponsePackage = useSelector(
+    (state: any) => state.foiRequests.foiPDFStitchedRecordForResponsePackage,
   );
 
-  let foiPDFStitchStatusForOIPackage = useSelector(
-    (state: any) => state.foiRequests.foiPDFStitchStatusForOIPackage,
+  let foiPDFStitchStatusForResponsePackage = useSelector(
+    (state: any) => state.foiRequests.foiPDFStitchStatusForResponsePackage,
   );
+
+  let foiRequestRecords = useSelector(
+    (state: any) => state.foiRequests.foiRequestRecords,
+  );
+
+  const getRecordsFileCount = () => {
+    let count = 0;
+    if (foiRequestRecords?.records) {
+      foiRequestRecords.records.forEach((record: any) => {
+        if (!record.isduplicate) count++;
+        if (record.attachments && record.attachments.length > 0) {
+          record.attachments.forEach((attachment: any) => {
+            if (!attachment.isduplicate) count++;
+          });
+        }
+      });
+    }
+    return count;
+  };
 
   const totalFileCount =
     (foiOpenInfoAdditionalFiles?.length || 0) +
-    (foiPDFStitchedOIPackage?.finalpackagepath ? 1 : 0);
+    (foiPDFStitchedRecordForResponsePackage?.finalpackagepath ? getRecordsFileCount() : 0);
 
   const [downloadDisabled, setDownloadDisabled] = useState(true);
   const [packageCreatedAt, setPackageCreatedAt] = useState("N/A");
 
   useEffect(() => {
-    if (foiPDFStitchStatusForOIPackage === RecordDownloadStatus.completed) {
+    if (foiPDFStitchStatusForResponsePackage === RecordDownloadStatus.completed) {
       setDownloadDisabled(false);
     }
-  }, [foiPDFStitchStatusForOIPackage]);
+  }, [foiPDFStitchStatusForResponsePackage]);
 
   useEffect(() => {
-    setPackageCreatedAt(foiPDFStitchedOIPackage?.createdat_datetime || "N/A");
-  }, [foiPDFStitchedOIPackage]);
+    setPackageCreatedAt(foiPDFStitchedRecordForResponsePackage?.createdat_datetime || "N/A");
+  }, [foiPDFStitchedRecordForResponsePackage]);
 
   //Styling
   const useStyles = makeStyles({
@@ -302,7 +321,7 @@ const ProactiveDisclosureRequestPublicationMain = ({
 
   const downloadPackage = () => {
     const toastID = toast.loading("Downloading file (0%)");
-    const s3filepath = foiPDFStitchedOIPackage?.finalpackagepath;
+    const s3filepath = foiPDFStitchedRecordForResponsePackage?.finalpackagepath;
     getFOIS3DocumentPreSignedUrl(
       s3filepath.split("/").slice(4).join("/"),
       ministryId,
@@ -394,7 +413,6 @@ const ProactiveDisclosureRequestPublicationMain = ({
                   }
                   InputProps={{ inputProps: { min: formatDate(new Date()) } }}
                   disabled={
-                    
                     disableUserInput ||
                     currentOIRequestState === "First Review" ||
                     currentOIRequestState === "Unopened"
@@ -472,11 +490,11 @@ const ProactiveDisclosureRequestPublicationMain = ({
                         "row",
                         "file-upload-preview",
                         "file-upload-row",
-                        additionalFiles.length > 0 ? "justify-start" : "justify-between"
+                        additionalFiles.length > 0 ? "justify-start" : "justify-center"
                       )}
                     >
                       <div
-                        className="file-upload-column file-upload-col-grow"
+                        className={clsx("file-upload-column", additionalFiles.length === 0 ? "file-upload-column-empty" : "file-upload-col-grow")}
                       >
                         {additionalFiles.length === 0 ? (
                           <span className="drag-drop-text">
@@ -493,7 +511,7 @@ const ProactiveDisclosureRequestPublicationMain = ({
                           />
                         )}
                       </div>
-                      <div className="file-upload-column file-upload-column-3">
+                      <div className={clsx("file-upload-column", additionalFiles.length === 0 ? "file-upload-column-empty" : "file-upload-column-3")}>
                         <button
                           className="btn-add-files"
                           onClick={() => setOpenModal(true)}

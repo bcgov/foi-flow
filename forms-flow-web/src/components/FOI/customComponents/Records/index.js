@@ -318,7 +318,8 @@ export const RecordsLog = ({
   );
 
   let requestDetails = useSelector(
-    (state) => state.foiRequests.foiRequestDetail
+    (state) => Object.keys(state.foiRequests.foiRequestDetail || {}).length > 0 ?
+      state.foiRequests.foiRequestDetail : state.foiRequests.foiMinistryViewRequestDetail
   );
 
   const tagList = divisions?.filter((d) => d.divisionname.toLowerCase() !== "communications")
@@ -2632,7 +2633,8 @@ export const RecordsLog = ({
             spacing={1}
           >
             <Grid item xs={12}>
-              <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure} />
+              <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure}
+                proactiveDisclosureCategory={requestDetails?.proactiveDisclosureCategory} />
             </Grid>
             {isProactiveDisclosure ? (
               <Grid
@@ -2645,7 +2647,7 @@ export const RecordsLog = ({
                 spacing={1}
               >
                 {validLockRecordsState() && (
-                  <Grid item xs={isScanningTeamMember  ? 3 : 2}>
+                  <Grid item xs={isScanningTeamMember ? 3 : 2}>
                     <Tooltip
                       enterDelay={1000}
                       title={isMinistryCoordinator ? "Only the IAO analyst can manually lock or unlock the records log, please contact the assigned analyst for assistance" : "Manually unlock or lock the records log"}

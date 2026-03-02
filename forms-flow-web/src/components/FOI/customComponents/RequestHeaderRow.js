@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendar } from '@fortawesome/free-regular-svg-icons';
 import Link from '@material-ui/core/Link';
 
-const RequestHeaderRow = ({ headerText, isProactiveDisclosure }) => {
+const RequestHeaderRow = ({ headerText, isProactiveDisclosure, proactiveDisclosureCategory }) => {
 
     const preventDefault = (event) => event.preventDefault();
 
@@ -16,11 +16,17 @@ const RequestHeaderRow = ({ headerText, isProactiveDisclosure }) => {
                         <div className="foi-request-number-header-pd">
                             <h1 className="foi-request-number-text">{headerText}</h1>
                         </div>
-                        <div className='foi-request-calendar'>
-                            <button type="button" className="btn-calendar">
-                                <FontAwesomeIcon icon={faCalendar} size="lg" /> Calendar
-                            </button>
-                        </div>
+                        {proactiveDisclosureCategory &&
+                            <div className='foi-request-calendar'>
+                                <button type="button" className="btn-calendar">
+                                    {proactiveDisclosureCategory?.toLowerCase() == "calendar"
+                                        ? <FontAwesomeIcon icon={faCalendar} size="lg" />
+                                        : ""
+                                    }
+                                    {proactiveDisclosureCategory}
+                                </button>
+                            </div>
+                        }
                     </div>
                 </div>
             ) : (
