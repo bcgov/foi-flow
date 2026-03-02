@@ -161,7 +161,7 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
 
 export const fetchFOIRequestDetailsWrapper = (requestId, ministryId, userGroups) => {
   if (ministryId) {
-    return fetchFOIRequestDetails(requestId, ministryId);
+    return fetchFOIRequestDetails(requestId, ministryId, userGroups);
   } else {
     return fetchFOIRawRequestDetails(requestId, userGroups);
   }
@@ -182,7 +182,7 @@ export const fetchFOIRawRequestDetails = (requestId, userGroups) => {
           dispatch(setFOIRequestDetail(foiRequest));
           const ministryCode = (foiRequest.currentState !== StateEnum.redirect.name && foiRequest.requestType === 'personal') ? foiRequest.selectedMinistries[0].code.toLowerCase() : "";
           let isagbcpsteam = false;
-          if (!ministryCode && foiRequest.selectedMinistries[0].code.toLowerCase() == 'ag' && userGroups.includes('BCPS Team')) isagbcpsteam = true;
+          if (!ministryCode && foiRequest.selectedMinistries[0].code.toLowerCase() == 'ag' && userGroups && userGroups.includes('BCPS Team')) isagbcpsteam = true;
           dispatch(fetchFOIAssignedToList(foiRequest.requestType.toLowerCase(), foiRequest.currentState.replace(/\s/g, '').toLowerCase(), ministryCode, isagbcpsteam));
           dispatch(fetchFOIProcessingTeamList(foiRequest.requestType.toLowerCase() == 'proactive disclosure'? 'general' : foiRequest.requestType.toLowerCase()));
           dispatch(setFOILoader(false));
@@ -197,7 +197,7 @@ export const fetchFOIRawRequestDetails = (requestId, userGroups) => {
   }
 };
 
-export const fetchFOIRequestDetails = (requestId, ministryId) => {
+export const fetchFOIRequestDetails = (requestId, ministryId, userGroups) => {
   
   const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
     API.FOI_REQUEST_API,

@@ -1136,7 +1136,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
     if (!_unSaved) {
       setUnSavedRequest(_unSaved);
-      dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId));
+      dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId, userGroups));
       dispatch(fetchFOIRequestDescriptionList(id || requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(id || requestId, ministryId));
       fetchCFRForm(ministryId, dispatch);
