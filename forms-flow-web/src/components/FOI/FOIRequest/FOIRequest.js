@@ -1770,6 +1770,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             createSaveRequestObject={createSaveRequestObject}
                             isHistoricalRequest={isHistoricalRequest}
                             requestExtensions={requestExtensions}
+                            saveRequestObject={saveRequestObject}
                           />
                           <ApplicantDetails
                             requestDetails={requestDetails}
