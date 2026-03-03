@@ -396,7 +396,11 @@ export const checkValidationError = (
         ?.toLowerCase()
         ?.includes("select") ||
       !requiredProactiveDetailsValues.requestStartDate ||
-
+      !requiredProactiveDetailsValues.reportPeriod ||
+      requiredProactiveDetailsValues.reportPeriod
+        ?.toLowerCase()
+        ?.includes("select") ||
+      !requiredProactiveDetailsValues.cfrDueDate ||
       !requiredProactiveDetailsValues.publicationDate ||
       requiredRequestDescriptionValues.description === "" ||
       assignedToValue.toLowerCase().includes("unassigned") ||
@@ -444,7 +448,7 @@ export const checkValidationError = (
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
     !requiredRequestDetailsValues.dueDate ||
-    ("recordsDueDate" in requiredRequestDetailsValues  && !requiredRequestDetailsValues.recordsDueDate) ||
+    ("recordsDueDate" in requiredRequestDetailsValues && !requiredRequestDetailsValues.recordsDueDate) ||
     // !requiredAxisDetails.axisRequestId ||
     (Object.values(personalRequestDetailsErrors).some(personalReqestError => personalReqestError)) ||
     (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {

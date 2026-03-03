@@ -154,7 +154,7 @@ const QuarterSelector = ({ date, selectedQuarter, onUpdate }) => {
         const monthStr = (q.startMonth + 1).toString().padStart(2, '0');
         const newDate = `${dateYear}-${monthStr}-01`;
 
-        onUpdate(newDate, `${qName} ${year}`);
+        onUpdate(newDate, `${qName} ${year}-${(year + 1).toString().slice(2)}`);
     };
 
     const handleQuarterClick = (q) => {
@@ -191,7 +191,7 @@ const QuarterSelector = ({ date, selectedQuarter, onUpdate }) => {
 
             <Grid container spacing={1} className={classes.quarterContainer}>
                 {quarters.map((q) => {
-                    const isSelected = selectedQuarter === q.name || selectedQuarter === `${q.name} ${fiscalYear}`;
+                    const isSelected = selectedQuarter === q.name || selectedQuarter === `${q.name} ${fiscalYear}` || selectedQuarter === `${q.name} ${fiscalYear}-${(fiscalYear + 1).toString().slice(2)}`;
                     return (
                         <Grid item xs={6} key={q.name} className={classes.noPadding}>
                             <Card
