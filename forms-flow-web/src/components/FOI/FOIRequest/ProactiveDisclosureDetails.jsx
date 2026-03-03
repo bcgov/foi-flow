@@ -235,13 +235,7 @@ const ProactiveDisclosureDetails = React.memo(
     };
 
     const getReportPeriodDisplay = (period) => {
-      // if (!period) return "";
-      // if (period.toLowerCase().includes("select")) return "";
-      // if (period.toLowerCase().includes("n/a")) return period;
-      // if (/\d{4}/.test(period)) return period;
-      // const year = startDate ? startDate.split("-")[0] : "";
-      // return year ? `${period} ${year}` : period;
-      if (!period || period.toLowerCase().includes("select")) return "";
+      if (!period) return "";
       return period;
     };
 

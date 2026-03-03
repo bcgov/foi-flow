@@ -242,7 +242,8 @@ const FOIRequestHeader = React.memo(
       return assigneeDetails.assignedministrygroup;
     }
     const ministryAssignedTo = getMinistryAssignedTo();
-    const watcherList = assignedToList.filter(assignedTo => assignedTo.type === 'iao');
+    const watcherList = assignedToList.filter(assignedTo => assignedTo.type === 'iao' ||
+      (isProactiveDisclosure && assignedTo.name === "OI Team"));
 
     const updateIsPhasedRelease = (isPhasedRelease) => {
       const toastID = toast.loading("Updating phased release status for request...");
