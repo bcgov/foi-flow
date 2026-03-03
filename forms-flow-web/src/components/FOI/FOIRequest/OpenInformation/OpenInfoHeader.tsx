@@ -5,24 +5,28 @@ import { makeStyles, Theme } from '@material-ui/core/styles';
 import { getMenuItems } from "../FOIRequestHeader/utils";
 import { saveFOIOpenInfoRequest } from "../../../../apiManager/services/FOI/foiOpenInfoRequestServices";
 import { useDispatch } from "react-redux";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendar } from '@fortawesome/free-regular-svg-icons';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import FOI_COMPONENT_CONSTANTS from "../../../../constants/FOI/foiComponentConstants";
 import "./openinfo.scss";
 
 const OIAssignedToStyles = makeStyles((theme: Theme) => ({
-    formControl: {
-      margin: theme.spacing(1),
-      minWidth: 120,
-    },
-    item: {
-        paddingLeft: theme.spacing(3),
-    },
-    group: {
-        fontWeight: theme.typography.fontWeightBold as any,
-        opacity: 1,
-    },
-    blankrow: {
-      padding: 25
-    }
-  }));
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  item: {
+    paddingLeft: theme.spacing(3),
+  },
+  group: {
+    fontWeight: theme.typography.fontWeightBold as any,
+    opacity: 1,
+  },
+  blankrow: {
+    padding: 25
+  }
+}));
 
 const OpenInfoHeader = ({
   requestNumber,
@@ -38,10 +42,14 @@ const OpenInfoHeader = ({
   const classes = OIAssignedToStyles();
   let foiOITransactionData = useSelector(
     (state: any) => state.foiRequests.foiOpenInfoRequest
-  ); 
+  );
+
+  const isProactiveDisclosure = requestDetails?.requestType === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE;
+  const proactiveDisclosureCategory = requestDetails?.proactiveDisclosureCategory;
+  const headerText = requestNumber ? `Request #${requestNumber}` : "Request";
 
   let iaoassignedToList = useSelector(
-    (state : any) => state.foiRequests.foiAssignedToList
+    (state: any) => state.foiRequests.foiAssignedToList
   );
 
   const getGroupName = () => {
@@ -72,156 +80,215 @@ const OpenInfoHeader = ({
 
   const [selectedAssignedTo, setAssignedTo] = useState(() => getFullName());
 
-const handleOIAssigneeUpdate = async (event: any) => {
-  const assigneeValue = event?.target?.value;
-  const [groupName, username, firstName, lastName] = assigneeValue.split('|');
-  const fullName = firstName !== "" ? `${lastName}, ${firstName}` : username;;
+  const handleOIAssigneeUpdate = async (event: any) => {
+    const assigneeValue = event?.target?.value;
+    const [groupName, username, firstName, lastName] = assigneeValue.split('|');
+    const fullName = firstName !== "" ? `${lastName}, ${firstName}` : username;;
 
-  // Update the selected assignee in the dropdown and the oi state object
-  setOIAssignedTo(assigneeValue);
-  handleOIDataChange(username, "oiassignedto");
+    // Update the selected assignee in the dropdown and the oi state object
+    setOIAssignedTo(assigneeValue);
+    handleOIDataChange(username, "oiassignedto");
 
-  if(username != 'OI Team'){
-    const assigneeDetails = {
-      assignedGroup: groupName,
-      assignedTo: username,
-      assignedToFirstName: firstName,
-      assignedToLastName: lastName,
-      assignedToName: fullName
-    };
-  
-    const updatedOpenInfoRequest = {
-      ...foiOITransactionData,  
-      oiassignedto: username,
-      assigneeDetails:assigneeDetails,
-      publicationdate: foiOITransactionData.publicationdate ? 
-      new Date(foiOITransactionData.publicationdate).toISOString().split('T')[0] : 
-      null
-    };
-  
-    dispatch(
-      saveFOIOpenInfoRequest(
-        foiministryrequestid, 
-        foirequestid, 
-        updatedOpenInfoRequest, 
-        isOIUser,
-        requestDetails,
-        (err: any, res: any) => {
-        if (!err) {
-          toast.success("Assignee has been saved successfully.", {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });  
-        } else {
-          toast.error(
-            "Temporarily unable to save the assignee. Please try again in a few minutes.",
-            {
-              position: "top-right",
-              autoClose: 3000,
-              hideProgressBar: true,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-              progress: undefined,
+    if (username != 'OI Team') {
+      const assigneeDetails = {
+        assignedGroup: groupName,
+        assignedTo: username,
+        assignedToFirstName: firstName,
+        assignedToLastName: lastName,
+        assignedToName: fullName
+      };
+
+      const updatedOpenInfoRequest = {
+        ...foiOITransactionData,
+        oiassignedto: username,
+        assigneeDetails: assigneeDetails,
+        publicationdate: foiOITransactionData.publicationdate ?
+          new Date(foiOITransactionData.publicationdate).toISOString().split('T')[0] :
+          null
+      };
+
+      dispatch(
+        saveFOIOpenInfoRequest(
+          foiministryrequestid,
+          foirequestid,
+          updatedOpenInfoRequest,
+          isOIUser,
+          requestDetails,
+          (err: any, res: any) => {
+            if (!err) {
+              toast.success("Assignee has been saved successfully.", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+            } else {
+              toast.error(
+                "Temporarily unable to save the assignee. Please try again in a few minutes.",
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
             }
-          );
-        }
-      })
-    );
+          })
+      );
+    }
   }
-}
 
-const [menuItems, setMenuItems] = useState<any>([]);
-const [selectedOIAssignedTo, setOIAssignedTo] = useState("Unassigned");
+  const [menuItems, setMenuItems] = useState<any>([]);
+  const [selectedOIAssignedTo, setOIAssignedTo] = useState("Unassigned");
 
-useEffect(() => {
-  // Find OI Team from the assignedToList
-  const oiTeam = iaoassignedToList?.find((team: any) => team.name === 'OI Team');
+  useEffect(() => {
+    // Find OI Team from the assignedToList
+    const oiTeam = iaoassignedToList?.find((team: any) => team.name === 'OI Team');
 
-  // Find specific member if request is assigned to individual
-  const member = oiTeam?.members?.find(
-    (member: any) => member.username === foiOITransactionData?.oiassignedto
-  );
-
-  if(isOIUser){
-    /* For OI users, Mapping for assignee display values:
-     - 'OI Team': When assigned to entire OI Team
-     - 'member': When assigned to specific OI Team member
-     - 'default': When unassigned */
-    const assigneeMap = {
-      'OI Team': 'OI Team|OI Team',
-      'member': member && `${oiTeam.name}|${member.username}|${member.firstname}|${member.lastname}`,
-      'default': 'OI Team|OI Team'
-    };
-
-    const currentAssignee = assigneeMap[foiOITransactionData?.oiassignedto === null ? 'OI Team' : member ? 'member' : 'default'];
-    setOIAssignedTo(currentAssignee);
-
-    // Generate menu items for the dropdown with OI Team members only
-    setMenuItems(
-      getMenuItems({ 
-        classes, 
-        assignedToList: iaoassignedToList?.filter((team: any) => team.name === 'OI Team'), 
-        selectedAssignedTo: currentAssignee,
-        isIAORestrictedRequest: false,
-        requestDetails,
-        isMinistry: false
-      })
+    // Find specific member if request is assigned to individual
+    const member = oiTeam?.members?.find(
+      (member: any) => member.username === foiOITransactionData?.oiassignedto
     );
-  } else {
+
+    if (isOIUser) {
+      /* For OI users, Mapping for assignee display values:
+       - 'OI Team': When assigned to entire OI Team
+       - 'member': When assigned to specific OI Team member
+       - 'default': When unassigned */
+      const assigneeMap = {
+        'OI Team': 'OI Team|OI Team',
+        'member': member && `${oiTeam.name}|${member.username}|${member.firstname}|${member.lastname}`,
+        'default': 'OI Team|OI Team'
+      };
+
+      const currentAssignee = assigneeMap[foiOITransactionData?.oiassignedto === null ? 'OI Team' : member ? 'member' : 'default'];
+      setOIAssignedTo(currentAssignee);
+
+      // Generate menu items for the dropdown with OI Team members only
+      setMenuItems(
+        getMenuItems({
+          classes,
+          assignedToList: iaoassignedToList?.filter((team: any) => team.name === 'OI Team'),
+          selectedAssignedTo: currentAssignee,
+          isIAORestrictedRequest: false,
+          requestDetails,
+          isMinistry: false
+        })
+      );
+    } else {
       // For non-OI users, just set the formatted name
       const displayMap = {
         'OI Team': 'OI Team',
         'member': member && `${member.lastname}, ${member.firstname}`,
         'default': 'OI Team'
       };
-  
+
       setOIAssignedTo(displayMap[foiOITransactionData?.oiassignedto === null ? 'OI Team' : member ? 'member' : 'default']);
-  }
-}, [iaoassignedToList, foiOITransactionData, isOIUser]);
+    }
+  }, [iaoassignedToList, foiOITransactionData, isOIUser]);
 
   return (
-    <div className="oi-header">
-      <h1 className="foi-review-request-text foi-ministry-requestheadertext">
-        {requestNumber ? `Request #${requestNumber}` : ""}
-      </h1>
-      <div className="oi-assignment">
-        <TextField
-          id="assignedTo"
-          label={"FOI Ops Assigned To"}
-          inputProps={{ "aria-labelledby": "assignedTo-label", readOnly: true }}
-          InputLabelProps={{ shrink: true }}
-          style={{ paddingBottom: "4%" }}
-          value={selectedAssignedTo}
-          variant="outlined"
-          fullWidth
-          disabled={isOIUser}
-        ></TextField>
-        <TextField
-          id="oiAssignedTo"
-          label={"OI Assigned To"}
-          inputProps={{
-            "aria-labelledby": "assignedTo-label"
-          }}
-          InputLabelProps={{ shrink: true }}
-          value={selectedOIAssignedTo}
-          onChange={handleOIAssigneeUpdate}
-          variant="outlined"
-          fullWidth
-          select={isOIUser}
-          required={isOIUser}
-          disabled={!isOIUser}
-          error={isOIUser && selectedOIAssignedTo.toLowerCase().includes("unassigned")}
-        >
-          {menuItems}
-        </TextField>
-      </div>
-    </div>
+    <>
+      {isProactiveDisclosure ? (
+        <>
+          <div className="col-lg-12">
+            <div className="foi-request-header-card">
+              <div className="foi-request-number-header-pd">
+                <h1 className="foi-request-number-text">{headerText}</h1>
+              </div>
+              {proactiveDisclosureCategory &&
+                <div className='foi-request-calendar'>
+                  <button type="button" className="btn-calendar">
+                    {proactiveDisclosureCategory?.toLowerCase() == "calendar"
+                      ? <FontAwesomeIcon icon={faCalendar as IconProp} size="lg" />
+                      : ""
+                    }
+                    {proactiveDisclosureCategory}
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <div className="oi-assignment">
+              <TextField
+                id="assignedTo"
+                label={"FOI Ops Assigned To"}
+                inputProps={{ "aria-labelledby": "assignedTo-label", readOnly: true }}
+                InputLabelProps={{ shrink: true }}
+                style={{ paddingBottom: "4%" }}
+                value={selectedAssignedTo}
+                variant="outlined"
+                fullWidth
+                disabled={isOIUser}
+              ></TextField>
+              <TextField
+                id="oiAssignedTo"
+                label={"OI Assigned To"}
+                inputProps={{
+                  "aria-labelledby": "assignedTo-label"
+                }}
+                InputLabelProps={{ shrink: true }}
+                value={selectedOIAssignedTo}
+                onChange={handleOIAssigneeUpdate}
+                variant="outlined"
+                fullWidth
+                select={isOIUser}
+                required={isOIUser}
+                disabled={!isOIUser}
+                error={isOIUser && selectedOIAssignedTo.toLowerCase().includes("unassigned")}
+              >
+                {menuItems}
+              </TextField>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="oi-header">
+          <h1 className="foi-review-request-text foi-ministry-requestheadertext">
+            {requestNumber ? `Request #${requestNumber}` : ""}
+          </h1>
+          <div className="oi-assignment">
+            <TextField
+              id="assignedTo"
+              label={"FOI Ops Assigned To"}
+              inputProps={{ "aria-labelledby": "assignedTo-label", readOnly: true }}
+              InputLabelProps={{ shrink: true }}
+              style={{ paddingBottom: "4%" }}
+              value={selectedAssignedTo}
+              variant="outlined"
+              fullWidth
+              disabled={isOIUser}
+            ></TextField>
+            <TextField
+              id="oiAssignedTo"
+              label={"OI Assigned To"}
+              inputProps={{
+                "aria-labelledby": "assignedTo-label"
+              }}
+              InputLabelProps={{ shrink: true }}
+              value={selectedOIAssignedTo}
+              onChange={handleOIAssigneeUpdate}
+              variant="outlined"
+              fullWidth
+              select={isOIUser}
+              required={isOIUser}
+              disabled={!isOIUser}
+              error={isOIUser && selectedOIAssignedTo.toLowerCase().includes("unassigned")}
+            >
+              {menuItems}
+            </TextField>
+          </div>
+        </div>
+
+      )}
+    </>
   );
 };
 

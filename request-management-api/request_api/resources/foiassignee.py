@@ -84,8 +84,6 @@ class FOIAssigneesByTypeAndStatus(Resource):
         try:
             result = assigneeservice().getgroupsandmembersbytypeandstatus(requestype, status, bcgovcode)
             if result is not None:
-                #Exclude BCPS Team as they are not standard operating team
-                result = [i for i in result if i['name'] != 'BCPS Team']
                 return json.dumps(result), 200
             else:
                 return {'status': False, 'message':EXCEPTION_MESSAGE_NOT_FOUND}, 404   

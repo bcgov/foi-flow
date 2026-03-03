@@ -75,7 +75,6 @@ class FOIRequestComment(db.Model):
         
     @classmethod
     def updatecomment(cls, commentid, foirequestcomment, userid):   
-        #print("updatecomment:",foirequestcomment)
         dbquery = db.session.query(FOIRequestComment)
         comment = dbquery.filter_by(commentid=commentid).order_by(FOIRequestComment.commentsversion.desc()).first()        
         _existingtaggedusers = []
@@ -119,7 +118,6 @@ class FOIRequestComment(db.Model):
         
     @classmethod
     def updatechildcomments(cls, parentcommentid, foirequestcomment, userid):   
-        #print("updatecomment:",foirequestcomment)
         dbquery = db.session.query(FOIRequestComment)
         childcomments = dbquery.filter_by(parentcommentid=parentcommentid, isactive = True)     
         _existingtaggedusers = []

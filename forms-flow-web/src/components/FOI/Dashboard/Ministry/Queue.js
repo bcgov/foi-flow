@@ -130,6 +130,8 @@ const Queue = ({ userDetail, tableInfo }) => {
       headerName: "CATEGORY",
       flex: 1,
       headerAlign: "left",
+      valueGetter: (params) => 
+        params.row.requestType =="proactive disclosure" ? params.row.proactivedisclosurecategory : params.row.applicantcategory,
     },
     {
       field: "requestType",
