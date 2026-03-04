@@ -319,7 +319,10 @@ class FOIRequestsById(Resource):
                 foirequest['oistatusid'] = request_json['oistatusid']
             else:
                 foirequest[section] = request_json[section]
-            foirequestschema = FOIRequestWrapperSchema().load(foirequest)
+            if foirequest['requestType'] == 'proactive disclosure':
+                foirequestschema = FOIPDRequestWrapperSchema().load(foirequest)
+            else:
+                foirequestschema = FOIRequestWrapperSchema().load(foirequest)
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
                 event_loop = asyncio.get_running_loop()
