@@ -54,7 +54,8 @@ const ApplicantDetailsSections = ({
     displayOtherNotes,
     isAddRequest,
     isUnopenedRequest,
-    requestType = "general"
+    requestType = "general",
+    disableAdditionalDetails = requestType == "general" ? true : false
 }) => {
     return (
         <>
@@ -84,9 +85,10 @@ const ApplicantDetailsSections = ({
             <AdditionalApplicantDetails
                 requestDetails={requestDetails}
                 createSaveRequestObject={createSaveRequestObject}
-                disableInput={disableInput || requestType == "general"}
+                disableInput={disableInput || disableAdditionalDetails}
                 defaultExpanded={defaultExpanded}
                 warning={requestType != "general" || isAddRequest || isUnopenedRequest ? warning : null}
+                setError={() => {}} //!!!!
             />
         </>
     )
@@ -96,6 +98,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const classes = useStyles();
 
     let requestDetails = useSelector((state) => state.foiRequests.foiRequestDetail);
+    console.log('requestDetails higher level: ', requestDetails)
     const dispatch = useDispatch();
     const isAddRequest = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1;
     const isUnopenedRequest = requestDetails?.currentState == "Unopened"
@@ -121,11 +124,16 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
             headerName: "REQUEST ID",
             flex: 1,
             renderCell: (params) => {
+                let link = "";
+                if (params.row.receiveddate == "Historical Request") {
+                    link = "/foi/historicalrequest/" + params.row.axisrequestid
+                } else if (params.row.ministryrequestid) {
+                    link = "/foi/foirequests/" + params.row.requestid + "/ministryrequest/" +  params.row.ministryrequestid
+                } else {
+                    link = "/foi/reviewrequest/" + params.row.requestid
+                }
                 return <span className="table-cell-truncate">
-                    <a style={{color: "rgba(0, 0, 0, 0.87)"}} href={params.row.ministryrequestid ?
-                        "/foi/foirequests/" + params.row.requestid + "/ministryrequest/" +  params.row.ministryrequestid :
-                        "/foi/reviewrequest/" + params.row.requestid
-                    } target="_blank">
+                    <a style={{color: "rgba(0, 0, 0, 0.87)"}} href={link} target="_blank">
                         {params.row.axisrequestid}
                     </a>
                 </span>
@@ -163,8 +171,11 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                     }))
             } else {
                 setSelectedApplicant(true);
+                console.log('*FETCHING APPLICANT')
+                console.log('ID: ', requestDetails.foiRequestApplicantID)
                 dispatch(fetchApplicantInfo(requestDetails.foiRequestApplicantID, (err, res) => {
                     const {requestHistory, ...selectedApplicant} = res
+                    console.log('APPLICANT: ', selectedApplicant)
                     setSelectedApplicant(selectedApplicant);
                     setRequestHistory(requestHistory)
                     setIsLoading(false);
@@ -190,9 +201,15 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                 break;
             }
         }
-        if (requestDetails?.foiRequestApplicantID != selectedApplicant?.foiRequestApplicantID) {
+        console.log('requestDetails: ', requestDetails)
+        console.log('requestDetails?.foiRequestApplicantID: ', requestDetails?.foiRequestApplicantID)
+        console.log('requestDetails?.foiRequestApplicantID: ', requestDetails?.foiRequestApplicantID)
+        console.log('selectedApplicant?.foiRequestApplicantID: ', selectedApplicant?.foiRequestApplicantID)
+        if (requestDetails?.foiRequestApplicantID && requestDetails?.foiRequestApplicantID != selectedApplicant?.foiRequestApplicantID) {
+            console.log('in if')
             setIsChangeToDifferentProfile(true)
         } else {
+            console.log('in else')
             setIsChangeToDifferentProfile(false)
         }
     }, [selectedApplicant])
@@ -244,7 +261,9 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                 if (shouldClear) {
                     dispatch(setFOIRequestApplicantProfile({}));
                 } else {
-                    dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
+                    console.log('res: ', res)
+                    console.log('saveApplicantObject: ', saveApplicantObject)
+                    dispatch(setFOIRequestApplicantProfile({...saveApplicantObject, foiRequestApplicantID: res.id}));
                 }
             }
         }));
@@ -341,6 +360,8 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     }
 
     const back = () => {
+        console.log('in back button')
+        console.log('selectedApplicant: ', selectedApplicant)
         setIsUnassignProfile(false);
         if (confirmationMessage) {
             setConfirmationMessage(false);
@@ -349,10 +370,23 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         } else if (createConfirmation) {
             setCreateConfirmation(false)
         } else if (!isBeforeOpen(requestDetails)) {
+            console.log('3')
             handleClose();
         } else if (requestDetails?.foiRequestApplicantID) {
-            handleClose();
+            console.log('2')
+            // handleClose();
+            dispatch(fetchApplicantInfo(requestDetails.foiRequestApplicantID, (err, res) => {
+                    const {requestHistory, ...selectedApplicant} = res
+                    console.log('APPLICANT: ', selectedApplicant)
+                    setSelectedApplicant(selectedApplicant);
+                    setRequestHistory(requestHistory)
+                    setIsLoading(false);
+                    console.log('setting setShowSearchApplicantsTab')
+                    setShowSearchApplicantsTab(true);
+                    setShowApplicantProfileTab(false);
+                }))
         } else {
+            console.log('1')
             setSelectedApplicant(false);
             setShowRequestHistoryTab(false);
             setIsProfileDifferent(false);
@@ -381,6 +415,8 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         if (hasAtributes && [FOI_COMPONENT_CONSTANTS.DOB, FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER, FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS].includes(field)) {
             if (!requestDetails.additionalPersonalInfo?.[field] && saveApplicantObject?.additionalPersonalInfo[field]) return true;
             return requestDetails.additionalPersonalInfo?.[field] && requestDetails.additionalPersonalInfo[field] !== saveApplicantObject?.additionalPersonalInfo[field]
+        } else if (field == "otherNotes") {
+            return selectedApplicant?.[field] != saveApplicantObject?.[field]
         } else {
             return requestDetails[field] != saveApplicantObject?.[field]
         }
@@ -483,6 +519,53 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
             return <Loading />;
         }
 
+        // if (isBeforeOpen(requestDetails)) {
+        //     console.log('moda')
+        //     console.log('createConfirmation: ', createConfirmation)
+        //     console.log('isChangeToDifferentProfile: ' , isChangeToDifferentProfile)
+        //     console.log('selectedApplicant: ', selectedApplicant)
+        //     if (createConfirmation) {
+        //         return (
+        //         <ApplicantDetailsSections
+        //                 requestDetails={saveApplicantObject}
+        //                 contactDetailsNotGiven={false}
+        //                 createSaveRequestObject={createSaveApplicantObject}
+        //                 handleApplicantDetailsInitialValue={() => {}}
+        //                 handleApplicantDetailsValue={() => {}}
+        //                 disableInput={true}
+        //                 defaultExpanded={true}
+        //                 showHistory={showApplicantHistory}
+        //                 warning={null}
+        //                 displayOtherNotes={true}
+        //                 isAddRequest={isAddRequest}
+        //                 isUnopenedRequest={isUnopenedRequest}
+        //                 requestType={requestDetails?.requestType}
+        //                 disableAdditionalDetails={false}
+        //             />
+        //         );
+        //     }
+        //     if (selectedApplicant) {
+        //         return (
+        //         <ApplicantDetailsSections
+        //                 requestDetails={saveApplicantObject}
+        //                 contactDetailsNotGiven={false}
+        //                 createSaveRequestObject={createSaveApplicantObject}
+        //                 handleApplicantDetailsInitialValue={() => {}}
+        //                 handleApplicantDetailsValue={() => {}}
+        //                 disableInput={true}
+        //                 defaultExpanded={true}
+        //                 showHistory={showApplicantHistory}
+        //                 warning={null}
+        //                 displayOtherNotes={true}
+        //                 isAddRequest={isAddRequest}
+        //                 isUnopenedRequest={isUnopenedRequest}
+        //                 requestType={requestDetails?.requestType}
+        //                 disableAdditionalDetails={false}
+        //             />
+        //         );
+        //     }
+        // }
+
         if (confirmationMessage && isChangeToDifferentProfile) return (
             <>
   
@@ -512,11 +595,22 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
 
         if (createConfirmation && isBeforeOpen(requestDetails)) {
             return (
-            <div style={{ textAlign: "center" }}>
-                New Profile will be created automatically when request is moved to open state.
-                <br />
-                <i>Please make any additional changes in Request Details.</i>
-            </div>
+            <ApplicantDetailsSections
+                    requestDetails={saveApplicantObject}
+                    contactDetailsNotGiven={false}
+                    createSaveRequestObject={createSaveApplicantObject}
+                    handleApplicantDetailsInitialValue={() => {}}
+                    handleApplicantDetailsValue={() => {}}
+                    disableInput={false}
+                    defaultExpanded={true}
+                    showHistory={showApplicantHistory}
+                    warning={null}
+                    displayOtherNotes={true}
+                    isAddRequest={isAddRequest}
+                    isUnopenedRequest={isUnopenedRequest}
+                    requestType={requestDetails?.requestType}
+                    disableAdditionalDetails={false}
+                />
             );
         } 
         if (createConfirmation) return (
@@ -618,7 +712,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                         createSaveRequestObject={createSaveApplicantObject}
                         handleApplicantDetailsInitialValue={() => {}}
                         handleApplicantDetailsValue={() => {}}
-                        disableInput={isChangeToDifferentProfile ? true : false}
+                        disableInput={isChangeToDifferentProfile || !requestDetails?.foiRequestApplicantID ? true : false}
                         defaultExpanded={isChangeToDifferentProfile ? true : false}
                         showHistory={showApplicantHistory}
                         warning={warning}
@@ -658,7 +752,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                             loading={isLoading}                
                             // onRowClick={selectApplicantRow}
                             getRowHeight={() => 'auto'} 
-                            getRowId={(row) => row.filenumber}
+                            getRowId={(row) => row.axisrequestid}
                         />
                         </Box>
                     </>
@@ -773,6 +867,55 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     );
 
     // Rendering logic
+    if (isBeforeOpen(requestDetails)) {
+        const hasAssignedApplicant = requestDetails?.foiRequestApplicantID ? true : false
+        console.log('before open')
+        console.log('requestDetails?.foiRequestApplicantID: ', requestDetails?.foiRequestApplicantID)
+        console.log('hasAssignedApplicant: ', hasAssignedApplicant)
+        console.log('isChangeToDifferentProfile: ', isChangeToDifferentProfile)
+        if (createConfirmation) {
+            return (<>
+                    {confirmCreateNewProfileButton}
+                    {backButton}
+                </>)
+            }
+        
+        if (selectedApplicant && !hasAssignedApplicant || isChangeToDifferentProfile) {
+            return (
+            <>
+                {!applicantHistory && (
+                <>
+                    {selectProfileButton}
+                </>
+                )}
+                {backButton}
+            </>
+            );
+        }
+        
+        if (selectedApplicant && hasAssignedApplicant) {
+            return (
+            <>
+                {!applicantHistory && (
+                <>
+                    {createNewProfileButton}
+                    {/* {selectProfileButton} */}
+                    {updateProfileButton}
+                </>
+                )}
+                {backButton}
+            </>
+            );
+        }
+
+        if (!selectedApplicant) {
+            return (<>
+                    {createNewProfileButton}
+                    {backButton}
+                </>)
+        }
+        }
+    return;
     if (isUnassignProfile && confirmationMessage) {
         return (
         <>
