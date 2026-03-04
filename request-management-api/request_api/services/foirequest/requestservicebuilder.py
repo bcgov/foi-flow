@@ -51,6 +51,7 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.estimatedtaggedpagecount = requestschema.get("estimatedtaggedpagecount")
         if requestschema.get("isoipcreview") is not None and requestschema.get("isoipcreview")  != "":
             foiministryrequest.isoipcreview = requestschema.get("isoipcreview")
+            foiministryrequest.oipcreviews = self.prepareoipc(requestschema, ministryid, activeversion, userid)
         if requestschema.get("isphasedrelease") is not None and requestschema.get("isphasedrelease")  != "":
             foiministryrequest.isphasedrelease = requestschema.get("isphasedrelease")
         if requestschema.get("isconsultflag") is not None and requestschema.get("isconsultflag")  != "":

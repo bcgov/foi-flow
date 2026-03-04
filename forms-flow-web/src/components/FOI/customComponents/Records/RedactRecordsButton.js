@@ -16,8 +16,8 @@ export default function RedactRecordsButton({ records, groups, ministryrequestid
   const useStyles = makeStyles((_theme) => ({
     createButton: {
       margin: 0,
-      width: "100%",
-      height: "50%",
+      width: "150px",
+      minWidth: "150px",
       backgroundColor: "#38598A",
       color: "#FFFFFF",
       fontWeight: 700,
@@ -53,8 +53,8 @@ export default function RedactRecordsButton({ records, groups, ministryrequestid
       !record.isredactionready &&
       !record.attributes?.incompatible
 
-    return allRecords.some(record =>{
-      if(isInvalid(record)) return true;
+    return allRecords.some(record => {
+      if (isInvalid(record)) return true;
 
       if (Array.isArray(record.attachments)) {
         return record.attachments.some(isInvalidAttachment);
@@ -138,10 +138,9 @@ export default function RedactRecordsButton({ records, groups, ministryrequestid
             variant="contained"
             color="primary"
             onClick={handleMenuOpen}
-            style={{ minWidth: "100px" }}
             className={clsx(
               "btn",
-              //buttonClassName
+              classes.createButton
             )}
 
 
