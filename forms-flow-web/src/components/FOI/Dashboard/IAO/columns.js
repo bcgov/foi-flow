@@ -363,10 +363,12 @@ const OITeamColumns = [
     headerAlign: "left",
   },
   {
-    field: "proactivedisclosurecategory",
+    field: "applicantType",
     headerName: "CATEGORY",
     flex: 1,
     headerAlign: "left",
+    valueGetter: (params) => params.row.requestType == "PD" ?
+      params.row.proactivedisclosurecategory : params.row.applicantType
   },
 ];
 

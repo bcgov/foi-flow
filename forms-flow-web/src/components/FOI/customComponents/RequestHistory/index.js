@@ -188,11 +188,11 @@ export const RequestHistorySection = ({
         closeModal={() => setShowHistoryExportModal(false)}
       />
       <div className="section">
-        <div className="row">
+        <div className="row d-flex align-items-center">
           <div className={isProactiveDisclosure ? "col-12" : "col-9"}>
             <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure} pdCategory = {requestDetails.proactiveDisclosureCategory} />
           </div>
-          <div className={isProactiveDisclosure ? "col-3 ml-auto d-flex justify-content-end" : "col-3"}>
+          <div className={isProactiveDisclosure ? "col-3 ml-auto d-flex justify-content-end" : "col-3 d-flex justify-content-end"}>
             <button type="button" style={{ display: 'block' }} className="btn foi-btn-create exportAll" onClick={exportRequestHistory}>Export All</button>
           </div>
         </div>
