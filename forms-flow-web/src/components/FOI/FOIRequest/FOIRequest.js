@@ -125,7 +125,7 @@ import { UnsavedModal } from "../customComponents";
 import { DISABLE_GATHERINGRECORDS_TAB, SKIP_OPENINFO_MINISTRIES } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
-import ApplicantProfileModal from "./ApplicantProfileModal";
+import ApplicantProfileModal from "./ApplicantProfile/ApplicantProfileModal";
 import { setFOIRequestDetail, setFOIPDFStitchedOIPackage, setFOIPDFStitchStatusForOIPackage } from "../../../actions/FOI/foiRequestActions";
 import OIPCDetails from "./OIPCDetails/Index";
 import useOIPCHook from "./OIPCDetails/oipcHook";
@@ -1537,7 +1537,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           handleApplicantDetailsValue
                         }
                         createSaveRequestObject={createSaveRequestObject}
-                        disableInput={disableInput || isHistoricalRequest || requestDetails?.axisApplicantID || requestDetails?.foiRequestApplicantID > 0}
+                        disableInput={true}
                         defaultExpanded={!closeApplicantDetails(userDetail, requestDetails?.requestType)}                        
                         userDetail={userDetail}
                         openApplicantProfileModal={openApplicantProfileModal}
@@ -1574,7 +1574,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           handleContactDetailsInitialValue
                         }
                         handleContanctDetailsValue={handleContanctDetailsValue}
-                        disableInput={disableInput || isHistoricalRequest || requestDetails?.axisApplicantID || requestDetails?.foiRequestApplicantID > 0}
+                        disableInput={true}
                         handleEmailValidation={handleEmailValidation}
                         defaultExpanded={!closeContactInfo(userDetail,requestDetails)}
                         userDetail={userDetail}
@@ -1623,7 +1623,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         <AdditionalApplicantDetails
                           requestDetails={requestDetails}
                           createSaveRequestObject={createSaveRequestObject}
-                          disableInput={disableInput || requestDetails?.axisApplicantID || requestDetails?.foiRequestApplicantID > 0}
+                          disableInput={true}
                           defaultExpanded={true}
                           setError={setPersonalRequestDetailErrors}
                         />
