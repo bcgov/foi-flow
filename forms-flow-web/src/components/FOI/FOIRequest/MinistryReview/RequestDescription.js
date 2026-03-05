@@ -62,7 +62,7 @@ const RequestDescription = React.memo((requestDetails) => {
                 disabled={filteredList.length <= 1}
                 onClick={handleDescriptionHistoryClick}
               >
-                {isProactiveDisclosure ? "Description History" : "Ministerial Directive"}
+                {isProactiveDisclosure ? "Ministerial Directive" : "Description History"}
               </button>
             </div>
           </div>
