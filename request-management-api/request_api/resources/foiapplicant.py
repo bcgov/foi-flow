@@ -53,7 +53,6 @@ class FOIApplicants(Resource):
     def get(email=None):
         if email is None or email == "":
             return []
-            return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400
         try:
             keywords = {'email': email}
             result = applicantservice().searchapplicant(keywords)
@@ -129,7 +128,7 @@ class EventPagination(Resource):
             payload = request.get_json()
             applicant = FOIRequestApplicantSchema().load(payload.get("applicant"))
             changeapplicantpayload = ApplicantProfilePayloadSchema().load(payload)
-            result = applicantservice().updateapplicantprofile(applicant, changeapplicantpayload, AuthHelper.getuserid())             
+            result = applicantservice().update_applicant_profile(applicant, changeapplicantpayload, AuthHelper.getuserid())
             return _handle_result(result)
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500 
@@ -239,7 +238,7 @@ class FOIApplicants(Resource):
         if applicantid is None or applicantid == 0:
             return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400
         try:
-            result = applicantservice().getapplicantbyid(applicantid)
+            result = applicantservice().get_applicant_profile_by_id(applicantid)
             if result is not None:
                 return json.dumps(result), 200
             else:
