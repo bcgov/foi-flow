@@ -12,7 +12,6 @@ const ApplicantProfileModalActions = ({
   selectedApplicant,
   applicantHistory,
   isChangeToDifferentProfile,
-  isUnassignProfile,
   createProfile,
 }) => {
   // Buttons
@@ -77,12 +76,6 @@ const ApplicantProfileModalActions = ({
       Update Profile
     </button>
   );
-
-//   const unassignProfileButton = (
-//       <button className={`btn-bottom btn-save btn`} onClick={unassignProfileFromRequest}>
-//       Unassign Profile
-//       </button>
-//   );
 
   const confirmUpdateProfileButton = (
     <button className={`btn-bottom btn-save btn`} onClick={updateProfile}>
@@ -159,10 +152,9 @@ const ApplicantProfileModalActions = ({
     }
   }
 //   return;
-  if (isUnassignProfile && confirmationMessage) {
+  if (confirmationMessage) {
     return (
       <>
-        {/* {unassignProfileButton} */}
         {backButton}
       </>
     );
@@ -226,7 +218,6 @@ const ApplicantProfileModalActions = ({
             {!applicantHistory && (
               <>
                 {updateProfileButton}
-                {/* {unassignProfileButton} */}
               </>
             )}
             {backButton}

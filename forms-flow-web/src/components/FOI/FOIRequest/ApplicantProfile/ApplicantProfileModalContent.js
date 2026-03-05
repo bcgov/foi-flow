@@ -33,7 +33,6 @@ const ApplicantProfileModalContent = ({
   isProfileDifferent,
   setIsProfileDifferent,
   isChangeToDifferentProfile,
-  isUnassignProfile,
   warning,
   requestHistory,
   setRequestHistory,
@@ -136,7 +135,7 @@ const ApplicantProfileModalContent = ({
         </Alert>
       </>
     );
-  if (confirmationMessage && isUnassignProfile)
+  if (confirmationMessage)
     return (
       <div style={{ textAlign: "center" }}>
         The linked applicant profile will be removed, but the information for

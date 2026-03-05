@@ -15,6 +15,7 @@ from request_api.services.rawrequest.rawrequestservicegetter import rawrequestse
 from request_api.exceptions import BusinessException, Error
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
+from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator
 from request_api.utils.enums import StateName
 import logging
@@ -46,6 +47,14 @@ class rawrequestservice:
         axissyncdate = requestdatajson["axisSyncDate"] if 'axisSyncDate' in requestdatajson  else None
         linkedrequests = requestdatajson["linkedRequests"] if 'linkedRequests' in requestdatajson  else None
         requirespayment =  rawrequestservice.doesrequirepayment(requestdatajson) if sourceofsubmission == "onlineform"  else False 
+
+        # Raw request should already have applicant attached, but if not this is a fallback to create one
+        if not requestdatajson.get("foiRequestApplicantID", None) and sourceofsubmission != "onlineform":
+            applicant = FOIRequestApplicant.from_request_data(requestdatajson)
+            result = FOIRequestApplicant.save_instance(applicant, userid)
+            applicantid = result.identifier
+            requestdatajson.setdefault("foiRequestApplicantID", applicantid)
+
         if axisrequestid is None or isaxisrequestidpresent == False:
             result = FOIRawRequest.saverawrequest(
                                                     _requestrawdata=requestdatajson,
@@ -106,6 +115,13 @@ class rawrequestservice:
         if actiontype == "assignee":
             result = FOIRawRequest.saverawrequestassigneeversion(_requestid, _assigneegroup, _assignee, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         else:
+            # This should mostly be used for onlineform requests
+            if not _requestdatajson.get("foiRequestApplicantID", None):
+                applicant = FOIRequestApplicant.from_request_data(_requestdatajson)
+                result = FOIRequestApplicant.save_instance(applicant, userid)
+                applicantid = result.identifier
+                _requestdatajson.setdefault("foiRequestApplicantID", applicantid)
+
             result = FOIRawRequest.saverawrequestversion(_requestdatajson, _requestid, _assigneegroup, _assignee, status,ispiiredacted, userid, statuslabel, assigneefirstname, assigneemiddlename, assigneelastname)
         documentservice().createrawrequestdocumentversion(_requestid)
         return result

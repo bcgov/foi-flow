@@ -4,7 +4,6 @@ import clsx from "clsx";
 
 const ApplicantProfileModalHeader = ({
   confirmationMessage,
-  isUnassignProfile,
   applicantHistory,
   selectedApplicant,
   createConfirmation,
@@ -25,11 +24,9 @@ const ApplicantProfileModalHeader = ({
     );
   };
 
-  if (confirmationMessage && !isUnassignProfile)
+  if (confirmationMessage)
     return <FormattedHeader text={"Saving Changes to Applicant Profile"} />;
   if (applicantHistory) return <FormattedHeader text={"Applicant History"} />;
-  if (isUnassignProfile)
-    return <FormattedHeader text={"Unassign Applicant Profile"} />;
   if (!selectedApplicant) return <FormattedHeader text={"Search Applicants"} />;
   if (createConfirmation)
     return <FormattedHeader text={"Create New Profile"} />;

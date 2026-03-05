@@ -12,6 +12,7 @@ class FOIRequestApplicantSchema(Schema):
     middleName = fields.Str(data_key="middleName",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])    
     lastName = fields.Str(data_key="lastName", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE, max=50)])         
     email = fields.Str(data_key="email",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])      
+    category = fields.Str(data_key="category",allow_none=True, validate=[validate.Length(max=120, error=MAX_EXCEPTION_MESSAGE)])
     businessName = fields.Str(data_key="businessName",allow_none=True, validate=[validate.Length(max=255, error=MAX_EXCEPTION_MESSAGE)]) 
 
     phonePrimary = fields.Str(data_key="phonePrimary",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])    

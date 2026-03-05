@@ -45,7 +45,6 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const [confirmationMessage, setConfirmationMessage] = useState(false);
     const [createConfirmation, setCreateConfirmation] = useState(false);
     const [isProfileDifferent, setIsProfileDifferent] = useState(false);
-    const [isUnassignProfile, setIsUnassignProfile] = useState(false);
     const [isChangeToDifferentProfile, setIsChangeToDifferentProfile] = useState(false);
     const [applicantHistory, setApplicantHistory] = useState(false);
     const [requestHistory, setRequestHistory] = useState(false);
@@ -119,7 +118,6 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         setConfirmationMessage(false);
         setCreateConfirmation(false);
         setIsProfileDifferent(false);
-        setIsUnassignProfile(false);
         setApplicantHistory(false);
         setRequestHistory(false);
         handleModalClose();
@@ -199,7 +197,6 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     }
 
     const back = () => {
-        setIsUnassignProfile(false);
         if (confirmationMessage) {
             setConfirmationMessage(false);
         } else if (applicantHistory) {
@@ -254,238 +251,6 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         }
     }
 
-    // const renderApplicantProfileModalActions = () => {
-    // // Buttons
-    // const reassignProfileButton = (
-    //     <button
-    //     className={`btn-bottom btn-save btn`}
-    //     onClick={reassignProfileToRequest}
-    //     disabled={isSaveDisabled()}
-    //     >
-    //     Reassign Profile
-    //     </button>
-    // );
-    // const selectProfileButton = (
-    //     <button
-    //     className={`btn-bottom btn-save btn`}
-    //     onClick={reassignProfileToRequest}
-    //     disabled={isSaveDisabled()}
-    //     >
-    //     Select Profile
-    //     </button>
-    // );
-
-    // const confirmReassignProfileButton = (
-    //     <button className={`btn-bottom btn-save btn`} onClick={reassignProfileToRequest}>
-    //     Confirm Reassign Profile
-    //     </button>
-    // );
-
-    // const confirmSelectedProfileButton = (
-    //     <button className={`btn-bottom btn-save btn`} onClick={reassignProfileToRequest}>
-    //     Confirm Reassigned Profile
-    //     </button>
-    // );
-
-
-    // const confirmBackButton = (
-    //     <button
-    //     className="btn-bottom btn-cancel"
-    //     onClick={() => setConfirmationMessage(false)}
-    //     >
-    //     Back
-    //     </button>
-    // );
-
-    // const backButton = (
-    //     <button className="btn-bottom btn-cancel" onClick={back}>
-    //     Back
-    //     </button>
-    // );
-
-    // const updateProfileButton = (
-    //     <button
-    //     className={`btn-bottom btn-save btn`}
-    //     onClick={updateProfile}
-    //     disabled={isSaveDisabled()}
-    //     >
-    //     Update Profile
-    //     </button>
-    // );
-
-    // // const unassignProfileButton = (
-    // //     <button className={`btn-bottom btn-save btn`} onClick={unassignProfileFromRequest}>
-    // //     Unassign Profile
-    // //     </button>
-    // // );
-
-    // const confirmUpdateProfileButton = (
-    //     <button className={`btn-bottom btn-save btn`} onClick={updateProfile}>
-    //     Save Changes
-    //     </button>
-    // );
-
-    // const createNewProfileButton = (
-    //     <button className={`btn-bottom btn-save btn`} onClick={createProfile}>
-    //     Create New Profile
-    //     </button>
-    // );
-
-    // const confirmCreateNewProfileButton = (
-    //     <button className={`btn-bottom btn-save btn`} onClick={createProfile}>
-    //     Confirm New Profile
-    //     </button>
-    // );
-
-    // const cancelButton = (
-    //     <button className="btn-bottom btn-cancel" onClick={cancel}>
-    //     Cancel
-    //     </button>
-    // );
-
-    // // Rendering logic
-    // if (isBeforeOpen(requestDetails)) {
-    //     const hasAssignedApplicant = requestDetails?.foiRequestApplicantID ? true : false
-    //     if (createConfirmation) {
-    //         return (<>
-    //                 {confirmCreateNewProfileButton}
-    //                 {backButton}
-    //             </>)
-    //         }
-        
-    //     if (selectedApplicant && !hasAssignedApplicant || isChangeToDifferentProfile) {
-    //         return (
-    //         <>
-    //             {!applicantHistory && (
-    //             <>
-    //                 {selectProfileButton}
-    //             </>
-    //             )}
-    //             {backButton}
-    //         </>
-    //         );
-    //     }
-        
-    //     if (selectedApplicant && hasAssignedApplicant) {
-    //         return (
-    //         <>
-    //             {!applicantHistory && (
-    //             <>
-    //                 {createNewProfileButton}
-    //                 {/* {selectProfileButton} */}
-    //                 {updateProfileButton}
-    //             </>
-    //             )}
-    //             {backButton}
-    //         </>
-    //         );
-    //     }
-
-    //     if (!selectedApplicant) {
-    //         return (<>
-    //                 {createNewProfileButton}
-    //                 {backButton}
-    //             </>)
-    //     }
-    //     }
-    // return;
-    // if (isUnassignProfile && confirmationMessage) {
-    //     return (
-    //     <>
-    //         {unassignProfileButton}
-    //         {backButton}
-    //     </>
-    //     );
-    // }
-    // if (createConfirmation && isBeforeOpen(requestDetails)) {
-    //     return <>{backButton}</>
-    // }
-
-    // if (isChangeToDifferentProfile && !confirmationMessage) return (
-    //     <>
-    //         {!applicantHistory && selectProfileButton}
-    //         {backButton}
-    //     </>
-    // )
-    // if (isChangeToDifferentProfile && confirmationMessage) return (
-    //    <>
-    //     {confirmSelectedProfileButton}
-    //     {backButton}
-    //    </>
-    // )
-
-    // if (isChangeToDifferentProfile) {
-    //     if (confirmationMessage) {
-    //     return (
-    //         <>
-    //             {confirmReassignProfileButton}
-    //             {confirmBackButton}
-    //         </>
-    //     );
-    //     } else {
-    //     return (
-    //         <>
-    //             {!applicantHistory && reassignProfileButton}
-    //             {backButton}
-    //         </>
-    //     );
-    //     }
-    // }
-
-    // if (selectedApplicant) {
-    //     if (confirmationMessage) {
-    //     return (
-    //         <>
-    //         {confirmUpdateProfileButton}
-    //         {confirmBackButton}
-    //         </>
-    //     );
-    //     } else if (createConfirmation) {
-    //     return (
-    //         <>
-    //         {!applicantHistory && (
-    //             <>
-    //             {confirmCreateNewProfileButton}
-    //             </>
-    //         )}
-    //         {backButton}
-    //         </>
-    //     );
-    //     } else {
-    //     if (isBeforeOpen(requestDetails)) {
-    //         return (
-    //         <>
-    //             {!applicantHistory && (
-    //             <>
-    //                 {updateProfileButton}
-    //                 {unassignProfileButton}
-    //             </>
-    //             )}
-    //             {backButton}
-    //         </>
-    //         );
-    //     }
-    //     return (
-    //         <>
-    //         {!applicantHistory && (
-    //             <>
-    //             {createNewProfileButton}
-    //             {updateProfileButton}
-    //             </>
-    //         )}
-    //         {backButton}
-    //         </>
-    //     );
-    //     }
-    // }
-    // return (
-    //     <>
-    //         {createNewProfileButton}
-    //         {cancelButton}
-    //     </>
-    //     );
-    // };
-    
     return (
       <div className={"applicant-profile-modal-div"}>
         <ReactModal
@@ -500,7 +265,6 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
           <DialogTitle disableTypography id="request-history-dialog-title">
             <ApplicantProfileModalHeader 
                 confirmationMessage={confirmationMessage}
-                isUnassignProfile={isUnassignProfile}
                 applicantHistory={applicantHistory}
                 selectedApplicant={selectedApplicant}
                 createConfirmation={createConfirmation}
@@ -540,7 +304,6 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                 isProfileDifferent={isProfileDifferent}
                 setIsProfileDifferent={setIsProfileDifferent}
                 isChangeToDifferentProfile={isChangeToDifferentProfile}
-                isUnassignProfile={isUnassignProfile}
                 warning={warning}
                 requestHistory={requestHistory}
                 setRequestHistory={setRequestHistory}
@@ -554,7 +317,6 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
           </DialogContent>
         </div>
           <DialogActions sx={{padding: 30}}>
-            {/* {renderApplicantProfileModalActions()} */}
             <ApplicantProfileModalActions
                 requestDetails={requestDetails}
                 reassignProfileToRequest={reassignProfileToRequest}
@@ -569,7 +331,6 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                 selectedApplicant={selectedApplicant}
                 applicantHistory={applicantHistory}
                 isChangeToDifferentProfile={isChangeToDifferentProfile}
-                isUnassignProfile={isUnassignProfile}
                 createProfile={createProfile}
             />
           </DialogActions>
