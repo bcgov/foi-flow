@@ -129,7 +129,7 @@ import {
 } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
-import ApplicantProfileModal from "./ApplicantProfileModal";
+import ApplicantProfileModal from "./ApplicantProfile/ApplicantProfileModal";
 import {
   setFOIRequestDetail,
   setFOIPDFStitchedOIPackage,
@@ -1839,10 +1839,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             handleContanctDetailsValue={
                               handleContanctDetailsValue
                             }
-                            disableInput={
-                              disableInput ||
-                              isHistoricalRequest || requestDetails?.axisApplicantID || requestDetails?.foiRequestApplicantID > 0
-                            }
+                            disableInput={true}
                             handleEmailValidation={handleEmailValidation}
                             defaultExpanded={
                               !closeContactInfo(userDetail, requestDetails)

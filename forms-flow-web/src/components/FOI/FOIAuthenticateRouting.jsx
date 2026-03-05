@@ -14,7 +14,7 @@ import { isMinistryLogin } from '../../helper/FOI/helper';
 import UnAuthorized from "./UnAuthorized";
 import Admin from "./Admin";
 import Divisions from "./Admin/Divisions";
-import ApplicantProfileModal from "./FOIRequest/ApplicantProfileModal";
+import ApplicantProfileModal from "./FOIRequest/ApplicantProfile/ApplicantProfileModal";
 
 
 const FOIAuthenticateRouting = React.memo((props) => {

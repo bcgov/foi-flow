@@ -7,14 +7,14 @@ import InputAdornment from "@mui/material/InputAdornment";
 import InputBase from "@mui/material/InputBase";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
-import { ClickableChip } from "../Dashboard/utils";
+import { ClickableChip } from "../../Dashboard/utils";
 import { DataGrid } from "@mui/x-data-grid";
 import { toast } from "react-toastify";
 
 import {
   fetchApplicantProfileByKeyword,
   fetchApplicantRequests,
-} from "../../../apiManager/services/FOI/foiApplicantProfileService";
+} from "../../../../apiManager/services/FOI/foiApplicantProfileService";
 
 export const ApplicantProfileSearchView = ({
   setShowApplicantProfileTab,
@@ -78,12 +78,12 @@ export const ApplicantProfileSearchView = ({
   const search = (rows) => {
     return rows.filter(
       (r) =>
-        r.firstName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
+        r.firstName?.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
         r.middleName?.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-        r.lastName.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
+        r.lastName?.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
         r.birthDate?.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
         r.email?.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-        r.primaryPhone?.toLowerCase().indexOf(searchText.toLowerCase()) > -1,
+        r.primaryPhone?.toLowerCase().indexOf(searchText.toLowerCase()) > -1
     );
   };
 
@@ -151,6 +151,7 @@ export const ApplicantProfileSearchView = ({
         setSelectedApplicant(applicant);
         setRequestHistory(res);
         setIsLoading(false);
+        setShowApplicantProfileTab(true);
         setShowSearchApplicantsTab(false);
       }),
     );

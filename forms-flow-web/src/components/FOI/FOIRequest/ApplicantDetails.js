@@ -396,7 +396,7 @@ const ApplicantDetails = React.memo(
                 className={warning && warning(FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) && classes.warning}
                 fullWidth
                 required
-                disabled={StateEnum.closed.name.toLowerCase() === requestDetails?.currentState?.toLowerCase() || !openApplicantProfileModal}
+                disabled={disableInput}
                 error={selectedCategory.toLowerCase().includes("select")}
               >
                 {menuItems}
