@@ -57,7 +57,7 @@ const useStyles = makeStyles((_theme) => ({
   },
   attachmentLog: {
     marginTop: "1em",
-    marginLeft: "1em",
+    //marginLeft: "1em",
   },
 }));
 
@@ -442,8 +442,10 @@ export const AttachmentSection = ({
               justifyContent="flex-end"
               alignItems="flex-start"
               xs={isProactiveDisclosure ? 12 : 6}
+              spacing={1}
+              style={!isProactiveDisclosure ? { marginTop: '12px' } : {}}
             >
-              <Grid item xs={3}>
+              <Grid item xs={3} style={{minWidth:'245px'}}>
                 <ConditionalComponent condition={hasDocumentsToExport}>
                   <button
                     className="btn addAttachment foi-export-button"
@@ -455,7 +457,7 @@ export const AttachmentSection = ({
                   </button>
                 </ConditionalComponent>
               </Grid>
-              <Grid item xs={3}>
+              <Grid item xs={3} style={{minWidth:'245px'}}>
                 {!isHistoricalRequest && (
                   <button
                     className={clsx("btn", "addAttachment", classes.createButton)}
@@ -463,7 +465,7 @@ export const AttachmentSection = ({
                     onClick={addAttachments}
                     color="primary"
                   >
-                    + Upload Records
+                    + Add Attachment
                   </button>
                 )}
               </Grid>
