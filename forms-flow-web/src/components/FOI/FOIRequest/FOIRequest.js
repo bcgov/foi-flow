@@ -104,6 +104,7 @@ import {
   getUniqueIdentifier,
   closeContactInfo,
   closeApplicantDetails,
+  getIsAddRequest
 } from "./utils";
 import {
   ConditionalComponent,
@@ -128,7 +129,7 @@ import {
 } from "../../../constants/constants";
 import _ from "lodash";
 import { MinistryNeedsScanning } from "../../../constants/FOI/enum";
-import ApplicantProfileModal from "./ApplicantProfileModal";
+import ApplicantProfileModal from "./ApplicantProfile/ApplicantProfileModal";
 import {
   setFOIRequestDetail,
   setFOIPDFStitchedOIPackage,
@@ -178,7 +179,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
   const isHistoricalRequest =
     url.indexOf(FOI_COMPONENT_CONSTANTS.HISTORICAL_REQUEST) > -1;
-  const [isAddRequest, setIsAddRequest] = useState(urlIndexCreateRequest > -1);
+  const [isAddRequest, setIsAddRequest] = useState(getIsAddRequest());
   //gets the request detail from the store
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
@@ -1782,12 +1783,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             handleApplicantDetailsValue={
                               handleApplicantDetailsValue
                             }
-                            createSaveRequestObject={createSaveRequestObject}
-                            disableInput={
-                              disableInput ||
-                              isHistoricalRequest ||
-                              requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/
-                            }
+                            createSaveRequestObject={ createSaveRequestObject}
+                            disableInput={true}
                             defaultExpanded={
                               !closeApplicantDetails(
                                 userDetail,
@@ -1795,6 +1792,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                               )
                             }
                             userDetail={userDetail}
+                            openApplicantProfileModal={openApplicantProfileModal}
                           />
                           {requiredRequestDetailsValues.requestType.toLowerCase() ===
                             FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
@@ -1838,15 +1836,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             handleContanctDetailsValue={
                               handleContanctDetailsValue
                             }
-                            disableInput={
-                              disableInput ||
-                              isHistoricalRequest /* || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/
-                            }
+                            disableInput={true}
                             handleEmailValidation={handleEmailValidation}
                             defaultExpanded={
                               !closeContactInfo(userDetail, requestDetails)
                             }
-                            moreInfoAction={openApplicantProfileModal}
                             userDetail={userDetail}
                           />
 
@@ -1900,9 +1894,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                               <AdditionalApplicantDetails
                                 requestDetails={requestDetails}
                                 createSaveRequestObject={createSaveRequestObject}
-                                disableInput={
-                                  disableInput /* || requestDetails?.axisApplicantID /* requestDetails?.foiRequestApplicantID > 0 comment back in after axis decommission*/
-                                }
+                                disableInput={true}
                                 defaultExpanded={true}
                                 setError={setPersonalRequestDetailErrors}
                               />
