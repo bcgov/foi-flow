@@ -17,7 +17,7 @@ export const LinkedRequestsTable = ({
     linkedRequestsInfo,
     linkedRequests,
     renderReviewRequest,
-    removeLinkedRequest,
+    handleRemoveLinkedRequest,
     isMinistry
 }) => {
     const [page, setPage] = useState(0);
@@ -94,7 +94,7 @@ export const LinkedRequestsTable = ({
                                     type="button"
                                     className="btn btn-link text-danger"
                                     aria-label={`Remove linked request ${reqObj.axisrequestid}`}
-                                    onClick={() => removeLinkedRequest(reqObj)}
+                                    onClick={() => handleRemoveLinkedRequest(reqObj)}
                                 >
                                 <CancelIcon
                                     fontSize="small"

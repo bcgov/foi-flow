@@ -1988,6 +1988,66 @@ class FOIMinistryRequest(db.Model):
         finally:
             db.session.close()
 
+    @classmethod
+    def get_linkedrequests(cls, foiministryrequestid):
+        try:
+            result = db.session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == foiministryrequestid, FOIMinistryRequest.isactive == True).order_by(FOIMinistryRequest.version.desc()).first()
+            linkedrequests = result.linkedrequests
+            return linkedrequests if linkedrequests is not None else []
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+
+    @classmethod
+    def update_linkedrequests(cls, foiministryrequestid, new_linkedrequests, user):
+        print("WHY", new_linkedrequests)
+        update_at = datetime.now().isoformat()
+        sql = """
+        UPDATE public."FOIMinistryRequests"
+        SET 
+            linkedrequests = :new_linkedrequests,
+            updated_at = :update_at,
+            updatedby = :user
+        WHERE foiministryrequestid = :foiministryrequestid AND isactive = TRUE
+        RETURNING foiministryrequestid, linkedrequests, updated_at, updatedby;
+        """
+        params = {"new_linkedrequests": new_linkedrequests, "update_at": update_at, "user": user, "foiministryrequestid": foiministryrequestid}
+        res = db.session.execute(text(sql), params)
+        
+        row = res.fetchone()     # ← valid on ResultProxy
+        if row is None:
+            print("NONE")
+            return None  # WHERE matched 0 rows
+
+        keys = res.keys()
+        print("VERIFY", dict(zip(keys, row)))
+
+        return res
+
+    @classmethod
+    def bulkupdate_linkedrequests(cls, linkedrequest_requestids, new_linkedrequest, user):
+        new_linkedrequest_axisid = new_linkedrequest.keys()[0]
+        update_at = datetime.now().isoformat()
+        sql = """
+        UPDATE public."FOIMinistryRequests"
+        SET 
+            linkedrequests = ((COALESCE(linkedrequests, '[]'::json))::jsonb || jsonb_build_array((:new_linkedrequest)::jsonb))::json,
+            updated_at = :update_at,
+            updatedby = :user
+        WHERE foiministryrequestid in :linkedrequest_requestids
+            AND isactive = TRUE
+            AND NOT EXISTS (
+                SELECT 1
+                FROM jsonb_array_elements((COALESCE(linkedrequests, '[]'::json))::jsonb) AS elem
+                WHERE elem ? :new_linkedrequest_axisid
+            );
+        """
+        params = {"new_linkedrequest": new_linkedrequest, "updated_at": update_at, "user": user  ,"linkedrequest_requestids": tuple(linkedrequest_requestids), "new_linkedrequest_axisid": new_linkedrequest_axisid}
+        res = db.session.execute(text(sql), params)
+        return res
+
 
 class FOIMinistryRequestSchema(ma.Schema):
     class Meta:

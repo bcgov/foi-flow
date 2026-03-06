@@ -184,6 +184,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     (state) => state.foiRequests.foiRequestDetail
   );
 
+  console.log("HI", requestId)
+
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   let requestExtensions = useSelector(
     (state) => state.foiRequests.foiRequestExtesions
@@ -1880,6 +1882,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                               disableInput={disableInput || isHistoricalRequest}
                               isHistoricalRequest={isHistoricalRequest}
                               isMinistry={isMinistry}
+                              ministryId={ministryId}
+                              requestId={requestId}
                             />
                           }
                           {redactedSections &&

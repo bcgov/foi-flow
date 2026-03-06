@@ -19,14 +19,16 @@ import {
   Autocomplete,
   CircularProgress
 } from "@mui/material";
-import {getFOIMinistryLinkedRequestInfo, linkedRequestsLists} from "../../../apiManager/services/FOI/foiRequestServices";
+import {getFOIMinistryLinkedRequestInfo, linkedRequestsLists, deleteLinkedRequest} from "../../../apiManager/services/FOI/foiRequestServices";
 import { LinkedRequestsTable } from "./LinkedRequestsTable";
 
 const LinkedRequests = React.memo(
   ({
     requestDetails,
     createSaveRequestObject,
-    isMinistry
+    isMinistry,
+    ministryId,
+    requestId,
   }) => {
     const useStyles = makeStyles({
       heading: {
@@ -74,13 +76,34 @@ const LinkedRequests = React.memo(
       setOptions([]);
     }
 
+    const handleRemoveLinkedRequest = (linkedrequestToRemove) => {
+      try {
+        const updatedLinkedRequests = removeLinkedRequest(linkedrequestToRemove);
+        const parentLinkedRequest = {
+          foiministryrequestid: ministryId ? ministryId : null,
+          rawrequestid: requestId,
+          axisrequestid: requestDetails?.axisRequestId
+        }
+        const data = {
+          linkedrequest_a: parentLinkedRequest,
+          linkedrequest_b: linkedrequestToRemove,
+          new_linkedrequests: updatedLinkedRequests,
+        }
+        dispatch (
+          deleteLinkedRequest(data, requestDetails?.axisRequestId)
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
     const removeLinkedRequest = (reqItem) => {
       const reqId = reqItem.axisrequestid;
       const updatedLinkedRequests = linkedRequests?.filter(item => getAxisRequestId(item) !== reqId);
       const updatedLinkedInfoRequests = linkedRequestsInfo?.filter(item => item.axisrequestid !== reqId);
       setLinkedRequests(updatedLinkedRequests);
       setLinkedRequestsInfo(updatedLinkedInfoRequests);
-      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS, updatedLinkedRequests);
+      return updatedLinkedRequests;
     }
 
     const renderReviewRequest = (e, reqItem) => {
@@ -155,6 +178,8 @@ const LinkedRequests = React.memo(
         const govCode = selectedValue.govcode;
         const linkedReqObj = {
           [selectedValue.axisrequestid]: govCode,
+          foiministryrequestid: selectedValue.foiministryrequestid || null,
+          rawrequestid:  selectedValue.rawrequestid
         };
         const linkedReqInfoObj = {
           "axisrequestid": axisRequestId,
@@ -189,7 +214,7 @@ const LinkedRequests = React.memo(
                 linkedRequestsInfo={linkedRequestsInfo}
                 linkedRequests={linkedRequests}
                 renderReviewRequest={renderReviewRequest}
-                removeLinkedRequest={removeLinkedRequest}
+                handleRemoveLinkedRequest={handleRemoveLinkedRequest}
                 isMinistry={isMinistry}
               />
               {!showSearch && (

@@ -29,7 +29,6 @@ const API = {
   FOI_POST_REQUEST_POST: `${FOI_BASE_API_URL}/api/foirequests`,
   FOI_REQUEST_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>`,
   FOI_REQUEST_SECTION_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>/section`,
-  FOI_MINISTRY_REQUEST_LINKEDREQUESTINFO: `${FOI_BASE_API_URL}/api/linkrequest/foiministryinfo/axisrequestid/<axisrequestid>`,
   FOI_MINISTRYVIEW_REQUEST_API: `${FOI_BASE_API_URL}/api/foirequests/<requestid>/ministryrequest/<ministryid>/ministry`,
   FOI_RAW_REQUEST_DESCRIPTION: `${FOI_BASE_API_URL}/api/foiaudit/rawrequest/<requestid>/description`,
   FOI_MINISTRY_REQUEST_DESCRIPTION: `${FOI_BASE_API_URL}/api/foiaudit/ministryrequest/<ministryid>/description`,
@@ -229,6 +228,10 @@ const API = {
   
   FOI_GET_PROACTIVE_DISCLOSURE_CATEGORIES_API: `${FOI_BASE_API_URL}/api/foiflow/proactivedisclosurecategories`,
 
-  FOI_GET_LINKED_REQUESTS_LIST: `${FOI_BASE_API_URL}/api/linkrequests/<ministrycode>/axisrequestid/<axisrequestid>`
+  FOI_GET_LINKED_REQUESTS_LIST: `${FOI_BASE_API_URL}/api/linkrequests/<ministrycode>/axisrequestid/<axisrequestid>`,
+  FOI_MINISTRY_REQUEST_LINKEDREQUESTINFO: `${FOI_BASE_API_URL}/api/linkrequest/foiministryinfo/axisrequestid/<axisrequestid>`,
+  FOI_REQUEST_ADD_LINKEDREQUESTS: `${FOI_BASE_API_URL}/api/linkrequest/createlink/axisrequestid/<axisrequestid>`,
+  FOI_REQUEST_REMOVE_LINKEDREQUESTS: `${FOI_BASE_API_URL}/api/linkrequest/removelink/axisrequestid/<axisrequestid>`,
+
 };
 export default API;
