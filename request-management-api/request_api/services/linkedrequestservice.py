@@ -49,20 +49,15 @@ class linkedrequestservice:
             foiministryrequestid = linkedrequest_a["foiministryrequestid"]
             rawrequestid = linkedrequest_a["rawrequestid"]
             if foiministryrequestid is not None:
-                result = FOIMinistryRequest().update_linkedrequests(foiministryrequestid, json.dumps(updated_linkedrequests), user)
+                removal_result = FOIMinistryRequest().update_linkedrequests(foiministryrequestid, json.dumps(updated_linkedrequests), user)
             else:
-                result = FOIRawRequest().update_linkedrequests(rawrequestid, json.dumps(updated_linkedrequests), user)
-            print("FIRST TXN")
-            # db.session.commit()
-            finalresult = self.__remove_two_way_link(linkedrequest_a, linkedrequest_b, user)
-            print("SECOND TXN")
+                removal_result = FOIRawRequest().update_linkedrequests(rawrequestid, json.dumps(updated_linkedrequests), user)
+            delink_result = self.__remove_two_way_link(linkedrequest_a, linkedrequest_b, user)
             db.session.commit()
             return DefaultMethodResult(True,'Linkedrequest data updated', linkedrequest_a["axisrequestid"], 201)
         except Exception as e:
             db.session.rollback()
             raise Exception("Error when delinking removed linkedrequests", e) from e
-        finally:
-            db.session.close()
 
     def __remove_two_way_link(self, linkedrequest_a, linkedrequest_b, user):
         # Delink linkedrequest_a from linkedrequest_b

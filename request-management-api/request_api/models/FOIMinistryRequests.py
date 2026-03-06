@@ -1991,18 +1991,23 @@ class FOIMinistryRequest(db.Model):
     @classmethod
     def get_linkedrequests(cls, foiministryrequestid):
         try:
-            result = db.session.query(FOIMinistryRequest).filter(FOIMinistryRequest.foiministryrequestid == foiministryrequestid, FOIMinistryRequest.isactive == True).order_by(FOIMinistryRequest.version.desc()).first()
-            linkedrequests = result.linkedrequests
+            sql = """
+            SELECT * 
+            FROM public."FOIMinistryRequests"
+            WHERE foiministryrequestid = :foiministryrequestid AND isactive = TRUE
+            ORDER BY version DESC
+            LIMIT 1;
+            """
+            params = {"foiministryrequestid": foiministryrequestid}
+            result = db.session.execute(text(sql), params).first()
+            print("result", result.linkedrequests)
+            linkedrequests  = result.linkedrequests
             return linkedrequests if linkedrequests is not None else []
         except Exception as ex:
             logging.error(ex)
-            raise ex
-        finally:
-            db.session.close()
 
     @classmethod
     def update_linkedrequests(cls, foiministryrequestid, new_linkedrequests, user):
-        print("WHY", new_linkedrequests)
         update_at = datetime.now().isoformat()
         sql = """
         UPDATE public."FOIMinistryRequests"
@@ -2015,15 +2020,6 @@ class FOIMinistryRequest(db.Model):
         """
         params = {"new_linkedrequests": new_linkedrequests, "update_at": update_at, "user": user, "foiministryrequestid": foiministryrequestid}
         res = db.session.execute(text(sql), params)
-        
-        row = res.fetchone()     # ← valid on ResultProxy
-        if row is None:
-            print("NONE")
-            return None  # WHERE matched 0 rows
-
-        keys = res.keys()
-        print("VERIFY", dict(zip(keys, row)))
-
         return res
 
     @classmethod

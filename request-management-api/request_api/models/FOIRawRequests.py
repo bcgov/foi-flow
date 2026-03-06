@@ -1414,14 +1414,20 @@ class FOIRawRequest(db.Model):
     @classmethod
     def get_linkedrequests(cls, requestid):
         try:
-            result = db.session.query(FOIRawRequest).filter(FOIRawRequest.requestid == requestid).order_by(FOIRawRequest.version.desc()).first()
-            linkedrequests = result.linkedrequests
+            sql = """
+            SELECT * 
+            public."FOIRawRequests"
+            WHERE requestid = :requestid
+            ORDER BY version DESC
+            LIMIT 1;
+            """
+            params = {"foiministryrequestid": requestid}
+            result = db.session.execute(text(sql), params)
+            linkedrequests  = result.linkedrequests
             return linkedrequests if linkedrequests is not None else []
         except Exception as ex:
             logging.error(ex)
             raise ex
-        finally:
-            db.session.close()
 
     @classmethod
     def update_linkedrequests(cls, requestid, new_linkedrequests, user):
@@ -1449,7 +1455,7 @@ class FOIRawRequest(db.Model):
         WHERE foirawreq.requestid = latestfoirawreq.requestid;
         """
         params = {"new_linkedrequests": new_linkedrequests, "update_at": update_at, "user": user, "requestid": requestid}
-        res = session.execute(text(sql), params)
+        res = db.session.execute(text(sql), params)
         return res
     
     @classmethod

@@ -147,7 +147,6 @@ class FOIRequestsById(Resource):
     def post(foirequestid,foiministryrequestid):
         """ POST Method for capturing FOI requests before processing"""
         try:
-            #HERE
             request_json = request.get_json()
             request_type = request_json.get('requestType', '').lower()
             if request_type == 'proactive disclosure':
@@ -156,12 +155,12 @@ class FOIRequestsById(Resource):
                 foirequestschema = FOIRequestWrapperSchema().load(request_json)  
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:                             
-                # event_loop = asyncio.get_running_loop()
-                # asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()), event_loop)
-                # if IAOTeamWithKeycloackGroup.oi.value in AuthHelper.getusergroups():
-                #     eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
-                # metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
-                # requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
+                event_loop = asyncio.get_running_loop()
+                asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()), event_loop)
+                if IAOTeamWithKeycloackGroup.oi.value in AuthHelper.getusergroups():
+                    eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
+                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
+                requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
@@ -199,10 +198,10 @@ class FOIRequestsByIdAndType(Resource):
                 ministryrequestschema = FOIRequestMinistrySchema().load(request_json)
             result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid(), usertype)
             if result.success == True:
-                # event_loop = asyncio.get_running_loop()
-                # asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(), AuthHelper.isministrymember(),assigneename), event_loop)
-                # metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
-                # requestservice().posteventtoworkflow(foiministryrequestid, ministryrequestschema, json.loads(metadata),usertype)
+                event_loop = asyncio.get_running_loop()
+                asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(), AuthHelper.isministrymember(),assigneename), event_loop)
+                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
+                requestservice().posteventtoworkflow(foiministryrequestid, ministryrequestschema, json.loads(metadata),usertype)
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
@@ -323,14 +322,14 @@ class FOIRequestsById(Resource):
             foirequestschema = FOIRequestWrapperSchema().load(foirequest)
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:
-                # event_loop = asyncio.get_running_loop()
-                # asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()), event_loop)
-                # if (section == 'oistatusid'):
-                #     eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
-                #     if(request_json['oistatusid'] == OIStatusEnum.EXEMPTION_REQUEST.value):
-                #         eventservice().postopeninfoexemptionevent(foiministryrequestid, foirequestid, AuthHelper.getuserid(),AuthHelper.getusername(), OpenInfoNotificationType.EXEMPTION_REQUEST.value, None)
-                # metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
-                # requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
+                event_loop = asyncio.get_running_loop()
+                asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()), event_loop)
+                if (section == 'oistatusid'):
+                    eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
+                    if(request_json['oistatusid'] == OIStatusEnum.EXEMPTION_REQUEST.value):
+                        eventservice().postopeninfoexemptionevent(foiministryrequestid, foirequestid, AuthHelper.getuserid(),AuthHelper.getusername(), OpenInfoNotificationType.EXEMPTION_REQUEST.value, None)
+                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
+                requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
                 return {'success': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
             else:
                  return {'status': False, 'message':EXCEPTION_MESSAGE_NOTFOUND_REQUEST,'id':foirequestid} , 404
