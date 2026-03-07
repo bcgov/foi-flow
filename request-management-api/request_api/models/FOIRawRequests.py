@@ -1416,13 +1416,13 @@ class FOIRawRequest(db.Model):
         try:
             sql = """
             SELECT * 
-            public."FOIRawRequests"
+            FROM public."FOIRawRequests"
             WHERE requestid = :requestid
             ORDER BY version DESC
             LIMIT 1;
             """
-            params = {"foiministryrequestid": requestid}
-            result = db.session.execute(text(sql), params)
+            params = {"requestid": requestid}
+            result = db.session.execute(text(sql), params).first()
             linkedrequests  = result.linkedrequests
             return linkedrequests if linkedrequests is not None else []
         except Exception as ex:
@@ -1440,10 +1440,10 @@ class FOIRawRequest(db.Model):
             jsonb_set(
                 COALESCE(requestrawdata::jsonb, '{}'::jsonb),
                 '{linkedRequests}',
-                :new_linkedrequests::jsonb,
+                (:new_linkedrequests)::jsonb,
                 true
             )
-            )::json
+            )::json,
             updated_at = :update_at,
             updatedby = :user
         FROM (

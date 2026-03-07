@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import SearchIcon from "@material-ui/icons/Search";
 import CloseIcon from '@mui/icons-material/Close';
+import { toast } from "react-toastify";
 import {
   Grid,
   TextField,
@@ -78,7 +79,7 @@ const LinkedRequests = React.memo(
 
     const handleRemoveLinkedRequest = (linkedrequestToRemove) => {
       try {
-        const updatedLinkedRequests = removeLinkedRequest(linkedrequestToRemove);
+        const [updatedLinkedRequests, updatedLinkedInfoRequests]= removeLinkedRequest(linkedrequestToRemove);
         const parentLinkedRequest = {
           foiministryrequestid: ministryId ? ministryId : null,
           rawrequestid: requestId,
@@ -89,8 +90,39 @@ const LinkedRequests = React.memo(
           linkedrequest_b: linkedrequestToRemove,
           new_linkedrequests: updatedLinkedRequests,
         }
+        const toastID = toast.loading(`Removing linked request ${linkedrequestToRemove?.axisrequestid}`);
         dispatch (
-          deleteLinkedRequest(data, requestDetails?.axisRequestId)
+          deleteLinkedRequest(data, requestDetails?.axisRequestId, (err, _result) => {
+            if (!err) {
+              setLinkedRequests(updatedLinkedRequests);
+              setLinkedRequestsInfo(updatedLinkedInfoRequests);
+              toast.update(toastID, {
+                type: "success",
+                render: "Linked request details have been successfully updated",
+                position: "top-right",
+                isLoading: false,
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+            } else {
+              toast.error(
+                "Error in removing linked request. Please try again",
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
+            }
+          })
         );
       } catch (error) {
         console.log(error);
@@ -101,9 +133,7 @@ const LinkedRequests = React.memo(
       const reqId = reqItem.axisrequestid;
       const updatedLinkedRequests = linkedRequests?.filter(item => getAxisRequestId(item) !== reqId);
       const updatedLinkedInfoRequests = linkedRequestsInfo?.filter(item => item.axisrequestid !== reqId);
-      setLinkedRequests(updatedLinkedRequests);
-      setLinkedRequestsInfo(updatedLinkedInfoRequests);
-      return updatedLinkedRequests;
+      return [updatedLinkedRequests, updatedLinkedInfoRequests];
     }
 
     const renderReviewRequest = (e, reqItem) => {

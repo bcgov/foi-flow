@@ -693,18 +693,22 @@ export const getFOIMinistryLinkedRequestInfo = (axisid) => async (dispatch) => {
   }
 };
 
-export const deleteLinkedRequest = (data, axisid) => async (dispatch) => {
+export const deleteLinkedRequest = (data, axisid, ...rest) => {
+  const done = fnDone(rest);
   const apiUrl= replaceUrl(API.FOI_REQUEST_REMOVE_LINKEDREQUESTS, "<axisrequestid>", axisid);
-  try {
-    const res = await httpPUTRequest(apiUrl, data, UserService.getToken());
-    if (res.data) {
-      return res.data;
-    } else {
-      console.error("API failed to update and remove linkedrequest:", res);
-      dispatch(serviceActionError(res));
-    }
-  } catch (error) {
-    console.error("Error in removing linkedrequests:", error);
-    dispatch(serviceActionError(error));
-  }
-};
+  return (dispatch) => {
+    httpPUTRequest(apiUrl, data, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          console.error("API failed to update and remove linkedrequest:", res);
+          dispatch(serviceActionError(res));       
+        }
+      })
+      .catch((error) => {
+        done(error);
+        catchError(error, dispatch);
+      });
+  };
+}

@@ -2015,8 +2015,7 @@ class FOIMinistryRequest(db.Model):
             linkedrequests = :new_linkedrequests,
             updated_at = :update_at,
             updatedby = :user
-        WHERE foiministryrequestid = :foiministryrequestid AND isactive = TRUE
-        RETURNING foiministryrequestid, linkedrequests, updated_at, updatedby;
+        WHERE foiministryrequestid = :foiministryrequestid AND isactive = TRUE;
         """
         params = {"new_linkedrequests": new_linkedrequests, "update_at": update_at, "user": user, "foiministryrequestid": foiministryrequestid}
         res = db.session.execute(text(sql), params)
