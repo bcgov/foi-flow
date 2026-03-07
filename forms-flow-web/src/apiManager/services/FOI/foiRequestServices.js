@@ -1,6 +1,7 @@
 import {
   httpPOSTRequest,
   httpGETRequest,
+  httpPUTRequest
 } from "../../httpRequestHandler";
 import API from "../../endpoints";
 import {
@@ -691,3 +692,23 @@ export const getFOIMinistryLinkedRequestInfo = (axisid) => async (dispatch) => {
     dispatch(serviceActionError(error));
   }
 };
+
+export const deleteLinkedRequest = (data, axisid, ...rest) => {
+  const done = fnDone(rest);
+  const apiUrl= replaceUrl(API.FOI_REQUEST_REMOVE_LINKEDREQUESTS, "<axisrequestid>", axisid);
+  return (dispatch) => {
+    httpPUTRequest(apiUrl, data, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          console.error("API failed to update and remove linkedrequest:", res);
+          dispatch(serviceActionError(res));       
+        }
+      })
+      .catch((error) => {
+        done(error);
+        catchError(error, dispatch);
+      });
+  };
+}

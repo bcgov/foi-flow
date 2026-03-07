@@ -403,8 +403,8 @@ class LinkedRequests(Resource):
             results = linkedrequestservice().findrequestids(search_text, axisrequestid,ministrycode)
             return results, 200
         except Exception as ex:
-            print(ex)
-            return {'status': 500, 'message':"Invalid Request Id"}, 500
+            print("ERROR:", str(ex))
+            return {'success': False, 'message': str(ex), 'id': axisrequestid}, 500
         
 @cors_preflight('GET,OPTIONS')
 @API.route('/linkrequest/foiministryinfo/axisrequestid/<string:axisrequestid>')
@@ -419,5 +419,45 @@ class LinkedRequestsInfo(Resource):
             results = linkedrequestservice().get_linkedfoiministryrequest_info_by_axisid(axisrequestid)
             return results, 200
         except Exception as ex:
-            print(ex)
-            return {'status': 500, 'message': ex}, 500
+            print("ERROR:", str(ex))
+            return {'success': False, 'message': str(ex), 'id': axisrequestid}, 500
+
+@cors_preflight('POST, PUT, OPTIONS')
+@API.route('/linkrequest/removelink/axisrequestid/<string:axisrequestid>')
+class LinkedRequestsInfo(Resource):
+    """Update FOIRawRequest linkedrequest data removal"""
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def put(axisrequestid):
+        try:
+            request_data = request.get_json()
+            linkedrequest_a = request_data["linkedrequest_a"]
+            linkedrequest_b = request_data["linkedrequest_b"]
+            new_linkedrequests = request_data["new_linkedrequests"]
+            results = linkedrequestservice().remove_linkedrequest(linkedrequest_a, linkedrequest_b, new_linkedrequests, AuthHelper.getuserid())
+            if results is not None and results.success == True:
+                return {'success': results.success, 'message': results.message,'id':  axisrequestid} , 201
+            else:
+                return {'success': False, 'message': "Failed to remove linkedrequest data",'id': axisrequestid} , 404
+        except Exception as ex:
+            print("ERROR:", str(ex))
+            return {'success': False, 'message': str(ex), 'id': axisrequestid}, 500
+
+@cors_preflight('POST, PUT, OPTIONS')
+@API.route('/linkrequest/createlink/axisrequestid/<string:axisrequestid>')
+class LinkedRequestsInfo(Resource):
+    """Update FOIMinistryRequest linkedrequest data creation"""
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def put():
+        try:
+            request_data = request.get_json()
+            results = linkedrequestservice().get_linkedfoiministryrequest_info_by_axisid(axisrequestid)
+            return results, 201
+        except Exception as ex:
+            print("ERROR:", str(ex))
+            return {'success': False, 'message': str(ex), 'id': axisrequestid}, 500

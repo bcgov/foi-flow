@@ -1875,6 +1875,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                               disableInput={disableInput || isHistoricalRequest}
                               isHistoricalRequest={isHistoricalRequest}
                               isMinistry={isMinistry}
+                              ministryId={ministryId}
+                              requestId={requestId}
                             />
                           }
                           {redactedSections &&

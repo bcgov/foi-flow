@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import SearchIcon from "@material-ui/icons/Search";
 import CloseIcon from '@mui/icons-material/Close';
+import { toast } from "react-toastify";
 import {
   Grid,
   TextField,
@@ -19,14 +20,16 @@ import {
   Autocomplete,
   CircularProgress
 } from "@mui/material";
-import {getFOIMinistryLinkedRequestInfo, linkedRequestsLists} from "../../../apiManager/services/FOI/foiRequestServices";
+import {getFOIMinistryLinkedRequestInfo, linkedRequestsLists, deleteLinkedRequest} from "../../../apiManager/services/FOI/foiRequestServices";
 import { LinkedRequestsTable } from "./LinkedRequestsTable";
 
 const LinkedRequests = React.memo(
   ({
     requestDetails,
     createSaveRequestObject,
-    isMinistry
+    isMinistry,
+    ministryId,
+    requestId,
   }) => {
     const useStyles = makeStyles({
       heading: {
@@ -74,13 +77,63 @@ const LinkedRequests = React.memo(
       setOptions([]);
     }
 
+    const handleRemoveLinkedRequest = (linkedrequestToRemove) => {
+      try {
+        const [updatedLinkedRequests, updatedLinkedInfoRequests]= removeLinkedRequest(linkedrequestToRemove);
+        const parentLinkedRequest = {
+          foiministryrequestid: ministryId ? ministryId : null,
+          rawrequestid: requestId,
+          axisrequestid: requestDetails?.axisRequestId
+        }
+        const data = {
+          linkedrequest_a: parentLinkedRequest,
+          linkedrequest_b: linkedrequestToRemove,
+          new_linkedrequests: updatedLinkedRequests,
+        }
+        const toastID = toast.loading(`Removing linked request ${linkedrequestToRemove?.axisrequestid}`);
+        dispatch (
+          deleteLinkedRequest(data, requestDetails?.axisRequestId, (err, _result) => {
+            if (!err) {
+              setLinkedRequests(updatedLinkedRequests);
+              setLinkedRequestsInfo(updatedLinkedInfoRequests);
+              toast.update(toastID, {
+                type: "success",
+                render: "Linked request details have been successfully updated",
+                position: "top-right",
+                isLoading: false,
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+            } else {
+              toast.error(
+                "Error in removing linked request. Please try again",
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
+            }
+          })
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
     const removeLinkedRequest = (reqItem) => {
       const reqId = reqItem.axisrequestid;
       const updatedLinkedRequests = linkedRequests?.filter(item => getAxisRequestId(item) !== reqId);
       const updatedLinkedInfoRequests = linkedRequestsInfo?.filter(item => item.axisrequestid !== reqId);
-      setLinkedRequests(updatedLinkedRequests);
-      setLinkedRequestsInfo(updatedLinkedInfoRequests);
-      createSaveRequestObject(FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS, updatedLinkedRequests);
+      return [updatedLinkedRequests, updatedLinkedInfoRequests];
     }
 
     const renderReviewRequest = (e, reqItem) => {
@@ -155,6 +208,8 @@ const LinkedRequests = React.memo(
         const govCode = selectedValue.govcode;
         const linkedReqObj = {
           [selectedValue.axisrequestid]: govCode,
+          foiministryrequestid: selectedValue.foiministryrequestid || null,
+          rawrequestid:  selectedValue.rawrequestid
         };
         const linkedReqInfoObj = {
           "axisrequestid": axisRequestId,
@@ -189,7 +244,7 @@ const LinkedRequests = React.memo(
                 linkedRequestsInfo={linkedRequestsInfo}
                 linkedRequests={linkedRequests}
                 renderReviewRequest={renderReviewRequest}
-                removeLinkedRequest={removeLinkedRequest}
+                handleRemoveLinkedRequest={handleRemoveLinkedRequest}
                 isMinistry={isMinistry}
               />
               {!showSearch && (
