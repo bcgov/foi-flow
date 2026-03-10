@@ -36,7 +36,6 @@ class requestservicegetter:
         iaorestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(ministryrequestid=foiministryrequestid,type='iao')
         requestproactive = FOIProactiveDisclosureRequests.getcurrentfoiproactiverequest(foiministryrequestid)
         baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions, requestproactive)
-        #print("baserequestinfo:",baserequestinfo)
         baserequestinfo['lastStatusUpdateDate'] = FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatuslabel']).strftime(self.__genericdateformat()),
         for contactinfo in requestcontactinformation:
             if contactinfo['contacttype.name'] == 'Email':
@@ -90,7 +89,6 @@ class requestservicegetter:
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
         ministryrestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(foiministryrequestid,type='ministry')
         requestproactive = FOIProactiveDisclosureRequests.getcurrentfoiproactiverequest(foiministryrequestid)
-        #print("\n----requestproactive in getrequestdetailsforministry:",requestproactive)
         baserequestinfo = {}
         if requestministry["assignedministrygroup"] in authmembershipgroups:
             baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions, requestproactive)

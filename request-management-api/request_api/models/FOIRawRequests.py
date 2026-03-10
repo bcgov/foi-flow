@@ -731,7 +731,6 @@ class FOIRawRequest(db.Model):
     @classmethod
     def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups):
         unopened_request_restriction = getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") if getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") not in (None, "") else datetime.now()
-        print("UNOPENED_REQUEST_DATE", unopened_request_restriction)
         basequery = FOIRawRequest.getbasequery(additionalfilter, userid, isiaorestrictedfilemanager, groups)
         basequery = basequery.filter(FOIRawRequest.status != 'Closed').filter(or_(FOIRawRequest.status != 'Unopened', FOIRawRequest.created_at >= unopened_request_restriction))
         #filter/search
@@ -780,7 +779,6 @@ class FOIRawRequest(db.Model):
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
         subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-        #print("\n-------subquery_ministry_queue:",subquery_ministry_queue)
         #sorting
         if is_oi_team:
             sortingcondition = FOIOpenInformationRequests.getsorting(sortingitems, sortingorders, True)
@@ -797,7 +795,6 @@ class FOIRawRequest(db.Model):
                 return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
             else:
                 subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups)
-                print("\n------IAO query:", subquery_rawrequest_queue)
                 query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
                 return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:
@@ -945,7 +942,6 @@ class FOIRawRequest(db.Model):
 
         #rawrequests
         query_full_queue = searchquery.union(subquery_ministry_queue)
-        print("\n\nFull Query:\n", query_full_queue)
         return query_full_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
 
     @classmethod

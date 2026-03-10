@@ -104,7 +104,6 @@ class FOIRequests(Resource):
             else:
                 foirequestschema = FOIRequestWrapperSchema().load(request_json)
 
-            #print("foirequestschema: ",foirequestschema)
             assignedgroup = request_json['assignedGroup'] if 'assignedGroup' in foirequestschema  else None
             assignedto = request_json['assignedTo'] if 'assignedTo' in foirequestschema  else None
             assignedtofirstname = request_json["assignedToFirstName"] if request_json.get("assignedToFirstName") != None else None
