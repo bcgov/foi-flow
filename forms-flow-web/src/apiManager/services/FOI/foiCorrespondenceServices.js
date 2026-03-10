@@ -407,12 +407,9 @@ export const exportSFDT = (
   callback,
   errorCallback = null,
 ) => {
-  // console.log("data: ", data);
   const apiUrl = API.FOI_EXPORT_SFDT;
-  // console.log("apiUrl: ", apiUrl);
   httpPOSTRequest(apiUrl, data, UserService.getToken())
   .then((res) => {
-    // console.log("res: ", res);
     if (res.data) {
       callback(res.data);
     } else {

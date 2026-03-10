@@ -1073,7 +1073,6 @@ class FOIRequestApplicant(db.Model):
                                 FOIRequest.isactive == True
                             ).order_by(FOIRequestApplicantMapping.created_at.desc())
 
-        # print("query_applicant_history", query_all)
 
         applicantprofile_schema = ApplicantProfileSchema(many=True)
         return applicantprofile_schema.dump(query_all.all())
@@ -1149,7 +1148,6 @@ class FOIRequestApplicant(db.Model):
                                 FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
                             ).order_by(FOIRequest.foirequestid.desc())
         
-        # print('query_all', query_all)
 
         applicantrequest_schema = ApplicantRequestSchema(many=True)
         return applicantrequest_schema.dump(query_all.all())

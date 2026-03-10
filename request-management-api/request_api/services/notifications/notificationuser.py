@@ -148,7 +148,6 @@ class notificationuser:
 
     def __getcommentusers(self, foirequest, comment, requesttype):
         _requestusers = self.getnotificationusers("General", requesttype, "nouser", foirequest, comment)
-        print("_requestusers:",_requestusers)
         commentusers = []
         commentusers.extend(_requestusers)
         taggedusers = self.__gettaggedusers(comment)

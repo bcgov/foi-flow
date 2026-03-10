@@ -632,9 +632,14 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE
     ) {
       setIsProactiveDisclosure(true);
-      //dispatch(fetchFOIProactiveDisclosureCategoryList());
     } else setIsProactiveDisclosure(false);
-  }, [saveRequestObject]);
+
+    if (isAddRequest) {
+      let isbcpsteam = false;
+      if (userGroups.includes("BCPS Team")) isbcpsteam = true;
+      dispatch(fetchFOIAssignedToList(saveRequestObject?.requestType, requestState?.toLowerCase(), "", isbcpsteam));
+    }
+  }, [saveRequestObject?.requestType]);
 
   useEffect(() => {
     if (requestApplicantProfile) {

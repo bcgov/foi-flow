@@ -49,7 +49,7 @@ class requestservicecreate:
         openfoirequest.wfinstanceid = wfinstanceid if wfinstanceid is not None else None
         openfoirequest.createdby = userid
         # openfoirequest_dict = openfoirequest.__dict__
-        # print("\n---------openfoirequest in saveRequest:",openfoirequest_dict)     
+        # print("\n-openfoirequest in saveRequest:",openfoirequest_dict)     
         return FOIRequest.saverequest(openfoirequest)
         
     
@@ -94,7 +94,6 @@ class requestservicecreate:
         if foirequestschema.get("selectedMinistries") is not None:
             for ministry in foirequestschema.get("selectedMinistries"):
                 foiministryrequestarr.append(requestservicebuilder().createministry(foirequestschema, ministry, activeversion, userid, filenumber,ministryid))     
-        #print("\n------foiministryrequestarr in __prepareministries:",foiministryrequestarr)           
         return foiministryrequestarr
 
     def _prearepersonalattributes(self, foirequestschema, userid):
