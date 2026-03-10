@@ -1936,7 +1936,6 @@ class FOIMinistryRequest(db.Model):
             )
         elif additionalfilter is not None and additionalfilter.lower() == 'all':
             basequery = basequery.filter(FOIMinistryRequest.assignedto != None)
-        #print("\n\n\n" + str(basequery.statement))
         return basequery
 
 

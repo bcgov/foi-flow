@@ -33,7 +33,6 @@ class dashboardservice:
     """
 
     def __preparefoirequestinfo(self, request, receiveddate, receiveddateuf, idnumberprefix = ''):
-        #print("\nrequest in __preparefoirequestinfo-dashboard",request)
         idnumber = self.__getidnumber(idnumberprefix, request.axisRequestId, request.idNumber)
         baserequestinfo = self.__preparebaserequestinfo(
             request.id, 

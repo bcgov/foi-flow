@@ -1167,7 +1167,7 @@ export const RecordsLog = ({
     let extension = path.slice(extIndex)
     if (extension?.toLowerCase() != ".pdf" || isIncompatible)
       return path;
-    console.log("ORIGINAL path:", path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex))
+    //console.log("ORIGINAL path:", path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex))
     return path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex);
   }
 
@@ -1660,7 +1660,6 @@ export const RecordsLog = ({
   };
 
   const retrieveRecordVersion = (action, record) => {
-    console.log("-->", Object.keys(record).length)
     let selectedRecords = []
     if (Object.keys(record).length === 0)
       selectedRecords = records.filter((record) => record.isselected);

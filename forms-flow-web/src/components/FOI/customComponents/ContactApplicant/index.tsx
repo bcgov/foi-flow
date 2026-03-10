@@ -1551,13 +1551,6 @@ export const ContactApplicant = ({
   ))
 
 
-
-  function onExportClick(output: string) {
-    console.log("Output: ", output);
-  }
-
-
-
   let templatesList;
   const parser = new DOMParser();
   let templateListItems = templates.map((template: any, index: any) => {
