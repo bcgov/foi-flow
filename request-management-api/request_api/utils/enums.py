@@ -20,6 +20,7 @@ class RequestType(Enum):
 
     PERSONAL = 'Personal'
     GENERAL = 'General'
+    PROACTIVE_DISCLOSURE = 'proactive disclosure'
 
 
 class ContentType(Enum):
