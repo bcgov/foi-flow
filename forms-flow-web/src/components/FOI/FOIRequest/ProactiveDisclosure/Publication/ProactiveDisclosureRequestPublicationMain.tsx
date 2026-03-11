@@ -398,7 +398,7 @@ const ProactiveDisclosureRequestPublicationMain = ({
               <Grid item xs={12} md={6}>
                 <TextField
                   name="publicationdate"
-                  label="Earliest eligible publication date"
+                  label="Publication Date"
                   type="date"
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
@@ -418,6 +418,8 @@ const ProactiveDisclosureRequestPublicationMain = ({
                     currentOIRequestState === "Unopened"
                   }
                 />
+                {earliestPublicationDate !== 0 &&
+                  <span style={{ fontStyle: "italic", fontSize: "12px" }}>Earliest Eligible Publication Date: {earliestPublicationDate}</span>}
               </Grid>
               <Grid item xs={12}>
                 <div
