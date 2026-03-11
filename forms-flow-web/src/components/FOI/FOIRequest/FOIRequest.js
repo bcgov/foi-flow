@@ -1760,6 +1760,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput || isHistoricalRequest}
                           />
+                          {showDivisionalTracking && (
+                            <DivisionalTracking
+                              divisions={requestDetails.divisions}
+                            />
+                          )}
                         </>
                       ) : (
                         <>
