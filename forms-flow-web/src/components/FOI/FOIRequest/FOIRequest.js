@@ -1876,7 +1876,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                               handleRequestDetailsInitialValue={
                                 handleRequestDetailsInitialValue
                               }
-                              createSaveRequestObject={createSaveRequestObject}
                               disableInput={disableInput || isHistoricalRequest}
                               isHistoricalRequest={isHistoricalRequest}
                               isMinistry={isMinistry}

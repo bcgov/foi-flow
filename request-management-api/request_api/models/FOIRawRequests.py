@@ -1452,16 +1452,15 @@ class FOIRawRequest(db.Model):
             WHERE requestid = :requestid
             ORDER BY requestid, version DESC
         ) AS latestfoirawreq
-        WHERE foirawreq.requestid = latestfoirawreq.requestid;
+        WHERE foirawreq.requestid = latestfoirawreq.requestid AND foirawreq.version = latestfoirawreq.version;
         """
         params = {"new_linkedrequests": new_linkedrequests, "update_at": update_at, "user": user, "requestid": requestid}
         res = db.session.execute(text(sql), params)
         return res
     
     @classmethod
-    def bulkupdate_linkedrequests(cls, linkedrequest_requestids, new_linkedrequest, user):
+    def bulkupdate_linkedrequests(cls, linkedrequest_requestids, new_linkedrequest, new_linkedrequest_axisid, user):
         try:
-            new_linkedrequest_axisid = new_linkedrequest.keys()[0]
             update_at = datetime.now().isoformat()
             sql = """
             UPDATE public."FOIRawRequests" AS foirawreq
@@ -1484,7 +1483,7 @@ class FOIRawRequest(db.Model):
                     WHERE elem ? :new_linkedrequest_axisid
                 );
             """
-            params = {"new_linkedrequest": new_linkedrequest, "updated_at": update_at, "user": user  ,"linkedrequest_requestids": tuple(linkedrequest_requestids), "new_linkedrequest_axisid": new_linkedrequest_axisid}
+            params = {"new_linkedrequest": new_linkedrequest, "update_at": update_at, "user": user  ,"linkedrequest_requestids": tuple(linkedrequest_requestids), "new_linkedrequest_axisid": new_linkedrequest_axisid}
             res = db.session.execute(text(sql), params)
             return res
         except Exception as ex:

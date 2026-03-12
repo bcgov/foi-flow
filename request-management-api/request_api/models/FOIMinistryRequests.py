@@ -2022,8 +2022,7 @@ class FOIMinistryRequest(db.Model):
         return res
 
     @classmethod
-    def bulkupdate_linkedrequests(cls, linkedrequest_requestids, new_linkedrequest, user):
-        new_linkedrequest_axisid = new_linkedrequest.keys()[0]
+    def bulkupdate_linkedrequests(cls, linkedrequest_requestids, new_linkedrequest, new_linkedrequest_axisid, user):
         update_at = datetime.now().isoformat()
         sql = """
         UPDATE public."FOIMinistryRequests"
@@ -2039,7 +2038,7 @@ class FOIMinistryRequest(db.Model):
                 WHERE elem ? :new_linkedrequest_axisid
             );
         """
-        params = {"new_linkedrequest": new_linkedrequest, "updated_at": update_at, "user": user  ,"linkedrequest_requestids": tuple(linkedrequest_requestids), "new_linkedrequest_axisid": new_linkedrequest_axisid}
+        params = {"new_linkedrequest": new_linkedrequest, "update_at": update_at, "user": user  ,"linkedrequest_requestids": tuple(linkedrequest_requestids), "new_linkedrequest_axisid": new_linkedrequest_axisid}
         res = db.session.execute(text(sql), params)
         return res
 

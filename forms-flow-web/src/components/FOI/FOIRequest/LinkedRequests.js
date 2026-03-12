@@ -20,13 +20,12 @@ import {
   Autocomplete,
   CircularProgress
 } from "@mui/material";
-import {getFOIMinistryLinkedRequestInfo, linkedRequestsLists, deleteLinkedRequest} from "../../../apiManager/services/FOI/foiRequestServices";
+import {getFOIMinistryLinkedRequestInfo, linkedRequestsLists, deleteLinkedRequest, saveLinkedRequests} from "../../../apiManager/services/FOI/foiRequestServices";
 import { LinkedRequestsTable } from "./LinkedRequestsTable";
 
 const LinkedRequests = React.memo(
   ({
     requestDetails,
-    createSaveRequestObject,
     isMinistry,
     ministryId,
     requestId,
@@ -88,7 +87,6 @@ const LinkedRequests = React.memo(
         const data = {
           linkedrequest_a: parentLinkedRequest,
           linkedrequest_b: linkedrequestToRemove,
-          new_linkedrequests: updatedLinkedRequests,
         }
         const toastID = toast.loading(`Removing linked request ${linkedrequestToRemove?.axisrequestid}`);
         dispatch (
@@ -208,8 +206,6 @@ const LinkedRequests = React.memo(
         const govCode = selectedValue.govcode;
         const linkedReqObj = {
           [selectedValue.axisrequestid]: govCode,
-          foiministryrequestid: selectedValue.foiministryrequestid || null,
-          rawrequestid:  selectedValue.rawrequestid
         };
         const linkedReqInfoObj = {
           "axisrequestid": axisRequestId,
@@ -221,11 +217,58 @@ const LinkedRequests = React.memo(
         updatedLinkedRequests.push(linkedReqObj);
         setLinkedRequests(updatedLinkedRequests);
         setLinkedRequestsInfo(prev => ([...prev, linkedReqInfoObj]));
-        createSaveRequestObject(FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS, updatedLinkedRequests);
       }
       
       // Clear the search after selection
       handleClearSearch();
+    }
+
+    const handleSaveLinkedRequests = () => {
+      try {
+        const parentLinkedRequest = {
+          [requestDetails?.axisRequestId]: requestDetails.bcgovcode ? requestDetails?.bcgovcode : requestDetails?.selectedMinistries[0].code
+        }
+        const data = {
+          linkedrequest_a: parentLinkedRequest,
+          foiministryrequestid: ministryId ? ministryId : null,
+          rawrequestid: requestId,
+          new_linkedrequests: linkedRequestsInfo,
+        }
+        const toastID = toast.loading(`Saving linked requests`);
+        dispatch (
+          saveLinkedRequests(data, requestDetails?.axisRequestId, (err, _result) => {
+            if (!err) {
+              toast.update(toastID, {
+                type: "success",
+                render: "Linked request details have been successfully saved",
+                position: "top-right",
+                isLoading: false,
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              });
+            } else {
+              toast.error(
+                "Error in saving linked requests. Please try again",
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
+            }
+          })
+        );
+      } catch (error) {
+        console.log(error);
+      }
     }
 
     return (
@@ -247,93 +290,105 @@ const LinkedRequests = React.memo(
                 handleRemoveLinkedRequest={handleRemoveLinkedRequest}
                 isMinistry={isMinistry}
               />
-              {!showSearch && (
-              <div style={{display: "flex", flexDirection: "row", alignItems: "center", margin: "7px 0px 7px 0px"}}>
-                  <button onClick={() => setShowSearch(true)} style={{ border: "none", background: "none" }}>
-                      <FontAwesomeIcon icon={faCirclePlus}  size="lg" color="#38598A" />
-                  </button>
-                  <p onClick={() => setShowSearch(true)} style={{fontWeight: "bold", color: "#38598A", cursor: "pointer"}}>Add Linked Request</p>
-              </div>
-              )}
-              {showSearch && (
-                <Grid
-                  item
-                  xs={12}
-                  sx={{
-                    p: 1,
-                    width: "35%"
-                  }}
-                >
-                  <Autocomplete
-                    freeSolo
-                    disableClearable
-                    loading={loading}
-                    options={options || []}
-                    getOptionLabel={(option) => {
-                      const axisrequestid = option.axisrequestid
-                      if (!option) return "";
-                      return axisrequestid;
-                    }}
-                    inputValue={searchQuery}
-                    onInputChange={(e, newValue) => {
-                      if (e?.type === "change") {
-                        handleSearch(newValue);
-                      }
-                    }}
-                    onChange={(e, selectedValue) => {
-                      if (selectedValue) {
-                        linkRequest(selectedValue);
-                      }
-                    }}
+              <div style={{display:"flex", flexDirection: "row", justifyContent:"center", alignItems: "center"}}>
+                {!showSearch && (
+                <div style={{display: "flex", flexDirection: "row", alignItems: "center", margin: "7px 0px 7px 0px"}}>
+                    <button onClick={() => setShowSearch(true)} style={{ border: "none", background: "none" }}>
+                        <FontAwesomeIcon icon={faCirclePlus}  size="lg" color="#38598A" />
+                    </button>
+                    <p onClick={() => setShowSearch(true)} style={{fontWeight: "bold", color: "#38598A", cursor: "pointer"}}>Add Linked Request</p>
+                </div>
+                )}
+                {showSearch && (
+                  <Grid
+                    item
+                    xs={12}
                     sx={{
-                      "& .MuiOutlinedInput-root": {
-                        borderRadius: "6px",
-                        height: 40,
-                        border: "1px solid #ccc",
-                        "& fieldset": { border: "none" },
-                        "&:hover fieldset": { border: "none" },
-                        "&.Mui-focused fieldset": { border: "1px solid #38598A" },
-                      },
-                      "& .MuiInputBase-input": {
-                        padding: "6px 8px",
-                        fontSize: "0.9rem",
-                      },
+                      p: 1,
+                      width: "25%",
+                      maxWidth: "400px",
+                      padding: "0px"
                     }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="Search RequestID"
-                        InputProps={{
-                          ...params.InputProps,
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <IconButton sx={{ color: "#003388" }}>
-                                <SearchIcon sx={{ color: "#038", "& path": { fill: "#038" } }} />
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              {loading ? (
-                                <CircularProgress size={18} />
-                              ) : 
-                                <IconButton
-                                  size="small"
-                                  onClick={handleClearSearch}
-                                  aria-label="Clear search"
-                                  sx={{ p: 0.5, color: "#038" }}
-                                >
-                                  <CloseIcon fontSize="small" />
+                  >
+                    <Autocomplete
+                      freeSolo
+                      disableClearable
+                      loading={loading}
+                      options={options || []}
+                      getOptionLabel={(option) => {
+                        const axisrequestid = option.axisrequestid
+                        if (!option) return "";
+                        return axisrequestid;
+                      }}
+                      inputValue={searchQuery}
+                      onInputChange={(e, newValue) => {
+                        if (e?.type === "change") {
+                          handleSearch(newValue);
+                        }
+                      }}
+                      onChange={(e, selectedValue) => {
+                        if (selectedValue) {
+                          linkRequest(selectedValue);
+                        }
+                      }}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: "6px",
+                          height: 40,
+                          border: "1px solid #ccc",
+                          "& fieldset": { border: "none" },
+                          "&:hover fieldset": { border: "none" },
+                          "&.Mui-focused fieldset": { border: "1px solid #38598A" },
+                        },
+                        "& .MuiInputBase-input": {
+                          padding: "6px 8px",
+                          fontSize: "0.9rem",
+                        },
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          placeholder="Search RequestID"
+                          InputProps={{
+                            ...params.InputProps,
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <IconButton sx={{ color: "#003388" }}>
+                                  <SearchIcon sx={{ color: "#038", "& path": { fill: "#038" } }} />
                                 </IconButton>
-                              }
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    )}
-                  />
-                </Grid>
-              )}
+                              </InputAdornment>
+                            ),
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                {loading ? (
+                                  <CircularProgress size={18} />
+                                ) : 
+                                  <IconButton
+                                    size="small"
+                                    onClick={handleClearSearch}
+                                    aria-label="Clear search"
+                                    sx={{ p: 0.5, color: "#038" }}
+                                  >
+                                    <CloseIcon fontSize="small" />
+                                  </IconButton>
+                                }
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                      )}
+                    />
+                  </Grid>
+                )}
+                <button
+                  type="button"
+                  style={{maxWidth: "250px", marginBottom: "10px", height: "37px", marginLeft: "100px"}}
+                  className={`btn-bottom btn-save btn`}
+                  onClick={() => handleSaveLinkedRequests()}
+                >
+                  Link Requests
+                </button>
+              </div>
             </div>
             <div className="row foi-details-row foi-details-row-break"></div>
           </AccordionDetails>

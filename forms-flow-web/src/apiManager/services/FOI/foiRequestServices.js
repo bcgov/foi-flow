@@ -700,6 +700,7 @@ export const deleteLinkedRequest = (data, axisid, ...rest) => {
     httpPUTRequest(apiUrl, data, UserService.getToken())
       .then((res) => {
         if (res.data) {
+          console.log("RES" ,res)
           done(null, res.data);
         } else {
           console.error("API failed to update and remove linkedrequest:", res);
@@ -711,4 +712,25 @@ export const deleteLinkedRequest = (data, axisid, ...rest) => {
         catchError(error, dispatch);
       });
   };
+}
+
+export const saveLinkedRequests = (data, axisid, ...rest) => {
+  const done = fnDone(rest);
+  const apiUrl= replaceUrl(API.FOI_REQUEST_ADD_LINKEDREQUESTS, "<axisrequestid>", axisid);
+  return (dispatch) => {
+    httpPOSTRequest(apiUrl, data, UserService.getToken())
+      .then((res) => {
+        if (res.data) {
+          console.log("RES" ,res)
+          done(null, res.data);
+        } else {
+          console.error("API failed to update and remove linkedrequest:", res);
+          dispatch(serviceActionError(res)); 
+        }
+      })
+      .catch((err) => {
+        done(err);
+        catchError(err, dispatch);
+      });
+  }
 }

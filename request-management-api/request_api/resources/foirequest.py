@@ -104,7 +104,6 @@ class FOIRequests(Resource):
             else:
                 foirequestschema = FOIRequestWrapperSchema().load(request_json)
 
-            #print("foirequestschema: ",foirequestschema)
             assignedgroup = request_json['assignedGroup'] if 'assignedGroup' in foirequestschema  else None
             assignedto = request_json['assignedTo'] if 'assignedTo' in foirequestschema  else None
             assignedtofirstname = request_json["assignedToFirstName"] if request_json.get("assignedToFirstName") != None else None
@@ -422,7 +421,7 @@ class LinkedRequestsInfo(Resource):
 @cors_preflight('POST, PUT, OPTIONS')
 @API.route('/linkrequest/removelink/axisrequestid/<string:axisrequestid>')
 class LinkedRequestsInfo(Resource):
-    """Update FOIRawRequest linkedrequest data removal"""
+    """Update FOIRequest linkedrequest data removal"""
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
@@ -432,8 +431,7 @@ class LinkedRequestsInfo(Resource):
             request_data = request.get_json()
             linkedrequest_a = request_data["linkedrequest_a"]
             linkedrequest_b = request_data["linkedrequest_b"]
-            new_linkedrequests = request_data["new_linkedrequests"]
-            results = linkedrequestservice().remove_linkedrequest(linkedrequest_a, linkedrequest_b, new_linkedrequests, AuthHelper.getuserid())
+            results = linkedrequestservice().remove_linkedrequest(linkedrequest_a, linkedrequest_b, AuthHelper.getuserid())
             if results is not None and results.success == True:
                 return {'success': results.success, 'message': results.message,'id':  axisrequestid} , 201
             else:
@@ -445,16 +443,23 @@ class LinkedRequestsInfo(Resource):
 @cors_preflight('POST, PUT, OPTIONS')
 @API.route('/linkrequest/createlink/axisrequestid/<string:axisrequestid>')
 class LinkedRequestsInfo(Resource):
-    """Update FOIMinistryRequest linkedrequest data creation"""
+    """Update FOIRequest linkedrequest data creation"""
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    def put():
+    def post(axisrequestid):
         try:
             request_data = request.get_json()
-            results = linkedrequestservice().get_linkedfoiministryrequest_info_by_axisid(axisrequestid)
-            return results, 201
+            linkedrequest_a = request_data["linkedrequest_a"]
+            foiministryrequestid = request_data["foiministryrequestid"]
+            requestid = request_data["rawrequestid"]
+            new_linkedrequests = request_data["new_linkedrequests"]
+            results = linkedrequestservice().bulk_add_linkedrequest(linkedrequest_a, new_linkedrequests, requestid, foiministryrequestid, AuthHelper.getuserid())
+            if results is not None and results.success == True:
+                return {'success': results.success, 'message': results.message,'id':  axisrequestid} , 201
+            else:
+                return {'success': False, 'message': "Failed to remove linkedrequest data",'id': axisrequestid} , 404
         except Exception as ex:
             print("ERROR:", str(ex))
             return {'success': False, 'message': str(ex), 'id': axisrequestid}, 500
