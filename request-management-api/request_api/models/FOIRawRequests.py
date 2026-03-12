@@ -377,6 +377,15 @@ class FOIRawRequest(db.Model):
     
     @classmethod
     def getrawrequestsbyapplicantid(cls,applicantid):
+        # applicant_type_filter = FOIRawRequest.requestrawdata["foiRequestApplicantID"].astext.cast(db.Integer).in_(subquery_applicant_id_list)
+        # # if applicanttype == "applicant":
+        # #     applicanttype_id = "foiRequestApplicantID"
+        # if applicanttype == "child":
+        #     applicant_type_filter = FOIRawRequest.requestrawdata["foiRequestChildApplicantID"].astext.cast(db.Integer).in_(subquery_applicant_id_list)
+        # elif applicanttype == "onbehalfof":
+        #     applicant_type_filter = FOIRawRequest.requestrawdata["foiRequestOnBehalfOfApplicantID"].astext.cast(db.Integer).in_(subquery_applicant_id_list)
+        # print('applicanttype_id: ', applicant_type_filter)
+        # print('applicantid: ', applicantid)
         request_schema = FOIRawRequestSchema(many=True)
         applicant_subquery = db.session.query(FOIRequestApplicant.applicantprofileid).filter(FOIRequestApplicant.foirequestapplicantid == applicantid).subquery()
         subquery_applicant_id_list = db.session.query(FOIRequestApplicant.foirequestapplicantid).filter(applicant_subquery.c.applicantprofileid == FOIRequestApplicant.applicantprofileid).subquery()

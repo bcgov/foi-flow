@@ -29,6 +29,7 @@ class FOIRequestApplicantSchema(Schema):
     publicServiceEmployeeNumber = fields.Str(data_key="publicServiceEmployeeNumber",allow_none=True, validate=[validate.Length(max=50, error=MAX_EXCEPTION_MESSAGE)])
     
     foiRequestApplicantID = fields.Int(data_key="foiRequestApplicantID",required=False,allow_none=True)
+    applicantprofileid = fields.Str(data_key="applicantprofileid",required=False,allow_none=True)
     foirequestID = fields.List(fields.Int(),data_key="foirequestID",required=False,allow_none=False)
     additionalPersonalInfo = fields.Nested(FOIAdditionallPersonalInfoWrapperSchema,required=False,allow_none=True)
     axisapplicantid = fields.Int(data_key="axisapplicantid",required=False,allow_none=True)
@@ -40,6 +41,7 @@ class ApplicantProfilePayloadSchema(Schema):
 
         unknown = EXCLUDE
     requesttype = fields.Str(data_key="requestType", required=True, allow_none=False)
+    applicanttype = fields.Str(data_key="applicantType", required=True, allow_none=False)
     createnewprofile = fields.Bool(data_key="createNewProfile", required=False, allow_none=True)
     foirequestid = fields.Int(data_key="foiRequestId", required=False, allow_none=True)
     rawrequestid = fields.Int(data_key="rawRequestId", required=False, allow_none=True)

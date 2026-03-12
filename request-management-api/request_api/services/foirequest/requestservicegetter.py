@@ -46,6 +46,7 @@ class requestservicegetter:
 
         additionalpersonalinfo ={}
         for applicant in requestapplicants:
+            print('**APPLICANT (getrequest): ', applicant)
             firstname = applicant['firstname']
             middlename = applicant['middlename']
             lastname = applicant['lastname']
@@ -59,6 +60,11 @@ class requestservicegetter:
 
             if requestortypeid == 1:
                 baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, axisapplicantid))
+            if requestortypeid == 2:
+                baserequestinfo.update({"foiRequestOnBehalfOfApplicantID": foirequestapplicantid})
+            if requestortypeid == 3:
+                baserequestinfo.update({"foiRequestChildApplicantID": foirequestapplicantid})
+            
             additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob, alsoknownas))
 
         baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])

@@ -271,6 +271,13 @@ const foiRequests = (state = initialState, action) => {
     case FOI_ACTION_CONSTANTS.FOI_REQUESTS_COUNT:
       return { ...state, foiRequestsCount: action.payload.count };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_DETAIL:
+      return {
+        ...state,
+        foiRequestDetail: {
+          ...state.foiRequestDetail,
+          ...action.payload,
+        },
+      };
       return { ...state, foiRequestDetail: action.payload };
     case FOI_ACTION_CONSTANTS.FOI_REQUEST_APPLICANT_PROFILE:
       return { ...state, foiRequestApplicantProfile: action.payload };

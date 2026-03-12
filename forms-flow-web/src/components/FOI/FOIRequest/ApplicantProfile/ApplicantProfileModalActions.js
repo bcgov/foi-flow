@@ -28,7 +28,7 @@ const ApplicantProfileModalActions = ({
     <button
       className={`btn-bottom btn-save btn`}
       onClick={reassignProfileToRequest}
-      disabled={isSaveDisabled()}
+      disabled={false}
     >
       Select Profile
     </button>
@@ -90,7 +90,7 @@ const ApplicantProfileModalActions = ({
   );
 
   const confirmCreateNewProfileButton = (
-    <button className={`btn-bottom btn-save btn`} onClick={createProfile}>
+    <button className={`btn-bottom btn-save btn`} disabled={isSaveDisabled()} onClick={createProfile}>
       Confirm New Profile
     </button>
   );
@@ -152,9 +152,27 @@ const ApplicantProfileModalActions = ({
     }
   }
 //   return;
+console.log("**isChangeToDifferentProfile: ", isChangeToDifferentProfile)
+  if (confirmationMessage && isChangeToDifferentProfile) {
+    return (
+        <>
+          {confirmSelectedProfileButton}
+          {backButton}
+        </>
+      );
+  }
+  if (isChangeToDifferentProfile) {
+    return (
+        <>
+          {selectProfileButton}
+          {backButton}
+        </>
+      );
+  }
   if (confirmationMessage) {
     return (
       <>
+        {confirmUpdateProfileButton}
         {backButton}
       </>
     );
@@ -230,6 +248,7 @@ const ApplicantProfileModalActions = ({
             <>
               {createNewProfileButton}
               {updateProfileButton}
+              {selectProfileButton}
             </>
           )}
           {backButton}

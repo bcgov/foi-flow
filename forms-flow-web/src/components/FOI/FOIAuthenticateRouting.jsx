@@ -21,15 +21,6 @@ const FOIAuthenticateRouting = React.memo((props) => {
   const dispatch = useDispatch();
   const isAuth = useSelector((state) => state.user.isAuthenticated); 
 
-  
-  const [applicantProfileModalOpen, setApplicantProfileModalOpen] = useState(false);
-  const handleApplicantModalClose = () => {
-    setApplicantProfileModalOpen(false);
-  }
-  const openApplicantProfileModal = () => {
-    setApplicantProfileModalOpen(true);
-  }
-
   useEffect(()=>{
     // console.log('authenticate')
     if(props.store){
@@ -60,13 +51,13 @@ const FOIAuthenticateRouting = React.memo((props) => {
                   )}
               </Route>
               <Route path="/foi/reviewrequest/:requestId">
-                <FOIRequest userDetail={userDetail} openApplicantProfileModal={openApplicantProfileModal} />
+                <FOIRequest userDetail={userDetail} />
               </Route>
               <Route path="/foi/addrequest">
-                <FOIRequest  userDetail={userDetail} openApplicantProfileModal={openApplicantProfileModal}/>
+                <FOIRequest  userDetail={userDetail} />
               </Route>
               <Route path="/foi/foirequests/:requestId/ministryrequest/:ministryId">
-                <FOIRequest userDetail={userDetail} openApplicantProfileModal={openApplicantProfileModal}/>
+                <FOIRequest userDetail={userDetail} />
               </Route>
               <Route path="/foi/historicalrequest/:requestId">
                 <FOIRequest userDetail={userDetail} />
@@ -84,10 +75,6 @@ const FOIAuthenticateRouting = React.memo((props) => {
                 <Redirect to="/foi/dashboard"/>
               </Route>
               <FOIFooter />
-              <ApplicantProfileModal
-                modalOpen={applicantProfileModalOpen}
-                handleModalClose={handleApplicantModalClose}
-              />
             </>
           ) : (
             <Route path="/foi">

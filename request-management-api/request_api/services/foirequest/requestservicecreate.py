@@ -43,7 +43,12 @@ class requestservicecreate:
         if requestservicebuilder().isNotBlankorNone(foirequestschema,"category","main") == True:
             openfoirequest.applicantcategoryid = requestserviceconfigurator().getvalueof("category",foirequestschema.get("category"))
         openfoirequest.personalAttributes = self._prearepersonalattributes(foirequestschema, userid)        
-        openfoirequest.requestApplicants = self.__prepareapplicants(foirequestschema, userid)       
+        # openfoirequest.requestApplicants = self.__prepareapplicants(foirequestschema, userid)       
+        print('SETTING APPLICANTS: ', foirequestschema.get("requestApplicants"))
+        if foirequestschema.get("requestApplicants"):
+            openfoirequest.requestApplicants = foirequestschema.get("requestApplicants")     
+        else:
+            openfoirequest.requestApplicants = self.__prepareapplicants(foirequestschema, userid)       
         if foirequestid is not None:         
            openfoirequest.foirequestid = foirequestid
         openfoirequest.wfinstanceid = wfinstanceid if wfinstanceid is not None else None
@@ -130,54 +135,135 @@ class requestservicecreate:
     
     def __prepareapplicants(self, foirequestschema, userid):
         requestapplicantarr = []
-        selfalsoknownas=None
-        selfdob=None
-        if foirequestschema.get("additionalPersonalInfo") is not None:
-            applicantinfo = foirequestschema.get("additionalPersonalInfo")
-            selfdob = applicantinfo["birthDate"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"birthDate","additionalPersonalInfo") else None
-            selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
-        applicant = self.__getapplicant(foirequestschema.get('axisapplicantid'), foirequestschema.get('foiRequestApplicantID', 0))
-        foirequestschema['foiRequestApplicantID'] = applicant.get('foirequestapplicantid', 0) # temporary for axis sync, remove after axis decommissioned
-        # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
-        if foirequestschema.get('foiRequestApplicantID', 0) > 0:
-            foirequestapplicantid = foirequestschema.get('foiRequestApplicantID', 0)
-            updatedapplicant = FOIRequestApplicant.from_request_data(foirequestschema)
-            save_result = FOIRequestApplicant.update_applicant_profile(updatedapplicant, foirequestapplicantid, userid)
-            # applicant = FOIRequestApplicant().getlatestprofilebyapplicantid(foirequestschema['foiRequestApplicantID']) comment back in after axis decommission
-            requestapplicant = FOIRequestApplicantMapping()
-            requestapplicant.foirequestapplicantid = save_result.identifier # = applicant['foirequestapplicantid'] comment back in after axis decommission
-            requestapplicant.requestortypeid = RequestorType().getrequestortype("Self")["requestortypeid"]
-            requestapplicantarr.append(requestapplicant)
-        else:
-            # This is a fallback - all raw requests should have foiRequestApplicantID set
-            newapplicant = FOIRequestApplicant().from_request_data(foirequestschema)
-            save_result = FOIRequestApplicant().save_instance(newapplicant, userid)
-            requestapplicant = FOIRequestApplicantMapping()
-            requestapplicant.foirequestapplicantid = save_result.identifier # = applicant['foirequestapplicantid'] comment back in after axis decommission
-            requestapplicant.requestortypeid = RequestorType().getrequestortype("Self")["requestortypeid"]
-            requestapplicantarr.append(requestapplicant)
-
-        #Prepare additional applicants
-        # We are not doing this for the time being, but may want to handle it at some point
+        # selfalsoknownas=None
+        # selfdob=None
         # if foirequestschema.get("additionalPersonalInfo") is not None:
-        #     addlapplicantinfo = foirequestschema.get("additionalPersonalInfo")
-        #     if requestservicebuilder().isNotBlankorNone(foirequestschema,"childFirstName","additionalPersonalInfo"):
-        #         childapplicantobj = FOIRequestApplicant().child_from_additional_personal_info(addlapplicantinfo, userid)
-        #         newchildapplicant = FOIRequestApplicant().save_instance(childapplicantobj, userid)
-        #         requestapplicant = FOIRequestApplicantMapping()
-        #         requestapplicant.foirequestapplicantid = newchildapplicant.identifier # = applicant['foirequestapplicantid'] comment back in after axis decommission
-        #         requestapplicant.requestortypeid = RequestorType().getrequestortype("Applying for a child under 12")["requestortypeid"]
-        #         requestapplicantarr.append(requestapplicant)
+        #     applicantinfo = foirequestschema.get("additionalPersonalInfo")
+        #     selfdob = applicantinfo["birthDate"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"birthDate","additionalPersonalInfo") else None
+        #     selfalsoknownas = applicantinfo["alsoKnownAs"] if requestservicebuilder().isNotBlankorNone(foirequestschema,"alsoKnownAs","additionalPersonalInfo") else None
+        
+        if not foirequestschema.get('foiRequestApplicantID'): # temporary for axis sync, remove after axis decommissioned
+            applicant = self.__getapplicant(foirequestschema.get('axisapplicantid'), foirequestschema.get('foiRequestApplicantID', 0))
+            foirequestschema['foiRequestApplicantID'] = applicant.get('foirequestapplicantid', 0)
+        # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
+        applicantdata = foirequestschema.get("applicantdata")
+        applicant_id = foirequestschema.get('foiRequestApplicantID')
+        child_applicant_id = foirequestschema.get("foiRequestChildApplicantID")
+        onbehalfof_applicant_id = foirequestschema.get("foiRequestOnBehalfOfApplicantID")
+        applicanttype = None
+        updated_applicant_id = None
+        print('\n\n*****\n\nfoirequestschema: ', foirequestschema)
+        print('\n\napplicantdata: ', applicantdata)
+        if applicantdata:
+            actiontype = applicantdata.get("actiontype")
+            applicanttype = applicantdata.get("applicanttype")
+            applicant = applicantdata.get("applicant")
+            # handlers = {
+            #     ("applicant", "reassign"): self._reassign_applicant,
+            #     ("applicant", "update"): self._update_applicant,
+            #     ("applicant", "create"): self._create_applicant,
 
-        #     if requestservicebuilder().isNotBlankorNone(foirequestschema,"anotherFirstName","additionalPersonalInfo"):
-        #         otherapplicantobj = FOIRequestApplicant().other_from_additional_personal_info(addlapplicantinfo, userid)
-        #         newotherapplicant = FOIRequestApplicant().save_instance(otherapplicantobj, userid)
-        #         requestapplicant = FOIRequestApplicantMapping()
-        #         requestapplicant.foirequestapplicantid = newotherapplicant.identifier # = applicant['foirequestapplicantid'] comment back in after axis decommission
-        #         requestapplicant.requestortypeid = RequestorType().getrequestortype("Applying for other person")["requestortypeid"]
-        #         requestapplicantarr.append(requestapplicant)
+            #     ("child", "reassign"): self._reassign_child,
+            #     ("child", "update"): self._update_child,
+            #     ("child", "create"): self._create_child,
 
+            #     ("onbehalfof", "reassign"): self._reassign_onbehalfof,
+            #     ("onbehalfof", "update"): self._update_onbehalfof,
+            #     ("onbehalfof", "create"): self._create_onbehalfof,
+            # }
+            # handler = handlers.get((applicanttype, actiontype))
+
+            # if not handler:
+            #     return requestapplicantarr
+
+            handler_name = f"_{actiontype}_{applicanttype}"
+            handler = getattr(self, handler_name, None)
+            print("\n\n***handler_name: ", handler_name)
+            print("***handler: ", handler)
+            if not handler:
+                raise ValueError(f"No handler for _{actiontype}_{applicanttype}")
+
+            if handler:
+                updated_applicant_id = handler(foirequestschema, applicantdata, userid)
+
+                if applicanttype == "applicant":
+                    applicant_id = updated_applicant_id
+                elif applicanttype == "child":
+                    child_applicant_id = updated_applicant_id
+                elif applicanttype == "onbehalfof":
+                    onbehalfof_applicant_id = updated_applicant_id
+
+        print('\n\n***applicant_id: ', applicant_id)
+        print('***child_applicant_id: ', child_applicant_id)
+        print('***onbehalfof_applicant_id: ', onbehalfof_applicant_id)
+
+        self._update_all_applicant_mappings(
+            applicant_id,
+            child_applicant_id,
+            onbehalfof_applicant_id,
+            requestapplicantarr
+        )
         return requestapplicantarr
+    
+    # Applicant handlers
+    def _reassign_applicant(self, foirequestschema, applicantdata, userid):
+        return applicantdata["applicant"]["foiRequestApplicantID"]
+    
+    def _update_applicant(self, foirequestschema, applicantdata, userid):
+        updatedapplicant = FOIRequestApplicant.from_request_data(foirequestschema, applicantdata, "applicant")
+        applicant_id = applicantdata["applicant"]["foiRequestApplicantID"]
+        applicant_save_result = FOIRequestApplicant.update_applicant_profile(updatedapplicant, applicant_id, userid)
+        return applicant_save_result.identifier
+    
+    def _create_applicant(self, foirequestschema, applicantdata, userid):
+        newapplicant = FOIRequestApplicant.from_request_data(foirequestschema, applicantdata, "applicant", is_new=True)
+        applicant_create_result = FOIRequestApplicant.save_instance(newapplicant, userid)
+        return applicant_create_result.identifier
+    
+    def _reassign_child(self, foirequestschema, applicantdata, userid):
+        return applicantdata["applicant"]["foiRequestApplicantID"]
+    
+    def _update_child(self, foirequestschema, applicantdata, userid):
+        updatedchildapplicant = FOIRequestApplicant.from_request_data(foirequestschema, applicantdata, "child")
+        applicant_id = applicantdata["applicant"]["foiRequestApplicantID"]
+        child_save_result = FOIRequestApplicant.update_applicant_profile(updatedchildapplicant, applicant_id, userid)
+        return child_save_result.identifier
+    
+    def _create_child(self, foirequestschema, applicantdata, userid):
+        newapplicant = FOIRequestApplicant.from_request_data(foirequestschema, applicantdata, "child", is_new=True)
+        applicant_create_result = FOIRequestApplicant.save_instance(newapplicant, userid)
+        return applicant_create_result.identifier
+    
+    def _reassign_onbehalfof(self, foirequestschema, applicantdata, userid):
+        return applicantdata["applicant"]["foiRequestApplicantID"]
+    
+    def _update_onbehalfof(self, foirequestschema, applicantdata, userid):
+        updatedonbehalfofapplicant = FOIRequestApplicant.from_request_data(foirequestschema, applicantdata, "onbehalfof")
+        applicant_id = applicantdata["applicant"]["foiRequestApplicantID"]
+        onbehalfof_save_result = FOIRequestApplicant.update_applicant_profile(updatedonbehalfofapplicant, applicant_id, userid)
+        return onbehalfof_save_result.identifier
+    
+    def _create_onbehalfof(self, foirequestschema, applicantdata, userid):
+        newapplicant = FOIRequestApplicant.from_request_data(foirequestschema, applicantdata, "onbehalfof", is_new=True)
+        applicant_create_result = FOIRequestApplicant.save_instance(newapplicant, userid)
+        return applicant_create_result.identifier
+    
+    def _update_applicant_mapping(self, applicantid, requestortypeid, requestapplicantarr):
+        requestapplicant = FOIRequestApplicantMapping()
+        requestapplicant.foirequestapplicantid = applicantid
+        requestapplicant.requestortypeid = requestortypeid
+        requestapplicantarr.append(requestapplicant)
+
+    def _update_all_applicant_mappings(self, applicant_id, child_applicant_id, onbehalfof_applicant_id, requestapplicantarr):
+        requestortypeid = RequestorType().getrequestortype("Self")["requestortypeid"]
+        child_requestortypeid = RequestorType().getrequestortype("Applying for a child under 12")["requestortypeid"]
+        onbehalfof_requestortypeid = RequestorType().getrequestortype("Applying for other person")["requestortypeid"]
+        if applicant_id:
+            self._update_applicant_mapping(applicant_id, requestortypeid, requestapplicantarr)
+        if child_applicant_id:
+            self._update_applicant_mapping(child_applicant_id, child_requestortypeid, requestapplicantarr)
+        if onbehalfof_applicant_id:
+            self._update_applicant_mapping(onbehalfof_applicant_id, onbehalfof_requestortypeid, requestapplicantarr)
 
     def __getapplicant(self, axisapplicantid, foirequestapplicantid):
         applicant = {}

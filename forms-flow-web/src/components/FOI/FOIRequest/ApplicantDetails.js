@@ -14,6 +14,7 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { isBeforeOpen } from "./utils";
+import ApplicantProfileModal from './ApplicantProfile/ApplicantProfileModal';
 
 const ApplicantDetails = React.memo(
   ({
@@ -26,9 +27,10 @@ const ApplicantDetails = React.memo(
     defaultExpanded,
     showHistory,
     warning,
-    openApplicantProfileModal,
+    // openApplicantProfileModal,
     displayOtherNotes = false
   }) => {
+    const [openApplicantProfileModal, setOpenApplicantProfileModal] = React.useState(false)
 
     const useStyles = makeStyles({
       heading: {
@@ -310,11 +312,11 @@ const ApplicantDetails = React.memo(
             </button>}
           </div>
           <div>
-            {openApplicantProfileModal &&
+            {!openApplicantProfileModal &&
               <button
                 type="button"
                 className={`btn btn-link btn-description-history`}
-                onClick={openApplicantProfileModal}
+                onClick={() => {setOpenApplicantProfileModal(true)}}
                 style={(isBeforeOpen(requestDetails) && !requestDetails.foiRequestApplicantID) ? {color: "#9E2929"} : {}}
               >
                 {(isBeforeOpen(requestDetails) && !requestDetails.foiRequestApplicantID) && 'Search' } Applicant Profiles
@@ -421,6 +423,12 @@ const ApplicantDetails = React.memo(
           </div>
         </AccordionDetails>
       </Accordion>
+      <ApplicantProfileModal
+        modalOpen={openApplicantProfileModal}
+        handleModalClose={() => {setOpenApplicantProfileModal(false)}}
+        applicantProfileId={requestDetails?.foiRequestApplicantID}
+        applicantType={"applicant"}
+      />
       </div>
     );
   }

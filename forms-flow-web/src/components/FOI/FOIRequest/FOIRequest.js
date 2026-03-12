@@ -170,7 +170,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
+const FOIRequest = React.memo(({ userDetail }) => {
+  // const [applicantProfileModalOpen, setApplicantProfileModalOpen] = useState(false);
+  // const handleApplicantModalClose = () => {
+  //   setApplicantProfileModalOpen(false);
+  // }
+  // const openApplicantProfileModal = () => {
+  //   setApplicantProfileModalOpen(true);
+  // }
   const [_requestStatus, setRequestStatus] = React.useState(
     StateEnum.unopened.name
   );
@@ -184,6 +191,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   let requestDetails = useSelector(
     (state) => state.foiRequests.foiRequestDetail
   );
+
+  React.useEffect(() => {console.log('requestDetails: ', requestDetails)}, [requestDetails])
 
   const [_currentrequestStatus, setcurrentrequestStatus] = React.useState("");
   let requestExtensions = useSelector(
@@ -351,6 +360,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const [saveRequestObject, setSaveRequestObject] =
     React.useState(requestDetails);
+  useEffect(() => {console.log('FOIREQUEST requestDetails: ', requestDetails)}, [requestDetails])
+  useEffect(() => {console.log('FOIREQUEST saveRequestObject: ', saveRequestObject)}, [saveRequestObject])
   const showDivisionalTracking =
     requestDetails &&
     requestDetails.divisions?.length > 0 &&
@@ -1792,7 +1803,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                               )
                             }
                             userDetail={userDetail}
-                            openApplicantProfileModal={openApplicantProfileModal}
+                            // openApplicantProfileModal={openApplicantProfileModal}
                           />
                           {requiredRequestDetailsValues.requestType.toLowerCase() ===
                             FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
@@ -1812,6 +1823,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                                   setError={setPersonalRequestDetailErrors}
                                 />
                                 <OnBehalfOfDetails
+                                  onBehalfOfApplicantId={requestDetails?.foiRequestOnBehalfOfApplicantID}
+                                  requestDetails={requestDetails}
                                   additionalInfo={
                                     requestDetails.additionalPersonalInfo
                                   }
@@ -1822,6 +1835,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                                     disableInput || isHistoricalRequest
                                   }
                                   setError={setPersonalRequestDetailErrors}
+                                  // openApplicantProfileModal={openApplicantProfileModal}
                                 />
                               </>
                             )}
@@ -2321,6 +2335,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
             handleContinue={handleUnsavedContinue}
             modalMessage={unsavedMessage}
           />
+          {/* <ApplicantProfileModal
+            modalOpen={applicantProfileModalOpen}
+            handleModalClose={handleApplicantModalClose}
+          /> */}
         </div>
       </div>
     </div>
