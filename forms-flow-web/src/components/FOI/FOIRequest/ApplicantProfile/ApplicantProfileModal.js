@@ -15,6 +15,7 @@ import { isBeforeOpen } from "../utils";
 import ApplicantProfileModalHeader from "./ApplicantProfileModalHeader";
 import ApplicantProfileModalContent from "./ApplicantProfileModalContent";
 import ApplicantProfileModalActions from "./ApplicantProfileModalActions";
+import { validateApplicantProfileFields } from "./helper";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -48,6 +49,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const [isChangeToDifferentProfile, setIsChangeToDifferentProfile] = useState(false);
     const [applicantHistory, setApplicantHistory] = useState(false);
     const [requestHistory, setRequestHistory] = useState(false);
+    const [applicantProfileError, setApplicantProfileError] = useState(false);
 
     useEffect(() => {
         if (modalOpen) {
@@ -96,6 +98,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
         } else {
             setIsChangeToDifferentProfile(false)
         }
+        setApplicantProfileError(validateApplicantProfileFields(selectedApplicant));
     }, [selectedApplicant])
 
     const createSaveApplicantObject = (name, value, value2) => {
@@ -332,6 +335,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                 applicantHistory={applicantHistory}
                 isChangeToDifferentProfile={isChangeToDifferentProfile}
                 createProfile={createProfile}
+                applicantProfileError={applicantProfileError}
             />
           </DialogActions>
         </ReactModal>
