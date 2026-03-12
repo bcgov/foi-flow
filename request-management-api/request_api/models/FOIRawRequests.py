@@ -1472,7 +1472,7 @@ class FOIRawRequest(db.Model):
             FROM (
                 SELECT DISTINCT ON (requestid) requestid, version
                 FROM public."FOIRawRequests"
-                WHERE requestid IN (:linkedrequest_requestids)
+                WHERE requestid IN :linkedrequest_requestids
                 ORDER BY requestid, version DESC
             ) AS latestrawrequest
             WHERE foirawreq.requestid = latestrawrequest.requestid
