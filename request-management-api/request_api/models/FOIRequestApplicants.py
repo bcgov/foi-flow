@@ -65,7 +65,7 @@ class FOIRequestApplicant(db.Model):
         applicant.firstname = requestdata.get("firstName")
         applicant.middlename = requestdata.get("middleName")
         applicant.lastname = requestdata.get("lastName")
-        alsoknownas = requestdata.get("additionalPersonalInfo", None).get("alsoKnownAs", None)
+        alsoknownas = requestdata.get("additionalPersonalInfo", {}).get("alsoKnownAs", None)
         applicant.alsoknownas = alsoknownas if alsoknownas else None
         dob_str = requestdata.get("additionalPersonalInfo", {}).get("birthDate")
         if dob_str and dob_str.strip():
@@ -88,7 +88,7 @@ class FOIRequestApplicant(db.Model):
         applicant.work_phone = requestdata.get("workPhonePrimary")
         applicant.alternative_phone = requestdata.get("workPhoneSecondary")
         # applicant.other_contact_info = requestdata.get("")
-        applicant.personal_health_number = requestdata.get("additionalPersonalInfo", None).get("personalHealthNumber")
+        applicant.personal_health_number = requestdata.get("additionalPersonalInfo", {}).get("personalHealthNumber")
         applicant.employee_number = requestdata.get("publicServiceEmployeeNumber")
         applicant.correction_number = requestdata.get("correctionalServiceNumber")
         applicant.other_notes = requestdata.get("other_notes")
@@ -466,51 +466,8 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.other_notes).label('other_notes')
         ).group_by(subquery_all.c.foirequestapplicantid)
 
-        applicantprofile_schema = ApplicantProfileSchema()
+        applicantprofile_schema = ApplicantProfileCompositeSchema()
         return applicantprofile_schema.dump(query_aggregate.first())
-    
-    @classmethod
-    def get_applicant_profile_by_id(cls, applicantid):
-        selectedcolumns = [
-            FOIRequestApplicant.applicantprofileid.label('applicantprofileid'),
-            func.to_char(FOIRequestApplicant.created_at, 'YYYY-MM-DD HH24:MI:SS').label('createdat'),
-            FOIRequestApplicant.foirequestapplicantid.label('foirequestapplicantid'),
-            FOIRequestApplicant.firstname.label('firstname'),
-            FOIRequestApplicant.middlename.label('middlename'),
-            FOIRequestApplicant.lastname.label('lastname'),
-            FOIRequestApplicant.alsoknownas.label('alsoknownas'),
-            func.to_char(FOIRequestApplicant.dob, 'YYYY-MM-DD').label('dob'),
-            FOIRequestApplicant.businessname.label('businessname'),
-            # FOIRequest.foirequestid.label('foirequestid'),
-            # FOIRequest.version.label('foirequestversion'),
-            # FOIRequest.requesttype.label('requesttype'),
-            FOIRequestApplicant.category.label('applicantcategory'),
-            FOIRequestApplicant.email.label('email'),
-            FOIRequestApplicant.address.label('address'),
-            FOIRequestApplicant.address_secondary.label('address2'),
-            FOIRequestApplicant.home_phone.label('homephone'),
-            FOIRequestApplicant.work_phone.label('workphone'),
-            FOIRequestApplicant.alternative_phone.label('workphone2'),
-            FOIRequestApplicant.mobile_phone.label('mobilephone'),
-            FOIRequestApplicant.other_contact_info.label('othercontactinfo'),
-            FOIRequestApplicant.city.label('city'),
-            FOIRequestApplicant.province.label('province'),
-            FOIRequestApplicant.postal.label('postal'),
-            FOIRequestApplicant.country.label('country'),
-            FOIRequestApplicant.employee_number.label('employeenumber'),
-            FOIRequestApplicant.correction_number.label('correctionnumber'),
-            FOIRequestApplicant.personal_health_number.label('phn'),
-            FOIRequestApplicant.axisapplicantid.label('axisapplicantid'),
-            FOIRequestApplicant.other_notes.label('other_notes')
-        ]
-
-        query = db.session.query(
-                                *selectedcolumns
-                            ).filter(
-                                FOIRequestApplicant.foirequestapplicantid == applicantid
-                            ).order_by(FOIRequestApplicant.foirequestapplicantid.desc())
-        applicantprofile_schema = ApplicantProfileSchema()
-        return applicantprofile_schema.dump(query.first())
 
     @classmethod
     def search_applicant_profiles(cls, keywords, excluded_profile_ids):
@@ -538,7 +495,7 @@ class FOIRequestApplicant(db.Model):
                 FOIRequestApplicant.applicantprofileid.notin_(excluded_profile_ids)
             )
 
-        schema = ApplicantProfileFromRequestApplicantSchema(many=True)
+        schema = ApplicantProfileBaseSchema(many=True)
         return schema.dump(query.all())
 
     # Search applicant by keywords
@@ -823,7 +780,7 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.other_notes).label('other_notes')
         ).group_by(subquery_all.c.foirequestapplicantid)
 
-        applicantprofile_schema = ApplicantProfileSchema(many=True)
+        applicantprofile_schema = ApplicantProfileCompositeSchema(many=True)
         return applicantprofile_schema.dump(query_aggregate.all())
 
 
@@ -1075,7 +1032,7 @@ class FOIRequestApplicant(db.Model):
 
         # print("query_applicant_history", query_all)
 
-        applicantprofile_schema = ApplicantProfileSchema(many=True)
+        applicantprofile_schema = ApplicantProfileCompositeSchema(many=True)
         return applicantprofile_schema.dump(query_all.all())
 
 
@@ -1157,8 +1114,8 @@ class FOIRequestApplicant(db.Model):
     @classmethod
     def get_applicant_profile_by_id(cls, foirequestapplicantid):
         query = db.session.query(FOIRequestApplicant).filter_by(foirequestapplicantid=foirequestapplicantid).order_by(FOIRequestApplicant.foirequestapplicantid.desc())
-        applicantrequest_schema = ApplicantProfileFromRequestApplicantSchema(many=True)
-        return applicantrequest_schema.dump(query.all())
+        applicantrequest_schema = ApplicantProfileBaseSchema(many=False)
+        return applicantrequest_schema.dump(query.first())
 
     @classmethod
     def applicants_differ(cls, newapplicant, applicantfromdb, exclude=[]):
@@ -1188,7 +1145,7 @@ class FOIRequestApplicantSchema(ma.Schema):
                   'home_phone', 'mobile_phone', 'work_phone', 'alternative_phone', 'other_contact_info', 'personal_health_number',
                   'employee_number', 'correction_number', 'other_notes', 'section43_info', 'request_history')
 
-class ApplicantProfileSchema(ma.Schema):
+class ApplicantProfileCompositeSchema(ma.Schema): # For profiles with data derived from multiple tables
     class Meta:
         fields = ('applicantprofileid','updatedat','createdby','foirequestapplicantid','firstname','middlename','lastname',
                   'alsoknownas','dob','businessname','foirequestid','foirequestversion','requesttype','applicantcategory',
@@ -1199,7 +1156,7 @@ class ApplicantRequestSchema(ma.Schema):
     class Meta:
         fields = ('applicantprofileid','foirequestapplicantid','axisrequestid','foirequest_id','foiministryrequestid','filenumber', 'requeststatus','receiveddate','description')
 
-class ApplicantProfileFromRequestApplicantSchema(ma.Schema):
+class ApplicantProfileBaseSchema(ma.Schema): # For profiles with data solely from FOIRequestApplicants table
     address2 = fields.String(attribute="address_secondary")
     foirequestapplicantid = fields.Integer(attribute="foirequestapplicantid")
     homephone = fields.String(attribute="home_phone")

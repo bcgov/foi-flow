@@ -191,7 +191,7 @@ const ApplicantProfileModalContent = ({
           createSaveRequestObject={createSaveApplicantObject}
           handleApplicantDetailsInitialValue={() => {}}
           handleApplicantDetailsValue={() => {}}
-          disableInput={true}
+          disableInput={false}
           defaultExpanded={true}
           showHistory={showApplicantHistory}
           warning={null}

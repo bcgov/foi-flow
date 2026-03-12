@@ -151,14 +151,7 @@ const ApplicantProfileModalActions = ({
       );
     }
   }
-//   return;
-  if (confirmationMessage) {
-    return (
-      <>
-        {backButton}
-      </>
-    );
-  }
+
   if (createConfirmation && isBeforeOpen(requestDetails)) {
     return <>{backButton}</>;
   }

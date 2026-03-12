@@ -320,12 +320,11 @@ class applicantservice:
                 requestqueue.append(self.__preparerawrequest(request))
 
         # Get historical requests from FOIRequestApplicant table
-        applicant_profiles = FOIRequestApplicant.get_applicant_profile_by_id(applicantid)
-        for applicant in applicant_profiles:
-            request_history = applicant.get("requestHistory")
-            if request_history:
-                for historical_request in request_history:
-                    requestqueue.append(self.__prepare_historical_request(historical_request, applicant))
+        applicant_profile = FOIRequestApplicant.get_applicant_profile_by_id(applicantid)
+        request_history = applicant_profile.get("requestHistory")
+        if request_history:
+            for historical_request in request_history:
+                requestqueue.append(self.__prepare_historical_request(historical_request, applicant_profile))
         return requestqueue
 
     def __preparerequest(self, request):
