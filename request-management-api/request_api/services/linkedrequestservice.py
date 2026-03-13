@@ -46,7 +46,7 @@ class linkedrequestservice:
                 self.__create_two_way_link(new_linkedrequests, linkedrequest_a, user)
                 db.session.commit()
                 print("LINK PROCESS COMPLETED")
-            return DefaultMethodResult(True,'Linkedrequest data saved', linkedrequest_a, 201)
+            return DefaultMethodResult(True,'Linkedrequest data saved', 201, formatted_new_linkedrequests)
         except Exception as e:
             db.session.rollback()
             raise Exception("Error when saving linkedrequests", e) from e
@@ -78,7 +78,7 @@ class linkedrequestservice:
                 self.__remove_two_way_link(linkedrequest_a, linkedrequest_b, user)
                 db.session.commit()
                 print("DELINK PROCESS COMPLETED")
-            return DefaultMethodResult(True,'Linkedrequest data updated', linkedrequest_a["axisrequestid"], 201)
+            return DefaultMethodResult(True,'Linkedrequest data updated', 201, updated_linkedrequests)
         except Exception as e:
             db.session.rollback()
             raise Exception("Error when delinking removed linkedrequests", e) from e

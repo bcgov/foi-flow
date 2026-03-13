@@ -1871,16 +1871,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           {requestDetails?.axisRequestId &&
                             <LinkedRequests
                               requestDetails={requestDetails}
-                              requestStatus={_requestStatus}
-                              handleRequestDetailsValue={handleRequestDetailsValue}
-                              handleRequestDetailsInitialValue={
-                                handleRequestDetailsInitialValue
-                              }
-                              disableInput={disableInput || isHistoricalRequest}
-                              isHistoricalRequest={isHistoricalRequest}
                               isMinistry={isMinistry}
                               ministryId={ministryId}
                               requestId={requestId}
+                              createSaveRequestObject={createSaveRequestObject}
                             />
                           }
                           {redactedSections &&

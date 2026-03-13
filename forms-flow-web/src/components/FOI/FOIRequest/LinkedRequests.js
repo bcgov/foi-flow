@@ -29,6 +29,7 @@ const LinkedRequests = React.memo(
     isMinistry,
     ministryId,
     requestId,
+    createSaveRequestObject,
   }) => {
     const useStyles = makeStyles({
       heading: {
@@ -94,6 +95,7 @@ const LinkedRequests = React.memo(
             if (!err) {
               setLinkedRequests(updatedLinkedRequests);
               setLinkedRequestsInfo(updatedLinkedInfoRequests);
+              createSaveRequestObject(FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS, _result["new_linkedrequests"]);
               toast.update(toastID, {
                 type: "success",
                 render: "Linked request details have been successfully updated",
@@ -238,6 +240,7 @@ const LinkedRequests = React.memo(
         dispatch (
           saveLinkedRequests(data, requestDetails?.axisRequestId, (err, _result) => {
             if (!err) {
+              createSaveRequestObject(FOI_COMPONENT_CONSTANTS.LINKED_REQUESTS, linkedRequests, _result["new_linkedrequests"]);
               toast.update(toastID, {
                 type: "success",
                 render: "Linked request details have been successfully saved",

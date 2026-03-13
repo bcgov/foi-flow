@@ -433,7 +433,7 @@ class LinkedRequestsInfo(Resource):
             linkedrequest_b = request_data["linkedrequest_b"]
             results = linkedrequestservice().remove_linkedrequest(linkedrequest_a, linkedrequest_b, AuthHelper.getuserid())
             if results is not None and results.success == True:
-                return {'success': results.success, 'message': results.message,'id':  axisrequestid} , 201
+                return {'success': results.success, 'message': results.message, 'new_linkedrequests':  results.data} , 201
             else:
                 return {'success': False, 'message': "Failed to remove linkedrequest data",'id': axisrequestid} , 404
         except Exception as ex:
@@ -457,7 +457,7 @@ class LinkedRequestsInfo(Resource):
             new_linkedrequests = request_data["new_linkedrequests"]
             results = linkedrequestservice().bulk_add_linkedrequest(linkedrequest_a, new_linkedrequests, requestid, foiministryrequestid, AuthHelper.getuserid())
             if results is not None and results.success == True:
-                return {'success': results.success, 'message': results.message,'id':  axisrequestid} , 201
+                return {'success': results.success, 'message': results.message, 'new_linkedrequests':  results.data} , 201
             else:
                 return {'success': False, 'message': "Failed to remove linkedrequest data",'id': axisrequestid} , 404
         except Exception as ex:

@@ -699,8 +699,7 @@ export const deleteLinkedRequest = (data, axisid, ...rest) => {
   return (dispatch) => {
     httpPUTRequest(apiUrl, data, UserService.getToken())
       .then((res) => {
-        if (res.data) {
-          console.log("RES" ,res)
+        if (res.status === 201) {
           done(null, res.data);
         } else {
           console.error("API failed to update and remove linkedrequest:", res);
@@ -720,7 +719,7 @@ export const saveLinkedRequests = (data, axisid, ...rest) => {
   return (dispatch) => {
     httpPOSTRequest(apiUrl, data, UserService.getToken())
       .then((res) => {
-        if (res.data) {
+        if (res.status === 201) {
           console.log("RES" ,res)
           done(null, res.data);
         } else {
