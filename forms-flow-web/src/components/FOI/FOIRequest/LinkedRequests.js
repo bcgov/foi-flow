@@ -81,7 +81,7 @@ const LinkedRequests = React.memo(
       try {
         const [updatedLinkedRequests, updatedLinkedInfoRequests]= removeLinkedRequest(linkedrequestToRemove);
         const parentLinkedRequest = {
-          foiministryrequestid: ministryId ? ministryId : null,
+          foiministryrequestid: ministryId ?? null,
           rawrequestid: requestId,
           axisrequestid: requestDetails?.axisRequestId
         }
@@ -232,7 +232,7 @@ const LinkedRequests = React.memo(
         }
         const data = {
           linkedrequest_a: parentLinkedRequest,
-          foiministryrequestid: ministryId ? ministryId : null,
+          foiministryrequestid: ministryId ?? null,
           rawrequestid: requestId,
           new_linkedrequests: linkedRequestsInfo,
         }

@@ -399,8 +399,9 @@ class LinkedRequests(Resource):
             results = linkedrequestservice().findrequestids(search_text, axisrequestid,ministrycode)
             return results, 200
         except Exception as ex:
-            print("ERROR:", str(ex))
-            return {'success': False, 'message': str(ex), 'id': axisrequestid}, 500
+            message = str(ex)
+            print("ERROR:", message)
+            return {'success': False, 'message': message, 'id': axisrequestid}, 500
         
 @cors_preflight('GET,OPTIONS')
 @API.route('/linkrequest/foiministryinfo/axisrequestid/<string:axisrequestid>')
@@ -415,8 +416,9 @@ class LinkedRequestsInfo(Resource):
             results = linkedrequestservice().get_linkedfoiministryrequest_info_by_axisid(axisrequestid)
             return results, 200
         except Exception as ex:
-            print("ERROR:", str(ex))
-            return {'success': False, 'message': str(ex), 'id': axisrequestid}, 500
+            message = str(ex)
+            print("ERROR:", message)
+            return {'success': False, 'message': message, 'id': axisrequestid}, 500
 
 @cors_preflight('POST, PUT, OPTIONS')
 @API.route('/linkrequest/removelink/axisrequestid/<string:axisrequestid>')
@@ -437,8 +439,9 @@ class LinkedRequestsInfo(Resource):
             else:
                 return {'success': False, 'message': "Failed to remove linkedrequest data",'id': axisrequestid} , 404
         except Exception as ex:
-            print("ERROR:", str(ex))
-            return {'success': False, 'message': str(ex), 'id': axisrequestid}, 500
+            message = str(ex)
+            print("ERROR:", message)
+            return {'success': False, 'message': message, 'id': axisrequestid}, 500
 
 @cors_preflight('POST, PUT, OPTIONS')
 @API.route('/linkrequest/createlink/axisrequestid/<string:axisrequestid>')
