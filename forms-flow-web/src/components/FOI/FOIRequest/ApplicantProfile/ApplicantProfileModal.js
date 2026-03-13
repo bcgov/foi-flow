@@ -77,6 +77,13 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     }, [modalOpen])
 
     useEffect(() => {
+        setCreateConfirmation(!selectedApplicant && requestDetails?.sourceOfSubmission == "onlineform")
+        if (!selectedApplicant && requestDetails?.sourceOfSubmission == "onlineform") {
+            setSaveApplicantObject(requestDetails)
+        }
+    }, [modalOpen, selectedApplicant])
+
+    useEffect(() => {
         setSaveApplicantObject({...selectedApplicant})
         for (let field in selectedApplicant) {
             if (field === 'additionalPersonalInfo') {
