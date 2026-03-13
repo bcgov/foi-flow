@@ -13,6 +13,7 @@ const ApplicantProfileModalActions = ({
   applicantHistory,
   isChangeToDifferentProfile,
   createProfile,
+  applicantProfileError,
 }) => {
   // Buttons
   const reassignProfileButton = (
@@ -78,19 +79,19 @@ const ApplicantProfileModalActions = ({
   );
 
   const confirmUpdateProfileButton = (
-    <button className={`btn-bottom btn-save btn`} onClick={updateProfile}>
+    <button className={`btn-bottom btn-save btn`} disabled={applicantProfileError} onClick={updateProfile}>
       Save Changes
     </button>
   );
 
   const createNewProfileButton = (
-    <button className={`btn-bottom btn-save btn`} onClick={createProfile}>
+    <button className={`btn-bottom btn-save btn`} disabled={applicantProfileError} onClick={createProfile}>
       Create New Profile
     </button>
   );
 
   const confirmCreateNewProfileButton = (
-    <button className={`btn-bottom btn-save btn`} onClick={createProfile}>
+    <button className={`btn-bottom btn-save btn`} disabled={applicantProfileError} onClick={createProfile}>
       Confirm New Profile
     </button>
   );
@@ -151,14 +152,7 @@ const ApplicantProfileModalActions = ({
       );
     }
   }
-//   return;
-  if (confirmationMessage) {
-    return (
-      <>
-        {backButton}
-      </>
-    );
-  }
+
   if (createConfirmation && isBeforeOpen(requestDetails)) {
     return <>{backButton}</>;
   }
