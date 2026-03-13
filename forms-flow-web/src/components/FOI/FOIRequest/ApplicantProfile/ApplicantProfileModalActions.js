@@ -85,7 +85,7 @@ const ApplicantProfileModalActions = ({
   );
 
   const createNewProfileButton = (
-    <button className={`btn-bottom btn-save btn`} disabled={applicantProfileError} onClick={createProfile}>
+    <button className={`btn-bottom btn-save btn`} onClick={createProfile}>
       Create New Profile
     </button>
   );
