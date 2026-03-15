@@ -1400,6 +1400,85 @@ class FOIRawRequest(db.Model):
             db.session.close()
         return linkedrequestsinfo
 
+    @classmethod
+    def get_linkedrequests(cls, requestid):
+        try:
+            sql = """
+            SELECT * 
+            FROM public."FOIRawRequests"
+            WHERE requestid = :requestid
+            ORDER BY version DESC
+            LIMIT 1;
+            """
+            params = {"requestid": requestid}
+            result = db.session.execute(text(sql), params).first()
+            linkedrequests  = result.linkedrequests
+            return linkedrequests if linkedrequests is not None else []
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+
+    @classmethod
+    def update_linkedrequests(cls, requestid, new_linkedrequests, user):
+        update_at = datetime.now().isoformat()
+        sql = """
+        UPDATE public."FOIRawRequests" AS foirawreq
+        SET 
+            linkedrequests = :new_linkedrequests,
+            requestrawdata = (
+            jsonb_set(
+                COALESCE(requestrawdata::jsonb, '{}'::jsonb),
+                '{linkedRequests}',
+                (:new_linkedrequests)::jsonb,
+                true
+            )
+            )::json,
+            updated_at = :update_at,
+            updatedby = :user
+        FROM (
+            SELECT DISTINCT ON (requestid) requestid, version
+            FROM public."FOIRawRequests"
+            WHERE requestid = :requestid
+            ORDER BY requestid, version DESC
+        ) AS latestfoirawreq
+        WHERE foirawreq.requestid = latestfoirawreq.requestid AND foirawreq.version = latestfoirawreq.version;
+        """
+        params = {"new_linkedrequests": new_linkedrequests, "update_at": update_at, "user": user, "requestid": requestid}
+        res = db.session.execute(text(sql), params)
+        return res
+    
+    @classmethod
+    def bulkupdate_linkedrequests(cls, linkedrequest_requestids, new_linkedrequest, new_linkedrequest_axisid, user):
+        try:
+            update_at = datetime.now().isoformat()
+            sql = """
+            UPDATE public."FOIRawRequests" AS foirawreq
+            SET 
+                linkedrequests = ((COALESCE(foirawreq.linkedrequests, '[]'::json))::jsonb || jsonb_build_array((:new_linkedrequest)::jsonb))::json,
+                requestrawdata = (jsonb_set((foirawreq.requestrawdata)::jsonb,'{linkedRequests}',COALESCE( (foirawreq.requestrawdata)::jsonb->'linkedRequests', '[]'::jsonb ) || jsonb_build_array((:new_linkedrequest)::jsonb),true))::json,
+                updated_at = :update_at,
+                updatedby = :user
+            FROM (
+                SELECT DISTINCT ON (requestid) requestid, version
+                FROM public."FOIRawRequests"
+                WHERE requestid IN :linkedrequest_requestids
+                ORDER BY requestid, version DESC
+            ) AS latestrawrequest
+            WHERE foirawreq.requestid = latestrawrequest.requestid
+                AND foirawreq.version = latestrawrequest.version
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM jsonb_array_elements((COALESCE(foirawreq.linkedrequests, '[]'::json))::jsonb) AS elem
+                    WHERE elem ? :new_linkedrequest_axisid
+                );
+            """
+            params = {"new_linkedrequest": new_linkedrequest, "update_at": update_at, "user": user  ,"linkedrequest_requestids": tuple(linkedrequest_requestids), "new_linkedrequest_axisid": new_linkedrequest_axisid}
+            res = db.session.execute(text(sql), params)
+            return res
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+
 
 class FOIRawRequestSchema(ma.Schema):
     class Meta:

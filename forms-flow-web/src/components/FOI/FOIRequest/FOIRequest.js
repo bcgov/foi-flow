@@ -1137,7 +1137,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const createSaveRequestObject = (name, value, value2) => {
     let requestObject = { ...saveRequestObject };
-    if (name !== "assignedTo" && name !== "isphasedrelease") {
+    if (name !== "assignedTo" && name !== "isphasedrelease" && name !== "linkedRequests") {
       setUnSavedRequest(
         name !== FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES
       );
@@ -1876,15 +1876,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           {requestDetails?.axisRequestId &&
                             <LinkedRequests
                               requestDetails={requestDetails}
-                              requestStatus={_requestStatus}
-                              handleRequestDetailsValue={handleRequestDetailsValue}
-                              handleRequestDetailsInitialValue={
-                                handleRequestDetailsInitialValue
-                              }
-                              createSaveRequestObject={createSaveRequestObject}
-                              disableInput={disableInput || isHistoricalRequest}
-                              isHistoricalRequest={isHistoricalRequest}
                               isMinistry={isMinistry}
+                              ministryId={ministryId}
+                              requestId={requestId}
+                              createSaveRequestObject={createSaveRequestObject}
                             />
                           }
                           {redactedSections &&
