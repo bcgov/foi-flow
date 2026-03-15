@@ -17,8 +17,8 @@ export const LinkedRequestsTable = ({
     linkedRequestsInfo,
     linkedRequests,
     renderReviewRequest,
-    handleRemoveLinkedRequest,
-    isMinistry
+    isMinistry,
+    handleOpenModal
 }) => {
     const [page, setPage] = useState(0);
     const MAX_ROWS_PER_PAGE = 7;
@@ -94,7 +94,7 @@ export const LinkedRequestsTable = ({
                                     type="button"
                                     className="btn btn-link text-danger"
                                     aria-label={`Remove linked request ${reqObj.axisrequestid}`}
-                                    onClick={() => handleRemoveLinkedRequest(reqObj)}
+                                    onClick={() => handleOpenModal(reqObj)}
                                 >
                                 <CancelIcon
                                     fontSize="small"

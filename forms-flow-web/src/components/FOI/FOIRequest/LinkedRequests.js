@@ -22,6 +22,7 @@ import {
 } from "@mui/material";
 import {getFOIMinistryLinkedRequestInfo, linkedRequestsLists, deleteLinkedRequest, saveLinkedRequests} from "../../../apiManager/services/FOI/foiRequestServices";
 import { LinkedRequestsTable } from "./LinkedRequestsTable";
+import { RemoveLinkedRequestModal } from "./RemoveLinkedRequestModal";
 
 const LinkedRequests = React.memo(
   ({
@@ -48,6 +49,8 @@ const LinkedRequests = React.memo(
     const [linkedRequests, setLinkedRequests] = useState(requestDetails?.linkedRequests)
     const [linkedRequestsInfo, setLinkedRequestsInfo] = useState(requestDetails?.linkedRequestsInfo)
     const [loading, setLoading] = useState(false);
+    const [removeModalOpen, setRemoveModalOpen] = useState(false);
+    const [linkedrequestToRemove, setLinkedRequestToRemove] = useState(null);
  
     const dispatch = useDispatch();
 
@@ -76,7 +79,7 @@ const LinkedRequests = React.memo(
       setSearchQuery("");
       setOptions([]);
     }
-
+    console.log("BOOM", linkedrequestToRemove)
     const handleRemoveLinkedRequest = (linkedrequestToRemove) => {
       try {
         const [updatedLinkedRequests, updatedLinkedInfoRequests]= removeLinkedRequest(linkedrequestToRemove);
@@ -273,6 +276,20 @@ const LinkedRequests = React.memo(
         console.log(error);
       }
     }
+    const handleOpenModal = (linkedRequest) => {
+      console.log("BANG", linkedRequest)
+      setLinkedRequestToRemove(linkedRequest);
+      setRemoveModalOpen(true);
+    }
+    const handleCloseModal = () => {
+      setLinkedRequestToRemove(null);
+      setRemoveModalOpen(false);
+    }
+    const handleModalSave = () => {
+      handleRemoveLinkedRequest(linkedrequestToRemove);
+      setLinkedRequestToRemove(null);
+      setRemoveModalOpen(false);
+    }
 
     return (
       <div className="request-accordian">
@@ -290,8 +307,8 @@ const LinkedRequests = React.memo(
                 linkedRequestsInfo={linkedRequestsInfo}
                 linkedRequests={linkedRequests}
                 renderReviewRequest={renderReviewRequest}
-                handleRemoveLinkedRequest={handleRemoveLinkedRequest}
                 isMinistry={isMinistry}
+                handleOpenModal={handleOpenModal}
               />
               <div style={{display:"flex", flexDirection: "row", justifyContent:"center", alignItems: "center"}}>
                 {!showSearch && (
@@ -389,13 +406,18 @@ const LinkedRequests = React.memo(
                   className={`btn-bottom btn-save btn`}
                   onClick={() => handleSaveLinkedRequests()}
                 >
-                  Link Requests
+                  Save Linked Requests
                 </button>
               </div>
             </div>
             <div className="row foi-details-row foi-details-row-break"></div>
           </AccordionDetails>
         </Accordion>
+        <RemoveLinkedRequestModal
+          modalOpen={removeModalOpen}
+          handleClose={handleCloseModal}
+          handleSave={handleModalSave}
+        />
       </div>
     );
   }
