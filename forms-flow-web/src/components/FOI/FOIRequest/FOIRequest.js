@@ -653,6 +653,16 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               newRequestDetails[field][infofield] =
                 requestApplicantProfile[field][infofield];
             }
+          } else if (field === "onbehalfofApplicant") { // When updating OBO from applicant profile modal
+            newRequestDetails["additionalPersonalInfo"] =
+              newRequestDetails["additionalPersonalInfo"] || {};
+            newRequestDetails["additionalPersonalInfo"]["anotherFirstName"] = requestApplicantProfile["onbehalfofApplicant"]["firstName"]
+            newRequestDetails["additionalPersonalInfo"]["anotherMiddleName"] = requestApplicantProfile["onbehalfofApplicant"]["middleName"]
+            newRequestDetails["additionalPersonalInfo"]["anotherLastName"] = requestApplicantProfile["onbehalfofApplicant"]["lastName"]
+            newRequestDetails["additionalPersonalInfo"]["anotherAlsoKnownAs"] = requestApplicantProfile["onbehalfofApplicant"]["alsoKnownAs"]
+            newRequestDetails["additionalPersonalInfo"]["anotherBirthDate"] = requestApplicantProfile["onbehalfofApplicant"]["birthDate"]
+
+            newRequestDetails["foiRequestOnBehalfOfApplicantID"] = requestApplicantProfile["onbehalfofApplicant"]["foiRequestOnBehalfOfApplicantID"]
           } else {
             newRequestDetails[field] = requestApplicantProfile[field];
           }
@@ -1822,15 +1832,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                                   setError={setPersonalRequestDetailErrors}
                                 />
                                 <OnBehalfOfDetails
-                                  additionalInfo={
-                                    requestDetails.additionalPersonalInfo
-                                  }
+                                  requestDetails={requestDetails}
                                   createSaveRequestObject={
                                     createSaveRequestObject
                                   }
-                                  disableInput={
-                                    disableInput || isHistoricalRequest
-                                  }
+                                  disableInput={true}
                                   setError={setPersonalRequestDetailErrors}
                                 />
                               </>

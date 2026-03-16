@@ -35,7 +35,7 @@ const ApplicantProfileModalActions = ({
     back: <Button onClick={back} variant="cancel">Back</Button>,
     confirmBack: <Button onClick={() => setConfirmationMessage(false)} variant="cancel">Back</Button>,
     updateProfile: <Button onClick={updateProfile} disabled={isSaveDisabled()}>Update Profile</Button>,
-    confirmUpdateProfile: <Button onClick={updateProfile} disabled={applicantProfileError}>Save Changes</Button>,
+    confirmUpdateProfile: <Button onClick={updateProfile} disabled={isSaveDisabled()}>Save Changes</Button>,
     createNewProfile: <Button onClick={createProfile}>Create New Profile</Button>,
     confirmCreateNewProfile: <Button onClick={createProfile} disabled={applicantProfileError}>Confirm New Profile</Button>,
     cancel: <Button onClick={cancel} variant="cancel">Cancel</Button>,
@@ -51,7 +51,7 @@ const ApplicantProfileModalActions = ({
     CHANGE: [!applicantHistory && Buttons.reassignProfile, Buttons.back],
     UPDATE_CONFIRM: [Buttons.confirmUpdateProfile, Buttons.confirmBack],
     SELECT_PROFILE: [!applicantHistory && Buttons.selectProfile, Buttons.back],
-    UPDATE_BEFORE_OPEN: [!applicantHistory && Buttons.updateProfile, Buttons.cancel],
+    UPDATE_BEFORE_OPEN: [!applicantHistory && Buttons.updateProfile, Buttons.createNewProfile, Buttons.cancel],
     DEFAULT: [
       !applicantHistory && Buttons.createNewProfile,
       !applicantHistory && Buttons.updateProfile,

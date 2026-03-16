@@ -284,7 +284,8 @@ const ApplicantProfileModalContent = ({
             handleApplicantDetailsValue={() => {}}
             disableInput={
               isChangeToDifferentProfile ||
-              !requestDetails?.foiRequestApplicantID
+              !requestDetails?.foiRequestApplicantID &&
+              !requestDetails?.foiRequestOnBehalfOfApplicantID
                 ? true
                 : false
             }
