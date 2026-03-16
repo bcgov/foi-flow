@@ -32,9 +32,7 @@ class linkedrequestservice:
         
     def bulk_add_linkedrequest(self, linkedrequest_a, new_linkedrequests, requestid, foiministryrequestid, user):
         try:
-            print("newlinkedrequests", new_linkedrequests)
             formatted_new_linkedrequests = [{linkedrequest["axisrequestid"]: linkedrequest["govcode"]} for linkedrequest in new_linkedrequests]
-            print("formatted", formatted_new_linkedrequests)
             current_linkedrequests = self.__get_current_linkedrequests(requestid, foiministryrequestid)
             if self.__valid_update(current_linkedrequests, formatted_new_linkedrequests):
                 if foiministryrequestid is not None:
@@ -42,10 +40,8 @@ class linkedrequestservice:
                 else:
                     FOIRawRequest().update_linkedrequests(requestid, json.dumps(formatted_new_linkedrequests), user)
                 # Create link between linkedrequest_a and all the requests in its associated linkedrequests array
-                print("SAVE BULK PARENT COMPLETED", linkedrequest_a)
                 self.__create_two_way_link(new_linkedrequests, linkedrequest_a, user)
                 db.session.commit()
-                print("LINK PROCESS COMPLETED")
             return DefaultMethodResult(True,'Linkedrequest data saved', 201, formatted_new_linkedrequests)
         except Exception as e:
             db.session.rollback()
@@ -57,10 +53,8 @@ class linkedrequestservice:
         new_linkedrequest_axisid = next(iter(new_linkedrequest))
         if len(foirawrequest_ids) > 0:
             FOIRawRequest().bulkupdate_linkedrequests(foirawrequest_ids, json.dumps(new_linkedrequest), new_linkedrequest_axisid, userid)
-            print("FOIRAW REQUEST CHILD LINK COMPLETED", foirawrequest_ids)
         if len(foiministryrequest_ids) > 0:
             FOIMinistryRequest().bulkupdate_linkedrequests(foiministryrequest_ids, json.dumps(new_linkedrequest), new_linkedrequest_axisid, userid)
-            print("FOIMINISTRY REQUEST CHILD LINK COMPLETED", foiministryrequest_ids)
 
     def remove_linkedrequest(self, linkedrequest_a, linkedrequest_b, user):
         try:
@@ -74,10 +68,8 @@ class linkedrequestservice:
                 else:
                     FOIRawRequest().update_linkedrequests(rawrequestid, json.dumps(updated_linkedrequests), user)
                 # Delink linkedrequest_a from linkedrequest_b
-                print("REMOVE PARENT COMPLETED", linkedrequest_a)
                 self.__remove_two_way_link(linkedrequest_a, linkedrequest_b, user)
                 db.session.commit()
-                print("DELINK PROCESS COMPLETED")
             return DefaultMethodResult(True,'Linkedrequest data updated', 201, updated_linkedrequests)
         except Exception as e:
             db.session.rollback()
@@ -91,13 +83,11 @@ class linkedrequestservice:
             updated_linkedrequests = self.__update_linkedrequest_list(linkedrequest_a, current_linkedrequests)
             if self.__valid_update(current_linkedrequests, updated_linkedrequests):
                 FOIMinistryRequest().update_linkedrequests(foiministryrequestid, json.dumps(updated_linkedrequests), user)
-                print("CHILD DELINK FOIMINISTRY COMPLETED", linkedrequest_b)
         else:
             current_linkedrequests = self.__get_current_linkedrequests(rawrequestid, None)
             updated_linkedrequests = self.__update_linkedrequest_list(linkedrequest_a, current_linkedrequests)
             if self.__valid_update(current_linkedrequests, updated_linkedrequests):
                 FOIRawRequest().update_linkedrequests(rawrequestid, json.dumps(updated_linkedrequests), user)
-                print("CHILD DELINK FOIRAW COMPLETED", linkedrequest_b)
 
     def __update_linkedrequest_list(self, linkedrequest_toremove, linkedrequests):
         # Remove linkedrequest_b from linkedrequest_a's array of linkedrequests if linkedrequest_b's axisrequestid exists as a key in the array
@@ -109,9 +99,6 @@ class linkedrequestservice:
     def __valid_update(self, current_linkedrequests, updated_linkedrequests):
         current_axisids = [axisid for linkedrequest in current_linkedrequests for axisid in linkedrequest.keys()]
         updated_axisids = [axisid for linkedrequest in updated_linkedrequests for axisid in linkedrequest.keys()]
-        print("VALIDATE")
-        print("CURR", current_axisids)
-        print("UPD", updated_axisids)
         if sorted(current_axisids) == sorted(updated_axisids):
             return False
         return True

@@ -79,7 +79,6 @@ const LinkedRequests = React.memo(
       setSearchQuery("");
       setOptions([]);
     }
-    console.log("BOOM", linkedrequestToRemove)
     const handleRemoveLinkedRequest = (linkedrequestToRemove) => {
       try {
         const [updatedLinkedRequests, updatedLinkedInfoRequests]= removeLinkedRequest(linkedrequestToRemove);
@@ -277,7 +276,6 @@ const LinkedRequests = React.memo(
       }
     }
     const handleOpenModal = (linkedRequest) => {
-      console.log("BANG", linkedRequest)
       setLinkedRequestToRemove(linkedRequest);
       setRemoveModalOpen(true);
     }

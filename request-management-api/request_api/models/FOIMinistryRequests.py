@@ -2000,7 +2000,6 @@ class FOIMinistryRequest(db.Model):
             """
             params = {"foiministryrequestid": foiministryrequestid}
             result = db.session.execute(text(sql), params).first()
-            print("result", result.linkedrequests)
             linkedrequests  = result.linkedrequests
             return linkedrequests if linkedrequests is not None else []
         except Exception as ex:

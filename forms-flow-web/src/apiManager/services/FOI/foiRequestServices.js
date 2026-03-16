@@ -720,7 +720,6 @@ export const saveLinkedRequests = (data, axisid, ...rest) => {
     httpPOSTRequest(apiUrl, data, UserService.getToken())
       .then((res) => {
         if (res.status === 201) {
-          console.log("RES" ,res)
           done(null, res.data);
         } else {
           console.error("API failed to update and remove linkedrequest:", res);
