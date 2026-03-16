@@ -59,9 +59,12 @@ class FOIRequestApplicant(db.Model):
     is_active = db.Column(db.Boolean)
 
     @classmethod
-    def from_request_data(cls, requestdata):
+    def from_request_data(cls, requestdata, is_new = False):
         applicant = FOIRequestApplicant()
-        applicant.applicantprofileid = requestdata.get("applicantprofileid", str(uuid.uuid4()))
+        if is_new:
+            applicant.applicantprofileid = str(uuid.uuid4())
+        else:
+            applicant.applicantprofileid = requestdata.get("applicantprofileid", str(uuid.uuid4()))
         applicant.firstname = requestdata.get("firstName")
         applicant.middlename = requestdata.get("middleName")
         applicant.lastname = requestdata.get("lastName")
@@ -95,24 +98,27 @@ class FOIRequestApplicant(db.Model):
         applicant.is_active = True
         return applicant
 
-    @classmethod
-    def child_from_additional_personal_info(cls, addlapplicantinfo, userid):
-        applicant = FOIRequestApplicant()
-        applicant.firstname = addlapplicantinfo.get("childFirstName", None)
-        applicant.middlename = addlapplicantinfo.get("childMiddleName", None)
-        applicant.lastname = addlapplicantinfo.get("childLastName", None)
-        alsoknownas = addlapplicantinfo.get("childAlsoKnownAs", None)
-        applicant.alsoknownas = alsoknownas if alsoknownas else None
-        dob = addlapplicantinfo.get("childBirthDate", None)
-        applicant.dob = datetime.fromisoformat(dob) if dob else None
-        applicant.businessname = None
-        applicant.createdby = userid
-        applicant.applicantprofileid = str(uuid.uuid4())
-        applicant.is_active = True
-        return applicant
+    # @classmethod
+    # def child_from_additional_personal_info(cls, addlapplicantinfo, is_new = False):
+    #     applicant = FOIRequestApplicant()
+    #     applicant.firstname = addlapplicantinfo.get("childFirstName", None)
+    #     applicant.middlename = addlapplicantinfo.get("childMiddleName", None)
+    #     applicant.lastname = addlapplicantinfo.get("childLastName", None)
+    #     alsoknownas = addlapplicantinfo.get("childAlsoKnownAs", None)
+    #     applicant.alsoknownas = alsoknownas if alsoknownas else None
+    #     dob = addlapplicantinfo.get("childBirthDate", None)
+    #     applicant.dob = datetime.fromisoformat(dob) if dob else None
+    #     applicant.businessname = None
+    #     if is_new:
+    #         applicant.applicantprofileid = str(uuid.uuid4())
+    #     else:
+    #         applicant.applicantprofileid = applicant.get("applicantprofileid", str(uuid.uuid4()))
+    #     applicant.is_active = True
+    #     return applicant
 
     @classmethod
-    def other_from_additional_personal_info(cls, addlapplicantinfo, userid):
+    def onbehalfof_from_applicantschema(cls, applicantschema, is_new = False):
+        addlapplicantinfo = applicantschema.get("additionalPersonalInfo", {})
         applicant = FOIRequestApplicant()
         applicant.firstname = addlapplicantinfo.get("anotherFirstName", None)
         applicant.middlename = addlapplicantinfo.get("anotherMiddleName", None)
@@ -122,8 +128,10 @@ class FOIRequestApplicant(db.Model):
         dob = addlapplicantinfo.get("anotherBirthDate", None)
         applicant.dob = datetime.fromisoformat(dob) if dob else None
         applicant.businessname = None
-        applicant.createdby = userid
-        applicant.applicantprofileid = str(uuid.uuid4())
+        if is_new:
+            applicant.applicantprofileid = str(uuid.uuid4())
+        else:
+            applicant.applicantprofileid = applicantschema.get("applicantprofileid", str(uuid.uuid4()))
         applicant.is_active = True
         return applicant
 
@@ -1038,7 +1046,17 @@ class FOIRequestApplicant(db.Model):
 
     # requests by applicant id
     @classmethod
-    def getapplicantrequests(cls, applicantid):
+    def getapplicantrequests(cls, applicantid, applicanttype = "all"):
+        primary_applicant_requests = FOIRequestApplicantMapping.requestortypeid == 1
+        onbehalfof_applicant_requests = FOIRequestApplicantMapping.requestortypeid == 2
+        all_applicant_requests = or_(primary_applicant_requests, onbehalfof_applicant_requests)
+        applicant_join_statement = all_applicant_requests
+
+        if applicanttype == "applicant":
+            applicant_join_statement = primary_applicant_requests
+        elif applicanttype == "onbehalfof":
+            applicant_join_statement = onbehalfof_applicant_requests
+
         from .FOIMinistryRequests import FOIMinistryRequest
 
         #for queue/dashboard
@@ -1085,7 +1103,7 @@ class FOIRequestApplicant(db.Model):
                             ).join(
                                 FOIRequestApplicantMapping,
                                 and_(
-                                    FOIRequestApplicantMapping.requestortypeid == 1,
+                                    applicant_join_statement,
                                     FOIRequestApplicantMapping.foirequestapplicantid == FOIRequestApplicant.foirequestapplicantid)
                             ).join(
                                 FOIRequest,

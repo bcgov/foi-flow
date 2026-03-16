@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {    
+const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose, applicantType = "applicant"}) => {
     const classes = useStyles();
 
     let requestDetails = useSelector((state) => state.foiRequests.foiRequestDetail);
@@ -36,6 +36,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const isAddRequest = window.location.href.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST) > -1;
     const isUnopenedRequest = requestDetails?.currentState == "Unopened"
 
+    const [applicantId, setApplicantId] = useState(requestDetails?.foiRequestApplicantID)
     const [isLoading, setIsLoading] = useState(true);
     const [rows, setRows] = useState([]);
     const [selectedApplicant, setSelectedApplicant] = useState(false)
@@ -52,9 +53,17 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const [applicantProfileError, setApplicantProfileError] = useState(false);
 
     useEffect(() => {
+        if (applicantType == "applicant") {
+            setApplicantId(requestDetails?.foiRequestApplicantID)
+        } else if (applicantType == "onbehalfof") {
+            setApplicantId(requestDetails?.foiRequestOnBehalfOfApplicantID)
+        }
+    }, [requestDetails])
+
+    useEffect(() => {
         if (modalOpen) {
             setIsLoading(true);
-            if (!requestDetails?.foiRequestApplicantID) {
+            if (!applicantId) {
                 dispatch(fetchPotentialApplicants(
                     requestDetails.firstName,
                     requestDetails.lastName,
@@ -66,7 +75,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                     }))
             } else {
                 setSelectedApplicant(true);
-                dispatch(fetchApplicantInfo(requestDetails.foiRequestApplicantID, (err, res) => {
+                dispatch(fetchApplicantInfo(applicantId, (err, res) => {
                     const {requestHistory, ...selectedApplicant} = res
                     setSelectedApplicant(selectedApplicant);
                     setRequestHistory(requestHistory)
@@ -74,12 +83,24 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                 }))
             }
         }
-    }, [modalOpen])
+    }, [modalOpen, requestDetails, applicantId])
 
     useEffect(() => {
         setCreateConfirmation(!selectedApplicant && requestDetails?.sourceOfSubmission == "onlineform")
         if (!selectedApplicant && requestDetails?.sourceOfSubmission == "onlineform") {
-            setSaveApplicantObject(requestDetails)
+            // If no applicant assigned, set applicant profile modal data to match existing request data
+            if (applicantType == "applicant") {
+                setSaveApplicantObject(requestDetails)
+            } else if (applicantType == "onbehalfof") {
+                let onbehalfofApplicantObj = {
+                    firstName: requestDetails?.additionalPersonalInfo?.anotherFirstName,
+                    lastName: requestDetails?.additionalPersonalInfo?.anotherLastName,
+                    middleName: requestDetails?.additionalPersonalInfo?.anotherMiddleName,
+                    birthDate: requestDetails?.additionalPersonalInfo?.anotherBirthDate,
+                    alsoKnownAs: requestDetails?.additionalPersonalInfo?.anotherAlsoKnownAs
+                }
+                setSaveApplicantObject(onbehalfofApplicantObj)
+            }
         }
     }, [modalOpen, selectedApplicant])
 
@@ -100,7 +121,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                 break;
             }
         }
-        if (requestDetails?.foiRequestApplicantID && requestDetails?.foiRequestApplicantID != selectedApplicant?.foiRequestApplicantID) {
+        if (applicantId != selectedApplicant?.foiRequestApplicantID) {
             setIsChangeToDifferentProfile(true)
         } else {
             setIsChangeToDifferentProfile(false)
@@ -139,12 +160,37 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const profilePayloadBuilder = () => {
         const payload = {
                 "requestType": isBeforeOpen(requestDetails) ? "rawrequest" : "foirequest",
+                "applicantType": applicantType,
                 "foiRequestId": requestDetails?.id,
                 "rawRequestId": requestDetails?.rawRequestId,
-                "previousRequestApplicantId": requestDetails?.foiRequestApplicantID,
+                "previousRequestApplicantId": applicantId,
                 "applicant": saveApplicantObject
             }
         return payload
+    }
+
+    const dispatchUpdatedApplicantInfo = (updatedApplicantId = null) => {
+        // This handles applicant info for onbehalfof fields
+        const onbehalfofApplicant = {
+            "onbehalfofApplicant": {
+                "firstName": saveApplicantObject.firstName,
+                "middleName": saveApplicantObject.middleName,
+                "lastName": saveApplicantObject.lastName,
+                "alsoKnownAs": saveApplicantObject.additionalPersonalInfo?.alsoKnownAs,
+                "birthDate": saveApplicantObject.additionalPersonalInfo?.birthDate,
+                "foiRequestOnBehalfOfApplicantID": updatedApplicantId
+            }
+        }
+        // This handles applicant info for updated primary applicants
+        let updatedApplicantInfo = {...saveApplicantObject}
+        if (updatedApplicantId) {
+            updatedApplicantInfo = {...updatedApplicantInfo, foiRequestApplicantID: updatedApplicantId}
+        }
+        if (applicantType == "applicant") {
+            dispatch(setFOIRequestApplicantProfile(updatedApplicantInfo));
+        } else if (applicantType == "onbehalfof") {
+            dispatch(setFOIRequestApplicantProfile(onbehalfofApplicant));
+        }
     }
 
     const executeProfileAction = (actionHandler, options = { shouldClear: false }) => {
@@ -157,7 +203,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
                 if (shouldClear) {
                     dispatch(setFOIRequestApplicantProfile({}));
                 } else {
-                    dispatch(setFOIRequestApplicantProfile({...saveApplicantObject, foiRequestApplicantID: res.id}));
+                    dispatchUpdatedApplicantInfo(res.id);
                 }
             }
         }));
@@ -175,7 +221,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const updateProfile = () => {
         if (_.isEqual(selectedApplicant, saveApplicantObject) && !isChangeToDifferentProfile) {
             handleClose();
-            dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
+            // dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
             return;
         }
         if (!confirmationMessage) {
@@ -188,12 +234,12 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const reassignProfileToRequest = () => {
         if (isAddRequest || isUnopenedRequest) {
             handleClose();
-            dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
+            dispatchUpdatedApplicantInfo(selectedApplicant.foiRequestApplicantID);
             return;
         }
         if (!isChangeToDifferentProfile) {
             handleClose();
-            dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
+            // dispatch(setFOIRequestApplicantProfile(saveApplicantObject));
             return;
         }
         if (!confirmationMessage) {
@@ -218,9 +264,9 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
             setCreateConfirmation(false)
         } else if (!isBeforeOpen(requestDetails)) {
             handleClose();
-        } else if (requestDetails?.foiRequestApplicantID) {
+        } else if (applicantId) {
             // handleClose();
-            dispatch(fetchApplicantInfo(requestDetails.foiRequestApplicantID, (err, res) => {
+            dispatch(fetchApplicantInfo(applicantId, (err, res) => {
                     const {requestHistory, ...selectedApplicant} = res
                     setSelectedApplicant(selectedApplicant);
                     setRequestHistory(requestHistory)
@@ -244,7 +290,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     }
 
     const isSaveDisabled = () => {
-        if (isBeforeOpen(requestDetails) && !requestDetails?.foiRequestApplicantID) {
+        if (isBeforeOpen(requestDetails) && !applicantId) {
             return false
         } else {
             if (isChangeToDifferentProfile) return false
@@ -255,12 +301,12 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose}) => {
     const warning = (field) => {
         const hasAtributes = Object.keys(saveApplicantObject).length !== 0
         if (hasAtributes && [FOI_COMPONENT_CONSTANTS.DOB, FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER, FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS].includes(field)) {
-            if (!requestDetails.additionalPersonalInfo?.[field] && saveApplicantObject?.additionalPersonalInfo[field]) return true;
-            return requestDetails.additionalPersonalInfo?.[field] && requestDetails.additionalPersonalInfo[field] !== saveApplicantObject?.additionalPersonalInfo[field]
+            if (!requestDetails?.additionalPersonalInfo?.[field] && saveApplicantObject?.additionalPersonalInfo?.[field]) return true;
+            return requestDetails?.additionalPersonalInfo?.[field] && requestDetails?.additionalPersonalInfo?.[field] !== saveApplicantObject?.additionalPersonalInfo?.[field]
         } else if (field == "otherNotes") {
             return selectedApplicant?.[field] != saveApplicantObject?.[field]
         } else {
-            return requestDetails[field] != saveApplicantObject?.[field]
+            return requestDetails?.[field] != saveApplicantObject?.[field]
         }
     }
 
