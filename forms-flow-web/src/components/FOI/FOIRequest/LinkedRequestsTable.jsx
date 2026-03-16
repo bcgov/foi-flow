@@ -110,7 +110,7 @@ export const LinkedRequestsTable = ({
             </TableContainer>
             <TablePagination
                 component="div"
-                count={linkedRequests?.length}
+                count={linkedRequestsInfo?.length}
                 rowsPerPage={MAX_ROWS_PER_PAGE}
                 rowsPerPageOptions={[]}
                 page={page}
