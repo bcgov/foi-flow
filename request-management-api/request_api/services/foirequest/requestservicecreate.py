@@ -139,60 +139,33 @@ class requestservicecreate:
         foirequestschema['foiRequestApplicantID'] = applicant.get('foirequestapplicantid', 0) # temporary for axis sync, remove after axis decommissioned
         # if foirequestschema.get('foiRequestApplicantID') is None and foirequestschema.get('requeststatusid') == 1:
         if foirequestschema.get('foiRequestApplicantID', 0) > 0:
-            applicant = FOIRequestApplicant.updateapplicantprofile( # temporary for axis sync, remove after axis decommissioned
-                foirequestschema['foiRequestApplicantID'],
-                foirequestschema['firstName'],
-                foirequestschema['lastName'],
-                foirequestschema.get("middleName"),
-                foirequestschema.get("businessName"),
-                selfalsoknownas,
-                selfdob,
-                foirequestschema.get('axisapplicantid', None),
-                userid
-            )
-            # applicant = FOIRequestApplicant().getlatestprofilebyapplicantid(foirequestschema['foiRequestApplicantID']) comment back in after axis decommission
+            foirequestapplicantid = foirequestschema.get('foiRequestApplicantID', 0)
             requestapplicant = FOIRequestApplicantMapping()
-            requestapplicant.foirequestapplicantid = applicant.identifier # = applicant['foirequestapplicantid'] comment back in after axis decommission            
+            requestapplicant.foirequestapplicantid = foirequestapplicantid # = applicant['foirequestapplicantid'] comment back in after axis decommission
             requestapplicant.requestortypeid = RequestorType().getrequestortype("Self")["requestortypeid"]
             requestapplicantarr.append(requestapplicant)
         else:
-            requestapplicantarr.append(
-                requestservicebuilder().createapplicant(foirequestschema.get("firstName"),
-                                            foirequestschema.get("lastName"),
-                                            "Self",
-                                            userid,
-                                            foirequestschema.get("middleName"),
-                                            foirequestschema.get("businessName"),
-                                            selfalsoknownas,
-                                            selfdob,
-                                            foirequestschema.get('axisapplicantid', None),)
-                )
-                 
-        #Prepare additional applicants
-        if foirequestschema.get("additionalPersonalInfo") is not None:
-            addlapplicantinfo = foirequestschema.get("additionalPersonalInfo")
-            if requestservicebuilder().isNotBlankorNone(foirequestschema,"childFirstName","additionalPersonalInfo"):
-                requestapplicantarr.append(
-                    requestservicebuilder().createapplicant(self.__getkeyvalue(addlapplicantinfo,"childFirstName") ,
-                                           self.__getkeyvalue(addlapplicantinfo,"childLastName"),
-                                           "Applying for a child under 12",
-                                           userid,
-                                           self.__getkeyvalue(addlapplicantinfo,"childMiddleName") ,                                            
-                                           None,
-                                           self.__getkeyvalue(addlapplicantinfo,"childAlsoKnownAs") ,
-                                           self.__getkeyvalue(addlapplicantinfo,"childBirthDate"))
-                    )
-            if requestservicebuilder().isNotBlankorNone(foirequestschema,"anotherFirstName","additionalPersonalInfo"):
-                requestapplicantarr.append(
-                    requestservicebuilder().createapplicant(self.__getkeyvalue(addlapplicantinfo,"anotherFirstName") ,
-                                           self.__getkeyvalue(addlapplicantinfo,"anotherLastName") ,
-                                           "Applying for other person",
-                                           userid,
-                                           self.__getkeyvalue(addlapplicantinfo,"anotherMiddleName") ,                                            
-                                           None,
-                                           self.__getkeyvalue(addlapplicantinfo,"anotherAlsoKnownAs"),
-                                           self.__getkeyvalue(addlapplicantinfo,"anotherBirthDate")  )
-                    )
+            # This is a fallback - all raw requests should have foiRequestApplicantID set
+            newapplicant = FOIRequestApplicant().from_request_data(foirequestschema)
+            save_result = FOIRequestApplicant().save_instance(newapplicant, userid)
+            requestapplicant = FOIRequestApplicantMapping()
+            requestapplicant.foirequestapplicantid = save_result.identifier # = applicant['foirequestapplicantid'] comment back in after axis decommission
+            requestapplicant.requestortypeid = RequestorType().getrequestortype("Self")["requestortypeid"]
+            requestapplicantarr.append(requestapplicant)
+
+        if foirequestschema.get("foiRequestOnBehalfOfApplicantID"):
+            requestapplicant = FOIRequestApplicantMapping()
+            requestapplicant.foirequestapplicantid = foirequestschema.get("foiRequestOnBehalfOfApplicantID")
+            requestapplicant.requestortypeid = RequestorType().getrequestortype("Applying for other person")["requestortypeid"]
+            requestapplicantarr.append(requestapplicant)
+        elif requestservicebuilder().isNotBlankorNone(foirequestschema,"anotherFirstName","additionalPersonalInfo"):
+            onbehalfofapplicant = FOIRequestApplicant().onbehalfof_from_applicantschema(foirequestschema, is_new=True)
+            save_result = FOIRequestApplicant().save_instance(onbehalfofapplicant, userid)
+            requestapplicant = FOIRequestApplicantMapping()
+            requestapplicant.foirequestapplicantid = save_result.identifier
+            requestapplicant.requestortypeid = RequestorType().getrequestortype("Applying for other person")["requestortypeid"]
+            requestapplicantarr.append(requestapplicant)
+
         return requestapplicantarr
 
     def __getapplicant(self, axisapplicantid, foirequestapplicantid):
