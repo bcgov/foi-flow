@@ -128,3 +128,9 @@ class openinfoservice:
             deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
         if result and deactivateresult:
             return result
+    
+    def getopeninforequestforpublishing(self, foiministryrequestid):
+       return FOIOpenInformationRequests().getopeninforequestforpublishing(foiministryrequestid)
+    
+    def getopeninforequestforunpublishing(self, foiministryrequestid):
+       return FOIOpenInformationRequests().getopeninforequestforunpublishing(foiministryrequestid)
