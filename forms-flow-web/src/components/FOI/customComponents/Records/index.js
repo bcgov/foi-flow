@@ -133,10 +133,30 @@ import RequestHeaderRow from '../RequestHeaderRow';
 
 
 const useStyles = makeStyles((_theme) => ({
-  createButton: {
+  standardButton: {
     margin: 0,
-    width: "100%",
-    minWidth: "100px",
+    width: "150px",
+    minWidth: "150px",
+    backgroundColor: "#38598A",
+    color: "#FFFFFF",
+    fontFamily: " BCSans-Bold, sans-serif !important",
+    fontWeight: "bold",
+    textTransform: "none",
+    borderRadius: "5px",
+    "&:hover": {
+      backgroundColor: "#38598A",
+    },
+    "&:active": {
+      backgroundColor: "#38598A",
+    },
+    "&.Mui-focusVisible": {
+      backgroundColor: "#38598A",
+    },
+  },
+  uploadButton: {
+    margin: 0,
+    width: "210px",
+    minWidth: "210px",
     backgroundColor: "#38598A",
     color: "#FFFFFF",
     fontFamily: " BCSans-Bold, sans-serif !important",
@@ -1147,7 +1167,7 @@ export const RecordsLog = ({
     let extension = path.slice(extIndex)
     if (extension?.toLowerCase() != ".pdf" || isIncompatible)
       return path;
-    console.log("ORIGINAL path:", path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex))
+    //console.log("ORIGINAL path:", path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex))
     return path.slice(0, extIndex) + "ORIGINAL" + path.slice(extIndex);
   }
 
@@ -1640,7 +1660,6 @@ export const RecordsLog = ({
   };
 
   const retrieveRecordVersion = (action, record) => {
-    console.log("-->", Object.keys(record).length)
     let selectedRecords = []
     if (Object.keys(record).length === 0)
       selectedRecords = records.filter((record) => record.isselected);
@@ -2628,11 +2647,11 @@ export const RecordsLog = ({
           <Grid
             container
             direction="row"
-            justify={isProactiveDisclosure ? "flex-end" : "flex-start"}
-            alignItems="flex-start"
+            justify="space-between"
+            alignItems="center"
             spacing={1}
           >
-            <Grid item xs={12}>
+            <Grid item xs>
               <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure}
                 proactiveDisclosureCategory={requestDetails?.proactiveDisclosureCategory} />
             </Grid>
@@ -2641,13 +2660,13 @@ export const RecordsLog = ({
                 container
                 item
                 direction="row"
-                justifyContent="flex-end"
-                alignItems="flex-start"
-                xs={12}
+                justify="flex-end"
+                alignItems="center"
+                xs="auto"
                 spacing={1}
               >
                 {validLockRecordsState() && (
-                  <Grid item xs={isScanningTeamMember ? 3 : 2}>
+                  <Grid item xs="auto">
                     <Tooltip
                       enterDelay={1000}
                       title={isMinistryCoordinator ? "Only the IAO analyst can manually lock or unlock the records log, please contact the assigned analyst for assistance" : "Manually unlock or lock the records log"}
@@ -2661,7 +2680,7 @@ export const RecordsLog = ({
                           <button
                             disabled={isMinistryCoordinator}
                             onClick={handleLockRecords}
-                            className={clsx("btn", classes.createButton)}
+                            className={clsx("btn", classes.standardButton)}
                           >
                             {lockRecords ? "Unlock Records" : "Lock Records"}
                           </button>
@@ -2671,14 +2690,15 @@ export const RecordsLog = ({
                   </Grid>
                 )}
                 {isMinistryCoordinator == false && records?.length > 0 && DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
-                  <Grid item xs={2}>
+                  <Grid item xs="auto">
                     <RedactRecordsButton records={records} groups={groups} ministryrequestid={ministryId} />
                   </Grid>
                 )}
-                <Grid item xs={isMinistryCoordinator ? 3 : 2}>
+                <Grid item xs="auto">
                   {hasDocumentsToDownload && !isHistoricalRequest && (
                     <TextField
                       className="download-dropdown custom-select-wrapper foi-download-button"
+                      style={{ minWidth: '380px' }}
                       id="download"
                       label={currentDownload === 0 ? "Download" : ""}
                       inputProps={{ "aria-labelledby": "download-label" }}
@@ -2729,10 +2749,10 @@ export const RecordsLog = ({
                     </TextField>
                   )}
                 </Grid>
-                <Grid item xs={isMinistryCoordinator ? 3 : 2}>
+                <Grid item xs="auto">
                   {!isHistoricalRequest && (
                     <button
-                      className={clsx("btn", "addAttachment", classes.createButton)}
+                      className={clsx("btn", "addAttachment", classes.uploadButton)}
                       variant="contained"
                       onClick={addAttachments}
                       color="primary"
@@ -2748,13 +2768,13 @@ export const RecordsLog = ({
                 container
                 item
                 direction="row"
-                justifyContent="flex-end"
-                alignItems="flex-start"
-                xs={12}
+                justify="flex-end"
+                alignItems="center"
+                xs="auto"
                 spacing={1}
               >
                 {validLockRecordsState() ? (
-                  <Grid item xs={3}>
+                  <Grid item xs="auto">
                     <Tooltip
                       enterDelay={1000}
                       title={isMinistryCoordinator ? "Only the IAO analyst can manually lock or unlock the records log, please contact the assigned analyst for assistance" : "Manually unlock or lock the records log"}
@@ -2768,7 +2788,7 @@ export const RecordsLog = ({
                           <button
                             disabled={isMinistryCoordinator}
                             onClick={handleLockRecords}
-                            className={clsx("btn", classes.createButton)}
+                            className={clsx("btn", classes.standardButton)}
                           >
                             {lockRecords ? "Unlock Records" : "Lock Records"}
                           </button>
@@ -2777,17 +2797,18 @@ export const RecordsLog = ({
                     </Tooltip>
                   </Grid>
                 ) : (
-                  <Grid item xs={3}></Grid>
+                  <Grid item xs="auto"></Grid>
                 )}
                 {isMinistryCoordinator == false && records?.length > 0 && DISABLE_REDACT_WEBLINK?.toLowerCase() == "false" && (
-                  <Grid item xs={3}>
+                  <Grid item xs="auto">
                     <RedactRecordsButton records={records} groups={groups} ministryrequestid={ministryId} />
                   </Grid>
                 )}
-                <Grid item xs={3}>
+                <Grid item xs="auto">
                   {hasDocumentsToDownload && !isHistoricalRequest && (
                     <TextField
                       className="download-dropdown custom-select-wrapper foi-download-button"
+                      style={{ minWidth: '380px' }}
                       id="download"
                       label={currentDownload === 0 ? "Download" : ""}
                       inputProps={{ "aria-labelledby": "download-label" }}
@@ -2838,10 +2859,10 @@ export const RecordsLog = ({
                     </TextField>
                   )}
                 </Grid>
-                <Grid item xs={3}>
+                <Grid item xs="auto">
                   {!isHistoricalRequest && (
                     <button
-                      className={clsx("btn", "addAttachment", classes.createButton)}
+                      className={clsx("btn", "addAttachment", classes.uploadButton)}
                       variant="contained"
                       onClick={addAttachments}
                       color="primary"

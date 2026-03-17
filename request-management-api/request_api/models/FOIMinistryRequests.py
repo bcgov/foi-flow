@@ -257,7 +257,8 @@ class FOIMinistryRequest(db.Model):
         return [r._asdict() for r in query]
     
     @classmethod
-    def getopenrequestsbyapplicantid(cls,applicantid):
+    def getopenrequestsbyapplicantid(cls,applicantid, applicanttype = "applicant"):
+        requestortypeid = RequestorType[applicanttype].value
         _session = db.session
 
         selectedcolumns = [FOIMinistryRequest.foirequest_id, FOIMinistryRequest.foiministryrequestid]
@@ -287,7 +288,7 @@ class FOIMinistryRequest(db.Model):
                                 and_(
                                     FOIRequestApplicantMapping.foirequestapplicantid == FOIRequestApplicant.foirequestapplicantid,
                                     FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id,
-                                    FOIRequestApplicantMapping.requestortypeid == RequestorType['applicant'].value)
+                                    FOIRequestApplicantMapping.requestortypeid == requestortypeid)
                             ).join(
                                 subquery_ministry_maxversion,
                                 and_(*joincondition_ministry)
@@ -1936,7 +1937,6 @@ class FOIMinistryRequest(db.Model):
             )
         elif additionalfilter is not None and additionalfilter.lower() == 'all':
             basequery = basequery.filter(FOIMinistryRequest.assignedto != None)
-        #print("\n\n\n" + str(basequery.statement))
         return basequery
 
 

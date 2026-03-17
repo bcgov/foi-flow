@@ -26,7 +26,6 @@ class requestservicebuilder(requestserviceconfigurator):
     """
 
     def createministry(self, requestschema, ministry, activeversion, userid, filenumber=None, ministryid=None):
-        #print("\n-------requestschema-",requestschema)
         programareaiaocode = self.getprogramareaiaocodebyid(self.getvalueof("programArea",ministry["code"]))
         axisrequestid = requestschema.get("axisRequestId", FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("requestType"), requestschema.get("isconsultflag")))
         current_foiministryrequest = FOIMinistryRequest.getrequest(ministryid)
@@ -51,6 +50,7 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.estimatedtaggedpagecount = requestschema.get("estimatedtaggedpagecount")
         if requestschema.get("isoipcreview") is not None and requestschema.get("isoipcreview")  != "":
             foiministryrequest.isoipcreview = requestschema.get("isoipcreview")
+            foiministryrequest.oipcreviews = self.prepareoipc(requestschema, ministryid, activeversion, userid)
         if requestschema.get("isphasedrelease") is not None and requestschema.get("isphasedrelease")  != "":
             foiministryrequest.isphasedrelease = requestschema.get("isphasedrelease")
         if requestschema.get("isconsultflag") is not None and requestschema.get("isconsultflag")  != "":
@@ -81,7 +81,6 @@ class requestservicebuilder(requestserviceconfigurator):
             foiministryrequest.duedate = requestschema.get("cfrDueDate")
             foiministryrequest.proactivedisclosures = self._prepareproactivedisclosuredetails(requestschema, userid, ministryid, activeversion)
 
-        #print("foiministryrequest-proactivedisclosures",foiministryrequest.proactivedisclosures)
         if ministryid is not None:
             foiministryrequest.foiministryrequestid = ministryid
             activeversion = FOIMinistryRequest.getversionforrequest(ministryid)[0]+1
@@ -180,9 +179,9 @@ class requestservicebuilder(requestserviceconfigurator):
               contactinformation.contacttypeid =contacttype["contacttypeid"]              
         return contactinformation
     
-    def createapplicant(self,firstname, lastname, appltcategory, userid, middlename = None, businessname = None, alsoknownas = None, dob = None, axisapplicantid = None):
+    def createapplicant(self,firstname, lastname, appltcategory, userid, middlename = None, businessname = None, alsoknownas = None, dob = None, other_notes = None, axisapplicantid = None):
         requestapplicant = FOIRequestApplicantMapping()
-        _applicant = FOIRequestApplicant().createapplicant(firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid, userid)
+        _applicant = FOIRequestApplicant().createapplicant(firstname, lastname, middlename, businessname, alsoknownas, dob, axisapplicantid, other_notes, userid)
         requestapplicant.foirequestapplicantid = _applicant.identifier
         if appltcategory is not None:           
             requestertype = RequestorType().getrequestortype(appltcategory)  
@@ -223,7 +222,6 @@ class requestservicebuilder(requestserviceconfigurator):
                 oipcreview.createdby=userid
                 oipcreview.created_at= datetime2.now().isoformat()
                 oipcarr.append(oipcreview)
-            #print("\noipcarr",oipcarr)
         return oipcarr
         
     

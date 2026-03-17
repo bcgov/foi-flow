@@ -396,7 +396,11 @@ export const checkValidationError = (
         ?.toLowerCase()
         ?.includes("select") ||
       !requiredProactiveDetailsValues.requestStartDate ||
-
+      !requiredProactiveDetailsValues.reportPeriod ||
+      requiredProactiveDetailsValues.reportPeriod
+        ?.toLowerCase()
+        ?.includes("select") ||
+      !requiredProactiveDetailsValues.cfrDueDate ||
       !requiredProactiveDetailsValues.publicationDate ||
       requiredRequestDescriptionValues.description === "" ||
       assignedToValue.toLowerCase().includes("unassigned") ||
@@ -444,7 +448,7 @@ export const checkValidationError = (
     !requiredRequestDetailsValues.receivedDate ||
     !requiredRequestDetailsValues.requestStartDate ||
     !requiredRequestDetailsValues.dueDate ||
-    ("recordsDueDate" in requiredRequestDetailsValues  && !requiredRequestDetailsValues.recordsDueDate) ||
+    ("recordsDueDate" in requiredRequestDetailsValues && !requiredRequestDetailsValues.recordsDueDate) ||
     // !requiredAxisDetails.axisRequestId ||
     (Object.values(personalRequestDetailsErrors).some(personalReqestError => personalReqestError)) ||
     (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
@@ -588,4 +592,10 @@ export const isReadyForPublishing = (openinfo, additionalfiles) => {
     openinfo?.copyrightsevered === null ||
     !additionalfiles?.some((f) => responseLetterRegex.test(f.filename))
   );
+};
+
+export const getIsAddRequest = () => {
+  const url = window.location.href;
+  const urlIndexCreateRequest = url.indexOf(FOI_COMPONENT_CONSTANTS.ADDREQUEST);
+  return urlIndexCreateRequest > -1;
 };

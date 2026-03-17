@@ -1551,13 +1551,6 @@ export const ContactApplicant = ({
   ))
 
 
-
-  function onExportClick(output: string) {
-    console.log("Output: ", output);
-  }
-
-
-
   let templatesList;
   const parser = new DOMParser();
   let templateListItems = templates.map((template: any, index: any) => {
@@ -1612,7 +1605,8 @@ export const ContactApplicant = ({
           <RequestHeaderRow headerText={getRequestNumber(isProactiveDisclosure)} isProactiveDisclosure={isProactiveDisclosure}
           proactiveDisclosureCategory={requestDetails?.proactiveDisclosureCategory} />
         </Grid>
-        <Grid container xs={isProactiveDisclosure ? 12 : 6} direction="row" justifyContent='flex-end'>
+        <Grid container xs={isProactiveDisclosure ? 12 : 6} direction="row" justifyContent='flex-end'
+          style={{ paddingRight: '5px', paddingTop: '15px' }}>
           <ConditionalComponent condition={correspondenceFilter === "log"}>
             <button
               className="btn exportAllButton"
