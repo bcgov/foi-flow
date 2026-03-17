@@ -1,3 +1,4 @@
+from sqlalchemy import UniqueConstraint
 
 from .db import db
 
@@ -18,6 +19,10 @@ class FOIRequestRecordGroups(db.Model):
         db.Integer,
         db.ForeignKey("FOIRequestRecords.recordid", ondelete="CASCADE"),
         primary_key=True
+    )
+
+    __table_args__ = (
+        UniqueConstraint("record_id", name="uq_foirequestrecordgroups_record_id"),
     )
 
     def __repr__(self) -> str:
@@ -62,8 +67,10 @@ class FOIRequestRecordGroups(db.Model):
         if not record_ids:
             return
 
-        rows = [{"document_set_id": document_set_id, "record_id": rid}
-                for rid in record_ids]
+        rows = [
+            {"document_set_id": document_set_id, "record_id": rid}
+            for rid in sorted(set(record_ids))
+        ]
 
         db.session.execute(cls.__table__.insert(), rows)
 
