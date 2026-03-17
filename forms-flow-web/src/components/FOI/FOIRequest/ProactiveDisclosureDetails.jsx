@@ -90,9 +90,9 @@ const ProactiveDisclosureDetails = React.memo(
     const categoryTypes = useSelector(
       (state) => state.foiRequests.foiProactiveDisclosureCategoryList || []
     );
-    const reportPeriods = useSelector(
-      (state) => state.foiRequests.foiReportPeriodList || []
-    );
+    // const reportPeriods = useSelector(
+    //   (state) => state.foiRequests.foiReportPeriodList || []
+    // );
 
     useEffect(() => {
       dispatch(fetchFOIProactiveDisclosureCategoryList());
@@ -111,9 +111,9 @@ const ProactiveDisclosureDetails = React.memo(
           return request.startDate ? formatDate(request.startDate) : "";
         case "cfrDueDate":
           return request.cfrDueDate || "";
-        case "publicationDate":
-          return request.publicationDate
-            ? formatDate(request.publicationDate)
+        case "earliestEligiblePublicationDate":
+          return request.earliestEligiblePublicationDate
+            ? formatDate(request.earliestEligiblePublicationDate)
             : "";
         default:
           return "";
@@ -157,9 +157,9 @@ const ProactiveDisclosureDetails = React.memo(
         ? formatDate(requestDetails.requestProcessStart)
         : validateField(requestDetails, "startDate");
       const initialCfrDueDate = validateField(requestDetails, "cfrDueDate");
-      const initialPublicationDate = validateField(
+      const initialEarliestPublicationDate = validateField(
         requestDetails,
-        "publicationDate"
+        "earliestEligiblePublicationDate"
       );
 
       //setSelectedRequestType(initialRequestType);
@@ -167,14 +167,14 @@ const ProactiveDisclosureDetails = React.memo(
       setSelectedReportPeriod(initialReportPeriod);
       setStartDate(initialStartDate);
       setCfrDueDate(initialCfrDueDate);
-      setPublicationDate(initialPublicationDate);
+      setEarliestEligiblePublicationDate(initialEarliestPublicationDate);
 
       const disclosureDetailsObject = {
         proactiveDisclosureCategory: initialCategoryType,
         reportPeriod: initialReportPeriod,
         requestStartDate: initialStartDate,
         cfrDueDate: initialCfrDueDate,
-        publicationDate: initialPublicationDate,
+        earliestEligiblePublicationDate: initialEarliestPublicationDate,
       };
 
       handleProactiveDetailsInitialValue?.(disclosureDetailsObject);
@@ -205,7 +205,7 @@ const ProactiveDisclosureDetails = React.memo(
     );
     const [startDate, setStartDate] = useState("");
     const [cfrDueDate, setCfrDueDate] = useState("");
-    const [publicationDate, setPublicationDate] = useState("");
+    const [earliestEligiblePublicationDate, setEarliestEligiblePublicationDate] = useState("");
 
     const [anchorEl, setAnchorEl] = useState(null);
     const [tabValue, setTabValue] = useState(0);
@@ -213,7 +213,7 @@ const ProactiveDisclosureDetails = React.memo(
     const handleReportPeriodClick = (event) => {
       if (disableInput) return;
       setAnchorEl(event.currentTarget);
-      const isQuarter = selectedReportPeriod && selectedReportPeriod.toLowerCase().includes("quarter");
+      const isQuarter = selectedReportPeriod?.toLowerCase().includes("quarter");
       const isYearly = selectedReportPeriod && (/^\d{4}$/.test(selectedReportPeriod));
       let initialTab = 0;
       if (isQuarter) initialTab = 1;
@@ -284,11 +284,11 @@ const ProactiveDisclosureDetails = React.memo(
       createSaveRequestObject?.(FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, value);
     };
 
-    const handlePublicationDateChange = (e) => {
+    const handleEarliestPublicationDateChange = (e) => {
       const value = e.target.value;
-      setPublicationDate(value);
-      handleProactiveDetailsValue?.(value, "publicationDate");
-      createSaveRequestObject?.("publicationDate", value);
+      setEarliestEligiblePublicationDate(value);
+      handleProactiveDetailsValue?.(value, "earliestEligiblePublicationDate");
+      createSaveRequestObject?.("earliestEligiblePublicationDate", value);
     };
 
     const requestTypeMenuItems = requestTypes.map((item) => (
@@ -492,20 +492,20 @@ const ProactiveDisclosureDetails = React.memo(
                   />
 
                   <TextField
-                    id="publicationDate"
+                    id="earliestEligiblePublicationDate"
                     label="Publication Date"
                     type="date"
-                    value={publicationDate}
-                    onChange={handlePublicationDateChange}
+                    value={earliestEligiblePublicationDate}
+                    onChange={handleEarliestPublicationDateChange}
                     inputProps={{
-                      "aria-labelledby": "publicationDate-label",
+                      "aria-labelledby": "earliestEligiblePublicationDate-label",
                       // max: formatDate(new Date()),
                     }}
                     InputLabelProps={{ shrink: true }}
                     variant="outlined"
                     fullWidth
                     disabled={disableInput}
-                    error={publicationDate == undefined || publicationDate === ""}
+                    error={earliestEligiblePublicationDate == undefined || earliestEligiblePublicationDate === ""}
                     required
                   />
                 </div>

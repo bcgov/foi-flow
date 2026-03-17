@@ -13,7 +13,7 @@ from request_api.models.FOIRequestOIPC import FOIRequestOIPC
 from request_api.models.FOIRawRequests import FOIRawRequest
 
 from datetime import datetime as datetime2
-from request_api.utils.enums import MinistryTeamWithKeycloackGroup, StateName
+from request_api.utils.enums import MinistryTeamWithKeycloackGroup, StateName, RequestType
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
 from request_api.services.foirequest.requestserviceministrybuilder import requestserviceministrybuilder
 from request_api.services.openinfoservice import openinfoservice
@@ -27,7 +27,10 @@ class requestservicebuilder(requestserviceconfigurator):
 
     def createministry(self, requestschema, ministry, activeversion, userid, filenumber=None, ministryid=None):
         programareaiaocode = self.getprogramareaiaocodebyid(self.getvalueof("programArea",ministry["code"]))
-        axisrequestid = requestschema.get("axisRequestId", FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("requestType"), requestschema.get("isconsultflag")))
+        #axisrequestid = requestschema.get("axisRequestId", FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("requestType"), requestschema.get("isconsultflag")))
+        axisrequestid = FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, 
+                                                        requestschema.get("requestType"), 
+                                                        requestschema.get("isconsultflag"))
         current_foiministryrequest = FOIMinistryRequest.getrequest(ministryid)
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.__dict__.update(ministry)
@@ -77,7 +80,7 @@ class requestservicebuilder(requestserviceconfigurator):
         self.__updateassignedtoandgroup(foiministryrequest, requestschema, ministry, status, filenumber, ministryid)
         self.__updateministryassignedtoandgroup(foiministryrequest, requestschema, ministry, status)
 
-        if requestschema.get("requestType") == "proactive disclosure":
+        if requestschema.get("requestType") == RequestType.PROACTIVE_DISCLOSURE.value:
             foiministryrequest.duedate = requestschema.get("cfrDueDate")
             foiministryrequest.proactivedisclosures = self._prepareproactivedisclosuredetails(requestschema, userid, ministryid, activeversion)
 
@@ -223,28 +226,45 @@ class requestservicebuilder(requestserviceconfigurator):
                 oipcreview.created_at= datetime2.now().isoformat()
                 oipcarr.append(oipcreview)
         return oipcarr
-        
+
     
-    def _prepareproactivedisclosuredetails(self, foirequestschema, userid,ministryid,version):
-        proactivedisclosurearr = []
-            #for pd in foirequestschema['proactivedisclosuredetails']:
-        proactivedisclosure = FOIProactiveDisclosureRequests()
-        proactivedisclosure.foiministryrequest_id = ministryid
-        proactivedisclosure.foiministryrequestversion_id=version
-        proactivedisclosure.created_at=datetime2.now().isoformat()
-        proactivedisclosure.createdby=userid
-        proactivedisclosure.publicationdate=foirequestschema["publicationdate"]
-        proactivedisclosure.reportperiod=foirequestschema["reportperiod"] if 'reportperiod' in foirequestschema else ""
-        if requestservicebuilder().isNotBlankorNone(foirequestschema,"proactivedisclosurecategory","main") == True:
-            proactivedisclosure.proactivedisclosurecategoryid = requestserviceconfigurator().getvalueof("proactiveDisclosureCategory",foirequestschema["proactivedisclosurecategory"])
-        proactivedisclosurearr.append(proactivedisclosure)
-        return proactivedisclosure 
+    # def _prepareproactivedisclosuredetails(self, foirequestschema, userid,ministryid,version):
+    #     proactivedisclosurearr = []
+    #         #for pd in foirequestschema['proactivedisclosuredetails']:
+    #     proactivedisclosure = FOIProactiveDisclosureRequests()
+        
+    #     current_proactive = FOIProactiveDisclosureRequests.getcurrentfoiproactiverequest(ministryid)
+    #     if current_proactive and 'version' in current_proactive:
+    #         proactivedisclosure.version = current_proactive['version'] + 1
+    #         proactivedisclosure.proactivedisclosureid = current_proactive['proactivedisclosureid']
+    #     else:
+    #         proactivedisclosure.version = 1
+
+    #     proactivedisclosure.foiministryrequest_id = ministryid
+    #     proactivedisclosure.foiministryrequestversion_id=version
+    #     proactivedisclosure.created_at=datetime2.now().isoformat()
+    #     proactivedisclosure.createdby=userid
+    #     proactivedisclosure.publicationdate=foirequestschema.get("publicationdate")
+    #     proactivedisclosure.reportperiod=foirequestschema.get("reportperiod", "")
+        
+    #     # New Proactive Disclosure Fields
+    #     proactivedisclosure.earliesteligiblepublicationdate = foirequestschema.get("earliesteligiblepublicationdate")
+    #     proactivedisclosure.processingstatus = foirequestschema.get("processingstatus")
+    #     proactivedisclosure.processingmessage = foirequestschema.get("processingmessage")
+    #     proactivedisclosure.sitemap_pages = foirequestschema.get("sitemap_pages")
+    #     proactivedisclosure.pdpublicationstatus_id = foirequestschema.get("pdpublicationstatus_id", 1)
+    #     proactivedisclosure.isactive = foirequestschema.get("isactive", True)
+        
+    #     if requestservicebuilder().isNotBlankorNone(foirequestschema,"proactivedisclosurecategory","main") == True:
+    #         proactivedisclosure.proactivedisclosurecategoryid = requestserviceconfigurator().getvalueof("proactiveDisclosureCategory",foirequestschema["proactivedisclosurecategory"])
+    #     proactivedisclosurearr.append(proactivedisclosure)
+    #     return proactivedisclosure 
     
     def __formatoipcattributes(self, inquiryattributes):
         if inquiryattributes not in (None, "") and inquiryattributes["inquirydate"] in ("","null"):
             inquiryattributes["inquirydate"] = None
         return inquiryattributes
-    
+
 
     def isNotBlankorNone(self, dataschema, key, location):        
         if location == "main":

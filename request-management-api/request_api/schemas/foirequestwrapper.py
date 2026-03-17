@@ -297,4 +297,5 @@ class FOIPDRequestWrapperSchema(Schema):
     proactivedisclosurecategory = fields.Str(data_key="proactiveDisclosureCategory", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
     reportperiod = fields.Str(data_key="reportPeriod",allow_none=True, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])  
     publicationdate = fields.Str(data_key="publicationDate",allow_none=True)
+    earliesteligiblepublicationdate = fields.Str(data_key="earliestEligiblePublicationDate",allow_none=True)
     proactivedisclosurecategory = fields.Str(data_key="proactiveDisclosureCategory", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])

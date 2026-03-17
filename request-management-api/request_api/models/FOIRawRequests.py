@@ -64,6 +64,8 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def generaterequestid(cls, foirawrequestid: int, programareaiaocode: str, requesttype: str, isconsultflag: bool):
+        if programareaiaocode is None or programareaiaocode == '':
+            programareaiaocode='U'
         baserequestid = f'{programareaiaocode}-{datetime.now().year}-{str(foirawrequestid).zfill(6)}'
         if requesttype == "proactive disclosure":
             return 'PD-'+baserequestid
@@ -82,11 +84,18 @@ class FOIRawRequest(db.Model):
         if not axisrequestid:
             db.session.flush() # Force insert to generate PK, but do not commit yet
             bcgovcode = cls.getbcgovcodefromrawdata(_requestrawdata)
+            # if bcgovcode:
+            #     programarea = ProgramArea.getprogramarea(bcgovcode)
+            #     iaocode = programarea['iaocode']
+            #     requesttype = _requestrawdata.get("requestType")
+            #     newaxisrequestid = cls.generaterequestid(newrawrequest.requestid, iaocode, requesttype, newrawrequest.isconsultflag)
+            #     updated_rawdata = copy.deepcopy(_requestrawdata)
+            #     updated_rawdata["axisRequestId"] = newaxisrequestid
+            #     newrawrequest.axisrequestid = newaxisrequestid
+            #     newrawrequest.requestrawdata = updated_rawdata
             if bcgovcode:
-                programarea = ProgramArea.getprogramarea(bcgovcode)
-                iaocode = programarea['iaocode']
                 requesttype = _requestrawdata.get("requestType")
-                newaxisrequestid = cls.generaterequestid(newrawrequest.requestid, iaocode, requesttype, newrawrequest.isconsultflag)
+                newaxisrequestid = cls.generaterequestid(newrawrequest.requestid, '', requesttype, newrawrequest.isconsultflag)
                 updated_rawdata = copy.deepcopy(_requestrawdata)
                 updated_rawdata["axisRequestId"] = newaxisrequestid
                 newrawrequest.axisrequestid = newaxisrequestid
@@ -117,16 +126,23 @@ class FOIRawRequest(db.Model):
             linkedrequests = _requestrawdata["linkedRequests"] if 'linkedRequests' in _requestrawdata  else None 
             isconsultflag = _requestrawdata["isconsultflag"] if 'isconsultflag' in _requestrawdata  else False
 
+            # if not axisrequestid:
+            #     bcgovcode = cls.getbcgovcodefromrawdata(_requestrawdata)
+            #     if bcgovcode:
+            #         programarea = ProgramArea.getprogramarea(bcgovcode)
+            #         iaocode = programarea['iaocode']
+            #         requesttype = _requestrawdata.get("requestType")
+            #         axisrequestid = cls.generaterequestid(request.requestid, iaocode, requesttype, isconsultflag)
+            #         updated_rawdata = copy.deepcopy(_requestrawdata)
+            #         updated_rawdata["axisRequestId"] = axisrequestid
+            #         _requestrawdata = updated_rawdata
+
             if not axisrequestid:
-                bcgovcode = cls.getbcgovcodefromrawdata(_requestrawdata)
-                if bcgovcode:
-                    programarea = ProgramArea.getprogramarea(bcgovcode)
-                    iaocode = programarea['iaocode']
-                    requesttype = _requestrawdata.get("requestType")
-                    axisrequestid = cls.generaterequestid(request.requestid, iaocode, requesttype, isconsultflag)
-                    updated_rawdata = copy.deepcopy(_requestrawdata)
-                    updated_rawdata["axisRequestId"] = axisrequestid
-                    _requestrawdata = updated_rawdata
+                requesttype = _requestrawdata.get("requestType")
+                axisrequestid = cls.generaterequestid(request.requestid, '', requesttype, isconsultflag)
+                updated_rawdata = copy.deepcopy(_requestrawdata)
+                updated_rawdata["axisRequestId"] = axisrequestid
+                _requestrawdata = updated_rawdata
 
             _version = request.version+1           
             insertstmt =(

@@ -28,7 +28,7 @@ from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema, FOIPDRequestWrapperSchema
 from request_api.schemas.foiassignee import FOIRequestAssigneeSchema
-from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup
+from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup, RequestType
 from marshmallow import Schema, fields, validate, ValidationError
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 from request_api.utils.enums import OIStatusEnum
@@ -99,7 +99,7 @@ class FOIRequests(Resource):
         try:
             request_json = request.get_json()
             request_type = request_json.get('requestType', '').lower()
-            if request_type == 'proactive disclosure':
+            if request_type == RequestType.PROACTIVE_DISCLOSURE.value:
                 foirequestschema = FOIPDRequestWrapperSchema().load(request_json)
             else:
                 foirequestschema = FOIRequestWrapperSchema().load(request_json)
@@ -148,7 +148,7 @@ class FOIRequestsById(Resource):
         try:
             request_json = request.get_json()
             request_type = request_json.get('requestType', '').lower()
-            if request_type == 'proactive disclosure':
+            if request_type == RequestType.PROACTIVE_DISCLOSURE.value:
                 foirequestschema = FOIPDRequestWrapperSchema().load(request_json)
             else:
                 foirequestschema = FOIRequestWrapperSchema().load(request_json)  
@@ -318,7 +318,7 @@ class FOIRequestsById(Resource):
                 foirequest['oistatusid'] = request_json['oistatusid']
             else:
                 foirequest[section] = request_json[section]
-            if foirequest['requestType'] == 'proactive disclosure':
+            if foirequest['requestType'] == RequestType.PROACTIVE_DISCLOSURE.value:
                 foirequestschema = FOIPDRequestWrapperSchema().load(foirequest)
             else:
                 foirequestschema = FOIRequestWrapperSchema().load(foirequest)

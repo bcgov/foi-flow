@@ -236,5 +236,7 @@ const API = {
   FOI_REQUEST_ADD_LINKEDREQUESTS: `${FOI_BASE_API_URL}/api/linkrequest/createlink/axisrequestid/<axisrequestid>`,
   FOI_REQUEST_REMOVE_LINKEDREQUESTS: `${FOI_BASE_API_URL}/api/linkrequest/removelink/axisrequestid/<axisrequestid>`,
 
+  FOI_GET_PROACTIVE_DISCLOSURE_REQUEST: `${FOI_BASE_API_URL}/api/foiproactivedisclosure/ministryrequest/<ministryrequestid>`,
+  FOI_POST_PROACTIVE_DISCLOSURE_REQUEST: `${FOI_BASE_API_URL}/api/foiproactivedisclosure/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>`,
 };
 export default API;

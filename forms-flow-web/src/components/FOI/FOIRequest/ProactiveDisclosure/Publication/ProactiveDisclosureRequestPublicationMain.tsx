@@ -34,27 +34,36 @@ import {
 import { OSS_S3_CHUNK_SIZE } from "../../../../../constants/constants";
 import { RecordDownloadStatus } from "../../../../../constants/FOI/enum";
 import Tooltip from "@mui/material/Tooltip";
-import { OIPublicationStatus } from "../../OpenInformation/types";
-import { OIPublicationStatuses } from "../../../../../helper/openinfo-helper";
+import { PDPublicationStatus, PDTransactionObject } from "./types";
+import { OIStates, OIPublicationStatuses } from "../../../../../helper/openinfo-helper";
 import "./proactivepublication.scss";
 
 
 const ProactiveDisclosureRequestPublicationMain = ({
   requestId,
   ministryId,
-  oiPublicationData,
-  currentOIRequestState,
-  handleOIDataChange,
+  pdPublicationData,
+  currentPDRequestState,
+  handlePDDataChange,
   bcgovcode,
   requestNumber,
   earliestPublicationDate,
-}: any) => {
+}: {
+  requestId: number;
+  ministryId: number;
+  pdPublicationData: PDTransactionObject;
+  currentPDRequestState: any;
+  handlePDDataChange: any;
+  bcgovcode: string;
+  requestNumber: string;
+  earliestPublicationDate: any;
+}) => {
   const dispatch = useDispatch();
 
-  const oiPublicationStatuses: OIPublicationStatus[] = useSelector(
+  const pdPublicationStatuses: PDPublicationStatus[] = useSelector(
     (state: any) => state.foiRequests.oiPublicationStatuses,
   );
-  let foiOpenInfoAdditionalFiles = useSelector(
+  let foiPDAdditionalFiles = useSelector(
     (state: any) => state.foiRequests.foiOpenInfoAdditionalFiles,
   );
 
@@ -86,7 +95,7 @@ const ProactiveDisclosureRequestPublicationMain = ({
   };
 
   const totalFileCount =
-    (foiOpenInfoAdditionalFiles?.length || 0) +
+    (foiPDAdditionalFiles?.length || 0) +
     (foiPDFStitchedRecordForResponsePackage?.finalpackagepath ? getRecordsFileCount() : 0);
 
   const [downloadDisabled, setDownloadDisabled] = useState(true);
@@ -123,8 +132,8 @@ const ProactiveDisclosureRequestPublicationMain = ({
   const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
-    setAdditionalFiles(foiOpenInfoAdditionalFiles);
-  }, [foiOpenInfoAdditionalFiles]);
+    setAdditionalFiles(foiPDAdditionalFiles || []);
+  }, [foiPDAdditionalFiles]);
 
   //Functions
   const deleteFile = (_index: any) => {
@@ -306,7 +315,7 @@ const ProactiveDisclosureRequestPublicationMain = ({
   };
 
   const disableUserInput =
-    oiPublicationData.oipublicationstatus_id ===
+    pdPublicationData.pdpublicationstatus_id ===
     OIPublicationStatuses.DoNotPublish;
 
   var saveAs = (blob: any, filename: any) => {
@@ -404,18 +413,19 @@ const ProactiveDisclosureRequestPublicationMain = ({
                   variant="outlined"
                   fullWidth
                   value={
-                    (earliestPublicationDate
-                      ? formatDate(new Date(earliestPublicationDate))
+                    (pdPublicationData.publicationdate
+                      ? formatDate(new Date(pdPublicationData.publicationdate))
                       : "") || ""
                   }
                   onChange={(event) =>
-                    handleOIDataChange(event.target.value, event.target.name)
+                    handlePDDataChange(event.target.value, event.target.name)
                   }
                   InputProps={{ inputProps: { min: formatDate(new Date()) } }}
                   disabled={
                     disableUserInput ||
-                    currentOIRequestState === "First Review" ||
-                    currentOIRequestState === "Unopened"
+                    currentPDRequestState === "First Review" ||
+                    currentPDRequestState === OIStates.FirstReview ||
+                    currentPDRequestState === "Unopened"
                   }
                 />
                 {earliestPublicationDate !== 0 &&
