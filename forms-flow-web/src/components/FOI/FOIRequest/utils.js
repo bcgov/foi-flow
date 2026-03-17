@@ -401,7 +401,7 @@ export const checkValidationError = (
         ?.toLowerCase()
         ?.includes("select") ||
       !requiredProactiveDetailsValues.cfrDueDate ||
-      !requiredProactiveDetailsValues.publicationDate ||
+      !requiredProactiveDetailsValues.earliestEligiblePublicationDate ||
       requiredRequestDescriptionValues.description === "" ||
       assignedToValue.toLowerCase().includes("unassigned") ||
       (!requiredRequestDescriptionValues.isProgramAreaSelected &&

@@ -55,6 +55,7 @@ from .foiaxissync import API as FOIAXISSYNC_API
 from .foiopeninfo import API as FOIOPENINFO_API
 from .foiinvoice import API as FOIREQUESTINVOICE_API
 from .solrauth import API as FOISolr
+from .foiproactivedisclosure import API as FOIPROACTIVEDISCLOSURE_API
 
 __all__ = ('API_BLUEPRINT')
 
@@ -104,3 +105,4 @@ API.add_namespace(FOIAXISSYNC_API, '/api')
 API.add_namespace(FOIOPENINFO_API, '/api')
 API.add_namespace(FOIREQUESTINVOICE_API, '/api')
 API.add_namespace(FOISolr, '/api')
+API.add_namespace(FOIPROACTIVEDISCLOSURE_API, '/api')

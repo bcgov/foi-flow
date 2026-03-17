@@ -122,7 +122,7 @@ const ProactiveDisclosureDescription = React.memo(
           ? requestDetails.description
           : "",
         isProgramAreaSelected:
-          requestDetails?.selectedMinistries?.length === 1 &&
+          requestDetails?.selectedMinistries?.length > 0 &&
           requestDetails?.selectedMinistries.some((programArea) =>
             isValidMinistryCode(programArea.code, proactiveProgramAreaList)
           ),
@@ -216,7 +216,7 @@ const ProactiveDisclosureDescription = React.memo(
     // Handle onchange of Program Area List and bubble up the latest data
     const handleUpdatedMasterProgramAreaList = (updatedProgramAreaList) => {
       handleOnChangeRequiredRequestDescriptionValues(
-        countOfMinistrySelected(updatedProgramAreaList) === 1 &&
+        countOfMinistrySelected(updatedProgramAreaList) > 0 &&
         updatedProgramAreaList?.some(
           (programArea) =>
             programArea.isChecked &&

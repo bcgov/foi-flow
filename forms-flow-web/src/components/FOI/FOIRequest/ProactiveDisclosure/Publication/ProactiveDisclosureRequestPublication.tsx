@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import ProactiveDisclosureRequestPublicationMain from "./ProactiveDisclosureRequestPublicationMain";
 import OpenInfoConfirmationModal from "../../OpenInformation/OpenInfoConfirmationModal";
 import OpenInfoHeader from "../../OpenInformation/OpenInfoHeader";
-import { saveFOIOpenInfoRequest, fetchFOIOpenInfoRequest } from "../../../../../apiManager/services/FOI/foiOpenInfoRequestServices";
-import { OIPublicationStatus, OITransactionObject } from "./types";
+import { saveFOIProactiveDisclosureRequest, fetchFOIProactiveDisclosureRequest } from "../../../../../apiManager/services/FOI/foiProactiveDisclosureServices";
+import { PDPublicationStatus, PDTransactionObject } from "./types";
 import { OIStates, OIPublicationStatuses } from "../../../../../helper/openinfo-helper";
-import { calculateBusinessDaysBetween, addBusinessDays, formatDateInPst } from "../../../../../helper/FOI/helper";
+import { calculateBusinessDaysBetween, formatDateInPst } from "../../../../../helper/FOI/helper";
 import "../../OpenInformation/openinfo.scss";
 
 const ProactiveDisclosureRequestPublication = ({
@@ -16,7 +16,7 @@ const ProactiveDisclosureRequestPublication = ({
     foirequestid,
     bcgovcode,
     toast,
-    currentOIRequestState,
+    currentPDRequestState,
     isOITeam,
 }: any) => {
     const dispatch = useDispatch();
@@ -25,19 +25,19 @@ const ProactiveDisclosureRequestPublication = ({
     const assignedToList = useSelector(
         (state: any) => state.foiRequests.foiFullAssignedToList
     );
-    let foiOpenInfoAdditionalFiles = useSelector(
+    let foiPDAdditionalFiles = useSelector(
         (state: any) => state.foiRequests.foiOpenInfoAdditionalFiles
     );
-    let foiOITransactionData = useSelector(
+    let foiPDTransactionData = useSelector(
         (state: any) => state.foiRequests.foiOpenInfoRequest
     );
-    const oiPublicationStatuses: OIPublicationStatus[] = useSelector(
+    const pdPublicationStatuses: PDPublicationStatus[] = useSelector(
         (state: any) => state.foiRequests.oiPublicationStatuses
     );
 
     //Local State
-    const [oiPublicationData, setOiPublicationData] =
-        useState<OITransactionObject>(foiOITransactionData);
+    const [pdPublicationData, setPdPublicationData] =
+        useState<PDTransactionObject>(foiPDTransactionData);
     const [confirmationModal, setConfirmationModal] = useState<{
         show: boolean;
         title: string;
@@ -56,31 +56,32 @@ const ProactiveDisclosureRequestPublication = ({
     const [isDataEdited, setIsDataEdited] = useState(false);
 
     useEffect(() => {
-        setOiPublicationData({ ...foiOITransactionData, oipublicationstatus_id: foiOITransactionData?.oipublicationstatus_id || OIPublicationStatuses.Publish });
-    }, [foiOITransactionData]);
+        setPdPublicationData({
+            ...foiPDTransactionData,
+            pdpublicationstatus_id: foiPDTransactionData?.pdpublicationstatus_id || OIPublicationStatuses.Publish
+        });
+    }, [foiPDTransactionData]);
 
     //Functions
-    const findOIPublicationState = (name: string) => {
-        return oiPublicationStatuses.find((s: OIPublicationStatus) => s.name === name);
+    const findPDPublicationState = (name: string) => {
+        return pdPublicationStatuses.find((s: PDPublicationStatus) => s.name === name);
     }
-    const handleOIDataChange = (
+    const handlePDDataChange = (
         value: number | string | boolean,
-        oiDataKey: string
+        pdDataKey: string
     ) => {
         if (!isDataEdited) {
             setIsDataEdited(true);
         }
-        //Reset foi oi data if publication status goes back to publication.
-        if (oiDataKey === "oipublicationstatus_id" && value === findOIPublicationState("Publish")?.oipublicationstatusid) {
-            setOiPublicationData((prev: any) => ({
+        //Reset foi pd data if publication status goes back to publication.
+        if (pdDataKey === "pdpublicationstatus_id" && value === findPDPublicationState("Publish")?.pdpublicationstatusid) {
+            setPdPublicationData((prev: any) => ({
                 ...prev,
-                [oiDataKey]: value,
-                copyrightsevered: null,
+                [pdDataKey]: value,
                 publicationdate: null,
                 receiveddate: null,
-                oiexemption_id: null
             }));
-        } else if (oiDataKey === "publicationdate" && requestDetails.closedate
+        } else if (pdDataKey === "publicationdate" && requestDetails.closedate
             && typeof (value) === "string") {
             const daysBetween = calculateBusinessDaysBetween(requestDetails.closedate, value);
             if (daysBetween >= 0 && daysBetween < 10) {
@@ -95,41 +96,39 @@ const ProactiveDisclosureRequestPublication = ({
                 }));
             }
             else {
-                setOiPublicationData((prev: any) => ({
+                setPdPublicationData((prev: any) => ({
                     ...prev,
-                    [oiDataKey]: value,
+                    [pdDataKey]: value,
                 }));
             }
         } else {
-            setOiPublicationData((prev: any) => ({
+            setPdPublicationData((prev: any) => ({
                 ...prev,
-                [oiDataKey]: value,
+                [pdDataKey]: value,
             }));
         }
     };
 
     const saveData = (publicationdate?: any) => {
-        const toastID = toast.loading("Saving FOI OpenInformation request...");
-        publicationdate = publicationdate || (oiPublicationData.publicationdate ?
-            new Date(oiPublicationData.publicationdate).toISOString().split('T')[0] :
+        const toastID = toast.loading("Saving FOI Proactive Disclosure request...");
+        publicationdate = publicationdate || (pdPublicationData.publicationdate ?
+            new Date(pdPublicationData.publicationdate).toISOString().split('T')[0] :
             null)
         const formattedData = {
-            ...oiPublicationData,
+            ...pdPublicationData,
             publicationdate: publicationdate
         };
         dispatch(
-            saveFOIOpenInfoRequest(
+            saveFOIProactiveDisclosureRequest(
                 foiministryrequestid,
                 foirequestid,
                 formattedData,
-                isOITeam,
-                requestDetails,
                 (err: any, _res: any) => {
                     if (!err) {
                         toast.update(toastID, {
                             type: "success",
                             render:
-                                "FOI Open Information request has been saved successfully.",
+                                "FOI Proactive Disclosure request has been saved successfully.",
                             position: "top-right",
                             isLoading: false,
                             autoClose: 3000,
@@ -139,19 +138,11 @@ const ProactiveDisclosureRequestPublication = ({
                             draggable: true,
                             progress: undefined,
                         });
-                        const manualPublicationStatusChange = requestDetails.oistatusid === OIStates.ExemptionRequest && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.Publish;
-                        const isUnpublish = isOITeam && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest;
-
-                        if (manualPublicationStatusChange) {
-                            requestDetails.oistatusid = null;
-                        }
-                        if (isUnpublish) {
-                            requestDetails.oistatusid = OIStates.Unpublished
-                        }
-                        dispatch(fetchFOIOpenInfoRequest(foiministryrequestid));
+                        dispatch(fetchFOIProactiveDisclosureRequest(foiministryrequestid));
+                        setIsDataEdited(false);
                     } else {
                         toast.error(
-                            "Temporarily unable to save FOI Open Information request. Please try again in a few minutes.",
+                            "Temporarily unable to save FOI Proactive Disclosure request. Please try again in a few minutes.",
                             {
                                 position: "top-right",
                                 autoClose: 3000,
@@ -170,9 +161,9 @@ const ProactiveDisclosureRequestPublication = ({
 
     const disablePublish = (): boolean => {
         const responseLetterRegex = /Response[_\-\s]*Letter/i;
-        const isMissingRequiredInput = oiPublicationData?.copyrightsevered === null || oiPublicationData?.publicationdate === null || !foiOpenInfoAdditionalFiles?.some((f: any) => responseLetterRegex.test(f.filename));
-        const isOIReadyToPublish = currentOIRequestState === "Ready to Publish";
-        if (!isOIReadyToPublish) {
+        const isMissingRequiredInput = pdPublicationData?.copyrightsevered === null || pdPublicationData?.publicationdate === null || !foiPDAdditionalFiles?.some((f: any) => responseLetterRegex.test(f.filename));
+        const isPDReadyToPublish = currentPDRequestState === "Ready to Publish" || currentPDRequestState === OIStates.ReadyToPublish;
+        if (!isPDReadyToPublish) {
             return true;
         }
         if (isMissingRequiredInput) {
@@ -182,7 +173,7 @@ const ProactiveDisclosureRequestPublication = ({
     }
 
     const handleDateConfirmation = (value: Date) => {
-        setOiPublicationData((prev: any) => ({
+        setPdPublicationData((prev: any) => ({
             ...prev,
             publicationdate: value,
         }));
@@ -204,7 +195,7 @@ const ProactiveDisclosureRequestPublication = ({
     }
 
     const save = () => {
-        if (oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest) {
+        if (pdPublicationData.pdpublicationstatus_id === OIPublicationStatuses.UnpublishRequest) {
             setConfirmationModal({
                 show: true,
                 title: "Unpublish Request",
@@ -228,17 +219,17 @@ const ProactiveDisclosureRequestPublication = ({
                 foiministryrequestid={foiministryrequestid}
                 foirequestid={foirequestid}
                 toast={toast}
-                handleOIDataChange={handleOIDataChange}
+                handleOIDataChange={handlePDDataChange}
             />
             <ProactiveDisclosureRequestPublicationMain
-                oiPublicationData={oiPublicationData}
-                handleOIDataChange={handleOIDataChange}
-                currentOIRequestState={currentOIRequestState}
+                pdPublicationData={pdPublicationData}
+                handlePDDataChange={handlePDDataChange}
+                currentPDRequestState={currentPDRequestState}
                 ministryId={foiministryrequestid}
                 requestId={foirequestid}
                 bcgovcode={bcgovcode}
                 requestNumber={requestNumber}
-                earliestPublicationDate={requestDetails?.publicationDate}
+                earliestPublicationDate={requestDetails?.earliestEligiblePublicationDate}
             />
             <button
                 type="button"

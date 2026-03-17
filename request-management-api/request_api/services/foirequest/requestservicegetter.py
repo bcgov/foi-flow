@@ -231,9 +231,14 @@ class requestservicegetter:
             'isconsultflag': requestministry['isconsultflag'],  
             'publicationDate': parse(requestproactive['publicationdate']).strftime(self.__genericdateformat()) if requestproactive != None and 'publicationdate' in requestproactive and requestproactive['publicationdate'] is not None else '',
             'reportPeriod': requestproactive['reportperiod'] if requestproactive != None and 'reportperiod' in requestproactive else '',
-            #'proactivedisclosurecategoryid': requestproactive['proactivedisclosurecategoryid'] if requestproactive != None and 'proactivedisclosurecategoryid' in requestproactive else ''
             'proactiveDisclosureCategory':requestproactive['proactivedisclosurecategory.name'] if requestproactive != None and 'proactivedisclosurecategory.name' in requestproactive else "",
             'proactivedisclosurecategoryid':requestproactive['proactivedisclosurecategory.proactivedisclosurecategoryid'] if requestproactive != None and 'proactivedisclosurecategory.proactivedisclosurecategoryid' in requestproactive else None,
+            'processingstatus': requestproactive['processingstatus'] if requestproactive != None and 'processingstatus' in requestproactive else '',
+            'processingmessage': requestproactive['processingmessage'] if requestproactive != None and 'processingmessage' in requestproactive else '',
+            'sitemap_pages': requestproactive['sitemap_pages'] if requestproactive != None and 'sitemap_pages' in requestproactive else '',
+            'earliestEligiblePublicationDate': parse(requestproactive['earliesteligiblepublicationdate']).strftime(self.__genericdateformat()) if requestproactive != None and 'earliesteligiblepublicationdate' in requestproactive and requestproactive['earliesteligiblepublicationdate'] is not None else '',
+            'pdpublicationstatus_id': requestproactive['pdpublicationstatus_id'] if requestproactive != None and 'pdpublicationstatus_id' in requestproactive else None,
+            'isactive': requestproactive['isactive'] if requestproactive != None and 'isactive' in requestproactive else True,
         }
         if requestministry['cfrduedate'] is not None:
             baserequestinfo.update({'cfrDueDate':parse(requestministry['cfrduedate']).strftime(self.__genericdateformat())})

@@ -228,7 +228,8 @@ const API = {
   FOI_DELETE_RECORD_GROUP: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups/<groupid>/records/<recordid>`,
   
   FOI_GET_PROACTIVE_DISCLOSURE_CATEGORIES_API: `${FOI_BASE_API_URL}/api/foiflow/proactivedisclosurecategories`,
-
+  FOI_GET_PROACTIVE_DISCLOSURE_REQUEST: `${FOI_BASE_API_URL}/api/foiproactivedisclosure/ministryrequest/<ministryrequestid>`,
+  FOI_POST_PROACTIVE_DISCLOSURE_REQUEST: `${FOI_BASE_API_URL}/api/foiproactivedisclosure/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>`,
   FOI_GET_LINKED_REQUESTS_LIST: `${FOI_BASE_API_URL}/api/linkrequests/<ministrycode>/axisrequestid/<axisrequestid>`
 };
 export default API;

@@ -37,7 +37,7 @@ class FOIProactiveDisclosureRequests(db.Model):
     reportperiod = db.Column(db.String, nullable=True)
     publicationdate = db.Column(db.DateTime, nullable=True)
     earliesteligiblepublicationdate = db.Column(db.DateTime, nullable=True)
-    isactive = db.Column(db.Boolean, nullable=True)
+    isactive = db.Column(db.Boolean, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now, nullable=False)
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), nullable=False)
@@ -62,12 +62,77 @@ class FOIProactiveDisclosureRequests(db.Model):
             return request_schema.dump(query)
         except Exception as exception:
             logging.error(f"Error: {exception}")
+
+    @classmethod
+    def savefoiproactiverequest(cls, foiproactiverequest, userid)->DefaultMethodResult:
+        try:
+            current_proactive = cls.getcurrentfoiproactiverequest(foiproactiverequest['foiministryrequest_id'])
+            createddate = datetime2.now().isoformat()
+            if current_proactive:
+                new_proactive = FOIProactiveDisclosureRequests(
+                    proactivedisclosureid=current_proactive['proactivedisclosureid'],
+                    version=current_proactive['version']+1,
+                    foiministryrequest_id=foiproactiverequest["foiministryrequest_id"],
+                    foiministryrequestversion_id=foiproactiverequest["foiministryrequestversion_id"],
+                    proactivedisclosurecategoryid=foiproactiverequest.get("proactivedisclosurecategoryid", current_proactive.get("proactivedisclosurecategory.proactivedisclosurecategoryid")),
+                    reportperiod=foiproactiverequest.get("reportperiod", current_proactive.get("reportperiod")),
+                    publicationdate=foiproactiverequest.get("publicationdate", current_proactive.get("publicationdate")),
+                    earliesteligiblepublicationdate=foiproactiverequest.get("earliesteligiblepublicationdate", current_proactive.get("earliesteligiblepublicationdate")),
+                    isactive=True,
+                    created_at=createddate,
+                    createdby=userid,
+                    pdpublicationstatus_id=foiproactiverequest.get("pdpublicationstatus_id", current_proactive.get("pdpublicationstatus_id")),
+                    processingstatus=foiproactiverequest.get("processingstatus", current_proactive.get("processingstatus")),
+                    processingmessage=foiproactiverequest.get("processingmessage", current_proactive.get("processingmessage")),
+                    sitemap_pages=foiproactiverequest.get("sitemap_pages", current_proactive.get("sitemap_pages"))
+                )
+                db.session.add(new_proactive)
+                db.session.commit()
+                return DefaultMethodResult(True, "FOI Proactive Disclosure request version updated", new_proactive.proactivedisclosureid)
+            else:
+                new_proactive = FOIProactiveDisclosureRequests(
+                    version=1,
+                    foiministryrequest_id=foiproactiverequest["foiministryrequest_id"],
+                    foiministryrequestversion_id=foiproactiverequest["foiministryrequestversion_id"],
+                    proactivedisclosurecategoryid=foiproactiverequest.get("proactivedisclosurecategoryid"),
+                    reportperiod=foiproactiverequest.get("reportperiod"),
+                    publicationdate=foiproactiverequest.get("publicationdate"),
+                    earliesteligiblepublicationdate=foiproactiverequest.get("earliesteligiblepublicationdate"),
+                    isactive=True,
+                    created_at=createddate,
+                    createdby=userid,
+                    pdpublicationstatus_id=foiproactiverequest.get("pdpublicationstatus_id", 1),
+                    processingstatus=foiproactiverequest.get("processingstatus"),
+                    processingmessage=foiproactiverequest.get("processingmessage"),
+                    sitemap_pages=foiproactiverequest.get("sitemap_pages")
+                )
+                db.session.add(new_proactive)
+                db.session.commit()
+                return DefaultMethodResult(True, "FOI Proactive Disclosure request created", new_proactive.proactivedisclosureid)
+        except Exception as exception:
+            logging.error(f"Error: {exception}")
+            return DefaultMethodResult(False, "FOI Proactive Disclosure request version unable to be updated")
+
+    @classmethod
+    def deActivateOldVersion(cls, ministryid, userid)->DefaultMethodResult:
+        try:
+            sql = """update "FOIProactiveDisclosureRequests" set isactive = false, updatedby = :userid, updated_at = now()  
+                        where foiministryrequest_id = :ministryid and isactive = true 
+                        and version != (select version from "FOIProactiveDisclosureRequests" where foiministryrequest_id = :ministryid order by "version" desc limit 1)"""
+            db.session.execute(text(sql), {'ministryid': ministryid, 'userid':userid})
+            db.session.commit()
+            return DefaultMethodResult(True,'Request Updated',ministryid)
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
                 
 class FOIProactiveDisclosureRequestSchema(ma.Schema):
     class Meta:
         fields = (
             'proactivedisclosureid', 'foiministryrequest_id', 'foiministryrequestversion_id',
             'proactivedisclosurecategory.proactivedisclosurecategoryid','proactivedisclosurecategory.name','reportperiod',
-            'publicationdate', 'created_at', 'updated_at', 'createdby', 'updatedby', 'version', 'isactive', 'oipublicationstatus_id',
+            'publicationdate', 'created_at', 'updated_at', 'createdby', 'updatedby', 'version', 'isactive', 'pdpublicationstatus_id',
             'processingstatus', 'processingmessage', 'sitemap_pages','earliesteligiblepublicationdate'
         )

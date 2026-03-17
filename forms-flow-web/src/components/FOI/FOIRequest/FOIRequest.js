@@ -74,6 +74,9 @@ import {
   fetchFOIOpenInfoAdditionalFiles,
   fetchFOIOpenInfoRequest,
 } from "../../../apiManager/services/FOI/foiOpenInfoRequestServices";
+import {
+  fetchFOIProactiveDisclosureRequest,
+} from "../../../apiManager/services/FOI/foiProactiveDisclosureServices";
 import { makeStyles } from "@material-ui/core/styles";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
 import { push } from "connected-react-router";
@@ -524,7 +527,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   useEffect(() => {
     if (activePublicationRequest) {
-      dispatch(fetchFOIOpenInfoRequest(ministryId));
+      if (isProactiveDisclosure) {
+        dispatch(fetchFOIProactiveDisclosureRequest(ministryId));
+      } else {
+        dispatch(fetchFOIOpenInfoRequest(ministryId));
+      }
     }
     if (requestDetails?.isphasedrelease) {
       dispatch(fetchPDFStitchStatusesForPhasedRedlines(requestId, ministryId));
@@ -916,7 +923,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     reportPeriod: "",
     requestStartDate: "",
     cfrDueDate: "",
-    publicationDate: ""
+    earliestEligiblePublicationDate: ""
   }
 
   const personalRequestDetailErrorsInit = {
@@ -1166,6 +1173,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
     if (!_unSaved) {
       setUnSavedRequest(_unSaved);
+      /*if (isAddRequest && (isProactiveDisclosure || saveRequestObject?.selectedMinistries?.length > 1)) {
+        dispatch(push(`/foi/dashboard`));
+        return;
+      }*/
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId, userGroups));
       dispatch(fetchFOIRequestDescriptionList(id || requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(id || requestId, ministryId));
@@ -1187,6 +1198,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const handleOpenRequest = (parendId, _ministryId, unSaved) => {
     if (!unSaved) {
       setUnSavedRequest(unSaved);
+      if (saveRequestObject?.selectedMinistries?.length > 1) {
+        dispatch(push(`/foi/dashboard`));
+        return;
+      }
       setStateChanged(false);
       setcurrentrequestStatus(StateEnum.open.name);
 

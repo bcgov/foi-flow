@@ -4,6 +4,7 @@ from request_api.models.FOIRequests import FOIRequest
 from request_api.models.ContactTypes import ContactType
 from request_api.models.PersonalInformationAttributes import PersonalInformationAttribute
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 from request_api.services.watcherservice import watcherservice
 from request_api.services.foirequest.requestservicebuilder import requestservicebuilder
 from request_api.services.foirequest.requestserviceministrybuilder import requestserviceministrybuilder  
@@ -14,7 +15,7 @@ from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAt
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.RequestorType import RequestorType
-from request_api.utils.enums import StateName
+from request_api.utils.enums import StateName, RequestType
 
 import json
 class requestservicecreate:
@@ -30,6 +31,8 @@ class requestservicecreate:
         openfoirequest.requesttype = foirequestschema.get("requestType")
         openfoirequest.initialdescription = foirequestschema.get("description")
         openfoirequest.receiveddate = foirequestschema.get("receivedDate")
+        if foirequestschema.get("requestType") == RequestType.PROACTIVE_DISCLOSURE.value:
+            openfoirequest.receiveddate = foirequestschema.get("startDate", foirequestschema.get("requestProcessStart"))
         openfoirequest.ministryRequests = self.__prepareministries(foirequestschema, activeversion, filenumber,ministryid, userid)               
         openfoirequest.contactInformations = self.__prearecontactinformation(foirequestschema, userid)       
         if requestservicebuilder().isNotBlankorNone(foirequestschema,"fromDate","main") == True:
@@ -68,6 +71,8 @@ class requestservicecreate:
             result = self.saverequest(foirequestschema, userid, foirequestid,ministryid,filenumber,activeversion,_foirequest["foirawrequestid"],_foirequest["wfinstanceid"])
             if result.success == True:
                 FOIMinistryRequest.deActivateFileNumberVersion(ministryid, filenumber, userid)
+                if foirequestschema.get("requestType") == "proactive disclosure":
+                    FOIProactiveDisclosureRequests.deActivateOldVersion(ministryid, userid)
             return result
     
     def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype = None):        
@@ -84,9 +89,13 @@ class requestservicecreate:
         foirequest.requestApplicants = requestserviceministrybuilder().createfoirequestappplicantfromobject(_foirequestapplicant, foirequestid,  _foirequest['version']+1, userid)
         foirequest.contactInformations = requestserviceministrybuilder().createfoirequestcontactfromobject( _foirequestcontact, foirequestid, _foirequest['version']+1, userid)
         foirequest.personalAttributes = requestserviceministrybuilder().createfoirequestpersonalattributefromobject(_foirequestpersonalattrbs, foirequestid, _foirequest['version']+1, userid)
+        if foirequest.requesttype == RequestType.PROACTIVE_DISCLOSURE.value:
+            foirequest.receiveddate = ministryrequestschema.get("startDate", ministryrequestschema.get("requestProcessStart"))
         result = FOIRequest.saverequest(foirequest)
         if result.success == True:
             FOIMinistryRequest.deActivateFileNumberVersion(ministryid, _foiministryrequest['filenumber'], userid)
+            if _foirequest.get("requesttype") == "proactive disclosure":
+                FOIProactiveDisclosureRequests.deActivateOldVersion(ministryid, userid)
         return result       
     
     def __prepareministries(self,foirequestschema, activeversion, filenumber,ministryid, userid):

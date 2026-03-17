@@ -13,12 +13,12 @@ import WarningIcon from "@material-ui/icons/Warning";
 
 const useStyles = makeStyles((theme) => ({
   dialogPaper: {
-    maxWidth: "600px",
+    maxWidth: "700px",
     width: "100%",
     fontFamily: "BCSans, sans-serif !important",
   },
   dialogTitle: {
-    padding: "24px 24px 16px",
+    padding: "35px 35px 10px 35px",
   },
   titleHeader: {
     display: "flex",
@@ -32,7 +32,8 @@ const useStyles = makeStyles((theme) => ({
     margin: "0 0 8px 0",
     color: "#036",
     fontFamily: "BCSans-Bold, sans-serif !important",
-    lineHeight: "1.6",
+    //lineHeight: "1.6",
+    marginLeft: "-3px",
   },
   subtitle: {
     fontSize: "14px",
@@ -48,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
   },
   dialogContent: {
     color: "#2D2D2D",
+    padding: "0px 35px",
   },
   selectAllContainer: {
     marginBottom: "16px",
@@ -56,15 +58,15 @@ const useStyles = makeStyles((theme) => ({
   },
   ministriesGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(5, 1fr)",
-    gap: "8px",
+    gridTemplateColumns: "repeat(9, 1fr)",
     marginBottom: "20px",
   },
   ministryCheckbox: {
     "& .MuiFormControlLabel-label": {
       fontSize: "13px",
-      color: "#333",
+      color: "#2D2D2D",
       fontFamily: "BCSans, sans-serif !important",
+      margin: "0 !important",
     },
   },
   warningBox: {
@@ -100,7 +102,7 @@ const useStyles = makeStyles((theme) => ({
     fontFamily: "BCSans-Bold, sans-serif !important",
   },
   dialogActions: {
-    padding: "16px 24px",
+    padding: "20px 35px 35px 35px",
     borderTop: "1px solid #e0e0e0",
     justifyContent: "flex-end",
     gap: "12px",
@@ -142,7 +144,7 @@ const ConfirmSaveModal = ({
   selectedMinistries = [],
   allMinistries = [],
   onProceed,
-  //onCancel,
+  onCancel,
 }) => {
   const classes = useStyles();
   const [modalOpen, setModalOpen] = useState(showModal);
@@ -201,7 +203,7 @@ const ConfirmSaveModal = ({
 
   const handleClose = () => {
     setModalOpen(false);
-    //onCancel?.();
+    onCancel?.();
   };
 
   const selectedCount = Object.values(ministries).filter(Boolean).length;
@@ -243,7 +245,7 @@ const ConfirmSaveModal = ({
                 <Checkbox
                   checked={selectAll}
                   onChange={handleSelectAll}
-                  //color="primary"
+                //color="primary"
                 />
               }
               label="Select all"

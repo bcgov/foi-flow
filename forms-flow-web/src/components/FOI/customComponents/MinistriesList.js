@@ -42,12 +42,12 @@ const MinistriesList = React.memo(
     useEffect(() => {
       setProgramAreaListItems(masterProgramAreaList);
       setError(
-        countOfMinistrySelected(programAreaList) !== 1 ||
-          !programAreaList?.some(
-            (programArea) =>
-              programArea.isChecked &&
-              isValidMinistryCode(programArea.bcgovcode, masterProgramAreaList)
-          )
+        countOfMinistrySelected(programAreaList) === 0 ||
+        !programAreaList?.some(
+          (programArea) =>
+            programArea.isChecked &&
+            isValidMinistryCode(programArea.bcgovcode, masterProgramAreaList)
+        )
       );
     }, [masterProgramAreaList, programAreaList]);
 
@@ -123,7 +123,7 @@ const MinistriesList = React.memo(
             </label>
           ))}
         </div>
-        <h5
+        {/* <h5
           className={clsx({
             [classes.showValidation]: countOfMinistry > 1,
             [classes.hideValidation]: countOfMinistry <= 1,
@@ -131,7 +131,7 @@ const MinistriesList = React.memo(
         >
           * Only Select 1 Ministry Client per request. Please deselect all
           expect 1 and open others as separate requests
-        </h5>
+        </h5> */}
       </div>
     );
   }
