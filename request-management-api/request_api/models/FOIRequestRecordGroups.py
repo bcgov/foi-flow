@@ -38,6 +38,17 @@ class FOIRequestRecordGroups(db.Model):
         )
 
     @classmethod
+    def remove_records_from_all_groups(cls, record_ids: set[int]) -> None:
+        if not record_ids:
+            return
+
+        (
+            db.session.query(cls)
+            .filter(cls.record_id.in_(record_ids))
+            .delete(synchronize_session=False)
+        )
+
+    @classmethod
     def get_record_ids(cls, document_set_id: int) -> set[int]:
         rows = (
             db.session.query(cls.record_id)
@@ -95,4 +106,3 @@ class FOIRequestRecordGroups(db.Model):
         )
 
         return deleted_count
-
