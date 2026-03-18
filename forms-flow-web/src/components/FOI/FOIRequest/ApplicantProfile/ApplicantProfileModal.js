@@ -86,7 +86,6 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose, applican
     }, [modalOpen, requestDetails, applicantId])
 
     useEffect(() => {
-        setCreateConfirmation(!selectedApplicant && requestDetails?.sourceOfSubmission == "onlineform")
         if (!selectedApplicant && requestDetails?.sourceOfSubmission == "onlineform") {
             // If no applicant assigned, set applicant profile modal data to match existing request data
             if (applicantType == "applicant") {
@@ -96,8 +95,12 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose, applican
                     firstName: requestDetails?.additionalPersonalInfo?.anotherFirstName,
                     lastName: requestDetails?.additionalPersonalInfo?.anotherLastName,
                     middleName: requestDetails?.additionalPersonalInfo?.anotherMiddleName,
-                    birthDate: requestDetails?.additionalPersonalInfo?.anotherBirthDate,
-                    alsoKnownAs: requestDetails?.additionalPersonalInfo?.anotherAlsoKnownAs
+                    additionalPersonalInfo: {
+                        birthDate: requestDetails?.additionalPersonalInfo?.anotherBirthDate,
+                        alsoKnownAs: requestDetails?.additionalPersonalInfo?.anotherAlsoKnownAs
+                    },
+                    publicServiceEmployeeNumber: requestDetails?.publicServiceEmployeeNumber,
+                    correctionalServiceNumber: requestDetails?.correctionalServiceNumber,
                 }
                 setSaveApplicantObject(onbehalfofApplicantObj)
             }
