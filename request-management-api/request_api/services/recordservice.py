@@ -155,6 +155,8 @@ class recordservice(recordservicebase):
 
                 # Apply all updates to the main record
                 updated_record = self._prepare_record_update(record, requestdata, userid)
+                if requestdata['isdelete'] and hasattr(updated_record, 'groups'):
+                    updated_record.groups = []
                 updated_orm_records.append(updated_record)
 
             if requestdata['isdelete']:
