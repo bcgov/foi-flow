@@ -234,39 +234,10 @@ const ApplicantProfileModalContent = ({
     );
   }
 
-  const renderApplicantProfileTabMessage = () => {
-    if (isChangeToDifferentProfile)
-      return (
-        <span style={{ fontSize: "13px" }}>
-          You are changing the applicant profile that is linked to this request.
-        </span>
-      );
-    if (isProfileDifferent)
-      return (
-        <span style={{ fontSize: "13px" }}>
-          Some of the fields in this profile do not match your original request.
-          <button
-            type="button"
-            className="btn-link btn-update-profile"
-            onClick={copyInfo}
-          >
-            UPDATE ALL
-          </button>
-        </span>
-      );
-    return (
-      <span style={{ fontSize: "13px" }}>
-        All of the fields in the applicant profile match your original request.
-      </span>
-    );
-  };
-
   if (showApplicantProfileTab) {
     if (selectedApplicant) {
       return (
         <>
-          {renderApplicantProfileTabMessage()}
-
           <ApplicantDetailsSections
             requestDetails={saveApplicantObject}
             contactDetailsNotGiven={false}
@@ -319,7 +290,7 @@ const ApplicantProfileModalContent = ({
             columns={requestHistoryColumns}
             rowHeight={30}
             headerHeight={50}
-            hideFooter={true}
+            hideFooter={false}
             loading={isLoading}
             // onRowClick={selectApplicantRow}
             getRowHeight={() => "auto"}

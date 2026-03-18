@@ -28,12 +28,9 @@ export const ApplicantProfileSearchView = ({
   setRequestHistory,
   initialSearchMode = "auto"
 }) => {
-  const [searchText, setSearchText] = useState("");
-  const [searchMode, setSearchMode] = useState(initialSearchMode);
-
- useEffect(() => {
-    if (searchText && searchText.length > 0) setSearchMode("manual")
-  }, [searchText])
+  const [firstNameSearchText, setFirstNameSearchText] = useState("")
+  const [lastNameSearchText, setLastNameSearchText] = useState("")
+  const [emailSearchText, setEmailSearchText] = useState("")
 
   const columns = [
     {
@@ -63,33 +60,40 @@ export const ApplicantProfileSearchView = ({
       flex: 1,
     },
     {
+      field: "category",
+      headerName: "CATEGORY",
+      flex: 1,
+    },
+    {
       field: "primaryPhone",
       headerName: "PRIMARY PHONE",
       flex: 1,
     },
   ];
 
-  const onSearchChange = (e) => {
-    if (searchMode === "auto") {
-      setSearchText(e.target.value);
-    }
-  };
+  const onFirstNameChange = (e) => {
+    setFirstNameSearchText(e.target.value);
+  }
+
+  const onLastNameChange = (e) => {
+    setLastNameSearchText(e.target.value);
+  }
+
+  const onEmailChange = (e) => {
+    setEmailSearchText(e.target.value);
+  }
 
   const search = (rows) => {
     return rows.filter(
       (r) =>
-        r.firstName?.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-        r.middleName?.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-        r.lastName?.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-        r.birthDate?.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-        r.email?.toLowerCase().indexOf(searchText.toLowerCase()) > -1 ||
-        r.primaryPhone?.toLowerCase().indexOf(searchText.toLowerCase()) > -1
+        r.firstName?.toLowerCase().indexOf(firstNameSearchText.toLowerCase()) > -1 ||
+        r.lastName?.toLowerCase().indexOf(lastNameSearchText.toLowerCase()) > -1 ||
+        r.email?.toLowerCase().indexOf(emailSearchText.toLowerCase()) > -1 
     );
   };
 
-  const onSearchEnter = (e) => {
-    if (searchMode === "manual" && e.key === "Enter") {
-      const keywordJSON = createKeywordJSON(e.target.value);
+  const searchKeywords = () => {
+    const keywordJSON = createKeywordsJSON();
       setIsLoading(true);
       dispatch(
         fetchApplicantProfileByKeyword(keywordJSON, (err, res) => {
@@ -112,33 +116,30 @@ export const ApplicantProfileSearchView = ({
           }
         }),
       );
+  }
+
+  const onSearchEnter = (e) => {
+    if (e.key === "Enter") {
+      searchKeywords()
     }
   };
-
-  const createKeywordJSON = (keyword) => {
+  const createKeywordsJSON = () => {
     const keywordJSON = {
       keywords: {},
     };
-    const mobileNumberRegex =
-      /^(\+\d{1,3}[-.●]?)?\(?\d{3}\)?[-.●]?\d{3}[-.●]?\d{4}$/;
     const stringRegex = /^[A-Za-z0-9\s.@!#$%^&*()\-_=+[\]{};:'",<.>/?\\|]+$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const isValidEmail = emailRegex.test(keyword);
-    const isValidNumber = mobileNumberRegex.test(keyword);
-    const isValidString = stringRegex.test(keyword);
+    const isValidEmail = stringRegex.test(emailSearchText);
+    const isValidFirstName = stringRegex.test(firstNameSearchText);
+    const isValidLastName = stringRegex.test(lastNameSearchText);
     if (isValidEmail) {
-      keywordJSON.keywords["email"] = keyword;
+      keywordJSON.keywords["email"] = emailSearchText;
     }
-    if (isValidNumber) {
-      keywordJSON.keywords["homephone"] = keyword;
-      keywordJSON.keywords["workphone"] = keyword;
-      keywordJSON.keywords["workphone2"] = keyword;
-      keywordJSON.keywords["mobilephone"] = keyword;
+    if (isValidFirstName) {
+      keywordJSON.keywords["firstname"] = firstNameSearchText;
     }
-    if (isValidString) {
-      keywordJSON.keywords["firstname"] = keyword;
-      keywordJSON.keywords["lastname"] = keyword;
-      keywordJSON.keywords["email"] = keyword;
+    if (isValidLastName) {
+      keywordJSON.keywords["lastname"] = lastNameSearchText;
     }
     return keywordJSON;
   };
@@ -190,23 +191,52 @@ export const ApplicantProfileSearchView = ({
           }}
         >
           <InputBase
-            id="filter"
-            placeholder="Search..."
-            defaultValue={searchText}
-            onChange={onSearchChange}
+            id="filter-firstname"
+            placeholder="First Name"
+            defaultValue={firstNameSearchText}
+            onChange={onFirstNameChange}
             onKeyDown={onSearchEnter}
             sx={{
               color: "#38598A",
             }}
             startAdornment={
               <InputAdornment position="start">
-                <IconButton sx={{ color: "#38598A" }}>
+                <IconButton sx={{ color: "#38598A" }} onClick={() => searchKeywords()}>
                   <span className="hideContent">Search</span>
                   <SearchIcon />
                 </IconButton>
               </InputAdornment>
             }
-            fullWidth
+            endAdornment={
+              <InputAdornment position="start">
+                OR
+              </InputAdornment>
+            }
+          />
+          <InputBase
+            id="filter-lastname"
+            placeholder="Last Name"
+            defaultValue={lastNameSearchText}
+            onChange={onLastNameChange}
+            onKeyDown={onSearchEnter}
+            sx={{
+              color: "#38598A",
+            }}
+            endAdornment={
+              <InputAdornment position="start">
+                OR
+              </InputAdornment>
+            }
+          />
+          <InputBase
+            id="filter-email"
+            placeholder="Email"
+            defaultValue={emailSearchText}
+            onChange={onEmailChange}
+            onKeyDown={onSearchEnter}
+            sx={{
+              color: "#38598A",
+            }}
           />
         </Grid>
         <Grid
@@ -214,23 +244,15 @@ export const ApplicantProfileSearchView = ({
           container
           alignItems="flex-start"
           justifyContent="center"
-          xs={2.5}
+          xs={1}
           minWidth="100px"
         >
           <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
             <ClickableChip
-              label={"MANUAL"}
+              label={"Search"}
               color="primary"
               size="small"
-              onClick={() => setSearchMode("manual")}
-              clicked={searchMode === "manual"}
-            />
-            <ClickableChip
-              label={"AUTO"}
-              color="primary"
-              size="small"
-              onClick={() => setSearchMode("auto")}
-              clicked={searchMode === "auto"}
+              onClick={() => searchKeywords()}
             />
           </Stack>
         </Grid>
@@ -240,7 +262,7 @@ export const ApplicantProfileSearchView = ({
           className="foi-data-grid foi-applicant-data-grid"
           rows={search(rows)}
           columns={columns}
-          hideFooter={true}
+          hideFooter={false}
           pageSizeOptions={[5]}
           rowHeight={30}
           headerHeight={50}
