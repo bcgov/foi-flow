@@ -115,7 +115,6 @@ const OnBehalfOfDetails = React.memo(({requestDetails, createSaveRequestObject, 
             <Typography className={classes.heading}>ON BEHALF OF DETAILS</Typography>
         </AccordionSummary>
         <AccordionDetails>
-            {!openApplicantProfileModal &&
                 <button
                 type="button"
                 className={`btn btn-link btn-description-history`}
@@ -123,7 +122,6 @@ const OnBehalfOfDetails = React.memo(({requestDetails, createSaveRequestObject, 
                 >
                     Applicant Profiles
                 </button>
-            }
                 <div className="row foi-details-row">
                     <div className="col-lg-6 foi-details-col">                        
                         <TextField      

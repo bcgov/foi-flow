@@ -135,15 +135,6 @@ const ApplicantProfileModalContent = ({
         </Alert>
       </>
     );
-  if (confirmationMessage)
-    return (
-      <div style={{ textAlign: "center" }}>
-        The linked applicant profile will be removed, but the information for
-        this request will stay the same. You can make updates to the request,
-        and when the request is moved into the Open state, the correspondening
-        applicant profile will be automatically created.
-      </div>
-    );
 
   if (confirmationMessage)
     return (
