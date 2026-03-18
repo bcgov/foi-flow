@@ -31,13 +31,18 @@ class applicantservice:
 
     def searchapplicant(self, keywords):
         applicantqueue = []
-        applicants = FOIRequestApplicant.search_composite_applicant(keywords)
+        applicants = FOIRequestApplicant.search_applicant_limited(keywords)
+        print('\n**COMPOSITE APPLICANTS: ', applicants)
         excluded_profile_ids = []
         if applicants is not None:
             for applicant in applicants:
                 applicantqueue.append(self.__prepareapplicant(applicant))
                 excluded_profile_ids.append(self.__first_not_null(applicant["applicantprofileid"]))
-        applicantprofiles = FOIRequestApplicant.search_applicant_profiles(keywords, excluded_profile_ids)
+        clean_ids = [i for i in excluded_profile_ids if i is not None]
+        applicantprofiles = FOIRequestApplicant.search_applicant_profiles(keywords, clean_ids)
+        print('\n**excluded_profile_ids: ', excluded_profile_ids)
+        print('\n**clean_ids: ', clean_ids)
+        print('\n**applicantprofiles: ', applicantprofiles, '\n')
         if applicantprofiles:
             for applicant in applicantprofiles:
                 applicantqueue.append(self.__prepareapplicant(applicant))
