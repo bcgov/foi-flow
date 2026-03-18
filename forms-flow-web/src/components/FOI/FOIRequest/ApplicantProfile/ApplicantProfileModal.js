@@ -321,6 +321,8 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose, applican
           minWidth={400}
           minHeight={200}
           className={`${classes.root} applicant-profile-modal state-change-dialog`}
+          top={applicantType == "onbehalfof" ? 1350 : 100}
+          left={applicantType == "onbehalfof" ? 198 : 500}
           onRequestClose={handleClose}
           isOpen={modalOpen}
         >
