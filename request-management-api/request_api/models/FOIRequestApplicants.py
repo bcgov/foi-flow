@@ -791,6 +791,96 @@ class FOIRequestApplicant(db.Model):
         applicantprofile_schema = ApplicantProfileCompositeSchema(many=True)
         return applicantprofile_schema.dump(query_aggregate.all())
 
+    # This is a temporary search that only searches through firstname, lastname, email.
+    # We can either expand it to replace the above, or remove it and fix the above
+    @classmethod
+    def search_applicant_limited(cls, keywords):
+        from sqlalchemy.orm import aliased
+        _session = db.session
+
+        # Aliases
+        contactemail = aliased(FOIRequestContactInformation)
+        searchapplicant = aliased(FOIRequestApplicant)
+        applicantmapping = aliased(FOIRequestApplicantMapping)
+        latest_foirequest = aliased(FOIRequest)
+
+        # Subquery: max version per FOIRequest
+        subquery_max_version = (
+            _session.query(
+                FOIRequest.foirequestid.label("foirequestid"),
+                func.max(FOIRequest.version).label("max_version")
+            )
+            .group_by(FOIRequest.foirequestid)
+            .subquery()
+        )
+
+        query = (
+            _session.query(
+                searchapplicant.applicantprofileid,
+                searchapplicant.foirequestapplicantid,
+                searchapplicant.axisapplicantid,
+                searchapplicant.category,
+                searchapplicant.lastname,
+                searchapplicant.firstname,
+                searchapplicant.middlename,
+                searchapplicant.address,
+                searchapplicant.address_secondary,
+                searchapplicant.city,
+                searchapplicant.province,
+                searchapplicant.country,
+                searchapplicant.postal,
+                searchapplicant.home_phone,
+                searchapplicant.mobile_phone,
+                searchapplicant.work_phone,
+                searchapplicant.alternative_phone,
+                searchapplicant.other_contact_info,
+                contactemail.contactinformation.label("email"),
+                searchapplicant.businessname,
+                searchapplicant.dob,
+                searchapplicant.alsoknownas,
+                searchapplicant.personal_health_number,
+                searchapplicant.employee_number,
+                searchapplicant.correction_number,
+                searchapplicant.other_notes,
+                searchapplicant.section43_info,
+                searchapplicant.request_history,
+            ).join(
+                applicantmapping,
+                searchapplicant.foirequestapplicantid == applicantmapping.foirequestapplicantid
+            ).join(
+                latest_foirequest,
+                and_(
+                    latest_foirequest.foirequestid == applicantmapping.foirequest_id,
+                    latest_foirequest.version == applicantmapping.foirequestversion_id
+                )
+            ).join(
+                subquery_max_version,
+                and_(
+                    subquery_max_version.c.foirequestid == latest_foirequest.foirequestid,
+                    subquery_max_version.c.max_version == latest_foirequest.version
+                )
+            ).join(
+                contactemail,
+                and_(
+                    contactemail.foirequest_id == latest_foirequest.foirequestid,
+                    contactemail.foirequestversion_id == latest_foirequest.version,
+                    contactemail.contacttypeid == 1  # assuming 1 = email
+                ),
+                isouter=True
+            ).distinct(searchapplicant.applicantprofileid)
+        )
+
+        if keywords.get("firstname"):
+            query = query.filter(searchapplicant.firstname.ilike(f"%{keywords.get('firstname')}%"))
+
+        if keywords.get("lastname"):
+            query = query.filter(searchapplicant.lastname.ilike(f"%{keywords.get('lastname')}%"))
+
+        if keywords.get("email"):
+            query = query.filter(contactemail.contactinformation.ilike(f"%{keywords.get('email')}%"))
+
+        applicantprofile_schema = ApplicantProfileBaseSchema(many=True)
+        return applicantprofile_schema.dump(query.all())
 
     @classmethod
     def getsearchfilters(cls, searchapplicant, searchcontactinfo, keywords, contactemail, contacthomephone, contactworkphone, contactworkphone2, contactmobilephone):
