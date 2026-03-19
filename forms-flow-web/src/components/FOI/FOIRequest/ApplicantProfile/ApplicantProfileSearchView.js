@@ -10,11 +10,12 @@ import IconButton from "@mui/material/IconButton";
 import { ClickableChip } from "../../Dashboard/utils";
 import { DataGrid } from "@mui/x-data-grid";
 import { toast } from "react-toastify";
-
+import './applicantprofile.scss';
 import {
   fetchApplicantProfileByKeyword,
   fetchApplicantRequests,
 } from "../../../../apiManager/services/FOI/foiApplicantProfileService";
+import { Button } from "@mui/material";
 
 export const ApplicantProfileSearchView = ({
   setShowApplicantProfileTab,
@@ -209,7 +210,7 @@ export const ApplicantProfileSearchView = ({
             }
             endAdornment={
               <InputAdornment position="start">
-                OR
+                AND
               </InputAdornment>
             }
           />
@@ -224,7 +225,7 @@ export const ApplicantProfileSearchView = ({
             }}
             endAdornment={
               <InputAdornment position="start">
-                OR
+                AND
               </InputAdornment>
             }
           />
@@ -239,23 +240,13 @@ export const ApplicantProfileSearchView = ({
             }}
           />
         </Grid>
-        <Grid
-          item
-          container
-          alignItems="flex-start"
-          justifyContent="center"
-          xs={1}
-          minWidth="100px"
-        >
-          <Stack direction="row" sx={{ overflowX: "hidden" }} spacing={1}>
-            <ClickableChip
-              label={"Search"}
-              color="primary"
-              size="small"
-              onClick={() => searchKeywords()}
-            />
-          </Stack>
-        </Grid>
+        <button onClick={(e) => {
+            e.preventDefault();
+            searchKeywords()
+          }} 
+          className="search-button">
+          Search
+        </button>
       </Paper>
       <Box sx={{ height: "calc(100% - 100px)", width: "100%" }}>
         <DataGrid
