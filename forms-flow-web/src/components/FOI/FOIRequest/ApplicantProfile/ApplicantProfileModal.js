@@ -293,7 +293,7 @@ const ApplicantProfileModal = React.memo(({modalOpen, handleModalClose, applican
     }
 
     const isSaveDisabled = () => {
-        if (isBeforeOpen(requestDetails) && !applicantId) {
+        if (!applicantId) {
             return false
         } else {
             if (isChangeToDifferentProfile) return false

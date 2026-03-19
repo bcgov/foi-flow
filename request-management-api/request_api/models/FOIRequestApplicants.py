@@ -489,7 +489,7 @@ class FOIRequestApplicant(db.Model):
 
         query = (
             db.session.query(FOIRequestApplicant)
-            .filter(or_(*conditions))
+            .filter(and_(*conditions))
             .filter(FOIRequestApplicant.is_active.is_(True))
             .order_by(
                 FOIRequestApplicant.applicantprofileid,
@@ -799,7 +799,6 @@ class FOIRequestApplicant(db.Model):
         _session = db.session
 
         # Aliases
-        contactemail = aliased(FOIRequestContactInformation)
         searchapplicant = aliased(FOIRequestApplicant)
         applicantmapping = aliased(FOIRequestApplicantMapping)
         latest_foirequest = aliased(FOIRequest)
@@ -811,6 +810,28 @@ class FOIRequestApplicant(db.Model):
                 func.max(FOIRequest.version).label("max_version")
             )
             .group_by(FOIRequest.foirequestid)
+            .subquery()
+        )
+
+        email_ranked = (
+            _session.query(
+                FOIRequestContactInformation.foirequest_id,
+                FOIRequestContactInformation.foirequestversion_id,
+                FOIRequestContactInformation.contactinformation.label("email"),
+                func.row_number().over(
+                    partition_by=(
+                        FOIRequestContactInformation.foirequest_id,
+                        FOIRequestContactInformation.foirequestversion_id
+                    ),
+                    order_by=FOIRequestContactInformation.created_at.desc()  # or id desc
+                ).label("rn")
+            )
+            .filter(FOIRequestContactInformation.contacttypeid == 1)
+            .subquery()
+        )
+        email_subquery = (
+            _session.query(email_ranked)
+            .filter(email_ranked.c.rn == 1)
             .subquery()
         )
 
@@ -834,7 +855,7 @@ class FOIRequestApplicant(db.Model):
                 searchapplicant.work_phone,
                 searchapplicant.alternative_phone,
                 searchapplicant.other_contact_info,
-                contactemail.contactinformation.label("email"),
+                email_subquery.c.email,
                 searchapplicant.businessname,
                 searchapplicant.dob,
                 searchapplicant.alsoknownas,
@@ -860,13 +881,15 @@ class FOIRequestApplicant(db.Model):
                     subquery_max_version.c.max_version == latest_foirequest.version
                 )
             ).join(
-                contactemail,
+                email_subquery,
                 and_(
-                    contactemail.foirequest_id == latest_foirequest.foirequestid,
-                    contactemail.foirequestversion_id == latest_foirequest.version,
-                    contactemail.contacttypeid == 1  # assuming 1 = email
+                    email_subquery.c.foirequest_id == latest_foirequest.foirequestid,
+                    email_subquery.c.foirequestversion_id == latest_foirequest.version
                 ),
                 isouter=True
+            ).order_by(
+                searchapplicant.applicantprofileid,
+                latest_foirequest.version.desc()
             ).distinct(searchapplicant.applicantprofileid)
         )
 
@@ -877,7 +900,7 @@ class FOIRequestApplicant(db.Model):
             query = query.filter(searchapplicant.lastname.ilike(f"%{keywords.get('lastname')}%"))
 
         if keywords.get("email"):
-            query = query.filter(contactemail.contactinformation.ilike(f"%{keywords.get('email')}%"))
+            query = query.filter(email_subquery.c.email.ilike(f"%{keywords.get('email')}%"))
 
         applicantprofile_schema = ApplicantProfileBaseSchema(many=True)
         return applicantprofile_schema.dump(query.all())
@@ -1276,6 +1299,7 @@ class ApplicantProfileBaseSchema(ma.Schema): # For profiles with data solely fro
     section43_info = fields.String(attribute="section43_info")
     requestHistory = fields.Dict(attribute="request_history")
     applicantcategory = fields.String(attribute="category")
+    dob = fields.Date(format="%Y-%m-%d")
 
     class Meta:
         fields = (
