@@ -19,15 +19,15 @@ export const validateApplicantProfileFields = (applicantProfile) => {
   const emailProvided = email && email.length > 0;
   const emailValid = emailProvided && EmailValidator.validate(email);
   const addressFieldsValid =
-    (applicantProfile?.address !== "" && applicantProfile?.address !== null && applicantProfile?.address?.length <= 120) && 
-    (applicantProfile?.city !== "" && applicantProfile?.city !== null && applicantProfile?.city?.length <= 120) &&
-    (applicantProfile?.province !== "" && applicantProfile?.province !== null && applicantProfile?.province?.length <= 120) &&
-    (applicantProfile?.country !== "" && applicantProfile?.country !== null && applicantProfile?.country?.length <= 120) &&
-    (applicantProfile?.postal !== "" && applicantProfile?.postal !== null && applicantProfile?.postal?.length <= 6);
+    (Object.hasOwn(applicantProfile, 'address') && applicantProfile?.address !== "" && applicantProfile?.address !== null && applicantProfile?.address?.length <= 120) && 
+    (Object.hasOwn(applicantProfile, 'city') && applicantProfile?.city !== "" && applicantProfile?.city !== null && applicantProfile?.city?.length <= 120) &&
+    (Object.hasOwn(applicantProfile, 'province') && applicantProfile?.province !== "" && applicantProfile?.province !== null && applicantProfile?.province?.length <= 120) &&
+    (Object.hasOwn(applicantProfile, 'country') && applicantProfile?.country !== "" && applicantProfile?.country !== null && applicantProfile?.country?.length <= 120) &&
+    (Object.hasOwn(applicantProfile, 'postal') &&  applicantProfile?.postal !== "" && applicantProfile?.postal !== null && applicantProfile?.postal?.length <= 6);
   const applicantDetailFieldsValid = 
-    (applicantProfile?.firstName !== "" && applicantProfile?.firstName !== null && applicantProfile?.firstName?.length <= 50) && 
-    (applicantProfile?.lastName !== "" && applicantProfile?.lastName !== null && applicantProfile?.lastName?.length <= 50) &&
-    (applicantProfile?.category !== "" && applicantProfile?.category !== null);
+    (Object.hasOwn(applicantProfile, 'firstName') && applicantProfile?.firstName !== "" && applicantProfile?.firstName !== null && applicantProfile?.firstName?.length <= 50) && 
+    (Object.hasOwn(applicantProfile, 'lastName') && applicantProfile?.lastName !== "" && applicantProfile?.lastName !== null && applicantProfile?.lastName?.length <= 50) &&
+    (Object.hasOwn(applicantProfile, 'category') && applicantProfile?.category !== "" && applicantProfile?.category !== null);
   const charFieldLengthInvalid = 
     applicantProfile?.address?.length > 120 ||
     applicantProfile?.city?.length > 120 ||
