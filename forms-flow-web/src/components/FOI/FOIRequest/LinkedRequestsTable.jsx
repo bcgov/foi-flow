@@ -35,7 +35,7 @@ export const LinkedRequestsTable = ({
 
     return (
         <>
-            {linkedRequests?.length > 0 &&
+            {linkedRequestsInfo?.length > 0 &&
             <>
             <TableContainer sx={{display:"flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center", minHeight: "410px"}}>
                 <Table
