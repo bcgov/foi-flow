@@ -1,7 +1,7 @@
 """Enforce single document set ownership per record
 
 Revision ID: c94f5a9b3e21
-Revises: 8253475faad7
+Revises: 786d5b509254
 Create Date: 2026-03-17 11:30:00.000000
 
 """
@@ -10,7 +10,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = 'c94f5a9b3e21'
-down_revision = '8253475faad7'
+down_revision = '786d5b509254'
 branch_labels = None
 depends_on = None
 
