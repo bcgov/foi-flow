@@ -64,12 +64,7 @@ export const ApplicantProfileSearchView = ({
       field: "category",
       headerName: "CATEGORY",
       flex: 1,
-    },
-    {
-      field: "primaryPhone",
-      headerName: "PRIMARY PHONE",
-      flex: 1,
-    },
+    }
   ];
 
   const onFirstNameChange = (e) => {
