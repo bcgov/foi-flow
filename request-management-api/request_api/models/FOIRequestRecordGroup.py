@@ -71,13 +71,10 @@ class FOIRequestRecordGroup(db.Model):
             db.session.flush()  # now group.document_set_id is available
 
             # 2. Insert into association table
-            for rid in sorted(set(records)):
-                db.session.execute(
-                    db.insert(FOIRequestRecordGroups).values(
-                        document_set_id=group.document_set_id,
-                        record_id=rid,
-                    )
-                )
+            FOIRequestRecordGroups.add_records(
+                document_set_id=group.document_set_id,
+                record_ids=set(records),
+            )
 
             db.session.commit()
             return group
@@ -187,4 +184,3 @@ class FOIRequestRecordGroup(db.Model):
             )
             .first()
         )
-
