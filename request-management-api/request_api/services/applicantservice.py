@@ -79,9 +79,9 @@ class applicantservice:
                 rawrequest['assignedto'],
                 rawrequest['status'], 
                 userid,
-                rawrequest['assignee.firstname'],
-                rawrequest['assignee.middlename'],
-                rawrequest['assignee.lastname'],
+                rawrequest.get('assignee.firstname'),
+                rawrequest.get('assignee.middlename'),
+                rawrequest.get('assignee.lastname'),
                 rawrequest['requeststatuslabel']
             )
         return DefaultMethodResult(True,'Applicant profile created',applicantschema['foiRequestApplicantID'])
@@ -128,9 +128,9 @@ class applicantservice:
                 rawrequest['assignedto'],
                 rawrequest['status'], 
                 userid,
-                rawrequest['assignee.firstname'],
-                rawrequest['assignee.middlename'],
-                rawrequest['assignee.lastname'],
+                rawrequest.get('assignee.firstname'),
+                rawrequest.get('assignee.middlename'),
+                rawrequest.get('assignee.lastname'),
                 rawrequest['requeststatuslabel']
             )
             updated_primary_requests.append(rawrequest.get("axisrequestid"))
@@ -144,9 +144,9 @@ class applicantservice:
                 rawrequest['assignedto'],
                 rawrequest['status'], 
                 userid,
-                rawrequest['assignee.firstname'],
-                rawrequest['assignee.middlename'],
-                rawrequest['assignee.lastname'],
+                rawrequest.get('assignee.firstname'),
+                rawrequest.get('assignee.middlename'),
+                rawrequest.get('assignee.lastname'),
                 rawrequest['requeststatuslabel']
             )
             updated_onbehalfof_requests.append(rawrequest.get("axisrequestid"))
@@ -179,9 +179,9 @@ class applicantservice:
                 rawrequest['assignedto'],
                 rawrequest['status'], 
                 userid,
-                rawrequest['assignee.firstname'],
-                rawrequest['assignee.middlename'],
-                rawrequest['assignee.lastname'],
+                rawrequest.get('assignee.firstname'),
+                rawrequest.get('assignee.middlename'),
+                rawrequest.get('assignee.lastname'),
                 rawrequest['requeststatuslabel']
             )
         return DefaultMethodResult(True,
@@ -213,9 +213,9 @@ class applicantservice:
             rawrequest['assignedto'],
             rawrequest['status'], 
             userid,
-            rawrequest['assignee.firstname'],
-            rawrequest['assignee.middlename'],
-            rawrequest['assignee.lastname'],
+            rawrequest.get('assignee.firstname'),
+            rawrequest.get('assignee.middlename'),
+            rawrequest.get('assignee.lastname'),
             rawrequest['requeststatuslabel']
         )
         return DefaultMethodResult(True,'Applicant profile unassigned from request',rawrequestid)
