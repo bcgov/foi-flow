@@ -902,13 +902,21 @@ class FOIRequestApplicant(db.Model):
         if keywords.get("email"):
             query = query.filter(email_subquery.c.email.ilike(f"%{keywords.get('email')}%"))
 
-        applicantprofile_schema = ApplicantProfileBaseSchema(many=True)
-        return applicantprofile_schema.dump(query.all())
+        temp_applicants = ApplicantProfileBaseSchema(many=True)
+        data = temp_applicants.dump(query.all())
+        applicantprofileids = []
+        for applicant in data:
+            applicantprofileids.append(applicant['applicantprofileid'])
+        keywords = {"applicantprofileids": applicantprofileids}
+        applicants = cls.search_composite_applicant(keywords)
+        return applicants
 
     @classmethod
     def getsearchfilters(cls, searchapplicant, searchcontactinfo, keywords, contactemail, contacthomephone, contactworkphone, contactworkphone2, contactmobilephone):
         searchfilters = []
         if(len(keywords) > 0):
+            if('applicantprofileids' in keywords):
+                searchfilters.append(searchapplicant.applicantprofileid.in_(keywords['applicantprofileids']))
             if('firstname' in keywords):
                 searchfilters.append(searchapplicant.firstname.ilike('%'+keywords['firstname']+'%'))
 
