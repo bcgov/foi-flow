@@ -60,6 +60,8 @@ class FOIRequestRecordGroup(db.Model):
     ) -> "FOIRequestRecordGroup | None":
 
         try:
+            record_ids = set(records)
+
             # 1. Insert parent group
             group = cls(
                 ministry_request_id=ministry_request_id,
@@ -70,14 +72,17 @@ class FOIRequestRecordGroup(db.Model):
             db.session.add(group)
             db.session.flush()  # now group.document_set_id is available
 
-            # 2. Insert into association table
-            for rid in sorted(set(records)):
-                db.session.execute(
-                    db.insert(FOIRequestRecordGroups).values(
-                        document_set_id=group.document_set_id,
-                        record_id=rid,
-                    )
-                )
+            # 2. Enforce one-group-per-record before inserting associations
+            FOIRequestRecordGroups.remove_from_other_groups(
+                document_set_id=group.document_set_id,
+                record_ids=record_ids,
+            )
+
+            # 3. Insert into association table
+            FOIRequestRecordGroups.add_records(
+                document_set_id=group.document_set_id,
+                record_ids=record_ids,
+            )
 
             db.session.commit()
             return group
@@ -187,4 +192,3 @@ class FOIRequestRecordGroup(db.Model):
             )
             .first()
         )
-
