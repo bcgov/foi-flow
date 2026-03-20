@@ -16,7 +16,7 @@ import { useSelector } from "react-redux";
 export const LinkedRequestsTable = ({
     linkedRequestsInfo,
     linkedRequests,
-    renderReviewRequest,
+    renderRequest,
     isMinistry,
     handleOpenModal
 }) => {
@@ -79,7 +79,7 @@ export const LinkedRequestsTable = ({
                                 <Link
                                     component="button"
                                     sx={{ color: "#38598A", cursor: "pointer", textDecoration: "underline"}}
-                                    onClick={(e) => renderReviewRequest(e, reqObj)}
+                                    onClick={(e) => renderRequest(e, reqObj)}
                                     className="linked-request-link"
                                 >
                                 {reqObj.axisrequestid}
