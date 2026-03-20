@@ -548,7 +548,6 @@ const AddressContactDetails = memo(
                 className={warning && warning(FOI_COMPONENT_CONSTANTS.POSTALCODE) && classes.warning}
                 value={postalText}
                 onChange={handlePostalChange}
-                inputProps={{ maxLength: 6 }}
                 fullWidth
                 required={true}
                 disabled={disableInput}

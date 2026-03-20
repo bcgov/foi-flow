@@ -23,7 +23,7 @@ export const validateApplicantProfileFields = (applicantProfile) => {
     (Object.hasOwn(applicantProfile, 'city') && applicantProfile?.city !== "" && applicantProfile?.city !== null && applicantProfile?.city?.length <= 120) &&
     (Object.hasOwn(applicantProfile, 'province') && applicantProfile?.province !== "" && applicantProfile?.province !== null && applicantProfile?.province?.length <= 120) &&
     (Object.hasOwn(applicantProfile, 'country') && applicantProfile?.country !== "" && applicantProfile?.country !== null && applicantProfile?.country?.length <= 120) &&
-    (Object.hasOwn(applicantProfile, 'postal') &&  applicantProfile?.postal !== "" && applicantProfile?.postal !== null && applicantProfile?.postal?.length <= 6);
+    (Object.hasOwn(applicantProfile, 'postal') &&  applicantProfile?.postal !== "" && applicantProfile?.postal !== null && applicantProfile?.postal?.length <= 10);
   const applicantDetailFieldsValid = 
     (Object.hasOwn(applicantProfile, 'firstName') && applicantProfile?.firstName !== "" && applicantProfile?.firstName !== null && applicantProfile?.firstName?.length <= 50) && 
     (Object.hasOwn(applicantProfile, 'lastName') && applicantProfile?.lastName !== "" && applicantProfile?.lastName !== null && applicantProfile?.lastName?.length <= 50) &&
@@ -33,7 +33,7 @@ export const validateApplicantProfileFields = (applicantProfile) => {
     applicantProfile?.city?.length > 120 ||
     applicantProfile?.province?.length > 120 ||
     applicantProfile?.country?.length > 120 ||
-    applicantProfile?.postal?.length > 6 ||
+    applicantProfile?.postal?.length > 10 ||
     applicantProfile?.middleName?.length > 50 ||
     applicantProfile?.businessName?.length > 255 ||
     applicantProfile?.addressSecondary?.length > 120 ||
