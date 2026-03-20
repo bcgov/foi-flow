@@ -64,7 +64,7 @@ class FOIRequestApplicant(db.Model):
         if is_new:
             applicant.applicantprofileid = str(uuid.uuid4())
         else:
-            applicant.applicantprofileid = requestdata.get("applicantprofileid", str(uuid.uuid4()))
+            applicant.applicantprofileid = requestdata.get("applicantprofileid")
         applicant.firstname = requestdata.get("firstName")
         applicant.middlename = requestdata.get("middleName")
         applicant.lastname = requestdata.get("lastName")
@@ -98,23 +98,27 @@ class FOIRequestApplicant(db.Model):
         applicant.is_active = True
         return applicant
 
-    # @classmethod
-    # def child_from_additional_personal_info(cls, addlapplicantinfo, is_new = False):
-    #     applicant = FOIRequestApplicant()
-    #     applicant.firstname = addlapplicantinfo.get("childFirstName", None)
-    #     applicant.middlename = addlapplicantinfo.get("childMiddleName", None)
-    #     applicant.lastname = addlapplicantinfo.get("childLastName", None)
-    #     alsoknownas = addlapplicantinfo.get("childAlsoKnownAs", None)
-    #     applicant.alsoknownas = alsoknownas if alsoknownas else None
-    #     dob = addlapplicantinfo.get("childBirthDate", None)
-    #     applicant.dob = datetime.fromisoformat(dob) if dob else None
-    #     applicant.businessname = None
-    #     if is_new:
-    #         applicant.applicantprofileid = str(uuid.uuid4())
-    #     else:
-    #         applicant.applicantprofileid = applicant.get("applicantprofileid", str(uuid.uuid4()))
-    #     applicant.is_active = True
-    #     return applicant
+    @classmethod
+    def child_from_additional_personal_info(cls, addlapplicantinfo, is_new = False):
+        applicant = FOIRequestApplicant()
+        applicant.firstname = addlapplicantinfo.get("childFirstName", None)
+        applicant.middlename = addlapplicantinfo.get("childMiddleName", None)
+        applicant.lastname = addlapplicantinfo.get("childLastName", None)
+        alsoknownas = addlapplicantinfo.get("childAlsoKnownAs", None)
+        applicant.alsoknownas = alsoknownas if alsoknownas else None
+        dob_str = addlapplicantinfo.get("childBirthDate")
+        if dob_str and dob_str.strip():
+            date = datetime.fromisoformat(dob_str).replace(tzinfo=None) # normalize to naive datetime to match DB
+            applicant.dob = date
+        else:
+            applicant.dob = None
+        applicant.businessname = None
+        if is_new:
+            applicant.applicantprofileid = str(uuid.uuid4())
+        else:
+            applicant.applicantprofileid = addlapplicantinfo.get("applicantprofileid")
+        applicant.is_active = True
+        return applicant
 
     @classmethod
     def onbehalfof_from_applicantschema(cls, applicantschema, is_new = False):
@@ -131,7 +135,7 @@ class FOIRequestApplicant(db.Model):
         if is_new:
             applicant.applicantprofileid = str(uuid.uuid4())
         else:
-            applicant.applicantprofileid = applicantschema.get("applicantprofileid", str(uuid.uuid4()))
+            applicant.applicantprofileid = applicantschema.get("applicantprofileid")
         applicant.is_active = True
         return applicant
 
