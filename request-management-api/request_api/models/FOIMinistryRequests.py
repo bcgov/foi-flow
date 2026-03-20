@@ -267,16 +267,16 @@ class FOIMinistryRequest(db.Model):
         applicant = aliased(FOIRequestApplicant)
 
         #subquery for getting latest version & proper group/team for FOIMinistryRequest
-        subquery_ministry_maxversion = _session.query(FOIMinistryRequest.foirequest_id, func.max(FOIMinistryRequest.foirequestversion_id).label('max_version')).group_by(FOIMinistryRequest.foirequest_id).subquery()
-        joincondition_ministry = [
-            subquery_ministry_maxversion.c.foirequest_id == FOIRequestApplicantMapping.foirequest_id,
-            subquery_ministry_maxversion.c.max_version == FOIRequestApplicantMapping.foirequestversion_id,
-        ]
+        subquery_ministry_maxversion = _session.query(FOIMinistryRequest.foirequest_id, func.max(FOIMinistryRequest.foirequestversion_id).label('max_version')).group_by(FOIMinistryRequest.foirequest_id).subquery(name="latest_request")
 
         query = db.session.query(
                                 *selectedcolumns
-                            ).distinct(
-                                FOIMinistryRequest.foiministryrequestid
+                            ).join(
+                                subquery_ministry_maxversion,
+                                and_(
+                                    subquery_ministry_maxversion.c.foirequest_id == FOIMinistryRequest.foirequest_id,
+                                    subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.foirequestversion_id
+                                )
                             ).join(
                                 applicant,
                                 applicant.foirequestapplicantid == applicantid,
@@ -289,15 +289,13 @@ class FOIMinistryRequest(db.Model):
                                     FOIRequestApplicantMapping.foirequestapplicantid == FOIRequestApplicant.foirequestapplicantid,
                                     FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id,
                                     FOIRequestApplicantMapping.requestortypeid == requestortypeid)
-                            ).join(
-                                subquery_ministry_maxversion,
-                                and_(*joincondition_ministry)
                             ).filter(
                                 # FOIRequestApplicant.foirequestapplicantid == applicantid,
                                 FOIMinistryRequest.requeststatusid != 3
+                            ).distinct(FOIMinistryRequest.foiministryrequestid
                             ).order_by(
                                 FOIMinistryRequest.foiministryrequestid.asc(),
-                                FOIMinistryRequest.version.asc())
+                                FOIMinistryRequest.version.desc())
         return [r._asdict() for r in query]
 
     @classmethod

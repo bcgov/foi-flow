@@ -489,7 +489,7 @@ class FOIRequestApplicant(db.Model):
 
         query = (
             db.session.query(FOIRequestApplicant)
-            .filter(or_(*conditions))
+            .filter(and_(*conditions))
             .filter(FOIRequestApplicant.is_active.is_(True))
             .order_by(
                 FOIRequestApplicant.applicantprofileid,
@@ -791,11 +791,132 @@ class FOIRequestApplicant(db.Model):
         applicantprofile_schema = ApplicantProfileCompositeSchema(many=True)
         return applicantprofile_schema.dump(query_aggregate.all())
 
+    # This is a temporary search that only searches through firstname, lastname, email.
+    # We can either expand it to replace the above, or remove it and fix the above
+    @classmethod
+    def search_applicant_limited(cls, keywords):
+        from sqlalchemy.orm import aliased
+        _session = db.session
+
+        # Aliases
+        searchapplicant = aliased(FOIRequestApplicant)
+        applicantmapping = aliased(FOIRequestApplicantMapping)
+        latest_foirequest = aliased(FOIRequest)
+
+        # Subquery: max version per FOIRequest
+        subquery_max_version = (
+            _session.query(
+                FOIRequest.foirequestid.label("foirequestid"),
+                func.max(FOIRequest.version).label("max_version")
+            )
+            .group_by(FOIRequest.foirequestid)
+            .subquery()
+        )
+
+        email_ranked = (
+            _session.query(
+                FOIRequestContactInformation.foirequest_id,
+                FOIRequestContactInformation.foirequestversion_id,
+                FOIRequestContactInformation.contactinformation.label("email"),
+                func.row_number().over(
+                    partition_by=(
+                        FOIRequestContactInformation.foirequest_id,
+                        FOIRequestContactInformation.foirequestversion_id
+                    ),
+                    order_by=FOIRequestContactInformation.created_at.desc()  # or id desc
+                ).label("rn")
+            )
+            .filter(FOIRequestContactInformation.contacttypeid == 1)
+            .subquery()
+        )
+        email_subquery = (
+            _session.query(email_ranked)
+            .filter(email_ranked.c.rn == 1)
+            .subquery()
+        )
+
+        query = (
+            _session.query(
+                searchapplicant.applicantprofileid,
+                searchapplicant.foirequestapplicantid,
+                searchapplicant.axisapplicantid,
+                searchapplicant.category,
+                searchapplicant.lastname,
+                searchapplicant.firstname,
+                searchapplicant.middlename,
+                searchapplicant.address,
+                searchapplicant.address_secondary,
+                searchapplicant.city,
+                searchapplicant.province,
+                searchapplicant.country,
+                searchapplicant.postal,
+                searchapplicant.home_phone,
+                searchapplicant.mobile_phone,
+                searchapplicant.work_phone,
+                searchapplicant.alternative_phone,
+                searchapplicant.other_contact_info,
+                email_subquery.c.email,
+                searchapplicant.businessname,
+                searchapplicant.dob,
+                searchapplicant.alsoknownas,
+                searchapplicant.personal_health_number,
+                searchapplicant.employee_number,
+                searchapplicant.correction_number,
+                searchapplicant.other_notes,
+                searchapplicant.section43_info,
+                searchapplicant.request_history,
+            ).join(
+                applicantmapping,
+                searchapplicant.foirequestapplicantid == applicantmapping.foirequestapplicantid
+            ).join(
+                latest_foirequest,
+                and_(
+                    latest_foirequest.foirequestid == applicantmapping.foirequest_id,
+                    latest_foirequest.version == applicantmapping.foirequestversion_id
+                )
+            ).join(
+                subquery_max_version,
+                and_(
+                    subquery_max_version.c.foirequestid == latest_foirequest.foirequestid,
+                    subquery_max_version.c.max_version == latest_foirequest.version
+                )
+            ).join(
+                email_subquery,
+                and_(
+                    email_subquery.c.foirequest_id == latest_foirequest.foirequestid,
+                    email_subquery.c.foirequestversion_id == latest_foirequest.version
+                ),
+                isouter=True
+            ).order_by(
+                searchapplicant.applicantprofileid,
+                latest_foirequest.version.desc()
+            ).distinct(searchapplicant.applicantprofileid)
+        )
+
+        if keywords.get("firstname"):
+            query = query.filter(searchapplicant.firstname.ilike(f"%{keywords.get('firstname')}%"))
+
+        if keywords.get("lastname"):
+            query = query.filter(searchapplicant.lastname.ilike(f"%{keywords.get('lastname')}%"))
+
+        if keywords.get("email"):
+            query = query.filter(email_subquery.c.email.ilike(f"%{keywords.get('email')}%"))
+
+        temp_applicants = ApplicantProfileBaseSchema(many=True)
+        data = temp_applicants.dump(query.all())
+        applicantprofileids = []
+        for applicant in data:
+            applicantprofileids.append(applicant['applicantprofileid'])
+        keywords = {"applicantprofileids": applicantprofileids}
+        applicants = cls.search_composite_applicant(keywords)
+        return applicants
 
     @classmethod
     def getsearchfilters(cls, searchapplicant, searchcontactinfo, keywords, contactemail, contacthomephone, contactworkphone, contactworkphone2, contactmobilephone):
         searchfilters = []
         if(len(keywords) > 0):
+            if('applicantprofileids' in keywords):
+                searchfilters.append(searchapplicant.applicantprofileid.in_(keywords['applicantprofileids']))
             if('firstname' in keywords):
                 searchfilters.append(searchapplicant.firstname.ilike('%'+keywords['firstname']+'%'))
 
@@ -1186,6 +1307,7 @@ class ApplicantProfileBaseSchema(ma.Schema): # For profiles with data solely fro
     section43_info = fields.String(attribute="section43_info")
     requestHistory = fields.Dict(attribute="request_history")
     applicantcategory = fields.String(attribute="category")
+    dob = fields.Date(format="%Y-%m-%d")
 
     class Meta:
         fields = (

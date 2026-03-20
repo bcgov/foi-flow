@@ -1894,7 +1894,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput || isHistoricalRequest}
                           />
-                          {requestDetails?.axisRequestId &&
+                          {requestDetails?.axisRequestId && requestState?.toLowerCase() !== StateEnum.unopened.name.toLowerCase() &&
                             <LinkedRequests
                               requestDetails={requestDetails}
                               isMinistry={isMinistry}
