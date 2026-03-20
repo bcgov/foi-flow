@@ -102,7 +102,6 @@ const convertToISO = (dateStr) => {
               queryParams,
               authorization: `Basic ${authToken}`, 
             callback: (responseDocs) => {  
-              //console.log("responseDocs:",responseDocs)
               const foirequestNumbers = [...new Set(
                 responseDocs
                   .map((doc) => doc.foirequestnumber)

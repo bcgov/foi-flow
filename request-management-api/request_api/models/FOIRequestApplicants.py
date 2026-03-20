@@ -59,13 +59,16 @@ class FOIRequestApplicant(db.Model):
     is_active = db.Column(db.Boolean)
 
     @classmethod
-    def from_request_data(cls, requestdata):
+    def from_request_data(cls, requestdata, is_new = False):
         applicant = FOIRequestApplicant()
-        applicant.applicantprofileid = requestdata.get("applicantprofileid", str(uuid.uuid4()))
+        if is_new:
+            applicant.applicantprofileid = str(uuid.uuid4())
+        else:
+            applicant.applicantprofileid = requestdata.get("applicantprofileid", str(uuid.uuid4()))
         applicant.firstname = requestdata.get("firstName")
         applicant.middlename = requestdata.get("middleName")
         applicant.lastname = requestdata.get("lastName")
-        alsoknownas = requestdata.get("additionalPersonalInfo", None).get("alsoKnownAs", None)
+        alsoknownas = requestdata.get("additionalPersonalInfo", {}).get("alsoKnownAs", None)
         applicant.alsoknownas = alsoknownas if alsoknownas else None
         dob_str = requestdata.get("additionalPersonalInfo", {}).get("birthDate")
         if dob_str and dob_str.strip():
@@ -88,31 +91,34 @@ class FOIRequestApplicant(db.Model):
         applicant.work_phone = requestdata.get("workPhonePrimary")
         applicant.alternative_phone = requestdata.get("workPhoneSecondary")
         # applicant.other_contact_info = requestdata.get("")
-        applicant.personal_health_number = requestdata.get("additionalPersonalInfo", None).get("personalHealthNumber")
+        applicant.personal_health_number = requestdata.get("additionalPersonalInfo", {}).get("personalHealthNumber")
         applicant.employee_number = requestdata.get("publicServiceEmployeeNumber")
         applicant.correction_number = requestdata.get("correctionalServiceNumber")
         applicant.other_notes = requestdata.get("other_notes")
         applicant.is_active = True
         return applicant
 
-    @classmethod
-    def child_from_additional_personal_info(cls, addlapplicantinfo, userid):
-        applicant = FOIRequestApplicant()
-        applicant.firstname = addlapplicantinfo.get("childFirstName", None)
-        applicant.middlename = addlapplicantinfo.get("childMiddleName", None)
-        applicant.lastname = addlapplicantinfo.get("childLastName", None)
-        alsoknownas = addlapplicantinfo.get("childAlsoKnownAs", None)
-        applicant.alsoknownas = alsoknownas if alsoknownas else None
-        dob = addlapplicantinfo.get("childBirthDate", None)
-        applicant.dob = datetime.fromisoformat(dob) if dob else None
-        applicant.businessname = None
-        applicant.createdby = userid
-        applicant.applicantprofileid = str(uuid.uuid4())
-        applicant.is_active = True
-        return applicant
+    # @classmethod
+    # def child_from_additional_personal_info(cls, addlapplicantinfo, is_new = False):
+    #     applicant = FOIRequestApplicant()
+    #     applicant.firstname = addlapplicantinfo.get("childFirstName", None)
+    #     applicant.middlename = addlapplicantinfo.get("childMiddleName", None)
+    #     applicant.lastname = addlapplicantinfo.get("childLastName", None)
+    #     alsoknownas = addlapplicantinfo.get("childAlsoKnownAs", None)
+    #     applicant.alsoknownas = alsoknownas if alsoknownas else None
+    #     dob = addlapplicantinfo.get("childBirthDate", None)
+    #     applicant.dob = datetime.fromisoformat(dob) if dob else None
+    #     applicant.businessname = None
+    #     if is_new:
+    #         applicant.applicantprofileid = str(uuid.uuid4())
+    #     else:
+    #         applicant.applicantprofileid = applicant.get("applicantprofileid", str(uuid.uuid4()))
+    #     applicant.is_active = True
+    #     return applicant
 
     @classmethod
-    def other_from_additional_personal_info(cls, addlapplicantinfo, userid):
+    def onbehalfof_from_applicantschema(cls, applicantschema, is_new = False):
+        addlapplicantinfo = applicantschema.get("additionalPersonalInfo", {})
         applicant = FOIRequestApplicant()
         applicant.firstname = addlapplicantinfo.get("anotherFirstName", None)
         applicant.middlename = addlapplicantinfo.get("anotherMiddleName", None)
@@ -122,8 +128,10 @@ class FOIRequestApplicant(db.Model):
         dob = addlapplicantinfo.get("anotherBirthDate", None)
         applicant.dob = datetime.fromisoformat(dob) if dob else None
         applicant.businessname = None
-        applicant.createdby = userid
-        applicant.applicantprofileid = str(uuid.uuid4())
+        if is_new:
+            applicant.applicantprofileid = str(uuid.uuid4())
+        else:
+            applicant.applicantprofileid = applicantschema.get("applicantprofileid", str(uuid.uuid4()))
         applicant.is_active = True
         return applicant
 
@@ -466,51 +474,8 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.other_notes).label('other_notes')
         ).group_by(subquery_all.c.foirequestapplicantid)
 
-        applicantprofile_schema = ApplicantProfileSchema()
+        applicantprofile_schema = ApplicantProfileCompositeSchema()
         return applicantprofile_schema.dump(query_aggregate.first())
-    
-    @classmethod
-    def get_applicant_profile_by_id(cls, applicantid):
-        selectedcolumns = [
-            FOIRequestApplicant.applicantprofileid.label('applicantprofileid'),
-            func.to_char(FOIRequestApplicant.created_at, 'YYYY-MM-DD HH24:MI:SS').label('createdat'),
-            FOIRequestApplicant.foirequestapplicantid.label('foirequestapplicantid'),
-            FOIRequestApplicant.firstname.label('firstname'),
-            FOIRequestApplicant.middlename.label('middlename'),
-            FOIRequestApplicant.lastname.label('lastname'),
-            FOIRequestApplicant.alsoknownas.label('alsoknownas'),
-            func.to_char(FOIRequestApplicant.dob, 'YYYY-MM-DD').label('dob'),
-            FOIRequestApplicant.businessname.label('businessname'),
-            # FOIRequest.foirequestid.label('foirequestid'),
-            # FOIRequest.version.label('foirequestversion'),
-            # FOIRequest.requesttype.label('requesttype'),
-            FOIRequestApplicant.category.label('applicantcategory'),
-            FOIRequestApplicant.email.label('email'),
-            FOIRequestApplicant.address.label('address'),
-            FOIRequestApplicant.address_secondary.label('address2'),
-            FOIRequestApplicant.home_phone.label('homephone'),
-            FOIRequestApplicant.work_phone.label('workphone'),
-            FOIRequestApplicant.alternative_phone.label('workphone2'),
-            FOIRequestApplicant.mobile_phone.label('mobilephone'),
-            FOIRequestApplicant.other_contact_info.label('othercontactinfo'),
-            FOIRequestApplicant.city.label('city'),
-            FOIRequestApplicant.province.label('province'),
-            FOIRequestApplicant.postal.label('postal'),
-            FOIRequestApplicant.country.label('country'),
-            FOIRequestApplicant.employee_number.label('employeenumber'),
-            FOIRequestApplicant.correction_number.label('correctionnumber'),
-            FOIRequestApplicant.personal_health_number.label('phn'),
-            FOIRequestApplicant.axisapplicantid.label('axisapplicantid'),
-            FOIRequestApplicant.other_notes.label('other_notes')
-        ]
-
-        query = db.session.query(
-                                *selectedcolumns
-                            ).filter(
-                                FOIRequestApplicant.foirequestapplicantid == applicantid
-                            ).order_by(FOIRequestApplicant.foirequestapplicantid.desc())
-        applicantprofile_schema = ApplicantProfileSchema()
-        return applicantprofile_schema.dump(query.first())
 
     @classmethod
     def search_applicant_profiles(cls, keywords, excluded_profile_ids):
@@ -524,7 +489,7 @@ class FOIRequestApplicant(db.Model):
 
         query = (
             db.session.query(FOIRequestApplicant)
-            .filter(or_(*conditions))
+            .filter(and_(*conditions))
             .filter(FOIRequestApplicant.is_active.is_(True))
             .order_by(
                 FOIRequestApplicant.applicantprofileid,
@@ -538,7 +503,7 @@ class FOIRequestApplicant(db.Model):
                 FOIRequestApplicant.applicantprofileid.notin_(excluded_profile_ids)
             )
 
-        schema = ApplicantProfileFromRequestApplicantSchema(many=True)
+        schema = ApplicantProfileBaseSchema(many=True)
         return schema.dump(query.all())
 
     # Search applicant by keywords
@@ -823,14 +788,135 @@ class FOIRequestApplicant(db.Model):
             func.array_agg(subquery_all.c.other_notes).label('other_notes')
         ).group_by(subquery_all.c.foirequestapplicantid)
 
-        applicantprofile_schema = ApplicantProfileSchema(many=True)
+        applicantprofile_schema = ApplicantProfileCompositeSchema(many=True)
         return applicantprofile_schema.dump(query_aggregate.all())
 
+    # This is a temporary search that only searches through firstname, lastname, email.
+    # We can either expand it to replace the above, or remove it and fix the above
+    @classmethod
+    def search_applicant_limited(cls, keywords):
+        from sqlalchemy.orm import aliased
+        _session = db.session
+
+        # Aliases
+        searchapplicant = aliased(FOIRequestApplicant)
+        applicantmapping = aliased(FOIRequestApplicantMapping)
+        latest_foirequest = aliased(FOIRequest)
+
+        # Subquery: max version per FOIRequest
+        subquery_max_version = (
+            _session.query(
+                FOIRequest.foirequestid.label("foirequestid"),
+                func.max(FOIRequest.version).label("max_version")
+            )
+            .group_by(FOIRequest.foirequestid)
+            .subquery()
+        )
+
+        email_ranked = (
+            _session.query(
+                FOIRequestContactInformation.foirequest_id,
+                FOIRequestContactInformation.foirequestversion_id,
+                FOIRequestContactInformation.contactinformation.label("email"),
+                func.row_number().over(
+                    partition_by=(
+                        FOIRequestContactInformation.foirequest_id,
+                        FOIRequestContactInformation.foirequestversion_id
+                    ),
+                    order_by=FOIRequestContactInformation.created_at.desc()  # or id desc
+                ).label("rn")
+            )
+            .filter(FOIRequestContactInformation.contacttypeid == 1)
+            .subquery()
+        )
+        email_subquery = (
+            _session.query(email_ranked)
+            .filter(email_ranked.c.rn == 1)
+            .subquery()
+        )
+
+        query = (
+            _session.query(
+                searchapplicant.applicantprofileid,
+                searchapplicant.foirequestapplicantid,
+                searchapplicant.axisapplicantid,
+                searchapplicant.category,
+                searchapplicant.lastname,
+                searchapplicant.firstname,
+                searchapplicant.middlename,
+                searchapplicant.address,
+                searchapplicant.address_secondary,
+                searchapplicant.city,
+                searchapplicant.province,
+                searchapplicant.country,
+                searchapplicant.postal,
+                searchapplicant.home_phone,
+                searchapplicant.mobile_phone,
+                searchapplicant.work_phone,
+                searchapplicant.alternative_phone,
+                searchapplicant.other_contact_info,
+                email_subquery.c.email,
+                searchapplicant.businessname,
+                searchapplicant.dob,
+                searchapplicant.alsoknownas,
+                searchapplicant.personal_health_number,
+                searchapplicant.employee_number,
+                searchapplicant.correction_number,
+                searchapplicant.other_notes,
+                searchapplicant.section43_info,
+                searchapplicant.request_history,
+            ).join(
+                applicantmapping,
+                searchapplicant.foirequestapplicantid == applicantmapping.foirequestapplicantid
+            ).join(
+                latest_foirequest,
+                and_(
+                    latest_foirequest.foirequestid == applicantmapping.foirequest_id,
+                    latest_foirequest.version == applicantmapping.foirequestversion_id
+                )
+            ).join(
+                subquery_max_version,
+                and_(
+                    subquery_max_version.c.foirequestid == latest_foirequest.foirequestid,
+                    subquery_max_version.c.max_version == latest_foirequest.version
+                )
+            ).join(
+                email_subquery,
+                and_(
+                    email_subquery.c.foirequest_id == latest_foirequest.foirequestid,
+                    email_subquery.c.foirequestversion_id == latest_foirequest.version
+                ),
+                isouter=True
+            ).order_by(
+                searchapplicant.applicantprofileid,
+                latest_foirequest.version.desc()
+            ).distinct(searchapplicant.applicantprofileid)
+        )
+
+        if keywords.get("firstname"):
+            query = query.filter(searchapplicant.firstname.ilike(f"%{keywords.get('firstname')}%"))
+
+        if keywords.get("lastname"):
+            query = query.filter(searchapplicant.lastname.ilike(f"%{keywords.get('lastname')}%"))
+
+        if keywords.get("email"):
+            query = query.filter(email_subquery.c.email.ilike(f"%{keywords.get('email')}%"))
+
+        temp_applicants = ApplicantProfileBaseSchema(many=True)
+        data = temp_applicants.dump(query.all())
+        applicantprofileids = []
+        for applicant in data:
+            applicantprofileids.append(applicant['applicantprofileid'])
+        keywords = {"applicantprofileids": applicantprofileids}
+        applicants = cls.search_composite_applicant(keywords)
+        return applicants
 
     @classmethod
     def getsearchfilters(cls, searchapplicant, searchcontactinfo, keywords, contactemail, contacthomephone, contactworkphone, contactworkphone2, contactmobilephone):
         searchfilters = []
         if(len(keywords) > 0):
+            if('applicantprofileids' in keywords):
+                searchfilters.append(searchapplicant.applicantprofileid.in_(keywords['applicantprofileids']))
             if('firstname' in keywords):
                 searchfilters.append(searchapplicant.firstname.ilike('%'+keywords['firstname']+'%'))
 
@@ -1073,15 +1159,24 @@ class FOIRequestApplicant(db.Model):
                                 FOIRequest.isactive == True
                             ).order_by(FOIRequestApplicantMapping.created_at.desc())
 
-        # print("query_applicant_history", query_all)
 
-        applicantprofile_schema = ApplicantProfileSchema(many=True)
+        applicantprofile_schema = ApplicantProfileCompositeSchema(many=True)
         return applicantprofile_schema.dump(query_all.all())
 
 
     # requests by applicant id
     @classmethod
-    def getapplicantrequests(cls, applicantid):
+    def getapplicantrequests(cls, applicantid, applicanttype = "all"):
+        primary_applicant_requests = FOIRequestApplicantMapping.requestortypeid == 1
+        onbehalfof_applicant_requests = FOIRequestApplicantMapping.requestortypeid == 2
+        all_applicant_requests = or_(primary_applicant_requests, onbehalfof_applicant_requests)
+        applicant_join_statement = all_applicant_requests
+
+        if applicanttype == "applicant":
+            applicant_join_statement = primary_applicant_requests
+        elif applicanttype == "onbehalfof":
+            applicant_join_statement = onbehalfof_applicant_requests
+
         from .FOIMinistryRequests import FOIMinistryRequest
 
         #for queue/dashboard
@@ -1128,7 +1223,7 @@ class FOIRequestApplicant(db.Model):
                             ).join(
                                 FOIRequestApplicantMapping,
                                 and_(
-                                    FOIRequestApplicantMapping.requestortypeid == 1,
+                                    applicant_join_statement,
                                     FOIRequestApplicantMapping.foirequestapplicantid == FOIRequestApplicant.foirequestapplicantid)
                             ).join(
                                 FOIRequest,
@@ -1149,7 +1244,6 @@ class FOIRequestApplicant(db.Model):
                                 FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
                             ).order_by(FOIRequest.foirequestid.desc())
         
-        # print('query_all', query_all)
 
         applicantrequest_schema = ApplicantRequestSchema(many=True)
         return applicantrequest_schema.dump(query_all.all())
@@ -1157,8 +1251,8 @@ class FOIRequestApplicant(db.Model):
     @classmethod
     def get_applicant_profile_by_id(cls, foirequestapplicantid):
         query = db.session.query(FOIRequestApplicant).filter_by(foirequestapplicantid=foirequestapplicantid).order_by(FOIRequestApplicant.foirequestapplicantid.desc())
-        applicantrequest_schema = ApplicantProfileFromRequestApplicantSchema(many=True)
-        return applicantrequest_schema.dump(query.all())
+        applicantrequest_schema = ApplicantProfileBaseSchema(many=False)
+        return applicantrequest_schema.dump(query.first())
 
     @classmethod
     def applicants_differ(cls, newapplicant, applicantfromdb, exclude=[]):
@@ -1188,7 +1282,7 @@ class FOIRequestApplicantSchema(ma.Schema):
                   'home_phone', 'mobile_phone', 'work_phone', 'alternative_phone', 'other_contact_info', 'personal_health_number',
                   'employee_number', 'correction_number', 'other_notes', 'section43_info', 'request_history')
 
-class ApplicantProfileSchema(ma.Schema):
+class ApplicantProfileCompositeSchema(ma.Schema): # For profiles with data derived from multiple tables
     class Meta:
         fields = ('applicantprofileid','updatedat','createdby','foirequestapplicantid','firstname','middlename','lastname',
                   'alsoknownas','dob','businessname','foirequestid','foirequestversion','requesttype','applicantcategory',
@@ -1199,7 +1293,7 @@ class ApplicantRequestSchema(ma.Schema):
     class Meta:
         fields = ('applicantprofileid','foirequestapplicantid','axisrequestid','foirequest_id','foiministryrequestid','filenumber', 'requeststatus','receiveddate','description')
 
-class ApplicantProfileFromRequestApplicantSchema(ma.Schema):
+class ApplicantProfileBaseSchema(ma.Schema): # For profiles with data solely from FOIRequestApplicants table
     address2 = fields.String(attribute="address_secondary")
     foirequestapplicantid = fields.Integer(attribute="foirequestapplicantid")
     homephone = fields.String(attribute="home_phone")
@@ -1213,6 +1307,7 @@ class ApplicantProfileFromRequestApplicantSchema(ma.Schema):
     section43_info = fields.String(attribute="section43_info")
     requestHistory = fields.Dict(attribute="request_history")
     applicantcategory = fields.String(attribute="category")
+    dob = fields.Date(format="%Y-%m-%d")
 
     class Meta:
         fields = (

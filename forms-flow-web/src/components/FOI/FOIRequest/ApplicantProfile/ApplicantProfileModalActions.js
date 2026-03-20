@@ -1,3 +1,5 @@
+import React from "react";
+
 const ApplicantProfileModalActions = ({
   requestDetails,
   reassignProfileToRequest,
@@ -13,236 +15,68 @@ const ApplicantProfileModalActions = ({
   applicantHistory,
   isChangeToDifferentProfile,
   createProfile,
+  applicantProfileError,
 }) => {
-  // Buttons
-  const reassignProfileButton = (
+  const Button = ({ children, onClick, disabled, variant = "save" }) => (
     <button
-      className={`btn-bottom btn-save btn`}
-      onClick={reassignProfileToRequest}
-      disabled={isSaveDisabled()}
+      className={`btn-bottom btn-${variant} btn`}
+      onClick={onClick}
+      disabled={disabled}
     >
-      Reassign Profile
-    </button>
-  );
-  const selectProfileButton = (
-    <button
-      className={`btn-bottom btn-save btn`}
-      onClick={reassignProfileToRequest}
-      disabled={isSaveDisabled()}
-    >
-      Select Profile
+      {children}
     </button>
   );
 
-  const confirmReassignProfileButton = (
-    <button
-      className={`btn-bottom btn-save btn`}
-      onClick={reassignProfileToRequest}
-    >
-      Confirm Reassign Profile
-    </button>
-  );
+  const Buttons = {
+    reassignProfile: <Button onClick={reassignProfileToRequest} disabled={isSaveDisabled()}>Reassign Profile</Button>,
+    selectProfile: <Button onClick={reassignProfileToRequest} disabled={isSaveDisabled()}>Select Profile</Button>,
+    confirmReassignProfile: <Button onClick={reassignProfileToRequest}>Confirm Reassign Profile</Button>,
+    confirmSelectedProfile: <Button onClick={reassignProfileToRequest}>Confirm Reassigned Profile</Button>,
+    back: <Button onClick={back} variant="cancel">Back</Button>,
+    confirmBack: <Button onClick={() => setConfirmationMessage(false)} variant="cancel">Back</Button>,
+    updateProfile: <Button onClick={updateProfile} disabled={isSaveDisabled() || applicantProfileError}>Update Profile</Button>,
+    confirmUpdateProfile: <Button onClick={updateProfile} disabled={isSaveDisabled() || applicantProfileError}>Save Changes</Button>,
+    createNewProfile: <Button onClick={createProfile}>Create New Profile</Button>,
+    confirmCreateNewProfile: <Button onClick={createProfile} disabled={applicantProfileError}>Confirm New Profile</Button>,
+    cancel: <Button onClick={cancel} variant="cancel">Cancel</Button>,
+  };
 
-  const confirmSelectedProfileButton = (
-    <button
-      className={`btn-bottom btn-save btn`}
-      onClick={reassignProfileToRequest}
-    >
-      Confirm Reassigned Profile
-    </button>
-  );
+  const beforeOpen = isBeforeOpen(requestDetails);
+  const hasAssignedApplicant = !!requestDetails?.foiRequestApplicantID;
 
-  const confirmBackButton = (
-    <button
-      className="btn-bottom btn-cancel"
-      onClick={() => setConfirmationMessage(false)}
-    >
-      Back
-    </button>
-  );
+  const stateMachine = {
+    NO_APPLICANT: [Buttons.createNewProfile, Buttons.cancel],
+    CREATE_CONFIRM: [Buttons.confirmCreateNewProfile, Buttons.back],
+    CHANGE_CONFIRM: [Buttons.confirmSelectedProfile, Buttons.back],
+    CHANGE: [!applicantHistory && Buttons.reassignProfile, Buttons.back],
+    UPDATE_CONFIRM: [Buttons.confirmUpdateProfile, Buttons.confirmBack],
+    SELECT_PROFILE: [!applicantHistory && Buttons.selectProfile, Buttons.back],
+    UPDATE_BEFORE_OPEN: [!applicantHistory && Buttons.updateProfile, Buttons.createNewProfile, Buttons.cancel],
+    DEFAULT: [
+      !applicantHistory && Buttons.createNewProfile,
+      !applicantHistory && Buttons.updateProfile,
+      Buttons.cancel,
+    ],
+  };
 
-  const backButton = (
-    <button className="btn-bottom btn-cancel" onClick={back}>
-      Back
-    </button>
-  );
+  const uiState = (() => {
+    if (createConfirmation) return "CREATE_CONFIRM";
+    if (!selectedApplicant) return "NO_APPLICANT";
+    if (isChangeToDifferentProfile && confirmationMessage) return "CHANGE_CONFIRM";
+    if (isChangeToDifferentProfile) return "CHANGE";
+    if (confirmationMessage) return "UPDATE_CONFIRM";
+    if (beforeOpen && !hasAssignedApplicant) return "SELECT_PROFILE";
+    if (beforeOpen && hasAssignedApplicant) return "UPDATE_BEFORE_OPEN";
+    return "DEFAULT";
+  })();
 
-  const updateProfileButton = (
-    <button
-      className={`btn-bottom btn-save btn`}
-      onClick={updateProfile}
-      disabled={isSaveDisabled()}
-    >
-      Update Profile
-    </button>
-  );
-
-  const confirmUpdateProfileButton = (
-    <button className={`btn-bottom btn-save btn`} onClick={updateProfile}>
-      Save Changes
-    </button>
-  );
-
-  const createNewProfileButton = (
-    <button className={`btn-bottom btn-save btn`} onClick={createProfile}>
-      Create New Profile
-    </button>
-  );
-
-  const confirmCreateNewProfileButton = (
-    <button className={`btn-bottom btn-save btn`} onClick={createProfile}>
-      Confirm New Profile
-    </button>
-  );
-
-  const cancelButton = (
-    <button className="btn-bottom btn-cancel" onClick={cancel}>
-      Cancel
-    </button>
-  );
-
-  // Rendering logic
-  if (isBeforeOpen(requestDetails)) {
-    const hasAssignedApplicant = requestDetails?.foiRequestApplicantID
-      ? true
-      : false;
-    if (createConfirmation) {
-      return (
-        <>
-          {confirmCreateNewProfileButton}
-          {backButton}
-        </>
-      );
-    }
-
-    if (
-      (selectedApplicant && !hasAssignedApplicant) ||
-      isChangeToDifferentProfile
-    ) {
-      return (
-        <>
-          {!applicantHistory && <>{selectProfileButton}</>}
-          {backButton}
-        </>
-      );
-    }
-
-    if (selectedApplicant && hasAssignedApplicant) {
-      return (
-        <>
-          {!applicantHistory && (
-            <>
-              {createNewProfileButton}
-              {/* {selectProfileButton} */}
-              {updateProfileButton}
-            </>
-          )}
-          {backButton}
-        </>
-      );
-    }
-
-    if (!selectedApplicant) {
-      return (
-        <>
-          {createNewProfileButton}
-          {backButton}
-        </>
-      );
-    }
-  }
-//   return;
-  if (confirmationMessage) {
-    return (
-      <>
-        {backButton}
-      </>
-    );
-  }
-  if (createConfirmation && isBeforeOpen(requestDetails)) {
-    return <>{backButton}</>;
-  }
-
-  if (isChangeToDifferentProfile && !confirmationMessage)
-    return (
-      <>
-        {!applicantHistory && selectProfileButton}
-        {backButton}
-      </>
-    );
-  if (isChangeToDifferentProfile && confirmationMessage)
-    return (
-      <>
-        {confirmSelectedProfileButton}
-        {backButton}
-      </>
-    );
-
-  if (isChangeToDifferentProfile) {
-    if (confirmationMessage) {
-      return (
-        <>
-          {confirmReassignProfileButton}
-          {confirmBackButton}
-        </>
-      );
-    } else {
-      return (
-        <>
-          {!applicantHistory && reassignProfileButton}
-          {backButton}
-        </>
-      );
-    }
-  }
-
-  if (selectedApplicant) {
-    if (confirmationMessage) {
-      return (
-        <>
-          {confirmUpdateProfileButton}
-          {confirmBackButton}
-        </>
-      );
-    } else if (createConfirmation) {
-      return (
-        <>
-          {!applicantHistory && <>{confirmCreateNewProfileButton}</>}
-          {backButton}
-        </>
-      );
-    } else {
-      if (isBeforeOpen(requestDetails)) {
-        return (
-          <>
-            {!applicantHistory && (
-              <>
-                {updateProfileButton}
-              </>
-            )}
-            {backButton}
-          </>
-        );
-      }
-      return (
-        <>
-          {!applicantHistory && (
-            <>
-              {createNewProfileButton}
-              {updateProfileButton}
-            </>
-          )}
-          {backButton}
-        </>
-      );
-    }
-  }
   return (
-    <>
-      {createNewProfileButton}
-      {cancelButton}
-    </>
-  );
-};
+  <>
+    {stateMachine[uiState].filter(Boolean).map((btn, idx) => (
+      <React.Fragment key={idx}>{btn}</React.Fragment>
+    ))}
+  </>
+);  
+}
 
 export default ApplicantProfileModalActions;

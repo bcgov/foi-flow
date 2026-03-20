@@ -376,10 +376,19 @@ class FOIRawRequest(db.Model):
        return request_schema.dump(request)
     
     @classmethod
-    def getrawrequestsbyapplicantid(cls,applicantid):
+    def getrawrequestsbyapplicantid(cls,applicantid, applicanttype = "applicant"):
         request_schema = FOIRawRequestSchema(many=True)
         applicant_subquery = db.session.query(FOIRequestApplicant.applicantprofileid).filter(FOIRequestApplicant.foirequestapplicantid == applicantid).subquery()
         subquery_applicant_id_list = db.session.query(FOIRequestApplicant.foirequestapplicantid).filter(applicant_subquery.c.applicantprofileid == FOIRequestApplicant.applicantprofileid).subquery()
+
+        primary_applicant_filter = FOIRawRequest.requestrawdata['foiRequestApplicantID'].astext.cast(db.Integer).in_(subquery_applicant_id_list)
+        onbehalfof_applicant_filter = FOIRawRequest.requestrawdata['foiRequestOnBehalfOfApplicantID'].astext.cast(db.Integer).in_(subquery_applicant_id_list)
+        if applicanttype == "all":
+            filter_condition = or_(primary_applicant_filter, onbehalfof_applicant_filter)
+        elif applicanttype == "applicant":
+            filter_condition = primary_applicant_filter
+        elif applicanttype == "onbehalfof":
+            filter_condition = onbehalfof_applicant_filter
 
         #subquery for getting the latest version
         subquery_maxversion = db.session.query(FOIRawRequest.requestid, func.max(FOIRawRequest.version).label('max_version')).group_by(FOIRawRequest.requestid).subquery()
@@ -394,7 +403,7 @@ class FOIRawRequest(db.Model):
             subquery_maxversion,
             and_(*joincondition)
         ).filter(
-            FOIRawRequest.requestrawdata['foiRequestApplicantID'].astext.cast(db.Integer).in_(subquery_applicant_id_list),
+            filter_condition,
             FOIRawRequest.status.notin_(['Archived', 'Closed'])
         ).order_by(FOIRawRequest.requestid.desc()).all()
         return request_schema.dump(query)
@@ -731,7 +740,6 @@ class FOIRawRequest(db.Model):
     @classmethod
     def getrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups):
         unopened_request_restriction = getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") if getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") not in (None, "") else datetime.now()
-        print("UNOPENED_REQUEST_DATE", unopened_request_restriction)
         basequery = FOIRawRequest.getbasequery(additionalfilter, userid, isiaorestrictedfilemanager, groups)
         basequery = basequery.filter(FOIRawRequest.status != 'Closed').filter(or_(FOIRawRequest.status != 'Unopened', FOIRawRequest.created_at >= unopened_request_restriction))
         #filter/search
@@ -780,7 +788,6 @@ class FOIRawRequest(db.Model):
         iaoassignee = aliased(FOIAssignee)
         ministryassignee = aliased(FOIAssignee)
         subquery_ministry_queue = FOIMinistryRequest.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, 'IAO', isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-        #print("\n-------subquery_ministry_queue:",subquery_ministry_queue)
         #sorting
         if is_oi_team:
             sortingcondition = FOIOpenInformationRequests.getsorting(sortingitems, sortingorders, True)
@@ -797,7 +804,6 @@ class FOIRawRequest(db.Model):
                 return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
             else:
                 subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups)
-                print("\n------IAO query:", subquery_rawrequest_queue)
                 query_full_queue = subquery_rawrequest_queue.union(subquery_ministry_queue)
                 return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
         else:
@@ -931,13 +937,6 @@ class FOIRawRequest(db.Model):
             basequery  = basequery.add_columns(literal(None).label('oiReceivedDate'))
             basequery  = basequery.add_columns(literal("ZZZ").label('oiAssignedTo'))
 
-        is_oi_team = params['usertype'] == "iao" and params['groups'] and 'OI Team' in params['groups']
-        if is_oi_team:
-            basequery  = basequery.add_columns(literal("unopened").label('publicationStatus'))
-            basequery  = basequery.add_columns(literal(None).label('publicationDate'))
-            basequery  = basequery.add_columns(literal(None).label('oiReceivedDate'))
-            basequery  = basequery.add_columns(literal("ZZZ").label('oiAssignedTo'))
-
         #filter/search
         filtercondition = FOIRawRequest.getfilterforadvancedsearch(params)
         searchquery = basequery.filter(and_(*filtercondition))
@@ -952,7 +951,6 @@ class FOIRawRequest(db.Model):
 
         #rawrequests
         query_full_queue = searchquery.union(subquery_ministry_queue)
-        print("\n\nFull Query:\n", query_full_queue)
         return query_full_queue.order_by(*sortingcondition).paginate(page=params['page'], per_page=params['size'])
 
     @classmethod

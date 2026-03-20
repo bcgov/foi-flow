@@ -26,10 +26,10 @@ const ApplicantProfileModalHeader = ({
 
   if (confirmationMessage)
     return <FormattedHeader text={"Saving Changes to Applicant Profile"} />;
-  if (applicantHistory) return <FormattedHeader text={"Applicant History"} />;
-  if (!selectedApplicant) return <FormattedHeader text={"Search Applicants"} />;
   if (createConfirmation)
     return <FormattedHeader text={"Create New Profile"} />;
+  if (applicantHistory) return <FormattedHeader text={"Applicant History"} />;
+  if (!selectedApplicant) return <FormattedHeader text={"Search Applicants"} />;
 
   // Renders the tab options if none of the above conditions are met
   return (

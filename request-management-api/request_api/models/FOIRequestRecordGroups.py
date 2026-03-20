@@ -1,3 +1,4 @@
+from sqlalchemy import UniqueConstraint
 
 from .db import db
 
@@ -20,6 +21,10 @@ class FOIRequestRecordGroups(db.Model):
         primary_key=True
     )
 
+    __table_args__ = (
+        UniqueConstraint("record_id", name="uq_foirequestrecordgroups_record_id"),
+    )
+
     def __repr__(self) -> str:
         return f"<FOIRequestRecordGroups(set={self.document_set_id}, record={self.record_id})>"
 
@@ -38,6 +43,17 @@ class FOIRequestRecordGroups(db.Model):
         )
 
     @classmethod
+    def remove_records_from_all_groups(cls, record_ids: set[int]) -> None:
+        if not record_ids:
+            return
+
+        (
+            db.session.query(cls)
+            .filter(cls.record_id.in_(record_ids))
+            .delete(synchronize_session=False)
+        )
+
+    @classmethod
     def get_record_ids(cls, document_set_id: int) -> set[int]:
         rows = (
             db.session.query(cls.record_id)
@@ -51,8 +67,10 @@ class FOIRequestRecordGroups(db.Model):
         if not record_ids:
             return
 
-        rows = [{"document_set_id": document_set_id, "record_id": rid}
-                for rid in record_ids]
+        rows = [
+            {"document_set_id": document_set_id, "record_id": rid}
+            for rid in sorted(set(record_ids))
+        ]
 
         db.session.execute(cls.__table__.insert(), rows)
 
@@ -95,4 +113,3 @@ class FOIRequestRecordGroups(db.Model):
         )
 
         return deleted_count
-

@@ -227,6 +227,8 @@ class recordgroupservice:
         # Commit once
         db.session.commit()
 
+        persisted_records = sorted(FOIRequestRecordGroups.get_record_ids(document_set_id))
+
         return DefaultMethodResult(
             True,
             "Group updated.",
@@ -234,7 +236,7 @@ class recordgroupservice:
             data={
                 "documentsetid": group.document_set_id,
                 "name": group.name,
-                "records": sorted(payload.get("records", [])),
+                "records": persisted_records,
             },
         )
 
@@ -288,4 +290,3 @@ class recordgroupservice:
         except Exception:
             current_app.logger.exception("Error fetching record groups")
             return DefaultMethodResult(False, "Unexpected error fetching groups.", 500)
-

@@ -10,12 +10,14 @@ import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Box, Fade } from "@mui/material";
-
-const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, disableInput, setError}) => {
+import ApplicantProfileModal from './ApplicantProfile/ApplicantProfileModal';
     
+const OnBehalfOfDetails = React.memo(({requestDetails, createSaveRequestObject, disableInput, setError}) => {
+    let additionalInfo = requestDetails?.additionalPersonalInfo || {}
      /**
      *  On Behalf of details box in the UI
      *  No mandatory fields here
+     *  This is now updated via the applicant profile modal
      */ 
       const useStyles = makeStyles({
         heading: {
@@ -49,6 +51,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
 
      
 
+    const [openApplicantProfileModal, setOpenApplicantProfileModal] = React.useState(false)
     //local states for Another person FirstName, MiddleName, LastName, NickName and DOB
     const [anotherFirstNameText, setAnotherFirstName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.ANOTHER_FIRST_NAME));
     const [anotherMiddleNameText, setAnotherMiddleName] = React.useState(validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.ANOTHER_MIDDLE_NAME));
@@ -73,7 +76,7 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
         setAnotherDOB(
             validateFields(additionalInfo, FOI_COMPONENT_CONSTANTS.ANOTHER_DOB)
         );
-    }, [additionalInfo]);
+    }, [additionalInfo, requestDetails]);
     
     const handleFirtNameChange = (e) => {
         setError(prev => ({...prev, onBehalfFirstName: validateTextFieldError(e.target.value)}));
@@ -112,6 +115,13 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
             <Typography className={classes.heading}>ON BEHALF OF DETAILS</Typography>
         </AccordionSummary>
         <AccordionDetails>
+                <button
+                type="button"
+                className={`btn btn-link btn-description-history`}
+                onClick={() => {setOpenApplicantProfileModal(true)}}
+                >
+                    Applicant Profiles
+                </button>
                 <div className="row foi-details-row">
                     <div className="col-lg-6 foi-details-col">                        
                         <TextField      
@@ -209,6 +219,11 @@ const OnBehalfOfDetails = React.memo(({additionalInfo, createSaveRequestObject, 
                 </div> 
             </AccordionDetails>
       </Accordion>
+      <ApplicantProfileModal 
+        modalOpen={openApplicantProfileModal}
+        handleModalClose={() => {setOpenApplicantProfileModal(false)}}
+        applicantType={"onbehalfof"}
+      />
     </div>
     );
   });

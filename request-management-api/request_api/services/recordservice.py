@@ -5,6 +5,7 @@ from request_api.models.FOIRequestRecordHistory import FOIRequestRecordHistory
 from request_api.utils import json_utils
 from request_api.utils.constants import FILE_CONVERSION_FILE_TYPES, DEDUPE_FILE_TYPES, NONREDACTABLE_FILE_TYPES
 from request_api.models.FOIRequestRecords import FOIRequestRecord
+from request_api.models.FOIRequestRecordGroups import FOIRequestRecordGroups
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.HistoricalRecords import HistoricalRecords
 from request_api.services.external.eventqueueservice import eventqueueservice
@@ -154,7 +155,12 @@ class recordservice(recordservicebase):
 
                 # Apply all updates to the main record
                 updated_record = self._prepare_record_update(record, requestdata, userid)
+                if requestdata['isdelete'] and hasattr(updated_record, 'groups'):
+                    updated_record.groups = []
                 updated_orm_records.append(updated_record)
+
+            if requestdata['isdelete']:
+                FOIRequestRecordGroups.remove_records_from_all_groups(set(recordids))
 
             # 3. Database Transaction (Atomic Save)
             response = FOIRequestRecord.create(updated_orm_records, historical_records)
@@ -631,4 +637,3 @@ class recordservice(recordservicebase):
     
 
     
-

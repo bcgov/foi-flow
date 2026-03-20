@@ -31,13 +31,18 @@ class applicantservice:
 
     def searchapplicant(self, keywords):
         applicantqueue = []
-        applicants = FOIRequestApplicant.search_composite_applicant(keywords)
+        applicants = FOIRequestApplicant.search_applicant_limited(keywords)
+        print('\n**COMPOSITE APPLICANTS: ', applicants)
         excluded_profile_ids = []
         if applicants is not None:
             for applicant in applicants:
                 applicantqueue.append(self.__prepareapplicant(applicant))
                 excluded_profile_ids.append(self.__first_not_null(applicant["applicantprofileid"]))
-        applicantprofiles = FOIRequestApplicant.search_applicant_profiles(keywords, excluded_profile_ids)
+        clean_ids = [i for i in excluded_profile_ids if i is not None]
+        applicantprofiles = FOIRequestApplicant.search_applicant_profiles(keywords, clean_ids)
+        print('\n**excluded_profile_ids: ', excluded_profile_ids)
+        print('\n**clean_ids: ', clean_ids)
+        print('\n**applicantprofiles: ', applicantprofiles, '\n')
         if applicantprofiles:
             for applicant in applicantprofiles:
                 applicantqueue.append(self.__prepareapplicant(applicant))
@@ -45,15 +50,17 @@ class applicantservice:
 
     def createnewapplicant(self, applicantschema, applicantpayload, userid):
         requesttype = applicantpayload.get('requesttype')
-        applicant = FOIRequestApplicant.from_request_data(applicantschema)
-        save_result = FOIRequestApplicant.save_instance(applicant, userid)
+        applicanttype = applicantpayload.get('applicanttype')
 
+        applicant = FOIRequestApplicant.from_request_data(applicantschema, is_new=True)
+        save_result = FOIRequestApplicant.save_instance(applicant, userid)
         applicantschema['foiRequestApplicantID'] = save_result.identifier
         if applicantpayload.get('foirequestid', None) and requesttype == 'foirequest':
             requests = FOIMinistryRequest.getopenrequestsbyrequestId([applicantpayload['foirequestid']])
             for request in requests:
+                print('\n\n**SETTING NEW APPLICANT FOR REQUEST: ', request, '\n\n')
                 requestschema = requestservicegetter().getrequest(request['foirequest_id'], request['foiministryrequestid'])
-                requestschema.update(applicantschema)
+                self.__update_requestschema(requestschema, applicantschema, applicanttype)
                 responseschema = requestservicecreate().saverequestversion(
                     requestschema, request['foirequest_id'], request['foiministryrequestid'], userid
                 )
@@ -63,13 +70,8 @@ class applicantservice:
         if applicantpayload.get('rawrequestid', None) and requesttype == 'rawrequest':
             rawrequest = FOIRawRequest.get_request(applicantpayload['rawrequestid'])
             raw_data = rawrequest["requestrawdata"]
-            for key, value in applicantschema.items():
-                if key != "additionalPersonalInfo":
-                    raw_data[key] = value
-            applicant_additional = applicantschema.get("additionalPersonalInfo")
-
-            if applicant_additional:
-                raw_data.setdefault("additionalPersonalInfo", {}).update(applicant_additional)
+            print('\n\n**SETTING NEW APPLICANT FOR RAW REQUEST ID: ', applicantpayload['rawrequestid'], '\n\n')
+            self.__update_requestschema(raw_data, applicantschema, applicantpayload["applicanttype"])
             rawrequestservice().saverawrequestversion(
                 rawrequest['requestrawdata'],
                 rawrequest['requestid'],
@@ -77,38 +79,48 @@ class applicantservice:
                 rawrequest['assignedto'],
                 rawrequest['status'], 
                 userid,
-                rawrequest['assignee.firstname'],
-                rawrequest['assignee.middlename'],
-                rawrequest['assignee.lastname'],
+                rawrequest.get('assignee.firstname'),
+                rawrequest.get('assignee.middlename'),
+                rawrequest.get('assignee.lastname'),
                 rawrequest['requeststatuslabel']
             )
         return DefaultMethodResult(True,'Applicant profile created',applicantschema['foiRequestApplicantID'])
 
     def update_applicant_profile(self, applicantschema, applicantpayload, userid):
-        foirequestapplicantid = applicantschema['foiRequestApplicantID']
+        applicant_id_before_update = applicantschema['foiRequestApplicantID']
+
         updatedapplicant = FOIRequestApplicant.from_request_data(applicantschema)
-        applicant = FOIRequestApplicant.update_applicant_profile(updatedapplicant,foirequestapplicantid, userid) # replace with applicant id once new save function is written
+        applicant = FOIRequestApplicant.save_instance(updatedapplicant, userid)
         applicantschema['foiRequestApplicantID'] = applicant.identifier
-        requests = FOIMinistryRequest.getopenrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
-        for request in requests:
+
+        primary_requests = FOIMinistryRequest.getopenrequestsbyapplicantid(applicant_id_before_update, "applicant")
+        onbehalfof_requests = FOIMinistryRequest.getopenrequestsbyapplicantid(applicant_id_before_update, "onbehalfof")
+        updated_primary_requests = []
+        updated_onbehalfof_requests = []
+        for request in primary_requests:
             requestschema = requestservicegetter().getrequest(request['foirequest_id'], request['foiministryrequestid'])
-            requestschema.update(applicantschema)
+            self.__update_requestschema(requestschema, applicantschema, "applicant")
             responseschema = requestservicecreate().saverequestversion(
                 requestschema, request['foirequest_id'], request['foiministryrequestid'], userid
             )
+            updated_primary_requests.append(requestschema.get("axisRequestId"))
+            if not responseschema.success:
+                return responseschema
+        for request in onbehalfof_requests:
+            requestschema = requestservicegetter().getrequest(request['foirequest_id'], request['foiministryrequestid'])
+            self.__update_requestschema(requestschema, applicantschema, "onbehalfof")
+            responseschema = requestservicecreate().saverequestversion(
+                requestschema, request['foirequest_id'], request['foiministryrequestid'], userid
+            )
+            updated_onbehalfof_requests.append(requestschema.get("axisRequestId"))
             if not responseschema.success:
                 return responseschema
 
-        rawrequests = FOIRawRequest.getrawrequestsbyapplicantid(applicantschema['foiRequestApplicantID'])
-        for rawrequest in rawrequests:
+        primary_rawrequests = FOIRawRequest.getrawrequestsbyapplicantid(applicant_id_before_update, "applicant")
+        onbehalfof_rawrequests = FOIRawRequest.getrawrequestsbyapplicantid(applicant_id_before_update, "onbehalfof")
+        for rawrequest in primary_rawrequests:
             raw_data = rawrequest["requestrawdata"]
-            for key, value in applicantschema.items():
-                if key != "additionalPersonalInfo":
-                    raw_data[key] = value
-            applicant_additional = applicantschema.get("additionalPersonalInfo")
-
-            if applicant_additional:
-                raw_data.setdefault("additionalPersonalInfo", {}).update(applicant_additional)
+            self.__update_requestschema(raw_data, applicantschema, "applicant")
             rawrequestservice().saverawrequestversion(
                 rawrequest['requestrawdata'],
                 rawrequest['requestid'],
@@ -116,20 +128,40 @@ class applicantservice:
                 rawrequest['assignedto'],
                 rawrequest['status'], 
                 userid,
-                rawrequest['assignee.firstname'],
-                rawrequest['assignee.middlename'],
-                rawrequest['assignee.lastname'],
+                rawrequest.get('assignee.firstname'),
+                rawrequest.get('assignee.middlename'),
+                rawrequest.get('assignee.lastname'),
                 rawrequest['requeststatuslabel']
             )
-        return DefaultMethodResult(True,'Applicant profile updated',applicantschema['foiRequestApplicantID'])
+            updated_primary_requests.append(rawrequest.get("axisrequestid"))
+        for rawrequest in onbehalfof_rawrequests:
+            raw_data = rawrequest["requestrawdata"]
+            self.__update_requestschema(raw_data, applicantschema, "onbehalfof")
+            rawrequestservice().saverawrequestversion(
+                rawrequest['requestrawdata'],
+                rawrequest['requestid'],
+                rawrequest['assignedgroup'],
+                rawrequest['assignedto'],
+                rawrequest['status'], 
+                userid,
+                rawrequest.get('assignee.firstname'),
+                rawrequest.get('assignee.middlename'),
+                rawrequest.get('assignee.lastname'),
+                rawrequest['requeststatuslabel']
+            )
+            updated_onbehalfof_requests.append(rawrequest.get("axisrequestid"))
+        update_message = f'Updated primary applicant requests: {", ".join(updated_primary_requests)}. \n' \
+        'Updated onbehalfof applicant on: f{", ".join(updated_onbehalfof_requests)}'
+        return DefaultMethodResult(True, update_message, applicantschema['foiRequestApplicantID'])
     
     def reassignapplicantprofilelinkedtorequest(self, applicantschema, applicantpayload, userid):
         if applicantpayload['requesttype'] == 'foirequest':
             ministryrequest = FOIMinistryRequest.getopenrequestsbyrequestId([applicantpayload['foirequestid']])
             foirequestid = applicantpayload['foirequestid']
             foiministryrequestid = ministryrequest[0]['foiministryrequestid']
+            print('\n***REASSIGNING MINISTRY REQUEST: ', ministryrequest)
             requestschema = requestservicegetter().getrequest(foirequestid, foiministryrequestid)
-            requestschema.update(applicantschema)
+            self.__update_requestschema(requestschema, applicantschema, applicantpayload["applicanttype"])
             responseschema = requestservicecreate().saverequestversion(
                 requestschema, foirequestid, foiministryrequestid, userid
             )
@@ -138,13 +170,8 @@ class applicantservice:
         elif applicantpayload['requesttype'] == 'rawrequest':
             rawrequest = FOIRawRequest.get_request(applicantpayload['rawrequestid'])
             raw_data = rawrequest["requestrawdata"]
-            for key, value in applicantschema.items():
-                if key != "additionalPersonalInfo":
-                    raw_data[key] = value
-            applicant_additional = applicantschema.get("additionalPersonalInfo")
-
-            if applicant_additional:
-                raw_data.setdefault("additionalPersonalInfo", {}).update(applicant_additional)
+            print('\n***REASSIGNING RAW REQUEST: ', rawrequest)
+            self.__update_requestschema(raw_data, applicantschema, applicantpayload["applicanttype"])
             rawrequestservice().saverawrequestversion(
                 rawrequest['requestrawdata'],
                 rawrequest['requestid'],
@@ -152,9 +179,9 @@ class applicantservice:
                 rawrequest['assignedto'],
                 rawrequest['status'], 
                 userid,
-                rawrequest['assignee.firstname'],
-                rawrequest['assignee.middlename'],
-                rawrequest['assignee.lastname'],
+                rawrequest.get('assignee.firstname'),
+                rawrequest.get('assignee.middlename'),
+                rawrequest.get('assignee.lastname'),
                 rawrequest['requeststatuslabel']
             )
         return DefaultMethodResult(True,
@@ -186,9 +213,9 @@ class applicantservice:
             rawrequest['assignedto'],
             rawrequest['status'], 
             userid,
-            rawrequest['assignee.firstname'],
-            rawrequest['assignee.middlename'],
-            rawrequest['assignee.lastname'],
+            rawrequest.get('assignee.firstname'),
+            rawrequest.get('assignee.middlename'),
+            rawrequest.get('assignee.lastname'),
             rawrequest['requeststatuslabel']
         )
         return DefaultMethodResult(True,'Applicant profile unassigned from request',rawrequestid)
@@ -309,23 +336,22 @@ class applicantservice:
         requestqueue = []
 
         # order by update date desc
-        requests = FOIRequestApplicant.getapplicantrequests(applicantid)
+        requests = FOIRequestApplicant.getapplicantrequests(applicantid, "all")
         if requests is not None:
             for request in requests:
                 requestqueue.append(self.__preparerequest(request))
 
-        rawrequests = FOIRawRequest.getrawrequestsbyapplicantid(applicantid)
+        rawrequests = FOIRawRequest.getrawrequestsbyapplicantid(applicantid, "all")
         if rawrequests is not None:
             for request in rawrequests:
                 requestqueue.append(self.__preparerawrequest(request))
 
         # Get historical requests from FOIRequestApplicant table
-        applicant_profiles = FOIRequestApplicant.get_applicant_profile_by_id(applicantid)
-        for applicant in applicant_profiles:
-            request_history = applicant.get("requestHistory")
-            if request_history:
-                for historical_request in request_history:
-                    requestqueue.append(self.__prepare_historical_request(historical_request, applicant))
+        applicant_profile = FOIRequestApplicant.get_applicant_profile_by_id(applicantid)
+        request_history = applicant_profile.get("requestHistory")
+        if request_history:
+            for historical_request in request_history:
+                requestqueue.append(self.__prepare_historical_request(historical_request, applicant_profile))
         return requestqueue
 
     def __preparerequest(self, request):
@@ -361,3 +387,24 @@ class applicantservice:
             'receiveddate': "Historical Request",
             'description': historical_request["description"],
         }
+
+    def __update_requestschema(self, requestschema, applicantschema, applicanttype):
+        if applicanttype == "onbehalfof":
+            requestschema["foiRequestOnBehalfOfApplicantID"] = applicantschema.get("foiRequestApplicantID")
+            additional = requestschema.get("additionalPersonalInfo")
+            if additional:
+                additional["anotherFirstName"] = applicantschema.get("firstName")
+                additional["anotherMiddleName"] = applicantschema.get("middleName")
+                additional["anotherLastName"] = applicantschema.get("lastName")
+                additional["anotherBirthDate"] = applicantschema.get("additionalPersonalInfo", {}).get("birthDate")
+                additional["anotherAlsoKnownAs"] = applicantschema.get("additionalPersonalInfo", {}).get("alsoKnownAs")
+        if applicanttype == "applicant":
+            additional = requestschema.get("additionalPersonalInfo")
+            requestschema.update({
+                k: v for k, v in applicantschema.items()
+                if k != "additionalPersonalInfo"
+            })
+            if additional:
+                additional["birthDate"] = applicantschema.get("additionalPersonalInfo", {}).get("birthDate")
+                additional["alsoKnownAs"] = applicantschema.get("additionalPersonalInfo", {}).get("alsoKnownAs")
+                additional["personalHealthNumber"] = applicantschema.get("additionalPersonalInfo", {}).get("personalHealthNumber")

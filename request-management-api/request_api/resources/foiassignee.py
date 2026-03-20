@@ -51,7 +51,7 @@ class FOIAssignees(Resource):
         response_filter=response_filter
         )
     def get(requestype=None, status=None, bcgovcode=None):
-        if requestype is not None and (requestype != "personal" and requestype != "general"):
+        if requestype is not None and (requestype != "personal" and requestype != "general" and requestype != "proactive disclosure"):
             return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400   
         try:
             result = assigneeservice().getgroupsandmembersbytypeandstatus(requestype, status, bcgovcode)
@@ -79,7 +79,7 @@ class FOIAssigneesByTypeAndStatus(Resource):
     #     response_filter=response_filter
     #     )
     def get(requestype=None, status=None, bcgovcode=None):
-        if requestype is not None and (requestype != "personal" and requestype != "general"):
+        if requestype is not None and (requestype != "personal" and requestype != "general" and requestype != "proactive disclosure"):
             return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400   
         try:
             result = assigneeservice().getgroupsandmembersbytypeandstatus(requestype, status, bcgovcode)
@@ -138,7 +138,7 @@ class FOIAssigneesTeams(Resource):
         try:
             if requestype is None:
                 return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400   
-            if requestype is not None and (requestype != "personal" and requestype != "general"):
+            if requestype is not None and (requestype != "personal" and requestype != "general" and requestype != "proactive disclosure"):
                 return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400   
             result = assigneeservice().getprocessingteamsbyrequesttype(requestype)
             if result is not None:

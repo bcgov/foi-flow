@@ -632,9 +632,14 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE
     ) {
       setIsProactiveDisclosure(true);
-      //dispatch(fetchFOIProactiveDisclosureCategoryList());
     } else setIsProactiveDisclosure(false);
-  }, [saveRequestObject]);
+
+    if (isAddRequest) {
+      let isbcpsteam = false;
+      if (userGroups.includes("BCPS Team")) isbcpsteam = true;
+      dispatch(fetchFOIAssignedToList(saveRequestObject?.requestType, requestState?.toLowerCase(), "", isbcpsteam));
+    }
+  }, [saveRequestObject?.requestType]);
 
   useEffect(() => {
     if (requestApplicantProfile) {
@@ -648,6 +653,16 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               newRequestDetails[field][infofield] =
                 requestApplicantProfile[field][infofield];
             }
+          } else if (field === "onbehalfofApplicant") { // When updating OBO from applicant profile modal
+            newRequestDetails["additionalPersonalInfo"] =
+              newRequestDetails["additionalPersonalInfo"] || {};
+            newRequestDetails["additionalPersonalInfo"]["anotherFirstName"] = requestApplicantProfile["onbehalfofApplicant"]["firstName"]
+            newRequestDetails["additionalPersonalInfo"]["anotherMiddleName"] = requestApplicantProfile["onbehalfofApplicant"]["middleName"]
+            newRequestDetails["additionalPersonalInfo"]["anotherLastName"] = requestApplicantProfile["onbehalfofApplicant"]["lastName"]
+            newRequestDetails["additionalPersonalInfo"]["anotherAlsoKnownAs"] = requestApplicantProfile["onbehalfofApplicant"]["alsoKnownAs"]
+            newRequestDetails["additionalPersonalInfo"]["anotherBirthDate"] = requestApplicantProfile["onbehalfofApplicant"]["birthDate"]
+
+            newRequestDetails["foiRequestOnBehalfOfApplicantID"] = requestApplicantProfile["onbehalfofApplicant"]["foiRequestOnBehalfOfApplicantID"]
           } else {
             newRequestDetails[field] = requestApplicantProfile[field];
           }
@@ -1756,6 +1771,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput || isHistoricalRequest}
                           />
+                          {showDivisionalTracking && (
+                            <DivisionalTracking
+                              divisions={requestDetails.divisions}
+                            />
+                          )}
                         </>
                       ) : (
                         <>
@@ -1812,15 +1832,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                                   setError={setPersonalRequestDetailErrors}
                                 />
                                 <OnBehalfOfDetails
-                                  additionalInfo={
-                                    requestDetails.additionalPersonalInfo
-                                  }
+                                  requestDetails={requestDetails}
                                   createSaveRequestObject={
                                     createSaveRequestObject
                                   }
-                                  disableInput={
-                                    disableInput || isHistoricalRequest
-                                  }
+                                  disableInput={true}
                                   setError={setPersonalRequestDetailErrors}
                                 />
                               </>
@@ -1863,7 +1879,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput || isHistoricalRequest}
                           />
-                          {requestDetails?.axisRequestId &&
+                          {requestDetails?.axisRequestId && requestState?.toLowerCase() !== StateEnum.unopened.name.toLowerCase() &&
                             <LinkedRequests
                               requestDetails={requestDetails}
                               requestStatus={_requestStatus}

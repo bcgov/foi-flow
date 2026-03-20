@@ -36,7 +36,6 @@ class requestservicegetter:
         iaorestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(ministryrequestid=foiministryrequestid,type='iao')
         requestproactive = FOIProactiveDisclosureRequests.getcurrentfoiproactiverequest(foiministryrequestid)
         baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions, requestproactive)
-        #print("baserequestinfo:",baserequestinfo)
         baserequestinfo['lastStatusUpdateDate'] = FOIMinistryRequest.getLastStatusUpdateDate(foiministryrequestid, requestministry['requeststatuslabel']).strftime(self.__genericdateformat()),
         for contactinfo in requestcontactinformation:
             if contactinfo['contacttype.name'] == 'Email':
@@ -59,6 +58,10 @@ class requestservicegetter:
 
             if requestortypeid == 1:
                 baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, axisapplicantid))
+            if requestortypeid == 2:
+                baserequestinfo.update({"foiRequestOnBehalfOfApplicantID": foirequestapplicantid})
+            if requestortypeid == 3:
+                baserequestinfo.update({"foiRequestChildApplicantID": foirequestapplicantid})
             additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob, alsoknownas))
 
         baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
@@ -90,7 +93,6 @@ class requestservicegetter:
         requestministrydivisions = FOIMinistryRequestDivision.getdivisions(foiministryrequestid,requestministry['version'])
         ministryrestrictrequestdetails = FOIRestrictedMinistryRequest.getrestricteddetails(foiministryrequestid,type='ministry')
         requestproactive = FOIProactiveDisclosureRequests.getcurrentfoiproactiverequest(foiministryrequestid)
-        #print("\n----requestproactive in getrequestdetailsforministry:",requestproactive)
         baserequestinfo = {}
         if requestministry["assignedministrygroup"] in authmembershipgroups:
             baserequestinfo = self.__preparebaseinfo(request,foiministryrequestid,requestministry,requestministrydivisions, requestproactive)
@@ -112,6 +114,10 @@ class requestservicegetter:
 
                 if requestortypeid == 1:
                     baserequestinfo.update(self.__prepareapplicant(foirequestapplicantid, firstname, middlename, lastname, businessname, axisapplicantid))
+                if requestortypeid == 2:
+                    baserequestinfo.update({"foiRequestOnBehalfOfApplicantID": foirequestapplicantid})
+                if requestortypeid == 3:
+                    baserequestinfo.update({"foiRequestChildApplicantID": foirequestapplicantid})
                 additionalpersonalinfo.update(self.__prepareadditionalpersonalinfo(requestortypeid, firstname, middlename, lastname, dob, alsoknownas))
             baserequestdetails, additionalpersonalinfodetails = self.preparepersonalattributes(foirequestid, request['version'])
             baserequestinfo.update(baserequestdetails)
