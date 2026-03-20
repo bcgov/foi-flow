@@ -552,7 +552,7 @@ class FOIOpenInformationRequests(db.Model):
                     COALESCE((fee.feedata->>'amountpaid')::Numeric, 0) as fees,
                     LOWER(pa.bcgovcode) AS bcgovcode,
                     COALESCE(oi.sitemap_pages, '') as sitemap_pages,
-                    'publish' as type,
+                    'publishnow' as type,
                     COALESCE(
                         json_agg(
                             json_build_object(
