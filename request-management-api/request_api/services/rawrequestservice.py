@@ -50,7 +50,7 @@ class rawrequestservice:
 
         # Raw request should already have applicant attached, but if not this is a fallback to create one
         if not requestdatajson.get("foiRequestApplicantID", None) and sourceofsubmission != "onlineform":
-            applicant = FOIRequestApplicant.from_request_data(requestdatajson)
+            applicant = FOIRequestApplicant.from_request_data(requestdatajson, is_new=True)
             result = FOIRequestApplicant.save_instance(applicant, userid)
             applicantid = result.identifier
             requestdatajson.setdefault("foiRequestApplicantID", applicantid)
@@ -117,7 +117,7 @@ class rawrequestservice:
         else:
             # This should mostly be used for onlineform requests
             if not _requestdatajson.get("foiRequestApplicantID", None):
-                applicant = FOIRequestApplicant.from_request_data(_requestdatajson)
+                applicant = FOIRequestApplicant.from_request_data(_requestdatajson, is_new=True)
                 result = FOIRequestApplicant.save_instance(applicant, userid)
                 applicantid = result.identifier
                 _requestdatajson.setdefault("foiRequestApplicantID", applicantid)
