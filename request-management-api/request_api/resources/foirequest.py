@@ -465,7 +465,7 @@ class LinkedRequestsInfo(Resource):
             if results is not None and results.success == True:
                 return {'success': results.success, 'message': results.message, 'new_linkedrequests':  results.data} , 201
             else:
-                return {'success': False, 'message': "Failed to remove linkedrequest data",'id': axisrequestid} , 404
+                return {'success': False, 'message': "Failed to save linkedrequest data",'id': axisrequestid} , 404
         except Exception as ex:
             print("ERROR:", str(ex))
             return {'success': False, 'message': str(ex), 'id': axisrequestid}, 500
