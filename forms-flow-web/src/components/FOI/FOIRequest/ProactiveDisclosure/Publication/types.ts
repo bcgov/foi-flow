@@ -1,5 +1,5 @@
 export type PDTransactionObject = {
-  pdpublicationstatus_id: number;
+  oipublicationstatus_id: number;
   pdexemption_id: number | null;
   pdexemptionapproved: boolean | null;
   pagereference: string;
@@ -11,7 +11,7 @@ export type PDTransactionObject = {
 };
 
 export type PDPublicationStatus = {
-  pdpublicationstatusid: number;
+  oipublicationstatusid: number;
   name: string;
   isactive: boolean;
 };

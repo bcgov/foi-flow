@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-import CloseIcon from "@material-ui/icons/CloseOutlined";
+import CloseIcon from "@material-ui/icons/Close";
 import IconButton from "@material-ui/core/IconButton";
 import Checkbox from "@material-ui/core/Checkbox";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -13,108 +9,118 @@ import WarningIcon from "@material-ui/icons/Warning";
 
 const useStyles = makeStyles((theme) => ({
   dialogPaper: {
-    maxWidth: "700px",
+    maxWidth: "850px",
     width: "100%",
-    fontFamily: "BCSans, sans-serif !important",
-  },
-  dialogTitle: {
-    padding: "35px 35px 10px 35px",
-  },
-  titleHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    margin: 0,
-  },
-  titleText: {
-    //fontSize: "xx-large",
-    fontWeight: "bold",
-    margin: "0 0 8px 0",
-    color: "#036",
-    fontFamily: "BCSans-Bold, sans-serif !important",
-    //lineHeight: "1.6",
-    marginLeft: "-3px",
-  },
-  subtitle: {
-    fontSize: "14px",
-    fontWeight: "normal",
-    margin: "4px 0 0 0",
-    color: "#313132",
-    fontFamily: "BCSans-Bold, sans-serif !important",
+    borderRadius: "0px",
+    overflow: "hidden",
   },
   closeButton: {
-    padding: "4px",
-    marginTop: "-4px",
-    marginRight: "-8px",
+    backgroundColor: "#003366",
+    color: "#fff",
+    borderRadius: 0,
+    padding: "10px",
+    position: "absolute",
+    right: "0px",
+    top: "0px",
+    zIndex: 1000,
+    "&:hover": {
+      backgroundColor: "#002447",
+    },
+    "& .MuiSvgIcon-root": {
+      fontSize: "30px",
+    }
   },
-  dialogContent: {
+  contentFrame: {
+    padding: "20px 35px 20px 40px",
+    backgroundColor: "#fff",
+    position: "relative",
+  },
+  titleText: {
+    fontSize: "28px",
+    fontWeight: "bold",
+    margin: "0 0 2px 0",
+    color: "#003366",
+    fontFamily: "BCSans-Bold, sans-serif !important",
+  },
+  subtitle: {
+    fontSize: "16px",
+    fontWeight: "bold",
+    margin: "0 0 10px 0",
     color: "#2D2D2D",
-    padding: "0px 35px",
+    fontFamily: "BCSans-Bold, sans-serif !important",
   },
   selectAllContainer: {
-    marginBottom: "16px",
-    paddingBottom: "12px",
-    color: "#2D2D2D",
+    marginBottom: "12px",
   },
   ministriesGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(9, 1fr)",
-    marginBottom: "20px",
+    marginBottom: "10px",
+    gap: "4px",
   },
   ministryCheckbox: {
+    marginRight: 0,
     "& .MuiFormControlLabel-label": {
       fontSize: "13px",
-      color: "#2D2D2D",
-      fontFamily: "BCSans, sans-serif !important",
-      margin: "0 !important",
+      //fontWeight: "600",
+      color: "#000",
+      //marginLeft: "-4px",
+      //fontFamily: "BCSans-Bold, sans-serif !important",
     },
   },
+  checkbox: {
+    //color: "#2E8540 !important",
+    padding: "4px",
+    "&.Mui-checked": {
+      color: "#2E8540 !important",
+    },
+    "& .MuiSvgIcon-root": {
+      fontSize: "24px",
+    }
+  },
   warningBox: {
-    backgroundColor: "#FEF1D8",
-    border: "1px solid #F8BB47",
-    borderRadius: "4px",
+    backgroundColor: "#FFF9E1",
+    border: "1px solid #FCBA19",
     padding: "12px",
-    marginBottom: "16px",
+    display: "flex",
+    alignItems: "flex-start",
+    marginBottom: "25px",
   },
   warningIcon: {
-    color: "#013366",
-    marginRight: "8px",
-    marginTop: "2px",
-    fontSize: "20px",
+    color: "#003366",
+    marginRight: "16px",
+    fontSize: "24px",
+    marginTop: "4px",
   },
-  warningText: {
-    fontSize: "13px",
-    color: "#313132",
-    margin: 0,
-    lineHeight: "2.0",
-    fontFamily: "BCSans, sans-serif !important",
+  warningTextContainer: {
+    display: "flex",
+    flexDirection: "column",
   },
-  infoText: {
-    fontSize: "13px",
-    color: "#313132",
-    margin: "0px 30px",
+  warningContent: {
+    fontSize: "15px",
+    color: "#000",
     lineHeight: "1.6",
     fontFamily: "BCSans, sans-serif !important",
   },
   callForRecords: {
-    fontWeight: "600",
-    color: "#313132",
+    fontWeight: "bold",
     fontFamily: "BCSans-Bold, sans-serif !important",
   },
-  dialogActions: {
-    padding: "20px 35px 35px 35px",
-    borderTop: "1px solid #e0e0e0",
-    justifyContent: "flex-end",
-    gap: "12px",
+  actionsContainer: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "20px",
+    marginTop: "10px",
   },
   proceedButton: {
     backgroundColor: "#003366",
     color: "#fff",
-    padding: "8px 32px",
+    flex: 1,
+    height: "28px",
     border: "none",
     borderRadius: "4px",
-    fontSize: "14px",
-    fontWeight: "500",
+    fontSize: "13px",
+    fontWeight: "bold",
     cursor: "pointer",
     fontFamily: "BCSans-Bold, sans-serif !important",
     "&:hover": {
@@ -122,20 +128,19 @@ const useStyles = makeStyles((theme) => ({
     },
   },
   cancelButton: {
-    marginRight: "20px",
-    marginTop: "10px",
-    position: "relative",
-    width: "30%",
+    backgroundColor: "#fff",
+    color: "#000",
+    flex: 1,
+    height: "28px",
+    border: "1px solid #707070",
+    borderRadius: "4px",
+    fontSize: "13px",
+    fontWeight: "bold",
+    cursor: "pointer",
     fontFamily: "BCSans-Bold, sans-serif !important",
-    border: "1px solid #38598A",
-    backgroundColor: "#FFFFFF",
-    color: "#38598A",
-    borderRadius: "3px",
-    fontSize: "small",
-    height: "30px",
-    flexBasis: "50%",
-    fontFamily: "BCSans-Bold, sans-serif !important",
-    marginTop: "10px",
+    "&:hover": {
+      backgroundColor: "#f5f5f5",
+    },
   },
 }));
 
@@ -151,7 +156,6 @@ const ConfirmSaveModal = ({
   const [ministries, setMinistries] = useState({});
   const [selectAll, setSelectAll] = useState(false);
 
-  // Initialize ministries state
   useEffect(() => {
     if (allMinistries.length > 0) {
       const initialState = {};
@@ -162,7 +166,6 @@ const ConfirmSaveModal = ({
       });
       setMinistries(initialState);
 
-      // Check if all are selected
       const allSelected = Object.values(initialState).every((val) => val);
       setSelectAll(allSelected);
     }
@@ -190,7 +193,6 @@ const ConfirmSaveModal = ({
     };
     setMinistries(updatedMinistries);
 
-    // Update select all if all are checked
     const allSelected = Object.values(updatedMinistries).every((val) => val);
     setSelectAll(allSelected);
   };
@@ -214,91 +216,82 @@ const ConfirmSaveModal = ({
       onClose={handleClose}
       aria-labelledby="confirm-proceed-dialog-title"
       classes={{ paper: classes.dialogPaper }}
+      maxWidth="md"
+      fullWidth
     >
-      <DialogTitle
-        id="confirm-proceed-dialog-title"
-        className={classes.dialogTitle}
+      <IconButton
+        className={classes.closeButton}
+        onClick={handleClose}
+        aria-label="close"
       >
-        <div className={classes.titleHeader}>
-          <div>
-            <h2 className={classes.titleText}>Confirm and Proceed</h2>
-            <h6 className={classes.subtitle}>
-              You've selected {selectedCount} ministries and public bodies.
-            </h6>
-          </div>
-          <IconButton
-            className={classes.closeButton}
-            onClick={handleClose}
-            aria-label="close"
-          >
-            <CloseIcon />
-          </IconButton>
-        </div>
-      </DialogTitle>
+        <CloseIcon />
+      </IconButton>
 
-      <DialogContent className={classes.dialogContent}>
-        <DialogContentText component="div">
-          {/* Select All Checkbox */}
-          <div>
+      <div className={classes.contentFrame}>
+        <h2 className={classes.titleText}>Confirm and Proceed</h2>
+        <h6 className={classes.subtitle}>
+          You've selected {selectedCount} ministries and public bodies.
+        </h6>
+
+        <div className={classes.selectAllContainer}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={selectAll}
+                onChange={handleSelectAll}
+                className={classes.checkbox}
+              />
+            }
+            label="Select all"
+            className={classes.ministryCheckbox}
+          />
+        </div>
+
+        <div className={classes.ministriesGrid}>
+          {allMinistries.map((ministry) => (
             <FormControlLabel
+              key={ministry.code}
+              className={classes.ministryCheckbox}
               control={
                 <Checkbox
-                  checked={selectAll}
-                  onChange={handleSelectAll}
-                //color="primary"
+                  checked={ministries[ministry.code] || false}
+                  onChange={handleMinistryChange(ministry.code)}
+                  className={classes.checkbox}
+                  size="small"
                 />
               }
-              label="Select all"
+              label={ministry.code}
             />
-          </div>
+          ))}
+        </div>
 
-          {/* Ministries Grid */}
-          <div className={classes.ministriesGrid}>
-            {allMinistries.map((ministry) => (
-              <FormControlLabel
-                key={ministry.code}
-                className={classes.ministryCheckbox}
-                control={
-                  <Checkbox
-                    checked={ministries[ministry.code] || false}
-                    onChange={handleMinistryChange(ministry.code)}
-                    color="primary"
-                    size="small"
-                  />
-                }
-                label={ministry.code}
-              />
-            ))}
-          </div>
-
-          {/* Warning Message */}
-          <div className={classes.warningBox}>
-            <WarningIcon className={classes.warningIcon} />
-            <span className={classes.warningText}>
-              This screen will close, and you'll be redirected to the queue
-              where you can view all related sub-tickets.
-            </span>
-            {/* Info Text */}
-            <p className={classes.infoText}>
-              When you proceed, tickets will be created for each selected
-              ministry and sent to ministry coordinators as part of the{" "}
+        <div className={classes.warningBox}>
+          <WarningIcon className={classes.warningIcon} />
+          <div className={classes.warningTextContainer}>
+            <div className={classes.warningContent}>
+              This screen will close and the request will update to Intake in progress.
+            </div>
+            <div className={classes.warningContent} style={{ marginTop: "12px" }}>
+              When the request is moved to 'Open' then the requests will be created for each selected Ministry
+              and will be ready to move to the{" "}
               <span className={classes.callForRecords}>"Call for Records"</span>{" "}
               process.
-            </p>
+            </div>
           </div>
-        </DialogContentText>
-      </DialogContent>
+        </div>
 
-      <DialogActions>
-        <button className={`btn-bottom btn-save btn`} onClick={handleProceed}>
-          Proceed
-        </button>
-        <button className={classes.cancelButton} onClick={handleClose}>
-          Cancel
-        </button>
-      </DialogActions>
+        <div className={classes.actionsContainer}>
+          <button className={classes.proceedButton} onClick={handleProceed}>
+            Proceed
+          </button>
+          <button className={classes.cancelButton} onClick={handleClose}>
+            Cancel
+          </button>
+        </div>
+      </div>
     </Dialog>
   );
 };
 
 export default ConfirmSaveModal;
+

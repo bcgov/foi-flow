@@ -445,8 +445,9 @@ class FOIMinistryRequest(db.Model):
         latest_proactive_subq = (
             _session.query(
                 FOIProactiveDisclosureRequests.foiministryrequest_id.label("foiministryrequest_id"),
-                func.max(FOIProactiveDisclosureRequests.foiministryrequestversion_id).label("max_version")
+                func.max(FOIProactiveDisclosureRequests.version).label("max_proactive_version")
             )
+            .filter(FOIProactiveDisclosureRequests.isactive == True)
             .group_by(FOIProactiveDisclosureRequests.foiministryrequest_id)
             .subquery()
         )
@@ -464,6 +465,8 @@ class FOIMinistryRequest(db.Model):
                 onekeywordfiltercondition = []
                 if(_keyword != "restricted"):
                     for field in filterfields:
+                        if(field == 'requestType' and _keyword.lower() == 'pd'):
+                            onekeywordfiltercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%proactive disclosure%'))
                         onekeywordfiltercondition.append(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).ilike('%'+_keyword+'%'))
                 else:
                     if(requestby == 'IAO'):
@@ -713,7 +716,7 @@ class FOIMinistryRequest(db.Model):
         ).join(
             latest_proactive,
             (latest_proactive.foiministryrequest_id == latest_proactive_subq.c.foiministryrequest_id) &
-            (latest_proactive.foiministryrequestversion_id == latest_proactive_subq.c.max_version),
+            (latest_proactive.version == latest_proactive_subq.c.max_proactive_version),
             isouter=True
         )
 
@@ -872,7 +875,8 @@ class FOIMinistryRequest(db.Model):
             'subjectcode': SubjectCode.name,
             'isoipcreview': FOIMinistryRequest.isoipcreview,
             'isphasedrelease': FOIMinistryRequest.isphasedrelease,
-            'proactivedisclosurecategory': ProactiveDisclosureCategory.name
+            'proactivedisclosurecategory': ProactiveDisclosureCategory.name,
+            'proactiveDisclosureCategory': ProactiveDisclosureCategory.name
         }.get(x, FOIMinistryRequest.axisrequestid)
 
     @classmethod
@@ -955,6 +959,42 @@ class FOIMinistryRequest(db.Model):
             rs = db.session.execute(text(sql), {'requeststatuslabel': requeststatuslabel})
             for row in rs:
                 upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+        finally:
+            db.session.close()
+        return upcomingduerecords
+
+    @classmethod
+    def getupcomingpublicationduerecords(cls):
+        upcomingduerecords = []
+        try:
+            sql = """select distinct on (fmr.filenumber) fmr.filenumber, to_char(fpd.publicationdate, 'YYYY-MM-DD') as publicationdate,
+                        fmr.foiministryrequestid, fmr.version, fmr.foirequest_id, fmr.created_at, fmr.createdby
+                        from "FOIProactiveDisclosureRequests" fpd
+                        inner join (
+                            select distinct on (fpa.foiministryrequestid) foiministryrequestid, version, filenumber, foirequest_id, requeststatuslabel, created_at, createdby
+                            from "FOIMinistryRequests" fpa
+                            order by fpa.foiministryrequestid, fpa.version desc
+                        ) fmr on fpd.foiministryrequest_id = fmr.foiministryrequestid
+                        where fpd.isactive = true
+                        and fpd.publicationdate is not null
+                        and fmr.requeststatuslabel not in :requeststatuslabel
+                        and fpd.publicationdate between NOW() - INTERVAL '7 DAY' AND NOW() + INTERVAL '7 DAY'
+                        order by fmr.filenumber, fpd.version desc;"""
+            requeststatuslabel = tuple([StateName.closed.name, StateName.redirect.name, StateName.unopened.name, StateName.intakeinprogress.name, StateName.onhold.name, StateName.archived.name, StateName.onholdother.name])
+            rs = db.session.execute(text(sql), {'requeststatuslabel': requeststatuslabel})
+            for row in rs:
+                upcomingduerecords.append({
+                    "filenumber": row["filenumber"],
+                    "publicationdate": row["publicationdate"],
+                    "foiministryrequestid": row["foiministryrequestid"],
+                    "version": row["version"],
+                    "foirequest_id": row["foirequest_id"],
+                    "created_at": row["created_at"],
+                    "createdby": row["createdby"]
+                })
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -1139,8 +1179,9 @@ class FOIMinistryRequest(db.Model):
         latest_proactive_subq = (
             _session.query(
                 FOIProactiveDisclosureRequests.foiministryrequest_id.label("foiministryrequest_id"),
-                func.max(FOIProactiveDisclosureRequests.foiministryrequestversion_id).label("max_version")
+                func.max(FOIProactiveDisclosureRequests.version).label("max_proactive_version")
             )
+            .filter(FOIProactiveDisclosureRequests.isactive == True)
             .group_by(FOIProactiveDisclosureRequests.foiministryrequest_id)
             .subquery()
         )
@@ -1397,7 +1438,7 @@ class FOIMinistryRequest(db.Model):
         ).join(
             latest_proactive,
             (latest_proactive.foiministryrequest_id == latest_proactive_subq.c.foiministryrequest_id) &
-            (latest_proactive.foiministryrequestversion_id == latest_proactive_subq.c.max_version),
+            (latest_proactive.version == latest_proactive_subq.c.max_proactive_version),
             isouter=True
         )
 
@@ -1827,6 +1868,7 @@ class FOIMinistryRequest(db.Model):
                 FOIProactiveDisclosureRequests.foiministryrequest_id,
                 func.max(FOIProactiveDisclosureRequests.foiministryrequestversion_id).label("max_version")
             )
+            .filter(FOIProactiveDisclosureRequests.isactive == True)
             .group_by(FOIProactiveDisclosureRequests.foiministryrequest_id)
             .subquery()
         )
@@ -1877,24 +1919,24 @@ class FOIMinistryRequest(db.Model):
             FOIRequest.foirequestid.label('id'), 
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'), 
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
-            FOIMinistryRequest.closedate, 
+            FOIMinistryRequest.closedate.label('closedate'), 
             FOIRequest.requesttype.label('requestType'), 
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
-            literal(None).label('applicantcategory'),
+            cast(None, String).label('applicantcategory'),
             recordspagecount.label('recordspagecount'),  
-            literal(None).label('oiStatusName'),
+            cast(None, String).label('oiStatusName'),
             FOIRequest.receiveddate.label('receivedDate'),
-            latest_proactive.publicationdate,
-            FOIMinistryRequest.created_at, 
+            latest_proactive.publicationdate.label('publicationdate'),
+            FOIMinistryRequest.created_at.label('created_at'), 
             assignedtoformatted.label('assignedToFormatted'), 
-            literal(None).label('oistatus_id'),
-            FOIMinistryRequest.version,
+            cast(None, Integer).label('oistatus_id'),
+            FOIMinistryRequest.version.label('version'),
             latest_proactive.proactivedisclosureid.label('foiopeninforequestid'),
             FOIRequestStatus.name.label('currentState'),
-            literal(None).label('isiaorestricted'),
-            literal(None).label('subjectcode'),
-            FOIMinistryRequest.closedate,
-            FOIMinistryRequest.cfrduedate,
+            cast(None, db.Boolean).label('isiaorestricted'),
+            cast(None, String).label('subjectcode'),
+            FOIMinistryRequest.closedate.label('closedate_1'),
+            FOIMinistryRequest.cfrduedate.label('cfrduedate'),
             ProactiveDisclosureCategory.name.label('proactivedisclosurecategory'),
         ]   
         basequery = (
@@ -1934,7 +1976,12 @@ class FOIMinistryRequest(db.Model):
                     FOIMinistryRequest.assignedto.is_(None),                         
             )
         elif additionalfilter is not None and additionalfilter.lower() == 'all':
-            basequery = basequery.filter(FOIMinistryRequest.assignedto != None)
+            basequery = basequery.filter(
+                or_(
+                    FOIMinistryRequest.assignedto.isnot(None),
+                    FOIMinistryRequest.assignedgroup.in_(groups)
+                )
+            )
         return basequery
 
 

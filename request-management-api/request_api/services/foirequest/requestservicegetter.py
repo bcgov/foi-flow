@@ -245,7 +245,7 @@ class requestservicegetter:
             'processingmessage': requestproactive['processingmessage'] if requestproactive != None and 'processingmessage' in requestproactive else '',
             'sitemap_pages': requestproactive['sitemap_pages'] if requestproactive != None and 'sitemap_pages' in requestproactive else '',
             'earliestEligiblePublicationDate': parse(requestproactive['earliesteligiblepublicationdate']).strftime(self.__genericdateformat()) if requestproactive != None and 'earliesteligiblepublicationdate' in requestproactive and requestproactive['earliesteligiblepublicationdate'] is not None else '',
-            'pdpublicationstatus_id': requestproactive['pdpublicationstatus_id'] if requestproactive != None and 'pdpublicationstatus_id' in requestproactive else None,
+            'oipublicationstatus_id': requestproactive['oipublicationstatus_id'] if requestproactive != None and 'oipublicationstatus_id' in requestproactive else None,
             'isactive': requestproactive['isactive'] if requestproactive != None and 'isactive' in requestproactive else True,
         }
         if requestministry['cfrduedate'] is not None:

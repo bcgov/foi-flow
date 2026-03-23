@@ -303,15 +303,15 @@ const OITeamColumns = [
     headerName: "RECEIVED DATE",
     flex: 1,
     headerAlign: "left",
-    valueGetter: (params) => params.row.requestType == "PD" ?
-      "N/A" : params.row.receivedDate
+    // valueGetter: (params) => params.row.requestType == "PD" ?
+    //   "N/A" : params.row.receivedDate
   },
   {
     field: "axisRequestId",
     headerName: "ID NUMBER",
     flex: 1,
     headerAlign: "left",
-    valueGetter: (params) => params.row.requestType == "PD" ?
+    valueGetter: (params) => params.row.requestType == "PD" && !params.row.axisRequestId ?
       params.row.idNumber : params.row.axisRequestId
   },
   {

@@ -36,6 +36,7 @@ export const fetchFOIRequestList = () => {
           });
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestList(data));
+          dispatch(setFOILoader(false));
         } else {
           dispatch(serviceActionError(res));
           throw new Error("Error in fetching dashboard data for IAO");
@@ -83,6 +84,7 @@ export const fetchFOIRequestListByPage = (
         if (res.data) {
           dispatch(clearRequestDetails({}));
           dispatch(setFOIRequestList(res.data));
+          dispatch(setFOILoader(false));
         } else {
           dispatch(serviceActionError(res));
           throw new Error("Error in fetching dashboard data for IAO");

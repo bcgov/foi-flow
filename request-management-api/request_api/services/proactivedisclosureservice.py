@@ -16,12 +16,18 @@ class proactivedisclosureservice:
             "foiministryrequest_id": foiministryrequestid,
             "foiministryrequestversion_id": foiministryrequestversion
         }
-        if "publicationdate" in foiproactiverequest:
-            proactive_disclosure_data["publicationdate"] = foiproactiverequest["publicationdate"]
-        if "pdpublicationstatus_id" in foiproactiverequest:
-            proactive_disclosure_data["pdpublicationstatus_id"] = foiproactiverequest["pdpublicationstatus_id"]
+        if "oipublicationstatus_id" in foiproactiverequest:
+            proactive_disclosure_data["oipublicationstatus_id"] = foiproactiverequest["oipublicationstatus_id"]
         if "earliesteligiblepublicationdate" in foiproactiverequest:
-            proactive_disclosure_data["earliesteligiblepublicationdate"] = foiproactiverequest["earliesteligiblepublicationdate"]
+            val = foiproactiverequest["earliesteligiblepublicationdate"]
+            proactive_disclosure_data["earliesteligiblepublicationdate"] = val if val != "" else None
+            # Auto-sync publicationdate from earliesteligiblepublicationdate when it changes
+            if proactive_disclosure_data["earliesteligiblepublicationdate"]:
+                proactive_disclosure_data["publicationdate"] = proactive_disclosure_data["earliesteligiblepublicationdate"]
+        # Publicationdate always overrides the auto-synced value
+        if "publicationdate" in foiproactiverequest:
+            val = foiproactiverequest["publicationdate"]
+            proactive_disclosure_data["publicationdate"] = val if val != "" else None
         if "proactivedisclosurecategoryid" in foiproactiverequest:
             proactive_disclosure_data["proactivedisclosurecategoryid"] = foiproactiverequest["proactivedisclosurecategoryid"]
         if "reportperiod" in foiproactiverequest:

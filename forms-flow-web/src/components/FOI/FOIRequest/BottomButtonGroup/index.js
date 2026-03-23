@@ -262,9 +262,9 @@ const BottomButtonGroup = React.memo(
     }, [unSavedRequest, recordsUploading, CFRUnsaved]);
 
     const openRequest = () => {
-      saveRequestObject.id = saveRequestObject.id
+      saveRequestObject.id = (saveRequestObject.id && saveRequestObject.id !== "-1")
         ? saveRequestObject.id
-        : requestId;
+        : requestId && requestId !== "-1" ? requestId : saveRequestObject.foirawrequestid;
       saveRequestObject.requeststatuslabel = StateEnum.open.label;
       setOpenModal(true);
     };
@@ -486,8 +486,16 @@ const BottomButtonGroup = React.memo(
             showModal={saveConfirmationModal}
             selectedMinistries={saveRequestObject?.selectedMinistries?.map(m => m.code) || []}
             allMinistries={(allMinistries || []).map(m => ({ ...m, code: m.bcgovcode }))}
-            onProceed={() => {
+            onProceed={(selected) => {
               setSaveConfirmationModal(false);
+              if (selected) {
+                const selectedMinistries = allMinistries.filter(m => selected.includes(m.bcgovcode)).map(m => ({
+                  code: m.bcgovcode,
+                  name: m.name,
+                  isSelected: true
+                }));
+                saveRequestObject.selectedMinistries = selectedMinistries;
+              }
               saveRequest(true);
             }}
             onCancel={() => setSaveConfirmationModal(false)}

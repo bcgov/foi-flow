@@ -7,6 +7,8 @@ import {
   isValidMinistryCode,
   countOfMinistrySelected,
 } from "../FOIRequest/utils";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Checkbox from "@material-ui/core/Checkbox";
 
 const useStyles = makeStyles((_theme) => ({
   headingError: {
@@ -69,6 +71,17 @@ const MinistriesList = React.memo(
     };
 
     const countOfMinistry = countOfMinistrySelected(programAreaList);
+
+    const handleSelectAll = (event) => {
+      const newProgramAreaList = [...programAreaList];
+      newProgramAreaList.forEach((programArea) => {
+        programArea.isChecked = event.target.checked;
+      });
+      setProgramAreaListItems(newProgramAreaList);
+      handleUpdatedMasterProgramAreaList(newProgramAreaList);
+    };
+
+    const selectAll = programAreaList?.every((programArea) => programArea.isChecked);
     return (
       <div className="foi-ministries-container">
         {isProactiveDisclosure ? (
@@ -96,6 +109,17 @@ const MinistriesList = React.memo(
             Select Ministry Client *
           </h4>
         )}
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={selectAll}
+              onChange={handleSelectAll}
+              className={classes.checkbox}
+            />
+          }
+          label="Select all"
+          className={classes.selectAllLabel}
+        />
         <div className="foi-ministries-checkboxes">
           {programAreaList?.map((programArea, index) => (
             <label

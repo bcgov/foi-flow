@@ -786,7 +786,11 @@ class FOIRawRequest(db.Model):
                     if(field == 'lastName'):
                         onekeywordfiltercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+_keyword+'%'))
                     if(field == 'requestType'):
+                        if(_keyword.lower() == 'pd'):
+                            onekeywordfiltercondition.append(FOIRawRequest.findfield('requestType').ilike('%proactive disclosure%'))
                         onekeywordfiltercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+_keyword+'%'))
+                    if(field == 'proactiveDisclosureCategory' or field == 'proactivedisclosurecategory'):
+                        onekeywordfiltercondition.append(FOIRawRequest.findfield('proactiveDisclosureCategory').ilike('%'+_keyword+'%'))
             else:
                 onekeywordfiltercondition.append(FOIRawRequest.isiaorestricted == True)
             
@@ -794,6 +798,119 @@ class FOIRawRequest(db.Model):
 
         return and_(*filtercondition)
 
+
+    @classmethod
+    def getpdrawrequest_basequery(cls, additionalfilter, userid, isiaorestrictedfilemanager, groups):
+        _session = db.session
+        subquery_maxversion = (
+            _session.query(FOIRawRequest.requestid, func.max(FOIRawRequest.version).label('max_version'))
+            .group_by(FOIRawRequest.requestid)
+            .subquery()
+        )
+        joincondition = [
+            subquery_maxversion.c.requestid == FOIRawRequest.requestid,
+            subquery_maxversion.c.max_version == FOIRawRequest.version,
+        ]
+
+        assignedtoformatted = case([
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
+                             func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
+                             FOIAssignee.lastname),
+                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
+                             FOIAssignee.firstname),
+                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.is_(None), FOIRawRequest.assignedgroup.isnot(None)),
+                             FOIRawRequest.assignedgroup),
+                           ],
+                           else_ = FOIRawRequest.assignedto).label('assignedToFormatted')
+
+        axisrequestid_raw = case([
+            (FOIRawRequest.axisrequestid.is_(None),
+            'U-00' + cast(FOIRawRequest.requestid, String)),
+            ],
+            else_ = cast(FOIRawRequest.axisrequestid, String))
+
+        axisrequestid = axisrequestid_raw.label('axisRequestId')
+
+        isiaorestricted = case([
+                            (FOIRawRequest.isiaorestricted.is_(None),
+                             False),
+                           ],
+                           else_ = cast(FOIRawRequest.isiaorestricted, db.Boolean)).label('isiaorestricted')
+
+        receiveddate = cast(func.nullif(FOIRawRequest.requestrawdata['receivedDateUF'].astext, ''), db.DateTime).label('receivedDate')
+
+        proactivedisclosurecategory = case([
+            (FOIRawRequest.requestrawdata['proactiveDisclosureCategory'].is_(None),
+            literal(None)),
+            ],
+            else_ = cast(FOIRawRequest.requestrawdata['proactiveDisclosureCategory'].astext, String)).label('proactivedisclosurecategory')
+
+        publicationdate = cast(func.nullif(FOIRawRequest.requestrawdata['earliestEligiblePublicationDate'].astext, ''), db.DateTime).label('publicationdate')
+        cfrduedate = cast(func.nullif(FOIRawRequest.requestrawdata['cfrDueDate'].astext, ''), db.DateTime).label('cfrduedate')
+
+        selectedcolumns = [
+            FOIRawRequest.requestid.label('id'), 
+            cast(None, Integer).label('ministryrequestid'), 
+            axisrequestid,
+            FOIRawRequest.closedate.label('closedate'), 
+            literal('proactive disclosure').label('requestType'), 
+            axisrequestid_raw.label('idNumber'),
+            cast(None, String).label('applicantcategory'),
+            literal("0").label('recordspagecount'),  
+            cast(None, String).label('oiStatusName'),
+            receiveddate,
+            publicationdate,
+            FOIRawRequest.created_at.label('created_at'), 
+            assignedtoformatted, 
+            cast(None, Integer).label('oistatus_id'),
+            FOIRawRequest.version.label('version'),
+            cast(None, Integer).label('foiopeninforequestid'),
+            cast(FOIRawRequest.status, String).label('currentState'),
+            isiaorestricted,
+            cast(None, String).label('subjectcode'),
+            FOIRawRequest.closedate.label('closedate_1'),
+            cfrduedate,
+            proactivedisclosurecategory,
+        ]   
+
+        basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
+
+        if additionalfilter == 'watchingRequests':
+            subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
+            basequery = basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid)
+        elif additionalfilter == 'myRequests':
+            basequery = basequery.filter(FOIRawRequest.assignedto == userid)
+        elif additionalfilter == 'unassignedRequests':
+            basequery = basequery.filter(and_(FOIRawRequest.assignedto.is_(None), FOIRawRequest.assignedgroup.in_(groups)))
+        elif additionalfilter is not None and additionalfilter.lower() == 'all':
+            basequery = basequery.filter(
+                or_(
+                    FOIRawRequest.assignedto.isnot(None),
+                    FOIRawRequest.assignedgroup.in_(groups)
+                )
+            )
+
+        basequery = basequery.filter(
+            or_(
+                FOIRawRequest.requestrawdata['requestType'].astext == 'proactive disclosure',
+                FOIRawRequest.requestrawdata['requestType']['requestType'].astext == 'proactive disclosure'
+            )
+        )
+
+        return basequery
+
+    @classmethod
+    def getpdrawrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups):
+        #from os import getenv
+        #unopened_request_restriction = getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") if getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") not in (None, "") else datetime.now()
+        basequery = FOIRawRequest.getpdrawrequest_basequery(additionalfilter, userid, isiaorestrictedfilemanager, groups)
+        #basequery = basequery.filter(FOIRawRequest.status != 'Closed').filter(or_(FOIRawRequest.status != 'Unopened', FOIRawRequest.created_at >= unopened_request_restriction))
+        if(len(filterfields) > 0 and keyword is not None):
+            filtercondition = FOIRawRequest.getfilterforrequestssubquery(filterfields, keyword)
+            return basequery.filter(filtercondition)
+        else:
+            return basequery
 
     @classmethod
     def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, usertype, isministryrestrictedfilemanager=False):
@@ -816,7 +933,8 @@ class FOIRawRequest(db.Model):
                 subquery_oirequest_queue = FOIOpenInformationRequests.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, "OI", isiaorestrictedfilemanager, isministryrestrictedfilemanager)
                 subquery_pdrequest_queue = FOIMinistryRequest.getpdrequestssubquery(groups, filterfields, keyword, additionalfilter, 
                                                                 userid, iaoassignee, ministryassignee, "OI", isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-                query_full_queue = subquery_oirequest_queue.union(subquery_pdrequest_queue)
+                subquery_pdrawrequest_queue = FOIRawRequest.getpdrawrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups)
+                query_full_queue = subquery_oirequest_queue.union(subquery_pdrequest_queue, subquery_pdrawrequest_queue)
                 return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
             else:
                 subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups)
@@ -851,6 +969,7 @@ class FOIRawRequest(db.Model):
             'DaysLeftValue': FOIRawRequest.requestrawdata['dueDate'].astext,
             'subjectcode': FOIRawRequest.requestrawdata['subjectCode'].astext,
             'proactivedisclosurecategory': FOIRawRequest.requestrawdata['proactiveDisclosureCategory'].astext,
+            'proactiveDisclosureCategory': FOIRawRequest.requestrawdata['proactiveDisclosureCategory'].astext,
         }.get(x, cast(FOIRawRequest.requestid, String))
     
     @classmethod
@@ -862,6 +981,8 @@ class FOIRawRequest(db.Model):
             'idNumber',
             'axisRequestId',
             'requestpagecount',
+            'proactiveDisclosureCategory',
+            'proactivedisclosurecategory',
             'currentState',
             'assignedTo',
             'receivedDate',

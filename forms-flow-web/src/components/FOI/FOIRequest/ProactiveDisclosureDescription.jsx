@@ -42,9 +42,9 @@ const useStyles = makeStyles({
     marginTop: "24px",
   },
   textField: {
-    "& .MuiOutlinedInput-root": {
-      backgroundColor: "#fff",
-    },
+    // "& .MuiOutlinedInput-root": {
+    //   backgroundColor: "#fff",
+    // },
   },
 });
 
@@ -305,10 +305,9 @@ const ProactiveDisclosureDescription = React.memo(
                     label="Start Date"
                     type="date"
                     value={startDate}
-                    className={classes.textField}
                     onChange={handleStartDateChange}
                     InputLabelProps={{
-                      shrink: true,
+                        shrink: true,
                     }}
                     InputProps={{ inputProps: { max: formatDate(new Date()) } }}
                     variant="outlined"
@@ -322,7 +321,6 @@ const ProactiveDisclosureDescription = React.memo(
                     label="End Date"
                     type="date"
                     value={endDate}
-                    className={classes.textField}
                     onChange={handleEndDateChange}
                     InputLabelProps={{
                       shrink: true,

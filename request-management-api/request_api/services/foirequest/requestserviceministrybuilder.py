@@ -97,7 +97,11 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.isphasedrelease = ministryschema["isphasedrelease"]
         foiministryrequest.isconsultflag = ministryschema["isconsultflag"]
         foiministryrequest.oipcreviews = self.createfoirequestoipcs(foiministryrequest.isoipcreview, ministryschema["foiministryrequestid"], ministryschema["version"])
-        if requestschema.get("requestType") == RequestType.PROACTIVE_DISCLOSURE.value:
+        is_proactive_disclosure = (
+            requestschema.get("requestType") == RequestType.PROACTIVE_DISCLOSURE.value or
+            ministryschema.get("requesttype", "").lower() == RequestType.PROACTIVE_DISCLOSURE.value.lower()
+        )
+        if is_proactive_disclosure:
              foiministryrequest.proactivedisclosures = self._prepareproactivedisclosuredetails(requestschema, userid, foiministryrequest.foiministryrequestid, foiministryrequest.version)
         return foiministryrequest
 

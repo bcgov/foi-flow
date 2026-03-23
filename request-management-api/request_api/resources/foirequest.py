@@ -114,7 +114,7 @@ class FOIRequests(Resource):
 
             
             if rawresult.success == True:
-                result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
+                result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid(), rawrequestid=rawresult.identifier)
                 if result.success == True:
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())

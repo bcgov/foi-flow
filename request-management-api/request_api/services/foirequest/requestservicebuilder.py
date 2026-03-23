@@ -61,10 +61,10 @@ class requestservicebuilder(requestserviceconfigurator):
             
         if requestschema.get("cfrDueDate") is not None and requestschema.get("cfrDueDate")  != "":
             foiministryrequest.cfrduedate = requestschema.get("cfrDueDate")
-        startdate = ""
-        if (requestschema.get("startDate") is not None):
+        startdate = None
+        if (requestschema.get("startDate") is not None and requestschema.get("startDate") != ""):
             startdate = requestschema.get("startDate")
-        elif (requestschema.get("requestProcessStart") is not None):
+        elif (requestschema.get("requestProcessStart") is not None and requestschema.get("requestProcessStart") != ""):
             startdate = requestschema.get("requestProcessStart")
         
         foiministryrequest.startdate = startdate

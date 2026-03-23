@@ -21,6 +21,7 @@ from request_api.services.events.section5pending import section5pendingevent
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.exceptions import BusinessException
 from request_api.utils.enums import PaymentEventType
+from request_api.services.events.pdpublishdate import pdpublishdateevent
 import time as timer
 
 import json
@@ -68,9 +69,12 @@ class eventservice:
             divisioneventresponse = divisiondateevent().createdueevent()   
             oipceventresponse = oipcduedateevent().createdueevent() 
             paymentremindereventresponse = paymentevent().createpaymentreminderevent()
-            section5pendingresponse = section5pendingevent().createdueevent()            
-            if cfreventresponse.success == False or legislativeeventresponse.success == False or divisioneventresponse.success == False or paymentremindereventresponse.success == False or section5pendingresponse == False or oipceventresponse == False:
-                current_app.logger.error("FOI Notification failed for reminder event response=%s ; legislative response=%s ; division response=%s ; payment response=%s ; section5pending response=%s ; oipcduereminder response=%s" % (cfreventresponse.message, legislativeeventresponse.message, divisioneventresponse.message, paymentremindereventresponse.message, section5pendingresponse.message, oipceventresponse.message))
+            section5pendingresponse = section5pendingevent().createdueevent()   
+            proactivedisclosureeventresponse = pdpublishdateevent().createdueevent()   
+            if (cfreventresponse.success == False or legislativeeventresponse.success == False or divisioneventresponse.success == False or 
+                paymentremindereventresponse.success == False or section5pendingresponse == False or oipceventresponse == False or 
+                    proactivedisclosureeventresponse.success == False):
+                current_app.logger.error("FOI Notification failed for reminder event response=%s ; legislative response=%s ; division response=%s ; payment response=%s ; section5pending response=%s ; oipcduereminder response=%s ; proactivedisclosure response=%s" % (cfreventresponse.message, legislativeeventresponse.message, divisioneventresponse.message, paymentremindereventresponse.message, section5pendingresponse.message, oipceventresponse.message, proactivedisclosureeventresponse.message))
                 return DefaultMethodResult(False,'Due reminder notifications failed',cfreventresponse.identifier)
             return DefaultMethodResult(True,'Due reminder notifications created',cfreventresponse.identifier)
         except BusinessException as exception:            

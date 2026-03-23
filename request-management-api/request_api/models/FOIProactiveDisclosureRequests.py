@@ -42,7 +42,7 @@ class FOIProactiveDisclosureRequests(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), nullable=False)
     updatedby = db.Column(db.String(120), nullable=True)
-    pdpublicationstatus_id = db.Column(db.Integer, ForeignKey('OpenInfoPublicationStatuses.oipublicationstatusid'), nullable=False)
+    oipublicationstatus_id = db.Column(db.Integer, ForeignKey('OpenInfoPublicationStatuses.oipublicationstatusid'), nullable=False)
     processingstatus = db.Column(db.String(120), nullable=True)
     processingmessage = db.Column(db.String(250), nullable=True)
     sitemap_pages = db.Column(db.String(120), nullable=True)
@@ -51,14 +51,14 @@ class FOIProactiveDisclosureRequests(db.Model):
     @classmethod
     def getproactiverequestbyministryrequestid(cls,ministryrequestid, ministryversion):
         request_schema = FOIProactiveDisclosureRequestSchema()
-        query = db.session.query(FOIProactiveDisclosureRequests).filter_by(foiministryrequest_id=ministryrequestid , foiministryrequestversion_id = ministryversion).order_by(FOIProactiveDisclosureRequests.foiministryrequestversion_id.desc()).first()
+        query = db.session.query(FOIProactiveDisclosureRequests).filter_by(foiministryrequest_id=ministryrequestid , foiministryrequestversion_id = ministryversion, isactive=True).order_by(FOIProactiveDisclosureRequests.version.desc()).first()
         return request_schema.dump(query) 
 
     @classmethod
     def getcurrentfoiproactiverequest(cls, foiministryrequestid)->DefaultMethodResult:
         try:
             request_schema = FOIProactiveDisclosureRequestSchema()
-            query = db.session.query(FOIProactiveDisclosureRequests).filter_by(foiministryrequest_id=foiministryrequestid).order_by(FOIProactiveDisclosureRequests.foiministryrequestversion_id.desc()).first()
+            query = db.session.query(FOIProactiveDisclosureRequests).filter_by(foiministryrequest_id=foiministryrequestid, isactive=True).order_by(FOIProactiveDisclosureRequests.version.desc()).first()
             return request_schema.dump(query)
         except Exception as exception:
             logging.error(f"Error: {exception}")
@@ -76,12 +76,12 @@ class FOIProactiveDisclosureRequests(db.Model):
                     foiministryrequestversion_id=foiproactiverequest["foiministryrequestversion_id"],
                     proactivedisclosurecategoryid=foiproactiverequest.get("proactivedisclosurecategoryid", current_proactive.get("proactivedisclosurecategory.proactivedisclosurecategoryid")),
                     reportperiod=foiproactiverequest.get("reportperiod", current_proactive.get("reportperiod")),
-                    publicationdate=foiproactiverequest.get("publicationdate", current_proactive.get("publicationdate")),
-                    earliesteligiblepublicationdate=foiproactiverequest.get("earliesteligiblepublicationdate", current_proactive.get("earliesteligiblepublicationdate")),
+                    publicationdate=foiproactiverequest.get("publicationdate", current_proactive.get("publicationdate")) if foiproactiverequest.get("publicationdate", current_proactive.get("publicationdate")) != "" else None,
+                    earliesteligiblepublicationdate=foiproactiverequest.get("earliesteligiblepublicationdate", current_proactive.get("earliesteligiblepublicationdate")) if foiproactiverequest.get("earliesteligiblepublicationdate", current_proactive.get("earliesteligiblepublicationdate")) != "" else None,
                     isactive=True,
                     created_at=createddate,
                     createdby=userid,
-                    pdpublicationstatus_id=foiproactiverequest.get("pdpublicationstatus_id", current_proactive.get("pdpublicationstatus_id")),
+                    oipublicationstatus_id=foiproactiverequest.get("oipublicationstatus_id", current_proactive.get("oipublicationstatus_id")),
                     processingstatus=foiproactiverequest.get("processingstatus", current_proactive.get("processingstatus")),
                     processingmessage=foiproactiverequest.get("processingmessage", current_proactive.get("processingmessage")),
                     sitemap_pages=foiproactiverequest.get("sitemap_pages", current_proactive.get("sitemap_pages"))
@@ -96,12 +96,12 @@ class FOIProactiveDisclosureRequests(db.Model):
                     foiministryrequestversion_id=foiproactiverequest["foiministryrequestversion_id"],
                     proactivedisclosurecategoryid=foiproactiverequest.get("proactivedisclosurecategoryid"),
                     reportperiod=foiproactiverequest.get("reportperiod"),
-                    publicationdate=foiproactiverequest.get("publicationdate"),
-                    earliesteligiblepublicationdate=foiproactiverequest.get("earliesteligiblepublicationdate"),
+                    publicationdate=foiproactiverequest.get("publicationdate") if foiproactiverequest.get("publicationdate") != "" else None,
+                    earliesteligiblepublicationdate=foiproactiverequest.get("earliesteligiblepublicationdate") if foiproactiverequest.get("earliesteligiblepublicationdate") != "" else None,
                     isactive=True,
                     created_at=createddate,
                     createdby=userid,
-                    pdpublicationstatus_id=foiproactiverequest.get("pdpublicationstatus_id", 1),
+                    oipublicationstatus_id=foiproactiverequest.get("oipublicationstatus_id", 1),
                     processingstatus=foiproactiverequest.get("processingstatus"),
                     processingmessage=foiproactiverequest.get("processingmessage"),
                     sitemap_pages=foiproactiverequest.get("sitemap_pages")
@@ -133,6 +133,6 @@ class FOIProactiveDisclosureRequestSchema(ma.Schema):
         fields = (
             'proactivedisclosureid', 'foiministryrequest_id', 'foiministryrequestversion_id',
             'proactivedisclosurecategory.proactivedisclosurecategoryid','proactivedisclosurecategory.name','reportperiod',
-            'publicationdate', 'created_at', 'updated_at', 'createdby', 'updatedby', 'version', 'isactive', 'pdpublicationstatus_id',
+            'publicationdate', 'created_at', 'updated_at', 'createdby', 'updatedby', 'version', 'isactive', 'oipublicationstatus_id',
             'processingstatus', 'processingmessage', 'sitemap_pages','earliesteligiblepublicationdate'
         )

@@ -60,16 +60,28 @@ class requestserviceconfigurator:
         proactivedisclosure.createdby = userid
         proactivedisclosure.created_at = datetime.datetime.now()
         
-        # Support both camelCase and lowercase from schema
-        proactivedisclosure.publicationdate = foirequestschema.get("publicationDate", foirequestschema.get("publicationdate"))
-        proactivedisclosure.reportperiod = foirequestschema.get("reportPeriod", foirequestschema.get("reportperiod", ""))
-        
         # New Proactive Disclosure Fields
-        proactivedisclosure.earliesteligiblepublicationdate = foirequestschema.get("earliestEligiblePublicationDate", foirequestschema.get("earliesteligiblepublicationdate"))
-        proactivedisclosure.processingstatus = foirequestschema.get("processingStatus", foirequestschema.get("processingstatus"))
-        proactivedisclosure.processingmessage = foirequestschema.get("processingMessage", foirequestschema.get("processingmessage"))
-        proactivedisclosure.sitemap_pages = foirequestschema.get("sitemapPages", foirequestschema.get("sitemap_pages"))
-        proactivedisclosure.pdpublicationstatus_id = foirequestschema.get("pdPublicationStatusId", foirequestschema.get("pdpublicationstatus_id", 1))
+        earliest_in_schema = "earliestEligiblePublicationDate" in foirequestschema or "earliesteligiblepublicationdate" in foirequestschema
+        if earliest_in_schema:
+            val = foirequestschema.get("earliestEligiblePublicationDate", foirequestschema.get("earliesteligiblepublicationdate"))
+            proactivedisclosure.earliesteligiblepublicationdate = val if val != "" else None
+        elif current_proactive:
+            proactivedisclosure.earliesteligiblepublicationdate = current_proactive.get("earliesteligiblepublicationdate")
+
+        publicationdate_in_schema = "publicationDate" in foirequestschema or "publicationdate" in foirequestschema
+        if publicationdate_in_schema:
+            val = foirequestschema.get("publicationDate", foirequestschema.get("publicationdate"))
+            proactivedisclosure.publicationdate = val if val != "" else None
+        elif earliest_in_schema and proactivedisclosure.earliesteligiblepublicationdate:
+            proactivedisclosure.publicationdate = proactivedisclosure.earliesteligiblepublicationdate
+        elif current_proactive:
+            proactivedisclosure.publicationdate = current_proactive.get("publicationdate")
+
+        proactivedisclosure.reportperiod = foirequestschema.get("reportPeriod", foirequestschema.get("reportperiod", current_proactive.get("reportperiod", "")))
+        proactivedisclosure.processingstatus = foirequestschema.get("processingStatus", foirequestschema.get("processingstatus", current_proactive.get("processingstatus")))
+        proactivedisclosure.processingmessage = foirequestschema.get("processingMessage", foirequestschema.get("processingmessage", current_proactive.get("processingmessage")))
+        proactivedisclosure.sitemap_pages = foirequestschema.get("sitemapPages", foirequestschema.get("sitemap_pages", current_proactive.get("sitemap_pages")))
+        proactivedisclosure.oipublicationstatus_id = foirequestschema.get("pdPublicationStatusId", foirequestschema.get("oipublicationstatus_id", current_proactive.get("oipublicationstatus_id", 1)))
         proactivedisclosure.isactive = foirequestschema.get("isactive", True)
         
         category_name = None

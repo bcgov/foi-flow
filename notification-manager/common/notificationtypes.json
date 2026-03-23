@@ -106,5 +106,9 @@
     "exemptiondenied":{
         "name": "Exemption Denied",
         "notificationtypelabel": "exemptiondenied"
-    }   
+    },
+    "publicationduereminder": {
+        "name": "Publication Due Reminder",
+        "notificationtypelabel": "publicationduereminder"    
+    } 
 }

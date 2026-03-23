@@ -58,7 +58,7 @@ const ProactiveDisclosureRequestPublication = ({
     useEffect(() => {
         setPdPublicationData({
             ...foiPDTransactionData,
-            pdpublicationstatus_id: foiPDTransactionData?.pdpublicationstatus_id || OIPublicationStatuses.Publish
+            oipublicationstatus_id: foiPDTransactionData?.oipublicationstatus_id || OIPublicationStatuses.Publish
         });
     }, [foiPDTransactionData]);
 
@@ -74,7 +74,7 @@ const ProactiveDisclosureRequestPublication = ({
             setIsDataEdited(true);
         }
         //Reset foi pd data if publication status goes back to publication.
-        if (pdDataKey === "pdpublicationstatus_id" && value === findPDPublicationState("Publish")?.pdpublicationstatusid) {
+        if (pdDataKey === "oipublicationstatus_id" && value === findPDPublicationState("Publish")?.oipublicationstatusid) {
             setPdPublicationData((prev: any) => ({
                 ...prev,
                 [pdDataKey]: value,
@@ -195,7 +195,7 @@ const ProactiveDisclosureRequestPublication = ({
     }
 
     const save = () => {
-        if (pdPublicationData.pdpublicationstatus_id === OIPublicationStatuses.UnpublishRequest) {
+        if (pdPublicationData.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest) {
             setConfirmationModal({
                 show: true,
                 title: "Unpublish Request",
