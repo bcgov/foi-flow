@@ -81,7 +81,7 @@ const RequestDescription = React.memo(({
             startDate: !!requestDetails.fromDate ? formatDate(new Date(requestDetails.fromDate)): "",
             endDate: !!requestDetails.toDate ? formatDate(new Date(requestDetails.toDate)): "",
             description: !!requestDetails.description ? requestDetails.description : "",
-            isProgramAreaSelected: requestDetails?.selectedMinistries?.length === 1 && requestDetails?.selectedMinistries.some(programArea =>
+            isProgramAreaSelected: requestDetails?.selectedMinistries?.length > 0 && requestDetails?.selectedMinistries.some(programArea =>
               (isValidMinistryCode(programArea.code, masterProgramAreaList))),
             ispiiredacted: ministryId ? true : !!requestDetails.ispiiredacted,
             subjectCode: getSubjectCode()
@@ -163,7 +163,7 @@ const RequestDescription = React.memo(({
     };  
     //handle onchange of Program Area List and bubble up the latest data to ReviewRequest
     const handleUpdatedMasterProgramAreaList = (updatedProgramAreaList) => {
-        handleOnChangeRequiredRequestDescriptionValues(countOfMinistrySelected(updatedProgramAreaList) === 1 && updatedProgramAreaList.some(programArea =>
+        handleOnChangeRequiredRequestDescriptionValues(countOfMinistrySelected(updatedProgramAreaList) > 0 && updatedProgramAreaList.some(programArea =>
           (programArea.isChecked && isValidMinistryCode(programArea.bcgovcode, masterProgramAreaList))), 
           FOI_COMPONENT_CONSTANTS.IS_PROGRAM_AREA_SELECTED);     //event bubble up- update the required fields to validate later
         handleUpdatedProgramAreaList(updatedProgramAreaList);    //event bubble up - Updated program area list

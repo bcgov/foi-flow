@@ -28,7 +28,7 @@ from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema, FOIPDRequestWrapperSchema
 from request_api.schemas.foiassignee import FOIRequestAssigneeSchema
-from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup
+from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup, RequestType
 from marshmallow import Schema, fields, validate, ValidationError
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 from request_api.utils.enums import OIStatusEnum
@@ -99,7 +99,7 @@ class FOIRequests(Resource):
         try:
             request_json = request.get_json()
             request_type = request_json.get('requestType', '').lower()
-            if request_type == 'proactive disclosure':
+            if request_type == RequestType.PROACTIVE_DISCLOSURE.value:
                 foirequestschema = FOIPDRequestWrapperSchema().load(request_json)
             else:
                 foirequestschema = FOIRequestWrapperSchema().load(request_json)
@@ -114,7 +114,7 @@ class FOIRequests(Resource):
 
             
             if rawresult.success == True:
-                result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid())
+                result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid(), rawrequestid=rawresult.identifier)
                 if result.success == True:
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())
@@ -148,7 +148,7 @@ class FOIRequestsById(Resource):
         try:
             request_json = request.get_json()
             request_type = request_json.get('requestType', '').lower()
-            if request_type == 'proactive disclosure':
+            if request_type == RequestType.PROACTIVE_DISCLOSURE.value:
                 foirequestschema = FOIPDRequestWrapperSchema().load(request_json)
             else:
                 foirequestschema = FOIRequestWrapperSchema().load(request_json)  
@@ -318,7 +318,7 @@ class FOIRequestsById(Resource):
                 foirequest['oistatusid'] = request_json['oistatusid']
             else:
                 foirequest[section] = request_json[section]
-            if foirequest['requestType'] == 'proactive disclosure':
+            if foirequest['requestType'] == RequestType.PROACTIVE_DISCLOSURE.value:
                 foirequestschema = FOIPDRequestWrapperSchema().load(foirequest)
             else:
                 foirequestschema = FOIRequestWrapperSchema().load(foirequest)
@@ -402,8 +402,9 @@ class LinkedRequests(Resource):
             results = linkedrequestservice().findrequestids(search_text, axisrequestid,ministrycode)
             return results, 200
         except Exception as ex:
-            print(ex)
-            return {'status': 500, 'message':"Invalid Request Id"}, 500
+            message = str(ex)
+            print("ERROR:", message)
+            return {'success': False, 'message': message, 'id': axisrequestid}, 500
         
 @cors_preflight('GET,OPTIONS')
 @API.route('/linkrequest/foiministryinfo/axisrequestid/<string:axisrequestid>')
@@ -418,5 +419,53 @@ class LinkedRequestsInfo(Resource):
             results = linkedrequestservice().get_linkedfoiministryrequest_info_by_axisid(axisrequestid)
             return results, 200
         except Exception as ex:
-            print(ex)
-            return {'status': 500, 'message': ex}, 500
+            message = str(ex)
+            print("ERROR:", message)
+            return {'success': False, 'message': message, 'id': axisrequestid}, 500
+
+@cors_preflight('POST, PUT, OPTIONS')
+@API.route('/linkrequest/removelink/axisrequestid/<string:axisrequestid>')
+class LinkedRequestsInfo(Resource):
+    """Update FOIRequest linkedrequest data removal"""
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def put(axisrequestid):
+        try:
+            request_data = request.get_json()
+            linkedrequest_a = request_data["linkedrequest_a"]
+            linkedrequest_b = request_data["linkedrequest_b"]
+            results = linkedrequestservice().remove_linkedrequest(linkedrequest_a, linkedrequest_b, AuthHelper.getuserid())
+            if results is not None and results.success == True:
+                return {'success': results.success, 'message': results.message, 'new_linkedrequests':  results.data} , 201
+            else:
+                return {'success': False, 'message': "Failed to remove linkedrequest data",'id': axisrequestid} , 404
+        except Exception as ex:
+            message = str(ex)
+            print("ERROR:", message)
+            return {'success': False, 'message': message, 'id': axisrequestid}, 500
+
+@cors_preflight('POST, PUT, OPTIONS')
+@API.route('/linkrequest/createlink/axisrequestid/<string:axisrequestid>')
+class LinkedRequestsInfo(Resource):
+    """Update FOIRequest linkedrequest data creation"""
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post(axisrequestid):
+        try:
+            request_data = request.get_json()
+            linkedrequest_a = request_data["linkedrequest_a"]
+            foiministryrequestid = request_data["foiministryrequestid"]
+            requestid = request_data["rawrequestid"]
+            new_linkedrequests = request_data["new_linkedrequests"]
+            results = linkedrequestservice().bulk_add_linkedrequest(linkedrequest_a, new_linkedrequests, requestid, foiministryrequestid, AuthHelper.getuserid())
+            if results is not None and results.success == True:
+                return {'success': results.success, 'message': results.message, 'new_linkedrequests':  results.data} , 201
+            else:
+                return {'success': False, 'message': "Failed to save linkedrequest data",'id': axisrequestid} , 404
+        except Exception as ex:
+            print("ERROR:", str(ex))
+            return {'success': False, 'message': str(ex), 'id': axisrequestid}, 500

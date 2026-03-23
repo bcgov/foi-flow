@@ -87,6 +87,7 @@ const FOI_COMPONENT_CONSTANTS = {
     PROACTIVE_DISCLOSURE_CATEGORY: "proactiveDisclosureCategory",
     SELECTED_PROACTIVE_DISCLOSURE_CATEGORY: "selectedProactiveCategory",
     REPORT_PERIOD: "reportPeriod",
+    EARLIEST_ELIGIBLE_PUBLICATION_DATE: "earliestEligiblePublicationDate",
   };
   
   export default FOI_COMPONENT_CONSTANTS;

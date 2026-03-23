@@ -34,9 +34,6 @@ export const getAssigneeValue = (row) => {
 };
 
 export const getReceivedDate = (params) => {
-  if (params.row.requestType == "proactive disclosure") {
-    return "N/A";
-  }
   let receivedDateString = params.row.receivedDateUF;
   const dateString = receivedDateString
     ? receivedDateString.substring(0, 10)
@@ -56,20 +53,17 @@ export const getReceivedDate = (params) => {
 };
 
 export const getIDNumber = (params) => {
-  return params.row.requestType === "proactive disclosure"
+  return params.row.requestType === "proactive disclosure" && !params.row.axisRequestId
     ? params.row.idNumber
     : params.row.axisRequestId;
 };
 
 export const getOIReceivedDate = (params) => {
-  if (params.row.requestType === "proactive disclosure") {
-    return "N/A";
-  }
   return params.row.oiReceivedDate;
 };
 
 export const getOIApplicantCategory = (params) => {
-  if (params.row.requestType === "proactive disclosure") {
+  if (params.row.requestType === "proactive disclosure" || params.row.requestType === "PD") {
     return params.row.proactivedisclosurecategory ? params.row.proactivedisclosurecategory : "N/A";
   }
   return params.row.applicantcategory;
@@ -95,8 +89,10 @@ export const getClosedDate = (params) => {
 
 // update sortModel for applicantName & assignedTo
 export const updateSortModel = (sortModel) => {
-  let smodel = JSON.parse(JSON.stringify(sortModel));
-  if (smodel) {
+  // let smodel = JSON.parse(JSON.stringify(sortModel));
+  // if (smodel) {
+  let smodel = sortModel ? JSON.parse(JSON.stringify(sortModel)) : [];
+  if (smodel && Array.isArray(smodel) && smodel.length > 0) {
     let field = smodel[0]?.field;
     let order = smodel[0]?.sort;
 
@@ -174,7 +170,7 @@ export const formatRequestType = (requeststatus) => {
   if (!requeststatus) {
     return "";
   }
-  let formattedRequestState = Object.values(StateEnum).find(state => state.label === requeststatus).name
+  let formattedRequestState = Object.values(StateEnum).find(state => state.label === requeststatus)?.name || requeststatus;
   return formattedRequestState;
 };
 

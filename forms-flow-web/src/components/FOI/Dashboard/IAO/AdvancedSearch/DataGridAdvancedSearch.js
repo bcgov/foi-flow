@@ -149,7 +149,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       renderCell: hyperlinkTooltipRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: (params) =>
-        params.row.requestType === "proactive disclosure"
+        params.row.requestType === "proactive disclosure" && !params.row.axisRequestId
           ? params.row.idNumber
           : params.row.axisRequestId,
       width: 160,

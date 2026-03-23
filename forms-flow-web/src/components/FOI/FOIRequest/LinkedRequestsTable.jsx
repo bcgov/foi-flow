@@ -16,9 +16,9 @@ import { useSelector } from "react-redux";
 export const LinkedRequestsTable = ({
     linkedRequestsInfo,
     linkedRequests,
-    renderReviewRequest,
-    removeLinkedRequest,
-    isMinistry
+    renderRequest,
+    isMinistry,
+    handleOpenModal
 }) => {
     const [page, setPage] = useState(0);
     const MAX_ROWS_PER_PAGE = 7;
@@ -35,7 +35,7 @@ export const LinkedRequestsTable = ({
 
     return (
         <>
-            {linkedRequests?.length > 0 &&
+            {linkedRequestsInfo?.length > 0 &&
             <>
             <TableContainer sx={{display:"flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center", minHeight: "410px"}}>
                 <Table
@@ -79,7 +79,7 @@ export const LinkedRequestsTable = ({
                                 <Link
                                     component="button"
                                     sx={{ color: "#38598A", cursor: "pointer", textDecoration: "underline"}}
-                                    onClick={(e) => renderReviewRequest(e, reqObj)}
+                                    onClick={(e) => renderRequest(e, reqObj)}
                                     className="linked-request-link"
                                 >
                                 {reqObj.axisrequestid}
@@ -94,7 +94,7 @@ export const LinkedRequestsTable = ({
                                     type="button"
                                     className="btn btn-link text-danger"
                                     aria-label={`Remove linked request ${reqObj.axisrequestid}`}
-                                    onClick={() => removeLinkedRequest(reqObj)}
+                                    onClick={() => handleOpenModal(reqObj)}
                                 >
                                 <CancelIcon
                                     fontSize="small"
@@ -110,7 +110,7 @@ export const LinkedRequestsTable = ({
             </TableContainer>
             <TablePagination
                 component="div"
-                count={linkedRequests?.length}
+                count={linkedRequestsInfo?.length}
                 rowsPerPage={MAX_ROWS_PER_PAGE}
                 rowsPerPageOptions={[]}
                 page={page}
