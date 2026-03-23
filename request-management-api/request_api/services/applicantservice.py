@@ -263,7 +263,7 @@ class applicantservice:
 
         # order by update date desc
         applicants = FOIRequestApplicant.getapplicanthistory(applicantid)
-        if applicants is not None:
+        if applicants:
             newer = self.__prepareapplicantforcomparing(applicants[0])
             for idx, applicant in enumerate(applicants):
                 cur = self.__prepareapplicantforcomparing(applicant)
