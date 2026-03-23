@@ -16,7 +16,7 @@ import { useSelector } from "react-redux";
 export const LinkedRequestsTable = ({
     linkedRequestsInfo,
     linkedRequests,
-    renderReviewRequest,
+    renderRequest,
     isMinistry,
     handleOpenModal
 }) => {
@@ -35,7 +35,7 @@ export const LinkedRequestsTable = ({
 
     return (
         <>
-            {linkedRequests?.length > 0 &&
+            {linkedRequestsInfo?.length > 0 &&
             <>
             <TableContainer sx={{display:"flex", flexDirection: "column", justifyContent: "flex-start", alignItems: "center", minHeight: "410px"}}>
                 <Table
@@ -79,7 +79,7 @@ export const LinkedRequestsTable = ({
                                 <Link
                                     component="button"
                                     sx={{ color: "#38598A", cursor: "pointer", textDecoration: "underline"}}
-                                    onClick={(e) => renderReviewRequest(e, reqObj)}
+                                    onClick={(e) => renderRequest(e, reqObj)}
                                     className="linked-request-link"
                                 >
                                 {reqObj.axisrequestid}

@@ -1517,16 +1517,16 @@ class FOIRawRequest(db.Model):
             axis_ids = [axisid for req_obj in linkedrequests for axisid in req_obj.keys()]
             # Union Statement to get either FOIMINISTRYREQUEST data if axisrequestid exists in FOIMINISTRYREQUEST OR FOIRAWREQUEST data if axisrequestid does not exist in FOIMINISTRYREQUEST
             sql = """
-            SELECT DISTINCT ON (axisrequestid) axisrequestid, requestid, foiministryrequestid, requeststatuslabel, requestrawdata, iaocode, version 
+            SELECT DISTINCT ON (axisrequestid) axisrequestid, requestid, foiministryrequestid, requeststatuslabel, requestrawdata, iaocode, foirequest_id, version 
             FROM (
-                SELECT foimin.axisrequestid, NULL::bigint AS requestid, foimin.foiministryrequestid, foimin.requeststatuslabel, NULL::json AS requestrawdata, programarea.iaocode AS iaocode, foimin.version, 1 AS src
+                SELECT foimin.axisrequestid, NULL::bigint AS requestid, foimin.foiministryrequestid, foimin.requeststatuslabel, NULL::json AS requestrawdata, programarea.iaocode AS iaocode, foimin.foirequest_id, foimin.version, 1 AS src
                 FROM public."FOIMinistryRequests" foimin
                 LEFT JOIN public."ProgramAreas" programarea ON programarea.programareaid = foimin.programareaid
                 WHERE foimin.axisrequestid IN :axis_ids
 
                 UNION ALL
 
-                SELECT foiraw.axisrequestid, foiraw.requestid, NULL::bigint AS foiministryrequestid, foiraw.requeststatuslabel, requestrawdata, NULL::text AS iaocode, foiraw.version, 2 AS src
+                SELECT foiraw.axisrequestid, foiraw.requestid, NULL::bigint AS foiministryrequestid, foiraw.requeststatuslabel, requestrawdata, NULL::text AS iaocode, NULL::bigint AS foirequest_id, foiraw.version, 2 AS src
                 FROM public."FOIRawRequests" foiraw
                 WHERE foiraw.axisrequestid IN :axis_ids
             ) foilinkreq
@@ -1538,7 +1538,7 @@ class FOIRawRequest(db.Model):
                 requeststatus = StateName[row["requeststatuslabel"]].value
                 govcode = row["iaocode"] if row["iaocode"] is not None else row["requestrawdata"]["selectedMinistries"][0]["code"]
                 linkedrequestsinfo.append({"rawrequestid": row["requestid"],  "axisrequestid": row["axisrequestid"], "foiministryrequestid": row["foiministryrequestid"],
-                                           "requeststatus": requeststatus, "govcode": govcode})
+                                           "foirequestid": row["foirequest_id"] ,"requeststatus": requeststatus, "govcode": govcode})
         except Exception as ex:
             logging.error(ex)
             raise ex

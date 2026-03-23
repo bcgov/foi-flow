@@ -138,7 +138,7 @@ const LinkedRequests = React.memo(
       return [updatedLinkedRequests, updatedLinkedInfoRequests];
     }
 
-    const renderReviewRequest = (e, reqItem) => {
+    const renderRequest = (e, reqItem) => {
       e.preventDefault();
       const reqId = reqItem.axisrequestid;
       const item = linkedRequestsInfo.find(
@@ -146,9 +146,10 @@ const LinkedRequests = React.memo(
       );
       const rawrequestId = item?.rawrequestid;
       const ministryId = item?.foiministryrequestid;
+      const foirequestId = item?.foirequestid;
       let url = '';
       if (ministryId) {
-        url = `/foi/foirequests/${ministryId}/ministryrequest/${ministryId}`
+        url = `/foi/foirequests/${foirequestId}/ministryrequest/${ministryId}`
       } else {
         url = `/foi/reviewrequest/${rawrequestId}`;
       }
@@ -304,7 +305,7 @@ const LinkedRequests = React.memo(
               <LinkedRequestsTable
                 linkedRequestsInfo={linkedRequestsInfo}
                 linkedRequests={linkedRequests}
-                renderReviewRequest={renderReviewRequest}
+                renderRequest={renderRequest}
                 isMinistry={isMinistry}
                 handleOpenModal={handleOpenModal}
               />
