@@ -20,29 +20,15 @@ class applicantservice:
     """
 
     def get_applicant_profile_by_id(self, applicantid):
-        latestprofile = FOIRequestApplicant.getlatestprofilebyapplicantid(applicantid)
-        applicant = FOIRequestApplicant.get_composite_applicant_profile_by_id(latestprofile['foirequestapplicantid'])
-        # If composite applicant isn't found, fall back to getting applicant from FOIRequestApplicant table
-        if not applicant:
-            applicant = FOIRequestApplicant.get_applicant_profile_by_id(applicantid)
+        applicant = FOIRequestApplicant.get_latest_applicant_profile_by_id(applicantid)
         applicant = self.__prepareapplicant(applicant)
         applicant['requestHistory'] = self.getapplicantrequests(applicantid)
         return applicant
 
     def searchapplicant(self, keywords):
         applicantqueue = []
-        applicants = FOIRequestApplicant.search_applicant_limited(keywords)
-        print('\n**COMPOSITE APPLICANTS: ', applicants)
-        excluded_profile_ids = []
-        if applicants is not None:
-            for applicant in applicants:
-                applicantqueue.append(self.__prepareapplicant(applicant))
-                excluded_profile_ids.append(self.__first_not_null(applicant["applicantprofileid"]))
-        clean_ids = [i for i in excluded_profile_ids if i is not None]
-        applicantprofiles = FOIRequestApplicant.search_applicant_profiles(keywords, clean_ids)
-        print('\n**excluded_profile_ids: ', excluded_profile_ids)
-        print('\n**clean_ids: ', clean_ids)
-        print('\n**applicantprofiles: ', applicantprofiles, '\n')
+        applicantprofiles = FOIRequestApplicant.search_applicant_profiles(keywords)
+
         if applicantprofiles:
             for applicant in applicantprofiles:
                 applicantqueue.append(self.__prepareapplicant(applicant))
@@ -277,7 +263,7 @@ class applicantservice:
 
         # order by update date desc
         applicants = FOIRequestApplicant.getapplicanthistory(applicantid)
-        if applicants is not None:
+        if applicants:
             newer = self.__prepareapplicantforcomparing(applicants[0])
             for idx, applicant in enumerate(applicants):
                 cur = self.__prepareapplicantforcomparing(applicant)

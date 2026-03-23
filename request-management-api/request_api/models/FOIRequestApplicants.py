@@ -10,8 +10,9 @@ from .FOIRequests import FOIRequest
 from .FOIRequestContactInformation import FOIRequestContactInformation
 from .FOIRequestPersonalAttributes import FOIRequestPersonalAttribute
 from .FOIRequestStatus import FOIRequestStatus
-from sqlalchemy import and_, or_, func, text, desc
+from sqlalchemy import and_, or_, func, text, desc, cast, String
 from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.inspection import inspect
 from marshmallow import fields
 import uuid
@@ -210,6 +211,25 @@ class FOIRequestApplicant(db.Model):
             return schema.dump(sq)
         query = db.session.query(FOIRequestApplicant).filter(FOIRequestApplicant.applicantprofileid == sq.applicantprofileid).order_by(FOIRequestApplicant.foirequestapplicantid.desc()).first()
         return schema.dump(query)
+
+    @classmethod
+    def get_latest_applicant_profile_by_id(cls, foirequestapplicantid):
+        applicantprofileid = db.session.query(FOIRequestApplicant.applicantprofileid)\
+            .filter_by(foirequestapplicantid=foirequestapplicantid)\
+            .order_by(FOIRequestApplicant.foirequestapplicantid.desc())\
+            .limit(1)\
+            .scalar()
+
+        if applicantprofileid is None:
+            query = db.session.query(FOIRequestApplicant)\
+                .filter(FOIRequestApplicant.foirequestapplicantid == foirequestapplicantid)
+        else:
+            query = db.session.query(FOIRequestApplicant)\
+                .filter(FOIRequestApplicant.applicantprofileid == applicantprofileid)\
+                .order_by(FOIRequestApplicant.foirequestapplicantid.desc())
+
+        applicantrequest_schema = ApplicantProfileBaseSchema(many=False)
+        return applicantrequest_schema.dump(query.first())
     
     @classmethod
     def getlatestprofilebyaxisapplicantid(cls, axisapplicantid):
@@ -482,12 +502,12 @@ class FOIRequestApplicant(db.Model):
         return applicantprofile_schema.dump(query_aggregate.first())
 
     @classmethod
-    def search_applicant_profiles(cls, keywords, excluded_profile_ids):
+    def search_applicant_profiles(cls, keywords):
         conditions = []
         for key, value in keywords.items():
             column = getattr(FOIRequestApplicant, key, None)
             if column is not None and value:
-                conditions.append(column.ilike(f"%{value}%"))
+                conditions.append(cast(column, String).ilike(f"%{value}%"))
         if not conditions:
             return []
 
@@ -501,11 +521,6 @@ class FOIRequestApplicant(db.Model):
             )
             .distinct(FOIRequestApplicant.applicantprofileid)
         )
-
-        if excluded_profile_ids:
-            query = query.filter(
-                FOIRequestApplicant.applicantprofileid.notin_(excluded_profile_ids)
-            )
 
         schema = ApplicantProfileBaseSchema(many=True)
         return schema.dump(query.all())
@@ -795,126 +810,6 @@ class FOIRequestApplicant(db.Model):
         applicantprofile_schema = ApplicantProfileCompositeSchema(many=True)
         return applicantprofile_schema.dump(query_aggregate.all())
 
-    # This is a temporary search that only searches through firstname, lastname, email.
-    # We can either expand it to replace the above, or remove it and fix the above
-    @classmethod
-    def search_applicant_limited(cls, keywords):
-        from sqlalchemy.orm import aliased
-        _session = db.session
-
-        # Aliases
-        searchapplicant = aliased(FOIRequestApplicant)
-        applicantmapping = aliased(FOIRequestApplicantMapping)
-        latest_foirequest = aliased(FOIRequest)
-
-        # Subquery: max version per FOIRequest
-        subquery_max_version = (
-            _session.query(
-                FOIRequest.foirequestid.label("foirequestid"),
-                func.max(FOIRequest.version).label("max_version")
-            )
-            .group_by(FOIRequest.foirequestid)
-            .subquery()
-        )
-
-        email_ranked = (
-            _session.query(
-                FOIRequestContactInformation.foirequest_id,
-                FOIRequestContactInformation.foirequestversion_id,
-                FOIRequestContactInformation.contactinformation.label("email"),
-                func.row_number().over(
-                    partition_by=(
-                        FOIRequestContactInformation.foirequest_id,
-                        FOIRequestContactInformation.foirequestversion_id
-                    ),
-                    order_by=FOIRequestContactInformation.created_at.desc()  # or id desc
-                ).label("rn")
-            )
-            .filter(FOIRequestContactInformation.contacttypeid == 1)
-            .subquery()
-        )
-        email_subquery = (
-            _session.query(email_ranked)
-            .filter(email_ranked.c.rn == 1)
-            .subquery()
-        )
-
-        query = (
-            _session.query(
-                searchapplicant.applicantprofileid,
-                searchapplicant.foirequestapplicantid,
-                searchapplicant.axisapplicantid,
-                searchapplicant.category,
-                searchapplicant.lastname,
-                searchapplicant.firstname,
-                searchapplicant.middlename,
-                searchapplicant.address,
-                searchapplicant.address_secondary,
-                searchapplicant.city,
-                searchapplicant.province,
-                searchapplicant.country,
-                searchapplicant.postal,
-                searchapplicant.home_phone,
-                searchapplicant.mobile_phone,
-                searchapplicant.work_phone,
-                searchapplicant.alternative_phone,
-                searchapplicant.other_contact_info,
-                email_subquery.c.email,
-                searchapplicant.businessname,
-                searchapplicant.dob,
-                searchapplicant.alsoknownas,
-                searchapplicant.personal_health_number,
-                searchapplicant.employee_number,
-                searchapplicant.correction_number,
-                searchapplicant.other_notes,
-                searchapplicant.section43_info,
-                searchapplicant.request_history,
-            ).join(
-                applicantmapping,
-                searchapplicant.foirequestapplicantid == applicantmapping.foirequestapplicantid
-            ).join(
-                latest_foirequest,
-                and_(
-                    latest_foirequest.foirequestid == applicantmapping.foirequest_id,
-                    latest_foirequest.version == applicantmapping.foirequestversion_id
-                )
-            ).join(
-                subquery_max_version,
-                and_(
-                    subquery_max_version.c.foirequestid == latest_foirequest.foirequestid,
-                    subquery_max_version.c.max_version == latest_foirequest.version
-                )
-            ).join(
-                email_subquery,
-                and_(
-                    email_subquery.c.foirequest_id == latest_foirequest.foirequestid,
-                    email_subquery.c.foirequestversion_id == latest_foirequest.version
-                ),
-                isouter=True
-            ).order_by(
-                searchapplicant.applicantprofileid,
-                latest_foirequest.version.desc()
-            ).distinct(searchapplicant.applicantprofileid)
-        )
-
-        if keywords.get("firstname"):
-            query = query.filter(searchapplicant.firstname.ilike(f"%{keywords.get('firstname')}%"))
-
-        if keywords.get("lastname"):
-            query = query.filter(searchapplicant.lastname.ilike(f"%{keywords.get('lastname')}%"))
-
-        if keywords.get("email"):
-            query = query.filter(email_subquery.c.email.ilike(f"%{keywords.get('email')}%"))
-
-        temp_applicants = ApplicantProfileBaseSchema(many=True)
-        data = temp_applicants.dump(query.all())
-        applicantprofileids = []
-        for applicant in data:
-            applicantprofileids.append(applicant['applicantprofileid'])
-        keywords = {"applicantprofileids": applicantprofileids}
-        applicants = cls.search_composite_applicant(keywords)
-        return applicants
-
     @classmethod
     def getsearchfilters(cls, searchapplicant, searchcontactinfo, keywords, contactemail, contacthomephone, contactworkphone, contactworkphone2, contactmobilephone):
         searchfilters = []
@@ -1019,6 +914,7 @@ class FOIRequestApplicant(db.Model):
                                     ),
                                     and_(
                                         FOIRequestApplicant.foirequestapplicantid == applicantid,
+                                        applicantprofile.foirequestapplicantid == FOIRequestApplicant.foirequestapplicantid,
                                         applicantprofile.applicantprofileid.is_(None)
                                     )
                                 )
@@ -1047,7 +943,7 @@ class FOIRequestApplicant(db.Model):
                                     contactaddress.foirequest_id == FOIRequest.foirequestid,
                                     contactaddress.foirequestversion_id == FOIRequest.version,
                                     contactaddress.contacttypeid == 2,
-                                    contactaddress.contactinformation is not None,
+                                    contactaddress.contactinformation.isnot(None),
                                     contactaddress.dataformat == 'address'),
                                 isouter=True
                             ).join(
@@ -1056,7 +952,7 @@ class FOIRequestApplicant(db.Model):
                                     contactaddress2.foirequest_id == FOIRequest.foirequestid,
                                     contactaddress2.foirequestversion_id == FOIRequest.version,
                                     contactaddress2.contacttypeid == 2,
-                                    contactaddress2.contactinformation is not None,
+                                    contactaddress2.contactinformation.isnot(None),
                                     contactaddress2.dataformat == 'addressSecondary'),
                                 isouter=True
                             ).join(
@@ -1065,7 +961,7 @@ class FOIRequestApplicant(db.Model):
                                     contacthomephone.foirequest_id == FOIRequest.foirequestid,
                                     contacthomephone.foirequestversion_id == FOIRequest.version,
                                     contacthomephone.contacttypeid == 3,
-                                    contacthomephone.contactinformation is not None),
+                                    contacthomephone.contactinformation.isnot(None)),
                                 isouter=True
                             ).join(
                                 contactworkphone,
@@ -1073,7 +969,7 @@ class FOIRequestApplicant(db.Model):
                                     contactworkphone.foirequest_id == FOIRequest.foirequestid,
                                     contactworkphone.foirequestversion_id == FOIRequest.version,
                                     contactworkphone.contacttypeid == 4,
-                                    contactworkphone.contactinformation is not None),
+                                    contactworkphone.contactinformation.isnot(None)),
                                 isouter=True
                             ).join(
                                 contactworkphone2,
@@ -1081,7 +977,7 @@ class FOIRequestApplicant(db.Model):
                                     contactworkphone2.foirequest_id == FOIRequest.foirequestid,
                                     contactworkphone2.foirequestversion_id == FOIRequest.version,
                                     contactworkphone2.contacttypeid == 5,
-                                    contactworkphone2.contactinformation is not None),
+                                    contactworkphone2.contactinformation.isnot(None)),
                                 isouter=True
                             ).join(
                                 contactmobilephone,
@@ -1089,7 +985,7 @@ class FOIRequestApplicant(db.Model):
                                     contactmobilephone.foirequest_id == FOIRequest.foirequestid,
                                     contactmobilephone.foirequestversion_id == FOIRequest.version,
                                     contactmobilephone.contacttypeid == 6,
-                                    contactmobilephone.contactinformation is not None),
+                                    contactmobilephone.contactinformation.isnot(None)),
                                 isouter=True
                             ).join(
                                 contactother,
@@ -1097,7 +993,7 @@ class FOIRequestApplicant(db.Model):
                                     contactother.foirequest_id == FOIRequest.foirequestid,
                                     contactother.foirequestversion_id == FOIRequest.version,
                                     contactother.contacttypeid == 7,
-                                    contactother.contactinformation is not None),
+                                    contactother.contactinformation.isnot(None)),
                                 isouter=True
                             ).join(
                                 city,
@@ -1105,7 +1001,7 @@ class FOIRequestApplicant(db.Model):
                                     city.foirequest_id == FOIRequest.foirequestid,
                                     city.foirequestversion_id == FOIRequest.version,
                                     city.contacttypeid == 2,
-                                    city.contactinformation is not None,
+                                    city.contactinformation.isnot(None),
                                     city.dataformat == 'city'),
                                 isouter=True
                             ).join(
@@ -1114,7 +1010,7 @@ class FOIRequestApplicant(db.Model):
                                     province.foirequest_id == FOIRequest.foirequestid,
                                     province.foirequestversion_id == FOIRequest.version,
                                     province.contacttypeid == 2,
-                                    province.contactinformation is not None,
+                                    province.contactinformation.isnot(None),
                                     province.dataformat == 'province'),
                                 isouter=True
                             ).join(
@@ -1123,7 +1019,7 @@ class FOIRequestApplicant(db.Model):
                                     country.foirequest_id == FOIRequest.foirequestid,
                                     country.foirequestversion_id == FOIRequest.version,
                                     country.contacttypeid == 2,
-                                    country.contactinformation is not None,
+                                    country.contactinformation.isnot(None),
                                     country.dataformat == 'country'),
                                 isouter=True
                             ).join(
@@ -1132,7 +1028,7 @@ class FOIRequestApplicant(db.Model):
                                     postal.foirequest_id == FOIRequest.foirequestid,
                                     postal.foirequestversion_id == FOIRequest.version,
                                     postal.contacttypeid == 2,
-                                    postal.contactinformation is not None,
+                                    postal.contactinformation.isnot(None),
                                     postal.dataformat == 'postal'),
                                 isouter=True
                             ).join(
@@ -1141,7 +1037,7 @@ class FOIRequestApplicant(db.Model):
                                     personalemployeenumber.foirequest_id == FOIRequest.foirequestid,
                                     personalemployeenumber.foirequestversion_id == FOIRequest.version,
                                     personalemployeenumber.personalattributeid == 1,
-                                    personalemployeenumber.attributevalue is not None),
+                                    personalemployeenumber.attributevalue.isnot(None)),
                                 isouter=True
                             ).join(
                                 personalcorrectionnumber,
@@ -1149,7 +1045,7 @@ class FOIRequestApplicant(db.Model):
                                     personalcorrectionnumber.foirequest_id == FOIRequest.foirequestid,
                                     personalcorrectionnumber.foirequestversion_id == FOIRequest.version,
                                     personalcorrectionnumber.personalattributeid == 2,
-                                    personalcorrectionnumber.attributevalue is not None),
+                                    personalcorrectionnumber.attributevalue.isnot(None)),
                                 isouter=True
                             ).join(
                                 personalhealthnumber,
@@ -1157,7 +1053,7 @@ class FOIRequestApplicant(db.Model):
                                     personalhealthnumber.foirequest_id == FOIRequest.foirequestid,
                                     personalhealthnumber.foirequestversion_id == FOIRequest.version,
                                     personalhealthnumber.personalattributeid == 3,
-                                    personalhealthnumber.attributevalue is not None),
+                                    personalhealthnumber.attributevalue.isnot(None)),
                                 isouter=True
                             ).filter(
                                 FOIRequest.isactive == True
@@ -1167,10 +1063,8 @@ class FOIRequestApplicant(db.Model):
         applicantprofile_schema = ApplicantProfileCompositeSchema(many=True)
         return applicantprofile_schema.dump(query_all.all())
 
-
-    # requests by applicant id
     @classmethod
-    def getapplicantrequests(cls, applicantid, applicanttype = "all"):
+    def getapplicantrequests(cls, applicantid, applicanttype="all"):
         primary_applicant_requests = FOIRequestApplicantMapping.requestortypeid == 1
         onbehalfof_applicant_requests = FOIRequestApplicantMapping.requestortypeid == 2
         all_applicant_requests = or_(primary_applicant_requests, onbehalfof_applicant_requests)
@@ -1183,19 +1077,46 @@ class FOIRequestApplicant(db.Model):
 
         from .FOIMinistryRequests import FOIMinistryRequest
 
-        #for queue/dashboard
         _session = db.session
 
-        applicantprofile = aliased(FOIRequestApplicant)
+        # Get the applicantprofileid for the given applicantid
+        profile_id = _session.query(
+            FOIRequestApplicant.applicantprofileid
+        ).filter(
+            FOIRequestApplicant.foirequestapplicantid == applicantid
+        ).limit(1).scalar()
 
-        #max foirequest version
-        subquery_foirequest_maxversion = _session.query(FOIRequest.foirequestid, func.max(FOIRequest.version).label('max_version')).group_by(FOIRequest.foirequestid).subquery()
-        joincondition = [
-            subquery_foirequest_maxversion.c.foirequestid == FOIRequest.foirequestid,
-            subquery_foirequest_maxversion.c.max_version == FOIRequest.version,
-        ]
+        # Get all foirequestapplicantids sharing the same profile
+        # Fall back to just the given applicantid if no applicantprofileid assigned
+        if profile_id is None:
+            profile_subquery = _session.query(
+                FOIRequestApplicant.foirequestapplicantid
+            ).filter(
+                FOIRequestApplicant.foirequestapplicantid == applicantid
+            ).subquery()
+        else:
+            profile_subquery = _session.query(
+                FOIRequestApplicant.foirequestapplicantid
+            ).filter(
+                FOIRequestApplicant.applicantprofileid == profile_id
+            ).subquery()
 
-        #generate query
+        # Get the latest mapping version per foirequest to exclude stale applicant assignments
+        subquery_latest_mapping = _session.query(
+            FOIRequestApplicantMapping.foirequest_id,
+            func.max(FOIRequestApplicantMapping.foirequestversion_id).label('max_version')
+        ).group_by(
+            FOIRequestApplicantMapping.foirequest_id
+        ).subquery()
+
+        # Get the latest FOIRequest version per foirequestid
+        subquery_foirequest_maxversion = _session.query(
+            FOIRequest.foirequestid,
+            func.max(FOIRequest.version).label('max_version')
+        ).group_by(
+            FOIRequest.foirequestid
+        ).subquery()
+
         selectedcolumns = [
             FOIRequestApplicant.applicantprofileid.label('applicantprofileid'),
             FOIRequestApplicant.foirequestapplicantid.label('foirequestapplicantid'),
@@ -1209,47 +1130,51 @@ class FOIRequestApplicant(db.Model):
         ]
 
         query_all = _session.query(
-                                *selectedcolumns
-                            ).distinct(
-                                FOIRequest.foirequestid
-                            ).join(
-                                applicantprofile,
-                                or_(
-                                    and_(
-                                        applicantprofile.foirequestapplicantid == applicantid,
-                                        applicantprofile.applicantprofileid == FOIRequestApplicant.applicantprofileid
-                                    ),
-                                    and_(
-                                        FOIRequestApplicant.foirequestapplicantid == applicantid,
-                                        applicantprofile.applicantprofileid.is_(None)
-                                    )
-                                )
-                            ).join(
-                                FOIRequestApplicantMapping,
-                                and_(
-                                    applicant_join_statement,
-                                    FOIRequestApplicantMapping.foirequestapplicantid == FOIRequestApplicant.foirequestapplicantid)
-                            ).join(
-                                FOIRequest,
-                                and_(
-                                    FOIRequest.foirequestid == FOIRequestApplicantMapping.foirequest_id,
-                                    FOIRequest.version == FOIRequestApplicantMapping.foirequestversion_id,
-                                    FOIRequest.isactive == True)
-                            ).join(
-                                subquery_foirequest_maxversion,
-                                and_(*joincondition)
-                            ).join(
-                                FOIMinistryRequest,
-                                and_(
-                                    FOIMinistryRequest.foirequest_id == FOIRequest.foirequestid,
-                                    FOIMinistryRequest.isactive == True)
-                            ).join(
-                                FOIRequestStatus,
-                                FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
-                            ).order_by(FOIRequest.foirequestid.desc())
-        
+            *selectedcolumns
+        ).distinct(
+            FOIRequest.foirequestid
+        ).filter(
+            # Only include applicants sharing the current profile
+            FOIRequestApplicant.foirequestapplicantid.in_(profile_subquery)
+        ).join(
+            FOIRequestApplicantMapping,
+            and_(
+                applicant_join_statement,
+                FOIRequestApplicantMapping.foirequestapplicantid == FOIRequestApplicant.foirequestapplicantid
+            )
+        ).join(
+            # Only consider the latest mapping version per request
+            subquery_latest_mapping,
+            and_(
+                subquery_latest_mapping.c.foirequest_id == FOIRequestApplicantMapping.foirequest_id,
+                subquery_latest_mapping.c.max_version == FOIRequestApplicantMapping.foirequestversion_id
+            )
+        ).join(
+            FOIRequest,
+            and_(
+                FOIRequest.foirequestid == FOIRequestApplicantMapping.foirequest_id,
+                FOIRequest.version == FOIRequestApplicantMapping.foirequestversion_id,
+                FOIRequest.isactive == True
+            )
+        ).join(
+            subquery_foirequest_maxversion,
+            and_(
+                subquery_foirequest_maxversion.c.foirequestid == FOIRequest.foirequestid,
+                subquery_foirequest_maxversion.c.max_version == FOIRequest.version
+            )
+        ).join(
+            FOIMinistryRequest,
+            and_(
+                FOIMinistryRequest.foirequest_id == FOIRequest.foirequestid,
+                FOIMinistryRequest.isactive == True
+            )
+        ).join(
+            FOIRequestStatus,
+            FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid
+        ).order_by(FOIRequest.foirequestid.desc())
 
         applicantrequest_schema = ApplicantRequestSchema(many=True)
+
         return applicantrequest_schema.dump(query_all.all())
 
     @classmethod
@@ -1341,6 +1266,6 @@ class ApplicantProfileBaseSchema(ma.Schema): # For profiles with data solely fro
             "employeenumber",
             "correctionnumber",
             "other_notes",
-            "section43info",
+            "section43_info",
             "requestHistory"
         )
