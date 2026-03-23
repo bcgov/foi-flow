@@ -289,9 +289,6 @@ const ProactiveDisclosureDetails = React.memo(
       setEarliestEligiblePublicationDate(value);
       handleProactiveDetailsValue?.(value, "earliestEligiblePublicationDate");
       createSaveRequestObject?.("earliestEligiblePublicationDate", value);
-      // Keep publicationDate in sync with earliestEligiblePublicationDate
-      handleProactiveDetailsValue?.(value, "publicationDate");
-      createSaveRequestObject?.("publicationDate", value);
     };
 
     const requestTypeMenuItems = requestTypes.map((item) => (
