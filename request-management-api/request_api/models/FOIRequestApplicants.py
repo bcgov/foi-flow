@@ -220,9 +220,13 @@ class FOIRequestApplicant(db.Model):
             .limit(1)\
             .scalar()
 
-        query = db.session.query(FOIRequestApplicant)\
-            .filter(FOIRequestApplicant.applicantprofileid == applicantprofileid)\
-            .order_by(FOIRequestApplicant.foirequestapplicantid.desc())
+        if applicantprofileid is None:
+            query = db.session.query(FOIRequestApplicant)\
+                .filter(FOIRequestApplicant.foirequestapplicantid == foirequestapplicantid)
+        else:
+            query = db.session.query(FOIRequestApplicant)\
+                .filter(FOIRequestApplicant.applicantprofileid == applicantprofileid)\
+                .order_by(FOIRequestApplicant.foirequestapplicantid.desc())
 
         applicantrequest_schema = ApplicantProfileBaseSchema(many=False)
         return applicantrequest_schema.dump(query.first())
@@ -910,6 +914,7 @@ class FOIRequestApplicant(db.Model):
                                     ),
                                     and_(
                                         FOIRequestApplicant.foirequestapplicantid == applicantid,
+                                        applicantprofile.foirequestapplicantid == FOIRequestApplicant.foirequestapplicantid,
                                         applicantprofile.applicantprofileid.is_(None)
                                     )
                                 )
@@ -938,7 +943,7 @@ class FOIRequestApplicant(db.Model):
                                     contactaddress.foirequest_id == FOIRequest.foirequestid,
                                     contactaddress.foirequestversion_id == FOIRequest.version,
                                     contactaddress.contacttypeid == 2,
-                                    contactaddress.contactinformation is not None,
+                                    contactaddress.contactinformation.isnot(None),
                                     contactaddress.dataformat == 'address'),
                                 isouter=True
                             ).join(
@@ -947,7 +952,7 @@ class FOIRequestApplicant(db.Model):
                                     contactaddress2.foirequest_id == FOIRequest.foirequestid,
                                     contactaddress2.foirequestversion_id == FOIRequest.version,
                                     contactaddress2.contacttypeid == 2,
-                                    contactaddress2.contactinformation is not None,
+                                    contactaddress2.contactinformation.isnot(None),
                                     contactaddress2.dataformat == 'addressSecondary'),
                                 isouter=True
                             ).join(
@@ -956,7 +961,7 @@ class FOIRequestApplicant(db.Model):
                                     contacthomephone.foirequest_id == FOIRequest.foirequestid,
                                     contacthomephone.foirequestversion_id == FOIRequest.version,
                                     contacthomephone.contacttypeid == 3,
-                                    contacthomephone.contactinformation is not None),
+                                    contacthomephone.contactinformation.isnot(None)),
                                 isouter=True
                             ).join(
                                 contactworkphone,
@@ -964,7 +969,7 @@ class FOIRequestApplicant(db.Model):
                                     contactworkphone.foirequest_id == FOIRequest.foirequestid,
                                     contactworkphone.foirequestversion_id == FOIRequest.version,
                                     contactworkphone.contacttypeid == 4,
-                                    contactworkphone.contactinformation is not None),
+                                    contactworkphone.contactinformation.isnot(None)),
                                 isouter=True
                             ).join(
                                 contactworkphone2,
@@ -972,7 +977,7 @@ class FOIRequestApplicant(db.Model):
                                     contactworkphone2.foirequest_id == FOIRequest.foirequestid,
                                     contactworkphone2.foirequestversion_id == FOIRequest.version,
                                     contactworkphone2.contacttypeid == 5,
-                                    contactworkphone2.contactinformation is not None),
+                                    contactworkphone2.contactinformation.isnot(None)),
                                 isouter=True
                             ).join(
                                 contactmobilephone,
@@ -980,7 +985,7 @@ class FOIRequestApplicant(db.Model):
                                     contactmobilephone.foirequest_id == FOIRequest.foirequestid,
                                     contactmobilephone.foirequestversion_id == FOIRequest.version,
                                     contactmobilephone.contacttypeid == 6,
-                                    contactmobilephone.contactinformation is not None),
+                                    contactmobilephone.contactinformation.isnot(None)),
                                 isouter=True
                             ).join(
                                 contactother,
@@ -988,7 +993,7 @@ class FOIRequestApplicant(db.Model):
                                     contactother.foirequest_id == FOIRequest.foirequestid,
                                     contactother.foirequestversion_id == FOIRequest.version,
                                     contactother.contacttypeid == 7,
-                                    contactother.contactinformation is not None),
+                                    contactother.contactinformation.isnot(None)),
                                 isouter=True
                             ).join(
                                 city,
@@ -996,7 +1001,7 @@ class FOIRequestApplicant(db.Model):
                                     city.foirequest_id == FOIRequest.foirequestid,
                                     city.foirequestversion_id == FOIRequest.version,
                                     city.contacttypeid == 2,
-                                    city.contactinformation is not None,
+                                    city.contactinformation.isnot(None),
                                     city.dataformat == 'city'),
                                 isouter=True
                             ).join(
@@ -1005,7 +1010,7 @@ class FOIRequestApplicant(db.Model):
                                     province.foirequest_id == FOIRequest.foirequestid,
                                     province.foirequestversion_id == FOIRequest.version,
                                     province.contacttypeid == 2,
-                                    province.contactinformation is not None,
+                                    province.contactinformation.isnot(None),
                                     province.dataformat == 'province'),
                                 isouter=True
                             ).join(
@@ -1014,7 +1019,7 @@ class FOIRequestApplicant(db.Model):
                                     country.foirequest_id == FOIRequest.foirequestid,
                                     country.foirequestversion_id == FOIRequest.version,
                                     country.contacttypeid == 2,
-                                    country.contactinformation is not None,
+                                    country.contactinformation.isnot(None),
                                     country.dataformat == 'country'),
                                 isouter=True
                             ).join(
@@ -1023,7 +1028,7 @@ class FOIRequestApplicant(db.Model):
                                     postal.foirequest_id == FOIRequest.foirequestid,
                                     postal.foirequestversion_id == FOIRequest.version,
                                     postal.contacttypeid == 2,
-                                    postal.contactinformation is not None,
+                                    postal.contactinformation.isnot(None),
                                     postal.dataformat == 'postal'),
                                 isouter=True
                             ).join(
@@ -1032,7 +1037,7 @@ class FOIRequestApplicant(db.Model):
                                     personalemployeenumber.foirequest_id == FOIRequest.foirequestid,
                                     personalemployeenumber.foirequestversion_id == FOIRequest.version,
                                     personalemployeenumber.personalattributeid == 1,
-                                    personalemployeenumber.attributevalue is not None),
+                                    personalemployeenumber.attributevalue.isnot(None)),
                                 isouter=True
                             ).join(
                                 personalcorrectionnumber,
@@ -1040,7 +1045,7 @@ class FOIRequestApplicant(db.Model):
                                     personalcorrectionnumber.foirequest_id == FOIRequest.foirequestid,
                                     personalcorrectionnumber.foirequestversion_id == FOIRequest.version,
                                     personalcorrectionnumber.personalattributeid == 2,
-                                    personalcorrectionnumber.attributevalue is not None),
+                                    personalcorrectionnumber.attributevalue.isnot(None)),
                                 isouter=True
                             ).join(
                                 personalhealthnumber,
@@ -1048,7 +1053,7 @@ class FOIRequestApplicant(db.Model):
                                     personalhealthnumber.foirequest_id == FOIRequest.foirequestid,
                                     personalhealthnumber.foirequestversion_id == FOIRequest.version,
                                     personalhealthnumber.personalattributeid == 3,
-                                    personalhealthnumber.attributevalue is not None),
+                                    personalhealthnumber.attributevalue.isnot(None)),
                                 isouter=True
                             ).filter(
                                 FOIRequest.isactive == True
