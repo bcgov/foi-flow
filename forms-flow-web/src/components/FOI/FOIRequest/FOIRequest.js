@@ -1792,7 +1792,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                               divisions={requestDetails.divisions}
                             />
                           )}
-                          {requestDetails?.axisRequestId && (
+                          {requestDetails?.axisRequestId && requestState?.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
                             <LinkedRequests
                               requestDetails={requestDetails}
                               requestStatus={_requestStatus}
