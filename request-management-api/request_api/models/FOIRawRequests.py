@@ -64,6 +64,8 @@ class FOIRawRequest(db.Model):
 
     @classmethod
     def generaterequestid(cls, foirawrequestid: int, programareaiaocode: str, requesttype: str, isconsultflag: bool):
+        if programareaiaocode is None or programareaiaocode == '':
+            programareaiaocode='U'
         baserequestid = f'{programareaiaocode}-{datetime.now().year}-{str(foirawrequestid).zfill(6)}'
         if requesttype == "proactive disclosure":
             return 'PD-'+baserequestid
@@ -82,11 +84,18 @@ class FOIRawRequest(db.Model):
         if not axisrequestid:
             db.session.flush() # Force insert to generate PK, but do not commit yet
             bcgovcode = cls.getbcgovcodefromrawdata(_requestrawdata)
+            # if bcgovcode:
+            #     programarea = ProgramArea.getprogramarea(bcgovcode)
+            #     iaocode = programarea['iaocode']
+            #     requesttype = _requestrawdata.get("requestType")
+            #     newaxisrequestid = cls.generaterequestid(newrawrequest.requestid, iaocode, requesttype, newrawrequest.isconsultflag)
+            #     updated_rawdata = copy.deepcopy(_requestrawdata)
+            #     updated_rawdata["axisRequestId"] = newaxisrequestid
+            #     newrawrequest.axisrequestid = newaxisrequestid
+            #     newrawrequest.requestrawdata = updated_rawdata
             if bcgovcode:
-                programarea = ProgramArea.getprogramarea(bcgovcode)
-                iaocode = programarea['iaocode']
                 requesttype = _requestrawdata.get("requestType")
-                newaxisrequestid = cls.generaterequestid(newrawrequest.requestid, iaocode, requesttype, newrawrequest.isconsultflag)
+                newaxisrequestid = cls.generaterequestid(newrawrequest.requestid, '', requesttype, newrawrequest.isconsultflag)
                 updated_rawdata = copy.deepcopy(_requestrawdata)
                 updated_rawdata["axisRequestId"] = newaxisrequestid
                 newrawrequest.axisrequestid = newaxisrequestid
@@ -117,16 +126,23 @@ class FOIRawRequest(db.Model):
             linkedrequests = _requestrawdata["linkedRequests"] if 'linkedRequests' in _requestrawdata  else None 
             isconsultflag = _requestrawdata["isconsultflag"] if 'isconsultflag' in _requestrawdata  else False
 
+            # if not axisrequestid:
+            #     bcgovcode = cls.getbcgovcodefromrawdata(_requestrawdata)
+            #     if bcgovcode:
+            #         programarea = ProgramArea.getprogramarea(bcgovcode)
+            #         iaocode = programarea['iaocode']
+            #         requesttype = _requestrawdata.get("requestType")
+            #         axisrequestid = cls.generaterequestid(request.requestid, iaocode, requesttype, isconsultflag)
+            #         updated_rawdata = copy.deepcopy(_requestrawdata)
+            #         updated_rawdata["axisRequestId"] = axisrequestid
+            #         _requestrawdata = updated_rawdata
+
             if not axisrequestid:
-                bcgovcode = cls.getbcgovcodefromrawdata(_requestrawdata)
-                if bcgovcode:
-                    programarea = ProgramArea.getprogramarea(bcgovcode)
-                    iaocode = programarea['iaocode']
-                    requesttype = _requestrawdata.get("requestType")
-                    axisrequestid = cls.generaterequestid(request.requestid, iaocode, requesttype, isconsultflag)
-                    updated_rawdata = copy.deepcopy(_requestrawdata)
-                    updated_rawdata["axisRequestId"] = axisrequestid
-                    _requestrawdata = updated_rawdata
+                requesttype = _requestrawdata.get("requestType")
+                axisrequestid = cls.generaterequestid(request.requestid, '', requesttype, isconsultflag)
+                updated_rawdata = copy.deepcopy(_requestrawdata)
+                updated_rawdata["axisRequestId"] = axisrequestid
+                _requestrawdata = updated_rawdata
 
             _version = request.version+1           
             insertstmt =(
@@ -770,7 +786,11 @@ class FOIRawRequest(db.Model):
                     if(field == 'lastName'):
                         onekeywordfiltercondition.append(FOIRawRequest.findfield('contactLastName').ilike('%'+_keyword+'%'))
                     if(field == 'requestType'):
+                        if(_keyword.lower() == 'pd'):
+                            onekeywordfiltercondition.append(FOIRawRequest.findfield('requestType').ilike('%proactive disclosure%'))
                         onekeywordfiltercondition.append(FOIRawRequest.findfield('requestTypeRequestType').ilike('%'+_keyword+'%'))
+                    if(field == 'proactiveDisclosureCategory' or field == 'proactivedisclosurecategory'):
+                        onekeywordfiltercondition.append(FOIRawRequest.findfield('proactiveDisclosureCategory').ilike('%'+_keyword+'%'))
             else:
                 onekeywordfiltercondition.append(FOIRawRequest.isiaorestricted == True)
             
@@ -778,6 +798,119 @@ class FOIRawRequest(db.Model):
 
         return and_(*filtercondition)
 
+
+    @classmethod
+    def getpdrawrequest_basequery(cls, additionalfilter, userid, isiaorestrictedfilemanager, groups):
+        _session = db.session
+        subquery_maxversion = (
+            _session.query(FOIRawRequest.requestid, func.max(FOIRawRequest.version).label('max_version'))
+            .group_by(FOIRawRequest.requestid)
+            .subquery()
+        )
+        joincondition = [
+            subquery_maxversion.c.requestid == FOIRawRequest.requestid,
+            subquery_maxversion.c.max_version == FOIRawRequest.version,
+        ]
+
+        assignedtoformatted = case([
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
+                             func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
+                            (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
+                             FOIAssignee.lastname),
+                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.isnot(None)),
+                             FOIAssignee.firstname),
+                            (and_(FOIAssignee.lastname.is_(None), FOIAssignee.firstname.is_(None), FOIRawRequest.assignedgroup.isnot(None)),
+                             FOIRawRequest.assignedgroup),
+                           ],
+                           else_ = FOIRawRequest.assignedto).label('assignedToFormatted')
+
+        axisrequestid_raw = case([
+            (FOIRawRequest.axisrequestid.is_(None),
+            'U-00' + cast(FOIRawRequest.requestid, String)),
+            ],
+            else_ = cast(FOIRawRequest.axisrequestid, String))
+
+        axisrequestid = axisrequestid_raw.label('axisRequestId')
+
+        isiaorestricted = case([
+                            (FOIRawRequest.isiaorestricted.is_(None),
+                             False),
+                           ],
+                           else_ = cast(FOIRawRequest.isiaorestricted, db.Boolean)).label('isiaorestricted')
+
+        receiveddate = cast(func.nullif(FOIRawRequest.requestrawdata['receivedDateUF'].astext, ''), db.DateTime).label('receivedDate')
+
+        proactivedisclosurecategory = case([
+            (FOIRawRequest.requestrawdata['proactiveDisclosureCategory'].is_(None),
+            literal(None)),
+            ],
+            else_ = cast(FOIRawRequest.requestrawdata['proactiveDisclosureCategory'].astext, String)).label('proactivedisclosurecategory')
+
+        publicationdate = cast(func.nullif(FOIRawRequest.requestrawdata['earliestEligiblePublicationDate'].astext, ''), db.DateTime).label('publicationdate')
+        cfrduedate = cast(func.nullif(FOIRawRequest.requestrawdata['cfrDueDate'].astext, ''), db.DateTime).label('cfrduedate')
+
+        selectedcolumns = [
+            FOIRawRequest.requestid.label('id'), 
+            cast(None, Integer).label('ministryrequestid'), 
+            axisrequestid,
+            FOIRawRequest.closedate.label('closedate'), 
+            literal('proactive disclosure').label('requestType'), 
+            axisrequestid_raw.label('idNumber'),
+            cast(None, String).label('applicantcategory'),
+            literal("0").label('recordspagecount'),  
+            cast(None, String).label('oiStatusName'),
+            receiveddate,
+            publicationdate,
+            FOIRawRequest.created_at.label('created_at'), 
+            assignedtoformatted, 
+            cast(None, Integer).label('oistatus_id'),
+            FOIRawRequest.version.label('version'),
+            cast(None, Integer).label('foiopeninforequestid'),
+            cast(FOIRawRequest.status, String).label('currentState'),
+            isiaorestricted,
+            cast(None, String).label('subjectcode'),
+            FOIRawRequest.closedate.label('closedate_1'),
+            cfrduedate,
+            proactivedisclosurecategory,
+        ]   
+
+        basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
+
+        if additionalfilter == 'watchingRequests':
+            subquery_watchby = FOIRawRequestWatcher.getrequestidsbyuserid(userid)
+            basequery = basequery.join(subquery_watchby, subquery_watchby.c.requestid == FOIRawRequest.requestid)
+        elif additionalfilter == 'myRequests':
+            basequery = basequery.filter(FOIRawRequest.assignedto == userid)
+        elif additionalfilter == 'unassignedRequests':
+            basequery = basequery.filter(and_(FOIRawRequest.assignedto.is_(None), FOIRawRequest.assignedgroup.in_(groups)))
+        elif additionalfilter is not None and additionalfilter.lower() == 'all':
+            basequery = basequery.filter(
+                or_(
+                    FOIRawRequest.assignedto.isnot(None),
+                    FOIRawRequest.assignedgroup.in_(groups)
+                )
+            )
+
+        basequery = basequery.filter(
+            or_(
+                FOIRawRequest.requestrawdata['requestType'].astext == 'proactive disclosure',
+                FOIRawRequest.requestrawdata['requestType']['requestType'].astext == 'proactive disclosure'
+            )
+        )
+
+        return basequery
+
+    @classmethod
+    def getpdrawrequestssubquery(cls, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups):
+        #from os import getenv
+        #unopened_request_restriction = getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") if getenv("FOI_UNOPENED_REQUEST_DATE_RESTRICTION") not in (None, "") else datetime.now()
+        basequery = FOIRawRequest.getpdrawrequest_basequery(additionalfilter, userid, isiaorestrictedfilemanager, groups)
+        #basequery = basequery.filter(FOIRawRequest.status != 'Closed').filter(or_(FOIRawRequest.status != 'Unopened', FOIRawRequest.created_at >= unopened_request_restriction))
+        if(len(filterfields) > 0 and keyword is not None):
+            filtercondition = FOIRawRequest.getfilterforrequestssubquery(filterfields, keyword)
+            return basequery.filter(filtercondition)
+        else:
+            return basequery
 
     @classmethod
     def getrequestspagination(cls, groups, page, size, sortingitems, sortingorders, filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, usertype, isministryrestrictedfilemanager=False):
@@ -800,7 +933,8 @@ class FOIRawRequest(db.Model):
                 subquery_oirequest_queue = FOIOpenInformationRequests.getrequestssubquery(groups, filterfields, keyword, additionalfilter, userid, iaoassignee, ministryassignee, "OI", isiaorestrictedfilemanager, isministryrestrictedfilemanager)
                 subquery_pdrequest_queue = FOIMinistryRequest.getpdrequestssubquery(groups, filterfields, keyword, additionalfilter, 
                                                                 userid, iaoassignee, ministryassignee, "OI", isiaorestrictedfilemanager, isministryrestrictedfilemanager)
-                query_full_queue = subquery_oirequest_queue.union(subquery_pdrequest_queue)
+                subquery_pdrawrequest_queue = FOIRawRequest.getpdrawrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups)
+                query_full_queue = subquery_oirequest_queue.union(subquery_pdrequest_queue, subquery_pdrawrequest_queue)
                 return query_full_queue.order_by(*sortingcondition).paginate(page=page, per_page=size)
             else:
                 subquery_rawrequest_queue = FOIRawRequest.getrequestssubquery(filterfields, keyword, additionalfilter, userid, isiaorestrictedfilemanager, groups)
@@ -835,6 +969,7 @@ class FOIRawRequest(db.Model):
             'DaysLeftValue': FOIRawRequest.requestrawdata['dueDate'].astext,
             'subjectcode': FOIRawRequest.requestrawdata['subjectCode'].astext,
             'proactivedisclosurecategory': FOIRawRequest.requestrawdata['proactiveDisclosureCategory'].astext,
+            'proactiveDisclosureCategory': FOIRawRequest.requestrawdata['proactiveDisclosureCategory'].astext,
         }.get(x, cast(FOIRawRequest.requestid, String))
     
     @classmethod
@@ -846,6 +981,8 @@ class FOIRawRequest(db.Model):
             'idNumber',
             'axisRequestId',
             'requestpagecount',
+            'proactiveDisclosureCategory',
+            'proactivedisclosurecategory',
             'currentState',
             'assignedTo',
             'receivedDate',
@@ -1380,16 +1517,16 @@ class FOIRawRequest(db.Model):
             axis_ids = [axisid for req_obj in linkedrequests for axisid in req_obj.keys()]
             # Union Statement to get either FOIMINISTRYREQUEST data if axisrequestid exists in FOIMINISTRYREQUEST OR FOIRAWREQUEST data if axisrequestid does not exist in FOIMINISTRYREQUEST
             sql = """
-            SELECT DISTINCT ON (axisrequestid) axisrequestid, requestid, foiministryrequestid, requeststatuslabel, requestrawdata, iaocode, version 
+            SELECT DISTINCT ON (axisrequestid) axisrequestid, requestid, foiministryrequestid, requeststatuslabel, requestrawdata, iaocode, foirequest_id, version 
             FROM (
-                SELECT foimin.axisrequestid, NULL::bigint AS requestid, foimin.foiministryrequestid, foimin.requeststatuslabel, NULL::json AS requestrawdata, programarea.iaocode AS iaocode, foimin.version, 1 AS src
+                SELECT foimin.axisrequestid, NULL::bigint AS requestid, foimin.foiministryrequestid, foimin.requeststatuslabel, NULL::json AS requestrawdata, programarea.iaocode AS iaocode, foimin.foirequest_id, foimin.version, 1 AS src
                 FROM public."FOIMinistryRequests" foimin
                 LEFT JOIN public."ProgramAreas" programarea ON programarea.programareaid = foimin.programareaid
                 WHERE foimin.axisrequestid IN :axis_ids
 
                 UNION ALL
 
-                SELECT foiraw.axisrequestid, foiraw.requestid, NULL::bigint AS foiministryrequestid, foiraw.requeststatuslabel, requestrawdata, NULL::text AS iaocode, foiraw.version, 2 AS src
+                SELECT foiraw.axisrequestid, foiraw.requestid, NULL::bigint AS foiministryrequestid, foiraw.requeststatuslabel, requestrawdata, NULL::text AS iaocode, NULL::bigint AS foirequest_id, foiraw.version, 2 AS src
                 FROM public."FOIRawRequests" foiraw
                 WHERE foiraw.axisrequestid IN :axis_ids
             ) foilinkreq
@@ -1401,13 +1538,92 @@ class FOIRawRequest(db.Model):
                 requeststatus = StateName[row["requeststatuslabel"]].value
                 govcode = row["iaocode"] if row["iaocode"] is not None else row["requestrawdata"]["selectedMinistries"][0]["code"]
                 linkedrequestsinfo.append({"rawrequestid": row["requestid"],  "axisrequestid": row["axisrequestid"], "foiministryrequestid": row["foiministryrequestid"],
-                                           "requeststatus": requeststatus, "govcode": govcode})
+                                           "foirequestid": row["foirequest_id"] ,"requeststatus": requeststatus, "govcode": govcode})
         except Exception as ex:
             logging.error(ex)
             raise ex
         finally:
             db.session.close()
         return linkedrequestsinfo
+
+    @classmethod
+    def get_linkedrequests(cls, requestid):
+        try:
+            sql = """
+            SELECT * 
+            FROM public."FOIRawRequests"
+            WHERE requestid = :requestid
+            ORDER BY version DESC
+            LIMIT 1;
+            """
+            params = {"requestid": requestid}
+            result = db.session.execute(text(sql), params).first()
+            linkedrequests  = result.linkedrequests
+            return linkedrequests if linkedrequests is not None else []
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
+
+    @classmethod
+    def update_linkedrequests(cls, requestid, new_linkedrequests, user):
+        update_at = datetime.now().isoformat()
+        sql = """
+        UPDATE public."FOIRawRequests" AS foirawreq
+        SET 
+            linkedrequests = :new_linkedrequests,
+            requestrawdata = (
+            jsonb_set(
+                COALESCE(requestrawdata::jsonb, '{}'::jsonb),
+                '{linkedRequests}',
+                (:new_linkedrequests)::jsonb,
+                true
+            )
+            )::json,
+            updated_at = :update_at,
+            updatedby = :user
+        FROM (
+            SELECT DISTINCT ON (requestid) requestid, version
+            FROM public."FOIRawRequests"
+            WHERE requestid = :requestid
+            ORDER BY requestid, version DESC
+        ) AS latestfoirawreq
+        WHERE foirawreq.requestid = latestfoirawreq.requestid AND foirawreq.version = latestfoirawreq.version;
+        """
+        params = {"new_linkedrequests": new_linkedrequests, "update_at": update_at, "user": user, "requestid": requestid}
+        res = db.session.execute(text(sql), params)
+        return res
+    
+    @classmethod
+    def bulkupdate_linkedrequests(cls, linkedrequest_requestids, new_linkedrequest, new_linkedrequest_axisid, user):
+        try:
+            update_at = datetime.now().isoformat()
+            sql = """
+            UPDATE public."FOIRawRequests" AS foirawreq
+            SET 
+                linkedrequests = ((COALESCE(foirawreq.linkedrequests, '[]'::json))::jsonb || jsonb_build_array((:new_linkedrequest)::jsonb))::json,
+                requestrawdata = (jsonb_set((foirawreq.requestrawdata)::jsonb,'{linkedRequests}',COALESCE( (foirawreq.requestrawdata)::jsonb->'linkedRequests', '[]'::jsonb ) || jsonb_build_array((:new_linkedrequest)::jsonb),true))::json,
+                updated_at = :update_at,
+                updatedby = :user
+            FROM (
+                SELECT DISTINCT ON (requestid) requestid, version
+                FROM public."FOIRawRequests"
+                WHERE requestid IN :linkedrequest_requestids
+                ORDER BY requestid, version DESC
+            ) AS latestrawrequest
+            WHERE foirawreq.requestid = latestrawrequest.requestid
+                AND foirawreq.version = latestrawrequest.version
+                AND NOT EXISTS (
+                    SELECT 1
+                    FROM jsonb_array_elements((COALESCE(foirawreq.linkedrequests, '[]'::json))::jsonb) AS elem
+                    WHERE elem ? :new_linkedrequest_axisid
+                );
+            """
+            params = {"new_linkedrequest": new_linkedrequest, "update_at": update_at, "user": user  ,"linkedrequest_requestids": tuple(linkedrequest_requestids), "new_linkedrequest_axisid": new_linkedrequest_axisid}
+            res = db.session.execute(text(sql), params)
+            return res
+        except Exception as ex:
+            logging.error(ex)
+            raise ex
 
 
 class FOIRawRequestSchema(ma.Schema):

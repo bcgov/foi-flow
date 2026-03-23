@@ -15,6 +15,7 @@ from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.FOIRequestOIPC import FOIRequestOIPC
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator
 from datetime import datetime as datetime2
+from request_api.utils.enums import RequestType
 
 class requestserviceministrybuilder(requestserviceconfigurator):
     """ This class consolidates the helper functions for creating new foi request based on ministry actions. 
@@ -96,6 +97,12 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.isphasedrelease = ministryschema["isphasedrelease"]
         foiministryrequest.isconsultflag = ministryschema["isconsultflag"]
         foiministryrequest.oipcreviews = self.createfoirequestoipcs(foiministryrequest.isoipcreview, ministryschema["foiministryrequestid"], ministryschema["version"])
+        is_proactive_disclosure = (
+            requestschema.get("requestType") == RequestType.PROACTIVE_DISCLOSURE.value or
+            ministryschema.get("requesttype", "").lower() == RequestType.PROACTIVE_DISCLOSURE.value.lower()
+        )
+        if is_proactive_disclosure:
+             foiministryrequest.proactivedisclosures = self._prepareproactivedisclosuredetails(requestschema, userid, foiministryrequest.foiministryrequestid, foiministryrequest.version)
         return foiministryrequest
 
     def __getrequeststatusid(self, requeststatuslabel):

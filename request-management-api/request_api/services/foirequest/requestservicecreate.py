@@ -4,6 +4,8 @@ from request_api.models.FOIRequests import FOIRequest
 from request_api.models.ContactTypes import ContactType
 from request_api.models.PersonalInformationAttributes import PersonalInformationAttribute
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+from request_api.models.db import db
+from request_api.models.FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 from request_api.services.watcherservice import watcherservice
 from request_api.services.foirequest.requestservicebuilder import requestservicebuilder
 from request_api.services.foirequest.requestserviceministrybuilder import requestserviceministrybuilder  
@@ -14,7 +16,8 @@ from request_api.models.FOIRequestPersonalAttributes import FOIRequestPersonalAt
 from request_api.models.FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.RequestorType import RequestorType
-from request_api.utils.enums import StateName
+from request_api.utils.enums import StateName, RequestType
+from request_api.models.ProgramAreas import ProgramArea
 
 import json
 class requestservicecreate:
@@ -25,11 +28,16 @@ class requestservicecreate:
         
         # FOI Request    
         openfoirequest = FOIRequest()
-        openfoirequest.foirawrequestid = foirequestschema.get("foirawrequestid") if rawrequestid is None else rawrequestid
+        #openfoirequest.foirawrequestid = foirequestschema.get("foirawrequestid") if rawrequestid is None else rawrequestid
+        _foirawrequestid = foirequestschema.get("foirawrequestid") if rawrequestid is None else rawrequestid
+        openfoirequest.foirawrequestid = _foirawrequestid
+        foirequestschema["foirawrequestid"] = _foirawrequestid
         openfoirequest.version = activeversion
         openfoirequest.requesttype = foirequestschema.get("requestType")
         openfoirequest.initialdescription = foirequestschema.get("description")
         openfoirequest.receiveddate = foirequestschema.get("receivedDate")
+        if foirequestschema.get("requestType") == RequestType.PROACTIVE_DISCLOSURE.value:
+            openfoirequest.receiveddate = foirequestschema.get("startDate", foirequestschema.get("requestProcessStart"))
         openfoirequest.ministryRequests = self.__prepareministries(foirequestschema, activeversion, filenumber,ministryid, userid)               
         openfoirequest.contactInformations = self.__prearecontactinformation(foirequestschema, userid)       
         if requestservicebuilder().isNotBlankorNone(foirequestschema,"fromDate","main") == True:
@@ -50,7 +58,12 @@ class requestservicecreate:
         openfoirequest.createdby = userid
         # openfoirequest_dict = openfoirequest.__dict__
         # print("\n-openfoirequest in saveRequest:",openfoirequest_dict)     
-        return FOIRequest.saverequest(openfoirequest)
+        result = FOIRequest.saverequest(openfoirequest)
+        ##Auto Link requests for multiple ministries
+        if result.success == True:
+            print("Inside auto linking!")
+            self.__linkministries(openfoirequest.ministryRequests, userid)
+        return result
         
     
     
@@ -68,6 +81,8 @@ class requestservicecreate:
             result = self.saverequest(foirequestschema, userid, foirequestid,ministryid,filenumber,activeversion,_foirequest["foirawrequestid"],_foirequest["wfinstanceid"])
             if result.success == True:
                 FOIMinistryRequest.deActivateFileNumberVersion(ministryid, filenumber, userid)
+                if foirequestschema.get("requestType") == "proactive disclosure":
+                    FOIProactiveDisclosureRequests.deActivateOldVersion(ministryid, userid)
             return result
     
     def saveministryrequestversion(self,ministryrequestschema, foirequestid , ministryid, userid, usertype = None):        
@@ -84,9 +99,13 @@ class requestservicecreate:
         foirequest.requestApplicants = requestserviceministrybuilder().createfoirequestappplicantfromobject(_foirequestapplicant, foirequestid,  _foirequest['version']+1, userid)
         foirequest.contactInformations = requestserviceministrybuilder().createfoirequestcontactfromobject( _foirequestcontact, foirequestid, _foirequest['version']+1, userid)
         foirequest.personalAttributes = requestserviceministrybuilder().createfoirequestpersonalattributefromobject(_foirequestpersonalattrbs, foirequestid, _foirequest['version']+1, userid)
+        if foirequest.requesttype == RequestType.PROACTIVE_DISCLOSURE.value:
+            foirequest.receiveddate = ministryrequestschema.get("startDate", ministryrequestschema.get("requestProcessStart"))
         result = FOIRequest.saverequest(foirequest)
         if result.success == True:
             FOIMinistryRequest.deActivateFileNumberVersion(ministryid, _foiministryrequest['filenumber'], userid)
+            if _foirequest.get("requesttype") == "proactive disclosure":
+                FOIProactiveDisclosureRequests.deActivateOldVersion(ministryid, userid)
         return result       
     
     def __prepareministries(self,foirequestschema, activeversion, filenumber,ministryid, userid):
@@ -95,6 +114,19 @@ class requestservicecreate:
             for ministry in foirequestschema.get("selectedMinistries"):
                 foiministryrequestarr.append(requestservicebuilder().createministry(foirequestschema, ministry, activeversion, userid, filenumber,ministryid))     
         return foiministryrequestarr
+
+    def __linkministries(self, ministryrequests, userid):
+        if len(ministryrequests) > 1:
+            links = []
+            for ministry in ministryrequests:
+                programarea = ProgramArea.getprogramareabyid(ministry.programareaid)
+                links.append({ministry.axisrequestid: programarea['bcgovcode']})
+            
+            for ministry in ministryrequests:
+                # Filter out current ministry from links
+                current_links = [link for link in links if next(iter(link)) != ministry.axisrequestid]
+                FOIMinistryRequest.update_linkedrequests(ministry.foiministryrequestid, json.dumps(current_links), userid)
+            db.session.commit()
 
     def _prearepersonalattributes(self, foirequestschema, userid):
         personalattributearr = []

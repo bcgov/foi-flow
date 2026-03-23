@@ -1,6 +1,6 @@
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
-import { formatDate, isProcessingTeam, isFlexTeam, addBusinessDays } from "../../../helper/FOI/helper";
+import { formatDate, isProcessingTeam, isFlexTeam, addBusinessDays, calculateDaysRemaining } from "../../../helper/FOI/helper";
 import { extensionStatusId, KCProcessingTeams } from "../../../constants/FOI/enum";
 import MANDATORY_FOI_REQUEST_FIELDS from '../../../constants/FOI/mandatoryFOIRequestFields';
 import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
@@ -11,10 +11,15 @@ export const getTabBottomText = ({
   _status,
   requestExtensions,
   isProactiveDisclosure = false,
+  requestDetails = null,
 }) => {
   const _daysRemainingText = getDaysRemainingText(_daysRemaining);
   const _cfrDaysRemainingText = getcfrDaysRemainingText(_cfrDaysRemaining);
   const _extensionsCountText = getExtensionsCountText(requestExtensions);
+
+  const publicationDate = requestDetails?.publicationDate || requestDetails?.earliestEligiblePublicationDate;
+  const _publicationDaysRemaining = publicationDate ? calculateDaysRemaining(publicationDate) : "";
+  const publicationDaysRemaining = _publicationDaysRemaining !== "" ? getpublicationRemainingDaysText(_publicationDaysRemaining) : ""; 
 
   let bottomTextArray = [];
 
@@ -27,8 +32,14 @@ export const getTabBottomText = ({
     StateEnum.onholdother.name,
   ];
 
-  if (!statusesToNotAppearIn.includes(_status) && !isProactiveDisclosure) {
-    bottomTextArray.push(_daysRemainingText, _extensionsCountText);
+  if (!statusesToNotAppearIn.includes(_status)) {
+    if (isProactiveDisclosure) {
+      if (publicationDaysRemaining) {
+        bottomTextArray.push(publicationDaysRemaining);
+      }
+    } else {
+      bottomTextArray.push(_daysRemainingText, _extensionsCountText);
+    }
   }
 
   const cfrStates = [
@@ -57,6 +68,12 @@ const getDaysRemainingText = (_daysRemaining) => {
 
 const getcfrDaysRemainingText = (_cfrDaysRemaining) => {
   return `CFR Due in ${_cfrDaysRemaining} Days`;
+};
+
+const getpublicationRemainingDaysText = (publicationDaysRemaining) => {
+  return publicationDaysRemaining >= 0
+    ? `Publication Due in ${publicationDaysRemaining} Days`
+    : `Publication ${Math.abs(publicationDaysRemaining)} Days Overdue`;
 };
 
 export const isBeforeOpen = (requestDetails) => {
@@ -401,7 +418,7 @@ export const checkValidationError = (
         ?.toLowerCase()
         ?.includes("select") ||
       !requiredProactiveDetailsValues.cfrDueDate ||
-      !requiredProactiveDetailsValues.publicationDate ||
+      !requiredProactiveDetailsValues.earliestEligiblePublicationDate ||
       requiredRequestDescriptionValues.description === "" ||
       assignedToValue.toLowerCase().includes("unassigned") ||
       (!requiredRequestDescriptionValues.isProgramAreaSelected &&

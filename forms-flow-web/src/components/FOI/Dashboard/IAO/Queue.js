@@ -41,28 +41,32 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
     "currentState",
     "assignedToLastName",
     "assignedToFirstName",
+    "proactiveDisclosureCategory",
   ];
   if (isOITeam) {
     filterFields = [
       "publicationStatus",
       "axisRequestId",
       "assignedToFirstName",
-      "assignedToLastName"
+      "assignedToLastName",
+      "proactiveDisclosureCategory",
+      "requestType"
     ];
-  } 
+  }
 
   const queueParams = useSelector((state) => state.foiRequests.queueParams);
   const rowsState = useSelector((state) => state.foiRequests.queueParams?.rowsState);
   const sortModel = useSelector((state) => state.foiRequests.queueParams?.sortModel || tableInfo.sort);
 
-  let serverSortModel;
+  // let serverSortModel;
 
 
   const keyword = useSelector((state) => state.foiRequests.queueParams?.keyword);
   const requestFilter = useSelector((state) => state.foiRequests.queueFilter);
 
   useEffect(() => {
-    serverSortModel = updateSortModel(sortModel);
+    //serverSortModel = updateSortModel(sortModel);    
+    let serverSortModel = updateSortModel(sortModel);
     // page+1 here, because initial page value is 0 for mui-data-grid
     dispatch(
       fetchFOIRequestListByPage(
@@ -72,18 +76,24 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
         filterFields,
         keyword,
         requestFilter,
-        userDetail.preferred_username
+        userDetail?.preferred_username
       )
     );
-  }, [rowsState, sortModel, keyword, requestFilter]);
+  }, [rowsState, sortModel, keyword, requestFilter, isOITeam, userDetail]);
 
-  const columnsRef = React.useRef(tableInfo?.columns || []);
+  const columns = useMemo(() => {
+    return tableInfo?.columns || [];
+  }, [tableInfo]);
+
+  const rows = useMemo(() => {
+    return requestQueue?.data || [];
+  }, [requestQueue]);
 
   const requestFilterChange = (filter) => {
     if (filter === requestFilter) {
       return;
     }
-    dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: 0}}));
+    dispatch(setQueueParams({ ...queueParams, rowsState: { ...rowsState, page: 0 } }));
     dispatch(setQueueFilter(filter));
   };
 
@@ -91,13 +101,9 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
     dispatch(setQueueParams({
       ...queueParams,
       keyword: e.target.value.trim(),
-      rowsState: {...rowsState, page: 0}
+      rowsState: { ...rowsState, page: 0 }
     }));
   }, 500);
-
-  const rows = useMemo(() => {
-    return requestQueue?.data || [];
-  }, [JSON.stringify(requestQueue)]);
 
   const renderReviewRequest = (e) => {
     if (e.row.ministryrequestid) {
@@ -123,7 +129,7 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
     if (model.length === 0) {
       return;
     }
-    dispatch(setQueueParams({...queueParams, sortModel: model}));
+    dispatch(setQueueParams({ ...queueParams, sortModel: model }));
   };
 
   return (
@@ -154,7 +160,7 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
               backgroundColor: "rgba(56,89,138,0.1)",
             }}
           >
-            <label className="hideContent" for="filter">Search in Queue</label>
+            <label className="hideContent" htmlFor="filter">Search in Queue</label>
             <InputBase
               id="filter"
               placeholder="Search in Queue ..."
@@ -229,25 +235,24 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
         <DataGrid
           autoHeight
           className="foi-data-grid"
-          getRowId={(row) => row.idNumber}
+          getRowId={(row) => row.foiopeninforequestid || row.idNumber || row.id}
           rows={rows}
-          columns={columnsRef.current}
+          columns={columns}
           rowHeight={30}
           headerHeight={50}
           rowCount={requestQueue?.meta?.total || 0}
-          pageSize={rowsState?.pageSize}
-          // rowsPerPageOptions={[10]}
+          pageSize={rowsState?.pageSize || 100}
           hideFooterSelectedRowCount={true}
           disableColumnMenu={true}
           pagination
           paginationMode="server"
-          page={rowsState?.page}
-          onPageChange={(newPage) => dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: newPage}}))}
+          page={rowsState?.page || 0}
+          onPageChange={(newPage) => dispatch(setQueueParams({ ...queueParams, rowsState: { ...rowsState, page: newPage } }))}
           onPageSizeChange={(newpageSize) =>
-            dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, pageSize: newpageSize}}))
+            dispatch(setQueueParams({ ...queueParams, rowsState: { ...rowsState, pageSize: newpageSize } }))
           }
           components={{
-            Footer: ()=> <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={tableInfo.sort} footerFor={"queue"}></CustomFooter>
+            Footer: () => <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={tableInfo?.sort || []} footerFor={"queue"}></CustomFooter>
           }}
           sortingOrder={["desc", "asc"]}
           sortModel={[sortModel[0]]}
@@ -259,13 +264,11 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
           }}
           getRowClassName={(params) =>
             clsx(
-              `super-app-theme--${params.row.currentState
-                .toLowerCase()
-                .replace(/ +/g, "")}`,
+              `super-app-theme--${params?.row?.currentState?.toLowerCase()?.replace(/ +/g, "") || "unknown"}`,
               tableInfo?.stateClassName?.[
-                params.row.currentState.toLowerCase().replace(/ +/g, "")
+              params?.row?.currentState?.toLowerCase()?.replace(/ +/g, "")
               ],
-              (params.row.assignedTo == null && userDetail?.groups?.indexOf("/" + params.row.assignedGroup) > -1)
+              (params?.row?.assignedTo == null && userDetail?.groups?.indexOf("/" + params?.row?.assignedGroup) > -1)
               && tableInfo?.noAssignedClassName
             )
           }

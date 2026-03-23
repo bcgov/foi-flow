@@ -34,27 +34,36 @@ import {
 import { OSS_S3_CHUNK_SIZE } from "../../../../../constants/constants";
 import { RecordDownloadStatus } from "../../../../../constants/FOI/enum";
 import Tooltip from "@mui/material/Tooltip";
-import { OIPublicationStatus } from "../../OpenInformation/types";
-import { OIPublicationStatuses } from "../../../../../helper/openinfo-helper";
+import { PDPublicationStatus, PDTransactionObject } from "./types";
+import { OIStates, OIPublicationStatuses } from "../../../../../helper/openinfo-helper";
 import "./proactivepublication.scss";
 
 
 const ProactiveDisclosureRequestPublicationMain = ({
   requestId,
   ministryId,
-  oiPublicationData,
-  currentOIRequestState,
-  handleOIDataChange,
+  pdPublicationData,
+  currentPDRequestState,
+  handlePDDataChange,
   bcgovcode,
   requestNumber,
   earliestPublicationDate,
-}: any) => {
+}: {
+  requestId: number;
+  ministryId: number;
+  pdPublicationData: PDTransactionObject;
+  currentPDRequestState: any;
+  handlePDDataChange: any;
+  bcgovcode: string;
+  requestNumber: string;
+  earliestPublicationDate: any;
+}) => {
   const dispatch = useDispatch();
 
-  const oiPublicationStatuses: OIPublicationStatus[] = useSelector(
+  const pdPublicationStatuses: PDPublicationStatus[] = useSelector(
     (state: any) => state.foiRequests.oiPublicationStatuses,
   );
-  let foiOpenInfoAdditionalFiles = useSelector(
+  let foiPDAdditionalFiles = useSelector(
     (state: any) => state.foiRequests.foiOpenInfoAdditionalFiles,
   );
 
@@ -86,7 +95,7 @@ const ProactiveDisclosureRequestPublicationMain = ({
   };
 
   const totalFileCount =
-    (foiOpenInfoAdditionalFiles?.length || 0) +
+    (foiPDAdditionalFiles?.length || 0) +
     (foiPDFStitchedRecordForResponsePackage?.finalpackagepath ? getRecordsFileCount() : 0);
 
   const [downloadDisabled, setDownloadDisabled] = useState(true);
@@ -123,8 +132,8 @@ const ProactiveDisclosureRequestPublicationMain = ({
   const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
-    setAdditionalFiles(foiOpenInfoAdditionalFiles);
-  }, [foiOpenInfoAdditionalFiles]);
+    setAdditionalFiles(foiPDAdditionalFiles || []);
+  }, [foiPDAdditionalFiles]);
 
   //Functions
   const deleteFile = (_index: any) => {
@@ -306,7 +315,7 @@ const ProactiveDisclosureRequestPublicationMain = ({
   };
 
   const disableUserInput =
-    oiPublicationData.oipublicationstatus_id ===
+    pdPublicationData.oipublicationstatus_id ===
     OIPublicationStatuses.DoNotPublish;
 
   var saveAs = (blob: any, filename: any) => {
@@ -398,26 +407,29 @@ const ProactiveDisclosureRequestPublicationMain = ({
               <Grid item xs={12} md={6}>
                 <TextField
                   name="publicationdate"
-                  label="Earliest eligible publication date"
+                  label="Publication Date"
                   type="date"
                   InputLabelProps={{ shrink: true }}
                   variant="outlined"
                   fullWidth
                   value={
-                    (earliestPublicationDate
-                      ? formatDate(new Date(earliestPublicationDate))
+                    (pdPublicationData.publicationdate
+                      ? formatDate(new Date(pdPublicationData.publicationdate))
                       : "") || ""
                   }
                   onChange={(event) =>
-                    handleOIDataChange(event.target.value, event.target.name)
+                    handlePDDataChange(event.target.value, event.target.name)
                   }
                   InputProps={{ inputProps: { min: formatDate(new Date()) } }}
                   disabled={
-                    disableUserInput ||
-                    currentOIRequestState === "First Review" ||
-                    currentOIRequestState === "Unopened"
+                    //disableUserInput ||
+                    currentPDRequestState === "First Review" ||
+                    currentPDRequestState === OIStates.FirstReview ||
+                    currentPDRequestState === "Unopened"
                   }
                 />
+                {earliestPublicationDate !== 0 &&
+                  <span style={{ fontStyle: "italic", fontSize: "12px" }}>Earliest Eligible Publication Date: {earliestPublicationDate}</span>}
               </Grid>
               <Grid item xs={12}>
                 <div
@@ -469,65 +481,65 @@ const ProactiveDisclosureRequestPublicationMain = ({
                 Download Combined PDF for Review
               </button>
 
-              {!disableUserInput && (
-                <>
-                  <Typography className="files-heading">
-                    Add Optional Files
-                  </Typography>
-                  <Typography className="files-description">
-                    If you have any additional files you’d like to include in
-                    this publication, you can add them using the add files
-                    below.
-                    <p>These files will be added alongside the ones you
-                      previously uploaded.</p>
-                  </Typography>
+              {/* {!disableUserInput && ( */}
+              <>
+                <Typography className="files-heading">
+                  Add Optional Files
+                </Typography>
+                <Typography className="files-description">
+                  If you have any additional files you’d like to include in
+                  this publication, you can add them using the add files
+                  below.
+                  <p>These files will be added alongside the ones you
+                    previously uploaded.</p>
+                </Typography>
 
-                  <section
-                    className={clsx("file-upload-container", "pd-file-upload-section")}
+                <section
+                  className={clsx("file-upload-container", "pd-file-upload-section")}
+                >
+                  <div
+                    className={clsx(
+                      "row",
+                      "file-upload-preview",
+                      "file-upload-row",
+                      additionalFiles.length > 0 ? "justify-start" : "justify-center"
+                    )}
                   >
                     <div
-                      className={clsx(
-                        "row",
-                        "file-upload-preview",
-                        "file-upload-row",
-                        additionalFiles.length > 0 ? "justify-start" : "justify-center"
-                      )}
+                      className={clsx("file-upload-column", additionalFiles.length === 0 ? "file-upload-column-empty" : "file-upload-col-grow")}
                     >
-                      <div
-                        className={clsx("file-upload-column", additionalFiles.length === 0 ? "file-upload-column-empty" : "file-upload-col-grow")}
-                      >
-                        {additionalFiles.length === 0 ? (
-                          <span className="drag-drop-text">
-                            Drag and drop attachments, or click Add Files
-                          </span>
-                        ) : (
-                          <FilePreviewContainer
-                            files={additionalFiles.map((f: any) => {
-                              f.fileName = f.filename;
-                              return f;
-                            })}
-                            removeFile={deleteFile}
-                            clickHandler={openDocuemnt}
-                          />
-                        )}
-                      </div>
-                      <div className={clsx("file-upload-column", additionalFiles.length === 0 ? "file-upload-column-empty" : "file-upload-column-3")}>
-                        <button
-                          className="btn-add-files"
-                          onClick={() => setOpenModal(true)}
-                        // style={{
-                        //   color: "#38598a",
-                        //   borderColor: "#38598a",
-                        //   textTransform: "none",
-                        // }}
-                        >
-                          Add files
-                        </button>
-                      </div>
+                      {additionalFiles.length === 0 ? (
+                        <span className="drag-drop-text">
+                          Drag and drop attachments, or click Add Files
+                        </span>
+                      ) : (
+                        <FilePreviewContainer
+                          files={additionalFiles.map((f: any) => {
+                            f.fileName = f.filename;
+                            return f;
+                          })}
+                          removeFile={deleteFile}
+                          clickHandler={openDocuemnt}
+                        />
+                      )}
                     </div>
-                  </section>
-                </>
-              )}
+                    <div className={clsx("file-upload-column", additionalFiles.length === 0 ? "file-upload-column-empty" : "file-upload-column-3")}>
+                      <button
+                        className="btn-add-files"
+                        onClick={() => setOpenModal(true)}
+                      // style={{
+                      //   color: "#38598a",
+                      //   borderColor: "#38598a",
+                      //   textTransform: "none",
+                      // }}
+                      >
+                        Add files
+                      </button>
+                    </div>
+                  </div>
+                </section>
+              </>
+              {/* )} */}
             </div>
           </AccordionDetails >
         </Accordion >
