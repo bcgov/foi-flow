@@ -178,7 +178,7 @@ class requestservicecreate:
             requestapplicantarr.append(requestapplicant)
         else:
             # This is a fallback - all raw requests should have foiRequestApplicantID set
-            newapplicant = FOIRequestApplicant().from_request_data(foirequestschema)
+            newapplicant = FOIRequestApplicant().from_request_data(foirequestschema, is_new=True)
             save_result = FOIRequestApplicant().save_instance(newapplicant, userid)
             requestapplicant = FOIRequestApplicantMapping()
             requestapplicant.foirequestapplicantid = save_result.identifier # = applicant['foirequestapplicantid'] comment back in after axis decommission
@@ -197,6 +197,24 @@ class requestservicecreate:
             requestapplicant.foirequestapplicantid = save_result.identifier
             requestapplicant.requestortypeid = RequestorType().getrequestortype("Applying for other person")["requestortypeid"]
             requestapplicantarr.append(requestapplicant)
+
+        #Prepare additional applicants
+        addlapplicantinfo = foirequestschema.get("additionalPersonalInfo")
+        if foirequestschema.get("foiRequestChildApplicantID"):
+            childapplicant = FOIRequestApplicant().child_from_additional_personal_info(addlapplicantinfo)
+            requestapplicant = FOIRequestApplicantMapping()
+            save_result = FOIRequestApplicant().update_applicant_profile(childapplicant, foirequestschema.get("foiRequestChildApplicantID"), userid)
+            requestapplicant.foirequestapplicantid = save_result.identifier
+            requestapplicant.requestortypeid = RequestorType().getrequestortype("Applying for a child under 12")["requestortypeid"]
+            requestapplicantarr.append(requestapplicant)
+        elif addlapplicantinfo is not None:
+            if requestservicebuilder().isNotBlankorNone(foirequestschema,"childFirstName","additionalPersonalInfo"):
+                childapplicant = FOIRequestApplicant().child_from_additional_personal_info(addlapplicantinfo, is_new=True)
+                save_result = FOIRequestApplicant().save_instance(childapplicant, userid)
+                requestapplicant = FOIRequestApplicantMapping()
+                requestapplicant.foirequestapplicantid = save_result.identifier
+                requestapplicant.requestortypeid = RequestorType().getrequestortype("Applying for a child under 12")["requestortypeid"]
+                requestapplicantarr.append(requestapplicant)
 
         return requestapplicantarr
 
