@@ -134,3 +134,10 @@ class openinfoservice:
     
     def getopeninforequestforunpublishing(self, foiministryrequestid):
        return FOIOpenInformationRequests().getopeninforequestforunpublishing(foiministryrequestid)
+    
+    # for proactive disclosure
+    def getpdopeninforequestforpublishing(self, foiministryrequestid):
+       return FOIOpenInformationRequests().getpdopeninforequestforpublishing(foiministryrequestid)
+    
+    def getpdopeninforequestforunpublishing(self, foiministryrequestid):
+       return FOIOpenInformationRequests().getpdopeninforequestforunpublishing(foiministryrequestid)

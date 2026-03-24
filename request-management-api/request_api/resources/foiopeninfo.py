@@ -185,7 +185,7 @@ class FOIOpenInfoPublishNow(Resource):
             return {'status': exception.status_code, 'message': exception.message}, 500
         except redis.RedisError as redis_err:
             return {'status': False, 'message': f"Failed to queue request: {str(redis_err)}"}, 500
-        
+
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/unpublish')
 class FOIOpenInfoUnpublish(Resource):
@@ -200,6 +200,87 @@ class FOIOpenInfoUnpublish(Resource):
         try:
             # Fetch the data for unpublishing
             db_result = openinfoservice().getopeninforequestforunpublishing(foiministryrequestid)
+            
+            if not db_result:
+                return {"status": False, "message": "No data found to publish for this request ID"}, 404
+
+            result = db_result[0]
+
+            try:
+                # Convert to JSON
+                json_data = json.dumps(result, default=str) 
+            except (TypeError, ValueError) as err:
+                return {'status': False, 'message': f"JSON serialization failed: {err}"}, 500
+
+            # Push to queue for unpublishing
+            redis_client.rpush(redis_queue_name, json_data)
+            
+            return {'status': True, 'message': 'Request queued for unpublishing successfully'}, 202
+            
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message': exception.message}, 500
+        except redis.RedisError as redis_err:
+            return {'status': False, 'message': f"Failed to queue request: {str(redis_err)}"}, 500
+
+# for proactive disclosure
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/pdpublishnow')
+class FOIPDOpenInfoPublishNow(Resource):
+    """Publish Now"""
+    
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    @TRACER.trace()
+    @auth.require
+    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
+    def post(foiministryrequestid):
+        try:
+            # Fetch the data for publishing
+            db_result = openinfoservice().getpdopeninforequestforpublishing(foiministryrequestid)
+            
+            if not db_result:
+                return {"status": False, "message": "No data found to publish for this request ID"}, 404
+
+            result = db_result[0]
+
+            try:
+                # Convert to JSON
+                json_data = json.dumps(result, default=str) 
+            except (TypeError, ValueError) as err:
+                return {'status': False, 'message': f"JSON serialization failed: {err}"}, 500
+
+            # Push to queue for publishing
+            redis_client.rpush(redis_queue_name, json_data)
+            
+            return {'status': True, 'message': 'Request queued for publishing successfully'}, 202
+            
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message': exception.message}, 500
+        except redis.RedisError as redis_err:
+            return {'status': False, 'message': f"Failed to queue request: {str(redis_err)}"}, 500
+        
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/pdunpublish')
+class FOIPDOpenInfoUnpublish(Resource):
+    """Unpublish"""
+    
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    @TRACER.trace()
+    @auth.require
+    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
+    def post(foiministryrequestid):
+        try:
+            # Fetch the data for unpublishing
+            db_result = openinfoservice().getpdopeninforequestforunpublishing(foiministryrequestid)
             
             if not db_result:
                 return {"status": False, "message": "No data found to publish for this request ID"}, 404
