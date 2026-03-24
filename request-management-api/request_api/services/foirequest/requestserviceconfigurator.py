@@ -8,6 +8,7 @@ from request_api.models.ApplicantCategories import ApplicantCategory
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.SubjectCodes import SubjectCode
 from request_api.models.ProactiveDisclosureCategories import ProactiveDisclosureCategory
+from request_api.models.FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 from enum import Enum
 import datetime 
 import secrets
@@ -43,9 +44,65 @@ class requestserviceconfigurator:
             pdcategory = ProactiveDisclosureCategory().getproactivedisclosurecategory(key)
             return pdcategory["proactivedisclosurecategoryid"]
 
-    def getprogramareaiaocodebyid(self, programareaid):
-        programarea = ProgramArea().getprogramareabyid(programareaid)
-        return programarea['iaocode']
+    def _prepareproactivedisclosuredetails(self, foirequestschema, userid, ministryid, version):
+        proactivedisclosure = FOIProactiveDisclosureRequests()
+        current_proactive = FOIProactiveDisclosureRequests.getcurrentfoiproactiverequest(ministryid)
+        if current_proactive and 'version' in current_proactive:
+            proactivedisclosure.version = current_proactive['version'] + 1
+            proactivedisclosure.proactivedisclosureid = current_proactive['proactivedisclosureid']
+            # Carry over category ID if present in current version
+            if 'proactivedisclosurecategory.proactivedisclosurecategoryid' in current_proactive:
+                proactivedisclosure.proactivedisclosurecategoryid = current_proactive['proactivedisclosurecategory.proactivedisclosurecategoryid']
+        else:
+            proactivedisclosure.version = 1
+        proactivedisclosure.foiministryrequest_id = ministryid
+        proactivedisclosure.foiministryrequestversion_id = version
+        proactivedisclosure.createdby = userid
+        proactivedisclosure.created_at = datetime.datetime.now()
+        
+        # New Proactive Disclosure Fields
+        earliest_in_schema = "earliestEligiblePublicationDate" in foirequestschema or "earliesteligiblepublicationdate" in foirequestschema
+        if earliest_in_schema:
+            val = foirequestschema.get("earliestEligiblePublicationDate", foirequestschema.get("earliesteligiblepublicationdate"))
+            proactivedisclosure.earliesteligiblepublicationdate = val if val != "" else None
+        elif current_proactive:
+            proactivedisclosure.earliesteligiblepublicationdate = current_proactive.get("earliesteligiblepublicationdate")
+
+        publicationdate_in_schema = "publicationDate" in foirequestschema or "publicationdate" in foirequestschema
+        if publicationdate_in_schema:
+            val = foirequestschema.get("publicationDate", foirequestschema.get("publicationdate"))
+            proactivedisclosure.publicationdate = val if val != "" else None
+        elif earliest_in_schema and proactivedisclosure.earliesteligiblepublicationdate:
+            proactivedisclosure.publicationdate = proactivedisclosure.earliesteligiblepublicationdate
+        elif current_proactive:
+            proactivedisclosure.publicationdate = current_proactive.get("publicationdate")
+
+        proactivedisclosure.reportperiod = foirequestschema.get("reportPeriod", foirequestschema.get("reportperiod", current_proactive.get("reportperiod", "")))
+        proactivedisclosure.processingstatus = foirequestschema.get("processingStatus", foirequestschema.get("processingstatus", current_proactive.get("processingstatus")))
+        proactivedisclosure.processingmessage = foirequestschema.get("processingMessage", foirequestschema.get("processingmessage", current_proactive.get("processingmessage")))
+        proactivedisclosure.sitemap_pages = foirequestschema.get("sitemapPages", foirequestschema.get("sitemap_pages", current_proactive.get("sitemap_pages")))
+        proactivedisclosure.oipublicationstatus_id = foirequestschema.get("pdPublicationStatusId", foirequestschema.get("oipublicationstatus_id", current_proactive.get("oipublicationstatus_id", 1)))
+        proactivedisclosure.isactive = foirequestschema.get("isactive", True)
+        
+        category_name = None
+        if self._isNotBlankorNone(foirequestschema, "proactiveDisclosureCategory", "main"):
+            category_name = foirequestschema["proactiveDisclosureCategory"]
+        elif self._isNotBlankorNone(foirequestschema, "proactivedisclosurecategory", "main"):
+            category_name = foirequestschema["proactivedisclosurecategory"]
+
+        if category_name:
+            proactivedisclosure.proactivedisclosurecategoryid = self.getvalueof("proactiveDisclosureCategory", category_name)
+            
+        return proactivedisclosure 
+
+    def _isNotBlankorNone(self, dataschema, key, location):        
+        if location == "main":
+            if key in dataschema and  dataschema.get(key) is not None and dataschema.get(key)  and dataschema.get(key)  != "":
+                return True
+        else:
+            if dataschema.get(location) is not None and key in dataschema.get(location) and dataschema.get(location)[key] and dataschema.get(location)[key] is not None and dataschema.get(location)[key] !="":
+                return True
+        return False
 
     def getprogramareaiaocodebyid(self, programareaid):
         programarea = ProgramArea().getprogramareabyid(programareaid)

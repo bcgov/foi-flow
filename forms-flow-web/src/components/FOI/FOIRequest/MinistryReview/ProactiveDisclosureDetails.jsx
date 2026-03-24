@@ -54,7 +54,7 @@ const ProactiveDisclosureDetails = React.memo((requestDetails) => {
               <b>Publication Date:</b>
             </div>
             <div>
-              <span>{_requestDetails.publicationDate}</span>
+              <span>{_requestDetails.earliestEligiblePublicationDate}</span>
             </div>
           </div>
         </div>

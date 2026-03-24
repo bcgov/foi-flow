@@ -99,6 +99,16 @@ div {
   font-family: 'BCSans-Regular', sans-serif;
 }
 
+.MuiInputBase-root.Mui-disabled, .MuiOutlinedInput-root.Mui-disabled {
+  background-color: #EEEEEE !important;
+}
+
+.MuiInputBase-input.Mui-disabled, .MuiOutlinedInput-input.Mui-disabled {
+  background-color: #EEEEEE !important;
+  color: black !important;
+  -webkit-text-fill-color: black !important;
+}
+
 .loader {
   position: absolute;
   margin: auto;

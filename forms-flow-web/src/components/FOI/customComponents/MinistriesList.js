@@ -7,6 +7,8 @@ import {
   isValidMinistryCode,
   countOfMinistrySelected,
 } from "../FOIRequest/utils";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Checkbox from "@material-ui/core/Checkbox";
 
 const useStyles = makeStyles((_theme) => ({
   headingError: {
@@ -42,12 +44,12 @@ const MinistriesList = React.memo(
     useEffect(() => {
       setProgramAreaListItems(masterProgramAreaList);
       setError(
-        countOfMinistrySelected(programAreaList) !== 1 ||
-          !programAreaList?.some(
-            (programArea) =>
-              programArea.isChecked &&
-              isValidMinistryCode(programArea.bcgovcode, masterProgramAreaList)
-          )
+        countOfMinistrySelected(programAreaList) === 0 ||
+        !programAreaList?.some(
+          (programArea) =>
+            programArea.isChecked &&
+            isValidMinistryCode(programArea.bcgovcode, masterProgramAreaList)
+        )
       );
     }, [masterProgramAreaList, programAreaList]);
 
@@ -69,6 +71,17 @@ const MinistriesList = React.memo(
     };
 
     const countOfMinistry = countOfMinistrySelected(programAreaList);
+
+    const handleSelectAll = (event) => {
+      const newProgramAreaList = [...programAreaList];
+      newProgramAreaList.forEach((programArea) => {
+        programArea.isChecked = event.target.checked;
+      });
+      setProgramAreaListItems(newProgramAreaList);
+      handleUpdatedMasterProgramAreaList(newProgramAreaList);
+    };
+
+    const selectAll = programAreaList?.every((programArea) => programArea.isChecked);
     return (
       <div className="foi-ministries-container">
         {isProactiveDisclosure ? (
@@ -96,6 +109,17 @@ const MinistriesList = React.memo(
             Select Ministry Client *
           </h4>
         )}
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={selectAll}
+              onChange={handleSelectAll}
+              className={classes.checkbox}
+            />
+          }
+          label="Select all"
+          className={classes.selectAllLabel}
+        />
         <div className="foi-ministries-checkboxes">
           {programAreaList?.map((programArea, index) => (
             <label
@@ -123,7 +147,7 @@ const MinistriesList = React.memo(
             </label>
           ))}
         </div>
-        <h5
+        {/* <h5
           className={clsx({
             [classes.showValidation]: countOfMinistry > 1,
             [classes.hideValidation]: countOfMinistry <= 1,
@@ -131,7 +155,7 @@ const MinistriesList = React.memo(
         >
           * Only Select 1 Ministry Client per request. Please deselect all
           expect 1 and open others as separate requests
-        </h5>
+        </h5> */}
       </div>
     );
   }

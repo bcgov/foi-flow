@@ -74,6 +74,9 @@ import {
   fetchFOIOpenInfoAdditionalFiles,
   fetchFOIOpenInfoRequest,
 } from "../../../apiManager/services/FOI/foiOpenInfoRequestServices";
+import {
+  fetchFOIProactiveDisclosureRequest,
+} from "../../../apiManager/services/FOI/foiProactiveDisclosureServices";
 import { makeStyles } from "@material-ui/core/styles";
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
 import { push } from "connected-react-router";
@@ -225,8 +228,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     (state) => state.foiRequests.foiRequestApplicantProfile
   );
   const [isProactiveDisclosure, setIsProactiveDisclosure] = useState(
-    requestDetails?.requestType ==
-    FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE
+    requestDetails?.requestType?.toLowerCase() ==
+    FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE.toLowerCase()
   );
   const [attachments, setAttachments] = useState(requestAttachments);
   const [comment, setComment] = useState([]);
@@ -261,10 +264,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     (!SKIP_OPENINFO_MINISTRIES.split(",").includes(
       requestDetails?.bcgovcode?.toUpperCase()
     ) &&
-      requestDetails?.requestType ===
-      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL) ||
-    requestDetails?.requestType ===
-    FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE;
+      requestDetails?.requestType?.toLowerCase() ===
+      FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_GENERAL.toLowerCase()) ||
+    requestDetails?.requestType?.toLowerCase() ===
+    FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE.toLowerCase();
 
 
 
@@ -525,7 +528,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   useEffect(() => {
     if (activePublicationRequest) {
-      dispatch(fetchFOIOpenInfoRequest(ministryId));
+      if (requestDetails?.requestType?.toLowerCase() === FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE.toLowerCase()) {
+        dispatch(fetchFOIProactiveDisclosureRequest(ministryId));
+      } else {
+        dispatch(fetchFOIOpenInfoRequest(ministryId));
+      }
     }
     if (requestDetails?.isphasedrelease) {
       dispatch(fetchPDFStitchStatusesForPhasedRedlines(requestId, ministryId));
@@ -579,8 +586,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       if (requestDetails.axisRequestId) axisBannerCheck();
       setIsIAORestricted(isRequestRestricted(requestDetails, ministryId));
       if (
-        requestDetails.requestType ==
-        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE
+        requestDetails.requestType?.toLowerCase() ==
+        FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE.toLowerCase()
       )
         setIsProactiveDisclosure(true);
     }
@@ -927,7 +934,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     reportPeriod: "",
     requestStartDate: "",
     cfrDueDate: "",
-    publicationDate: ""
+    earliestEligiblePublicationDate: ""
   }
 
   const personalRequestDetailErrorsInit = {
@@ -1147,7 +1154,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const createSaveRequestObject = (name, value, value2) => {
     let requestObject = { ...saveRequestObject };
-    if (name !== "assignedTo" && name !== "isphasedrelease") {
+    if (name !== "assignedTo" && name !== "isphasedrelease" && name !== "linkedRequests") {
       setUnSavedRequest(
         name !== FOI_COMPONENT_CONSTANTS.RQUESTDETAILS_INITIALVALUES
       );
@@ -1177,6 +1184,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
     if (!_unSaved) {
       setUnSavedRequest(_unSaved);
+      /*if (isAddRequest && (isProactiveDisclosure || saveRequestObject?.selectedMinistries?.length > 1)) {
+        dispatch(push(`/foi/dashboard`));
+        return;
+      }*/
       dispatch(fetchFOIRequestDetailsWrapper(id || requestId, ministryId, userGroups));
       dispatch(fetchFOIRequestDescriptionList(id || requestId, ministryId));
       dispatch(fetchFOIRequestAttachmentsList(id || requestId, ministryId));
@@ -1198,6 +1209,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const handleOpenRequest = (parendId, _ministryId, unSaved) => {
     if (!unSaved) {
       setUnSavedRequest(unSaved);
+      if (saveRequestObject?.selectedMinistries?.length > 1) {
+        dispatch(push(`/foi/dashboard`));
+        return;
+      }
       setStateChanged(false);
       setcurrentrequestStatus(StateEnum.open.name);
 
@@ -1226,7 +1241,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       _cfrDaysRemaining,
       _status,
       requestExtensions,
-      isProactiveDisclosure
+      isProactiveDisclosure,
+      requestDetails
     });
 
     setRequestStatus(mappedBottomText);
@@ -1776,6 +1792,23 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                               divisions={requestDetails.divisions}
                             />
                           )}
+                          {requestDetails?.axisRequestId && requestState?.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
+                            <LinkedRequests
+                              requestDetails={requestDetails}
+                              requestStatus={_requestStatus}
+                              isMinistry={isMinistry}
+                              ministryId={ministryId}
+                              requestId={requestId}
+                              handleRequestDetailsValue={
+                                handleRequestDetailsValue
+                              }
+                              handleRequestDetailsInitialValue={
+                                handleRequestDetailsInitialValue
+                              }
+                              createSaveRequestObject={createSaveRequestObject}
+                              disableInput={disableInput || isHistoricalRequest}
+                            />
+                          )}
                         </>
                       ) : (
                         <>
@@ -1882,15 +1915,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                           {requestDetails?.axisRequestId && requestState?.toLowerCase() !== StateEnum.unopened.name.toLowerCase() &&
                             <LinkedRequests
                               requestDetails={requestDetails}
-                              requestStatus={_requestStatus}
-                              handleRequestDetailsValue={handleRequestDetailsValue}
-                              handleRequestDetailsInitialValue={
-                                handleRequestDetailsInitialValue
-                              }
-                              createSaveRequestObject={createSaveRequestObject}
-                              disableInput={disableInput || isHistoricalRequest}
-                              isHistoricalRequest={isHistoricalRequest}
                               isMinistry={isMinistry}
+                              ministryId={ministryId}
+                              requestId={requestId}
+                              createSaveRequestObject={createSaveRequestObject}
                             />
                           }
                           {redactedSections &&

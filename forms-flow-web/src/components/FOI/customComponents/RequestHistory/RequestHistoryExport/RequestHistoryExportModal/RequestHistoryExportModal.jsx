@@ -40,7 +40,7 @@ const RequestHistoryExportModal = ({
 
   return (
     <>
-      <Dialog open={showModal} onClose={handleClose}>
+      <Dialog open={showModal} onClose={handleClose} className="request-history-export-dialog">
         <div className="request-history-modal-header">
           <DialogTitle disableTypography id="request-history-dialog-title">
             <h2 className="request-history-export-header">Export Request History</h2>

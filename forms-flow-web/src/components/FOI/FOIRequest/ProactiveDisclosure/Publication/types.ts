@@ -1,7 +1,7 @@
-export type OITransactionObject = {
+export type PDTransactionObject = {
   oipublicationstatus_id: number;
-  oiexemption_id: number | null;
-  oiexemptionapproved: boolean | null;
+  pdexemption_id: number | null;
+  pdexemptionapproved: boolean | null;
   pagereference: string;
   iaorationale: string;
   oifeedback: string;
@@ -10,13 +10,13 @@ export type OITransactionObject = {
   receiveddate: string;
 };
 
-export type OIPublicationStatus = {
+export type PDPublicationStatus = {
   oipublicationstatusid: number;
   name: string;
   isactive: boolean;
 };
-export type OIExemption = {
-  oiexemptionid: number;
+export type PDExemption = {
+  pdexemptionid: number;
   name: string;
   isactive: boolean;
 };

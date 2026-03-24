@@ -22,6 +22,7 @@ from .FOIRequestStatus import FOIRequestStatus
 from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .SubjectCodes import SubjectCode
 from .FOIRequestOIPC import FOIRequestOIPC
+from .ProactiveDisclosureCategories import ProactiveDisclosureCategory
 from request_api.models.default_method_result import DefaultMethodResult
 from sqlalchemy import text
 from datetime import datetime as datetime2
@@ -194,24 +195,24 @@ class FOIOpenInformationRequests(db.Model):
             FOIRequest.foirequestid.label('id'), 
             FOIMinistryRequest.foiministryrequestid.label('ministryrequestid'), 
             cast(FOIMinistryRequest.axisrequestid, String).label('axisRequestId'),
-            FOIMinistryRequest.closedate, 
+            FOIMinistryRequest.closedate.label('closedate'), 
             FOIRequest.requesttype.label('requestType'), 
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             ApplicantCategory.name.label('applicantcategory'),
             recordspagecount.label('recordspagecount'),  
             oistatusname.label('oiStatusName'),
             cls.receiveddate.label('receivedDate'),
-            cls.publicationdate,
-            cls.created_at, 
+            cls.publicationdate.label('publicationdate'),
+            cls.created_at.label('created_at'), 
             assignedToFormatted.label('assignedToFormatted'), 
             FOIMinistryRequest.oistatus_id.label('oistatus_id'),
-            cls.version,
+            cls.version.label('version'),
             cls.foiopeninforequestid.label('foiopeninforequestid'),
             FOIRequestStatus.name.label('currentState'),
             FOIRestrictedMinistryRequest.isrestricted.label('isiaorestricted'),
             SubjectCode.name.label('subjectcode'),
-            FOIMinistryRequest.closedate,
-            FOIMinistryRequest.cfrduedate,
+            FOIMinistryRequest.closedate.label('closedate_1'),
+            FOIMinistryRequest.cfrduedate.label('cfrduedate'),
             literal(None).label('proactivedisclosurecategory'),
         ]   
 
@@ -409,8 +410,12 @@ class FOIOpenInformationRequests(db.Model):
             return FOIRequestStatus.name
         elif field == 'subjectcode':
             return SubjectCode.name
+        elif (field == 'proactivedisclosurecategory' or field == 'proactiveDisclosureCategory'):
+            return ProactiveDisclosureCategory.name
+        elif (field == 'requestType'):
+            return FOIRequest.requesttype
         else:
-            return text(field)
+            return cast(literal_column(field), String) if field in ['idNumber', 'axisRequestId'] else cast(FOIMinistryRequest.axisrequestid, String)
 
     @classmethod
     def findsortfield(cls, field):
@@ -470,6 +475,8 @@ class FOIOpenInformationRequests(db.Model):
                     if(field == 'idNumber'):
                         _keyword = _keyword.replace('u-00', '')
                     field_value = cls.findfield(field)
+                    if(field == 'requestType' and _keyword.lower() == 'pd'):
+                        onekeywordfiltercondition.append(field_value.ilike('%proactive disclosure%'))
                     condition = field_value.ilike('%'+_keyword+'%')
                     onekeywordfiltercondition.append(condition)            
             else:

@@ -42,9 +42,9 @@ const useStyles = makeStyles({
     marginTop: "24px",
   },
   textField: {
-    "& .MuiOutlinedInput-root": {
-      backgroundColor: "#fff",
-    },
+    // "& .MuiOutlinedInput-root": {
+    //   backgroundColor: "#fff",
+    // },
   },
 });
 
@@ -122,7 +122,7 @@ const ProactiveDisclosureDescription = React.memo(
           ? requestDetails.description
           : "",
         isProgramAreaSelected:
-          requestDetails?.selectedMinistries?.length === 1 &&
+          requestDetails?.selectedMinistries?.length > 0 &&
           requestDetails?.selectedMinistries.some((programArea) =>
             isValidMinistryCode(programArea.code, proactiveProgramAreaList)
           ),
@@ -216,7 +216,7 @@ const ProactiveDisclosureDescription = React.memo(
     // Handle onchange of Program Area List and bubble up the latest data
     const handleUpdatedMasterProgramAreaList = (updatedProgramAreaList) => {
       handleOnChangeRequiredRequestDescriptionValues(
-        countOfMinistrySelected(updatedProgramAreaList) === 1 &&
+        countOfMinistrySelected(updatedProgramAreaList) > 0 &&
         updatedProgramAreaList?.some(
           (programArea) =>
             programArea.isChecked &&
@@ -305,10 +305,9 @@ const ProactiveDisclosureDescription = React.memo(
                     label="Start Date"
                     type="date"
                     value={startDate}
-                    className={classes.textField}
                     onChange={handleStartDateChange}
                     InputLabelProps={{
-                      shrink: true,
+                        shrink: true,
                     }}
                     InputProps={{ inputProps: { max: formatDate(new Date()) } }}
                     variant="outlined"
@@ -322,7 +321,6 @@ const ProactiveDisclosureDescription = React.memo(
                     label="End Date"
                     type="date"
                     value={endDate}
-                    className={classes.textField}
                     onChange={handleEndDateChange}
                     InputLabelProps={{
                       shrink: true,

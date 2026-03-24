@@ -70,7 +70,7 @@ class dashboardservice:
         baserequestinfo.update({'isphasedrelease': request.isphasedrelease if request.isphasedrelease == True else False})
         
         proactivecategory = ""
-        if request.requestType == 'proactive disclosure':
+        if request.requestType in ['proactive disclosure', 'PD']:
             proactivecategory = getattr(request, 'proactivedisclosurecategory', "")
         baserequestinfo.update({'proactivedisclosurecategory': proactivecategory})
         return baserequestinfo
@@ -281,10 +281,9 @@ class dashboardservice:
             'applicantType': request.applicantcategory,
             'version': request.version,
             'foiopeninforequestid': request.foiopeninforequestid,
-            'currentState': request.currentState,
             'closedDate': fromClosed,
             'cfrduedate': cfrDueDate,
-            'proactivedisclosurecategory': request.proactivedisclosurecategory if request.requestType == 'proactive disclosure' else None
+            'proactivedisclosurecategory': request.proactivedisclosurecategory if request.requestType in ['proactive disclosure', 'PD'] else None
         }
 
     def __calculate_from_closed(self, closedate):

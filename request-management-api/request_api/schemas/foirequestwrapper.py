@@ -152,6 +152,7 @@ class FOIRequestWrapperSchema(Schema):
 
     foiRequestApplicantID = fields.Int(data_key="foiRequestApplicantID",required=False,allow_none=True)
     foiRequestOnBehalfOfApplicantID = fields.Int(data_key="foiRequestOnBehalfOfApplicantID",required=False,allow_none=True)
+    foiRequestChildApplicantID = fields.Int(data_key="foiRequestChildApplicantID",required=False,allow_none=True)
     other_notes = fields.Str(data_key="otherNotes", required=False, allow_none=True)
     axisapplicantid = fields.Int(data_key="axisApplicantID",required=False,allow_none=True)
     isoipcreview =   fields.Bool(data_key="isoipcreview")
@@ -297,4 +298,5 @@ class FOIPDRequestWrapperSchema(Schema):
     proactivedisclosurecategory = fields.Str(data_key="proactiveDisclosureCategory", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
     reportperiod = fields.Str(data_key="reportPeriod",allow_none=True, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])  
     publicationdate = fields.Str(data_key="publicationDate",allow_none=True)
+    earliesteligiblepublicationdate = fields.Str(data_key="earliestEligiblePublicationDate",allow_none=True)
     proactivedisclosurecategory = fields.Str(data_key="proactiveDisclosureCategory", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
