@@ -260,7 +260,7 @@ const ConfirmSaveModal = ({
                   size="small"
                 />
               }
-              label={ministry.code}
+              label={ministry.iaocode}
             />
           ))}
         </div>
