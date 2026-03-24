@@ -232,7 +232,6 @@ const API = {
   FOI_GET_PROACTIVE_DISCLOSURE_CATEGORIES_API: `${FOI_BASE_API_URL}/api/foiflow/proactivedisclosurecategories`,
 
   FOI_GET_LINKED_REQUESTS_LIST: `${FOI_BASE_API_URL}/api/linkrequests/<ministrycode>/axisrequestid/<axisrequestid>`,
-  FOI_MINISTRY_REQUEST_LINKEDREQUESTINFO: `${FOI_BASE_API_URL}/api/linkrequest/foiministryinfo/axisrequestid/<axisrequestid>`,
   FOI_REQUEST_ADD_LINKEDREQUESTS: `${FOI_BASE_API_URL}/api/linkrequest/createlink/axisrequestid/<axisrequestid>`,
   FOI_REQUEST_REMOVE_LINKEDREQUESTS: `${FOI_BASE_API_URL}/api/linkrequest/removelink/axisrequestid/<axisrequestid>`,
 

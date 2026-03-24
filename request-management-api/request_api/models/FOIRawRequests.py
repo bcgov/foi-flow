@@ -1462,7 +1462,7 @@ class FOIRawRequest(db.Model):
 
 
     @classmethod
-    def getautofilllinkedrequestids(cls, search_text, axisrequestid, ministrycode,limit):
+    def getautofilllinkedrequestids(cls, search_text, axisrequestid, limit):
         try:
             linked_request_data = (
             db.session.query(FOIRawRequest.linkedrequests)
@@ -1478,29 +1478,32 @@ class FOIRawRequest(db.Model):
                     linked_requests = linked_request_data
             axis_ids = [key for item in linked_requests for key in item.keys()]
             axis_ids.append(axisrequestid)
+            # Union Statement to get either FOIMINISTRYREQUEST data if axisrequestid exists in FOIMINISTRYREQUEST OR FOIRAWREQUEST data if axisrequestid does not exist in FOIMINISTRYREQUEST
+            sql = """
+            SELECT DISTINCT ON (axisrequestid) axisrequestid, requestid, foiministryrequestid, requeststatuslabel, requestrawdata, iaocode, foirequest_id, version 
+            FROM (
+                SELECT foimin.axisrequestid, NULL::bigint AS requestid, foimin.foiministryrequestid, foimin.requeststatuslabel, NULL::json AS requestrawdata, programarea.iaocode AS iaocode, foimin.foirequest_id, foimin.version, 1 AS src
+                FROM public."FOIMinistryRequests" foimin
+                LEFT JOIN public."ProgramAreas" programarea ON programarea.programareaid = foimin.programareaid
+                WHERE foimin.axisrequestid ILIKE '%' || :search_text || '%' AND foimin.axisrequestid NOT IN :axis_ids
 
-            # latest_rawrequest = (
-            #     db.session.query(FOIRawRequest)
-            #     .order_by(FOIRawRequest.axisrequestid, FOIRawRequest.version.desc())
-            #     .distinct(FOIRawRequest.axisrequestid)
-            # ).subquery()
-            results = (
-                db.session.query(FOIRawRequest.axisrequestid, FOIRawRequest.requestrawdata, FOIRawRequest.status, FOIRawRequest.requestid)
-                .order_by(FOIRawRequest.axisrequestid, FOIRawRequest.version.desc())
-                .distinct(FOIRawRequest.axisrequestid)
-                .filter(
-                    FOIRawRequest.axisrequestid.ilike(f"%{search_text}%"),
-                    ~FOIRawRequest.axisrequestid.in_(axis_ids)
-                )
-                .limit(limit)
-                .all()
-            )
+                UNION ALL
+
+                SELECT foiraw.axisrequestid, foiraw.requestid, NULL::bigint AS foiministryrequestid, foiraw.requeststatuslabel, requestrawdata, NULL::text AS iaocode, NULL::bigint AS foirequest_id, foiraw.version, 2 AS src
+                FROM public."FOIRawRequests" foiraw
+                WHERE foiraw.axisrequestid ILIKE '%' || :search_text || '%' AND foiraw.axisrequestid NOT IN :axis_ids
+            ) foilinkreq
+            ORDER BY axisrequestid, src, version DESC
+            LIMIT :limit;
+            """
+            params = {"search_text": search_text, "axis_ids": tuple(axis_ids), "limit": limit}
+            results = db.session.execute(text(sql), params)
             result_list=[]
-            for axisrequestid, requestrawdata, status, requestid in results:
-                if "selectedMinistries" in requestrawdata and len(requestrawdata["selectedMinistries"]) > 0:
-                    ministry_code = requestrawdata["selectedMinistries"][0]["code"]
-                    formattedresult= {"axisrequestid": axisrequestid, 'govcode': ministry_code, "requeststatus": status, "rawrequestid": requestid}
-                    result_list.append(formattedresult)
+            for row in results:
+                requeststatus = StateName[row["requeststatuslabel"]].value
+                govcode = row["iaocode"] if row["iaocode"] is not None else row["requestrawdata"]["selectedMinistries"][0]["code"]
+                result_list.append({"rawrequestid": row["requestid"],  "axisrequestid": row["axisrequestid"], "foiministryrequestid": row["foiministryrequestid"],
+                                           "foirequestid": row["foirequest_id"] ,"requeststatus": requeststatus, "govcode": govcode})
             return result_list
         except Exception as ex:
             logging.error(f"Error fetching linked request IDs: {ex}")
