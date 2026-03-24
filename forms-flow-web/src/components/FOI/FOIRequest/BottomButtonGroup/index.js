@@ -90,6 +90,10 @@ const BottomButtonGroup = React.memo(
     const classes = useStyles();
     const dispatch = useDispatch();
 
+    const allMinistries = useSelector(
+      (state) => state.foiRequests.foiProgramAreaList
+    );
+
     const [openModal, setOpenModal] = useState(false);
     const [opensaveModal, setsaveModal] = useState(false);
 
@@ -258,9 +262,9 @@ const BottomButtonGroup = React.memo(
     }, [unSavedRequest, recordsUploading, CFRUnsaved]);
 
     const openRequest = () => {
-      saveRequestObject.id = saveRequestObject.id
+      saveRequestObject.id = (saveRequestObject.id && saveRequestObject.id !== "-1")
         ? saveRequestObject.id
-        : requestId;
+        : requestId && requestId !== "-1" ? requestId : saveRequestObject.foirawrequestid;
       saveRequestObject.requeststatuslabel = StateEnum.open.label;
       setOpenModal(true);
     };
@@ -479,19 +483,23 @@ const BottomButtonGroup = React.memo(
 
         {saveConfirmationModal &&
           <ConfirmSaveModal
-            //   modalMessage={""}
-            //   modalDescription={""}
-            //   showModal={true}
-            // //  saveAssigneeDetails={}
-            //   assigneeVal={""}
-            //   assigneeName={""}
-            //   resetModal={false}
-            showModal={true}
-            selectedMinistries={[]}
-            allMinistries={[]}
-            onProceed={true}
+            showModal={saveConfirmationModal}
+            selectedMinistries={saveRequestObject?.selectedMinistries?.map(m => m.code) || []}
+            allMinistries={(allMinistries || []).map(m => ({ ...m, code: m.bcgovcode }))}
+            onProceed={(selected) => {
+              setSaveConfirmationModal(false);
+              if (selected) {
+                const selectedMinistries = allMinistries.filter(m => selected.includes(m.bcgovcode)).map(m => ({
+                  code: m.bcgovcode,
+                  name: m.name,
+                  isSelected: true
+                }));
+                saveRequestObject.selectedMinistries = selectedMinistries;
+              }
+              saveRequest(true);
+            }}
+            onCancel={() => setSaveConfirmationModal(false)}
           />
-
         }
 
         <div className="foi-bottom-button-group">
@@ -516,7 +524,13 @@ const BottomButtonGroup = React.memo(
               [classes.btnenabled]: !isValidationError,
             })}
             disabled={isValidationError || disableInput}
-            onClick={() => saveRequest(true)}
+            onClick={() => {
+              if (urlIndexCreateRequest > -1) {
+                setSaveConfirmationModal(true);
+              } else {
+                saveRequest(true);
+              }
+            }}
           >
             Save
           </button>

@@ -18,7 +18,13 @@ export const getMinistryBottomTextMap = (
       : `${Math.abs(_daysRemaining)} Days Overdue`;
 
   const _cfrDaysRemainingText = `CFR Due in ${_cfrDaysRemaining} Days`;
-
+  const publicationDate = requestDetails?.publicationDate || requestDetails?.earliestEligiblePublicationDate;
+  const pdPublicationRemainingDays = publicationDate ? calculateDaysRemaining(publicationDate) : "";
+  const pdPublicationRemainingDaysText = pdPublicationRemainingDays !== "" 
+    ? (pdPublicationRemainingDays >= 0 
+      ? `Publication Due in ${pdPublicationRemainingDays} Days` 
+      : `Publication ${Math.abs(pdPublicationRemainingDays)} Days Overdue`)
+    : "";
 
   const hideCFRDaysRemaining = [
     StateEnum.review.name.toLowerCase(),
@@ -34,6 +40,8 @@ export const getMinistryBottomTextMap = (
   }
   if (!isProactiveDisclosure) {
     bottomTexts.push(_daysRemainingText, getExtensionsCountText(requestExtensions));
+  } else if (pdPublicationRemainingDaysText) {
+    bottomTexts.push(pdPublicationRemainingDaysText);
   }
 
   return bottomTexts;

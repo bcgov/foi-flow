@@ -177,7 +177,12 @@ class rawrequestservicegetter:
                                'selectedMinistries': requestrawdata['ministry']['selectedMinistry'],
                                'lastStatusUpdateDate': FOIRawRequest.getLastStatusUpdateDate(requestid, request['status']).strftime(self.__generaldateformat()),
                                'stateTransition': FOIRawRequest.getstatesummary(requestid),
-                               'closedate': request['closedate'].strftime(self.__generaldateformat()) if request['closedate'] is not None else None
+                               'closedate': request['closedate'].strftime(self.__generaldateformat()) if request['closedate'] is not None else None,
+                               'proactiveDisclosureCategory': requestrawdata.get('proactiveDisclosureCategory'),
+                               'reportPeriod': requestrawdata.get('reportPeriod'),
+                               'requestStartDate': requestrawdata.get('requestStartDate'),
+                               'cfrDueDate': requestrawdata.get('cfrDueDate'),
+                               'earliestEligiblePublicationDate': requestrawdata.get('earliestEligiblePublicationDate'),
                                }
 
     def __prepareadditionalpersonalinfo(self, requestrawdata):

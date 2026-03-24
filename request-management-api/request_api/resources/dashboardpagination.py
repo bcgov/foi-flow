@@ -42,7 +42,8 @@ class DashboardPagination(Resource):
                                         'assignedToLastName',
                                         'assignedministrypersonFirstName',
                                         'assignedministrypersonLastName',
-                                        'requestType'
+                                        'requestType',
+                                        'proactiveDisclosureCategory'
                                     ]
             DEFAULT_ADDITIONAL_FILTER = 'All'
             _page = flask.request.args.get('page', DEFAULT_PAGE, type=int)
