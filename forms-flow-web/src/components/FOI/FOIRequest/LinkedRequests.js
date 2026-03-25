@@ -20,7 +20,7 @@ import {
   Autocomplete,
   CircularProgress
 } from "@mui/material";
-import {getFOIMinistryLinkedRequestInfo, linkedRequestsLists, deleteLinkedRequest, saveLinkedRequests} from "../../../apiManager/services/FOI/foiRequestServices";
+import {linkedRequestsLists, deleteLinkedRequest, saveLinkedRequests} from "../../../apiManager/services/FOI/foiRequestServices";
 import { LinkedRequestsTable } from "./LinkedRequestsTable";
 import { RemoveLinkedRequestModal } from "./RemoveLinkedRequestModal";
 
@@ -182,11 +182,12 @@ const LinkedRequests = React.memo(
     };
 
     const linkRequest = async (selectedValue) => {
-      // linkedrequestinfo = {"axisrequestid": str, requeststatus: str, bcgovcode: str}
+      // linkedrequestinfo = {axisrequestid: str, requeststatus: str, bcgovcode: str, foiministryrequestid: int || null, foirequestid: int || null, rawrequestid: int || null}
       // linkedrequests = {"axisrequestid": bcgovcode}
       if (!selectedValue) {
         return;
       }
+
       // Create a new array to avoid mutation issues
       const updatedLinkedRequests = [...(linkedRequests || [])];
       
@@ -197,14 +198,6 @@ const LinkedRequests = React.memo(
       const alreadyExists = updatedLinkedRequests.some(
         item => getAxisRequestId(item) === newRequestId
       );
-
-      // Get FOIMinistryRequest Status and MinistryId if FOIRawRequest Status is Archived
-      if (selectedValue.requeststatus === "Archived" && !alreadyExists) {
-        const res = await dispatch(getFOIMinistryLinkedRequestInfo(selectedValue.axisrequestid));
-        selectedValue.requeststatus = res.requeststatus;
-        selectedValue.foiministryrequestid = res.foiministryrequestid;
-      }
-
       // Add the new linkedrequest object to linkedrequest and linkedrequstinfo
       if (!alreadyExists && newRequestId) {
         const axisRequestId = selectedValue.axisrequestid;
@@ -215,8 +208,9 @@ const LinkedRequests = React.memo(
         const linkedReqInfoObj = {
           "axisrequestid": axisRequestId,
           "requeststatus": selectedValue.requeststatus,
-          "foiministryrequestid": selectedValue.foiministryrequestid || null, 
-          "rawrequestid": selectedValue.rawrequestid,
+          "foiministryrequestid": selectedValue.foiministryrequestid || null,
+          "rawrequestid": selectedValue.rawrequestid || null,
+          "foirequestid": selectedValue.foirequestid || null,
           "govcode": govCode
         };
         updatedLinkedRequests.push(linkedReqObj);

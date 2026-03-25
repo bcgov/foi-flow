@@ -1792,7 +1792,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                               divisions={requestDetails.divisions}
                             />
                           )}
-                          {requestDetails?.axisRequestId && requestState?.toLowerCase() !== StateEnum.unopened.name.toLowerCase() && (
+                          {requestDetails?.axisRequestId && ministryId && (
                             <LinkedRequests
                               requestDetails={requestDetails}
                               requestStatus={_requestStatus}
@@ -1912,7 +1912,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             createSaveRequestObject={createSaveRequestObject}
                             disableInput={disableInput || isHistoricalRequest}
                           />
-                          {requestDetails?.axisRequestId && requestState?.toLowerCase() !== StateEnum.unopened.name.toLowerCase() &&
+                          {requestDetails?.axisRequestId && ministryId &&
                             <LinkedRequests
                               requestDetails={requestDetails}
                               isMinistry={isMinistry}
