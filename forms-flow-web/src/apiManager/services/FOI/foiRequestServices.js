@@ -679,22 +679,6 @@ export const linkedRequestsLists = (queryParams,axisrequestid, ministrycode, ...
   }
 };
 
-export const getFOIMinistryLinkedRequestInfo = (axisid) => async (dispatch) => {
-  const apiUrl= replaceUrl(API.FOI_MINISTRY_REQUEST_LINKEDREQUESTINFO, "<axisrequestid>", axisid);
-  try {
-    const res = await httpGETRequest(apiUrl, {}, UserService.getToken());
-    if (res.data) {
-      return res.data;
-    } else {
-      console.error("API returned incomplete requeststatus data:", res);
-      dispatch(serviceActionError(res));
-    }
-  } catch (error) {
-    console.error("Error in fetching requeststatus data:", error);
-    dispatch(serviceActionError(error));
-  }
-};
-
 export const deleteLinkedRequest = (data, axisid, ...rest) => {
   const done = fnDone(rest);
   const apiUrl= replaceUrl(API.FOI_REQUEST_REMOVE_LINKEDREQUESTS, "<axisrequestid>", axisid);

@@ -391,7 +391,6 @@ class FOIRequestForDocReviewer(Resource):
 @cors_preflight('GET,OPTIONS')
 @API.route('/linkrequests/<string:ministrycode>/axisrequestid/<string:axisrequestid>')
 class LinkedRequests(Resource):
-    
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
@@ -399,24 +398,7 @@ class LinkedRequests(Resource):
     def get(ministrycode, axisrequestid):
         try:
             search_text = request.args.get('q', '').strip()
-            results = linkedrequestservice().findrequestids(search_text, axisrequestid,ministrycode)
-            return results, 200
-        except Exception as ex:
-            message = str(ex)
-            print("ERROR:", message)
-            return {'success': False, 'message': message, 'id': axisrequestid}, 500
-        
-@cors_preflight('GET,OPTIONS')
-@API.route('/linkrequest/foiministryinfo/axisrequestid/<string:axisrequestid>')
-class LinkedRequestsInfo(Resource):
-    """Retrieve additional information for FOIMinistry linked requests"""
-    @staticmethod
-    @TRACER.trace()
-    @cross_origin(origins=allowedorigins())
-    @auth.require
-    def get(axisrequestid):
-        try:
-            results = linkedrequestservice().get_linkedfoiministryrequest_info_by_axisid(axisrequestid)
+            results = linkedrequestservice().findrequestids(search_text, axisrequestid)
             return results, 200
         except Exception as ex:
             message = str(ex)
