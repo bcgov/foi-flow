@@ -18,8 +18,8 @@ class linkedrequestservice:
         linkedrequestinfo = FOIRawRequest.getlinkedrequestdetails(linkedrequests)
         return linkedrequestinfo
 
-    def findrequestids(self, search_text, axisrequestid, ministrycode):
-        raw_results = FOIRawRequest().getautofilllinkedrequestids(search_text, axisrequestid, ministrycode, 10)
+    def findrequestids(self, search_text, axisrequestid):
+        raw_results = FOIRawRequest().getautofilllinkedrequestids(search_text, axisrequestid, 10)
         return raw_results
     
     def get_linkedfoiministryrequest_info_by_axisid(self, axisid):
