@@ -1110,11 +1110,19 @@ class FOIRequestApplicant(db.Model):
         ).subquery()
 
         # Get the latest FOIRequest version per foirequestid
-        subquery_foirequest_maxversion = _session.query(
+        subquery_latest_foirequest_maxversion = _session.query(
             FOIRequest.foirequestid,
             func.max(FOIRequest.version).label('max_version')
         ).group_by(
             FOIRequest.foirequestid
+        ).subquery()
+
+        # Get the latest FOIMinistryRequest version per foiministryrequestid
+        subquery_ministry_maxversion = _session.query(
+            FOIMinistryRequest.foiministryrequestid,
+            func.max(FOIMinistryRequest.version).label('max_version')
+        ).group_by(
+            FOIMinistryRequest.foiministryrequestid
         ).subquery()
 
         selectedcolumns = [
@@ -1131,8 +1139,6 @@ class FOIRequestApplicant(db.Model):
 
         query_all = _session.query(
             *selectedcolumns
-        ).distinct(
-            FOIRequest.foirequestid
         ).filter(
             # Only include applicants sharing the current profile
             FOIRequestApplicant.foirequestapplicantid.in_(profile_subquery)
@@ -1157,16 +1163,22 @@ class FOIRequestApplicant(db.Model):
                 FOIRequest.isactive == True
             )
         ).join(
-            subquery_foirequest_maxversion,
+            subquery_latest_foirequest_maxversion,
             and_(
-                subquery_foirequest_maxversion.c.foirequestid == FOIRequest.foirequestid,
-                subquery_foirequest_maxversion.c.max_version == FOIRequest.version
+                subquery_latest_foirequest_maxversion.c.foirequestid == FOIRequest.foirequestid,
+                subquery_latest_foirequest_maxversion.c.max_version == FOIRequest.version
             )
         ).join(
             FOIMinistryRequest,
             and_(
                 FOIMinistryRequest.foirequest_id == FOIRequest.foirequestid,
                 FOIMinistryRequest.isactive == True
+            )
+        ).join(
+            subquery_ministry_maxversion,
+            and_(
+                subquery_ministry_maxversion.c.foiministryrequestid == FOIMinistryRequest.foiministryrequestid,
+                subquery_ministry_maxversion.c.max_version == FOIMinistryRequest.version
             )
         ).join(
             FOIRequestStatus,
