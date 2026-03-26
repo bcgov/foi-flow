@@ -54,6 +54,22 @@ source .venv/bin/activate
 python -m pip install --upgrade pip
 ```
 
+Windows PowerShell:
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+```
+
+Windows Command Prompt:
+
+```bat
+py -3 -m venv .venv
+call .venv\Scripts\activate.bat
+python -m pip install --upgrade pip
+```
+
 Install the Python dependencies used by this project:
 
 ```bash
@@ -70,6 +86,12 @@ Create a local environment file from the sample:
 cp .env_sample .env
 ```
 
+On Windows, use:
+
+```powershell
+Copy-Item .env_sample .env
+```
+
 Edit `.env` with the correct database connection values for your environment, then load it before running the migration:
 
 ```bash
@@ -77,6 +99,18 @@ set -a
 source ./.env
 set +a
 ```
+
+Windows PowerShell does not support `source` or `set -a`. Either set the variables manually in your shell, or load them from `.env` before each run:
+
+```powershell
+Get-Content .env | ForEach-Object {
+  if ($_ -match '^\s*#' -or $_ -match '^\s*$') { return }
+  $name, $value = $_ -split '=', 2
+  [System.Environment]::SetEnvironmentVariable($name, $value.Trim("'`""), 'Process')
+}
+```
+
+Windows Command Prompt users can set variables manually with `set VAR_NAME=value` before running commands.
 
 ## Configuration
 
@@ -141,6 +175,20 @@ Basic run:
 ```bash
 PYTHONPATH=src python -m main \
   --input-csv ./requests.csv
+```
+
+Windows PowerShell:
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m main --input-csv .\requests.csv
+```
+
+Windows Command Prompt:
+
+```bat
+set PYTHONPATH=src
+python -m main --input-csv .\requests.csv
 ```
 
 Write a results file:
@@ -241,6 +289,20 @@ Run the test suite with:
 
 ```bash
 PYTHONPATH=src pytest
+```
+
+Windows PowerShell:
+
+```powershell
+$env:PYTHONPATH = "src"
+pytest
+```
+
+Windows Command Prompt:
+
+```bat
+set PYTHONPATH=src
+pytest
 ```
 
 Current tests cover:
