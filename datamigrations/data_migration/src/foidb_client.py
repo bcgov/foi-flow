@@ -38,6 +38,120 @@ class FoidbClient:
         )
         return cursor.fetchone() is not None
 
+    def find_request_bundle(self, request_id: str) -> dict | None:
+        cursor = self._execute(
+            """
+            SELECT foirequestid, version, foirawrequestid
+            FROM public."FOIRequests"
+            WHERE migrationreference = %s
+            LIMIT 1
+            """,
+            (request_id,),
+        )
+        row = cursor.fetchone()
+        if row is None:
+            return None
+        return {
+            "foirequest_id": row[0],
+            "foirequestversion_id": row[1],
+            "foirawrequestid": row[2],
+        }
+
+    def preview_delete_counts(self, bundle: dict) -> dict:
+        foirequest_id = bundle["foirequest_id"]
+        version_id = bundle["foirequestversion_id"]
+        foirawrequestid = bundle.get("foirawrequestid")
+
+        return {
+            "FOIRequestContactInformation": self._count(
+                """
+                SELECT COUNT(*) FROM public."FOIRequestContactInformation"
+                WHERE foirequest_id = %s AND foirequestversion_id = %s
+                """,
+                (foirequest_id, version_id),
+            ),
+            "FOIRequestApplicantMappings": self._count(
+                """
+                SELECT COUNT(*) FROM public."FOIRequestApplicantMappings"
+                WHERE foirequest_id = %s AND foirequestversion_id = %s
+                """,
+                (foirequest_id, version_id),
+            ),
+            "FOIRequestApplicants": self._count(
+                """
+                SELECT COUNT(*) FROM public."FOIRequestApplicants"
+                WHERE foirequestapplicantid IN (
+                    SELECT foirequestapplicantid
+                    FROM public."FOIRequestApplicantMappings"
+                    WHERE foirequest_id = %s AND foirequestversion_id = %s
+                )
+                """,
+                (foirequest_id, version_id),
+            ),
+            "FOIMinistryRequests": self._count(
+                """
+                SELECT COUNT(*) FROM public."FOIMinistryRequests"
+                WHERE foirequest_id = %s AND foirequestversion_id = %s
+                """,
+                (foirequest_id, version_id),
+            ),
+            "FOIRequests": 1,
+            "FOIRawRequests": 1 if foirawrequestid else 0,
+        }
+
+    def delete_request_bundle(self, bundle: dict) -> None:
+        foirequest_id = bundle["foirequest_id"]
+        version_id = bundle["foirequestversion_id"]
+        foirawrequestid = bundle.get("foirawrequestid")
+
+        self._execute(
+            """
+            DELETE FROM public."FOIRequestContactInformation"
+            WHERE foirequest_id = %s AND foirequestversion_id = %s
+            """,
+            (foirequest_id, version_id),
+        )
+        self._execute(
+            """
+            DELETE FROM public."FOIRequestApplicantMappings"
+            WHERE foirequest_id = %s AND foirequestversion_id = %s
+            """,
+            (foirequest_id, version_id),
+        )
+        self._execute(
+            """
+            DELETE FROM public."FOIRequestApplicants"
+            WHERE foirequestapplicantid IN (
+                SELECT foirequestapplicantid
+                FROM public."FOIRequestApplicantMappings"
+                WHERE foirequest_id = %s AND foirequestversion_id = %s
+            )
+            """,
+            (foirequest_id, version_id),
+        )
+        self._execute(
+            """
+            DELETE FROM public."FOIMinistryRequests"
+            WHERE foirequest_id = %s AND foirequestversion_id = %s
+            """,
+            (foirequest_id, version_id),
+        )
+        self._execute(
+            """
+            DELETE FROM public."FOIRequests"
+            WHERE foirequestid = %s AND version = %s
+            """,
+            (foirequest_id, version_id),
+        )
+        if foirawrequestid:
+            self._execute(
+                """
+                DELETE FROM public."FOIRawRequests"
+                WHERE requestid = %s
+                """,
+                (foirawrequestid,),
+            )
+
     def resolve_received_mode_id(self, received_mode_name: str) -> int | None:
         return self._fetch_lookup_id('SELECT receivedmodeid FROM public."ReceivedModes" WHERE name = %s LIMIT 1', received_mode_name)
 
@@ -80,6 +194,11 @@ class FoidbClient:
         cursor = self._execute(query, (value,))
         row = cursor.fetchone()
         return row[0] if row else None
+
+    def _count(self, query: str, params) -> int:
+        cursor = self._execute(query, params)
+        row = cursor.fetchone()
+        return row[0] if row else 0
 
     def insert_raw_request(self, payload: dict) -> dict:
         cursor = self._execute(

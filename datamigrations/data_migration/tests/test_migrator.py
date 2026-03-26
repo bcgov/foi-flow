@@ -87,6 +87,26 @@ class FakeFoidbClient:
     def insert_contact_information(self, payload):
         self.calls.append(("insert_contact_information", payload["value"]))
 
+    def find_request_bundle(self, request_id: str):
+        self.calls.append(("find_request_bundle", request_id))
+        if self.exists:
+            return {"foirequest_id": 11, "foirequestversion_id": 1, "foirawrequestid": 31}
+        return None
+
+    def preview_delete_counts(self, bundle):
+        self.calls.append(("preview_delete_counts", bundle["foirequest_id"]))
+        return {
+            "FOIRequestContactInformation": 1,
+            "FOIRequestApplicantMappings": 1,
+            "FOIRequestApplicants": 1,
+            "FOIMinistryRequests": 1,
+            "FOIRequests": 1,
+            "FOIRawRequests": 1,
+        }
+
+    def delete_request_bundle(self, bundle):
+        self.calls.append(("delete_request_bundle", bundle["foirequest_id"]))
+
 
 def test_migrate_request_skips_when_request_already_exists() -> None:
     migrator = RequestMigrator(axis_client=FakeAxisClient(), foidb_client=FakeFoidbClient(exists=True))
@@ -226,6 +246,40 @@ def test_migrate_request_emits_debug_logs(caplog) -> None:
     assert any("Committed migration for request XGR-2020-10982" in message for message in messages)
 
 
+def test_delete_request_previews_counts_without_committing() -> None:
+    foidb_client = FakeFoidbClient(exists=True)
+    migrator = RequestMigrator(axis_client=FakeAxisClient(), foidb_client=foidb_client)
+
+    result = migrator.delete_request("XGR-2020-10982", confirm_delete=False)
+
+    assert result["status"] == "preview"
+    assert "FOIRequests=1" in result["reason"]
+    assert ("begin_request",) not in foidb_client.calls
+    assert ("delete_request_bundle", 11) not in foidb_client.calls
+
+
+def test_delete_request_commits_when_confirmed() -> None:
+    foidb_client = FakeFoidbClient(exists=True)
+    migrator = RequestMigrator(axis_client=FakeAxisClient(), foidb_client=foidb_client)
+
+    result = migrator.delete_request("XGR-2020-10982", confirm_delete=True)
+
+    assert result["status"] == "deleted"
+    assert ("begin_request",) in foidb_client.calls
+    assert ("delete_request_bundle", 11) in foidb_client.calls
+    assert ("commit_request",) in foidb_client.calls
+
+
+def test_delete_request_skips_when_request_not_found() -> None:
+    foidb_client = FakeFoidbClient(exists=False)
+    migrator = RequestMigrator(axis_client=FakeAxisClient(), foidb_client=foidb_client)
+
+    result = migrator.delete_request("XGR-2020-10982", confirm_delete=False)
+
+    assert result["status"] == "skipped"
+    assert result["reason"] == "request not found in FOIDB"
+
+
 def test_main_processes_csv_and_writes_optional_results(tmp_path: Path) -> None:
     csv_file = tmp_path / "requests.csv"
     output_file = tmp_path / "results.csv"
@@ -254,6 +308,38 @@ def test_main_processes_csv_and_writes_optional_results(tmp_path: Path) -> None:
 
     assert exit_code == 0
     assert output_file.exists()
+
+
+def test_main_routes_delete_mode_to_delete_request(tmp_path: Path) -> None:
+    csv_file = tmp_path / "requests.csv"
+    output_file = tmp_path / "results.csv"
+    csv_file.write_text("request_id\nXGR-2020-10982\n", encoding="utf-8")
+
+    class FakeAppMigrator:
+        def delete_request(self, request_id: str, confirm_delete: bool):
+            return {
+                "request_id": request_id,
+                "status": "preview",
+                "reason": f"confirm={confirm_delete}",
+                "foirequest_id": "11",
+                "started_at": "2026-03-26T10:00:00",
+                "finished_at": "2026-03-26T10:00:00",
+            }
+
+    exit_code = run(
+        [
+            "--input-csv",
+            str(csv_file),
+            "--output-csv",
+            str(output_file),
+            "--delete",
+        ],
+        migrator_factory=lambda settings, dry_run=False: FakeAppMigrator(),
+    )
+
+    assert exit_code == 0
+    assert output_file.exists()
+    assert "confirm=False" in output_file.read_text(encoding="utf-8")
 
 
 def test_create_migrator_passes_axis_filter_settings(monkeypatch) -> None:

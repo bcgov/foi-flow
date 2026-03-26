@@ -175,3 +175,47 @@ def test_insert_contact_information_uses_contactinformation_column() -> None:
     query, _ = connection.cursors[0].execute_calls[0]
     assert "contactinformation" in query
     assert " value," not in query
+
+
+def test_find_request_bundle_queries_by_migrationreference() -> None:
+    connection = RecordingPsycopgConnection(row=(11, 1, 21))
+    client = FoidbClient(connection)
+
+    bundle = client.find_request_bundle("XGR-2020-10982")
+
+    assert bundle == {"foirequest_id": 11, "foirequestversion_id": 1, "foirawrequestid": 21}
+    query, params = connection.cursors[0].execute_calls[0]
+    assert "migrationreference = %s" in query
+    assert params == ("XGR-2020-10982",)
+
+
+def test_preview_delete_counts_returns_per_table_counts() -> None:
+    connection = RecordingPsycopgConnection(row=(3,))
+    client = FoidbClient(connection)
+
+    counts = client.preview_delete_counts({"foirequest_id": 11, "foirequestversion_id": 1, "foirawrequestid": 21})
+
+    assert counts == {
+        "FOIRequestContactInformation": 3,
+        "FOIRequestApplicantMappings": 3,
+        "FOIRequestApplicants": 3,
+        "FOIMinistryRequests": 3,
+        "FOIRequests": 1,
+        "FOIRawRequests": 1,
+    }
+    assert len(connection.cursors) == 4
+
+
+def test_delete_request_bundle_executes_queries_in_fk_safe_order() -> None:
+    connection = RecordingPsycopgConnection()
+    client = FoidbClient(connection)
+
+    client.delete_request_bundle({"foirequest_id": 11, "foirequestversion_id": 1, "foirawrequestid": 21})
+
+    queries = [cursor.execute_calls[0][0] for cursor in connection.cursors]
+    assert 'DELETE FROM public."FOIRequestContactInformation"' in queries[0]
+    assert 'DELETE FROM public."FOIRequestApplicantMappings"' in queries[1]
+    assert 'DELETE FROM public."FOIRequestApplicants"' in queries[2]
+    assert 'DELETE FROM public."FOIMinistryRequests"' in queries[3]
+    assert 'DELETE FROM public."FOIRequests"' in queries[4]
+    assert 'DELETE FROM public."FOIRawRequests"' in queries[5]

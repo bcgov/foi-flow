@@ -20,6 +20,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--output-csv", type=Path)
     parser.add_argument("--limit", type=int)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--delete", action="store_true")
+    parser.add_argument("--confirm-delete", action="store_true")
     parser.add_argument("--log-level", default="INFO")
     return parser
 
@@ -56,7 +58,10 @@ def run(argv: list[str] | None = None, migrator_factory: Callable[[Settings, boo
     settings = load_settings() if migrator_factory is None else Settings("", "", "", "")
     migrator = (migrator_factory or create_migrator)(settings, args.dry_run)
 
-    results = [migrator.migrate_request(request_id) for request_id in request_ids]
+    if args.delete:
+        results = [migrator.delete_request(request_id, confirm_delete=args.confirm_delete) for request_id in request_ids]
+    else:
+        results = [migrator.migrate_request(request_id) for request_id in request_ids]
     if args.output_csv:
         write_results_csv(args.output_csv, results)
 

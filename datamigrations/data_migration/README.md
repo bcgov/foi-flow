@@ -19,6 +19,7 @@ The tool supports:
 - duplicate filtering in the input CSV
 - skipping requests already migrated into FOIDB
 - `dry-run` validation with transaction rollback
+- preview-first delete mode with explicit confirmation for destructive deletes
 - optional results CSV output
 - non-zero exit codes when any request fails
 
@@ -213,6 +214,25 @@ python src/main.py \
   --limit 10
 ```
 
+Preview what would be deleted for matching FOIMOD records:
+
+```bash
+python src/main.py \
+  --input-csv ./requests.csv \
+  --output-csv ./results.csv \
+  --delete
+```
+
+Delete matching FOIMOD records after previewing and explicitly confirming:
+
+```bash
+python src/main.py \
+  --input-csv ./requests.csv \
+  --output-csv ./results.csv \
+  --delete \
+  --confirm-delete
+```
+
 Enable debug logging:
 
 ```bash
@@ -227,6 +247,8 @@ CLI options:
 - `--output-csv`: optional path for per-request results
 - `--limit`: optional cap on the number of request IDs processed
 - `--dry-run`: validate inserts but roll back before commit
+- `--delete`: preview or delete FOIMOD rows for each request ID instead of migrating
+- `--confirm-delete`: execute deletes when used with `--delete`; otherwise delete mode is preview-only
 - `--log-level`: Python logging level, default `INFO`
 
 ## Output and Exit Codes
@@ -244,6 +266,8 @@ Status values produced by the current implementation:
 
 - `migrated`: request committed successfully
 - `dry-run`: request validated and rolled back intentionally
+- `preview`: delete mode found rows and reported what would be removed
+- `deleted`: delete mode removed rows successfully after confirmation
 - `skipped`: FOIDB already contains the request
 - `failed`: the request could not be migrated
 
@@ -267,6 +291,27 @@ For each request ID:
 9. Commit the transaction, or roll it back on error.
 
 In `--dry-run` mode, the tool performs the same reads, mappings, lookups, and insert attempts, then rolls back instead of committing.
+
+## Delete Flow
+
+For each request ID in `--delete` mode:
+
+1. Find the FOI request in FOIDB by `migrationreference`.
+2. If no matching request exists, report the request as `skipped`.
+3. Resolve the related records owned by this migration path.
+4. Count rows in the delete scope tables and return those counts in preview mode.
+5. If `--confirm-delete` is provided, delete rows in FK-safe order inside one transaction.
+
+Delete mode currently targets:
+
+- `FOIRequestContactInformation`
+- `FOIRequestApplicantMappings`
+- `FOIRequestApplicants`
+- `FOIMinistryRequests`
+- `FOIRequests`
+- `FOIRawRequests`
+
+Without `--confirm-delete`, the tool does not delete anything. It only reports what would be removed.
 
 ## Architecture Notes
 

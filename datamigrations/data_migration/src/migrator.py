@@ -89,6 +89,53 @@ class RequestMigrator:
                 foirequest_id="",
             )
 
+    def delete_request(self, request_id: str, *, confirm_delete: bool = False) -> dict:
+        started_at = datetime.now(UTC).isoformat()
+        LOGGER.debug("Starting delete flow for request %s", request_id)
+
+        bundle = self.foidb_client.find_request_bundle(request_id)
+        if bundle is None:
+            return self._result(
+                request_id=request_id,
+                status="skipped",
+                reason="request not found in FOIDB",
+                started_at=started_at,
+                foirequest_id="",
+            )
+
+        counts = self.foidb_client.preview_delete_counts(bundle)
+        reason = ", ".join(f"{table}={count}" for table, count in counts.items())
+
+        if not confirm_delete:
+            return self._result(
+                request_id=request_id,
+                status="preview",
+                reason=reason,
+                started_at=started_at,
+                foirequest_id=bundle["foirequest_id"],
+            )
+
+        self.foidb_client.begin_request()
+        try:
+            self.foidb_client.delete_request_bundle(bundle)
+            self.foidb_client.commit_request()
+            return self._result(
+                request_id=request_id,
+                status="deleted",
+                reason=reason,
+                started_at=started_at,
+                foirequest_id=bundle["foirequest_id"],
+            )
+        except Exception as exc:  # pragma: no cover - covered by behavior tests
+            self.foidb_client.rollback_request()
+            return self._result(
+                request_id=request_id,
+                status="failed",
+                reason=str(exc),
+                started_at=started_at,
+                foirequest_id=bundle["foirequest_id"],
+            )
+
     def _insert_request_bundle(self, request_id: str, parent_row: dict) -> dict:
         raw_payload = map_raw_request(parent_row, created_by=self.created_by)
         LOGGER.debug("Inserting FOI raw request for %s", request_id)
