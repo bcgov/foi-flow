@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 import main
@@ -164,6 +165,33 @@ def test_migrate_request_commits_successful_request() -> None:
     assert result["status"] == "migrated"
     assert result["foirequest_id"] == 11
     assert ("commit_request",) in foidb_client.calls
+
+
+def test_migrate_request_emits_debug_logs(caplog) -> None:
+    axis_client = FakeAxisClient(
+        parent={
+            "requestType": "general",
+            "receivedDate": "2020-01-02 10:00:00",
+            "requestdescription": "records",
+            "reqDescriptionFromDate": "",
+            "reqDescriptionToDate": "",
+            "receivedMode": "Email",
+            "category": "Media",
+            "filenumber": "XGR-2020-10982",
+        },
+        ministry={},
+        applicants=[],
+        contacts=[],
+    )
+    foidb_client = FakeFoidbClient(exists=False)
+    migrator = RequestMigrator(axis_client=axis_client, foidb_client=foidb_client)
+
+    with caplog.at_level(logging.DEBUG):
+        migrator.migrate_request("XGR-2020-10982")
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert any("Starting migration for request XGR-2020-10982" in message for message in messages)
+    assert any("Committed migration for request XGR-2020-10982" in message for message in messages)
 
 
 def test_main_processes_csv_and_writes_optional_results(tmp_path: Path) -> None:
