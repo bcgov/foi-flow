@@ -897,6 +897,7 @@ class FOIRawRequest(db.Model):
                 FOIRawRequest.requestrawdata['requestType']['requestType'].astext == 'proactive disclosure'
             )
         )
+        basequery = basequery.filter(FOIRawRequest.status.notin_(['Archived', 'Closed']))
 
         return basequery
 
