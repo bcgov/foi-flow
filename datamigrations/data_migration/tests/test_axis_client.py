@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+
 from axis_client import AxisClient
 
 
@@ -52,3 +54,16 @@ def test_axis_client_omits_status_filter_when_no_statuses_are_excluded() -> None
     query, params = connection.cursors[0].execute_calls[0]
     assert "requests.vcRequestStatus NOT IN" not in query
     assert params == ("XGR-2020-10982", "IAS")
+
+
+def test_axis_client_logs_sql_and_params(caplog) -> None:
+    connection = RecordingConnection(rows=[("XGR-2020-10982",)])
+    client = AxisClient(connection, office_code="IAS", excluded_statuses=("Closed",))
+
+    with caplog.at_level(logging.DEBUG):
+        client.fetch_parent_request("XGR-2020-10982")
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert any("Executing AXIS query:" in message for message in messages)
+    assert any("office.OFFICE_CODE = ?" in message for message in messages)
+    assert any("AXIS query params: ('XGR-2020-10982', 'IAS', 'Closed')" in message for message in messages)

@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+import logging
+
+
+LOGGER = logging.getLogger(__name__)
+
 
 PARENT_REQUEST_QUERY = """
 SELECT
@@ -109,14 +114,22 @@ class AxisClient:
         return (request_id, self.office_code, *self.excluded_statuses)
 
     def _fetch_one(self, query: str, request_id: str):
+        final_query = self._build_query(query)
+        params = self._build_params(request_id)
         cursor = self.connection.cursor()
-        cursor.execute(self._build_query(query), self._build_params(request_id))
+        LOGGER.debug("Executing AXIS query:\n%s", final_query)
+        LOGGER.debug("AXIS query params: %s", params)
+        cursor.execute(final_query, params)
         row = cursor.fetchone()
         return self._as_dict(cursor, row) if row else None
 
     def _fetch_all(self, query: str, request_id: str) -> list[dict]:
+        final_query = self._build_query(query)
+        params = self._build_params(request_id)
         cursor = self.connection.cursor()
-        cursor.execute(self._build_query(query), self._build_params(request_id))
+        LOGGER.debug("Executing AXIS query:\n%s", final_query)
+        LOGGER.debug("AXIS query params: %s", params)
+        cursor.execute(final_query, params)
         rows = cursor.fetchall()
         return [self._as_dict(cursor, row) for row in rows]
 
