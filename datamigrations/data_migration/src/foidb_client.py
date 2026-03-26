@@ -85,10 +85,11 @@ class FoidbClient:
         cursor = self._execute(
             """
             INSERT INTO public."FOIRequests" (
-                requesttype, receiveddate, initialdescription, initialrecordsearchfromdate,
-                initialrecordsearchtodate, receivedmodeid, applicantcategoryid, created_at,
-                updated_at, createdby, updatedby, migrationreference
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, %s)
+                version, requesttype, isactive, receiveddate, initialdescription,
+                initialrecordsearchfromdate, initialrecordsearchtodate, receivedmodeid,
+                applicantcategoryid, created_at, updated_at, createdby, updatedby,
+                migrationreference
+            ) VALUES (1, %s, FALSE, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, %s)
             RETURNING foirequestid, version
             """,
             (
@@ -114,10 +115,10 @@ class FoidbClient:
                 version, isactive, filenumber, description, recordsearchfromdate, recordsearchtodate,
                 startdate, duedate, created_at, updated_at, createdby, updatedby, programareaid,
                 requeststatusid, foirequest_id, foirequestversion_id, cfrduedate, axisrequestid,
-                requestpagecount, linkedrequests, migrationreference, identityverified, originalldd
+                axispagecount, linkedrequests, migrationreference, identityverified, originalldd, requeststatuslabel
             ) VALUES (
                 1, FALSE, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s::jsonb, %s, %s::jsonb, %s
+                %s, %s::jsonb, %s, %s::jsonb, %s, %s
             )
             """,
             (
@@ -135,11 +136,12 @@ class FoidbClient:
                 payload["foirequestversion_id"],
                 payload["cfrduedate"],
                 payload["filenumber"],
-                payload["requestpagecount"],
+                str(payload["requestpagecount"]),
                 json.dumps(payload["linkedrequests"]),
                 payload["migrationreference"],
                 json.dumps(payload["identityverified"]),
                 payload["originalldd"],
+                payload.get("requeststatuslabel", "Open"),
             ),
         )
 
@@ -185,7 +187,7 @@ class FoidbClient:
         self._execute(
             """
             INSERT INTO public."FOIRequestContactInformation" (
-                created_at, createdby, contacttypeid, dataformat, value,
+                created_at, createdby, contacttypeid, dataformat, contactinformation,
                 foirequest_id, foirequestversion_id
             ) VALUES (NOW(), %s, %s, %s, %s, %s, %s)
             """,

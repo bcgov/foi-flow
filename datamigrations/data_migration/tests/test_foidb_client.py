@@ -63,3 +63,80 @@ def test_foidb_client_keeps_psycopg_placeholders_for_non_odbc_connections() -> N
     query, params = connection.cursors[0].execute_calls[0]
     assert "migrationreference = %s" in query
     assert params == ("XGR-2020-10982",)
+
+
+def test_insert_parent_request_includes_required_version_and_isactive_columns() -> None:
+    connection = RecordingPsycopgConnection(row=(11, 1))
+    client = FoidbClient(connection)
+
+    client.insert_parent_request(
+        {
+            "requesttype": "general",
+            "receiveddate": None,
+            "initialdescription": "records",
+            "initialrecordsearchfromdate": None,
+            "initialrecordsearchtodate": None,
+            "receivedmodeid": 1,
+            "applicantcategoryid": 2,
+            "createdby": "migration",
+            "updatedby": "migration",
+            "migrationreference": "XGR-2020-10982",
+        }
+    )
+
+    query, _ = connection.cursors[0].execute_calls[0]
+    assert "version, requesttype, isactive" in query
+    assert "isactive" in query
+
+
+def test_insert_ministry_request_uses_schema_column_names() -> None:
+    connection = RecordingPsycopgConnection()
+    client = FoidbClient(connection)
+
+    client.insert_ministry_request(
+        {
+            "filenumber": "XGR-2020-10982",
+            "description": "records",
+            "recordsearchfromdate": None,
+            "recordsearchtodate": None,
+            "startdate": "2020-01-02 10:00:00",
+            "duedate": "2020-01-30 16:00:00",
+            "createdby": "migration",
+            "updatedby": "migration",
+            "programareaid": 2,
+            "requeststatusid": 4,
+            "foirequest_id": 11,
+            "foirequestversion_id": 1,
+            "cfrduedate": None,
+            "requestpagecount": 5,
+            "linkedrequests": [],
+            "migrationreference": "XGR-2020-10982",
+            "identityverified": None,
+            "originalldd": None,
+        }
+    )
+
+    query, _ = connection.cursors[0].execute_calls[0]
+    assert "requeststatuslabel" in query
+    assert "axispagecount" in query
+    assert "requestpagecount" not in query
+
+
+def test_insert_contact_information_uses_contactinformation_column() -> None:
+    connection = RecordingPsycopgConnection()
+    client = FoidbClient(connection)
+
+    client.insert_contact_information(
+        {
+            "createdby": "migration",
+            "contacttypeid": 1,
+            "dataformat": "email",
+            "value": "person@example.com",
+            "foirequest_id": 11,
+            "foirequestversion_id": 1,
+        }
+    )
+
+    query, _ = connection.cursors[0].execute_calls[0]
+    assert "contactinformation" in query
+    assert " value," not in query
