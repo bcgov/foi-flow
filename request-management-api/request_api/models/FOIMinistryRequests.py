@@ -1957,6 +1957,22 @@ class FOIMinistryRequest(db.Model):
             ))
             .outerjoin(ProactiveDisclosureCategory, ProactiveDisclosureCategory.proactivedisclosurecategoryid == latest_proactive.proactivedisclosurecategoryid)
             .outerjoin(iaoassignee, iaoassignee.username == FOIMinistryRequest.assignedto)
+            .join(ProgramArea, ProgramArea.programareaid == FOIMinistryRequest.programareaid)
+            .join(FOIRequestApplicantMapping,
+                        and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType.applicant.value),
+                        isouter=True
+            ).join(FOIRequestApplicant,
+                        FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
+                        isouter=True
+            ).outerjoin(FOIMinistryRequestSubjectCode, 
+                and_(
+                    FOIMinistryRequestSubjectCode.foiministryrequestid == FOIMinistryRequest.foiministryrequestid, FOIMinistryRequestSubjectCode.foiministryrequestversion == FOIMinistryRequest.version
+                )
+            ).join(
+                  SubjectCode,
+                  SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
+                  isouter=True
+            )
             .filter(FOIMinistryRequest.isactive == True)
         )
         if additionalfilter == 'watchingRequests':
@@ -1980,6 +1996,9 @@ class FOIMinistryRequest(db.Model):
                 or_(
                     FOIMinistryRequest.assignedto.isnot(None),
                     FOIMinistryRequest.assignedgroup.in_(groups)
+                    #,
+                    # FOIMinistryRequest.assignedministrygroup.in_(groups),
+                    # literal('OI Team').in_(groups)
                 )
             )
         return basequery

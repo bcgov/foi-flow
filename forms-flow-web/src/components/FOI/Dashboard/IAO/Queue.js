@@ -235,7 +235,7 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
         <DataGrid
           autoHeight
           className="foi-data-grid"
-          getRowId={(row) => row.foiopeninforequestid || row.idNumber || row.id}
+          getRowId={(row) => row.ministryrequestid || `req-${row.id}`}
           rows={rows}
           columns={columns}
           rowHeight={30}
