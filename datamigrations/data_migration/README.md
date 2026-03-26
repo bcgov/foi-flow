@@ -78,8 +78,6 @@ python -m pip install -r requirements.txt
 
 If your environment requires a different PostgreSQL package, install the driver your runtime expects and set `FOIDB_DB_DRIVER` accordingly.
 
-Because this subproject is not packaged, run commands with `PYTHONPATH=src`.
-
 Create a local environment file from the sample:
 
 ```bash
@@ -173,28 +171,26 @@ Behavior:
 Basic run:
 
 ```bash
-PYTHONPATH=src python -m main \
+python src/main.py \
   --input-csv ./requests.csv
 ```
 
 Windows PowerShell:
 
 ```powershell
-$env:PYTHONPATH = "src"
-python -m main --input-csv .\requests.csv
+python .\src\main.py --input-csv .\requests.csv
 ```
 
 Windows Command Prompt:
 
 ```bat
-set PYTHONPATH=src
-python -m main --input-csv .\requests.csv
+python .\src\main.py --input-csv .\requests.csv
 ```
 
 Write a results file:
 
 ```bash
-PYTHONPATH=src python -m main \
+python src/main.py \
   --input-csv ./requests.csv \
   --output-csv ./results.csv
 ```
@@ -202,7 +198,7 @@ PYTHONPATH=src python -m main \
 Validate only without committing:
 
 ```bash
-PYTHONPATH=src python -m main \
+python src/main.py \
   --input-csv ./requests.csv \
   --output-csv ./results.csv \
   --dry-run
@@ -211,7 +207,7 @@ PYTHONPATH=src python -m main \
 Process only the first 10 request IDs:
 
 ```bash
-PYTHONPATH=src python -m main \
+python src/main.py \
   --input-csv ./requests.csv \
   --limit 10
 ```
@@ -219,7 +215,7 @@ PYTHONPATH=src python -m main \
 Enable debug logging:
 
 ```bash
-PYTHONPATH=src python -m main \
+python src/main.py \
   --input-csv ./requests.csv \
   --log-level DEBUG
 ```
@@ -288,21 +284,19 @@ This separation keeps query logic, mapping rules, and orchestration concerns iso
 Run the test suite with:
 
 ```bash
-PYTHONPATH=src pytest
+python -m pytest
 ```
 
 Windows PowerShell:
 
 ```powershell
-$env:PYTHONPATH = "src"
-pytest
+python -m pytest
 ```
 
 Windows Command Prompt:
 
 ```bat
-set PYTHONPATH=src
-pytest
+python -m pytest
 ```
 
 Current tests cover:
