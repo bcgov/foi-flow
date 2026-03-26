@@ -19,7 +19,7 @@ def load_settings() -> Settings:
     required = {
         "AXIS_DB_DRIVER": os.getenv("AXIS_DB_DRIVER", "pyodbc"),
         "AXIS_DB_CONNECTION_STRING": os.getenv("AXIS_DB_CONNECTION_STRING"),
-        "FOIDB_DB_DRIVER": os.getenv("FOIDB_DB_DRIVER", "psycopg"),
+        "FOIDB_DB_DRIVER": os.getenv("FOIDB_DB_DRIVER", "pyodbc"),
         "FOIDB_DB_CONNECTION_STRING": os.getenv("FOIDB_DB_CONNECTION_STRING"),
     }
     missing = [name for name, value in required.items() if not value]

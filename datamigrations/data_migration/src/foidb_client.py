@@ -6,6 +6,21 @@ import json
 class FoidbClient:
     def __init__(self, connection):
         self.connection = connection
+        self._placeholder = self._resolve_placeholder()
+
+    def _resolve_placeholder(self) -> str:
+        module_name = type(self.connection).__module__.split(".", 1)[0]
+        return "?" if module_name == "pyodbc" else "%s"
+
+    def _query(self, template: str) -> str:
+        if self._placeholder == "%s":
+            return template
+        return template.replace("%s", "?")
+
+    def _execute(self, query: str, params=()):
+        cursor = self.connection.cursor()
+        cursor.execute(self._query(query), params)
+        return cursor
 
     def begin_request(self) -> None:
         return None
@@ -17,8 +32,7 @@ class FoidbClient:
         self.connection.rollback()
 
     def request_exists(self, request_id: str) -> bool:
-        cursor = self.connection.cursor()
-        cursor.execute(
+        cursor = self._execute(
             'SELECT 1 FROM public."FOIRequests" WHERE migrationreference = %s LIMIT 1',
             (request_id,),
         )
@@ -63,14 +77,12 @@ class FoidbClient:
         return result
 
     def _fetch_lookup_id(self, query: str, value):
-        cursor = self.connection.cursor()
-        cursor.execute(query, (value,))
+        cursor = self._execute(query, (value,))
         row = cursor.fetchone()
         return row[0] if row else None
 
     def insert_parent_request(self, payload: dict) -> dict:
-        cursor = self.connection.cursor()
-        cursor.execute(
+        cursor = self._execute(
             """
             INSERT INTO public."FOIRequests" (
                 requesttype, receiveddate, initialdescription, initialrecordsearchfromdate,
@@ -96,8 +108,7 @@ class FoidbClient:
         return {"foirequest_id": row[0], "version": row[1]}
 
     def insert_ministry_request(self, payload: dict) -> None:
-        cursor = self.connection.cursor()
-        cursor.execute(
+        self._execute(
             """
             INSERT INTO public."FOIMinistryRequests" (
                 version, isactive, filenumber, description, recordsearchfromdate, recordsearchtodate,
@@ -133,8 +144,7 @@ class FoidbClient:
         )
 
     def insert_applicant(self, payload: dict) -> int:
-        cursor = self.connection.cursor()
-        cursor.execute(
+        cursor = self._execute(
             """
             INSERT INTO public."FOIRequestApplicants" (
                 firstname, lastname, middlename, dob, businessname, created_at, createdby
@@ -154,8 +164,7 @@ class FoidbClient:
         return row[0]
 
     def insert_applicant_mapping(self, payload: dict) -> None:
-        cursor = self.connection.cursor()
-        cursor.execute(
+        self._execute(
             """
             INSERT INTO public."FOIRequestApplicantMappings" (
                 created_at, createdby, requestortypeid, foirequestapplicantid,
@@ -173,8 +182,7 @@ class FoidbClient:
         )
 
     def insert_contact_information(self, payload: dict) -> None:
-        cursor = self.connection.cursor()
-        cursor.execute(
+        self._execute(
             """
             INSERT INTO public."FOIRequestContactInformation" (
                 created_at, createdby, contacttypeid, dataformat, value,

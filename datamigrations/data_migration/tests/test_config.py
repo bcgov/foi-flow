@@ -6,6 +6,7 @@ from config import load_settings
 def test_load_settings_uses_default_axis_filters(monkeypatch) -> None:
     monkeypatch.setenv("AXIS_DB_CONNECTION_STRING", "axis-conn")
     monkeypatch.setenv("FOIDB_DB_CONNECTION_STRING", "foidb-conn")
+    monkeypatch.delenv("FOIDB_DB_DRIVER", raising=False)
     monkeypatch.delenv("AXIS_OFFICE_CODE", raising=False)
     monkeypatch.delenv("AXIS_EXCLUDED_STATUSES", raising=False)
 
@@ -13,6 +14,7 @@ def test_load_settings_uses_default_axis_filters(monkeypatch) -> None:
 
     assert settings.axis_office_code == "CFD"
     assert settings.axis_excluded_statuses == ("Closed", "Completed")
+    assert settings.foidb_driver == "pyodbc"
 
 
 def test_load_settings_parses_axis_filters_from_environment(monkeypatch) -> None:

@@ -40,9 +40,8 @@ Local execution assumes:
 - Python 3.11 or newer
 - access to the source AXIS database
 - access to the target FOIDB PostgreSQL database
-- a SQL Server Python driver for AXIS access, typically `pyodbc`
-- a PostgreSQL Python driver for FOIDB access, typically `psycopg`
-- system-level ODBC support if `pyodbc` is used
+- ODBC-capable Python database access, typically `pyodbc`
+- SQL Server and PostgreSQL ODBC drivers installed on the machine
 
 ## Local Setup
 
@@ -76,7 +75,7 @@ Install the Python dependencies used by this project:
 python -m pip install -r requirements.txt
 ```
 
-If your environment requires a different PostgreSQL package, install the driver your runtime expects and set `FOIDB_DB_DRIVER` accordingly.
+If your environment requires a different Python database package, install the driver your runtime expects and set `AXIS_DB_DRIVER` or `FOIDB_DB_DRIVER` accordingly.
 
 Create a local environment file from the sample:
 
@@ -124,19 +123,19 @@ Optional variables:
 - `AXIS_DB_DRIVER`: Python module used to connect to AXIS. Default: `pyodbc`
 - `AXIS_OFFICE_CODE`: AXIS office code used to scope source queries and FOIDB program area lookup. Default: `CFD`
 - `AXIS_EXCLUDED_STATUSES`: comma-separated AXIS request statuses to exclude. Default: `Closed,Completed`
-- `FOIDB_DB_DRIVER`: Python module used to connect to FOIDB. Default: `psycopg`
+- `FOIDB_DB_DRIVER`: Python module used to connect to FOIDB. Default: `pyodbc`
 - `DATA_MIGRATION_CREATED_BY`: audit value written into created/updated fields. Default: `cfdmigration`
 
 Example local environment:
 
 ```bash
 export AXIS_DB_DRIVER=pyodbc
-export AXIS_DB_CONNECTION_STRING='DRIVER={ODBC Driver 18 for SQL Server};SERVER=axis-host;DATABASE=AXIS;UID=axis_user;PWD=axis_password;Encrypt=yes;TrustServerCertificate=yes'
+export AXIS_DB_CONNECTION_STRING='DRIVER={ODBC Driver 17 for SQL Server};SERVER=Sphinx\CIRMO,1435;DATABASE=ATIPIPROD;Trusted_Connection=yes;Encrypt=no;'
 export AXIS_OFFICE_CODE=CFD
 export AXIS_EXCLUDED_STATUSES='Closed,Completed'
 
-export FOIDB_DB_DRIVER=psycopg
-export FOIDB_DB_CONNECTION_STRING='host=foidb-host dbname=foidb user=foidb_user password=foidb_password port=5432'
+export FOIDB_DB_DRIVER=pyodbc
+export FOIDB_DB_CONNECTION_STRING='DRIVER={PostgreSQL Unicode(x64)};SERVER=foidb-host;PORT=5432;DATABASE=foidb;UID=foidb_user;PWD=foidb_password;SSLmode=require;'
 
 export DATA_MIGRATION_CREATED_BY=cfdmigration
 ```
@@ -145,6 +144,8 @@ Notes:
 
 - `AXIS_DB_DRIVER` and `FOIDB_DB_DRIVER` are imported as Python modules. The value must match an installed importable package.
 - The connection string format depends on the selected driver.
+- The AXIS example above uses Windows integrated authentication through the SQL Server ODBC driver. On Windows, make sure `ODBC Driver 17 for SQL Server` is installed and that your current Windows account is allowed to connect.
+- The FOIDB example above uses a PostgreSQL ODBC driver. On Windows, make sure the PostgreSQL Unicode ODBC driver name in the connection string matches the driver installed on the machine.
 - `AXIS_EXCLUDED_STATUSES` is trimmed and split on commas. Set it to an empty string to include all statuses.
 - Missing required variables cause startup to fail with a `ValueError`.
 
