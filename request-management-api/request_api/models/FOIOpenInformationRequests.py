@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship, backref, aliased
 from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc, literal_column
 from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.sql.sqltypes import Date, Integer
-from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup, OICloseReason, ExcludedProgramArea, OIStatusEnum
+from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup, OICloseReason, ExcludedProgramArea, OIStatusEnum, RequestorType
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIAssignees import FOIAssignee
 from .FOIRequests import FOIRequest
@@ -201,9 +201,9 @@ class FOIOpenInformationRequests(db.Model):
             ApplicantCategory.name.label('applicantcategory'),
             recordspagecount.label('recordspagecount'),  
             oistatusname.label('oiStatusName'),
-            cls.receiveddate.label('receivedDate'),
+            func.coalesce(cls.receiveddate, FOIMinistryRequest.closedate).label('receivedDate'),
             cls.publicationdate.label('publicationdate'),
-            cls.created_at.label('created_at'), 
+            FOIMinistryRequest.created_at.label('created_at'), 
             assignedToFormatted.label('assignedToFormatted'), 
             FOIMinistryRequest.oistatus_id.label('oistatus_id'),
             cls.version.label('version'),
@@ -218,12 +218,15 @@ class FOIOpenInformationRequests(db.Model):
 
         basequery = (
             _session.query(*selectedcolumns)
-            .join(subquery_maxversion, and_(*joincondition))
-            .join(FOIMinistryRequest, and_(
-                FOIMinistryRequest.foiministryrequestid == cls.foiministryrequest_id, 
-                FOIMinistryRequest.isactive == True,
-            ))
+            # .join(subquery_maxversion, and_(*joincondition))
+            # .join(FOIMinistryRequest, and_(
+            #     FOIMinistryRequest.foiministryrequestid == cls.foiministryrequest_id, 
+            #     FOIMinistryRequest.isactive == True,
+            # ))
+            .select_from(FOIMinistryRequest)
             .join(FOIRequest, and_(FOIRequest.foirequestid == FOIMinistryRequest.foirequest_id, FOIRequest.version == FOIMinistryRequest.foirequestversion_id, FOIRequest.requesttype != 'personal'))
+            .outerjoin(cls, cls.foiministryrequest_id == FOIMinistryRequest.foiministryrequestid)
+            .outerjoin(subquery_maxversion, and_(subquery_maxversion.c.foiopeninforequestid == cls.foiopeninforequestid, subquery_maxversion.c.max_version == cls.version))
             .join(ApplicantCategory,and_(ApplicantCategory.applicantcategoryid == FOIRequest.applicantcategoryid, ApplicantCategory.isactive == True))
             .outerjoin(OpenInformationStatuses, OpenInformationStatuses.oistatusid == FOIMinistryRequest.oistatus_id)
             .join(FOIRequestStatus, FOIRequestStatus.requeststatusid == FOIMinistryRequest.requeststatusid)
@@ -233,7 +236,14 @@ class FOIOpenInformationRequests(db.Model):
                                     FOIRestrictedMinistryRequest.type == 'iao',
                                     FOIRestrictedMinistryRequest.isactive == True),
                                 isouter=True
-            ).outerjoin(FOIAssignee, FOIAssignee.username == cls.oiassignedto)
+            ).outerjoin(FOIAssignee, FOIAssignee.username == cls.oiassignedto
+            ).join(FOIRequestApplicantMapping,
+                        and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType.applicant.value),
+                        isouter=True
+            ).join(FOIRequestApplicant,
+                        FOIRequestApplicant.foirequestapplicantid == FOIRequestApplicantMapping.foirequestapplicantid,
+                        isouter=True
+            )
             .outerjoin(FOIMinistryRequestSubjectCode, 
                 and_(
                     FOIMinistryRequestSubjectCode.foiministryrequestid == FOIMinistryRequest.foiministryrequestid, FOIMinistryRequestSubjectCode.foiministryrequestversion == FOIMinistryRequest.version
@@ -243,7 +253,10 @@ class FOIOpenInformationRequests(db.Model):
                   SubjectCode,
                   SubjectCode.subjectcodeid == FOIMinistryRequestSubjectCode.subjectcodeid,
                   isouter=True
-                 )
+            ).join(
+                ProgramArea,
+                ProgramArea.programareaid == FOIMinistryRequest.programareaid
+            ).filter(and_(FOIMinistryRequest.isactive == True, or_(cls.isactive == True, cls.isactive.is_(None))))
         )
 
         if not isadvancedsearch:
@@ -324,6 +337,10 @@ class FOIOpenInformationRequests(db.Model):
 
             sortingcondition.append(default_sort)
             sortingcondition.append(cls.findsortfield('receivedDate').desc() if isunion else cls.findfield('receivedDate').desc())
+            sortingcondition.append(cls.findsortfield('axisRequestId').desc() if isunion else cls.findfield('axisRequestId').desc())
+
+        #always sort by created_at last to prevent pagination collisions
+        sortingcondition.append(asc('created_at'))
         
         return sortingcondition
 
@@ -411,7 +428,7 @@ class FOIOpenInformationRequests(db.Model):
         elif field == 'subjectcode':
             return SubjectCode.name
         elif (field == 'proactivedisclosurecategory' or field == 'proactiveDisclosureCategory'):
-            return ProactiveDisclosureCategory.name
+            return literal(None)
         elif (field == 'requestType'):
             return FOIRequest.requesttype
         else:

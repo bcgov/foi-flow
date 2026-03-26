@@ -49,6 +49,7 @@ class dashboardservice:
             request.recordsearchfromdate,
             request.recordsearchtodate,
         )
+        baserequestinfo.update({'foirequestid': request.id})
         baserequestinfo.update({'firstName': request.firstName})
         baserequestinfo.update({'lastName': request.lastName})
         baserequestinfo.update({'xgov': 'No'})
@@ -269,6 +270,7 @@ class dashboardservice:
     def __preparefoioirequestinfo(self, request, receivedDate, publicationDate, fromClosed, cfrDueDate):
         return {
             'id': request.id,
+            'foirequestid': request.id,
             'idNumber': request.idNumber,
             'ministryrequestid': request.ministryrequestid,
             'receivedDate': receivedDate,
