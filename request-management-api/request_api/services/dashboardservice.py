@@ -285,6 +285,7 @@ class dashboardservice:
             'foiopeninforequestid': request.foiopeninforequestid,
             'closedDate': fromClosed,
             'cfrduedate': cfrDueDate,
+            'currentState': request.currentState,
             'proactivedisclosurecategory': request.proactivedisclosurecategory if request.requestType in ['proactive disclosure', 'PD'] else None
         }
 
