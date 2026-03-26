@@ -135,7 +135,7 @@ export AXIS_OFFICE_CODE=CFD
 export AXIS_EXCLUDED_STATUSES='Closed,Completed'
 
 export FOIDB_DB_DRIVER=pyodbc
-export FOIDB_DB_CONNECTION_STRING='DRIVER={PostgreSQL Unicode(x64)};SERVER=foidb-host;PORT=5432;DATABASE=foidb;UID=foidb_user;PWD=foidb_password;SSLmode=require;'
+export FOIDB_DB_CONNECTION_STRING='FOIDB_DSN'
 
 export DATA_MIGRATION_CREATED_BY=cfdmigration
 ```
@@ -145,7 +145,7 @@ Notes:
 - `AXIS_DB_DRIVER` and `FOIDB_DB_DRIVER` are imported as Python modules. The value must match an installed importable package.
 - The connection string format depends on the selected driver.
 - The AXIS example above uses Windows integrated authentication through the SQL Server ODBC driver. On Windows, make sure `ODBC Driver 17 for SQL Server` is installed and that your current Windows account is allowed to connect.
-- The FOIDB example above uses a PostgreSQL ODBC driver. On Windows, make sure the PostgreSQL Unicode ODBC driver name in the connection string matches the driver installed on the machine.
+- `FOIDB_DB_CONNECTION_STRING` also accepts a bare DSN name such as `FOIDB_DSN`. The application normalizes that to `DSN=FOIDB_DSN;` before connecting.
 - `AXIS_EXCLUDED_STATUSES` is trimmed and split on commas. Set it to an empty string to include all statuses.
 - Missing required variables cause startup to fail with a `ValueError`.
 

@@ -15,12 +15,26 @@ class Settings:
     created_by: str = "cfdmigration"
 
 
+def _normalize_foidb_connection_string(value: str | None) -> str | None:
+    if value is None:
+        return None
+
+    candidate = value.strip()
+    if not candidate:
+        return candidate
+
+    if "=" in candidate or ";" in candidate:
+        return candidate
+
+    return f"DSN={candidate};"
+
+
 def load_settings() -> Settings:
     required = {
         "AXIS_DB_DRIVER": os.getenv("AXIS_DB_DRIVER", "pyodbc"),
         "AXIS_DB_CONNECTION_STRING": os.getenv("AXIS_DB_CONNECTION_STRING"),
         "FOIDB_DB_DRIVER": os.getenv("FOIDB_DB_DRIVER", "pyodbc"),
-        "FOIDB_DB_CONNECTION_STRING": os.getenv("FOIDB_DB_CONNECTION_STRING"),
+        "FOIDB_DB_CONNECTION_STRING": _normalize_foidb_connection_string(os.getenv("FOIDB_DB_CONNECTION_STRING")),
     }
     missing = [name for name, value in required.items() if not value]
     if missing:

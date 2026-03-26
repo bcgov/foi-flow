@@ -27,3 +27,12 @@ def test_load_settings_parses_axis_filters_from_environment(monkeypatch) -> None
 
     assert settings.axis_office_code == "IAS"
     assert settings.axis_excluded_statuses == ("Closed", "Completed", "On Hold")
+
+
+def test_load_settings_accepts_bare_foidb_dsn_name(monkeypatch) -> None:
+    monkeypatch.setenv("AXIS_DB_CONNECTION_STRING", "axis-conn")
+    monkeypatch.setenv("FOIDB_DB_CONNECTION_STRING", "FOIDB_DSN")
+
+    settings = load_settings()
+
+    assert settings.foidb_connection_string == "DSN=FOIDB_DSN;"
