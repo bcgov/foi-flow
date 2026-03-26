@@ -1,0 +1,192 @@
+from __future__ import annotations
+
+import json
+
+
+class FoidbClient:
+    def __init__(self, connection):
+        self.connection = connection
+
+    def begin_request(self) -> None:
+        return None
+
+    def commit_request(self) -> None:
+        self.connection.commit()
+
+    def rollback_request(self) -> None:
+        self.connection.rollback()
+
+    def request_exists(self, request_id: str) -> bool:
+        cursor = self.connection.cursor()
+        cursor.execute(
+            'SELECT 1 FROM public."FOIRequests" WHERE migrationreference = %s LIMIT 1',
+            (request_id,),
+        )
+        return cursor.fetchone() is not None
+
+    def resolve_received_mode_id(self, received_mode_name: str) -> int | None:
+        return self._fetch_lookup_id('SELECT receivedmodeid FROM public."ReceivedModes" WHERE name = %s LIMIT 1', received_mode_name)
+
+    def resolve_applicant_category_id(self, category_name: str | None) -> int | None:
+        if not category_name:
+            return None
+        return self._fetch_lookup_id(
+            'SELECT applicantcategoryid FROM public."ApplicantCategories" WHERE name = %s LIMIT 1',
+            category_name,
+        )
+
+    def resolve_program_area_id(self, iao_code: str = "CFD") -> int:
+        result = self._fetch_lookup_id(
+            'SELECT programareaid FROM public."ProgramAreas" WHERE iaocode = %s AND isactive = TRUE LIMIT 1',
+            iao_code,
+        )
+        if result is None:
+            raise ValueError(f"Program area not found for iaocode={iao_code}.")
+        return result
+
+    def resolve_request_status_id(self, name: str = "Open") -> int:
+        result = self._fetch_lookup_id(
+            'SELECT requeststatusid FROM public."FOIRequestStatuses" WHERE name = %s AND isactive = TRUE LIMIT 1',
+            name,
+        )
+        if result is None:
+            raise ValueError(f"Request status not found for name={name}.")
+        return result
+
+    def resolve_requestor_type_id(self, requestor_type_name: str) -> int:
+        result = self._fetch_lookup_id(
+            'SELECT requestortypeid FROM public."RequestorTypes" WHERE name = %s LIMIT 1',
+            requestor_type_name,
+        )
+        if result is None:
+            raise ValueError(f"Requestor type not found for name={requestor_type_name}.")
+        return result
+
+    def _fetch_lookup_id(self, query: str, value):
+        cursor = self.connection.cursor()
+        cursor.execute(query, (value,))
+        row = cursor.fetchone()
+        return row[0] if row else None
+
+    def insert_parent_request(self, payload: dict) -> dict:
+        cursor = self.connection.cursor()
+        cursor.execute(
+            """
+            INSERT INTO public."FOIRequests" (
+                requesttype, receiveddate, initialdescription, initialrecordsearchfromdate,
+                initialrecordsearchtodate, receivedmodeid, applicantcategoryid, created_at,
+                updated_at, createdby, updatedby, migrationreference
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, %s)
+            RETURNING foirequestid, version
+            """,
+            (
+                payload["requesttype"],
+                payload["receiveddate"],
+                payload["initialdescription"],
+                payload["initialrecordsearchfromdate"],
+                payload["initialrecordsearchtodate"],
+                payload["receivedmodeid"],
+                payload["applicantcategoryid"],
+                payload["createdby"],
+                payload["updatedby"],
+                payload["migrationreference"],
+            ),
+        )
+        row = cursor.fetchone()
+        return {"foirequest_id": row[0], "version": row[1]}
+
+    def insert_ministry_request(self, payload: dict) -> None:
+        cursor = self.connection.cursor()
+        cursor.execute(
+            """
+            INSERT INTO public."FOIMinistryRequests" (
+                version, isactive, filenumber, description, recordsearchfromdate, recordsearchtodate,
+                startdate, duedate, created_at, updated_at, createdby, updatedby, programareaid,
+                requeststatusid, foirequest_id, foirequestversion_id, cfrduedate, axisrequestid,
+                requestpagecount, linkedrequests, migrationreference, identityverified, originalldd
+            ) VALUES (
+                1, FALSE, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s, %s, %s,
+                %s, %s::jsonb, %s, %s::jsonb, %s
+            )
+            """,
+            (
+                payload["filenumber"],
+                payload["description"],
+                payload["recordsearchfromdate"],
+                payload["recordsearchtodate"],
+                payload["startdate"],
+                payload["duedate"],
+                payload["createdby"],
+                payload["updatedby"],
+                payload["programareaid"],
+                payload["requeststatusid"],
+                payload["foirequest_id"],
+                payload["foirequestversion_id"],
+                payload["cfrduedate"],
+                payload["filenumber"],
+                payload["requestpagecount"],
+                json.dumps(payload["linkedrequests"]),
+                payload["migrationreference"],
+                json.dumps(payload["identityverified"]),
+                payload["originalldd"],
+            ),
+        )
+
+    def insert_applicant(self, payload: dict) -> int:
+        cursor = self.connection.cursor()
+        cursor.execute(
+            """
+            INSERT INTO public."FOIRequestApplicants" (
+                firstname, lastname, middlename, dob, businessname, created_at, createdby
+            ) VALUES (%s, %s, %s, %s, %s, NOW(), %s)
+            RETURNING foirequestapplicantid
+            """,
+            (
+                payload["firstname"],
+                payload["lastname"],
+                payload["middlename"],
+                payload["dob"],
+                payload["businessname"],
+                payload["createdby"],
+            ),
+        )
+        row = cursor.fetchone()
+        return row[0]
+
+    def insert_applicant_mapping(self, payload: dict) -> None:
+        cursor = self.connection.cursor()
+        cursor.execute(
+            """
+            INSERT INTO public."FOIRequestApplicantMappings" (
+                created_at, createdby, requestortypeid, foirequestapplicantid,
+                foirequest_id, foirequestversion_id, migrationreference
+            ) VALUES (NOW(), %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                payload["createdby"],
+                payload["requestortypeid"],
+                payload["foirequestapplicantid"],
+                payload["foirequest_id"],
+                payload["foirequestversion_id"],
+                payload["migrationreference"],
+            ),
+        )
+
+    def insert_contact_information(self, payload: dict) -> None:
+        cursor = self.connection.cursor()
+        cursor.execute(
+            """
+            INSERT INTO public."FOIRequestContactInformation" (
+                created_at, createdby, contacttypeid, dataformat, value,
+                foirequest_id, foirequestversion_id
+            ) VALUES (NOW(), %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                payload["createdby"],
+                payload["contacttypeid"],
+                payload["dataformat"],
+                payload["value"],
+                payload["foirequest_id"],
+                payload["foirequestversion_id"],
+            ),
+        )
