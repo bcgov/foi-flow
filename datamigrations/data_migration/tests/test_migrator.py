@@ -46,8 +46,12 @@ class FakeFoidbClient:
     def rollback_request(self):
         self.calls.append(("rollback_request",))
 
+    def insert_raw_request(self, payload):
+        self.calls.append(("insert_raw_request", payload["axisrequestid"]))
+        return {"foirawrequest_id": 31, "version": 1}
+
     def insert_parent_request(self, payload):
-        self.calls.append(("insert_parent_request", payload["migrationreference"]))
+        self.calls.append(("insert_parent_request", payload["migrationreference"], payload.get("foirawrequestid")))
         return {"foirequest_id": 11, "version": 1}
 
     def resolve_received_mode_id(self, received_mode_name: str) -> int:
@@ -165,6 +169,34 @@ def test_migrate_request_commits_successful_request() -> None:
     assert result["status"] == "migrated"
     assert result["foirequest_id"] == 11
     assert ("commit_request",) in foidb_client.calls
+
+
+def test_migrate_request_inserts_raw_request_before_parent_request() -> None:
+    axis_client = FakeAxisClient(
+        parent={
+            "requestType": "general",
+            "receivedDate": "2020-01-02 10:00:00",
+            "requestdescription": "records",
+            "reqDescriptionFromDate": "",
+            "reqDescriptionToDate": "",
+            "receivedMode": "Email",
+            "category": "Media",
+            "filenumber": "XGR-2020-10982",
+            "status": "Open",
+            "linkedRequests": "[]",
+        },
+        ministry={},
+        applicants=[],
+        contacts=[],
+    )
+    foidb_client = FakeFoidbClient(exists=False)
+    migrator = RequestMigrator(axis_client=axis_client, foidb_client=foidb_client)
+
+    migrator.migrate_request("XGR-2020-10982")
+
+    assert foidb_client.calls.index(("insert_raw_request", "XGR-2020-10982")) < foidb_client.calls.index(
+        ("insert_parent_request", "XGR-2020-10982", 31)
+    )
 
 
 def test_migrate_request_emits_debug_logs(caplog) -> None:

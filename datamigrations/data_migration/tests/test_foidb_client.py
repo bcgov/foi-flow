@@ -89,6 +89,41 @@ def test_insert_parent_request_includes_required_version_and_isactive_columns() 
     assert "isactive" in query
 
 
+def test_insert_raw_request_returns_request_identifier_and_uses_schema_columns() -> None:
+    connection = RecordingPsycopgConnection(row=(21, 1))
+    client = FoidbClient(connection)
+
+    result = client.insert_raw_request(
+        {
+            "requestrawdata": {"filenumber": "XGR-2020-10982"},
+            "status": "Open",
+            "notes": None,
+            "assignedto": None,
+            "sourceofsubmission": "Email",
+            "assignedgroup": None,
+            "ispiiredacted": False,
+            "createdby": "migration",
+            "updatedby": "migration",
+            "requirespayment": False,
+            "closedate": None,
+            "closereasonid": None,
+            "axisrequestid": "XGR-2020-10982",
+            "axissyncdate": None,
+            "isiaorestricted": False,
+            "linkedrequests": [],
+            "requeststatuslabel": "Open",
+            "isconsultflag": False,
+        }
+    )
+
+    assert result == {"foirawrequest_id": 21, "version": 1}
+    query, _ = connection.cursors[0].execute_calls[0]
+    assert 'INSERT INTO public."FOIRawRequests"' in query
+    assert "requestrawdata" in query
+    assert "axisrequestid" in query
+    assert "requeststatuslabel" in query
+
+
 def test_insert_ministry_request_uses_schema_column_names() -> None:
     connection = RecordingPsycopgConnection()
     client = FoidbClient(connection)

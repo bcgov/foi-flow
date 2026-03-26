@@ -1,6 +1,6 @@
 from mappers.applicants import map_applicant, map_applicant_mapping
 from mappers.contact_information import map_contact_rows
-from mappers.requests import map_ministry_request, map_parent_request
+from mappers.requests import map_ministry_request, map_parent_request, map_raw_request
 
 
 def test_map_parent_request_builds_foirequest_payload() -> None:
@@ -42,6 +42,23 @@ def test_map_ministry_request_preserves_json_fields() -> None:
     assert payload["requestpagecount"] == 5
     assert payload["linkedrequests"] == [{"XGR-2020-00001": "CFD"}]
     assert payload["identityverified"] == "yes"
+
+
+def test_map_raw_request_builds_raw_payload() -> None:
+    payload = map_raw_request(
+        {
+            "filenumber": "XGR-2020-10982",
+            "status": "Open",
+            "requestdescription": "records",
+            "receivedMode": "Email",
+            "linkedRequests": '[{"XGR-2020-00001":"CFD"}]',
+        }
+    )
+
+    assert payload["axisrequestid"] == "XGR-2020-10982"
+    assert payload["sourceofsubmission"] == "Email"
+    assert payload["requestrawdata"]["requestdescription"] == "records"
+    assert payload["linkedrequests"] == [{"XGR-2020-00001": "CFD"}]
 
 
 def test_map_applicant_sets_main_applicant_fields() -> None:

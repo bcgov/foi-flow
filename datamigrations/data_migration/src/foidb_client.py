@@ -81,6 +81,44 @@ class FoidbClient:
         row = cursor.fetchone()
         return row[0] if row else None
 
+    def insert_raw_request(self, payload: dict) -> dict:
+        cursor = self._execute(
+            """
+            INSERT INTO public."FOIRawRequests" (
+                requestrawdata, status, notes, created_at, version, updated_at, assignedto,
+                updatedby, sourceofsubmission, assignedgroup, ispiiredacted, createdby,
+                requirespayment, closedate, closereasonid, axisrequestid, axissyncdate,
+                isiaorestricted, linkedrequests, requeststatuslabel, isconsultflag
+            ) VALUES (
+                %s::jsonb, %s, %s, NOW(), 1, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                %s, %s, %s::jsonb, %s, %s
+            )
+            RETURNING requestid, version
+            """,
+            (
+                json.dumps(payload["requestrawdata"]),
+                payload["status"],
+                payload["notes"],
+                payload["assignedto"],
+                payload["updatedby"],
+                payload["sourceofsubmission"],
+                payload["assignedgroup"],
+                payload["ispiiredacted"],
+                payload["createdby"],
+                payload["requirespayment"],
+                payload["closedate"],
+                payload["closereasonid"],
+                payload["axisrequestid"],
+                payload["axissyncdate"],
+                payload["isiaorestricted"],
+                json.dumps(payload["linkedrequests"]),
+                payload["requeststatuslabel"],
+                payload["isconsultflag"],
+            ),
+        )
+        row = cursor.fetchone()
+        return {"foirawrequest_id": row[0], "version": row[1]}
+
     def insert_parent_request(self, payload: dict) -> dict:
         cursor = self._execute(
             """
@@ -88,8 +126,8 @@ class FoidbClient:
                 version, requesttype, isactive, receiveddate, initialdescription,
                 initialrecordsearchfromdate, initialrecordsearchtodate, receivedmodeid,
                 applicantcategoryid, created_at, updated_at, createdby, updatedby,
-                migrationreference
-            ) VALUES (1, %s, FALSE, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, %s)
+                foirawrequestid, migrationreference
+            ) VALUES (1, %s, FALSE, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, %s, %s)
             RETURNING foirequestid, version
             """,
             (
@@ -102,6 +140,7 @@ class FoidbClient:
                 payload["applicantcategoryid"],
                 payload["createdby"],
                 payload["updatedby"],
+                payload.get("foirawrequestid"),
                 payload["migrationreference"],
             ),
         )
