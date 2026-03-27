@@ -196,7 +196,7 @@ class FoidbClient:
                 initialrecordsearchfromdate, initialrecordsearchtodate, receivedmodeid,
                 applicantcategoryid, created_at, updated_at, createdby, updatedby,
                 foirawrequestid, migrationreference
-            ) VALUES (1, %s, FALSE, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, %s, %s)
+            ) VALUES (1, %s, TRUE, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, %s, %s)
             RETURNING foirequestid, version
             """,
             (
@@ -225,7 +225,7 @@ class FoidbClient:
                 requeststatusid, foirequest_id, foirequestversion_id, cfrduedate, axisrequestid,
                 axispagecount, linkedrequests, migrationreference, identityverified, originalldd, requeststatuslabel
             ) VALUES (
-                1, FALSE, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s, %s, %s,
+                1, TRUE, %s, %s, %s, %s, %s, %s, NOW(), NOW(), %s, %s, %s, %s, %s, %s, %s, %s,
                 %s, %s::jsonb, %s, %s::jsonb, %s, %s
             )
             """,
