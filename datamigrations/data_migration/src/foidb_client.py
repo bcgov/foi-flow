@@ -153,7 +153,7 @@ class FoidbClient:
 
     def resolve_program_area_id(self, iao_code: str = "CFD") -> int:
         result = self._fetch_lookup_id(
-            'SELECT programareaid FROM public."ProgramAreas" WHERE iaocode = %s AND isactive = TRUE LIMIT 1',
+            'SELECT programareaid FROM public."ProgramAreas" WHERE iaocode = %s LIMIT 1',
             iao_code,
         )
         if result is None:
@@ -249,7 +249,7 @@ class FoidbClient:
                 payload["migrationreference"],
                 json.dumps(payload["identityverified"]),
                 payload["originalldd"],
-                payload.get("requeststatuslabel", "Open"),
+                str(payload.get("requeststatuslabel", "closed")).lower(),
             ),
         )
 
