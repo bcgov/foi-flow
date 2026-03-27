@@ -89,41 +89,6 @@ def test_insert_parent_request_includes_required_version_and_isactive_columns() 
     assert "isactive" in query
 
 
-def test_insert_raw_request_returns_request_identifier_and_uses_schema_columns() -> None:
-    connection = RecordingPsycopgConnection(row=(21, 1))
-    client = FoidbClient(connection)
-
-    result = client.insert_raw_request(
-        {
-            "requestrawdata": {"filenumber": "XGR-2020-10982"},
-            "status": "Open",
-            "notes": None,
-            "assignedto": None,
-            "sourceofsubmission": "Email",
-            "assignedgroup": None,
-            "ispiiredacted": False,
-            "createdby": "migration",
-            "updatedby": "migration",
-            "requirespayment": False,
-            "closedate": None,
-            "closereasonid": None,
-            "axisrequestid": "XGR-2020-10982",
-            "axissyncdate": None,
-            "isiaorestricted": False,
-            "linkedrequests": [],
-            "requeststatuslabel": "Open",
-            "isconsultflag": False,
-        }
-    )
-
-    assert result == {"foirawrequest_id": 21, "version": 1}
-    query, _ = connection.cursors[0].execute_calls[0]
-    assert 'INSERT INTO public."FOIRawRequests"' in query
-    assert "requestrawdata" in query
-    assert "axisrequestid" in query
-    assert "requeststatuslabel" in query
-
-
 def test_insert_ministry_request_uses_schema_column_names() -> None:
     connection = RecordingPsycopgConnection()
     client = FoidbClient(connection)
@@ -178,12 +143,12 @@ def test_insert_contact_information_uses_contactinformation_column() -> None:
 
 
 def test_find_request_bundle_queries_by_migrationreference() -> None:
-    connection = RecordingPsycopgConnection(row=(11, 1, 21))
+    connection = RecordingPsycopgConnection(row=(11, 1))
     client = FoidbClient(connection)
 
     bundle = client.find_request_bundle("XGR-2020-10982")
 
-    assert bundle == {"foirequest_id": 11, "foirequestversion_id": 1, "foirawrequestid": 21}
+    assert bundle == {"foirequest_id": 11, "foirequestversion_id": 1}
     query, params = connection.cursors[0].execute_calls[0]
     assert "migrationreference = %s" in query
     assert params == ("XGR-2020-10982",)
@@ -193,7 +158,7 @@ def test_preview_delete_counts_returns_per_table_counts() -> None:
     connection = RecordingPsycopgConnection(row=(3,))
     client = FoidbClient(connection)
 
-    counts = client.preview_delete_counts({"foirequest_id": 11, "foirequestversion_id": 1, "foirawrequestid": 21})
+    counts = client.preview_delete_counts({"foirequest_id": 11, "foirequestversion_id": 1})
 
     assert counts == {
         "FOIRequestContactInformation": 3,
@@ -201,7 +166,6 @@ def test_preview_delete_counts_returns_per_table_counts() -> None:
         "FOIRequestApplicants": 3,
         "FOIMinistryRequests": 3,
         "FOIRequests": 1,
-        "FOIRawRequests": 1,
     }
     assert len(connection.cursors) == 4
 
@@ -210,7 +174,7 @@ def test_delete_request_bundle_executes_queries_in_fk_safe_order() -> None:
     connection = RecordingPsycopgConnection()
     client = FoidbClient(connection)
 
-    client.delete_request_bundle({"foirequest_id": 11, "foirequestversion_id": 1, "foirawrequestid": 21})
+    client.delete_request_bundle({"foirequest_id": 11, "foirequestversion_id": 1})
 
     queries = [cursor.execute_calls[0][0] for cursor in connection.cursors]
     assert 'DELETE FROM public."FOIRequestContactInformation"' in queries[0]
@@ -218,4 +182,4 @@ def test_delete_request_bundle_executes_queries_in_fk_safe_order() -> None:
     assert 'DELETE FROM public."FOIRequestApplicants"' in queries[2]
     assert 'DELETE FROM public."FOIMinistryRequests"' in queries[3]
     assert 'DELETE FROM public."FOIRequests"' in queries[4]
-    assert 'DELETE FROM public."FOIRawRequests"' in queries[5]
+    assert len(queries) == 5

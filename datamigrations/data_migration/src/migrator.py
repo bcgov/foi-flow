@@ -5,7 +5,7 @@ import logging
 
 from mappers.applicants import map_applicant, map_applicant_mapping
 from mappers.contact_information import map_contact_rows
-from mappers.requests import map_ministry_request, map_parent_request, map_raw_request
+from mappers.requests import map_ministry_request, map_parent_request
 
 
 LOGGER = logging.getLogger(__name__)
@@ -137,16 +137,11 @@ class RequestMigrator:
             )
 
     def _insert_request_bundle(self, request_id: str, parent_row: dict) -> dict:
-        raw_payload = map_raw_request(parent_row, created_by=self.created_by)
-        LOGGER.debug("Inserting FOI raw request for %s", request_id)
-        foirawrequest = self.foidb_client.insert_raw_request(raw_payload)
-
         parent_payload = map_parent_request(parent_row, created_by=self.created_by)
         parent_payload["receivedmodeid"] = self.foidb_client.resolve_received_mode_id(parent_payload["received_mode_name"])
         parent_payload["applicantcategoryid"] = self.foidb_client.resolve_applicant_category_id(
             parent_payload["applicant_category_name"]
         )
-        parent_payload["foirawrequestid"] = foirawrequest["foirawrequest_id"]
         LOGGER.debug("Inserting FOI request for %s", request_id)
         foirequest = self.foidb_client.insert_parent_request(parent_payload)
 

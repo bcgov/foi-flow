@@ -46,10 +46,6 @@ class FakeFoidbClient:
     def rollback_request(self):
         self.calls.append(("rollback_request",))
 
-    def insert_raw_request(self, payload):
-        self.calls.append(("insert_raw_request", payload["axisrequestid"]))
-        return {"foirawrequest_id": 31, "version": 1}
-
     def insert_parent_request(self, payload):
         self.calls.append(("insert_parent_request", payload["migrationreference"], payload.get("foirawrequestid")))
         return {"foirequest_id": 11, "version": 1}
@@ -90,7 +86,7 @@ class FakeFoidbClient:
     def find_request_bundle(self, request_id: str):
         self.calls.append(("find_request_bundle", request_id))
         if self.exists:
-            return {"foirequest_id": 11, "foirequestversion_id": 1, "foirawrequestid": 31}
+            return {"foirequest_id": 11, "foirequestversion_id": 1}
         return None
 
     def preview_delete_counts(self, bundle):
@@ -101,7 +97,6 @@ class FakeFoidbClient:
             "FOIRequestApplicants": 1,
             "FOIMinistryRequests": 1,
             "FOIRequests": 1,
-            "FOIRawRequests": 1,
         }
 
     def delete_request_bundle(self, bundle):
@@ -191,7 +186,7 @@ def test_migrate_request_commits_successful_request() -> None:
     assert ("commit_request",) in foidb_client.calls
 
 
-def test_migrate_request_inserts_raw_request_before_parent_request() -> None:
+def test_migrate_request_inserts_parent_request_without_raw_request_reference() -> None:
     axis_client = FakeAxisClient(
         parent={
             "requestType": "general",
@@ -214,9 +209,8 @@ def test_migrate_request_inserts_raw_request_before_parent_request() -> None:
 
     migrator.migrate_request("XGR-2020-10982")
 
-    assert foidb_client.calls.index(("insert_raw_request", "XGR-2020-10982")) < foidb_client.calls.index(
-        ("insert_parent_request", "XGR-2020-10982", 31)
-    )
+    assert ("insert_parent_request", "XGR-2020-10982", None) in foidb_client.calls
+    assert not any(call[0] == "insert_raw_request" for call in foidb_client.calls)
 
 
 def test_migrate_request_emits_debug_logs(caplog) -> None:

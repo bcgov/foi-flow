@@ -41,7 +41,7 @@ class FoidbClient:
     def find_request_bundle(self, request_id: str) -> dict | None:
         cursor = self._execute(
             """
-            SELECT foirequestid, version, foirawrequestid
+            SELECT foirequestid, version
             FROM public."FOIRequests"
             WHERE migrationreference = %s
             LIMIT 1
@@ -54,13 +54,11 @@ class FoidbClient:
         return {
             "foirequest_id": row[0],
             "foirequestversion_id": row[1],
-            "foirawrequestid": row[2],
         }
 
     def preview_delete_counts(self, bundle: dict) -> dict:
         foirequest_id = bundle["foirequest_id"]
         version_id = bundle["foirequestversion_id"]
-        foirawrequestid = bundle.get("foirawrequestid")
 
         return {
             "FOIRequestContactInformation": self._count(
@@ -96,13 +94,11 @@ class FoidbClient:
                 (foirequest_id, version_id),
             ),
             "FOIRequests": 1,
-            "FOIRawRequests": 1 if foirawrequestid else 0,
         }
 
     def delete_request_bundle(self, bundle: dict) -> None:
         foirequest_id = bundle["foirequest_id"]
         version_id = bundle["foirequestversion_id"]
-        foirawrequestid = bundle.get("foirawrequestid")
 
         self._execute(
             """
@@ -143,14 +139,6 @@ class FoidbClient:
             """,
             (foirequest_id, version_id),
         )
-        if foirawrequestid:
-            self._execute(
-                """
-                DELETE FROM public."FOIRawRequests"
-                WHERE requestid = %s
-                """,
-                (foirawrequestid,),
-            )
 
     def resolve_received_mode_id(self, received_mode_name: str) -> int | None:
         return self._fetch_lookup_id('SELECT receivedmodeid FROM public."ReceivedModes" WHERE name = %s LIMIT 1', received_mode_name)
@@ -199,44 +187,6 @@ class FoidbClient:
         cursor = self._execute(query, params)
         row = cursor.fetchone()
         return row[0] if row else 0
-
-    def insert_raw_request(self, payload: dict) -> dict:
-        cursor = self._execute(
-            """
-            INSERT INTO public."FOIRawRequests" (
-                requestrawdata, status, notes, created_at, version, updated_at, assignedto,
-                updatedby, sourceofsubmission, assignedgroup, ispiiredacted, createdby,
-                requirespayment, closedate, closereasonid, axisrequestid, axissyncdate,
-                isiaorestricted, linkedrequests, requeststatuslabel, isconsultflag
-            ) VALUES (
-                %s::jsonb, %s, %s, NOW(), 1, NOW(), %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s::jsonb, %s, %s
-            )
-            RETURNING requestid, version
-            """,
-            (
-                json.dumps(payload["requestrawdata"]),
-                payload["status"],
-                payload["notes"],
-                payload["assignedto"],
-                payload["updatedby"],
-                payload["sourceofsubmission"],
-                payload["assignedgroup"],
-                payload["ispiiredacted"],
-                payload["createdby"],
-                payload["requirespayment"],
-                payload["closedate"],
-                payload["closereasonid"],
-                payload["axisrequestid"],
-                payload["axissyncdate"],
-                payload["isiaorestricted"],
-                json.dumps(payload["linkedrequests"]),
-                payload["requeststatuslabel"],
-                payload["isconsultflag"],
-            ),
-        )
-        row = cursor.fetchone()
-        return {"foirawrequest_id": row[0], "version": row[1]}
 
     def insert_parent_request(self, payload: dict) -> dict:
         cursor = self._execute(
