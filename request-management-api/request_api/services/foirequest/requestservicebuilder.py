@@ -37,8 +37,14 @@ class requestservicebuilder(requestserviceconfigurator):
             axisrequestid = requestschema.get("axisRequestId")
             if not axisrequestid:
                 axisrequestid = current_foiministryrequest.get("axisrequestid")
+            if not axisrequestid:
+                axisrequestid = FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, 
+                                                                requestschema.get("requestType"), 
+                                                                requestschema.get("isconsultflag"))
         else:
-            axisrequestid = FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("requestType"), requestschema.get("isconsultflag"))
+            axisrequestid = FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, 
+                                                                requestschema.get("requestType"), 
+                                                                requestschema.get("isconsultflag"))
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.__dict__.update(ministry)
         foiministryrequest.requeststatusid = self.__getrequeststatusid(requestschema.get("requeststatuslabel"))
