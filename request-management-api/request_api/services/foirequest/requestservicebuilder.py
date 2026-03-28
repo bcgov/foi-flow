@@ -28,10 +28,17 @@ class requestservicebuilder(requestserviceconfigurator):
     def createministry(self, requestschema, ministry, activeversion, userid, filenumber=None, ministryid=None):
         programareaiaocode = self.getprogramareaiaocodebyid(self.getvalueof("programArea",ministry["code"]))
         #axisrequestid = requestschema.get("axisRequestId", FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("requestType"), requestschema.get("isconsultflag")))
-        axisrequestid = FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, 
-                                                        requestschema.get("requestType"), 
-                                                        requestschema.get("isconsultflag"))
+        # axisrequestid = FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, 
+        #                                                 requestschema.get("requestType"), 
+        #                                                 requestschema.get("isconsultflag"))
         current_foiministryrequest = FOIMinistryRequest.getrequest(ministryid)
+        
+        if current_foiministryrequest != {}:
+            axisrequestid = requestschema.get("axisRequestId")
+            if not axisrequestid:
+                axisrequestid = current_foiministryrequest.get("axisrequestid")
+        else:
+            axisrequestid = FOIRawRequest.generaterequestid(requestschema.get("foirawrequestid"), programareaiaocode, requestschema.get("requestType"), requestschema.get("isconsultflag"))
         foiministryrequest = FOIMinistryRequest()
         foiministryrequest.__dict__.update(ministry)
         foiministryrequest.requeststatusid = self.__getrequeststatusid(requestschema.get("requeststatuslabel"))
