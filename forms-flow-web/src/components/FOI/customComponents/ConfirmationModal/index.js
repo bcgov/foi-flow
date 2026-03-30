@@ -57,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ConfirmationModal({requestId, openModal, handleModal, state, saveRequestObject,
-  handleClosingDateChange, handleClosingReasonChange, attachmentsArray, handleApprovalInputs, ministryApprovalState}) {
+  handleClosingDateChange, handleClosingReasonChange, attachmentsArray, handleApprovalInputs, ministryApprovalState, isProactiveDisclosure}) {
     const classes = useStyles();
     const processingTeamList = useSelector(reduxstate=> reduxstate.foiRequests.foiProcessingTeamList);
     const selectedMinistries = saveRequestObject?.selectedMinistries?.map(ministry => ministry.code);
@@ -81,6 +81,9 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     const user = useSelector((reduxState) => reduxState.user.userDetail);
     const userGroups = user?.groups?.map(group => group.slice(1));
     let isMinistry = isMinistryLogin(userGroups);
+    const foiPDFStitchStatusForResponsePackage = useSelector(
+      (reduxState) => reduxState.foiRequests.foiPDFStitchStatusForResponsePackage,
+    );
     
     
     const openInfo = useSelector((reduxState) => reduxState.foiRequests.foiOpenInfoRequest);
@@ -122,9 +125,16 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
 
     const isBtnDisabled = () => {
-      if (isOITeam) {        
+      if (isOITeam && !isProactiveDisclosure) {        
         if (state === 'Ready to Publish') {
           return !isReadyForPublishing(openInfo, additionalFiles, axisRequestId)
+        } else {
+          return false;
+        }
+      }
+      if (isProactiveDisclosure) {
+        if (state === "Ready to Publish") {
+          return foiPDFStitchStatusForResponsePackage !== "completed"
         } else {
           return false;
         }
@@ -193,7 +203,7 @@ export default function ConfirmationModal({requestId, openModal, handleModal, st
     }
 
     let message = userGroups.includes("OI Team") ? 
-      getMessageForOITeam(state, openInfo, additionalFiles, axisRequestId)
+      getMessageForOITeam(state, openInfo, additionalFiles, axisRequestId, isProactiveDisclosure, foiPDFStitchStatusForResponsePackage)
       : getMessage(saveRequestObject, state, axisRequestId, currentState, requestId, cfrStatus,allowStateChange,isAnyAmountPaid, estimatedTotalDue);
     const attchmentFileNameList = attachmentsArray?.map(_file => _file.filename);
 

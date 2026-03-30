@@ -237,6 +237,9 @@ const StateDropDown = ({
         if (consultflag) {
           return _stateList.responseforConsult;
         }
+        if (isOITeam && isProactiveDisclosure) {
+          return _stateList.responseforPD;
+        }
         if (personalIAO) return _stateList.responseforpersonal;
         else if (cfrFeeData?.balanceremaining > 0 && cfrStatus === "approved") {
           return _stateList.response;
@@ -263,13 +266,28 @@ const StateDropDown = ({
         } else {
           return _stateList.recordsintransit;
         }
+      case "Ready to Publish".toLowerCase():
+        if (isProactiveDisclosure && isOITeam) {
+          return _stateList.readytopublishPD
+        }
+      case "Published".toLowerCase():
+        if (isProactiveDisclosure && isOITeam) {
+          return _stateList.publishedPD
+        }
+      case "Unpublished".toLowerCase():
+        if (isProactiveDisclosure && isOITeam) {
+          return _stateList.unpublishedPD
+        }
       default:
         return [];
     }
   };
   const getDisableMenuItem = (index, status) => {
-    if (isOITeam) {
+    if (isOITeam && !isProactiveDisclosure) {
       return status === requestState || status === 'Do Not Publish' || status === 'Unpublished';
+    }
+    if (isProactiveDisclosure) {
+      return status === requestState || status === 'Published' || status === 'Unpublished';
     }
     if (index === 0) {
       return false;
