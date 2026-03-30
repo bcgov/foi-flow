@@ -160,6 +160,7 @@ const BottomButtonGroup = React.memo(
           requestId,
           ministryId,
           (err, res) => {
+            //HERE
             if (!err) {
               toast.success("The request has been saved successfully.", {
                 position: "top-right",
@@ -206,6 +207,7 @@ const BottomButtonGroup = React.memo(
       if (isValidationError || !stateChanged) {
         return;
       }
+      console.log("BANG")
 
       if (
         currentSelectedStatus &&
@@ -232,6 +234,7 @@ const BottomButtonGroup = React.memo(
             saveRequestObject.assignedToName = "";
           }
         }
+        //HERE
         saveRequestModal();
       } else {
         saveRequestObject.requeststatuslabel = StateEnum.open.label;
@@ -323,9 +326,15 @@ const BottomButtonGroup = React.memo(
     const [documents, setDocuments] = useState([]);
 
     const saveStatusId = () => {
+      console.log("JACKPOT")
+      //HERE FINALLY THIS IS IT FINAL!!!
+      const currentOIState = openInfoStates.find(s => s.name === currentSelectedStatus);
       if (userGroups.includes("OI Team") && !isProactiveDisclosure) {
-        saveRequestObject.oistatusid = openInfoStates.find(s => s.name === currentSelectedStatus).oistatusid;
+        saveRequestObject.oistatusid = currentOIState?.oistatusid;
+      } else if (userGroups.includes("OI Team") && isProactiveDisclosure && currentOIState) {
+        saveRequestObject.oistatusid = currentOIState.oistatusid;
       } else if (currentSelectedStatus) {
+        if (isProactiveDisclosure && saveRequestObject.oistatusid !== null) saveRequestObject.oistatusid = null;
         switch (currentSelectedStatus) {
           case StateEnum.closed.name:
             saveRequestObject.requeststatuslabel = StateEnum.closed.label;
@@ -343,32 +352,6 @@ const BottomButtonGroup = React.memo(
               const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
               saveRequestObject.cfrDueDate = calculatedCFRDueDate;
             }
-            /*if (
-              ![StateEnum.closed.name, StateEnum.onhold.name].includes(
-                currentSelectedStatus
-              ) &&
-              saveRequestObject.onholdTransitionDate
-            ) {
-              const today = new Date();
-  
-              // make it start of today
-              today.setHours(0, 0, 0, 0);
-  
-              const onHoldDays = calculateDaysRemaining(
-                today,
-                saveRequestObject.onholdTransitionDate
-              );
-              const calculatedCFRDueDate = addBusinessDays(
-                saveRequestObject.cfrDueDate,
-                onHoldDays
-              );
-              const calculatedRequestDueDate = addBusinessDays(
-                saveRequestObject.dueDate,
-                onHoldDays
-              );
-              saveRequestObject.cfrDueDate = calculatedCFRDueDate;
-              saveRequestObject.dueDate = calculatedRequestDueDate;
-            }*/
             break;
 
           case StateEnum.redirect.name:
@@ -413,6 +396,7 @@ const BottomButtonGroup = React.memo(
     }, [successCount]);
 
     const handleSaveModal = (value, fileInfoList, files) => {
+      console.log("HANDLE SAVE MODAL")
       setsaveModal(false);
       setFileCount(files?.length);
 
@@ -426,6 +410,7 @@ const BottomButtonGroup = React.memo(
       }
 
       if (!files || files.length < 1) {
+        console.log("SNAKEEE")
         saveStatusId();
         saveRequest();
         hasStatusRequestSaved(currentSelectedStatus);
@@ -467,7 +452,6 @@ const BottomButtonGroup = React.memo(
             saveRequestObject={saveRequestObject}
           />
         </ConditionalComponent>
-
         <ConditionalComponent condition={opensaveModal}>
           <ConfirmationModal
             requestId={requestId}
@@ -478,6 +462,7 @@ const BottomButtonGroup = React.memo(
             handleClosingDateChange={handleClosingDateChange}
             handleClosingReasonChange={handleClosingReasonChange}
             attachmentsArray={attachmentsArray}
+            isProactiveDisclosure={isProactiveDisclosure}
           />
         </ConditionalComponent>
 
