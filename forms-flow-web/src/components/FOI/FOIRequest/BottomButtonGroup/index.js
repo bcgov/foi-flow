@@ -265,7 +265,7 @@ const BottomButtonGroup = React.memo(
 
     const saveRequestModal = () => {
       if (currentSelectedStatus !== saveRequestObject?.currentState) setsaveModal(true)
-      else if (isProactiveDisclosure && saveRequestObject?.oistatusid !== null) setsaveModal(true);
+      else if (isProactiveDisclosure && userGroups.includes("OI Team")) setsaveModal(true);
     };
 
     const handleModal = (value) => {
