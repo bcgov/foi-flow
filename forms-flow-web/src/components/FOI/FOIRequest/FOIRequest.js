@@ -1173,7 +1173,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
-    // HERE
 
     if (
       _state?.toLowerCase() === StateEnum.unopened.name.toLowerCase() &&
@@ -1228,8 +1227,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   };
 
   const handleStateChange = (currentStatus) => {
-    // YOU HAVE TO ADJUST THIS SO IT WORKS APPROPIATELY FOR THIS WEIRD PD MIX OF REGULAR STATES AND OI STATES
-    // BUG -> OI TEAM = WHEN YOU GO BACK TO RESPONES STATE FROM PUBLICAITON STATUES = NOTHING HAPPENS
     if (isOITeam) {
       setOIStatus(currentStatus);
     } else {
@@ -1237,9 +1234,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     }
     setStateChanged(true);
   };
-  console.log("change?>", stateChanged)
-  console.log("OISTATUSSTATE", OIStatus)
-  console.log("currentSTatus", _currentrequestStatus)
 
   const handlestatusudpate = (_daysRemaining, _status, _cfrDaysRemaining, isProactiveDisclosure) => {
     const mappedBottomText = getTabBottomText({
@@ -1466,7 +1460,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const visibleCorrespondence =
     applicantCorrespondence?.filter((c) => c.category !== "draft") || [];
 
-  const getRequestState = (requestState) => {
+  const getOIRequestState = (requestState) => {
     if (requestDetails?.requestType == FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PROACTIVE_DISCLOSURE) {
       if (requestDetails?.oistatusid) {
         return openInfoStates?.find(
@@ -1500,7 +1494,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           <h4 className="foileftpanelrequestno">{headerText}</h4>
           <div className="foileftpaneldropdown">
             <StateDropDown
-              requestState={isOITeam ? getRequestState(requestState) : requestState}
+              requestState={isOITeam ? getOIRequestState(requestState) : requestState}
               updateStateDropDown={updateStateDropDown}
               stateTransition={stateTransition}
               requestStatus={_requestStatus}
@@ -2273,7 +2267,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   toast={toast}
                   requestNumber={requestNumber}
                   requestDetails={requestDetails}
-                  currentOIRequestState={getRequestState()}
+                  currentOIRequestState={getOIRequestState()}
                   foirequestid={requestId}
                   isOITeam={isOITeam}
                   foiministryrequestid={ministryId}
@@ -2284,7 +2278,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   toast={toast}
                   requestNumber={requestNumber}
                   requestDetails={requestDetails}
-                  currentOIRequestState={getRequestState()}
+                  currentOIRequestState={getOIRequestState()}
                   foirequestid={requestId}
                   isOITeam={isOITeam}
                   foiministryrequestid={ministryId}

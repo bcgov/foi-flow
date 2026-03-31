@@ -131,7 +131,6 @@ const BottomButtonGroup = React.memo(
     }, [stateChanged]);
 
     const saveRequest = async (setLoader = false) => {
-      //setSaveConfirmationModal(true);
       if (urlIndexCreateRequest > -1) {
         saveRequestObject.requeststatuslabel = StateEnum.intakeinprogress.label;
         setIsAddRequest(false);
@@ -145,11 +144,6 @@ const BottomButtonGroup = React.memo(
       //add oipc Data to save request object and sync/validate isoipcreview attribute
       if (requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()) {
         saveRequestObject.oipcdetails = oipcData ? oipcData : [];
-        // if (oipcData?.length > 0) {
-        //   saveRequestObject.isoipcreview = true;
-        // } else {
-        //   saveRequestObject.isoipcreview = false;
-        // }
       }
 
       dispatch(setFOILoader(setLoader))
@@ -160,7 +154,6 @@ const BottomButtonGroup = React.memo(
           requestId,
           ministryId,
           (err, res) => {
-            //HERE
             if (!err) {
               toast.success("The request has been saved successfully.", {
                 position: "top-right",
@@ -207,7 +200,6 @@ const BottomButtonGroup = React.memo(
       if (isValidationError || !stateChanged) {
         return;
       }
-      console.log("BANG")
 
       if (
         currentSelectedStatus &&
@@ -234,7 +226,6 @@ const BottomButtonGroup = React.memo(
             saveRequestObject.assignedToName = "";
           }
         }
-        //HERE
         saveRequestModal();
       } else {
         saveRequestObject.requeststatuslabel = StateEnum.open.label;
@@ -273,8 +264,6 @@ const BottomButtonGroup = React.memo(
     };
 
     const saveRequestModal = () => {
-      console.log("currentSelectedStatus", currentSelectedStatus)
-      console.log("saveobj", saveRequestObject?.currentState)
       if (currentSelectedStatus !== saveRequestObject?.currentState) setsaveModal(true)
       else if (isProactiveDisclosure && saveRequestObject?.oistatusid !== null) setsaveModal(true);
     };
@@ -328,8 +317,6 @@ const BottomButtonGroup = React.memo(
     const [documents, setDocuments] = useState([]);
 
     const saveStatusId = () => {
-      console.log("JACKPOT")
-      //HERE FINALLY THIS IS IT FINAL!!!
       const currentOIState = openInfoStates.find(s => s.name === currentSelectedStatus);
       if (userGroups.includes("OI Team") && !isProactiveDisclosure) {
         saveRequestObject.oistatusid = currentOIState?.oistatusid;
@@ -398,7 +385,6 @@ const BottomButtonGroup = React.memo(
     }, [successCount]);
 
     const handleSaveModal = (value, fileInfoList, files) => {
-      console.log("HANDLE SAVE MODAL")
       setsaveModal(false);
       setFileCount(files?.length);
 
@@ -412,7 +398,6 @@ const BottomButtonGroup = React.memo(
       }
 
       if (!files || files.length < 1) {
-        console.log("SNAKEEE")
         saveStatusId();
         saveRequest();
         hasStatusRequestSaved(currentSelectedStatus);
