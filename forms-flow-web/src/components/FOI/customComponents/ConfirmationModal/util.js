@@ -149,11 +149,17 @@ import { isReadyForPublishing } from '../../FOIRequest/utils';
     }
   }
 
-  export const getMessageForOITeam = (state, openinfo, additionalfiles, requestnumber) => {
+  export const getMessageForOITeam = (state, openinfo, additionalfiles, requestnumber, isProactiveDisclosure, stitchStatusForResponsePackage) => {
     if (state === 'Ready to Publish') {
-      if (!isReadyForPublishing(openinfo, additionalfiles, requestnumber)) {
+      if (isProactiveDisclosure && stitchStatusForResponsePackage !== "completed") {
+        return {title: "Changing the state", body: 'Unable to update state: please make sure a final package has been created for the Proactive Disclosure request'}
+      }
+      if (!isProactiveDisclosure && !isReadyForPublishing(openinfo, additionalfiles, requestnumber)) {
         return {title: "Changing the state", body: 'Unable to update state: please make sure the copyright is selected and a response letter is uploaded with "Response Letter" in the filename'}
       }
+    }
+    if (state === 'Unpublished' && isProactiveDisclosure) {
+      return {title: "Changing the state", body: 'If you change the state to Unpublished, the request will be removed from the sitemap. Are you sure you want to proceed?'}
     }
     return {title: "Changing the state", body: "Are you sure you want to change the state of this request to " + state + "?"}
   }

@@ -240,6 +240,17 @@ const StateList = Object.freeze({
     { status: "Peer Review", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
+    responseforPD: [
+    { status: "Response", isSelected: false },
+    { status: "On Hold", isSelected: false },
+    { status: "Records Review", isSelected: false },
+    { status: "Ready to Publish", isSelected: false },
+    { status: "Published", isSelected: false },
+    { status: "Unpublished", isSelected: false },
+    { status: "Peer Review", isSelected: false },
+    { status: "On Hold - Other", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
   //peerreview: [{status:"Peer Review", isSelected: false},{status:"Intake in Progress", isSelected: false}, {status: "Open", isSelected: false},{status: "Records Review", isSelected: false},{status: "Consult", isSelected: false},{status: "Response", isSelected: false}],
   peerreview: [
     { status: "Peer Review", isSelected: false },
@@ -285,6 +296,39 @@ const StateList = Object.freeze({
   onholdother: [
     { status: "On Hold - Other", isSelected: false },
     { status: "Closed", isSelected: false }
+  ],
+  readytopublishPD: [
+    { status: "Ready to Publish", isSelected: false },
+    { status: "Response", isSelected: false },
+    { status: "On Hold", isSelected: false },
+    { status: "Records Review", isSelected: false },
+    { status: "Published", isSelected: false },
+    { status: "Unpublished", isSelected: false },
+    { status: "Peer Review", isSelected: false },
+    { status: "On Hold - Other", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
+  publishedPD: [
+    { status: "Published", isSelected: false },
+    { status: "Response", isSelected: false },
+    { status: "On Hold", isSelected: false },
+    { status: "Records Review", isSelected: false },
+    { status: "Ready to Publish", isSelected: false },
+    { status: "Unpublished", isSelected: false },
+    { status: "Peer Review", isSelected: false },
+    { status: "On Hold - Other", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
+  unpublishedPD: [
+    { status: "Unpublished", isSelected: false },
+    { status: "Response", isSelected: false },
+    { status: "On Hold", isSelected: false },
+    { status: "Records Review", isSelected: false },
+    { status: "Ready to Publish", isSelected: false },
+    { status: "Published", isSelected: false },
+    { status: "Peer Review", isSelected: false },
+    { status: "On Hold - Other", isSelected: false },
+    { status: "Closed", isSelected: false },
   ]
 });
 
