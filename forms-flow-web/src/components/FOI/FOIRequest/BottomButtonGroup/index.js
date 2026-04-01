@@ -9,7 +9,8 @@ import {
 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import {
   saveRequestDetails,
-  openRequestDetails
+  openRequestDetails,
+  unpublishPDRequest
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
@@ -153,8 +154,10 @@ const BottomButtonGroup = React.memo(
           urlIndexCreateRequest,
           requestId,
           ministryId,
-          (err, res) => {
+          async (err, res) => {
+            console.log("SAVE FINAL")
             if (!err) {
+              if (isProactiveDisclosure && currentSelectedStatus === "Unpublished") await unpublishPDRequest();
               toast.success("The request has been saved successfully.", {
                 position: "top-right",
                 autoClose: 3000,
@@ -200,6 +203,7 @@ const BottomButtonGroup = React.memo(
       if (isValidationError || !stateChanged) {
         return;
       }
+      console.log("BANG")
 
       if (
         currentSelectedStatus &&
@@ -264,6 +268,8 @@ const BottomButtonGroup = React.memo(
     };
 
     const saveRequestModal = () => {
+      console.log("currentSelectedStatus", currentSelectedStatus)
+      console.log("saveobj", saveRequestObject?.currentState)
       if (currentSelectedStatus !== saveRequestObject?.currentState) setsaveModal(true)
       else if (isProactiveDisclosure && userGroups.includes("OI Team")) setsaveModal(true);
     };
@@ -317,6 +323,7 @@ const BottomButtonGroup = React.memo(
     const [documents, setDocuments] = useState([]);
 
     const saveStatusId = () => {
+      console.log("JACKPOT")
       const currentOIState = openInfoStates.find(s => s.name === currentSelectedStatus);
       if (userGroups.includes("OI Team") && !isProactiveDisclosure) {
         saveRequestObject.oistatusid = currentOIState?.oistatusid;
@@ -384,7 +391,8 @@ const BottomButtonGroup = React.memo(
       }
     }, [successCount]);
 
-    const handleSaveModal = (value, fileInfoList, files) => {
+    const handleSaveModal = async (value, fileInfoList, files) => {
+      console.log("SAVE MODAL CONFIRM")
       setsaveModal(false);
       setFileCount(files?.length);
 

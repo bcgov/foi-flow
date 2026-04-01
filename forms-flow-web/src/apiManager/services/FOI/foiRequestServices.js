@@ -263,6 +263,7 @@ export const fetchFOIMinistryViewRequestDetails = (requestId, ministryId) => {
 };
 
 export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ministryId, ...rest) => {
+  console.log("DATA", data)
   const done = fnDone(rest);
   let id = urlIndexCreateRequest > -1 ? -1 : requestId;
   let apiUrl = "";
@@ -717,4 +718,23 @@ export const saveLinkedRequests = (data, axisid, ...rest) => {
         catchError(err, dispatch);
       });
   }
+}
+
+export const unpublishPDRequest = async (foiministryrequestid) => {
+  const apiUrl= replaceUrl(API.FOI_UNPUBLISH_PROACTIVE_DISCLOSURE, "<foiministryrequestid>", foiministryrequestid);
+  return (dispatch) => {
+    httpPOSTRequest(apiUrl, {}, UserService.getToken())
+      .then((res) => {
+        if (res.status === 201) {
+          return res.data;
+        } else {
+          console.error("API call to unpublish request did not return status 201:", res);
+          dispatch(serviceActionError(res));       
+        }
+      })
+      .catch((error) => {
+        console.error("API failed to unpublish request:", error);
+        catchError(error, dispatch);
+      });
+  };
 }
