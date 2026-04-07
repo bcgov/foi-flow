@@ -157,7 +157,7 @@ const BottomButtonGroup = React.memo(
           async (err, res) => {
             console.log("SAVE FINAL")
             if (!err) {
-              if (isProactiveDisclosure && currentSelectedStatus === "Unpublished") await unpublishPDRequest();
+              if (isProactiveDisclosure && currentSelectedStatus === "Unpublished") await unpublishPDRequest(ministryId);
               toast.success("The request has been saved successfully.", {
                 position: "top-right",
                 autoClose: 3000,

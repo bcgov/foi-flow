@@ -646,7 +646,7 @@ class FOIOpenInformationRequests(db.Model):
                 INNER JOIN public."OpenInformationStatuses" oistatus on mr.oistatus_id = oistatus.oistatusid
                 INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on oi.oipublicationstatus_id = oirequesttype.oipublicationstatusid
                 WHERE mr.foiministryrequestid = :foiministryrequestid 
-                  AND oi.processingstatus != 'unpublished
+                  AND oi.processingstatus != 'unpublished'
                   AND oi.isactive = TRUE;
             """
             
@@ -671,12 +671,12 @@ class FOIOpenInformationRequests(db.Model):
                     r.foirequestid,
                     mr.axisrequestid,
                     mr.description,
-                    to_char(oi.publicationdate, 'YYYY-MM-DD') AS published_date,
+                    to_char(pd.publicationdate, 'YYYY-MM-DD') AS published_date,
                     pa.name as contributor,
                     ac.name as applicant_type,
                     COALESCE((fee.feedata->>'amountpaid')::Numeric, 0) as fees,
                     LOWER(pa.bcgovcode) AS bcgovcode,
-                    COALESCE(oi.sitemap_pages, '') as sitemap_pages,
+                    COALESCE(pd.sitemap_pages, '') as sitemap_pages,
                     'publishnow' as type,
                     pdc.name as proactivedisclosurecategory,
                     pd.reportperiod,
@@ -705,10 +705,10 @@ class FOIOpenInformationRequests(db.Model):
                 INNER JOIN public."FOIProactiveDisclosureRequests" pd on mr.foiministryrequestid = pd.foiministryrequest_id and pd.isactive = TRUE
                 INNER JOIN public."ProactiveDisclosureCategories" pdc on pd.proactivedisclosurecategoryid = pdc.proactivedisclosurecategoryid
                 INNER JOIN public."OpenInformationStatuses" oistatus on mr.oistatus_id = oistatus.oistatusid
-                INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on oi.oipublicationstatus_id = oirequesttype.oipublicationstatusid
+                INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on pd.oipublicationstatus_id = oirequesttype.oipublicationstatusid
                 LEFT JOIN public."FOIOpenInfoAdditionalFiles" oifiles on mr.foiministryrequestid = oifiles.ministryrequestid
                 WHERE mr.foiministryrequestid = :foiministryrequestid 
-                  AND oi.processingstatus is NULL 
+                  AND pd.processingstatus is NULL 
                   AND mr.isactive = TRUE
                 GROUP BY 
                     pd.proactivedisclosureid,
@@ -716,12 +716,12 @@ class FOIOpenInformationRequests(db.Model):
                     r.foirequestid,
                     mr.axisrequestid,
                     mr.description,
-                    oi.publicationdate,
+                    pd.publicationdate,
                     pa.name,
                     ac.name,
                     fee.feedata,
                     pa.bcgovcode,
-                    oi.sitemap_pages,
+                    pd.sitemap_pages,
                     pdc.name,
                     pd.reportperiod;
             """
@@ -743,14 +743,14 @@ class FOIOpenInformationRequests(db.Model):
                     pd.proactivedisclosureid,
                     mr.foiministryrequestid,
                     mr.axisrequestid,
-                    COALESCE(oi.sitemap_pages, '') as sitemap_pages,
+                    COALESCE(pd.sitemap_pages, '') as sitemap_pages,
                     'unpublish' as type
                 FROM public."FOIProactiveDisclosureRequests" pd
                 INNER JOIN public."FOIMinistryRequests" mr on pd.foiministryrequest_id = mr.foiministryrequestid and mr.isactive = TRUE
                 INNER JOIN public."OpenInformationStatuses" oistatus on mr.oistatus_id = oistatus.oistatusid
                 INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on pd.oipublicationstatus_id = oirequesttype.oipublicationstatusid
                 WHERE mr.foiministryrequestid = :foiministryrequestid 
-                  AND pd.processingstatus != 'unpublished
+                  AND pd.processingstatus != 'unpublished'
                   AND pd.isactive = TRUE;
             """
             
