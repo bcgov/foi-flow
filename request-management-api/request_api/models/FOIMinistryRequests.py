@@ -24,10 +24,9 @@ from request_api.utils.enums import RequestorType
 import logging
 from sqlalchemy.sql.sqltypes import Date, Integer
 from dateutil import parser
-from request_api.utils.enums import StateName
+from request_api.utils.enums import StateName, OIStatusEnum
 from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .SubjectCodes import SubjectCode
-from request_api.utils.enums import StateName
 from .FOIRequestOIPC import FOIRequestOIPC
 from .ProactiveDisclosureCategories import ProactiveDisclosureCategory
 from request_api.models import FOIProactiveDisclosureRequests
@@ -1881,6 +1880,11 @@ class FOIMinistryRequest(db.Model):
             else_= literal("0").label("recordspagecount")
         )
 
+        oistatusname = case(
+            [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
+            else_=OpenInformationStatuses.name
+        ).label('oiStatusName')
+
         assignedtoformatted = case(
             [
                 (
@@ -1924,12 +1928,12 @@ class FOIMinistryRequest(db.Model):
             cast(FOIMinistryRequest.filenumber, String).label('idNumber'),
             cast(None, String).label('applicantcategory'),
             recordspagecount.label('recordspagecount'),  
-            cast(None, String).label('oiStatusName'),
+            oistatusname,
             FOIRequest.receiveddate.label('receivedDate'),
             latest_proactive.publicationdate.label('publicationdate'),
             FOIMinistryRequest.created_at.label('created_at'), 
             assignedtoformatted.label('assignedToFormatted'), 
-            cast(None, Integer).label('oistatus_id'),
+            FOIMinistryRequest.oistatus_id.label('oistatus_id'),
             FOIMinistryRequest.version.label('version'),
             latest_proactive.proactivedisclosureid.label('foiopeninforequestid'),
             FOIRequestStatus.name.label('currentState'),
@@ -1957,6 +1961,7 @@ class FOIMinistryRequest(db.Model):
             ))
             .outerjoin(ProactiveDisclosureCategory, ProactiveDisclosureCategory.proactivedisclosurecategoryid == latest_proactive.proactivedisclosurecategoryid)
             .outerjoin(iaoassignee, iaoassignee.username == FOIMinistryRequest.assignedto)
+            .outerjoin(OpenInformationStatuses, OpenInformationStatuses.oistatusid == FOIMinistryRequest.oistatus_id)
             .join(ProgramArea, ProgramArea.programareaid == FOIMinistryRequest.programareaid)
             .join(FOIRequestApplicantMapping,
                         and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType.applicant.value),
@@ -2001,6 +2006,13 @@ class FOIMinistryRequest(db.Model):
                     # literal('OI Team').in_(groups)
                 )
             )
+        if not isadvancedsearch:
+            basequery = basequery.filter(
+                    or_(
+                        FOIMinistryRequest.oistatus_id != OIStatusEnum.PUBLISHED.value,
+                        FOIMinistryRequest.oistatus_id.is_(None),               
+                    ),
+                )
         return basequery
 
 
