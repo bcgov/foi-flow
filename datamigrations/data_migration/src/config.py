@@ -10,7 +10,6 @@ class Settings:
     axis_connection_string: str
     foidb_driver: str
     foidb_connection_string: str
-    axis_office_code: str = "CFD"
     axis_excluded_statuses: tuple[str, ...] = ("Closed", "Completed")
     created_by: str = "cfdmigration"
 
@@ -45,7 +44,6 @@ def load_settings() -> Settings:
         axis_connection_string=required["AXIS_DB_CONNECTION_STRING"] or "",
         foidb_driver=required["FOIDB_DB_DRIVER"],
         foidb_connection_string=required["FOIDB_DB_CONNECTION_STRING"] or "",
-        axis_office_code=os.getenv("AXIS_OFFICE_CODE", "CFD").strip() or "CFD",
         axis_excluded_statuses=tuple(
             status.strip()
             for status in os.getenv("AXIS_EXCLUDED_STATUSES", "Closed,Completed").split(",")

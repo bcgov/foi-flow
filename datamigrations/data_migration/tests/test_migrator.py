@@ -346,7 +346,6 @@ def test_create_migrator_passes_axis_filter_settings(monkeypatch) -> None:
         axis_connection_string="axis-conn",
         foidb_driver="foidb-driver",
         foidb_connection_string="foidb-conn",
-        axis_office_code="IAS",
         axis_excluded_statuses=("Closed", "Completed", "On Hold"),
     )
 
@@ -358,8 +357,8 @@ def test_create_migrator_passes_axis_filter_settings(monkeypatch) -> None:
         raise AssertionError(module_name)
 
     class FakeAxisClient:
-        def __init__(self, connection, office_code, excluded_statuses):
-            captured["axis"] = (connection, office_code, excluded_statuses)
+        def __init__(self, connection, excluded_statuses):
+            captured["axis"] = (connection, excluded_statuses)
 
     class FakeFoidbClient:
         def __init__(self, connection):
@@ -371,5 +370,5 @@ def test_create_migrator_passes_axis_filter_settings(monkeypatch) -> None:
 
     main.create_migrator(settings)
 
-    assert captured["axis"] == (axis_connection, "IAS", ("Closed", "Completed", "On Hold"))
+    assert captured["axis"] == (axis_connection, ("Closed", "Completed", "On Hold"))
     assert captured["foidb"] is foidb_connection

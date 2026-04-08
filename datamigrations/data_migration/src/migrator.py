@@ -19,13 +19,11 @@ class RequestMigrator:
         foidb_client,
         created_by: str = "cfdmigration",
         dry_run: bool = False,
-        program_area_code: str = "CFD",
     ):
         self.axis_client = axis_client
         self.foidb_client = foidb_client
         self.created_by = created_by
         self.dry_run = dry_run
-        self.program_area_code = program_area_code
 
     def migrate_request(self, request_id: str) -> dict:
         started_at = datetime.now(UTC).isoformat()
@@ -149,7 +147,8 @@ class RequestMigrator:
         if ministry_row:
             LOGGER.debug("Inserting ministry request for %s", request_id)
             ministry_payload = map_ministry_request(ministry_row, created_by=self.created_by)
-            ministry_payload["programareaid"] = self.foidb_client.resolve_program_area_id(self.program_area_code)
+            program_area_code = request_id.split("-")[0]
+            ministry_payload["programareaid"] = self.foidb_client.resolve_program_area_id(program_area_code)
             ministry_payload["requeststatusid"] = self.foidb_client.resolve_request_status_id("Closed")
             ministry_payload["foirequest_id"] = foirequest["foirequest_id"]
             ministry_payload["foirequestversion_id"] = foirequest["version"]

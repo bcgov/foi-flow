@@ -96,11 +96,9 @@ class AxisClient:
     def __init__(
         self,
         connection,
-        office_code: str = "CFD",
         excluded_statuses: tuple[str, ...] = ("Closed", "Completed"),
     ):
         self.connection = connection
-        self.office_code = office_code
         self.excluded_statuses = excluded_statuses
 
     def _build_query(self, base_query: str) -> str:
@@ -111,7 +109,8 @@ class AxisClient:
         return f"{base_query.rstrip()}\n  AND requests.vcRequestStatus NOT IN ({placeholders})\n"
 
     def _build_params(self, request_id: str) -> tuple[str, ...]:
-        return (request_id, self.office_code, *self.excluded_statuses)
+        office_code = request_id.split("-")[0]
+        return (request_id, office_code, *self.excluded_statuses)
 
     def _fetch_one(self, query: str, request_id: str):
         final_query = self._build_query(query)

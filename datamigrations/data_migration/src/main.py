@@ -37,13 +37,11 @@ def create_migrator(settings: Settings, dry_run: bool = False) -> RequestMigrato
     return RequestMigrator(
         axis_client=AxisClient(
             axis_connection,
-            office_code=settings.axis_office_code,
             excluded_statuses=settings.axis_excluded_statuses,
         ),
         foidb_client=FoidbClient(foidb_connection),
         created_by=settings.created_by,
         dry_run=dry_run,
-        program_area_code=settings.axis_office_code,
     )
 
 
