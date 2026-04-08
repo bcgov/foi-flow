@@ -68,7 +68,6 @@ import {
       return httpPOSTRequest(API.FOI_POST_COMMENT_REQUESTHISTORY, data)
         .then((res) => {
           if (res.data) {
-            console.log("Saved comment successfully!");
             return res.data
           } else {
             dispatch(serviceActionError(res));
