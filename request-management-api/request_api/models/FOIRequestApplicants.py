@@ -188,20 +188,16 @@ class FOIRequestApplicant(db.Model):
                                         )
                                     )
         oldapplicant = applicant_query.order_by(FOIRequestApplicant.foirequestapplicantid.desc()).first()
-
-        applicants_differ = FOIRequestApplicant().applicants_differ(updatedapplicant, oldapplicant)
-
-        if applicants_differ:
-            updatedapplicant.createdby = userid
-            # Persist these values as they will never be updated by the frontend
-            updatedapplicant.applicantprofileid = oldapplicant.applicantprofileid
+        # Old logic checked for updates using applicants_differ = FOIRequestApplicant().applicants_differ(updatedapplicant, oldapplicant)
+        # This just goes ahead and makes the update
+        updatedapplicant.createdby = userid
+        # Persist these values as they will never be updated by the frontend
+        if oldapplicant:
             updatedapplicant.section43_info = oldapplicant.section43_info
             updatedapplicant.request_history = oldapplicant.request_history
-            db.session.add(updatedapplicant)
-            db.session.commit()
-            return DefaultMethodResult(True,'Applicant profile updated',updatedapplicant.foirequestapplicantid)
-        else:
-            return DefaultMethodResult(True,'No update',oldapplicant.foirequestapplicantid)
+        db.session.add(updatedapplicant)
+        db.session.commit()
+        return DefaultMethodResult(True,'Applicant profile updated',updatedapplicant.foirequestapplicantid)
         
     @classmethod
     def getlatestprofilebyapplicantid(cls, applicantid):

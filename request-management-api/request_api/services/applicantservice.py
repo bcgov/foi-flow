@@ -76,7 +76,7 @@ class applicantservice:
         applicant_id_before_update = applicantschema['foiRequestApplicantID']
 
         updatedapplicant = FOIRequestApplicant.from_request_data(applicantschema)
-        applicant = FOIRequestApplicant.save_instance(updatedapplicant, userid)
+        applicant = FOIRequestApplicant.update_applicant_profile(updatedapplicant, applicant_id_before_update, userid)
         applicantschema['foiRequestApplicantID'] = applicant.identifier
 
         primary_requests = FOIMinistryRequest.getopenrequestsbyapplicantid(applicant_id_before_update, "applicant")
