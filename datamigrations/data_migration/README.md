@@ -255,7 +255,7 @@ python src/main.py \
 
 ## Excel Request Splitter
 
-Use the Excel splitter when you have a workbook with a `Request` column in column `A` and need one output workbook per request prefix such as `AGR_requests.xlsx`, `COR_requests.xlsx`, or `CAF_requests.xlsx`.
+Use the Excel splitter when you have a workbook with a `Request` column in column `A` and need one output CSV per request prefix such as `AGR_requests.csv`, `COR_requests.csv`, or `CAF_requests.csv`.
 
 Behavior:
 
@@ -263,7 +263,7 @@ Behavior:
 - normalizes spacing around hyphens, so values like `COR-2025-40987 - DR` become `COR-2025-40987-DR`
 - groups requests by the prefix before the first hyphen
 - sorts suffix variants such as `-DR` and `-R` before the base request
-- writes output workbooks with a single `Request` column
+- writes one output CSV per prefix with a single `Request` column
 - logs and skips invalid request identifiers instead of failing the whole run
 
 Example:
@@ -274,7 +274,7 @@ python src/request_splitter.py \
   --output-dir ./output
 ```
 
-This creates files like `./output/AGR_requests.xlsx` and `./output/COR_requests.xlsx`.
+This creates files like `./output/AGR_requests.csv` and `./output/COR_requests.csv`.
 
 CLI options:
 

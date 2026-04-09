@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import logging
 import re
 from collections import defaultdict
@@ -65,14 +66,12 @@ def split_request_workbook(input_path: Path, output_dir: Path) -> list[Path]:
 
     output_paths: list[Path] = []
     for prefix, requests in grouped.items():
-        output_path = output_dir / f"{prefix}_requests.xlsx"
-        output_workbook = Workbook()
-        output_sheet = output_workbook.active
-        output_sheet.title = "Requests"
-        output_sheet["A1"] = "Request"
-        for index, request in enumerate(requests, start=2):
-            output_sheet[f"A{index}"] = request
-        output_workbook.save(output_path)
+        output_path = output_dir / f"{prefix}_requests.csv"
+        with output_path.open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.writer(handle)
+            writer.writerow(["Request"])
+            for request in requests:
+                writer.writerow([request])
         output_paths.append(output_path)
 
     return output_paths

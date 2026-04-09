@@ -50,7 +50,9 @@ def test_group_requests_by_prefix_uses_normalized_values() -> None:
 
 
 def test_split_request_workbook_writes_prefix_files(tmp_path: Path) -> None:
-    from openpyxl import Workbook, load_workbook
+    import csv
+
+    from openpyxl import Workbook
 
     input_file = tmp_path / "requests.xlsx"
     workbook = Workbook()
@@ -66,20 +68,21 @@ def test_split_request_workbook_writes_prefix_files(tmp_path: Path) -> None:
     output_paths = split_request_workbook(input_file, tmp_path / "out")
 
     assert [path.name for path in output_paths] == [
-        "AGR_requests.xlsx",
-        "CAF_requests.xlsx",
-        "COR_requests.xlsx",
+        "AGR_requests.csv",
+        "CAF_requests.csv",
+        "COR_requests.csv",
     ]
 
-    cor_workbook = load_workbook(tmp_path / "out" / "COR_requests.xlsx")
-    cor_sheet = cor_workbook.active
-    cor_values = [cor_sheet[f"A{row}"].value for row in range(1, cor_sheet.max_row + 1)]
+    with (tmp_path / "out" / "COR_requests.csv").open(newline="", encoding="utf-8") as handle:
+        cor_values = [row[0] for row in csv.reader(handle)]
 
     assert cor_values == ["Request", "COR-2025-40987-DR", "COR-2025-40987"]
 
 
 def test_split_request_workbook_logs_and_skips_invalid_requests(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
-    from openpyxl import Workbook, load_workbook
+    import csv
+
+    from openpyxl import Workbook
 
     input_file = tmp_path / "requests.xlsx"
     workbook = Workbook()
@@ -92,11 +95,10 @@ def test_split_request_workbook_logs_and_skips_invalid_requests(tmp_path: Path, 
     with caplog.at_level("WARNING"):
         output_paths = split_request_workbook(input_file, tmp_path / "out")
 
-    assert [path.name for path in output_paths] == ["COR_requests.xlsx"]
+    assert [path.name for path in output_paths] == ["COR_requests.csv"]
     assert "Skipping invalid request identifier '[REQUESTNUMBER]'" in caplog.text
 
-    cor_workbook = load_workbook(tmp_path / "out" / "COR_requests.xlsx")
-    cor_sheet = cor_workbook.active
-    cor_values = [cor_sheet[f"A{row}"].value for row in range(1, cor_sheet.max_row + 1)]
+    with (tmp_path / "out" / "COR_requests.csv").open(newline="", encoding="utf-8") as handle:
+        cor_values = [row[0] for row in csv.reader(handle)]
 
     assert cor_values == ["Request", "COR-2025-40987-DR"]
