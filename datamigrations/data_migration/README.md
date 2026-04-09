@@ -20,6 +20,7 @@ The tool supports:
 - skipping requests already migrated into FOIDB
 - splitting Excel workbooks of request IDs into one workbook per prefix
 - generating missing results CSVs in batches from a directory of request CSVs
+- consolidating migrated rows from multiple results CSVs into one file
 - `dry-run` validation with transaction rollback
 - preview-first delete mode with explicit confirmation for destructive deletes
 - optional results CSV output
@@ -30,6 +31,7 @@ The tool supports:
 - `src/main.py`: CLI entrypoint
 - `src/request_splitter.py`: Excel request splitter CLI for generating one workbook per prefix
 - `src/batch_generate_results.py`: directory runner for generating missing results CSVs
+- `src/consolidate_migrated_results.py`: consolidates migrated rows from results CSVs into one file
 - `src/migrator.py`: orchestration and per-request transaction flow
 - `src/axis_client.py`: AXIS read queries
 - `src/foidb_client.py`: FOIDB lookups and inserts
@@ -220,6 +222,24 @@ Behavior:
 - skips any file whose sibling `*_results.csv` already exists
 - processes only the first 3 missing results files by default
 - accepts `--limit N` to change how many missing files are generated in one run
+
+Consolidate migrated rows from all results files in a directory:
+
+```bash
+python src/consolidate_migrated_results.py ./output --output-csv ./output/consolidated_migrated.csv
+```
+
+Windows PowerShell:
+
+```powershell
+python .\src\consolidate_migrated_results.py .\output --output-csv .\output\consolidated_migrated.csv
+```
+
+Behavior:
+
+- scans the target directory for `*_results.csv`
+- keeps only rows whose `status` is exactly `migrated`
+- writes one consolidated CSV with the standard results columns
 
 Validate only without committing:
 
