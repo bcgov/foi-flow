@@ -18,6 +18,7 @@ The tool supports:
 
 - duplicate filtering in the input CSV
 - skipping requests already migrated into FOIDB
+- splitting Excel workbooks of request IDs into one workbook per prefix
 - `dry-run` validation with transaction rollback
 - preview-first delete mode with explicit confirmation for destructive deletes
 - optional results CSV output
@@ -26,6 +27,7 @@ The tool supports:
 ## Repository Structure
 
 - `src/main.py`: CLI entrypoint
+- `src/request_splitter.py`: Excel request splitter CLI for generating one workbook per prefix
 - `src/migrator.py`: orchestration and per-request transaction flow
 - `src/axis_client.py`: AXIS read queries
 - `src/foidb_client.py`: FOIDB lookups and inserts
@@ -250,6 +252,29 @@ python src/main.py \
   --input-csv ./requests.csv \
   --log-level DEBUG
 ```
+
+## Excel Request Splitter
+
+Use the Excel splitter when you have a workbook with a `Request` column in column `A` and need one output workbook per request prefix such as `AGR_requests.xlsx`, `COR_requests.xlsx`, or `CAF_requests.xlsx`.
+
+Behavior:
+
+- reads the active sheet and requires `Request` in cell `A1`
+- normalizes spacing around hyphens, so values like `COR-2025-40987 - DR` become `COR-2025-40987-DR`
+- groups requests by the prefix before the first hyphen
+- sorts suffix variants such as `-DR` and `-R` before the base request
+- writes output workbooks with a single `Request` column
+- logs and skips invalid request identifiers instead of failing the whole run
+
+Example:
+
+```bash
+python src/request_splitter.py \
+  --input-xlsx ./MigrationAXIS-724.xlsx \
+  --output-dir ./output
+```
+
+This creates files like `./output/AGR_requests.xlsx` and `./output/COR_requests.xlsx`.
 
 CLI options:
 
