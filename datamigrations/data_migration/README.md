@@ -158,7 +158,7 @@ Notes:
 
 ## Input CSV Format
 
-The input file must contain a `request_id` column.
+The input file must contain a `request_id` column. For compatibility with request-splitter output, `Request` is also accepted as a fallback header.
 
 Example:
 
@@ -173,7 +173,7 @@ Behavior:
 - blank rows are ignored
 - duplicate request IDs are removed while preserving first-seen order
 - request IDs with the wrong format are written to the results file as `skipped` with reason `wrong request format`
-- a missing `request_id` column raises an error before migration starts
+- a missing `request_id` or `Request` column raises an error before migration starts
 
 ## Running the Migration
 
