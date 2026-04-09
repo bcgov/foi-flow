@@ -19,6 +19,7 @@ The tool supports:
 - duplicate filtering in the input CSV
 - skipping requests already migrated into FOIDB
 - splitting Excel workbooks of request IDs into one workbook per prefix
+- generating missing results CSVs in batches from a directory of request CSVs
 - `dry-run` validation with transaction rollback
 - preview-first delete mode with explicit confirmation for destructive deletes
 - optional results CSV output
@@ -28,6 +29,7 @@ The tool supports:
 
 - `src/main.py`: CLI entrypoint
 - `src/request_splitter.py`: Excel request splitter CLI for generating one workbook per prefix
+- `src/batch_generate_results.py`: directory runner for generating missing results CSVs
 - `src/migrator.py`: orchestration and per-request transaction flow
 - `src/axis_client.py`: AXIS read queries
 - `src/foidb_client.py`: FOIDB lookups and inserts
@@ -199,6 +201,25 @@ python src/main.py \
   --input-csv ./requests.csv \
   --output-csv ./results.csv
 ```
+
+Generate missing results files for a directory of request CSVs:
+
+```bash
+python src/batch_generate_results.py ./output
+```
+
+Windows PowerShell:
+
+```powershell
+python .\src\batch_generate_results.py .\output
+```
+
+Behavior:
+
+- scans the target directory for `*_requests.csv`
+- skips any file whose sibling `*_results.csv` already exists
+- processes only the first 3 missing results files by default
+- accepts `--limit N` to change how many missing files are generated in one run
 
 Validate only without committing:
 
