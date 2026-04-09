@@ -166,6 +166,7 @@ Behavior:
 
 - blank rows are ignored
 - duplicate request IDs are removed while preserving first-seen order
+- request IDs with the wrong format are written to the results file as `skipped` with reason `wrong request format`
 - a missing `request_id` column raises an error before migration starts
 
 ## Running the Migration
@@ -214,6 +215,15 @@ python src/main.py \
   --limit 10
 ```
 
+Skip suffixed request IDs such as `COR-2024-09887-DR` and write them to the results file as skipped:
+
+```bash
+python src/main.py \
+  --input-csv ./requests.csv \
+  --output-csv ./results.csv \
+  --skip-suffix-requests
+```
+
 Preview what would be deleted for matching FOIMOD records:
 
 ```bash
@@ -249,6 +259,7 @@ CLI options:
 - `--dry-run`: validate inserts but roll back before commit
 - `--delete`: preview or delete FOIMOD rows for each request ID instead of migrating
 - `--confirm-delete`: execute deletes when used with `--delete`; otherwise delete mode is preview-only
+- `--skip-suffix-requests`: skip request IDs that include a trailing suffix such as `-R` or `-DR`
 - `--log-level`: Python logging level, default `INFO`
 
 ## Output and Exit Codes
@@ -268,7 +279,7 @@ Status values produced by the current implementation:
 - `dry-run`: request validated and rolled back intentionally
 - `preview`: delete mode found rows and reported what would be removed
 - `deleted`: delete mode removed rows successfully after confirmation
-- `skipped`: FOIDB already contains the request
+- `skipped`: request was skipped because it was already migrated, had the wrong format, or matched suffix-skip rules
 - `failed`: the request could not be migrated
 
 Exit code behavior:

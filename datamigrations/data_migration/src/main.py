@@ -22,6 +22,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--delete", action="store_true")
     parser.add_argument("--confirm-delete", action="store_true")
+    parser.add_argument("--skip-suffix-requests", action="store_true")
     parser.add_argument("--log-level", default="INFO")
     return parser
 
@@ -31,7 +32,11 @@ def _connect(module_name: str, connection_string: str):
     return module.connect(connection_string)
 
 
-def create_migrator(settings: Settings, dry_run: bool = False) -> RequestMigrator:
+def create_migrator(
+    settings: Settings,
+    dry_run: bool = False,
+    skip_suffix_requests: bool = False,
+) -> RequestMigrator:
     axis_connection = _connect(settings.axis_driver, settings.axis_connection_string)
     foidb_connection = _connect(settings.foidb_driver, settings.foidb_connection_string)
     return RequestMigrator(
@@ -42,10 +47,14 @@ def create_migrator(settings: Settings, dry_run: bool = False) -> RequestMigrato
         foidb_client=FoidbClient(foidb_connection),
         created_by=settings.created_by,
         dry_run=dry_run,
+        skip_suffix_requests=skip_suffix_requests,
     )
 
 
-def run(argv: list[str] | None = None, migrator_factory: Callable[[Settings, bool], RequestMigrator] | None = None) -> int:
+def run(
+    argv: list[str] | None = None,
+    migrator_factory: Callable[[Settings, bool, bool], RequestMigrator] | None = None,
+) -> int:
     args = build_parser().parse_args(argv)
     logging.basicConfig(level=getattr(logging, str(args.log_level).upper(), logging.INFO))
 
@@ -54,7 +63,7 @@ def run(argv: list[str] | None = None, migrator_factory: Callable[[Settings, boo
         request_ids = request_ids[: args.limit]
 
     settings = load_settings() if migrator_factory is None else Settings("", "", "", "")
-    migrator = (migrator_factory or create_migrator)(settings, args.dry_run)
+    migrator = (migrator_factory or create_migrator)(settings, args.dry_run, args.skip_suffix_requests)
 
     if args.delete:
         results = [migrator.delete_request(request_id, confirm_delete=args.confirm_delete) for request_id in request_ids]

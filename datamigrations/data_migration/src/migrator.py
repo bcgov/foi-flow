@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, UTC
 import logging
+import re
 
 from mappers.applicants import map_applicant, map_applicant_mapping
 from mappers.contact_information import map_contact_rows
@@ -9,6 +10,7 @@ from mappers.requests import map_ministry_request, map_parent_request
 
 
 LOGGER = logging.getLogger(__name__)
+REQUEST_ID_PATTERN = re.compile(r"^[A-Z]+-\d{4}-\d+(?:-[A-Z]+)?$")
 
 
 class RequestMigrator:
@@ -19,15 +21,37 @@ class RequestMigrator:
         foidb_client,
         created_by: str = "cfdmigration",
         dry_run: bool = False,
+        skip_suffix_requests: bool = False,
     ):
         self.axis_client = axis_client
         self.foidb_client = foidb_client
         self.created_by = created_by
         self.dry_run = dry_run
+        self.skip_suffix_requests = skip_suffix_requests
 
     def migrate_request(self, request_id: str) -> dict:
         started_at = datetime.now(UTC).isoformat()
         LOGGER.debug("Starting migration for request %s", request_id)
+
+        if not self._is_valid_request_id(request_id):
+            LOGGER.warning("Skipping request %s because it has the wrong format", request_id)
+            return self._result(
+                request_id=request_id,
+                status="skipped",
+                reason="wrong request format",
+                started_at=started_at,
+                foirequest_id="",
+            )
+
+        if self.skip_suffix_requests and self._has_suffix(request_id):
+            LOGGER.info("Skipping request %s because suffix skipping is enabled", request_id)
+            return self._result(
+                request_id=request_id,
+                status="skipped",
+                reason="suffix request skipped",
+                started_at=started_at,
+                foirequest_id="",
+            )
 
         if self.foidb_client.request_exists(request_id):
             LOGGER.debug("Skipping request %s because it already exists in FOIDB", request_id)
@@ -90,6 +114,26 @@ class RequestMigrator:
     def delete_request(self, request_id: str, *, confirm_delete: bool = False) -> dict:
         started_at = datetime.now(UTC).isoformat()
         LOGGER.debug("Starting delete flow for request %s", request_id)
+
+        if not self._is_valid_request_id(request_id):
+            LOGGER.warning("Skipping delete for request %s because it has the wrong format", request_id)
+            return self._result(
+                request_id=request_id,
+                status="skipped",
+                reason="wrong request format",
+                started_at=started_at,
+                foirequest_id="",
+            )
+
+        if self.skip_suffix_requests and self._has_suffix(request_id):
+            LOGGER.info("Skipping delete for request %s because suffix skipping is enabled", request_id)
+            return self._result(
+                request_id=request_id,
+                status="skipped",
+                reason="suffix request skipped",
+                started_at=started_at,
+                foirequest_id="",
+            )
 
         bundle = self.foidb_client.find_request_bundle(request_id)
         if bundle is None:
@@ -194,3 +238,11 @@ class RequestMigrator:
             "started_at": started_at,
             "finished_at": datetime.now(UTC).isoformat(),
         }
+
+    @staticmethod
+    def _is_valid_request_id(request_id: str) -> bool:
+        return bool(REQUEST_ID_PATTERN.fullmatch(request_id))
+
+    @staticmethod
+    def _has_suffix(request_id: str) -> bool:
+        return len(request_id.split("-")) > 3

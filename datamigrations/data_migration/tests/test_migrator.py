@@ -112,6 +112,32 @@ def test_migrate_request_skips_when_request_already_exists() -> None:
     assert result["reason"] == "already migrated"
 
 
+def test_migrate_request_skips_when_request_id_has_wrong_format() -> None:
+    foidb_client = FakeFoidbClient(exists=False)
+    migrator = RequestMigrator(axis_client=FakeAxisClient(), foidb_client=foidb_client)
+
+    result = migrator.migrate_request("[REQUESTNUMBER]")
+
+    assert result["status"] == "skipped"
+    assert result["reason"] == "wrong request format"
+    assert foidb_client.calls == []
+
+
+def test_migrate_request_skips_suffix_requests_when_enabled() -> None:
+    foidb_client = FakeFoidbClient(exists=False)
+    migrator = RequestMigrator(
+        axis_client=FakeAxisClient(),
+        foidb_client=foidb_client,
+        skip_suffix_requests=True,
+    )
+
+    result = migrator.migrate_request("COR-2024-09887-DR")
+
+    assert result["status"] == "skipped"
+    assert result["reason"] == "suffix request skipped"
+    assert foidb_client.calls == []
+
+
 def test_migrate_request_rolls_back_when_parent_request_missing() -> None:
     foidb_client = FakeFoidbClient(exists=False)
     migrator = RequestMigrator(axis_client=FakeAxisClient(parent=None), foidb_client=foidb_client)
@@ -252,6 +278,32 @@ def test_delete_request_previews_counts_without_committing() -> None:
     assert ("delete_request_bundle", 11) not in foidb_client.calls
 
 
+def test_delete_request_skips_when_request_id_has_wrong_format() -> None:
+    foidb_client = FakeFoidbClient(exists=True)
+    migrator = RequestMigrator(axis_client=FakeAxisClient(), foidb_client=foidb_client)
+
+    result = migrator.delete_request("[REQUESTNUMBER]", confirm_delete=False)
+
+    assert result["status"] == "skipped"
+    assert result["reason"] == "wrong request format"
+    assert foidb_client.calls == []
+
+
+def test_delete_request_skips_suffix_requests_when_enabled() -> None:
+    foidb_client = FakeFoidbClient(exists=True)
+    migrator = RequestMigrator(
+        axis_client=FakeAxisClient(),
+        foidb_client=foidb_client,
+        skip_suffix_requests=True,
+    )
+
+    result = migrator.delete_request("COR-2024-09887-DR", confirm_delete=False)
+
+    assert result["status"] == "skipped"
+    assert result["reason"] == "suffix request skipped"
+    assert foidb_client.calls == []
+
+
 def test_delete_request_commits_when_confirmed() -> None:
     foidb_client = FakeFoidbClient(exists=True)
     migrator = RequestMigrator(axis_client=FakeAxisClient(), foidb_client=foidb_client)
@@ -297,7 +349,7 @@ def test_main_processes_csv_and_writes_optional_results(tmp_path: Path) -> None:
             "--output-csv",
             str(output_file),
         ],
-        migrator_factory=lambda settings, dry_run=False: FakeAppMigrator(),
+        migrator_factory=lambda settings, dry_run=False, skip_suffix_requests=False: FakeAppMigrator(),
     )
 
     assert exit_code == 0
@@ -328,12 +380,45 @@ def test_main_routes_delete_mode_to_delete_request(tmp_path: Path) -> None:
             str(output_file),
             "--delete",
         ],
-        migrator_factory=lambda settings, dry_run=False: FakeAppMigrator(),
+        migrator_factory=lambda settings, dry_run=False, skip_suffix_requests=False: FakeAppMigrator(),
     )
 
     assert exit_code == 0
     assert output_file.exists()
     assert "confirm=False" in output_file.read_text(encoding="utf-8")
+
+
+def test_main_passes_skip_suffix_requests_flag_to_migrator_factory(tmp_path: Path) -> None:
+    csv_file = tmp_path / "requests.csv"
+    csv_file.write_text("request_id\nCOR-2024-09887-DR\n", encoding="utf-8")
+    captured: dict[str, bool] = {}
+
+    class FakeAppMigrator:
+        def migrate_request(self, request_id: str):
+            return {
+                "request_id": request_id,
+                "status": "skipped",
+                "reason": "suffix request skipped",
+                "foirequest_id": "",
+                "started_at": "2026-04-09T10:00:00",
+                "finished_at": "2026-04-09T10:00:00",
+            }
+
+    def fake_factory(settings, dry_run=False, skip_suffix_requests=False):
+        captured["skip_suffix_requests"] = skip_suffix_requests
+        return FakeAppMigrator()
+
+    exit_code = run(
+        [
+            "--input-csv",
+            str(csv_file),
+            "--skip-suffix-requests",
+        ],
+        migrator_factory=fake_factory,
+    )
+
+    assert exit_code == 0
+    assert captured["skip_suffix_requests"] is True
 
 
 def test_create_migrator_passes_axis_filter_settings(monkeypatch) -> None:
