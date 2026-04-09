@@ -32,6 +32,16 @@ class FoidbClient:
         self.connection.rollback()
 
     def request_exists(self, request_id: str) -> bool:
+        # Check FOIMinistryRequests first
+        cursor = self._execute(
+            'SELECT 1 FROM public."FOIMinistryRequests" '
+            'WHERE axisrequestid = %s OR migrationreference = %s LIMIT 1',
+            (request_id, request_id),
+        )
+        if cursor.fetchone():
+            return True
+
+        # Then check FOIRequests
         cursor = self._execute(
             'SELECT 1 FROM public."FOIRequests" WHERE migrationreference = %s LIMIT 1',
             (request_id,),
