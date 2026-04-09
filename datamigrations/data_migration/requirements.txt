@@ -1,3 +1,4 @@
 pytest
 pyodbc
 psycopg[binary]
+openpyxl
