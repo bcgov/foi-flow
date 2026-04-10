@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ProactiveDisclosureRequestPublicationMain from "./ProactiveDisclosureRequestPublicationMain";
 import OpenInfoConfirmationModal from "../../OpenInformation/OpenInfoConfirmationModal";
 import OpenInfoHeader from "../../OpenInformation/OpenInfoHeader";
-import { saveFOIProactiveDisclosureRequest, fetchFOIProactiveDisclosureRequest } from "../../../../../apiManager/services/FOI/foiProactiveDisclosureServices";
+import { saveFOIProactiveDisclosureRequest, fetchFOIProactiveDisclosureRequest, publishFOIProactiveDisclosureRequest } from "../../../../../apiManager/services/FOI/foiProactiveDisclosureServices";
 import { PDPublicationStatus, PDTransactionObject } from "./types";
 import { OIStates, OIPublicationStatuses } from "../../../../../helper/openinfo-helper";
 import { calculateBusinessDaysBetween, formatDateInPst } from "../../../../../helper/FOI/helper";
@@ -24,9 +24,6 @@ const ProactiveDisclosureRequestPublication = ({
     //App State
     const assignedToList = useSelector(
         (state: any) => state.foiRequests.foiFullAssignedToList
-    );
-    let foiPDAdditionalFiles = useSelector(
-        (state: any) => state.foiRequests.foiOpenInfoAdditionalFiles
     );
     let foiPDTransactionData = useSelector(
         (state: any) => state.foiRequests.foiOpenInfoRequest
@@ -74,14 +71,7 @@ const ProactiveDisclosureRequestPublication = ({
             setIsDataEdited(true);
         }
         //Reset foi pd data if publication status goes back to publication.
-        if (pdDataKey === "oipublicationstatus_id" && value === findPDPublicationState("Publish")?.oipublicationstatusid) {
-            setPdPublicationData((prev: any) => ({
-                ...prev,
-                [pdDataKey]: value,
-                publicationdate: null,
-                receiveddate: null,
-            }));
-        } else if (pdDataKey === "publicationdate" && requestDetails.closedate
+         if (pdDataKey === "publicationdate" && requestDetails.closedate
             && typeof (value) === "string") {
             const daysBetween = calculateBusinessDaysBetween(requestDetails.closedate, value);
             if (daysBetween >= 0 && daysBetween < 10) {
@@ -159,10 +149,60 @@ const ProactiveDisclosureRequestPublication = ({
         );
     };
 
+    const publishNow = (publicationdate : any): any => {
+        const toastID = toast.loading("Publishing FOI Proactive Disclosure request...");
+        publicationdate = publicationdate || (pdPublicationData.publicationdate ?
+            new Date(pdPublicationData.publicationdate).toISOString().split('T')[0] :
+            null)
+        const formattedData = {
+            ...pdPublicationData,
+            publicationdate: publicationdate
+        };
+        dispatch(
+            publishFOIProactiveDisclosureRequest(
+                foiministryrequestid,
+                foirequestid,
+                formattedData,
+                (err: any, _res: any) => {
+                    if (!err) {
+                        toast.update(toastID, {
+                            type: "success",
+                            render:
+                                "FOI Proactive Disclosure request has been successfully published.",
+                            position: "top-right",
+                            isLoading: false,
+                            autoClose: 3000,
+                            hideProgressBar: true,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                        });
+                        requestDetails.oistatusid = OIStates.Published;
+                        dispatch(fetchFOIProactiveDisclosureRequest(foiministryrequestid));
+                        setIsDataEdited(false);
+                    } else {
+                        toast.error(
+                            "Temporarily unable to publish FOI Proactive Disclosure request. Please try again in a few minutes.",
+                            {
+                                position: "top-right",
+                                autoClose: 3000,
+                                hideProgressBar: true,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                            }
+                        );
+                    }
+                }
+            )
+        );
+    }
+
     const disablePublish = (): boolean => {
-        const responseLetterRegex = /Response[_\-\s]*Letter/i;
-        const isMissingRequiredInput = pdPublicationData?.copyrightsevered === null || pdPublicationData?.publicationdate === null || !foiPDAdditionalFiles?.some((f: any) => responseLetterRegex.test(f.filename));
-        const isPDReadyToPublish = currentPDRequestState === "Ready to Publish" || currentPDRequestState === OIStates.ReadyToPublish;
+        const isMissingRequiredInput = pdPublicationData?.publicationdate === null;
+        const isPDReadyToPublish = currentPDRequestState === "Ready to Publish";
         if (!isPDReadyToPublish) {
             return true;
         }
@@ -182,8 +222,8 @@ const ProactiveDisclosureRequestPublication = ({
         setConfirmationModal((prev: any) => ({
             ...prev,
             show: true,
-            title: "Publish Now",
-            description: "Are you sure you want to Publish this request now?",
+            title: "Publish Files Now",
+            description: "Your publication files will be published immediately. Any previously scheduled publication date is overridden.",
             message: "",
             confirmButtonTitle: "Publish Now",
         }));
@@ -191,22 +231,7 @@ const ProactiveDisclosureRequestPublication = ({
 
     const publishConfirmation = () => {
         const todaysDate = formatDateInPst(new Date());
-        saveData(todaysDate);
-    }
-
-    const save = () => {
-        if (pdPublicationData.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest) {
-            setConfirmationModal({
-                show: true,
-                title: "Unpublish Request",
-                description: "Are you sure you want to unpublish this request?",
-                message: "This request will be removed from the Open Information website, the request state will be changed to 'Unpublished', and the request will be available in the Open Information queue for further review and action.",
-                confirmButtonTitle: "Unpublish Request",
-                confirmationData: null,
-            });
-        } else {
-            saveData()
-        }
+        publishNow(todaysDate);
     }
 
     return (
@@ -235,7 +260,7 @@ const ProactiveDisclosureRequestPublication = ({
                 type="button"
                 className="btn btn-bottom"
                 disabled={!isDataEdited}
-                onClick={save}
+                onClick={saveData}
             >
                 Save
             </button>
@@ -250,8 +275,7 @@ const ProactiveDisclosureRequestPublication = ({
             <OpenInfoConfirmationModal
                 modal={confirmationModal}
                 confirm={(confirmationModal.title === "Change Publication Date" && handleDateConfirmation)
-                    || (confirmationModal.title === "Publish Now" && publishConfirmation)
-                    || (confirmationModal.title === "Unpublish Request" && saveData)
+                    || (confirmationModal.title === "Publish Files Now" && publishConfirmation)
                 }
                 setModal={setConfirmationModal}
             />

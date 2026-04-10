@@ -1173,6 +1173,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
+    // HERE
 
     if (
       _state?.toLowerCase() === StateEnum.unopened.name.toLowerCase() &&
@@ -1228,8 +1229,10 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const handleStateChange = (currentStatus) => {
     if (isOITeam) {
+      console.log("OI OI")
       setOIStatus(currentStatus);
     } else {
+      console.log("NORMIE")
       setcurrentrequestStatus(currentStatus);
     }
     setStateChanged(true);
@@ -1321,6 +1324,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const signupUrl = "/signup";
 
   const [OIStatus, setOIStatus] = useState("");
+  const [PDStatus, setPDStatus] = useState("");
 
   const requestNumber = requestDetails?.axisRequestId
     ? requestDetails.axisRequestId
@@ -1478,6 +1482,9 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       return StateEnum.unopened.name;
     }
   };
+  console.log("change?>", stateChanged)
+  console.log("OISTATUSSTATE", OIStatus)
+  console.log("currentSTatus", _currentrequestStatus)
 
   return (!isLoading &&
     requestDetails &&
@@ -2267,7 +2274,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   toast={toast}
                   requestNumber={requestNumber}
                   requestDetails={requestDetails}
-                  currentOIRequestState={getOIRequestState()}
+                  currentPDRequestState={getOIRequestState()}
                   foirequestid={requestId}
                   isOITeam={isOITeam}
                   foiministryrequestid={ministryId}

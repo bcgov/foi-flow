@@ -617,13 +617,13 @@ class FOIOpenInformationRequests(db.Model):
                     oi.publicationdate,
                     pa.name,
                     ac.name,
-                    fee.feedata,
+                    COALESCE((fee.feedata->>'amountpaid')::Numeric, 0),
                     pa.bcgovcode,
                     oi.sitemap_pages;
             """
             
             result = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid})
-            data = [dict(row._mapping) for row in result]
+            data = [dict(row) for row in result]
             return data
         except Exception as exception:
             logging.error(f"Error fetching FOIOpenInfo request details: {exception}")
@@ -652,7 +652,7 @@ class FOIOpenInformationRequests(db.Model):
             
             result = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid})
             # Convert the result rows into a list of dictionaries for easy JSON serialization
-            data = [dict(row._mapping) for row in result]
+            data = [dict(row) for row in result]
             return data
         except Exception as exception:
             logging.error(f"Error fetching FOIOpenInfo request details: {exception}")
@@ -694,7 +694,7 @@ class FOIOpenInformationRequests(db.Model):
                 FROM public."FOIMinistryRequests" mr
                 INNER JOIN public."FOIRequests" r on mr.foirequest_id = r.foirequestid and mr.foirequestversion_id = r.version
                 INNER JOIN public."ProgramAreas" pa on mr.programareaid = pa.programareaid
-                INNER JOIN public."ApplicantCategories" ac on r.applicantcategoryid = ac.applicantcategoryid
+                LEFT JOIN public."ApplicantCategories" ac on r.applicantcategoryid = ac.applicantcategoryid
                 LEFT JOIN (
                     SELECT ministryrequestid, MAX(version) as max_version
                     FROM public."FOIRequestCFRFees"
@@ -719,7 +719,7 @@ class FOIOpenInformationRequests(db.Model):
                     pd.publicationdate,
                     pa.name,
                     ac.name,
-                    fee.feedata,
+                    COALESCE((fee.feedata->>'amountpaid')::Numeric, 0),
                     pa.bcgovcode,
                     pd.sitemap_pages,
                     pdc.name,
@@ -727,7 +727,7 @@ class FOIOpenInformationRequests(db.Model):
             """
             
             result = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid})
-            data = [dict(row._mapping) for row in result]
+            data = [dict(row) for row in result]
             return data
         except Exception as exception:
             logging.error(f"Error fetching FOIOpenInfo request details: {exception}")
@@ -756,7 +756,7 @@ class FOIOpenInformationRequests(db.Model):
             
             result = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid})
             # Convert the result rows into a list of dictionaries for easy JSON serialization
-            data = [dict(row._mapping) for row in result]
+            data = [dict(row) for row in result]
             return data
         except Exception as exception:
             logging.error(f"Error fetching FOIOpenInfo request details: {exception}")
