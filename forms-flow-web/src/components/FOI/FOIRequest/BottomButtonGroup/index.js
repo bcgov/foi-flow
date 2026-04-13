@@ -10,7 +10,6 @@ import {
 import {
   saveRequestDetails,
   openRequestDetails,
-  unpublishPDRequest
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
@@ -154,10 +153,9 @@ const BottomButtonGroup = React.memo(
           urlIndexCreateRequest,
           requestId,
           ministryId,
-          async (err, res) => {
+          (err, res) => {
             console.log("SAVE FINAL")
             if (!err) {
-              if (isProactiveDisclosure && currentSelectedStatus === "Unpublished") await unpublishPDRequest(ministryId);
               toast.success("The request has been saved successfully.", {
                 position: "top-right",
                 autoClose: 3000,

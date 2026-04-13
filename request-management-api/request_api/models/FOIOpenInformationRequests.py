@@ -638,6 +638,7 @@ class FOIOpenInformationRequests(db.Model):
                 SELECT
                     oi.foiopeninforequestid AS openinfoid,
                     mr.foiministryrequestid,
+                    mr.foirequest_id,
                     mr.axisrequestid,
                     COALESCE(oi.sitemap_pages, '') as sitemap_pages,
                     'unpublish' as type
@@ -742,6 +743,7 @@ class FOIOpenInformationRequests(db.Model):
                 SELECT
                     pd.proactivedisclosureid,
                     mr.foiministryrequestid,
+                    mr.foirequest_id,
                     mr.axisrequestid,
                     COALESCE(pd.sitemap_pages, '') as sitemap_pages,
                     'unpublish' as type

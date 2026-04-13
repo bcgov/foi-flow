@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ProactiveDisclosureRequestPublicationMain from "./ProactiveDisclosureRequestPublicationMain";
 import OpenInfoConfirmationModal from "../../OpenInformation/OpenInfoConfirmationModal";
 import OpenInfoHeader from "../../OpenInformation/OpenInfoHeader";
-import { saveFOIProactiveDisclosureRequest, fetchFOIProactiveDisclosureRequest, publishFOIProactiveDisclosureRequest } from "../../../../../apiManager/services/FOI/foiProactiveDisclosureServices";
+import { saveFOIProactiveDisclosureRequest, fetchFOIProactiveDisclosureRequest, publishFOIProactiveDisclosureRequest, unpublishFOIProactiveDisclosureRequest } from "../../../../../apiManager/services/FOI/foiProactiveDisclosureServices";
 import { PDPublicationStatus, PDTransactionObject } from "./types";
 import { OIStates, OIPublicationStatuses } from "../../../../../helper/openinfo-helper";
 import { calculateBusinessDaysBetween, formatDateInPst } from "../../../../../helper/FOI/helper";
@@ -52,17 +52,7 @@ const ProactiveDisclosureRequestPublication = ({
     });
     const [isDataEdited, setIsDataEdited] = useState(false);
 
-    useEffect(() => {
-        setPdPublicationData({
-            ...foiPDTransactionData,
-            oipublicationstatus_id: foiPDTransactionData?.oipublicationstatus_id || OIPublicationStatuses.Publish
-        });
-    }, [foiPDTransactionData]);
-
     //Functions
-    const findPDPublicationState = (name: string) => {
-        return pdPublicationStatuses.find((s: PDPublicationStatus) => s.name === name);
-    }
     const handlePDDataChange = (
         value: number | string | boolean,
         pdDataKey: string
@@ -156,6 +146,7 @@ const ProactiveDisclosureRequestPublication = ({
             null)
         const formattedData = {
             ...pdPublicationData,
+            oipublicationstatus_id: 2,
             publicationdate: publicationdate
         };
         dispatch(
@@ -168,7 +159,7 @@ const ProactiveDisclosureRequestPublication = ({
                         toast.update(toastID, {
                             type: "success",
                             render:
-                                "FOI Proactive Disclosure request has been successfully published.",
+                                "FOI Proactive Disclosure request has successfully been sent for publishing.",
                             position: "top-right",
                             isLoading: false,
                             autoClose: 3000,
@@ -178,12 +169,58 @@ const ProactiveDisclosureRequestPublication = ({
                             draggable: true,
                             progress: undefined,
                         });
-                        requestDetails.oistatusid = OIStates.Published;
                         dispatch(fetchFOIProactiveDisclosureRequest(foiministryrequestid));
                         setIsDataEdited(false);
                     } else {
                         toast.error(
                             "Temporarily unable to publish FOI Proactive Disclosure request. Please try again in a few minutes.",
+                            {
+                                position: "top-right",
+                                autoClose: 3000,
+                                hideProgressBar: true,
+                                closeOnClick: true,
+                                pauseOnHover: true,
+                                draggable: true,
+                                progress: undefined,
+                            }
+                        );
+                    }
+                }
+            )
+        );
+    }
+
+    const unpublish = (): any => {
+        const toastID = toast.loading("Unpublishing FOI Proactive Disclosure request...");
+        const formattedData = {
+            ...pdPublicationData,
+            oipublicationstatus_id: 3,
+        };
+        dispatch(
+            unpublishFOIProactiveDisclosureRequest(
+                foiministryrequestid,
+                foirequestid,
+                formattedData,
+                (err: any, _res: any) => {
+                    if (!err) {
+                        toast.update(toastID, {
+                            type: "success",
+                            render:
+                                "FOI Proactive Disclosure request has successfully been sent for unpublishing.",
+                            position: "top-right",
+                            isLoading: false,
+                            autoClose: 3000,
+                            hideProgressBar: true,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                        });
+                        dispatch(fetchFOIProactiveDisclosureRequest(foiministryrequestid));
+                        setIsDataEdited(false);
+                    } else {
+                        toast.error(
+                            "Temporarily unable to unpublish FOI Proactive Disclosure request. Please try again in a few minutes.",
                             {
                                 position: "top-right",
                                 autoClose: 3000,
@@ -212,6 +249,14 @@ const ProactiveDisclosureRequestPublication = ({
         return false;
     }
 
+    const disableUnpublish = (): boolean => {
+        const isPDPublished = currentPDRequestState === "Published";
+        if (!isPDPublished) {
+            return true;
+        }
+        return false;
+    }
+
     const handleDateConfirmation = (value: Date) => {
         setPdPublicationData((prev: any) => ({
             ...prev,
@@ -223,12 +268,21 @@ const ProactiveDisclosureRequestPublication = ({
             ...prev,
             show: true,
             title: "Publish Files Now",
-            description: "Your publication files will be published immediately. Any previously scheduled publication date is overridden.",
+            description: "Your Proactive Disclosure files will be sent to our Publication Service for publishing. Any previously scheduled publication date will be overridden. You will receive a notification shortly once your request has been published, and the request state will be moved to 'Published'.",
             message: "",
             confirmButtonTitle: "Publish Now",
         }));
     }
-
+    const handleUnpublish = () => {
+        setConfirmationModal((prev: any) => ({
+            ...prev,
+            show: true,
+            title: "Unpublish",
+            description: "Your Proactive Disclosure files will be sent to our Publication Service for unpublishing. You will receive a notification shortly once your request has been unpublished and the request state will be moved to 'Unpublished'.",
+            message: "",
+            confirmButtonTitle: "Unpublish",
+        }));
+    }
     const publishConfirmation = () => {
         const todaysDate = formatDateInPst(new Date());
         publishNow(todaysDate);
@@ -264,18 +318,29 @@ const ProactiveDisclosureRequestPublication = ({
             >
                 Save
             </button>
+            {currentPDRequestState === "Published" ?
             <button
+                type="button"
+                disabled={disableUnpublish()}
+                className="btn btn-bottom"
+                onClick={handleUnpublish}
+            >
+                Unpublish
+            </button>
+            : <button
                 type="button"
                 disabled={disablePublish()}
                 className="btn btn-bottom"
                 onClick={handlePublishNow}
             >
                 Publish Now
-            </button>
+            </button> 
+            }
             <OpenInfoConfirmationModal
                 modal={confirmationModal}
                 confirm={(confirmationModal.title === "Change Publication Date" && handleDateConfirmation)
-                    || (confirmationModal.title === "Publish Files Now" && publishConfirmation)
+                    || (confirmationModal.title === "Publish Files Now" && publishConfirmation) ||
+                    (confirmationModal.title === "Unpublish" && unpublish)
                 }
                 setModal={setConfirmationModal}
             />

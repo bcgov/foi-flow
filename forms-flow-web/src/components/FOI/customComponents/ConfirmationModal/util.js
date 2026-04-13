@@ -158,9 +158,6 @@ import { isReadyForPublishing } from '../../FOIRequest/utils';
         return {title: "Changing the state", body: 'Unable to update state: please make sure the copyright is selected and a response letter is uploaded with "Response Letter" in the filename'}
       }
     }
-    if (state === 'Unpublished' && isProactiveDisclosure) {
-      return {title: "Changing the state", body: 'If you change the state to Unpublished, the request will be removed from the sitemap. Are you sure you want to proceed?'}
-    }
     return {title: "Changing the state", body: "Are you sure you want to change the state of this request to " + state + "?"}
   }
 

@@ -84,7 +84,6 @@ const updateFOIMinistryRequestOIStatus = (
 };
 
 export const publishFOIProactiveDisclosureRequest = (foiministryrequestid, foirequestId, data, ...rest) => {
-  //REFACTOR THIS FOR BETTER ERRO HANDLING AND SPLITTING OF API CALLS TO THEIR OWN FINC
   const proactiveDisclosureApiUrl = replaceUrl(
     replaceUrl(API.FOI_POST_PROACTIVE_DISCLOSURE_REQUEST, "<foirequestid>", foirequestId),
     "<foiministryrequestid>",
@@ -93,28 +92,55 @@ export const publishFOIProactiveDisclosureRequest = (foiministryrequestid, foire
   const pdPublishNowApi = replaceUrl(API.FOI_PUBLISHNOW_PROACTIVE_DISCLOSURE, "<foiministryrequestid>", foiministryrequestid);
   const done = fnDone(rest);
   return (dispatch) => {
-    // Update oistatus_id for FOIMinistryrequest related to FOIPDRequest
-    updateFOIMinistryRequestOIStatus(foiministryrequestid, foirequestId)
+    // Update FOIPDrequest data (publishdate, oipublcaitonstatus)
+    httpPOSTRequest(proactiveDisclosureApiUrl, data, UserService.getToken())
     .then((res) => {
-      // Update FOIPDrequest data (publishdate)
-      httpPOSTRequest(proactiveDisclosureApiUrl, data, UserService.getToken())
+      // Create a publish now message and add to redis queue
+      httpPOSTRequest(pdPublishNowApi, {}, UserService.getToken())
       .then((res) => {
-        // Finally create a publish now message and add to redis queue
-        httpPOSTRequest(pdPublishNowApi, {}, UserService.getToken())
-        .then((res) => {
-          if (res.status === 202) {
+        if (res.status === 202) {
             done(null, res.data);
-          } else {
-            console.log("API call to publish request did not return status 201:", res);
-            dispatch(serviceActionError(res));
-          }
-          })
-        });
+        } else {
+          console.log("API call to publish request did not return status 201:", res);
+          dispatch(serviceActionError(res));
+        }
       })
-      .catch((error) => {
-        done(error);
-        console.log("API call to publish request failed", error);
-        dispatch(serviceActionError(error));
-      });
+    })
+    .catch((error) => {
+      done(error);
+      console.log("API call to publish request failed", error);
+      dispatch(serviceActionError(error));
+    });
+  };
+}
+
+export const unpublishFOIProactiveDisclosureRequest = (foiministryrequestid, foirequestId, data, ...rest) => {
+  const pdUnpublishApi= replaceUrl(API.FOI_UNPUBLISH_PROACTIVE_DISCLOSURE, "<foiministryrequestid>", foiministryrequestid);
+  const proactiveDisclosureApiUrl = replaceUrl(
+    replaceUrl(API.FOI_POST_PROACTIVE_DISCLOSURE_REQUEST, "<foirequestid>", foirequestId),
+    "<foiministryrequestid>",
+    foiministryrequestid
+  );
+  const done = fnDone(rest);
+  return (dispatch) => {
+    // Update FOIPDrequest data (oipublcaitonstatus)
+    httpPOSTRequest(proactiveDisclosureApiUrl, data, UserService.getToken())
+    .then((res) => {
+      // Create a unpublish message and add to redis queue
+      httpPOSTRequest(pdUnpublishApi, {}, UserService.getToken())
+      .then((res) => {
+        if (res.status === 202) {
+            done(null, res.data);
+        } else {
+          console.log("API call to unpublish request did not return status 201:", res);
+          dispatch(serviceActionError(res));
+        }
+      })
+    })
+    .catch((error) => {
+      done(error);
+      console.log("API call to unpublish request failed", error);
+      dispatch(serviceActionError(error));
+    });
   };
 }
