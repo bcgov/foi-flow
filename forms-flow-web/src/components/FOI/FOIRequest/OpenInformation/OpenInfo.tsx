@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { saveFOIOpenInfoRequest, fetchFOIOpenInfoRequest } from "../../../../apiManager/services/FOI/foiOpenInfoRequestServices";
+import { saveFOIOpenInfoRequest, fetchFOIOpenInfoRequest, publishFOIOpenInfoRequest, unpublishFOIOpenInfoRequest } from "../../../../apiManager/services/FOI/foiOpenInfoRequestServices";
 import { useDispatch, useSelector } from "react-redux";
 import IAOOpenInfoPublishing from "./Exemption/IAOOpenInfoPublishing";
 import OpenInfoPublication from "./Publication/OpenInfoPublication";
@@ -142,11 +142,11 @@ const OpenInfo = ({
       saveData();
     }
   };
-  const saveData = (publicationdate?: any) => {
+  const saveData = () => {
     const toastID = toast.loading("Saving FOI OpenInformation request...");
-    publicationdate = publicationdate || (oiPublicationData.publicationdate ?
+    const publicationdate = oiPublicationData.publicationdate ?
       new Date(oiPublicationData.publicationdate).toISOString().split('T')[0] :
-      null)
+      null
     const formattedData = {
       ...oiPublicationData,
       publicationdate: publicationdate
@@ -177,7 +177,6 @@ const OpenInfo = ({
             const isValidExemptionDenial = isOITeam && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && oiPublicationData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && oiPublicationData.oiexemptionapproved === false;
             const isValidExemptionApproved = isOITeam && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && oiPublicationData.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && oiPublicationData.oiexemptionapproved === true;
             const manualPublicationStatusChange = requestDetails.oistatusid === OIStates.ExemptionRequest && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.Publish;
-            const isUnpublish = isOITeam && oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest;
             if (isValidExemptionRequest) {
               requestDetails.oistatusid = OIStates.ExemptionRequest;
             }
@@ -186,9 +185,6 @@ const OpenInfo = ({
             }
             if (isValidExemptionApproved) {
               requestDetails.oistatusid = OIStates.DoNotPublish
-            }
-            if (isUnpublish) {
-              requestDetails.oistatusid = OIStates.Unpublished
             }
             dispatch(fetchFOIOpenInfoRequest(foiministryrequestid));
           } else {
@@ -209,6 +205,104 @@ const OpenInfo = ({
       )
     );
   };
+
+  const publishNow = (publicationdate?: any) => {
+    const toastID = toast.loading("Publishing FOI Open Information request...");
+    publicationdate = publicationdate || (oiPublicationData.publicationdate ?
+      new Date(oiPublicationData.publicationdate).toISOString().split('T')[0] :
+      null)
+    const formattedData = {
+      ...oiPublicationData,
+      oipublicationstatus_id: OIPublicationStatuses.Publish,
+      publicationdate: publicationdate
+    };
+    dispatch(
+      publishFOIOpenInfoRequest(
+        foiministryrequestid,
+        foirequestid,
+        formattedData,
+        (err: any, _res: any) => {
+          if (!err) {
+            toast.update(toastID, {
+              type: "success",
+              render:
+                "FOI Open Information request has successfully been sent for publishing.",
+              position: "top-right",
+              isLoading: false,
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+            dispatch(fetchFOIOpenInfoRequest(foiministryrequestid));
+          } else {
+            toast.error(
+              "Temporarily unable to publish FOI Open Information request. Please try again in a few minutes.",
+              {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              }
+            );
+          }
+        }
+      )
+    );
+  };
+
+  const unpublish = () => {
+    const toastID = toast.loading("Unpublishing FOI Open Information request...");
+    const formattedData = {
+      ...oiPublicationData,
+      oipublicationstatus_id: OIPublicationStatuses.UnpublishRequest,
+      publicationdate: null,
+    };
+    dispatch(
+      unpublishFOIOpenInfoRequest(
+        foiministryrequestid,
+        foirequestid,
+        formattedData,
+        (err: any, _res: any) => {
+          if (!err) {
+            toast.update(toastID, {
+              type: "success",
+              render:
+                "FOI Open Information request has successfully been sent for unpublishing.",
+              position: "top-right",
+              isLoading: false,
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+            dispatch(fetchFOIOpenInfoRequest(foiministryrequestid));
+          } else {
+            toast.error(
+              "Temporarily unable to unpublish FOI Open Information request. Please try again in a few minutes.",
+              {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+              }
+            );
+          }
+        }
+      )
+    );
+  };
+
   const disableSave = (oiPublicationData: OITransactionObject): boolean => {
     const isDoNotPublish = oiPublicationData?.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish;
     const hasExemption = oiPublicationData?.oiexemption_id;
@@ -241,6 +335,13 @@ const OpenInfo = ({
     }
     return false;
   }
+  const disableUnpublish = (): boolean => {
+    const isOIPublished = currentOIRequestState === "Published";
+    if (!isOIPublished) {
+      return true;
+    }
+    return false;
+  }
   const handleTabSelect = (value: number): void => {
     setTabValue(value);
   };
@@ -256,8 +357,18 @@ const OpenInfo = ({
       show: true,
       title: "Publish Now",
       description: "Are you sure you want to Publish this request now?",
-      message: "",
+      message: "Your request will be sent to our Publication Service for publishing. Any previously scheduled publication date will be overridden. You will receive a notification shortly once your request has been published, and the request state will be moved to 'Published'.",
       confirmButtonTitle: "Publish Now",
+    }));
+  }
+  const handleUnpublish = () => {
+    setConfirmationModal((prev: any) => ({
+      ...prev,
+      show: true,
+      title: "Unpublish Request",
+      description: "Are you sure you want to Unpublish this request?",
+      message: "Your request will be sent to our Publication Service for unpublishing. You will receive a notification shortly once your request has been unpublished and the request state will be moved to 'Unpublished'.",
+      confirmButtonTitle: "Unpublish"
     }));
   }
 
@@ -303,6 +414,10 @@ const OpenInfo = ({
             requestNumber={requestNumber}
             handlePublishNow={handlePublishNow}
             earliestPublicationDate={addBusinessDays(requestDetails.closedate, 10)}
+            handleUnpublish={handleUnpublish}
+            disableUnpublish={disableUnpublish}
+            publishNow={publishNow}
+            unpublish={unpublish}
           />
         )}
       </div>

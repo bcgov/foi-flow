@@ -146,7 +146,7 @@ const ProactiveDisclosureRequestPublication = ({
             null)
         const formattedData = {
             ...pdPublicationData,
-            oipublicationstatus_id: 2,
+            oipublicationstatus_id: OIPublicationStatuses.Publish,
             publicationdate: publicationdate
         };
         dispatch(
@@ -194,7 +194,8 @@ const ProactiveDisclosureRequestPublication = ({
         const toastID = toast.loading("Unpublishing FOI Proactive Disclosure request...");
         const formattedData = {
             ...pdPublicationData,
-            oipublicationstatus_id: 3,
+            oipublicationstatus_id: OIPublicationStatuses.UnpublishRequest,
+            publicationdate: null,
         };
         dispatch(
             unpublishFOIProactiveDisclosureRequest(
@@ -268,8 +269,8 @@ const ProactiveDisclosureRequestPublication = ({
             ...prev,
             show: true,
             title: "Publish Files Now",
-            description: "Your Proactive Disclosure files will be sent to our Publication Service for publishing. Any previously scheduled publication date will be overridden. You will receive a notification shortly once your request has been published, and the request state will be moved to 'Published'.",
-            message: "",
+            description: "Are you sure you want to Publish this request now?",
+            message: "Your Proactive Disclosure request will be sent to our Publication Service for publishing. Any previously scheduled publication date will be overridden. You will receive a notification shortly once your request has been published, and the request state will be moved to 'Published'.",
             confirmButtonTitle: "Publish Now",
         }));
     }
@@ -277,9 +278,9 @@ const ProactiveDisclosureRequestPublication = ({
         setConfirmationModal((prev: any) => ({
             ...prev,
             show: true,
-            title: "Unpublish",
-            description: "Your Proactive Disclosure files will be sent to our Publication Service for unpublishing. You will receive a notification shortly once your request has been unpublished and the request state will be moved to 'Unpublished'.",
-            message: "",
+            title: "Unpublish Request",
+            description: "Are you sure you want to Unpublish this request?",
+            message: "Your Proactive Disclosure request will be sent to our Publication Service for unpublishing. You will receive a notification shortly once your request has been unpublished and the request state will be moved to 'Unpublished'.",
             confirmButtonTitle: "Unpublish",
         }));
     }
@@ -340,7 +341,7 @@ const ProactiveDisclosureRequestPublication = ({
                 modal={confirmationModal}
                 confirm={(confirmationModal.title === "Change Publication Date" && handleDateConfirmation)
                     || (confirmationModal.title === "Publish Files Now" && publishConfirmation) ||
-                    (confirmationModal.title === "Unpublish" && unpublish)
+                    (confirmationModal.title === "Unpublish Request" && unpublish)
                 }
                 setModal={setConfirmationModal}
             />
