@@ -1229,10 +1229,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const handleStateChange = (currentStatus) => {
     if (isOITeam) {
-      console.log("OI OI")
       setOIStatus(currentStatus);
     } else {
-      console.log("NORMIE")
       setcurrentrequestStatus(currentStatus);
     }
     setStateChanged(true);

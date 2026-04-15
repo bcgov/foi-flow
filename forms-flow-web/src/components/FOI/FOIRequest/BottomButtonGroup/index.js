@@ -321,7 +321,6 @@ const BottomButtonGroup = React.memo(
     const [documents, setDocuments] = useState([]);
 
     const saveStatusId = () => {
-      console.log("JACKPOT")
       const currentOIState = openInfoStates.find(s => s.name === currentSelectedStatus);
       if (userGroups.includes("OI Team") && !isProactiveDisclosure) {
         saveRequestObject.oistatusid = currentOIState?.oistatusid;
