@@ -156,10 +156,11 @@ const ProactiveDisclosureRequestPublication = ({
                 formattedData,
                 (err: any, _res: any) => {
                     if (!err) {
+                        const toastMsg = _res.status === 202 ? "FOI Proactive Disclosure request has successfully been sent for publishing." : "No data found to publish for this FOI Proactive Disclosure request.";
                         toast.update(toastID, {
                             type: "success",
                             render:
-                                "FOI Proactive Disclosure request has successfully been sent for publishing.",
+                                 toastMsg,
                             position: "top-right",
                             isLoading: false,
                             autoClose: 3000,
@@ -172,18 +173,19 @@ const ProactiveDisclosureRequestPublication = ({
                         dispatch(fetchFOIProactiveDisclosureRequest(foiministryrequestid));
                         setIsDataEdited(false);
                     } else {
-                        toast.error(
-                            "Temporarily unable to publish FOI Proactive Disclosure request. Please try again in a few minutes.",
-                            {
-                                position: "top-right",
-                                autoClose: 3000,
-                                hideProgressBar: true,
-                                closeOnClick: true,
-                                pauseOnHover: true,
-                                draggable: true,
-                                progress: undefined,
-                            }
-                        );
+                        toast.update(toastID, {
+                            type: "error",
+                            render:
+                                 "Temporarily unable to publish FOI Proactive Disclosure request. Please try again in a few minutes.",
+                            position: "top-right",
+                            isLoading: false,
+                            autoClose: 3000,
+                            hideProgressBar: true,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                        });
                     }
                 }
             )
@@ -195,7 +197,6 @@ const ProactiveDisclosureRequestPublication = ({
         const formattedData = {
             ...pdPublicationData,
             oipublicationstatus_id: OIPublicationStatuses.UnpublishRequest,
-            publicationdate: null,
         };
         dispatch(
             unpublishFOIProactiveDisclosureRequest(
@@ -204,10 +205,11 @@ const ProactiveDisclosureRequestPublication = ({
                 formattedData,
                 (err: any, _res: any) => {
                     if (!err) {
+                        const toastMsg = _res.status === 202 ? "FOI Proactive Disclosure request has successfully been sent for unpublishing." : "No data found to unpublish for this FOI Proactive Disclosure request.";
                         toast.update(toastID, {
                             type: "success",
                             render:
-                                "FOI Proactive Disclosure request has successfully been sent for unpublishing.",
+                                 toastMsg,
                             position: "top-right",
                             isLoading: false,
                             autoClose: 3000,
@@ -220,18 +222,19 @@ const ProactiveDisclosureRequestPublication = ({
                         dispatch(fetchFOIProactiveDisclosureRequest(foiministryrequestid));
                         setIsDataEdited(false);
                     } else {
-                        toast.error(
-                            "Temporarily unable to unpublish FOI Proactive Disclosure request. Please try again in a few minutes.",
-                            {
-                                position: "top-right",
-                                autoClose: 3000,
-                                hideProgressBar: true,
-                                closeOnClick: true,
-                                pauseOnHover: true,
-                                draggable: true,
-                                progress: undefined,
-                            }
-                        );
+                        toast.update(toastID, {
+                            type: "error",
+                            render:
+                                 "Temporarily unable to unpublish FOI Proactive Disclosure request. Please try again in a few minutes.",
+                            position: "top-right",
+                            isLoading: false,
+                            autoClose: 3000,
+                            hideProgressBar: true,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                            progress: undefined,
+                        });
                     }
                 }
             )

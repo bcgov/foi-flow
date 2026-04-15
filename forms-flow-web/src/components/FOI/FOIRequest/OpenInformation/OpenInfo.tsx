@@ -223,10 +223,11 @@ const OpenInfo = ({
         formattedData,
         (err: any, _res: any) => {
           if (!err) {
+            const toastMsg = _res.status === 202 ? "FOI Open Information request has successfully been sent for publishing." : "No data found to publish for this FOI Open Information request.";
             toast.update(toastID, {
               type: "success",
               render:
-                "FOI Open Information request has successfully been sent for publishing.",
+                toastMsg,
               position: "top-right",
               isLoading: false,
               autoClose: 3000,
@@ -238,18 +239,19 @@ const OpenInfo = ({
             });
             dispatch(fetchFOIOpenInfoRequest(foiministryrequestid));
           } else {
-            toast.error(
-              "Temporarily unable to publish FOI Open Information request. Please try again in a few minutes.",
-              {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-              }
-            );
+            toast.update(toastID, {
+              type: "error",
+              render:
+                "Temporarily unable to publish FOI Open Information request. Please try again in a few minutes.",
+              position: "top-right",
+              isLoading: false,
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
           }
         }
       )
@@ -270,10 +272,11 @@ const OpenInfo = ({
         formattedData,
         (err: any, _res: any) => {
           if (!err) {
+            const toastMsg = _res.status === 202 ? "FOI Open Information request has successfully been sent for unpublishing." : "No data found to unpublish for this FOI Open Information request.";
             toast.update(toastID, {
               type: "success",
               render:
-                "FOI Open Information request has successfully been sent for unpublishing.",
+                 toastMsg,
               position: "top-right",
               isLoading: false,
               autoClose: 3000,
@@ -285,18 +288,19 @@ const OpenInfo = ({
             });
             dispatch(fetchFOIOpenInfoRequest(foiministryrequestid));
           } else {
-            toast.error(
-              "Temporarily unable to unpublish FOI Open Information request. Please try again in a few minutes.",
-              {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-              }
-            );
+            toast.update(toastID, {
+              type: "error",
+              render:
+                 "Temporarily unable to unpublish FOI Open Information request. Please try again in a few minutes.",
+              position: "top-right",
+              isLoading: false,
+              autoClose: 3000,
+              hideProgressBar: true,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
           }
         }
       )

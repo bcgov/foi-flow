@@ -98,16 +98,17 @@ export const publishFOIProactiveDisclosureRequest = (foiministryrequestid, foire
       // Create a publish now message and add to redis queue
       httpPOSTRequest(pdPublishNowApi, {}, UserService.getToken())
       .then((res) => {
-        if (res.status === 202) {
-            done(null, res.data);
+        if (res.status === 202 || res.status === 200) {
+            done(null, res);
         } else {
+          done(true, null);
           console.log("API call to publish request did not return status 201:", res);
           dispatch(serviceActionError(res));
         }
       })
     })
     .catch((error) => {
-      done(error);
+      done(error, null);
       console.log("API call to publish request failed", error);
       dispatch(serviceActionError(error));
     });
@@ -129,16 +130,17 @@ export const unpublishFOIProactiveDisclosureRequest = (foiministryrequestid, foi
       // Create a unpublish message and add to redis queue
       httpPOSTRequest(pdUnpublishApi, {}, UserService.getToken())
       .then((res) => {
-        if (res.status === 202) {
-            done(null, res.data);
+        if (res.status === 202 || res.status === 200) {
+            done(null, res);
         } else {
+          done(true, null);
           console.log("API call to unpublish request did not return status 201:", res);
           dispatch(serviceActionError(res));
         }
       })
     })
     .catch((error) => {
-      done(error);
+      done(error, null);
       console.log("API call to unpublish request failed", error);
       dispatch(serviceActionError(error));
     });

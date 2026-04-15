@@ -111,16 +111,17 @@ export const publishFOIOpenInfoRequest = (foiministryrequestid, foirequestid, da
       // Create a publish now message and add to redis queue
       httpPOSTRequest(openInfoPublishNowApi, {}, UserService.getToken())
       .then((res) => {
-        if (res.status === 202) {
-            done(null, res.data);
+        if (res.status === 202 || res.status === 200) {
+            done(null, res);
         } else {
+          done(true, null);
           console.log("API call to publish request did not return status 201:", res);
           dispatch(serviceActionError(res));
         }
       })
     })
     .catch((error) => {
-      done(error);
+      done(error, null);
       console.log("API call to publish request failed", error);
       dispatch(serviceActionError(error));
     });
@@ -142,16 +143,17 @@ export const unpublishFOIOpenInfoRequest = (foiministryrequestid, foirequestid, 
       // Create a unpublish message and add to redis queue
       httpPOSTRequest(openInfoUnpublishApi, {}, UserService.getToken())
       .then((res) => {
-        if (res.status === 202) {
-            done(null, res.data);
+        if (res.status === 202 || res.status === 200) {
+            done(null, res);
         } else {
+          done(true, null);
           console.log("API call to unpublish request did not return status 201:", res);
           dispatch(serviceActionError(res));
         }
       })
     })
     .catch((error) => {
-      done(error);
+      done(error, null);
       console.log("API call to unpublish request failed", error);
       dispatch(serviceActionError(error));
     });

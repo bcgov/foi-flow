@@ -160,10 +160,10 @@ class FOIOpenInfoPublishNow(Resource):
         try:
             # Fetch the data for publishing
             db_result = openinfoservice().getopeninforequestforpublishing(foiministryrequestid)
-            
-            if not db_result:
-                return {"status": False, "message": "No data found to publish for this request ID"}, 404
 
+            if not db_result:
+                return {"status": True, "message": "No data found to publish for this request"}, 200
+            
             result = db_result[0]
 
             try:
@@ -200,9 +200,9 @@ class FOIOpenInfoUnpublish(Resource):
         try:
             # Fetch the data for unpublishing
             db_result = openinfoservice().getopeninforequestforunpublishing(foiministryrequestid)
-            
+
             if not db_result:
-                return {"status": False, "message": "No data found to publish for this request ID"}, 404
+                return {"status": True, "message": "No data found to unpublish for this request"}, 200
 
             result = db_result[0]
 
@@ -243,7 +243,7 @@ class FOIPDOpenInfoPublishNow(Resource):
             db_result = openinfoservice().getpdopeninforequestforpublishing(foiministryrequestid)
             
             if not db_result:
-                return {"status": False, "message": "No data found to publish for this request ID"}, 404
+                return {"status": True, "message": "No data found to publish for this request"}, 200
 
             result = db_result[0]
 
@@ -266,7 +266,7 @@ class FOIPDOpenInfoPublishNow(Resource):
             return {'status': exception.status_code, 'message': exception.message}, 500
         except redis.RedisError as redis_err:
             return {'status': False, 'message': f"Failed to queue request: {str(redis_err)}"}, 500
-        
+
 @cors_preflight('POST,OPTIONS')
 @API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/pdunpublish')
 class FOIPDOpenInfoUnpublish(Resource):
@@ -283,7 +283,7 @@ class FOIPDOpenInfoUnpublish(Resource):
             db_result = openinfoservice().getpdopeninforequestforunpublishing(foiministryrequestid)
             
             if not db_result:
-                return {"status": False, "message": "No data found to publish for this request ID"}, 404
+                return {"status": True, "message": "No data found to unpublish for this request"}, 200
 
             result = db_result[0]
 

@@ -290,7 +290,7 @@ const StateDropDown = ({
       return status === requestState || status === 'Do Not Publish' || status === 'Unpublished';
     }
     if (isProactiveDisclosure) {
-      return status === requestState || status === 'Published' || (requestState !== 'Published' && status === 'Unpublished');
+      return status === requestState || status === 'Published' || status === 'Unpublished'
     }
     if (index === 0) {
       return false;
