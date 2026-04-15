@@ -6,7 +6,7 @@ import OpenInfoHeader from "../../OpenInformation/OpenInfoHeader";
 import { saveFOIProactiveDisclosureRequest, fetchFOIProactiveDisclosureRequest, publishFOIProactiveDisclosureRequest, unpublishFOIProactiveDisclosureRequest } from "../../../../../apiManager/services/FOI/foiProactiveDisclosureServices";
 import { PDPublicationStatus, PDTransactionObject } from "./types";
 import { OIStates, OIPublicationStatuses } from "../../../../../helper/openinfo-helper";
-import { calculateBusinessDaysBetween, formatDateInPst } from "../../../../../helper/FOI/helper";
+import { formatDateInPst } from "../../../../../helper/FOI/helper";
 import "../../OpenInformation/openinfo.scss";
 
 const ProactiveDisclosureRequestPublication = ({
@@ -22,14 +22,8 @@ const ProactiveDisclosureRequestPublication = ({
     const dispatch = useDispatch();
 
     //App State
-    const assignedToList = useSelector(
-        (state: any) => state.foiRequests.foiFullAssignedToList
-    );
     let foiPDTransactionData = useSelector(
         (state: any) => state.foiRequests.foiOpenInfoRequest
-    );
-    const pdPublicationStatuses: PDPublicationStatus[] = useSelector(
-        (state: any) => state.foiRequests.oiPublicationStatuses
     );
 
     //Local State
@@ -51,6 +45,10 @@ const ProactiveDisclosureRequestPublication = ({
         confirmationData: null,
     });
     const [isDataEdited, setIsDataEdited] = useState(false);
+    
+    useEffect(() => {
+        if (foiPDTransactionData) setPdPublicationData(foiPDTransactionData);
+    }, [foiPDTransactionData]);
 
     //Functions
     const handlePDDataChange = (
@@ -60,27 +58,16 @@ const ProactiveDisclosureRequestPublication = ({
         if (!isDataEdited) {
             setIsDataEdited(true);
         }
-        //Reset foi pd data if publication status goes back to publication.
-         if (pdDataKey === "publicationdate" && requestDetails.closedate
-            && typeof (value) === "string") {
-            const daysBetween = calculateBusinessDaysBetween(requestDetails.closedate, value);
-            if (daysBetween >= 0 && daysBetween < 10) {
-                setConfirmationModal((prev: any) => ({
-                    ...prev,
-                    show: true,
-                    title: "Change Publication Date",
-                    description: "The date you have chosen falls within 10 business days of the closed date. Are you sure you want to continue?",
-                    message: "",
-                    confirmButtonTitle: "Continue",
-                    confirmationData: value,
-                }));
-            }
-            else {
-                setPdPublicationData((prev: any) => ({
-                    ...prev,
-                    [pdDataKey]: value,
-                }));
-            }
+         if (pdDataKey === "publicationdate") {
+            setConfirmationModal((prev: any) => ({
+                ...prev,
+                show: true,
+                title: "Change Publication Date",
+                description: `This proactive disclosure will be scheduled for publication on ${value}. Are you sure you want to proceed?`,
+                message: "",
+                confirmButtonTitle: "Confirm",
+                confirmationData: value,
+            }));
         } else {
             setPdPublicationData((prev: any) => ({
                 ...prev,
@@ -298,7 +285,6 @@ const ProactiveDisclosureRequestPublication = ({
                 requestDetails={requestDetails}
                 requestNumber={requestNumber}
                 isOIUser={isOITeam}
-                assignedToList={assignedToList}
                 foiministryrequestid={foiministryrequestid}
                 foirequestid={foirequestid}
                 toast={toast}
@@ -307,7 +293,6 @@ const ProactiveDisclosureRequestPublication = ({
             <ProactiveDisclosureRequestPublicationMain
                 pdPublicationData={pdPublicationData}
                 handlePDDataChange={handlePDDataChange}
-                currentPDRequestState={currentPDRequestState}
                 ministryId={foiministryrequestid}
                 requestId={foirequestid}
                 bcgovcode={bcgovcode}

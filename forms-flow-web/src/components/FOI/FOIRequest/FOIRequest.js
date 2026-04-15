@@ -1482,9 +1482,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       return StateEnum.unopened.name;
     }
   };
-  console.log("change?>", stateChanged)
-  console.log("OISTATUSSTATE", OIStatus)
-  console.log("currentSTatus", _currentrequestStatus)
 
   return (!isLoading &&
     requestDetails &&

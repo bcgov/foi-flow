@@ -43,7 +43,6 @@ const ProactiveDisclosureRequestPublicationMain = ({
   requestId,
   ministryId,
   pdPublicationData,
-  currentPDRequestState,
   handlePDDataChange,
   bcgovcode,
   requestNumber,
@@ -52,7 +51,6 @@ const ProactiveDisclosureRequestPublicationMain = ({
   requestId: number;
   ministryId: number;
   pdPublicationData: PDTransactionObject;
-  currentPDRequestState: any;
   handlePDDataChange: any;
   bcgovcode: string;
   requestNumber: string;
@@ -60,9 +58,6 @@ const ProactiveDisclosureRequestPublicationMain = ({
 }) => {
   const dispatch = useDispatch();
 
-  const pdPublicationStatuses: PDPublicationStatus[] = useSelector(
-    (state: any) => state.foiRequests.oiPublicationStatuses,
-  );
   let foiPDAdditionalFiles = useSelector(
     (state: any) => state.foiRequests.foiOpenInfoAdditionalFiles,
   );
@@ -314,10 +309,6 @@ const ProactiveDisclosureRequestPublicationMain = ({
     window.open(url, "_blank")?.focus();
   };
 
-  const disableUserInput =
-    pdPublicationData.oipublicationstatus_id ===
-    OIPublicationStatuses.DoNotPublish;
-
   var saveAs = (blob: any, filename: any) => {
     const fileURL = URL.createObjectURL(blob);
     const downloadLink = document.createElement("a");
@@ -421,12 +412,6 @@ const ProactiveDisclosureRequestPublicationMain = ({
                     handlePDDataChange(event.target.value, event.target.name)
                   }
                   InputProps={{ inputProps: { min: formatDate(new Date()) } }}
-                  disabled={
-                    //disableUserInput ||
-                    currentPDRequestState === "First Review" ||
-                    currentPDRequestState === OIStates.FirstReview ||
-                    currentPDRequestState === "Unopened"
-                  }
                 />
                 {earliestPublicationDate !== 0 &&
                   <span style={{ fontStyle: "italic", fontSize: "12px" }}>Earliest Eligible Publication Date: {earliestPublicationDate}</span>}
