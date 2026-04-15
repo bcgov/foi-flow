@@ -60,7 +60,7 @@ const OpenInfoPublication = ({
         type="button"
         className="btn btn-bottom"
         disabled={!isDataEdited}
-        onClick={saveData}
+        onClick={() => saveData()}
       >
         Save
       </button>
