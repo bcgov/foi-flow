@@ -12,9 +12,10 @@ const OpenInfoConfirmationModal = ({
   confirm,
   setModal,
   modal,
+  isProactiveDisclosure,
 }: any) => {
   const handleConfirmation = () => {
-    if (modal.title === "Change Publication Date") {
+    if (modal.title === "Change Publication Date" && !isProactiveDisclosure) {
       confirm(modal.confirmationData);
     } else {
       confirm();

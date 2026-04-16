@@ -58,22 +58,10 @@ const ProactiveDisclosureRequestPublication = ({
         if (!isDataEdited) {
             setIsDataEdited(true);
         }
-         if (pdDataKey === "publicationdate") {
-            setConfirmationModal((prev: any) => ({
-                ...prev,
-                show: true,
-                title: "Change Publication Date",
-                description: `This proactive disclosure will be scheduled for publication on ${value}. Are you sure you want to proceed?`,
-                message: "",
-                confirmButtonTitle: "Confirm",
-                confirmationData: value,
-            }));
-        } else {
-            setPdPublicationData((prev: any) => ({
-                ...prev,
-                [pdDataKey]: value,
-            }));
-        }
+        setPdPublicationData((prev: any) => ({
+            ...prev,
+            [pdDataKey]: value,
+        }));
     };
 
     const saveData = (publicationdate?: any) => {
@@ -247,13 +235,6 @@ const ProactiveDisclosureRequestPublication = ({
         }
         return false;
     }
-
-    const handleDateConfirmation = (value: Date) => {
-        setPdPublicationData((prev: any) => ({
-            ...prev,
-            publicationdate: value,
-        }));
-    }
     const handlePublishNow = () => {
         setConfirmationModal((prev: any) => ({
             ...prev,
@@ -277,6 +258,21 @@ const ProactiveDisclosureRequestPublication = ({
     const publishConfirmation = () => {
         const todaysDate = formatDateInPst(new Date());
         publishNow(todaysDate);
+    }
+    const handleSave = () => {
+        if (new Date(foiPDTransactionData.publicationdate).getTime() !== new Date(pdPublicationData.publicationdate).getTime()) {
+            setConfirmationModal((prev: any) => ({
+                ...prev,
+                show: true,
+                title: "Change Publication Date",
+                description: `This proactive disclosure will be scheduled for publication on ${pdPublicationData.publicationdate}. Are you sure you want to proceed?`,
+                message: "",
+                confirmButtonTitle: "Confirm",
+            }));
+        }
+        else {
+            saveData()
+        }
     }
 
     return (
@@ -303,7 +299,7 @@ const ProactiveDisclosureRequestPublication = ({
                 type="button"
                 className="btn btn-bottom"
                 disabled={!isDataEdited}
-                onClick={() => saveData()}
+                onClick={() => handleSave()}
             >
                 Save
             </button>
@@ -327,11 +323,12 @@ const ProactiveDisclosureRequestPublication = ({
             }
             <OpenInfoConfirmationModal
                 modal={confirmationModal}
-                confirm={(confirmationModal.title === "Change Publication Date" && handleDateConfirmation)
+                confirm={(confirmationModal.title === "Change Publication Date" && saveData)
                     || (confirmationModal.title === "Publish Files Now" && publishConfirmation) ||
                     (confirmationModal.title === "Unpublish Request" && unpublish)
                 }
                 setModal={setConfirmationModal}
+                isProactiveDisclosure={true}
             />
         </div>
     );

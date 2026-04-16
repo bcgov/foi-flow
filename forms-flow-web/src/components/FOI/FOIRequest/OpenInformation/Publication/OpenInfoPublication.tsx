@@ -89,6 +89,7 @@ const OpenInfoPublication = ({
            || (confirmModal.title === "Unpublish Request" && unpublish)
           }
         setModal={setConfirmationModal}
+        isProactiveDisclosure={false}
       />
     </>
   );
