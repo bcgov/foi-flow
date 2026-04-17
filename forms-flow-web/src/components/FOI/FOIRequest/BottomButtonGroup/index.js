@@ -154,7 +154,6 @@ const BottomButtonGroup = React.memo(
           requestId,
           ministryId,
           (err, res) => {
-            console.log("SAVE FINAL")
             if (!err) {
               toast.success("The request has been saved successfully.", {
                 position: "top-right",
@@ -201,7 +200,6 @@ const BottomButtonGroup = React.memo(
       if (isValidationError || !stateChanged) {
         return;
       }
-      console.log("BANG")
 
       if (
         currentSelectedStatus &&
@@ -266,8 +264,6 @@ const BottomButtonGroup = React.memo(
     };
 
     const saveRequestModal = () => {
-      console.log("currentSelectedStatus", currentSelectedStatus)
-      console.log("saveobj", saveRequestObject?.currentState)
       if (currentSelectedStatus !== saveRequestObject?.currentState) setsaveModal(true)
       else if (isProactiveDisclosure && userGroups.includes("OI Team")) setsaveModal(true);
     };
@@ -389,7 +385,6 @@ const BottomButtonGroup = React.memo(
     }, [successCount]);
 
     const handleSaveModal = async (value, fileInfoList, files) => {
-      console.log("SAVE MODAL CONFIRM")
       setsaveModal(false);
       setFileCount(files?.length);
 

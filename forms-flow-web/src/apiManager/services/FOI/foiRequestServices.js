@@ -263,7 +263,6 @@ export const fetchFOIMinistryViewRequestDetails = (requestId, ministryId) => {
 };
 
 export const saveRequestDetails = (data, urlIndexCreateRequest, requestId, ministryId, ...rest) => {
-  console.log("DATA", data)
   const done = fnDone(rest);
   let id = urlIndexCreateRequest > -1 ? -1 : requestId;
   let apiUrl = "";
