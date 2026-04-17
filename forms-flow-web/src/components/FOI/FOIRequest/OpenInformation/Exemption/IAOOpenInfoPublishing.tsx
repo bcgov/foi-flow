@@ -32,6 +32,7 @@ const IAOOpenInfoPublishing = ({
         modal={saveModal}
         confirm={() => saveData()}
         setModal={setSaveModal}
+        isProactiveDisclosure={false}
       />
     </>
   );

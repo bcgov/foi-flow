@@ -1173,7 +1173,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
-
+    
     if (
       _state?.toLowerCase() === StateEnum.unopened.name.toLowerCase() &&
       (saveRequestObject.isconsultflag === null ||
@@ -1321,6 +1321,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const signupUrl = "/signup";
 
   const [OIStatus, setOIStatus] = useState("");
+  const [PDStatus, setPDStatus] = useState("");
 
   const requestNumber = requestDetails?.axisRequestId
     ? requestDetails.axisRequestId
@@ -2267,7 +2268,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   toast={toast}
                   requestNumber={requestNumber}
                   requestDetails={requestDetails}
-                  currentOIRequestState={getOIRequestState()}
+                  currentPDRequestState={getOIRequestState()}
                   foirequestid={requestId}
                   isOITeam={isOITeam}
                   foiministryrequestid={ministryId}

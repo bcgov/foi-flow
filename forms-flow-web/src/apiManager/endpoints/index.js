@@ -237,5 +237,11 @@ const API = {
 
   FOI_GET_PROACTIVE_DISCLOSURE_REQUEST: `${FOI_BASE_API_URL}/api/foiproactivedisclosure/ministryrequest/<ministryrequestid>`,
   FOI_POST_PROACTIVE_DISCLOSURE_REQUEST: `${FOI_BASE_API_URL}/api/foiproactivedisclosure/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>`,
+  
+  FOI_PUBLISHNOW_PROACTIVE_DISCLOSURE: `${FOI_BASE_API_URL}/api/foiopeninfo/ministryrequest/<foiministryrequestid>/pdpublishnow`,
+  FOI_UNPUBLISH_PROACTIVE_DISCLOSURE: `${FOI_BASE_API_URL}/api/foiopeninfo/ministryrequest/<foiministryrequestid>/pdunpublish`,
+
+  FOI_PUBLISHNOW_OPEN_INFORMATION: `${FOI_BASE_API_URL}/api/foiopeninfo/ministryrequest/<foiministryrequestid>/publishnow`,
+  FOI_UNPUBLISH_OPEN_INFORMATION: `${FOI_BASE_API_URL}/api/foiopeninfo/ministryrequest/<foiministryrequestid>/unpublish`
 };
 export default API;

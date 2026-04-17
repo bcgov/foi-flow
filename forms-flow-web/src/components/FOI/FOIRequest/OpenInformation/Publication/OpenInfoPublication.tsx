@@ -18,28 +18,32 @@ const OpenInfoPublication = ({
   bcgovcode, 
   requestNumber,
   handlePublishNow,
-  earliestPublicationDate
+  earliestPublicationDate,
+  handleUnpublish,
+  disableUnpublish,
+  publishNow,
+  unpublish,
 }: any) => {
 
   //Functions
   const publishConfirmation = () => {
     const todaysDate = formatDateInPst(new Date());
-    saveData(todaysDate);
+    publishNow(todaysDate);
   }
+  // const save = () => {
+  //   if (oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest) {
+  //     setConfirmationModal({
+  //       show: true,
+  //       title: "Unpublish Request",
+  //       description: "Are you sure you want to Unpublish this request?",
+  //       message: "Your request will be sent to our Publication Service for unpublishing. You will receive a notification shortly once your request has been unpublished and the request state will be moved to 'Unpublished'.",
+  //       confirmButtonTitle: "Unpublish"
+  //     });
+  //   } else {
+  //     saveData()
+  //   }
+  // }
 
-  const save = () => {
-    if (oiPublicationData.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest) {
-      setConfirmationModal({
-        show: true,
-        title: "Unpublish Request",
-        description: "Are you sure you want to unpublish this request?",
-        message: "This request will be removed from the Open Information website, the request state will be changed to 'Unpublished', and the request will be available in the Open Information queue for further review and action.",
-        confirmButtonTitle: "Unpublish Request"
-      });
-    } else {
-      saveData()
-    }
-  }
   return (
     <>
       <OpenInfoPublicationMain
@@ -56,11 +60,20 @@ const OpenInfoPublication = ({
         type="button"
         className="btn btn-bottom"
         disabled={!isDataEdited}
-        onClick={save}
+        onClick={() => saveData()}
       >
         Save
       </button>
-      <button
+      {currentOIRequestState === "Published" ?
+       <button
+        type="button"
+        disabled={disableUnpublish()}
+        className="btn btn-bottom"
+        onClick={handleUnpublish}
+      >
+        Unpublish
+      </button>
+      : <button
         type="button"
         disabled={disablePublish()}
         className="btn btn-bottom"
@@ -68,13 +81,15 @@ const OpenInfoPublication = ({
       >
         Publish Now
       </button>
+      }
       <OpenInfoConfirmationModal
         modal={confirmModal}
         confirm={(confirmModal.title === "Change Publication Date" && handleDateConfirmation)
            || (confirmModal.title === "Publish Now" && publishConfirmation)
-           || (confirmModal.title === "Unpublish Request" && saveData)
+           || (confirmModal.title === "Unpublish Request" && unpublish)
           }
         setModal={setConfirmationModal}
+        isProactiveDisclosure={false}
       />
     </>
   );

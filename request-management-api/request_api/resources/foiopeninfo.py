@@ -11,6 +11,8 @@ from request_api.services.openinfoservice import openinfoservice
 from request_api.utils.enums import IAOTeamWithKeycloackGroup
 from marshmallow import Schema, fields, validate, ValidationError
 import json
+import redis
+from os import getenv
 
 API = Namespace('FOIOPENINFO', description='Endpoints for FOI OpenInformation management')
 TRACER = Tracer.get_instance()
@@ -20,6 +22,12 @@ CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 # GET CALL for oi data -> ALLOWABLE = IAO, OI. RESTRCIT = Ministry
 # POST CALL (Create + update oi data) -> ALLOWABLE = IAO (exemption speicifc data), OI (exemption + publicaiton data). RESTRCIT = Ministry. Specific data (exemption or pulibcation) done in FE
 # POST, GET, DELETE for additional files -> Allowable = ONLY OI
+
+redis_host = getenv("OPENINFO_REDIS_HOST")
+redis_port = getenv("OPENINFO_REDIS_PORT")
+redis_password = getenv("OPENINFO_REDIS_PASSWORD")
+redis_client = redis.Redis(host=redis_host, port=redis_port, db=0, password=redis_password, decode_responses=True)
+redis_queue_name = getenv("OPENINFO_REDIS_QUEUE_NAME")
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>', defaults={'usertype':None})
@@ -137,3 +145,164 @@ class FOIOpenInfoAdditionalFilesDelete(Resource):
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/publishnow')
+class FOIOpenInfoPublishNow(Resource):
+    """Publish Now"""
+    
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    @TRACER.trace()
+    @auth.require
+    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
+    def post(foiministryrequestid):
+        try:
+            # Fetch the data for publishing
+            db_result = openinfoservice().getopeninforequestforpublishing(foiministryrequestid)
+
+            if not db_result:
+                return {"status": True, "message": "No data found to publish for this request"}, 200
+            
+            result = db_result[0]
+
+            try:
+                # Convert to JSON
+                json_data = json.dumps(result, default=str) 
+            except (TypeError, ValueError) as err:
+                return {'status': False, 'message': f"JSON serialization failed: {err}"}, 500
+
+            # Push to queue for publishing
+            redis_client.rpush(redis_queue_name, json_data)
+            
+            return {'status': True, 'message': 'Request queued for publishing successfully'}, 202
+            
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message': exception.message}, 500
+        except redis.RedisError as redis_err:
+            return {'status': False, 'message': f"Failed to queue request: {str(redis_err)}"}, 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/unpublish')
+class FOIOpenInfoUnpublish(Resource):
+    """Unpublish"""
+    
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    @TRACER.trace()
+    @auth.require
+    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
+    def post(foiministryrequestid):
+        try:
+            # Fetch the data for unpublishing
+            db_result = openinfoservice().getopeninforequestforunpublishing(foiministryrequestid)
+
+            if not db_result:
+                return {"status": True, "message": "No data found to unpublish for this request"}, 200
+
+            result = db_result[0]
+
+            try:
+                # Convert to JSON
+                json_data = json.dumps(result, default=str) 
+            except (TypeError, ValueError) as err:
+                return {'status': False, 'message': f"JSON serialization failed: {err}"}, 500
+
+            # Push to queue for unpublishing
+            redis_client.rpush(redis_queue_name, json_data)
+            
+            return {'status': True, 'message': 'Request queued for unpublishing successfully'}, 202
+            
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message': exception.message}, 500
+        except redis.RedisError as redis_err:
+            return {'status': False, 'message': f"Failed to queue request: {str(redis_err)}"}, 500
+
+# for proactive disclosure
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/pdpublishnow')
+class FOIPDOpenInfoPublishNow(Resource):
+    """Publish Now"""
+    
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    @TRACER.trace()
+    @auth.require
+    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
+    def post(foiministryrequestid):
+        try:
+            # Fetch the data for publishing
+            db_result = openinfoservice().getpdopeninforequestforpublishing(foiministryrequestid)
+            
+            if not db_result:
+                return {"status": True, "message": "No data found to publish for this request"}, 200
+
+            result = db_result[0]
+
+            try:
+                # Convert to JSON
+                json_data = json.dumps(result, default=str) 
+            except (TypeError, ValueError) as err:
+                return {'status': False, 'message': f"JSON serialization failed: {err}"}, 500
+
+            # Push to queue for publishing
+            redis_client.rpush(redis_queue_name, json_data)
+            
+            return {'status': True, 'message': 'Request queued for publishing successfully'}, 202
+            
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message': exception.message}, 500
+        except redis.RedisError as redis_err:
+            return {'status': False, 'message': f"Failed to queue request: {str(redis_err)}"}, 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/pdunpublish')
+class FOIPDOpenInfoUnpublish(Resource):
+    """Unpublish"""
+    
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    @TRACER.trace()
+    @auth.require
+    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
+    def post(foiministryrequestid):
+        try:
+            # Fetch the data for unpublishing
+            db_result = openinfoservice().getpdopeninforequestforunpublishing(foiministryrequestid)
+            
+            if not db_result:
+                return {"status": True, "message": "No data found to unpublish for this request"}, 200
+
+            result = db_result[0]
+
+            try:
+                # Convert to JSON
+                json_data = json.dumps(result, default=str) 
+            except (TypeError, ValueError) as err:
+                return {'status': False, 'message': f"JSON serialization failed: {err}"}, 500
+
+            # Push to queue for unpublishing
+            redis_client.rpush(redis_queue_name, json_data)
+            
+            return {'status': True, 'message': 'Request queued for unpublishing successfully'}, 202
+            
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message': exception.message}, 500
+        except redis.RedisError as redis_err:
+            return {'status': False, 'message': f"Failed to queue request: {str(redis_err)}"}, 500

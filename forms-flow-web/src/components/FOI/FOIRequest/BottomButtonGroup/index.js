@@ -9,7 +9,7 @@ import {
 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import {
   saveRequestDetails,
-  openRequestDetails
+  openRequestDetails,
 } from "../../../../apiManager/services/FOI/foiRequestServices";
 import { toast } from "react-toastify";
 import { useParams } from "react-router-dom";
@@ -131,7 +131,6 @@ const BottomButtonGroup = React.memo(
     }, [stateChanged]);
 
     const saveRequest = async (setLoader = false) => {
-      //setSaveConfirmationModal(true);
       if (urlIndexCreateRequest > -1) {
         saveRequestObject.requeststatuslabel = StateEnum.intakeinprogress.label;
         setIsAddRequest(false);
@@ -145,11 +144,6 @@ const BottomButtonGroup = React.memo(
       //add oipc Data to save request object and sync/validate isoipcreview attribute
       if (requestState.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() && requestState.toLowerCase() !== StateEnum.unopened.name.toLowerCase()) {
         saveRequestObject.oipcdetails = oipcData ? oipcData : [];
-        // if (oipcData?.length > 0) {
-        //   saveRequestObject.isoipcreview = true;
-        // } else {
-        //   saveRequestObject.isoipcreview = false;
-        // }
       }
 
       dispatch(setFOILoader(setLoader))
@@ -270,8 +264,8 @@ const BottomButtonGroup = React.memo(
     };
 
     const saveRequestModal = () => {
-      if (currentSelectedStatus !== saveRequestObject?.currentState)
-        setsaveModal(true);
+      if (currentSelectedStatus !== saveRequestObject?.currentState) setsaveModal(true)
+      else if (isProactiveDisclosure && userGroups.includes("OI Team")) setsaveModal(true);
     };
 
     const handleModal = (value) => {
@@ -323,9 +317,13 @@ const BottomButtonGroup = React.memo(
     const [documents, setDocuments] = useState([]);
 
     const saveStatusId = () => {
+      const currentOIState = openInfoStates.find(s => s.name === currentSelectedStatus);
       if (userGroups.includes("OI Team") && !isProactiveDisclosure) {
-        saveRequestObject.oistatusid = openInfoStates.find(s => s.name === currentSelectedStatus).oistatusid;
+        saveRequestObject.oistatusid = currentOIState?.oistatusid;
+      } else if (userGroups.includes("OI Team") && isProactiveDisclosure && currentOIState) {
+        saveRequestObject.oistatusid = currentOIState.oistatusid;
       } else if (currentSelectedStatus) {
+        if (isProactiveDisclosure && saveRequestObject.oistatusid !== null) saveRequestObject.oistatusid = null;
         switch (currentSelectedStatus) {
           case StateEnum.closed.name:
             saveRequestObject.requeststatuslabel = StateEnum.closed.label;
@@ -343,32 +341,6 @@ const BottomButtonGroup = React.memo(
               const calculatedCFRDueDate = dueDateCalculation(new Date(), 10);
               saveRequestObject.cfrDueDate = calculatedCFRDueDate;
             }
-            /*if (
-              ![StateEnum.closed.name, StateEnum.onhold.name].includes(
-                currentSelectedStatus
-              ) &&
-              saveRequestObject.onholdTransitionDate
-            ) {
-              const today = new Date();
-  
-              // make it start of today
-              today.setHours(0, 0, 0, 0);
-  
-              const onHoldDays = calculateDaysRemaining(
-                today,
-                saveRequestObject.onholdTransitionDate
-              );
-              const calculatedCFRDueDate = addBusinessDays(
-                saveRequestObject.cfrDueDate,
-                onHoldDays
-              );
-              const calculatedRequestDueDate = addBusinessDays(
-                saveRequestObject.dueDate,
-                onHoldDays
-              );
-              saveRequestObject.cfrDueDate = calculatedCFRDueDate;
-              saveRequestObject.dueDate = calculatedRequestDueDate;
-            }*/
             break;
 
           case StateEnum.redirect.name:
@@ -412,7 +384,7 @@ const BottomButtonGroup = React.memo(
       }
     }, [successCount]);
 
-    const handleSaveModal = (value, fileInfoList, files) => {
+    const handleSaveModal = async (value, fileInfoList, files) => {
       setsaveModal(false);
       setFileCount(files?.length);
 
@@ -467,7 +439,6 @@ const BottomButtonGroup = React.memo(
             saveRequestObject={saveRequestObject}
           />
         </ConditionalComponent>
-
         <ConditionalComponent condition={opensaveModal}>
           <ConfirmationModal
             requestId={requestId}
@@ -478,6 +449,7 @@ const BottomButtonGroup = React.memo(
             handleClosingDateChange={handleClosingDateChange}
             handleClosingReasonChange={handleClosingReasonChange}
             attachmentsArray={attachmentsArray}
+            isProactiveDisclosure={isProactiveDisclosure}
           />
         </ConditionalComponent>
 

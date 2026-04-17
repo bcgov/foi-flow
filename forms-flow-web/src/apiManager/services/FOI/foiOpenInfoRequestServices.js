@@ -60,13 +60,12 @@ export const saveFOIOpenInfoRequest = (
   const isValidExemptionDenial = isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && data.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && data.oiexemptionapproved === false;
   const isValidExemptionApproved = isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && data.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && data.oiexemptionapproved === true;
   const manualPublicationStatusChange = requetsinfo.oistatusid === OIStates.ExemptionRequest && data.oipublicationstatus_id === OIPublicationStatuses.Publish;  
-  const isUnpublish = isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.UnpublishRequest;
   if (isValidExemptionDenial) {
     data.oipublicationstatus_id = 2;
     data.oiexemption_id = null;
   }
   return (dispatch) => {
-    updateFOIMinistryRequestOIStatus(foiministryrequestid, foirequestId, isValidExemptionRequest, isValidExemptionDenial, manualPublicationStatusChange, isUnpublish, isValidExemptionApproved)
+    updateFOIMinistryRequestOIStatus(foiministryrequestid, foirequestId, isValidExemptionRequest, isValidExemptionDenial, manualPublicationStatusChange, isValidExemptionApproved)
       .then((res) => {
         // If res.data.sucess (meaning BE call to update FOIMinistryRequest oistatusid for IAO OI Exemption purposes is successfull) =>
         // create and store an exemption date for the related foiopeninfo request
@@ -97,13 +96,76 @@ export const saveFOIOpenInfoRequest = (
   };
 };
 
+export const publishFOIOpenInfoRequest = (foiministryrequestid, foirequestid, data, ...rest) => {
+  const openInfoApiUrl = replaceUrl(
+    replaceUrl(API.FOI_POST_OPENINFO_REQUEST, "<foirequestid>", foirequestid),
+    "<foiministryrequestid>",
+    foiministryrequestid
+  );
+  const openInfoPublishNowApi = replaceUrl(API.FOI_PUBLISHNOW_OPEN_INFORMATION, "<foiministryrequestid>", foiministryrequestid);
+  const done = fnDone(rest);
+  return (dispatch) => {
+    // Update FOIOpenInfo data (publishdate, oipublcaitonstatus)
+    httpPOSTRequest(openInfoApiUrl, data, UserService.getToken())
+    .then((res) => {
+      // Create a publish now message and add to redis queue
+      httpPOSTRequest(openInfoPublishNowApi, {}, UserService.getToken())
+      .then((res) => {
+        if (res.status === 202 || res.status === 200) {
+            done(null, res);
+        } else {
+          done(true, null);
+          console.log("API call to publish request did not return status 201:", res);
+          dispatch(serviceActionError(res));
+        }
+      })
+    })
+    .catch((error) => {
+      done(error, null);
+      console.log("API call to publish request failed", error);
+      dispatch(serviceActionError(error));
+    });
+  };
+}
+
+export const unpublishFOIOpenInfoRequest = (foiministryrequestid, foirequestid, data, ...rest) => {
+  const openInfoApiUrl = replaceUrl(
+    replaceUrl(API.FOI_POST_OPENINFO_REQUEST, "<foirequestid>", foirequestid),
+    "<foiministryrequestid>",
+    foiministryrequestid
+  );
+  const openInfoUnpublishApi = replaceUrl(API.FOI_UNPUBLISH_OPEN_INFORMATION, "<foiministryrequestid>", foiministryrequestid);
+  const done = fnDone(rest);
+  return (dispatch) => {
+    // Update FOIOpenInfo data (publishdate, oipublcaitonstatus)
+    httpPOSTRequest(openInfoApiUrl, data, UserService.getToken())
+    .then((res) => {
+      // Create a unpublish message and add to redis queue
+      httpPOSTRequest(openInfoUnpublishApi, {}, UserService.getToken())
+      .then((res) => {
+        if (res.status === 202 || res.status === 200) {
+            done(null, res);
+        } else {
+          done(true, null);
+          console.log("API call to unpublish request did not return status 201:", res);
+          dispatch(serviceActionError(res));
+        }
+      })
+    })
+    .catch((error) => {
+      done(error, null);
+      console.log("API call to unpublish request failed", error);
+      dispatch(serviceActionError(error));
+    });
+  };
+}
+
 const updateFOIMinistryRequestOIStatus = (
   foiministryrequestid, 
   foirequestId, 
   isValidExemptionRequest,
   isValidExemptionDenial,
   manualPublicationStatusChange,
-  isUnpublish,
   isValidExemptionApproved
 ) => {
   let apiUrl= replaceUrl(replaceUrl(
@@ -119,8 +181,6 @@ const updateFOIMinistryRequestOIStatus = (
     return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: null });
   } else if (isValidExemptionApproved) {
     return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: OIStates.DoNotPublish });
-  } else if (isUnpublish) {
-    return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: OIStates.Unpublished });
   } else {
     return Promise.resolve("API call to adjust foiministryrequest not needed");
   }
