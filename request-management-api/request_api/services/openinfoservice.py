@@ -11,7 +11,7 @@ from request_api.utils.constants import SKIP_OPENINFO_MINISTRIES
 from request_api.utils.enums import OpenInfoNotificationType        
 from request_api.auth import AuthHelper
 from datetime import datetime
-import pytz
+
 
 class openinfoservice:
     """ OpenInformation service
@@ -128,3 +128,16 @@ class openinfoservice:
             deactivateresult = FOIOpenInformationRequests().deactivatefoiopeninforequest(foiopeninfoid, userid, foiministryrequestid)
         if result and deactivateresult:
             return result
+    
+    def getopeninforequestforpublishing(self, foiministryrequestid):
+       return FOIOpenInformationRequests().getopeninforequestforpublishing(foiministryrequestid)
+    
+    def getopeninforequestforunpublishing(self, foiministryrequestid):
+       return FOIOpenInformationRequests().getopeninforequestforunpublishing(foiministryrequestid)
+    
+    # for proactive disclosure
+    def getpdopeninforequestforpublishing(self, foiministryrequestid):
+        return FOIOpenInformationRequests().getpdopeninforequestforpublishing(foiministryrequestid)
+    
+    def getpdopeninforequestforunpublishing(self, foiministryrequestid):
+       return FOIOpenInformationRequests().getpdopeninforequestforunpublishing(foiministryrequestid)
