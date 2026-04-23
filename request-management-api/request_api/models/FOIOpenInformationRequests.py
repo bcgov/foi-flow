@@ -1,18 +1,17 @@
 from flask.app import Flask
-from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
+from sqlalchemy.sql.schema import ForeignKey
 from .db import  db, ma
 from datetime import datetime
-from sqlalchemy.orm import relationship, backref, aliased
-from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc, literal_column
+from sqlalchemy.orm import aliased
+from sqlalchemy import or_, and_, func, literal, cast, case, nullslast, nullsfirst, desc, asc, literal_column
 from sqlalchemy.sql.sqltypes import String
-from sqlalchemy.sql.sqltypes import Date, Integer
+from sqlalchemy.sql.sqltypes import  Integer
 from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup, OICloseReason, ExcludedProgramArea, OIStatusEnum, RequestorType
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIAssignees import FOIAssignee
 from .FOIRequests import FOIRequest
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
 from .FOIRequestApplicants import FOIRequestApplicant
-from .FOIRequestStatus import FOIRequestStatus
 from .ApplicantCategories import ApplicantCategory
 from .FOIRequestWatchers import FOIRequestWatcher
 from .FOIRestrictedMinistryRequests import FOIRestrictedMinistryRequest
@@ -21,8 +20,6 @@ from .OpenInformationStatuses import OpenInformationStatuses
 from .FOIRequestStatus import FOIRequestStatus
 from .FOIMinistryRequestSubjectCodes import FOIMinistryRequestSubjectCode
 from .SubjectCodes import SubjectCode
-from .FOIRequestOIPC import FOIRequestOIPC
-from .ProactiveDisclosureCategories import ProactiveDisclosureCategory
 from request_api.models.default_method_result import DefaultMethodResult
 from sqlalchemy import text
 from datetime import datetime as datetime2
@@ -726,10 +723,11 @@ class FOIOpenInformationRequests(db.Model):
                     pdc.name,
                     pd.reportperiod;
             """
-            
+
             result = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid})
             data = [dict(row) for row in result]
-            return data
+            return data[0] if data else None
+
         except Exception as exception:
             logging.error(f"Error fetching FOIOpenInfo request details: {exception}")
             return []
