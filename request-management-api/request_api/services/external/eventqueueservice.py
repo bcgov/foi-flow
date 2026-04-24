@@ -9,6 +9,10 @@ from request_api.models.default_method_result import DefaultMethodResult
 class eventqueueservice:
     """Supports legacy streams plus OpenInfo list and stream publishing."""
 
+    @staticmethod
+    def _format_exception(err):
+        return f"{type(err).__name__}: {err}"
+
     def __init__(self):
         self.stream_host = os.getenv("EVENT_QUEUE_HOST")
         self.stream_port = os.getenv("EVENT_QUEUE_PORT")
@@ -37,26 +41,27 @@ class eventqueueservice:
             msgid = stream.add(payload, id="*")
             return DefaultMethodResult(True, 'Added to stream', msgid.decode('utf-8'))
         except Exception as err:
-            logging.error("Error in contacting Redis Stream")
-            logging.error(err)
-            return DefaultMethodResult(False, err, -1)
+            logging.exception("Error in contacting Redis Stream")
+            return DefaultMethodResult(False, self._format_exception(err), -1)
 
     def add_openinfo_queue_message(self, queue_name, payload):
         try:
             queue_position = self.publication_client.rpush(queue_name, payload)
             return DefaultMethodResult(True, 'Added to queue', queue_position)
         except Exception as err:
-            logging.error("Error in contacting Publication Redis queue")
-            logging.error("Publication queue name: %s", queue_name)
-            logging.error(err)
-            return DefaultMethodResult(False, err, -1)
+            logging.exception(
+                "Error in contacting Publication Redis queue: %s",
+                queue_name,
+            )
+            return DefaultMethodResult(False, self._format_exception(err), -1)
 
     def add_publication_stream_message(self, stream_name, payload):
         try:
             message_id = self.publication_client.xadd(stream_name, {"payload": payload})
             return DefaultMethodResult(True, 'Added to stream', message_id)
         except Exception as err:
-            logging.error("Error in contacting Publication Redis stream")
-            logging.error("Publication stream name: %s", stream_name)
-            logging.error(err)
-            return DefaultMethodResult(False, err, -1)
+            logging.exception(
+                "Error in contacting Publication Redis stream: %s",
+                stream_name,
+            )
+            return DefaultMethodResult(False, self._format_exception(err), -1)
