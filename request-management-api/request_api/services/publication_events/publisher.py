@@ -32,6 +32,12 @@ class PublicationEventPublisher:
             raise ValueError(f"No Redis stream configured for event type: {event_type}")
         return stream_name
 
+    @staticmethod
+    def _stringify_message(message):
+        if isinstance(message, BaseException):
+            return f"{type(message).__name__}: {message}"
+        return str(message)
+
     def publish(self, envelope):
         serialized_envelope = json.dumps(envelope.to_dict(), default=str)
         stream_name = self._resolve_stream_name(envelope.event_type)
@@ -46,8 +52,13 @@ class PublicationEventPublisher:
         )
         result = self.queue_service.add_publication_stream_message(stream_name, serialized_envelope)
         if not result.success:
-            logging.error("Failed to publish publication event to stream %s", stream_name)
-            return DefaultMethodResult(False, result.message, result.identifier)
+            error_message = self._stringify_message(result.message)
+            logging.error(
+                "Failed to publish publication event to stream %s: %s",
+                stream_name,
+                error_message,
+            )
+            return DefaultMethodResult(False, error_message, result.identifier)
         logging.info(
             "Publication event pushed to OpenInfo stream",
             extra={
