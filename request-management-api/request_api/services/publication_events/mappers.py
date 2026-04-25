@@ -48,7 +48,7 @@ class PublicationPathResolver:
     def build_destination(self, row):
         return S3Location(
             bucket=self.resolve_bucket(row.get("bcgovcode")),
-            prefix=f"{row.get('axisrequestid')}/openinfo/staged",
+            prefix=f"{row.get('axisrequestid')}/staged/",
         )
 
 
