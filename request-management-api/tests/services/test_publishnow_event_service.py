@@ -66,6 +66,8 @@ def test_queue_proactive_disclosure_publishnow_builds_pd_envelope():
         openinfo_service=FakeOpenInfoService(
             proactive_row={
                 "proactivedisclosureid": 71,
+                "foiministryrequestid": 22318,
+                "foirequestid": 22318,
                 "axisrequestid": "PD-FIN-2026-047533",
                 "description": "Ministerial Directive",
                 "published_date": "2026-04-20",
@@ -73,8 +75,19 @@ def test_queue_proactive_disclosure_publishnow_builds_pd_envelope():
                 "fees": 0,
                 "applicant_type": None,
                 "bcgovcode": "fin",
+                "sitemap_pages": "",
+                "type": "publishnow",
                 "proactivedisclosurecategory": "Calendars",
                 "reportperiod": "Quarter 1 2026-27",
+                "additionalfiles": [
+                    {
+                        "additionalfileid": 67,
+                        "filename": "s.pdf",
+                        "s3uripath": "https://citz-foi-prod.objectstore.gov.bc.ca/fin-dev-e/PD-FIN-2026-047533/openinfo/e69081d4-2f01-4b43-9fd4-4c6835e09278.pdf",
+                        "isactive": True,
+                    }
+                ],
+                "openinfoid": 0,
             }
         ),
         publisher=publisher,
@@ -90,6 +103,12 @@ def test_queue_proactive_disclosure_publishnow_builds_pd_envelope():
     assert envelope["payload"]["tenant_id"] == str(uuid.uuid5(uuid.NAMESPACE_DNS, "bcgov:fin"))
     assert envelope["payload"]["proactivedisclosure_category"] == "Calendars"
     assert envelope["payload"]["report_period"] == "Quarter 1 2026-27"
+    assert envelope["payload"]["foiministryrequest_id"] == 22318
+    assert envelope["payload"]["foirequest_id"] == 22318
+    assert envelope["payload"]["sitemap_pages"] == ""
+    assert envelope["payload"]["openinfo_id"] == 0
+    assert envelope["payload"]["additionalfiles"][0]["filename"] == "s.pdf"
+    assert "type" not in envelope["payload"]
 
 
 def test_publication_event_publisher_serializes_envelope(monkeypatch):
