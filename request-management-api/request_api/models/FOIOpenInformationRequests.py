@@ -138,6 +138,65 @@ class FOIOpenInformationRequests(db.Model):
             return DefaultMethodResult(False, "FOIOpenInfo request version unable to be updated")
         finally:
             db.session.close()
+
+    @classmethod
+    def mark_ready_for_crawling(cls, foiministryrequestid, sitemap_page)->DefaultMethodResult:
+        try:
+            sql = """
+                UPDATE public."FOIOpenInformationRequests"
+                SET processingstatus = 'ready for crawling',
+                    processingmessage = 'sitemap ready',
+                    sitemap_pages = :sitemap_page,
+                    updated_at = now()
+                WHERE foiministryrequest_id = :foiministryrequestid
+                  AND isactive = TRUE
+                  AND processingstatus IS NULL;
+            """
+            result = db.session.execute(
+                text(sql),
+                {
+                    'foiministryrequestid': foiministryrequestid,
+                    'sitemap_page': sitemap_page,
+                },
+            )
+            if result.rowcount == 0:
+                db.session.rollback()
+                return DefaultMethodResult(False, "No active OpenInfo row found to update", foiministryrequestid)
+            logging.info(
+                "OpenInfo publication row updated for ministry request %s with sitemap page %s",
+                foiministryrequestid,
+                sitemap_page,
+            )
+            ministry_status_sql = """
+                UPDATE public."FOIMinistryRequests"
+                SET oistatus_id = :oistatus_id,
+                    updated_at = now()
+                WHERE foiministryrequestid = :foiministryrequestid
+                  AND isactive = TRUE;
+            """
+            ministry_result = db.session.execute(
+                text(ministry_status_sql),
+                {
+                    'foiministryrequestid': foiministryrequestid,
+                    'oistatus_id': OIStatusEnum.PUBLISHED.value,
+                },
+            )
+            if ministry_result.rowcount == 0:
+                db.session.rollback()
+                return DefaultMethodResult(False, "No active FOIMinistryRequests row found to update", foiministryrequestid)
+            logging.info(
+                "FOIMinistryRequests oistatus_id updated to %s for ministry request %s",
+                OIStatusEnum.PUBLISHED.value,
+                foiministryrequestid,
+            )
+            db.session.commit()
+            return DefaultMethodResult(True, "OpenInfo publication status updated", foiministryrequestid)
+        except Exception as exception:
+            logging.error(f"Error updating OpenInfo publication status: {exception}")
+            db.session.rollback()
+            return DefaultMethodResult(False, "OpenInfo publication status unable to be updated", foiministryrequestid)
+        finally:
+            db.session.close()
     
     @classmethod
     def getoibasequery(cls, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, groups=[], isadvancedsearch=False):

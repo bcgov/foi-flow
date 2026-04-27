@@ -7,7 +7,7 @@ from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
 from request_api.schemas.foiopeninfo import FOIOpenInfoSchema, FOIOpenInfoAdditionalFilesSchema, FOIOpenInfoAdditionalFilesDeleteSchema
 from request_api.services.openinfoservice import openinfoservice
-from request_api.services.publication_events.service import PublishNowEventService
+from request_api.services.publication_events.rest_service import PublishNowRestService
 from request_api.utils.enums import IAOTeamWithKeycloackGroup
 from marshmallow import ValidationError
 import json
@@ -170,8 +170,16 @@ class FOIOpenInfoPublishNow(Resource):
     @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
     def post(foiministryrequestid):
         try:
-            result = PublishNowEventService().queue_openinfo_publishnow(foiministryrequestid)
-            status_code = 202 if result.identifier else 200
+            result = PublishNowRestService().publish_openinfo_now(foiministryrequestid)
+            status_code = 200 if result.success else 500
+            logging.info(
+                "OpenInfo publish-now request completed for ministry request %s with status_code=%s success=%s identifier=%s message=%s",
+                foiministryrequestid,
+                status_code,
+                result.success,
+                result.identifier,
+                result.message,
+            )
             return {'status': result.success, 'message': result.message}, status_code
             
         except ValidationError as err:
@@ -240,21 +248,18 @@ class FOIPDOpenInfoPublishNow(Resource):
                 "PD publish-now request received",
                 extra={"foiministryrequestid": foiministryrequestid},
             )
-            result = PublishNowEventService().queue_proactive_disclosure_publishnow(foiministryrequestid)
+            result = PublishNowRestService().publish_proactive_disclosure_now(foiministryrequestid)
             if not result.success:
                 status_code = 500
-            elif result.identifier is None:
-                status_code = 200
             else:
-                status_code = 202
+                status_code = 200
             logging.info(
-                "PD publish-now request completed",
-                extra={
-                    "foiministryrequestid": foiministryrequestid,
-                    "status_code": status_code,
-                    "queue_identifier": result.identifier,
-                    "result_message": result.message,
-                },
+                "PD publish-now request completed for ministry request %s with status_code=%s success=%s identifier=%s message=%s",
+                foiministryrequestid,
+                status_code,
+                result.success,
+                result.identifier,
+                result.message,
             )
             return {'status': result.success, 'message': result.message}, status_code
             
