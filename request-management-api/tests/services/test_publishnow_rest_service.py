@@ -112,7 +112,10 @@ class FakeDbSession:
         self.closed = True
 
 
-def test_publish_openinfo_posts_rest_wrapper_and_updates_sitemap_page():
+def test_publish_openinfo_posts_rest_wrapper_and_updates_sitemap_page(monkeypatch):
+    monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
+    monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
+    monkeypatch.setenv("FLASK_ENV", "production")
     updater = FakePublicationStatusUpdater()
     client = FakePublicationClient(
         {
@@ -150,11 +153,16 @@ def test_publish_openinfo_posts_rest_wrapper_and_updates_sitemap_page():
     assert payload["tenant_id"] == str(uuid.uuid5(uuid.NAMESPACE_DNS, "bcgov:fin"))
     assert payload["axis_request_id"] == "FIN-2026-047533"
     assert payload["source"]["bucket"] == "fin-dev-e"
-    assert payload["destination"]["prefix"] == "FIN-2026-047533/staged/"
+    assert payload["source"]["prefix"] == "FIN-2026-047533/openinfo/"
+    assert payload["destination"]["bucket"] == "dev-openinfopub"
+    assert payload["destination"]["prefix"] == "packages/FIN-2026-047533/openinfo/"
     assert updater.openinfo_updates == [(22318, "sitemap_pages_1.xml")]
 
 
-def test_publish_proactive_disclosure_posts_rest_wrapper_and_updates_sitemap_page():
+def test_publish_proactive_disclosure_posts_rest_wrapper_and_updates_sitemap_page(monkeypatch):
+    monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
+    monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
+    monkeypatch.setenv("FLASK_ENV", "production")
     updater = FakePublicationStatusUpdater()
     client = FakePublicationClient(
         {
@@ -196,6 +204,10 @@ def test_publish_proactive_disclosure_posts_rest_wrapper_and_updates_sitemap_pag
     payload = client.calls[0][1]
     assert payload["proactivedisclosure_category"] == "Calendars"
     assert payload["report_period"] == "Quarter 1 2026-27"
+    assert payload["source"]["bucket"] == "fin-dev-e"
+    assert payload["source"]["prefix"] == "PD-FIN-2026-047533/openinfo/"
+    assert payload["destination"]["bucket"] == "dev-openinfopub"
+    assert payload["destination"]["prefix"] == "packages/PD-FIN-2026-047533/openinfo/"
     assert "foiministryrequest_id" not in payload
     assert "additionalfiles" not in payload
     assert "sitemap_pages" not in payload

@@ -27,7 +27,10 @@ class FakeOpenInfoService:
         return self.proactive_row
 
 
-def test_queue_openinfo_publishnow_builds_openinfo_envelope():
+def test_queue_openinfo_publishnow_builds_openinfo_envelope(monkeypatch):
+    monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
+    monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
+    monkeypatch.setenv("FLASK_ENV", "production")
     publisher = FakePublisher()
     service = PublishNowEventService(
         openinfo_service=FakeOpenInfoService(
@@ -57,10 +60,15 @@ def test_queue_openinfo_publishnow_builds_openinfo_envelope():
     assert envelope["payload"]["tenant_id"] == str(uuid.uuid5(uuid.NAMESPACE_DNS, "bcgov:fin"))
     assert envelope["payload"]["axis_request_id"] == "FIN-2026-047533"
     assert envelope["payload"]["source"]["bucket"] == "fin-dev-e"
-    assert envelope["payload"]["destination"]["prefix"] == "openinfo/published/"
+    assert envelope["payload"]["source"]["prefix"] == "FIN-2026-047533/openinfo/"
+    assert envelope["payload"]["destination"]["bucket"] == "dev-openinfopub"
+    assert envelope["payload"]["destination"]["prefix"] == "packages/FIN-2026-047533/openinfo/"
 
 
-def test_queue_proactive_disclosure_publishnow_builds_pd_envelope():
+def test_queue_proactive_disclosure_publishnow_builds_pd_envelope(monkeypatch):
+    monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
+    monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
+    monkeypatch.setenv("FLASK_ENV", "production")
     publisher = FakePublisher()
     service = PublishNowEventService(
         openinfo_service=FakeOpenInfoService(
@@ -108,6 +116,10 @@ def test_queue_proactive_disclosure_publishnow_builds_pd_envelope():
     assert envelope["payload"]["sitemap_pages"] == ""
     assert envelope["payload"]["openinfo_id"] == 0
     assert envelope["payload"]["additionalfiles"][0]["filename"] == "s.pdf"
+    assert envelope["payload"]["source"]["bucket"] == "fin-dev-e"
+    assert envelope["payload"]["source"]["prefix"] == "PD-FIN-2026-047533/openinfo/"
+    assert envelope["payload"]["destination"]["bucket"] == "dev-openinfopub"
+    assert envelope["payload"]["destination"]["prefix"] == "packages/PD-FIN-2026-047533/openinfo/"
     assert "type" not in envelope["payload"]
 
 
