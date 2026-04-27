@@ -1,31 +1,84 @@
-
 import os
-from request_api.exceptions import BusinessException
-
-from flask import current_app
-import time
-from request_api import socketio
 import json
-import redis
 import logging
-class RedisSubscriberService:
-   
-    foicommentredis = redis.from_url(os.getenv('SOCKETIO_REDISURL'), health_check_interval=int(os.getenv('SOCKETIO_REDIS_HEALTHCHECK_INTERVAL')), socket_connect_timeout=int(os.getenv('SOCKETIO_REDIS_CONNECT_TIMEOUT')), retry_on_timeout=True, socket_keepalive=True)
-    subscription = foicommentredis.pubsub(ignore_subscribe_messages=True)
-            
-    @classmethod
-    def register_subscription(cls):        
-        try: 
-            logging.warning("subscription to channel")
-            cls.subscription.subscribe(**{os.getenv('SOCKETIO_REDIS_COMMENT_CHANNEL'): event_handler})
-            cls.subscription.run_in_thread(sleep_time=float(os.getenv('SOCKETIO_REDIS_SLEEP_TIME')), daemon=True)
-        except BusinessException as exception:            
-            logging.error("%s,%s" % ('FOI request Queue REDIS Error', exception.message))              
+import redis
 
-    
-def event_handler(msg):
-    if msg and msg.get('type') == 'message':
-        data = msg.get('data')
-        _pushnotification = json.loads(data)
-        socketio.emit(_pushnotification["userid"], _pushnotification)
-            
+
+class RedisSubscriberService:
+    def __init__(self, socketio):
+        self.socketio = socketio
+
+        # Config
+        self.host = os.getenv("SOCKETIO_REDIS_HOST", "localhost")
+        self.port = int(os.getenv("SOCKETIO_REDIS_PORT", 6379))
+        self.password = os.getenv("SOCKETIO_REDIS_PASSWORD")
+        self.channel = os.getenv("SOCKETIO_REDIS_COMMENT_CHANNEL", "foi-comment")
+        self.sleep_time = float(os.getenv("SOCKETIO_REDIS_SLEEP_TIME", 0.1))
+
+        # Redis client
+        self.redis = redis.Redis(
+            host=self.host,
+            port=self.port,
+            password=self.password,
+            db=0,
+            decode_responses=True,
+            health_check_interval=int(os.getenv("SOCKETIO_REDIS_HEALTHCHECK_INTERVAL", 30)),
+            socket_connect_timeout=int(os.getenv("SOCKETIO_REDIS_CONNECT_TIMEOUT", 5)),
+            retry_on_timeout=True,
+            socket_keepalive=True
+        )
+
+        self.pubsub = self.redis.pubsub(ignore_subscribe_messages=True)
+        self.thread = None
+
+    def start(self):
+        try:
+            # 🔍 Connection check
+            self.redis.ping()
+            logging.info(f"Connected to Redis at {self.host}:{self.port}")
+
+            logging.info(f"Subscribing to Redis channel: {self.channel}")
+
+            self.pubsub.subscribe(**{self.channel: self._event_handler})
+            self.thread = self.pubsub.run_in_thread(
+                sleep_time=self.sleep_time,
+                daemon=True
+            )
+
+            logging.info("Redis subscription started")
+
+        except redis.RedisError as e:
+            logging.error(f"Redis connection/subscription error: {e}")
+
+        except Exception as e:
+            logging.error(f"Unexpected error starting Redis subscriber: {e}")
+
+    def stop(self):
+        if self.thread:
+            self.thread.stop()
+            logging.info("Redis subscription stopped")
+
+    def _event_handler(self, msg):
+        try:
+            if not msg or msg.get("type") != "message":
+                return
+
+            data = msg.get("data")
+            if not data:
+                return
+
+            payload = json.loads(data)
+
+            user_id = payload.get("userid")
+            if not user_id:
+                logging.warning("Missing userid in payload")
+                return
+
+            # Emit event
+            self.socketio.emit(user_id, payload)
+
+        except json.JSONDecodeError:
+            logging.error("Invalid JSON received from Redis")
+
+        except Exception as e:
+            logging.error(f"Error processing Redis message: {e}")

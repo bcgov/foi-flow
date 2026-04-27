@@ -15,6 +15,7 @@ from request_api.auth import AuthHelper
 from request_api.exceptions import BusinessException
 from flask import current_app
 from request_api.utils.redissubscriber import RedisSubscriberService
+from request_api.services.publication_events.completed_stream_consumer import PublicationCompletedStreamConsumer
 import logging
 
 @socketio.on('connect')
@@ -62,13 +63,34 @@ def error_handler(e):
 
 APP = create_app()
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))    
+    port = int(os.environ.get('PORT', 5000))
+
     messagequeue = os.getenv('SOCKETIO_MESSAGE_QUEUE', 'INMEMORY')
+
+    socketio.init_app(
+        APP,
+        async_mode='eventlet',
+        path='/api/v1/socket.io'
+    )
+
     if os.getenv("SOCKETIO_MESSAGE_QTYPE") == "REDIS":
-        RedisSubscriberService().register_subscription()
-    socketio.init_app(APP, async_mode='eventlet', 
-                      path='/api/v1/socket.io')    
-    socketio.run(APP, port=port,host='0.0.0.0', log_output=False, use_reloader=False)  
+        subscriber = RedisSubscriberService(socketio)
+        subscriber.start()
+
+    if os.getenv("PUBLICATION_COMPLETED_CONSUMER_ENABLED", "false").lower() == "true":
+        try:
+            publication_completed_consumer = PublicationCompletedStreamConsumer.from_env(app=APP)
+            publication_completed_consumer.start()
+        except Exception as exception:
+            logging.error("Unable to start publication completed stream consumer: %s", exception)
+
+    socketio.run(
+        APP,
+        port=port,
+        host='0.0.0.0',
+        log_output=False,
+        use_reloader=False
+    )
     
 
 
