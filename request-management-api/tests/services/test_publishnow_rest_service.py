@@ -1,3 +1,4 @@
+import logging
 import uuid
 
 import requests
@@ -30,6 +31,11 @@ class FakePublicationClient:
     def publish(self, publication_type, payload):
         self.calls.append((publication_type, payload))
         return self.response
+
+
+class FailingPublicationClient:
+    def publish(self, publication_type, payload):
+        raise RuntimeError("publication service unavailable")
 
 
 class FakePublicationStatusUpdater:
@@ -240,6 +246,31 @@ def test_publish_openinfo_requires_sitemap_page_key():
     assert result.success is False
     assert "sitemap_page_key" in result.message
     assert updater.openinfo_updates == []
+
+
+def test_publish_failure_log_includes_context_in_message(caplog):
+    service = PublishNowRestService(
+        openinfo_service=FakeOpenInfoService(
+            proactive_row={
+                "proactivedisclosureid": 71,
+                "foiministryrequestid": 22318,
+                "axisrequestid": "PD-FIN-2026-047533",
+                "bcgovcode": "fin",
+                "proactivedisclosurecategory": "Calendars",
+                "reportperiod": "Quarter 1 2026-27",
+            }
+        ),
+        publication_client=FailingPublicationClient(),
+        publication_status_updater=FakePublicationStatusUpdater(),
+    )
+
+    with caplog.at_level(logging.ERROR):
+        result = service.publish_proactive_disclosure_now(22318)
+
+    assert result.success is False
+    assert "publication_type=proactivedisclosure" in caplog.text
+    assert "foiministryrequestid=22318" in caplog.text
+    assert "axisrequestid=PD-FIN-2026-047533" in caplog.text
 
 
 def test_publication_rest_client_includes_upstream_error_body():

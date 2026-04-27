@@ -245,8 +245,8 @@ class FOIPDOpenInfoPublishNow(Resource):
     def post(foiministryrequestid):
         try:
             logging.info(
-                "PD publish-now request received",
-                extra={"foiministryrequestid": foiministryrequestid},
+                "PD publish-now request received foiministryrequestid=%s",
+                foiministryrequestid,
             )
             result = PublishNowRestService().publish_proactive_disclosure_now(foiministryrequestid)
             if not result.success:
@@ -271,8 +271,9 @@ class FOIPDOpenInfoPublishNow(Resource):
             return {'status': exception.status_code, 'message': exception.message}, 500
         except redis.RedisError as redis_err:
             logging.exception(
-                "PD publish-now queueing failed",
-                extra={"foiministryrequestid": foiministryrequestid},
+                "PD publish-now queueing failed foiministryrequestid=%s error=%s",
+                foiministryrequestid,
+                redis_err,
             )
             return {'status': False, 'message': f"Failed to queue request: {str(redis_err)}"}, 500
 
