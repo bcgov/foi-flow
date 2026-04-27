@@ -197,7 +197,72 @@ class FOIOpenInformationRequests(db.Model):
             return DefaultMethodResult(False, "OpenInfo publication status unable to be updated", foiministryrequestid)
         finally:
             db.session.close()
-    
+
+    @classmethod
+    def create_published_version_from_openinfo_id(cls, foiopeninforequestid, message)->DefaultMethodResult:
+        try:
+            current = (
+                db.session.query(cls)
+                .filter(cls.foiopeninforequestid == foiopeninforequestid)
+                .order_by(cls.version.desc())
+                .first()
+            )
+            if current is None:
+                return DefaultMethodResult(False, "FOIOpenInfo request not found", foiopeninforequestid)
+
+            updated_at = datetime2.now().isoformat()
+            ministry_request_id = current.foiministryrequest_id
+
+            active_rows = (
+                db.session.query(cls)
+                .filter(cls.foiministryrequest_id == ministry_request_id)
+                .filter(or_(cls.isactive == True, cls.isactive.is_(None)))
+                .all()
+            )
+            for row in active_rows:
+                row.isactive = False
+                row.updated_at = updated_at
+                row.updatedby = "publishingservice"
+
+            latest = (
+                db.session.query(cls)
+                .filter(cls.foiministryrequest_id == ministry_request_id)
+                .order_by(cls.version.desc())
+                .first()
+            )
+
+            new_foiopeninforequest = FOIOpenInformationRequests(
+                foiopeninforequestid=latest.foiopeninforequestid,
+                version=latest.version + 1,
+                foiministryrequest_id=latest.foiministryrequest_id,
+                foiministryrequestversion_id=latest.foiministryrequestversion_id,
+                oipublicationstatus_id=latest.oipublicationstatus_id,
+                oiexemption_id=latest.oiexemption_id,
+                oiassignedto=latest.oiassignedto,
+                oiexemptionapproved=latest.oiexemptionapproved,
+                pagereference=latest.pagereference,
+                iaorationale=latest.iaorationale,
+                oifeedback=latest.oifeedback,
+                publicationdate=latest.publicationdate,
+                receiveddate=latest.receiveddate,
+                copyrightsevered=latest.copyrightsevered,
+                created_at=updated_at,
+                createdby="publishingservice",
+                processingstatus="published",
+                processingmessage=message,
+                sitemap_pages=latest.sitemap_pages,
+                isactive=True,
+            )
+            db.session.add(new_foiopeninforequest)
+            db.session.commit()
+            return DefaultMethodResult(True, "OpenInfo publication status updated", new_foiopeninforequest.foiopeninforequestid)
+        except Exception as exception:
+            db.session.rollback()
+            logging.error(f"Error updating OpenInfo publication status: {exception}")
+            return DefaultMethodResult(False, str(exception), foiopeninforequestid)
+        finally:
+            db.session.close()
+
     @classmethod
     def getoibasequery(cls, additionalfilter=None, userid=None, isiaorestrictedfilemanager=False, groups=[], isadvancedsearch=False):
         _session = db.session
