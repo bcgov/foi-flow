@@ -17,6 +17,8 @@ class PublicationPathResolver:
     def __init__(self, tenant_id=None):
         self.tenant_id = tenant_id
         self.default_tenant_id = os.getenv("PUBLICATION_TENANT_ID", "foi-flow")
+        self.openinfo_publication_bucket = os.getenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
+        self.openinfo_source_bucket_suffix = os.getenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
         self.tenant_namespace = uuid.UUID(
             os.getenv("PUBLICATION_TENANT_NAMESPACE", str(uuid.NAMESPACE_DNS))
         )
@@ -29,26 +31,16 @@ class PublicationPathResolver:
             return self.tenant_id
         return self.default_tenant_id
 
-    @staticmethod
-    def resolve_bucket(bcgovcode):
-        env = os.getenv("FLASK_ENV", "production")
-        suffix_map = {
-            "production": "dev-e",
-            "development": "dev-e",
-        }
-        suffix = suffix_map.get(env, "dev-e")
-        return f"{bcgovcode}-{suffix}"
-
     def build_source(self, row):
         return S3Location(
-            bucket=self.resolve_bucket(row.get("bcgovcode")),
+            bucket=f"{row.get('bcgovcode')}-{self.openinfo_source_bucket_suffix}",
             prefix=f"{row.get('axisrequestid')}/openinfo/",
         )
 
     def build_destination(self, row):
         return S3Location(
-            bucket=self.resolve_bucket(row.get("bcgovcode")),
-            prefix=f"{row.get('axisrequestid')}/staged/",
+            bucket=self.openinfo_publication_bucket,
+            prefix=f"packages/{row.get('axisrequestid')}/openinfo/",
         )
 
 
