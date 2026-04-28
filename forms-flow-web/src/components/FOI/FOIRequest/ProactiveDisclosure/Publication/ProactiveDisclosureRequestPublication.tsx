@@ -131,7 +131,7 @@ const ProactiveDisclosureRequestPublication = ({
                 formattedData,
                 (err: any, _res: any) => {
                     if (!err) {
-                        const toastMsg = _res.status === 202 ? "FOI Proactive Disclosure request has successfully been sent for publishing." : "No data found to publish for this FOI Proactive Disclosure request.";
+                        const toastMsg = _res.data.message;
                         toast.update(toastID, {
                             type: "success",
                             render:
@@ -180,7 +180,7 @@ const ProactiveDisclosureRequestPublication = ({
                 formattedData,
                 (err: any, _res: any) => {
                     if (!err) {
-                        const toastMsg = _res.status === 202 ? "FOI Proactive Disclosure request has successfully been sent for unpublishing." : "No data found to unpublish for this FOI Proactive Disclosure request.";
+                        const toastMsg = _res.data.message;
                         toast.update(toastID, {
                             type: "success",
                             render:
