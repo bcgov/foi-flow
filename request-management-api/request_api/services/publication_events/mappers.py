@@ -34,7 +34,7 @@ class PublicationPathResolver:
     def build_source(self, row):
         return S3Location(
             bucket=f"{row.get('bcgovcode')}-{self.openinfo_source_bucket_suffix}",
-            prefix=f"{row.get('axisrequestid')}/openinfo/",
+            prefix=f"{row.get('axisrequestid')}/responsepackage/",
         )
 
     def build_destination(self, row):
