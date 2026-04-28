@@ -16,6 +16,7 @@ from request_api.exceptions import BusinessException
 from flask import current_app
 from request_api.utils.redissubscriber import RedisSubscriberService
 from request_api.services.publication_events.completed_stream_consumer import PublicationCompletedStreamConsumer
+from request_api.services.publication_events.scheduler import PublicationPrePublishingScheduler
 import logging
 
 @socketio.on('connect')
@@ -77,12 +78,19 @@ if __name__ == "__main__":
         subscriber = RedisSubscriberService(socketio)
         subscriber.start()
 
-    if os.getenv("PUBLICATION_COMPLETED_CONSUMER_ENABLED", "false").lower() == "true":
+    if os.getenv("PUBLICATION_COMPLETED_CONSUMER_ENABLED", "true").lower() == "true":
         try:
             publication_completed_consumer = PublicationCompletedStreamConsumer.from_env(app=APP)
             publication_completed_consumer.start()
         except Exception as exception:
             logging.error("Unable to start publication completed stream consumer: %s", exception)
+
+    if os.getenv("PUBLICATION_PREPUBLISHING_SCHEDULER_ENABLED", "true").lower() == "true":
+        try:
+            publication_prepublishing_scheduler = PublicationPrePublishingScheduler.from_env(app=APP)
+            publication_prepublishing_scheduler.start()
+        except Exception as exception:
+            logging.error("Unable to start publication pre-publishing scheduler: %s", exception)
 
     socketio.run(
         APP,

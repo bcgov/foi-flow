@@ -355,7 +355,7 @@ def test_create_published_version_from_openinfo_id_versions_active_record(monkey
     assert new_openinfo.publicationdate == "2026-04-21"
     assert new_openinfo.receiveddate == "2026-04-01"
     assert new_openinfo.copyrightsevered is False
-    assert new_openinfo.processingstatus == "published"
+    assert new_openinfo.processingstatus == "ready for sitemap"
     assert new_openinfo.processingmessage == "Published to OpenInfo"
     assert new_openinfo.sitemap_pages == "page-a,page-b"
     assert new_openinfo.isactive is True
@@ -425,7 +425,7 @@ def test_create_published_version_from_proactive_id_versions_active_record(monke
     assert new_proactive.publicationdate == "2026-04-21"
     assert new_proactive.earliesteligiblepublicationdate == "2026-03-20"
     assert new_proactive.oipublicationstatus_id == 1
-    assert new_proactive.processingstatus == "published"
+    assert new_proactive.processingstatus == "ready for sitemap"
     assert new_proactive.processingmessage == "Proactive disclosure published"
     assert new_proactive.sitemap_pages == "page-a,page-b"
     assert new_proactive.isactive is True

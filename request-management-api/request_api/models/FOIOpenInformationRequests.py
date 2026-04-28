@@ -1,7 +1,7 @@
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey
 from .db import  db, ma
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.orm import aliased
 from sqlalchemy import or_, and_, func, literal, cast, case, nullslast, nullsfirst, desc, asc, literal_column
 from sqlalchemy.sql.sqltypes import String
@@ -248,7 +248,7 @@ class FOIOpenInformationRequests(db.Model):
                 copyrightsevered=latest.copyrightsevered,
                 created_at=updated_at,
                 createdby="publishingservice",
-                processingstatus="published",
+                processingstatus="ready for sitemap",
                 processingmessage=message,
                 sitemap_pages=latest.sitemap_pages,
                 isactive=True,
@@ -748,6 +748,86 @@ class FOIOpenInformationRequests(db.Model):
             return data
         except Exception as exception:
             logging.error(f"Error fetching FOIOpenInfo request details: {exception}")
+            return []
+        finally:
+            db.session.close()
+
+    @classmethod
+    def getopeninforecordsforprepublishing(cls, now=None):
+        try:
+            publication_cutoff = ((now or datetime2.now()) + timedelta(days=1)).strftime('%Y-%m-%d')
+            sql = """
+                SELECT
+                    oi.foiopeninforequestid as openinfoid,
+                    mr.foiministryrequestid,
+                    r.foirequestid,
+                    mr.axisrequestid,
+                    mr.description,
+                    to_char(oi.publicationdate, 'YYYY-MM-DD') AS published_date,
+                    pa.name as contributor,
+                    ac.name as applicant_type,
+                    COALESCE((fee.feedata->>'amountpaid')::Numeric, 0) as fees,
+                    LOWER(pa.bcgovcode) AS bcgovcode,
+                    COALESCE(oi.sitemap_pages, '') as sitemap_pages,
+                    'publish' as type,
+                    COALESCE(
+                        json_agg(
+                            json_build_object(
+                                'additionalfileid', oifiles.additionalfileid,
+                                'filename', oifiles.filename,
+                                's3uripath', oifiles.s3uripath,
+                                'isactive', oifiles.isactive
+                            )
+                        ) FILTER (WHERE oifiles.additionalfileid IS NOT NULL), '[]'::json
+                    ) AS additionalfiles,
+                    0 as proactivedisclosureid,
+                    '' as proactivedisclosurecategory,
+                    '' as reportperiod
+                FROM public."FOIMinistryRequests" mr
+                INNER JOIN public."FOIRequests" r on mr.foirequest_id = r.foirequestid and mr.foirequestversion_id = r.version
+                INNER JOIN public."ProgramAreas" pa on mr.programareaid = pa.programareaid
+                INNER JOIN public."ApplicantCategories" ac on r.applicantcategoryid = ac.applicantcategoryid
+                LEFT JOIN (
+                    SELECT ministryrequestid, MAX(version) as max_version
+                    FROM public."FOIRequestCFRFees"
+                    GROUP BY ministryrequestid
+                ) latest_payment on mr.foiministryrequestid = latest_payment.ministryrequestid
+                LEFT JOIN public."FOIRequestCFRFees" fee on mr.foiministryrequestid = fee.ministryrequestid
+                    and latest_payment.max_version = fee.version and mr.version = fee.ministryrequestversion
+                INNER JOIN public."FOIOpenInformationRequests" oi on mr.foiministryrequestid = oi.foiministryrequest_id and oi.isactive = TRUE
+                INNER JOIN public."OpenInformationStatuses" oistatus on mr.oistatus_id = oistatus.oistatusid
+                INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on oi.oipublicationstatus_id = oirequesttype.oipublicationstatusid
+                LEFT JOIN public."FOIOpenInfoAdditionalFiles" oifiles on mr.foiministryrequestid = oifiles.ministryrequestid
+                WHERE oistatus.name IN (:ready_status, :published_status)
+                  AND oirequesttype.name = :publication_status
+                  AND oi.publicationdate < :publication_cutoff
+                  AND oi.processingstatus is NULL
+                  AND mr.isactive = TRUE
+                GROUP BY
+                    oi.foiopeninforequestid,
+                    mr.foiministryrequestid,
+                    r.foirequestid,
+                    mr.axisrequestid,
+                    mr.description,
+                    oi.publicationdate,
+                    pa.name,
+                    ac.name,
+                    COALESCE((fee.feedata->>'amountpaid')::Numeric, 0),
+                    pa.bcgovcode,
+                    oi.sitemap_pages;
+            """
+            result = db.session.execute(
+                text(sql),
+                {
+                    'ready_status': 'Ready to Publish',
+                    'published_status': 'Published',
+                    'publication_status': 'Publish',
+                    'publication_cutoff': publication_cutoff,
+                },
+            )
+            return [dict(row) for row in result]
+        except Exception as exception:
+            logging.error(f"Error fetching FOIOpenInfo pre-publishing records: {exception}")
             return []
         finally:
             db.session.close()
