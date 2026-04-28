@@ -36,13 +36,11 @@ class OpenInfoPublishCompletedConsumer:
         message = payload.get("message") or "Publication completed"
 
         logging.info(
-            "Handling OpenInfo publish completed event",
-            extra={
-                "event_id": envelope.get("event_id"),
-                "correlation_id": correlation_id,
-                "openinfo_id": openinfo_id,
-                "request_event_id": payload.get("request_event_id"),
-            },
+            "Handling OpenInfo publish completed event | "
+            f"event_id={envelope.get('event_id')} "
+            f"correlation_id={correlation_id} "
+            f"openinfo_id={openinfo_id} "
+            f"request_event_id={payload.get('request_event_id')}"
         )
         return self.openinfo_model.create_published_version_from_openinfo_id(openinfo_id, message)
 
@@ -76,14 +74,13 @@ class ProactiveDisclosurePublishCompletedConsumer:
         message = payload.get("message") or "Publication completed"
 
         logging.info(
-            "Handling Proactive Disclosure publish completed event",
-            extra={
-                "event_id": envelope.get("event_id"),
-                "correlation_id": correlation_id,
-                "proactive_id": proactive_id,
-                "request_event_id": payload.get("request_event_id"),
-            },
+            "Handling Proactive Disclosure publish completed event | "
+            f"event_id={envelope.get('event_id')} "
+            f"correlation_id={correlation_id} "
+            f"proactive_id={proactive_id} "
+            f"request_event_id={payload.get('request_event_id')}"
         )
+
         return self.proactive_model.create_published_version_from_proactive_id(
             proactive_id,
             message,
