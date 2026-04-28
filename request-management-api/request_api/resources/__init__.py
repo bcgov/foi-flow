@@ -22,8 +22,11 @@ That are used to expose operational health information about the service, and me
 """
 
 from flask import Blueprint
+from flask import current_app
+from flask_jwt_oidc.exceptions import AuthError
 
 from .apihelper import Api
+from request_api.utils.auth_error_handler import auth_error_restx_response
 
 from .meta import API as META_API
 from .ops import API as OPS_API
@@ -72,6 +75,12 @@ API = Api(
     version='1.0',
     description='The Core API for the FOI Request System',
 )
+
+
+@API.errorhandler(AuthError)
+def handle_auth_error(error):
+    """Handle authentication exceptions raised from Flask-RESTX resources."""
+    return auth_error_restx_response(error, current_app.logger)
 
 
 
