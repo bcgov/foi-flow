@@ -248,7 +248,7 @@ class FOIOpenInformationRequests(db.Model):
                 copyrightsevered=latest.copyrightsevered,
                 created_at=updated_at,
                 createdby="publishingservice",
-                processingstatus="ready for sitemap",
+                processingstatus="published",
                 processingmessage=message,
                 sitemap_pages=latest.sitemap_pages,
                 isactive=True,
