@@ -10,24 +10,21 @@ from request_api.services.publication_events.types import PublicationEventType
 
 
 class PublicationEventPublisher:
-    """Publishes publication events to the OpenInfo Redis stream."""
+    """Publishes publication events to unified Redis streams."""
 
-    def __init__(self, queue_service=None, stream_name=None, stream_names=None):
+    def __init__(self, queue_service=None, stream_names=None):
         self.queue_service = queue_service or eventqueueservice()
-        default_stream_name = stream_name or os.getenv("OPENINFO_REDIS_STREAM_NAME")
         self.stream_names = stream_names or {
-            PublicationEventType.OPENINFO_PUBLISH_REQUESTED: os.getenv(
-                "OPENINFO_PUBLISH_STREAM_NAME",
-                default_stream_name,
+            PublicationEventType.PUBLISH_REQUESTED: os.getenv(
+                "PUBLICATION_PUBLISH_STREAM_NAME",
             ),
-            PublicationEventType.PROACTIVE_DISCLOSURE_PUBLISH_REQUESTED: os.getenv(
-                "PROACTIVEDISCLOSURE_PUBLISH_STREAM_NAME",
-                default_stream_name,
+            PublicationEventType.UNPUBLISH_REQUESTED: os.getenv(
+                "PUBLICATION_UNPUBLISH_STREAM_NAME",
             ),
         }
 
     def _resolve_stream_name(self, event_type):
-        stream_name = self.stream_names.get(event_type) or os.getenv("OPENINFO_REDIS_STREAM_NAME")
+        stream_name = self.stream_names.get(event_type)
         if not stream_name:
             raise ValueError(f"No Redis stream configured for event type: {event_type}")
         return stream_name
@@ -42,13 +39,12 @@ class PublicationEventPublisher:
         serialized_envelope = json.dumps(envelope.to_dict(), default=str)
         stream_name = self._resolve_stream_name(envelope.event_type)
         logging.info(
-            "Publishing publication event to OpenInfo stream",
-            extra={
-                "stream_name": stream_name,
-                "event_id": envelope.event_id,
-                "event_type": envelope.event_type,
-                "correlation_id": envelope.correlation_id,
-            },
+            "Publishing publication event to stream | "
+            "stream=%s event_id=%s event_type=%s correlation_id=%s",
+            stream_name,
+            envelope.event_id,
+            envelope.event_type,
+            envelope.correlation_id,
         )
         result = self.queue_service.add_publication_stream_message(stream_name, serialized_envelope)
         if not result.success:
@@ -60,12 +56,11 @@ class PublicationEventPublisher:
             )
             return DefaultMethodResult(False, error_message, result.identifier)
         logging.info(
-            "Publication event pushed to OpenInfo stream",
-            extra={
-                "stream_name": stream_name,
-                "event_id": envelope.event_id,
-                "event_type": envelope.event_type,
-                "stream_identifier": result.identifier,
-            },
+            "Publication event pushed to stream | "
+            "stream=%s event_id=%s event_type=%s stream_identifier=%s",
+            stream_name,
+            envelope.event_id,
+            envelope.event_type,
+            result.identifier,
         )
         return DefaultMethodResult(True, "Request queued for publishing successfully", result.identifier)

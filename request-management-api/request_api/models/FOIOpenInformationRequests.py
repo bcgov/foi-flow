@@ -841,10 +841,13 @@ class FOIOpenInformationRequests(db.Model):
                     mr.foiministryrequestid,
                     mr.foirequest_id,
                     mr.axisrequestid,
+                    LOWER(pa.bcgovcode) AS bcgovcode,
+                    to_char(oi.publicationdate, 'YYYY-MM-DD') AS publicationdate,
                     COALESCE(oi.sitemap_pages, '') as sitemap_pages,
                     'unpublish' as type
                 FROM public."FOIOpenInformationRequests" oi
                 INNER JOIN public."FOIMinistryRequests" mr on oi.foiministryrequest_id = mr.foiministryrequestid and mr.isactive = TRUE
+                INNER JOIN public."ProgramAreas" pa on mr.programareaid = pa.programareaid
                 INNER JOIN public."OpenInformationStatuses" oistatus on mr.oistatus_id = oistatus.oistatusid
                 INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on oi.oipublicationstatus_id = oirequesttype.oipublicationstatusid
                 WHERE mr.foiministryrequestid = :foiministryrequestid 
@@ -947,10 +950,13 @@ class FOIOpenInformationRequests(db.Model):
                     mr.foiministryrequestid,
                     mr.foirequest_id,
                     mr.axisrequestid,
+                    LOWER(pa.bcgovcode) AS bcgovcode,
+                    to_char(pd.publicationdate, 'YYYY-MM-DD') AS publicationdate,
                     COALESCE(pd.sitemap_pages, '') as sitemap_pages,
                     'unpublish' as type
                 FROM public."FOIProactiveDisclosureRequests" pd
                 INNER JOIN public."FOIMinistryRequests" mr on pd.foiministryrequest_id = mr.foiministryrequestid and mr.isactive = TRUE
+                INNER JOIN public."ProgramAreas" pa on mr.programareaid = pa.programareaid
                 INNER JOIN public."OpenInformationStatuses" oistatus on mr.oistatus_id = oistatus.oistatusid
                 INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on pd.oipublicationstatus_id = oirequesttype.oipublicationstatusid
                 WHERE mr.foiministryrequestid = :foiministryrequestid 
