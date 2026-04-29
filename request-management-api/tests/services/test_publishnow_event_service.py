@@ -60,7 +60,7 @@ def test_queue_openinfo_publishnow_builds_openinfo_envelope(monkeypatch):
     assert envelope["payload"]["tenant_id"] == str(uuid.uuid5(uuid.NAMESPACE_DNS, "bcgov:fin"))
     assert envelope["payload"]["axis_request_id"] == "FIN-2026-047533"
     assert envelope["payload"]["source"]["bucket"] == "fin-dev-e"
-    assert envelope["payload"]["source"]["prefix"] == "FIN-2026-047533/openinfo/"
+    assert envelope["payload"]["source"]["prefix"] == "FIN-2026-047533/responsepackage/"
     assert envelope["payload"]["destination"]["bucket"] == "dev-openinfopub"
     assert envelope["payload"]["destination"]["prefix"] == "packages/FIN-2026-047533/openinfo/"
 
@@ -117,7 +117,7 @@ def test_queue_proactive_disclosure_publishnow_builds_pd_envelope(monkeypatch):
     assert envelope["payload"]["openinfo_id"] == 0
     assert envelope["payload"]["additionalfiles"][0]["filename"] == "s.pdf"
     assert envelope["payload"]["source"]["bucket"] == "fin-dev-e"
-    assert envelope["payload"]["source"]["prefix"] == "PD-FIN-2026-047533/openinfo/"
+    assert envelope["payload"]["source"]["prefix"] == "PD-FIN-2026-047533/responsepackage/"
     assert envelope["payload"]["destination"]["bucket"] == "dev-openinfopub"
     assert envelope["payload"]["destination"]["prefix"] == "packages/PD-FIN-2026-047533/openinfo/"
     assert "type" not in envelope["payload"]

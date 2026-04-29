@@ -187,6 +187,74 @@ class FOIProactiveDisclosureRequests(db.Model):
             raise ex
         finally:
             db.session.close()
+
+    @classmethod
+    def create_published_version_from_proactive_id(cls, proactivedisclosureid, message)->DefaultMethodResult:
+        try:
+            current = (
+                db.session.query(cls)
+                .filter(cls.proactivedisclosureid == proactivedisclosureid)
+                .order_by(cls.version.desc())
+                .first()
+            )
+            if current is None:
+                return DefaultMethodResult(
+                    False,
+                    "FOI Proactive Disclosure request not found",
+                    proactivedisclosureid,
+                )
+
+            updated_at = datetime2.now().isoformat()
+            ministry_request_id = current.foiministryrequest_id
+
+            active_rows = (
+                db.session.query(cls)
+                .filter(cls.foiministryrequest_id == ministry_request_id)
+                .filter(or_(cls.isactive == True, cls.isactive.is_(None)))
+                .all()
+            )
+            for row in active_rows:
+                row.isactive = False
+                row.updated_at = updated_at
+                row.updatedby = "publishingservice"
+
+            latest = (
+                db.session.query(cls)
+                .filter(cls.foiministryrequest_id == ministry_request_id)
+                .order_by(cls.version.desc())
+                .first()
+            )
+
+            new_proactive = FOIProactiveDisclosureRequests(
+                proactivedisclosureid=latest.proactivedisclosureid,
+                version=latest.version + 1,
+                foiministryrequest_id=latest.foiministryrequest_id,
+                foiministryrequestversion_id=latest.foiministryrequestversion_id,
+                proactivedisclosurecategoryid=latest.proactivedisclosurecategoryid,
+                reportperiod=latest.reportperiod,
+                publicationdate=latest.publicationdate,
+                earliesteligiblepublicationdate=latest.earliesteligiblepublicationdate,
+                isactive=True,
+                created_at=updated_at,
+                createdby="publishingservice",
+                oipublicationstatus_id=latest.oipublicationstatus_id,
+                processingstatus="ready for sitemap",
+                processingmessage=message,
+                sitemap_pages=latest.sitemap_pages,
+            )
+            db.session.add(new_proactive)
+            db.session.commit()
+            return DefaultMethodResult(
+                True,
+                "Proactive Disclosure publication status updated",
+                new_proactive.proactivedisclosureid,
+            )
+        except Exception as exception:
+            db.session.rollback()
+            logging.error(f"Error updating Proactive Disclosure publication status: {exception}")
+            return DefaultMethodResult(False, str(exception), proactivedisclosureid)
+        finally:
+            db.session.close()
                 
 class FOIProactiveDisclosureRequestSchema(ma.Schema):
     class Meta:
