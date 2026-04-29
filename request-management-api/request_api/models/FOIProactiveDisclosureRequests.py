@@ -120,6 +120,7 @@ class FOIProactiveDisclosureRequests(db.Model):
                 UPDATE public."FOIProactiveDisclosureRequests"
                 SET processingstatus = 'ready for crawling',
                     processingmessage = 'sitemap ready',
+                    oipublicationstatus_id = 2,
                     sitemap_pages = :sitemap_page,
                     updated_at = now()
                 WHERE foiministryrequest_id = :foiministryrequestid
