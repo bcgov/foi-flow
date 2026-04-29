@@ -8,6 +8,7 @@ from request_api.services.publication_events.payloads import (
     OpenInfoPublishRequestedPayload,
     ProactiveDisclosurePublishRequestedPayload,
     S3Location,
+    UnpublishRequestedPayload,
 )
 
 
@@ -110,3 +111,33 @@ class ProactiveDisclosurePublishRequestedMapper:
     @staticmethod
     def correlation_id(row):
         return f"proactivedisclosure-publish-{row.get('proactivedisclosureid')}"
+
+
+class UnpublishRequestedMapper:
+    """Maps unpublish DB rows to UnpublishRequestedPayload."""
+
+    def __init__(self, path_resolver=None):
+        self.path_resolver = path_resolver or PublicationPathResolver()
+        self.public_base_url = os.getenv(
+            "PUBLICATION_PUBLIC_BASE_URL",
+            "https://openinfo.gov.bc.ca",
+        )
+
+    def map(self, row, publication_type="openinfo"):
+        axis_request_id = row.get("axisrequestid")
+        return UnpublishRequestedPayload(
+            tenant_id=self.path_resolver.resolve_tenant_id(row),
+            publication_id=axis_request_id,
+            public_url=f"{self.public_base_url}/public/{axis_request_id}.html",
+            public_repository=S3Location(
+                bucket=self.path_resolver.openinfo_publication_bucket,
+                prefix=f"{publication_type}/{axis_request_id}",
+            ),
+            last_modified=row.get("publicationdate", ""),
+            kind=publication_type,
+        )
+
+    @staticmethod
+    def correlation_id(row, publication_type="openinfo"):
+        id_field = "openinfoid" if publication_type == "openinfo" else "proactivedisclosureid"
+        return f"{publication_type}-unpublish-{row.get(id_field)}"

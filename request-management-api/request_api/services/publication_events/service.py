@@ -38,7 +38,7 @@ class PublishNowEventService:
         row = rows[0]
         payload = self.openinfo_mapper.map(row)
         envelope = self.envelope_factory.create(
-            PublicationEventType.OPENINFO_PUBLISH_REQUESTED,
+            PublicationEventType.PUBLISH_REQUESTED,
             self.openinfo_mapper.correlation_id(row),
             payload.to_dict(),
         )
@@ -81,7 +81,7 @@ class PublishNowEventService:
             },
         )
         envelope = self.envelope_factory.create(
-            PublicationEventType.PROACTIVE_DISCLOSURE_PUBLISH_REQUESTED,
+            PublicationEventType.PUBLISH_REQUESTED,
             correlation_id,
             payload_dict,
         )
