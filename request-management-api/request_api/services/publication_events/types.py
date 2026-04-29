@@ -2,12 +2,19 @@
 
 
 class PublicationEventType:
-    """Known publication event types."""
+    """Unified publication event types."""
 
-    OPENINFO_PUBLISH_REQUESTED = "openinfo.publish.requested"
-    OPENINFO_PUBLISH_COMPLETED = "openinfo.publish.completed"
-    PROACTIVE_DISCLOSURE_PUBLISH_REQUESTED = "proactivedisclosure.publish.requested"
-    PROACTIVE_DISCLOSURE_PUBLISH_COMPLETED = "proactivedisclosure.publish.completed"
+    PUBLISH_REQUESTED = "publication.publish.requested"
+    PUBLISH_COMPLETED = "publication.publish.completed"
+    UNPUBLISH_REQUESTED = "publication.unpublish.requested"
+    UNPUBLISH_COMPLETED = "publication.unpublish.completed"
+
+
+class PublicationKind:
+    """Discriminator for OpenInfo vs Proactive Disclosure."""
+
+    OPENINFO = "openinfo"
+    PROACTIVE_DISCLOSURE = "proactivedisclosure"
 
 
 DEFAULT_SCHEMA_VERSION = "1.0.0"

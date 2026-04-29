@@ -155,7 +155,7 @@ def test_scheduled_publication_service_queues_each_prepublishing_record():
     assert mapper.rows == [row]
     assert len(publisher.envelopes) == 1
     envelope = publisher.envelopes[0].to_dict()
-    assert envelope["event_type"] == "openinfo.publish.requested"
+    assert envelope["event_type"] == "publication.publish.requested"
     assert envelope["correlation_id"] == "openinfo-publish-345"
     assert envelope["payload"] == {"axis_request_id": "FIN-2026-047533"}
     assert results[0].success is True

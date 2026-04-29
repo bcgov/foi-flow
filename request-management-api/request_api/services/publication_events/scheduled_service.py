@@ -34,7 +34,7 @@ class ScheduledPublicationService:
         for row in rows:
             payload = self.openinfo_mapper.map(row)
             envelope = self.envelope_factory.create(
-                PublicationEventType.OPENINFO_PUBLISH_REQUESTED,
+                PublicationEventType.PUBLISH_REQUESTED,
                 self.openinfo_mapper.correlation_id(row),
                 payload.to_dict(),
             )

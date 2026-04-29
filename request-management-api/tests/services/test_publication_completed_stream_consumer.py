@@ -36,19 +36,14 @@ class FakeHandler:
 
 
 def test_from_env_configures_completed_streams(monkeypatch):
-    monkeypatch.setenv("OPENINFO_PUBLISH_COMPLETED_STREAM_NAME", "openinfo.publish.completed")
-    monkeypatch.setenv(
-        "PROACTIVEDISCLOSURE_PUBLISH_COMPLETED_STREAM_NAME",
-        "proactivedisclosure.publish.completed",
-    )
+    monkeypatch.setenv("PUBLICATION_PUBLISH_COMPLETED_STREAM_NAME", "publication.publish.completed")
     monkeypatch.setenv("PUBLICATION_COMPLETED_CONSUMER_GROUP", "request-management-api")
     monkeypatch.setenv("PUBLICATION_COMPLETED_CONSUMER_NAME", "request-management-api-1")
 
     consumer = PublicationCompletedStreamConsumer.from_env(redis_client=FakeRedisClient())
 
     assert consumer.stream_names == {
-        "openinfo.publish.completed": "openinfo.publish.completed",
-        "proactivedisclosure.publish.completed": "proactivedisclosure.publish.completed",
+        "publication.publish.completed": "publication.publish.completed",
     }
     assert consumer.group_name == "request-management-api"
     assert consumer.consumer_name == "request-management-api-1"
@@ -59,8 +54,7 @@ def test_ensure_groups_creates_configured_stream_groups():
     consumer = PublicationCompletedStreamConsumer(
         redis_client=redis_client,
         stream_names={
-            PublicationEventType.OPENINFO_PUBLISH_COMPLETED: "openinfo.publish.completed",
-            PublicationEventType.PROACTIVE_DISCLOSURE_PUBLISH_COMPLETED: "proactivedisclosure.publish.completed",
+            PublicationEventType.PUBLISH_COMPLETED: "publication.publish.completed",
         },
         group_name="request-management-api",
         consumer_name="worker-1",
@@ -69,14 +63,13 @@ def test_ensure_groups_creates_configured_stream_groups():
     consumer.ensure_groups()
 
     assert redis_client.created_groups == [
-        ("openinfo.publish.completed", "request-management-api", "0", True),
-        ("proactivedisclosure.publish.completed", "request-management-api", "0", True),
+        ("publication.publish.completed", "request-management-api", "0", True),
     ]
 
 
 def test_read_once_dispatches_envelope_payload_and_acks_success():
     envelope = {
-        "event_type": "openinfo.publish.completed",
+        "event_type": "publication.publish.completed",
         "correlation_id": "openinfo-publish-345",
         "payload": {"tenant_id": "tenant-1", "request_event_id": "request-event-1"},
     }
@@ -84,33 +77,35 @@ def test_read_once_dispatches_envelope_payload_and_acks_success():
         messages=[
             [
                 (
-                    "openinfo.publish.completed",
+                    "publication.publish.completed",
                     [("1700000000000-0", {"payload": json.dumps(envelope)})],
                 )
             ]
         ]
     )
-    handler = FakeHandler()
+    oi_handler = FakeHandler()
+    pd_handler = FakeHandler()
     consumer = PublicationCompletedStreamConsumer(
         redis_client=redis_client,
-        stream_names={PublicationEventType.OPENINFO_PUBLISH_COMPLETED: "openinfo.publish.completed"},
+        stream_names={PublicationEventType.PUBLISH_COMPLETED: "publication.publish.completed"},
         group_name="request-management-api",
         consumer_name="worker-1",
-        handlers={PublicationEventType.OPENINFO_PUBLISH_COMPLETED: handler},
+        handlers={"openinfo": oi_handler, "proactivedisclosure": pd_handler},
     )
 
     processed = consumer.read_once()
 
     assert processed == 1
-    assert handler.calls == [envelope]
+    assert oi_handler.calls == [envelope]
+    assert pd_handler.calls == []
     assert redis_client.acked == [
-        ("openinfo.publish.completed", "request-management-api", "1700000000000-0")
+        ("publication.publish.completed", "request-management-api", "1700000000000-0")
     ]
 
 
 def test_read_once_does_not_ack_failed_handler_result():
     envelope = {
-        "event_type": "proactivedisclosure.publish.completed",
+        "event_type": "publication.publish.completed",
         "correlation_id": "proactivedisclosure-publish-71",
         "payload": {"tenant_id": "tenant-1", "request_event_id": "request-event-1"},
     }
@@ -118,25 +113,27 @@ def test_read_once_does_not_ack_failed_handler_result():
         messages=[
             [
                 (
-                    "proactivedisclosure.publish.completed",
+                    "publication.publish.completed",
                     [("1700000000000-1", {"payload": json.dumps(envelope)})],
                 )
             ]
         ]
     )
-    handler = FakeHandler(DefaultMethodResult(False, "not found", 71))
+    oi_handler = FakeHandler()
+    pd_handler = FakeHandler(DefaultMethodResult(False, "not found", 71))
     consumer = PublicationCompletedStreamConsumer(
         redis_client=redis_client,
         stream_names={
-            PublicationEventType.PROACTIVE_DISCLOSURE_PUBLISH_COMPLETED: "proactivedisclosure.publish.completed"
+            PublicationEventType.PUBLISH_COMPLETED: "publication.publish.completed"
         },
         group_name="request-management-api",
         consumer_name="worker-1",
-        handlers={PublicationEventType.PROACTIVE_DISCLOSURE_PUBLISH_COMPLETED: handler},
+        handlers={"openinfo": oi_handler, "proactivedisclosure": pd_handler},
     )
 
     processed = consumer.read_once()
 
     assert processed == 1
-    assert handler.calls == [envelope]
+    assert pd_handler.calls == [envelope]
+    assert oi_handler.calls == []
     assert redis_client.acked == []

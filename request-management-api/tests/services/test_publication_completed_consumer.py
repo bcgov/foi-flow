@@ -36,7 +36,7 @@ class FakeProactiveDisclosureModel:
 def completed_envelope(**overrides):
     envelope = {
         "event_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d92",
-        "event_type": "openinfo.publish.completed",
+        "event_type": "publication.publish.completed",
         "correlation_id": "openinfo-publish-345",
         "payload": {
             "tenant_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d91",
@@ -50,7 +50,7 @@ def completed_envelope(**overrides):
 def proactive_completed_envelope(**overrides):
     envelope = {
         "event_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d82",
-        "event_type": "proactivedisclosure.publish.completed",
+        "event_type": "publication.publish.completed",
         "correlation_id": "proactivedisclosure-publish-71",
         "payload": {
             "tenant_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d81",
@@ -91,7 +91,7 @@ def test_handle_openinfo_publish_completed_uses_payload_message():
 def test_handle_openinfo_publish_completed_rejects_wrong_event_type():
     openinfo_model = FakeOpenInfoModel()
     consumer = OpenInfoPublishCompletedConsumer(openinfo_model=openinfo_model)
-    envelope = completed_envelope(event_type="proactivedisclosure.publish.completed")
+    envelope = completed_envelope(event_type="publication.unpublish.completed")
 
     result = consumer.handle(envelope)
 
@@ -168,7 +168,7 @@ def test_handle_proactive_disclosure_publish_completed_uses_payload_message():
 def test_handle_proactive_disclosure_publish_completed_rejects_wrong_event_type():
     proactive_model = FakeProactiveDisclosureModel()
     consumer = ProactiveDisclosurePublishCompletedConsumer(proactive_model=proactive_model)
-    envelope = proactive_completed_envelope(event_type="openinfo.publish.completed")
+    envelope = proactive_completed_envelope(event_type="publication.unpublish.completed")
 
     result = consumer.handle(envelope)
 

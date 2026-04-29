@@ -27,6 +27,36 @@ class FakeOpenInfoService:
         return self.proactive_row
 
 
+def test_openinfo_mapper_sets_kind(monkeypatch):
+    monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
+    monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
+    from request_api.services.publication_events.mappers import OpenInfoPublishRequestedMapper
+
+    mapper = OpenInfoPublishRequestedMapper()
+    row = {
+        "openinfoid": 1,
+        "axisrequestid": "EDU-2024-001",
+        "bcgovcode": "edu",
+    }
+    payload = mapper.map(row)
+    assert payload.kind == "openinfo"
+
+
+def test_proactive_disclosure_mapper_sets_kind(monkeypatch):
+    monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
+    monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
+    from request_api.services.publication_events.mappers import ProactiveDisclosurePublishRequestedMapper
+
+    mapper = ProactiveDisclosurePublishRequestedMapper()
+    row = {
+        "proactivedisclosureid": 1,
+        "axisrequestid": "PD-001",
+        "bcgovcode": "fin",
+    }
+    payload = mapper.map(row)
+    assert payload.kind == "proactivedisclosure"
+
+
 def test_queue_openinfo_publishnow_builds_openinfo_envelope(monkeypatch):
     monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
     monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
@@ -55,7 +85,8 @@ def test_queue_openinfo_publishnow_builds_openinfo_envelope(monkeypatch):
     assert result.success is True
     assert result.identifier == "1-0"
     envelope = publisher.published_envelopes[0].to_dict()
-    assert envelope["event_type"] == PublicationEventType.OPENINFO_PUBLISH_REQUESTED
+    assert envelope["event_type"] == PublicationEventType.PUBLISH_REQUESTED
+    assert envelope["payload"]["kind"] == "openinfo"
     assert envelope["correlation_id"] == "openinfo-publish-345"
     assert envelope["payload"]["tenant_id"] == str(uuid.uuid5(uuid.NAMESPACE_DNS, "bcgov:fin"))
     assert envelope["payload"]["axis_request_id"] == "FIN-2026-047533"
@@ -106,7 +137,8 @@ def test_queue_proactive_disclosure_publishnow_builds_pd_envelope(monkeypatch):
     assert result.success is True
     assert result.identifier == "1-0"
     envelope = publisher.published_envelopes[0].to_dict()
-    assert envelope["event_type"] == PublicationEventType.PROACTIVE_DISCLOSURE_PUBLISH_REQUESTED
+    assert envelope["event_type"] == PublicationEventType.PUBLISH_REQUESTED
+    assert envelope["payload"]["kind"] == "proactivedisclosure"
     assert envelope["correlation_id"] == "proactivedisclosure-publish-71"
     assert envelope["payload"]["tenant_id"] == str(uuid.uuid5(uuid.NAMESPACE_DNS, "bcgov:fin"))
     assert envelope["payload"]["proactivedisclosure_category"] == "Calendars"
@@ -123,7 +155,7 @@ def test_queue_proactive_disclosure_publishnow_builds_pd_envelope(monkeypatch):
     assert "type" not in envelope["payload"]
 
 
-def test_publication_event_publisher_serializes_envelope(monkeypatch):
+def test_publication_event_publisher_serializes_unified_envelope(monkeypatch):
     from request_api.services.publication_events.envelope import EventEnvelopeFactory
     from request_api.services.publication_events.publisher import PublicationEventPublisher
     from request_api.services.publication_events.types import PublicationEventType
@@ -136,29 +168,27 @@ def test_publication_event_publisher_serializes_envelope(monkeypatch):
             self.calls.append((stream_name, payload))
             return DefaultMethodResult(True, "Added to stream", "2-0")
 
-    monkeypatch.setenv("OPENINFO_REDIS_STREAM_NAME", "fallback.publish.requested")
-    monkeypatch.setenv("OPENINFO_PUBLISH_STREAM_NAME", "openinfo.publish.requested")
-    monkeypatch.setenv("PROACTIVEDISCLOSURE_PUBLISH_STREAM_NAME", "proactivedisclosure.publish.requested")
+    monkeypatch.setenv("PUBLICATION_PUBLISH_STREAM_NAME", "publication.publish.requested")
 
     queue_service = FakeQueueService()
     publisher = PublicationEventPublisher(queue_service=queue_service)
     envelope = EventEnvelopeFactory().create(
-        PublicationEventType.PROACTIVE_DISCLOSURE_PUBLISH_REQUESTED,
+        PublicationEventType.PUBLISH_REQUESTED,
         "corr-1",
-        {"hello": "world"},
+        {"kind": "proactivedisclosure", "hello": "world"},
     )
 
     result = publisher.publish(envelope)
 
     assert result.success is True
-    assert queue_service.calls[0][0] == "proactivedisclosure.publish.requested"
+    assert queue_service.calls[0][0] == "publication.publish.requested"
     serialized_payload = queue_service.calls[0][1]
     message = json.loads(serialized_payload)
-    assert message["event_type"] == PublicationEventType.PROACTIVE_DISCLOSURE_PUBLISH_REQUESTED
-    assert message["payload"]["hello"] == "world"
+    assert message["event_type"] == "publication.publish.requested"
+    assert message["payload"]["kind"] == "proactivedisclosure"
 
 
-def test_publication_event_publisher_routes_openinfo_to_openinfo_stream(monkeypatch):
+def test_publication_event_publisher_routes_unpublish_to_unpublish_stream(monkeypatch):
     from request_api.services.publication_events.envelope import EventEnvelopeFactory
     from request_api.services.publication_events.publisher import PublicationEventPublisher
     from request_api.services.publication_events.types import PublicationEventType
@@ -171,21 +201,20 @@ def test_publication_event_publisher_routes_openinfo_to_openinfo_stream(monkeypa
             self.calls.append((stream_name, payload))
             return DefaultMethodResult(True, "Added to stream", "3-0")
 
-    monkeypatch.setenv("OPENINFO_PUBLISH_STREAM_NAME", "openinfo.publish.requested")
-    monkeypatch.setenv("PROACTIVEDISCLOSURE_PUBLISH_STREAM_NAME", "proactivedisclosure.publish.requested")
+    monkeypatch.setenv("PUBLICATION_UNPUBLISH_STREAM_NAME", "publication.unpublish.requested")
 
     queue_service = FakeQueueService()
     publisher = PublicationEventPublisher(queue_service=queue_service)
     envelope = EventEnvelopeFactory().create(
-        PublicationEventType.OPENINFO_PUBLISH_REQUESTED,
+        PublicationEventType.UNPUBLISH_REQUESTED,
         "corr-2",
-        {"hello": "openinfo"},
+        {"kind": "openinfo"},
     )
 
     result = publisher.publish(envelope)
 
     assert result.success is True
-    assert queue_service.calls[0][0] == "openinfo.publish.requested"
+    assert queue_service.calls[0][0] == "publication.unpublish.requested"
 
 
 def test_publication_event_publisher_requires_configured_stream(monkeypatch):
@@ -193,15 +222,14 @@ def test_publication_event_publisher_requires_configured_stream(monkeypatch):
     from request_api.services.publication_events.publisher import PublicationEventPublisher
     from request_api.services.publication_events.types import PublicationEventType
 
-    monkeypatch.delenv("OPENINFO_PUBLISH_STREAM_NAME", raising=False)
-    monkeypatch.delenv("PROACTIVEDISCLOSURE_PUBLISH_STREAM_NAME", raising=False)
-    monkeypatch.delenv("OPENINFO_REDIS_STREAM_NAME", raising=False)
+    monkeypatch.delenv("PUBLICATION_PUBLISH_STREAM_NAME", raising=False)
+    monkeypatch.delenv("PUBLICATION_UNPUBLISH_STREAM_NAME", raising=False)
 
     publisher = PublicationEventPublisher(queue_service=object())
     envelope = EventEnvelopeFactory().create(
-        PublicationEventType.PROACTIVE_DISCLOSURE_PUBLISH_REQUESTED,
+        PublicationEventType.PUBLISH_REQUESTED,
         "corr-3",
-        {"hello": "missing-config"},
+        {"kind": "openinfo"},
     )
 
     try:
@@ -220,13 +248,13 @@ def test_publication_event_publisher_normalizes_exception_messages(monkeypatch):
         def add_publication_stream_message(self, stream_name, payload):
             return DefaultMethodResult(False, TimeoutError("timed out waiting for Redis stream"), -1)
 
-    monkeypatch.setenv("PROACTIVEDISCLOSURE_PUBLISH_STREAM_NAME", "proactivedisclosure.publish.requested")
+    monkeypatch.setenv("PUBLICATION_PUBLISH_STREAM_NAME", "publication.publish.requested")
 
     publisher = PublicationEventPublisher(queue_service=FakeQueueService())
     envelope = EventEnvelopeFactory().create(
-        PublicationEventType.PROACTIVE_DISCLOSURE_PUBLISH_REQUESTED,
+        PublicationEventType.PUBLISH_REQUESTED,
         "corr-timeout",
-        {"hello": "timeout"},
+        {"kind": "openinfo"},
     )
 
     result = publisher.publish(envelope)
