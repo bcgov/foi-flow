@@ -146,7 +146,6 @@ class FOIOpenInformationRequests(db.Model):
                 UPDATE public."FOIOpenInformationRequests"
                 SET processingstatus = 'ready for crawling',
                     processingmessage = 'sitemap ready',
-                    oipublicationstatus_id = 2,
                     sitemap_pages = :sitemap_page,
                     updated_at = now()
                 WHERE foiministryrequest_id = :foiministryrequestid
