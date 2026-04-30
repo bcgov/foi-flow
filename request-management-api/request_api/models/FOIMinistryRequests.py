@@ -287,7 +287,8 @@ class FOIMinistryRequest(db.Model):
                                 FOIRequestApplicantMapping,
                                 and_(
                                     FOIRequestApplicantMapping.foirequestapplicantid == FOIRequestApplicant.foirequestapplicantid,
-                                    FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id,
+                                    FOIRequestApplicantMapping.foirequest_id == subquery_ministry_maxversion.c.foirequest_id,
+                                    FOIRequestApplicantMapping.foirequestversion_id == subquery_ministry_maxversion.c.max_version,
                                     FOIRequestApplicantMapping.requestortypeid == requestortypeid)
                             ).filter(
                                 # FOIRequestApplicant.foirequestapplicantid == applicantid,
