@@ -18,8 +18,8 @@ class OpenInfoPublishCompletedConsumer:
         self.openinfo_model = openinfo_model or FOIOpenInformationRequests
 
     def handle(self, envelope):
-        """Validate and apply an openinfo.publish.completed event."""
-        if envelope.get("event_type") != PublicationEventType.OPENINFO_PUBLISH_COMPLETED:
+        """Validate and apply a publication.publish.completed event for OpenInfo."""
+        if envelope.get("event_type") != PublicationEventType.PUBLISH_COMPLETED:
             return DefaultMethodResult(False, "Unsupported event type")
 
         payload = envelope.get("payload") or {}
@@ -56,8 +56,8 @@ class ProactiveDisclosurePublishCompletedConsumer:
         self.proactive_model = proactive_model or FOIProactiveDisclosureRequests
 
     def handle(self, envelope):
-        """Validate and apply a proactivedisclosure.publish.completed event."""
-        if envelope.get("event_type") != PublicationEventType.PROACTIVE_DISCLOSURE_PUBLISH_COMPLETED:
+        """Validate and apply a publication.publish.completed event for Proactive Disclosure."""
+        if envelope.get("event_type") != PublicationEventType.PUBLISH_COMPLETED:
             return DefaultMethodResult(False, "Unsupported event type")
 
         payload = envelope.get("payload") or {}

@@ -20,6 +20,7 @@ class OpenInfoPublishRequestedPayload:
     axis_request_id: str
     source: S3Location
     destination: S3Location
+    kind: str = "openinfo"
     published_date: Optional[str] = None
     description: Optional[str] = None
     contributor: Optional[str] = None
@@ -48,6 +49,7 @@ class ProactiveDisclosurePublishRequestedPayload:
     axis_request_id: str
     source: S3Location
     destination: S3Location
+    kind: str = "proactivedisclosure"
     published_date: Optional[str] = None
     description: Optional[str] = None
     proactivedisclosure_category: Optional[str] = None
@@ -60,6 +62,21 @@ class ProactiveDisclosurePublishRequestedPayload:
     sitemap_pages: Optional[str] = None
     additionalfiles: list[AdditionalFilePayload] = field(default_factory=list)
     openinfo_id: Optional[int] = None
+
+    def to_dict(self):
+        return asdict(self)
+
+
+@dataclass
+class UnpublishRequestedPayload:
+    """Payload for unpublish requested events (OI and PD)."""
+
+    tenant_id: str
+    publication_id: str
+    public_url: str
+    public_repository: S3Location
+    last_modified: str
+    kind: str = "openinfo"
 
     def to_dict(self):
         return asdict(self)

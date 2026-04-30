@@ -36,7 +36,7 @@ class FakeProactiveDisclosureModel:
 def completed_envelope(**overrides):
     envelope = {
         "event_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d92",
-        "event_type": "openinfo.publish.completed",
+        "event_type": "publication.publish.completed",
         "correlation_id": "openinfo-publish-345",
         "payload": {
             "tenant_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d91",
@@ -50,7 +50,7 @@ def completed_envelope(**overrides):
 def proactive_completed_envelope(**overrides):
     envelope = {
         "event_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d82",
-        "event_type": "proactivedisclosure.publish.completed",
+        "event_type": "publication.publish.completed",
         "correlation_id": "proactivedisclosure-publish-71",
         "payload": {
             "tenant_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d81",
@@ -91,7 +91,7 @@ def test_handle_openinfo_publish_completed_uses_payload_message():
 def test_handle_openinfo_publish_completed_rejects_wrong_event_type():
     openinfo_model = FakeOpenInfoModel()
     consumer = OpenInfoPublishCompletedConsumer(openinfo_model=openinfo_model)
-    envelope = completed_envelope(event_type="proactivedisclosure.publish.completed")
+    envelope = completed_envelope(event_type="publication.unpublish.completed")
 
     result = consumer.handle(envelope)
 
@@ -168,7 +168,7 @@ def test_handle_proactive_disclosure_publish_completed_uses_payload_message():
 def test_handle_proactive_disclosure_publish_completed_rejects_wrong_event_type():
     proactive_model = FakeProactiveDisclosureModel()
     consumer = ProactiveDisclosurePublishCompletedConsumer(proactive_model=proactive_model)
-    envelope = proactive_completed_envelope(event_type="openinfo.publish.completed")
+    envelope = proactive_completed_envelope(event_type="publication.unpublish.completed")
 
     result = consumer.handle(envelope)
 
@@ -355,7 +355,7 @@ def test_create_published_version_from_openinfo_id_versions_active_record(monkey
     assert new_openinfo.publicationdate == "2026-04-21"
     assert new_openinfo.receiveddate == "2026-04-01"
     assert new_openinfo.copyrightsevered is False
-    assert new_openinfo.processingstatus == "ready for sitemap"
+    assert new_openinfo.processingstatus == "published"
     assert new_openinfo.processingmessage == "Published to OpenInfo"
     assert new_openinfo.sitemap_pages == "page-a,page-b"
     assert new_openinfo.isactive is True
@@ -425,7 +425,7 @@ def test_create_published_version_from_proactive_id_versions_active_record(monke
     assert new_proactive.publicationdate == "2026-04-21"
     assert new_proactive.earliesteligiblepublicationdate == "2026-03-20"
     assert new_proactive.oipublicationstatus_id == 1
-    assert new_proactive.processingstatus == "ready for sitemap"
+    assert new_proactive.processingstatus == "published"
     assert new_proactive.processingmessage == "Proactive disclosure published"
     assert new_proactive.sitemap_pages == "page-a,page-b"
     assert new_proactive.isactive is True
