@@ -27,7 +27,9 @@ export const ApplicantProfileSearchView = ({
   dispatch,
   setSelectedApplicant,
   setRequestHistory,
-  initialSearchMode = "auto"
+  selectionModel = null,
+  onSelectionModelChange = null,
+  primaryApplicantID = null
 }) => {
   const [firstNameSearchText, setFirstNameSearchText] = useState("")
   const [lastNameSearchText, setLastNameSearchText] = useState("")
@@ -66,6 +68,108 @@ export const ApplicantProfileSearchView = ({
       flex: 1,
     }
   ];
+
+  if (selectionModel) {
+    const additionalColumns = [
+      {
+        field: "alsoKnownAs",
+        headerName: "AKA",
+        flex: 1,
+        valueGetter: (value) => {
+          if (value?.row?.additionalPersonalInfo?.alsoKnownAs) {
+            return value?.row?.additionalPersonalInfo?.alsoKnownAs;
+          }
+          return null;
+        },
+      },
+      {
+        field: "businessName",
+        headerName: "Organization",
+        flex: 1,
+      },
+      {
+        field: "address",
+        headerName: "Address",
+        flex: 1,
+      },
+      {
+        field: "addressSecondary",
+        headerName: "Secondary Address",
+        flex: 1,
+      },
+      {
+        field: "city",
+        headerName: "City",
+        flex: 1,
+      },
+      {
+        field: "province",
+        headerName: "Province",
+        flex: 1,
+      },
+      {
+        field: "postal",
+        headerName: "Postal",
+        flex: 1,
+      },
+      {
+        field: "country",
+        headerName: "Country",
+        flex: 1,
+      },
+      {
+        field: "phonePrimary",
+        headerName: "Home Phone",
+        flex: 1,
+      },
+      {
+        field: "phoneSecondary",
+        headerName: "Mobile Phone",
+        flex: 1,
+      },
+      {
+        field: "workPhonePrimary",
+        headerName: "Work Phone",
+        flex: 1,
+      },
+      {
+        field: "workPhoneSecondary",
+        headerName: "Alternative Phone",
+        flex: 1,
+      },
+      {
+        field: "personalHealthNumber",
+        headerName: "PHN",
+        flex: 1,
+        valueGetter: (value) => {
+          if (value?.row?.additionalPersonalInfo?.personalHealthNumber) {
+            return value?.row?.additionalPersonalInfo?.personalHealthNumber;
+          }
+          return null;
+        },
+      },
+      {
+        field: "publicServiceEmployeeNumber",
+        headerName: "Employee #",
+        flex: 1,
+      },
+      {
+        field: "correctionalServiceNumber",
+        headerName: "Correction #",
+        flex: 1,
+      },
+    ];
+
+    const idColumn = {
+        field: "foiRequestApplicantID",
+        headerName: "ID",
+        flex: 1,
+        minWidth: 60
+      }
+    columns.push(...additionalColumns);
+    columns.forEach((column) => (column["minWidth"] = 200));
+    columns.unshift(idColumn) // Add ID column to front of array
+  }
 
   const onFirstNameChange = (e) => {
     setFirstNameSearchText(e.target.value);
@@ -153,6 +257,58 @@ export const ApplicantProfileSearchView = ({
       }),
     );
   };
+
+  const dataGridWithSelection = (
+    <DataGrid
+      className="foi-data-grid foi-applicant-data-grid"
+      rows={search(rows)}
+      columns={columns}
+      hideFooter={false}
+      pageSizeOptions={[5]}
+      rowHeight={30}
+      headerHeight={50}
+      loading={isLoading}
+      onRowClick={selectApplicantRow}
+      getRowId={(row) => row.foiRequestApplicantID}
+      checkboxSelection={selectionModel ? true : false}
+      disableSelectionOnClick={selectionModel ? true : false}
+      onSelectionModelChange={
+        selectionModel
+          ? onSelectionModelChange
+          : false
+      }
+      selectionModel={selectionModel}
+      getRowClassName={(params) => {
+        console.log('params: ', params)
+        return params.id === primaryApplicantID ? 'selected-primary-applicant' : ''}
+      }
+      sx={{
+          '& .selected-primary-applicant.MuiDataGrid-row.Mui-selected': {
+              backgroundColor: 'red',
+              '&:hover': {
+                  backgroundColor: 'darkred',
+              }
+          }
+      }}
+    />
+  );
+  
+  const dataGridWithoutSelection = (
+    <DataGrid
+          className="foi-data-grid foi-applicant-data-grid"
+          rows={search(rows)}
+          columns={columns}
+          hideFooter={false}
+          pageSizeOptions={[5]}
+          rowHeight={30}
+          headerHeight={50}
+          loading={isLoading}
+          onRowClick={selectApplicantRow}
+          getRowId={(row) => row.foiRequestApplicantID}
+        />
+  )
+
+  const renderedDataGrid = selectionModel ? dataGridWithSelection : dataGridWithoutSelection
 
   return (
     <>
@@ -244,18 +400,7 @@ export const ApplicantProfileSearchView = ({
         </button>
       </Paper>
       <Box sx={{ height: "calc(100% - 100px)", width: "100%" }}>
-        <DataGrid
-          className="foi-data-grid foi-applicant-data-grid"
-          rows={search(rows)}
-          columns={columns}
-          hideFooter={false}
-          pageSizeOptions={[5]}
-          rowHeight={30}
-          headerHeight={50}
-          loading={isLoading}
-          onRowClick={selectApplicantRow}
-          getRowId={(row) => row.foiRequestApplicantID}
-        />
+        {renderedDataGrid}
       </Box>
     </>
   );

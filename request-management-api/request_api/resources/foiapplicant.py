@@ -27,7 +27,7 @@ import json
 from flask_cors import cross_origin
 import request_api
 from request_api.utils.cache import cache_filter, response_filter
-from request_api.schemas.foiapplicant import FOIRequestApplicantSchema, ApplicantProfilePayloadSchema
+from request_api.schemas.foiapplicant import FOIRequestApplicantSchema, ApplicantProfilePayloadSchema, MergeApplicantsPayloadSchema
 
 API = Namespace('FOIAssignee', description='Endpoints for FOI assignee management')
 TRACER = Tracer.get_instance()
@@ -175,6 +175,29 @@ class EventPagination(Resource):
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500 
 
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiapplicants/merge')
+class FOIApplicants(Resource):
+    """ Merges multiple profiles into the primary applicant profile
+    """
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isiao
+    @cors_preflight('POST,OPTIONS')
+    def post():
+        try:
+            print('in /merge')
+            payload = request.get_json()
+            payload_schema = MergeApplicantsPayloadSchema().load(payload)
+            primary_id = payload_schema.get("primary_id")
+            merged_profile_ids = payload_schema.get("merged_profile_ids")
+
+            result = applicantservice().merge_applicant_profiles(primary_id, merged_profile_ids)
+            return _handle_result(result)
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message':exception.message}, 500 
 
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiapplicants/history/<applicantid>')
@@ -215,7 +238,7 @@ class FOIApplicants(Resource):
         if applicantid is None or applicantid == 0:
             return {'status': False, 'message':EXCEPTION_MESSAGE_BAD_REQUEST}, 400
         try:
-            result = applicantservice().getapplicantrequests(applicantid)
+            result = applicantservice().get_applicant_requests_all_merged_profiles(applicantid)
             if result is not None:
                 return json.dumps(result), 200
             else:

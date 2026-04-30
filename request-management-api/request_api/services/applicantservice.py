@@ -1,6 +1,7 @@
 
 from os import stat
 from re import VERBOSE
+from request_api.schemas.foiapplicant import FOIRequestApplicantSchema, ApplicantProfilePayloadSchema
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
@@ -22,7 +23,7 @@ class applicantservice:
     def get_applicant_profile_by_id(self, applicantid):
         applicant = FOIRequestApplicant.get_latest_applicant_profile_by_id(applicantid)
         applicant = self.__prepareapplicant(applicant)
-        applicant['requestHistory'] = self.getapplicantrequests(applicantid)
+        applicant['requestHistory'] = self.get_applicant_requests_all_merged_profiles(applicantid)
         return applicant
 
     def searchapplicant(self, keywords):
@@ -206,6 +207,59 @@ class applicantservice:
         )
         return DefaultMethodResult(True,'Applicant profile unassigned from request',rawrequestid)
 
+    def merge_applicant_profiles(self, primary_id: int, merged_profile_ids: list[int]):
+        print('primary_id: ', primary_id)
+        print('merged_profile_ids: ', merged_profile_ids)
+        merged_profile_ids_without_primary = [x for x in merged_profile_ids if x != primary_id]
+        print('merged_profile_ids_without_primary: ', merged_profile_ids_without_primary)
+        # Merge and deactivate profiles
+        merged_applicantprofileids = FOIRequestApplicant.merge_applicant_profiles(primary_id, merged_profile_ids_without_primary)
+
+        # For any merged profiles that are linked to open requests, update requests to primary profile
+        result = applicantservice().get_applicant_profile_by_id(primary_id)
+        applicantschema = FOIRequestApplicantSchema().load(result)
+        print('\n***applicant: ', applicantschema)
+        # changeapplicantpayload = ApplicantProfilePayloadSchema().load(payload)
+        userid = AuthHelper.getuserid()
+
+        for applicantprofileid in merged_applicantprofileids:
+            foirequestapplicantid = FOIRequestApplicant.get_foirequestapplicantid_from_applicantprofileid(applicantprofileid)
+            print('\n***foirequestapplicantid: ', foirequestapplicantid)
+            primary_requests = FOIMinistryRequest.getopenrequestsbyapplicantid(foirequestapplicantid, "applicant")
+            print('\n***primary_requests: ', primary_requests)
+            onbehalfof_requests = FOIMinistryRequest.getopenrequestsbyapplicantid(foirequestapplicantid, "onbehalfof")
+            print('\n***onbehalfof_requests: ', onbehalfof_requests)
+            # for request in primary_requests:
+            #     applicantpayload = {'requesttype': 'foirequest', 'foirequestid': request['foirequest_id'], 'applicanttype': 'applicant'}
+            #     print('\napplicantid: ', applicantschema['foiRequestApplicantID'])
+            #     print('\napplicantpayload: ', applicantpayload)
+            #     self.reassignapplicantprofilelinkedtorequest(applicantschema, applicantpayload, userid)
+
+            # for request in onbehalfof_requests:
+            #     applicantpayload = {'requesttype': 'foirequest', 'foirequestid': request['foirequest_id'], 'applicanttype': 'onbehalfof'}
+            #     print('\napplicantid: ', applicantschema['foiRequestApplicantID'])
+            #     print('\napplicantpayload: ', applicantpayload)
+            #     self.reassignapplicantprofilelinkedtorequest(applicantschema, applicantpayload, userid)
+
+            primary_rawrequests = FOIRawRequest.getrawrequestsbyapplicantid(foirequestapplicantid, "applicant")
+            print('\n***primary_rawrequests: ', primary_rawrequests)
+            onbehalfof_rawrequests = FOIRawRequest.getrawrequestsbyapplicantid(foirequestapplicantid, "onbehalfof")
+            print('\n***onbehalfof_rawrequests: ', onbehalfof_rawrequests)
+
+            # for rawrequest in primary_rawrequests:
+            #     applicantpayload = {'requesttype': 'rawrequest', 'rawrequestid': rawrequest['requestid'], 'applicanttype': 'applicant'}
+            #     print('\napplicantid: ', applicantschema['foiRequestApplicantID'])
+            #     print('\napplicantpayload: ', applicantpayload)
+            #     self.reassignapplicantprofilelinkedtorequest(applicantschema, applicantpayload, userid)
+
+            # for rawrequest in onbehalfof_rawrequests:
+            #     applicantpayload = {'requesttype': 'rawrequest', 'rawrequestid': rawrequest['requestid'], 'applicanttype': 'onbehalfof'}
+            #     print('\napplicantid: ', applicantschema['foiRequestApplicantID'])
+            #     print('\napplicantpayload: ', applicantpayload)
+            #     self.reassignapplicantprofilelinkedtorequest(applicantschema, applicantpayload, userid)
+
+        return DefaultMethodResult(True,'Applicant profiles merged',[]) #merged_applicantprofileids
+
     def __validateandtransform(self, filterfields):
         return self.__transformfilteringfields(filterfields)
 
@@ -318,6 +372,20 @@ class applicantservice:
             # 'Applicant Category': applicant["applicantcategory"],
         }
 
+    def get_applicant_requests_all_merged_profiles(self, applicantid):
+        # Get merged_into_id for all requests here, and then do below for all applicant profile ids
+        all_merged_applicantprofileids = FOIRequestApplicant.get_all_merged_ids(applicantid)
+        all_merged_foirequestapplicantids = []
+        for applicantprofileid in all_merged_applicantprofileids:
+            all_merged_foirequestapplicantids.append(FOIRequestApplicant.get_foirequestapplicantid_from_applicantprofileid(applicantprofileid))
+        print('\nall_merged_foirequestapplicantids: ', all_merged_foirequestapplicantids)
+        
+        requests = []
+        for foirequestapplicantid in all_merged_foirequestapplicantids:
+            requests.extend(self.getapplicantrequests(foirequestapplicantid))
+        print('requests: ', requests)
+        return requests
+    
     def getapplicantrequests(self, applicantid):
         requestqueue = []
 

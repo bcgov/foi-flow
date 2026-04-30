@@ -15,6 +15,7 @@ import UnAuthorized from "./UnAuthorized";
 import Admin from "./Admin";
 import Divisions from "./Admin/Divisions";
 import ApplicantProfileModal from "./FOIRequest/ApplicantProfile/ApplicantProfileModal";
+import ApplicantProfileAdmin from "./FOIRequest/ApplicantProfile/ApplicantProfileAdmin";
 
 
 const FOIAuthenticateRouting = React.memo((props) => {
@@ -58,6 +59,9 @@ const FOIAuthenticateRouting = React.memo((props) => {
                   ) : (
                   <Dashboard userDetail={userDetail} />
                   )}
+              </Route>
+              <Route exact path="/foi/applicants">
+                  <ApplicantProfileAdmin />
               </Route>
               <Route path="/foi/reviewrequest/:requestId">
                 <FOIRequest userDetail={userDetail} openApplicantProfileModal={openApplicantProfileModal} />

@@ -5,3 +5,10 @@
     text-transform: none;
     // border-radius: 8px;
 }
+
+.selected-primary-applicant.MuiDataGrid-row.Mui-selected {
+    background-color: red;
+    &:hover {
+        background-color: darkred; // optional, stops hover from overriding it too
+    }
+}

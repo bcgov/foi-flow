@@ -58,6 +58,7 @@ class FOIRequestApplicant(db.Model):
     section43_info = db.Column(db.Text, nullable=True)
     request_history = db.Column(JSON, nullable=True)
     is_active = db.Column(db.Boolean)
+    merged_into_id = db.Column(db.Integer, unique=False, nullable=True)
 
     @classmethod
     def from_request_data(cls, requestdata, is_new = False):
@@ -97,6 +98,7 @@ class FOIRequestApplicant(db.Model):
         applicant.correction_number = requestdata.get("correctionalServiceNumber")
         applicant.other_notes = requestdata.get("other_notes")
         applicant.is_active = True
+        # section43_info, request_history missing.
         return applicant
 
     @classmethod
@@ -235,6 +237,24 @@ class FOIRequestApplicant(db.Model):
             return schema.dump(sq)
         query = db.session.query(FOIRequestApplicant).filter(FOIRequestApplicant.applicantprofileid == sq.applicantprofileid).order_by(FOIRequestApplicant.foirequestapplicantid.desc()).first()
         return schema.dump(query)
+
+    @classmethod
+    def get_applicantprofileid_from_foirequestapplicantid(cls, foirequestapplicantid):
+        applicantprofileid = db.session.query(FOIRequestApplicant.applicantprofileid)\
+            .filter_by(foirequestapplicantid=foirequestapplicantid)\
+            .order_by(FOIRequestApplicant.foirequestapplicantid.desc())\
+            .limit(1)\
+            .scalar()
+        return applicantprofileid
+    
+    @classmethod
+    def get_foirequestapplicantid_from_applicantprofileid(cls, applicantprofileid):
+        foirequestapplicantid = db.session.query(FOIRequestApplicant.foirequestapplicantid)\
+            .filter_by(applicantprofileid=applicantprofileid)\
+            .order_by(FOIRequestApplicant.foirequestapplicantid.desc())\
+            .limit(1)\
+            .scalar()
+        return foirequestapplicantid
 
     # Search applicant by id
     @classmethod
@@ -1097,6 +1117,59 @@ class FOIRequestApplicant(db.Model):
                 FOIRequestApplicant.applicantprofileid == profile_id
             ).subquery()
 
+        # # Determine if this applicant is a master or a duplicate
+        # merged_into_id = _session.query(
+        #     FOIRequestApplicant.merged_into_id
+        # ).filter(
+        #     FOIRequestApplicant.foirequestapplicantid == applicantid
+        # ).scalar()
+
+        # # If merged_into_id is None, this applicant is the master (or unmerged)
+        # master_id = merged_into_id if merged_into_id is not None else applicantid
+
+        # # Get all applicant ids in the merge group
+        # applicantids = _session.query(
+        #     FOIRequestApplicant.foirequestapplicantid
+        # ).filter(
+        #     or_(
+        #         (FOIRequestApplicant.foirequestapplicantid == master_id),
+        #         (FOIRequestApplicant.merged_into_id == master_id)
+        #     )
+        # ).all()
+
+        # # applicantids = [row.foirequestapplicantid for row in applicantids]
+        # applicantids = cls.get_all_merged_ids(applicantid)
+        # print('\n\n\n***applicantids: ', applicantids)
+
+        # # # Get all profile_ids for the given applicant ids (excluding nulls)
+        # # profile_ids = _session.query(
+        # #     FOIRequestApplicant.applicantprofileid
+        # # ).filter(
+        # #     FOIRequestApplicant.foirequestapplicantid.in_(applicantids),
+        # #     FOIRequestApplicant.applicantprofileid.isnot(None)
+        # # ).distinct().all()
+
+        # # profile_ids = [row.applicantprofileid for row in profile_ids]
+        # # print('\n\n\n****profile_ids: ', profile_ids)
+
+        # # Build the subquery
+        # profile_ids = cls.get_all_applicantprofileids(applicantids)
+        # print('\n\n\n****profile_ids: ', profile_ids)
+
+        # if not profile_ids:
+        #     # No profiles found, fall back to just the given applicant ids
+        #     profile_subquery = _session.query(
+        #         FOIRequestApplicant.foirequestapplicantid
+        #     ).filter(
+        #         FOIRequestApplicant.foirequestapplicantid.in_(applicantids)
+        #     ).subquery()
+        # else:
+        #     # Get all foirequestapplicantids sharing any of the found profiles
+        #     profile_subquery = _session.query(
+        #         FOIRequestApplicant.foirequestapplicantid
+        #     ).filter(
+        #         FOIRequestApplicant.applicantprofileid.in_(profile_ids)
+        #     ).subquery()
         # Get the latest mapping version per foirequest to exclude stale applicant assignments
         subquery_latest_mapping = _session.query(
             FOIRequestApplicantMapping.foirequest_id,
@@ -1182,6 +1255,8 @@ class FOIRequestApplicant(db.Model):
         ).order_by(FOIRequest.foirequestid.desc())
 
         applicantrequest_schema = ApplicantRequestSchema(many=True)
+        print('\n\nQUERY: \n')
+        print(query_all.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
 
         return applicantrequest_schema.dump(query_all.all())
 
@@ -1211,6 +1286,160 @@ class FOIRequestApplicant(db.Model):
                 return True
         return False
 
+    @classmethod
+    def get_merged_into_ids(cls, foirequestapplicantids):
+        _session = db.session
+        result = _session.query(
+            FOIRequestApplicant.merged_into_id
+        ).filter(
+            FOIRequestApplicant.foirequestapplicantid.in_(foirequestapplicantids)
+        ).all()
+        merged_into_ids = list(set([row[0] for row in result]))
+        print('merged_into_ids: ', merged_into_ids)
+        return merged_into_ids
+
+    
+    @classmethod
+    def get_all_merged_ids(cls, applicantid):
+        _session = db.session
+        # merged_into_id = _session.query(
+        #     FOIRequestApplicant.merged_into_id
+        # ).filter(
+        #     FOIRequestApplicant.foirequestapplicantid == applicantid
+        # ).scalar()
+
+        # # If merged_into_id is None, this applicant is the master (or unmerged)
+        # master_id = merged_into_id if merged_into_id is not None else applicantid
+
+        # cte = text("""
+        #     WITH RECURSIVE merge_group AS (
+        #         -- Base case: start with the given applicant
+        #         SELECT foirequestapplicantid, merged_into_id
+        #         FROM "FOIRequestApplicants"
+        #         WHERE foirequestapplicantid = :applicantid
+
+        #         UNION ALL
+
+        #         -- Recursive case: follow merged_into_id up to the master
+        #         SELECT a.foirequestapplicantid, a.merged_into_id
+        #         FROM "FOIRequestApplicants" a
+        #         INNER JOIN merge_group m ON a.foirequestapplicantid = m.merged_into_id
+        #     )
+        #     SELECT foirequestapplicantid FROM merge_group
+        # """)
+        applicantprofileid = cls.get_applicantprofileid_from_foirequestapplicantid(applicantid)
+        print('applicantprofileid: ', applicantprofileid)
+        cte = text("""
+            SELECT applicantprofileid
+            FROM "FOIRequestApplicants"
+            WHERE merged_into_id = COALESCE(
+                (SELECT merged_into_id 
+                FROM "FOIRequestApplicants" 
+                WHERE applicantprofileid = :applicantprofileid
+                ORDER BY foirequestapplicantid DESC
+                LIMIT 1),
+                :applicantprofileid
+            )
+            OR applicantprofileid = COALESCE(
+                (SELECT merged_into_id 
+                FROM "FOIRequestApplicants" 
+                WHERE applicantprofileid = :applicantprofileid
+                ORDER BY foirequestapplicantid DESC
+                LIMIT 1),
+                :applicantprofileid
+            )
+        """)
+
+        result = _session.execute(cte, {"applicantprofileid": applicantprofileid}).fetchall()
+        all_applicant_ids = list(set([row[0] for row in result]))
+        print('all_applicant_ids: ', all_applicant_ids)
+        return all_applicant_ids
+
+        # Get all applicant ids in the merge group
+        applicantids = _session.query(
+            FOIRequestApplicant.foirequestapplicantid
+        ).filter(
+            or_(
+                (FOIRequestApplicant.foirequestapplicantid.in_(all_applicant_ids)),
+                (FOIRequestApplicant.merged_into_id.in_(all_applicant_ids))
+            )
+        ).all()
+
+        applicantids = [row.foirequestapplicantid for row in applicantids]
+        return applicantids
+    
+    @classmethod
+    def get_all_applicantprofileids(cls, foirequestapplicantids):
+        _session = db.session
+        # Get all profile_ids for the given applicant ids (excluding nulls)
+        profile_ids = _session.query(
+            FOIRequestApplicant.applicantprofileid
+        ).filter(
+            FOIRequestApplicant.foirequestapplicantid.in_(foirequestapplicantids),
+            FOIRequestApplicant.applicantprofileid.isnot(None)
+        ).distinct().all()
+
+        profile_ids = [row.applicantprofileid for row in profile_ids]
+        return profile_ids
+
+    @classmethod
+    def merge_applicant_profiles(cls, primaryid, foirequestapplicantids):
+        _session = db.session
+        applicant_profile_ids = cls.get_all_applicantprofileids(foirequestapplicantids)
+        primary_applicantprofileid = cls.get_all_applicantprofileids([primaryid])
+        merged_into_ids = cls.get_merged_into_ids(foirequestapplicantids)
+
+        print('\napplicant_profile_ids: ', applicant_profile_ids)
+        print('\nprimary_applicantprofileid: ', primary_applicantprofileid)
+        print('\nprimary_applicantprofileid[0]: ', primary_applicantprofileid[0])
+        print('\nmerged_into_ids in merge_applicant_profiles: ', merged_into_ids)
+
+        # Merge selected profiles
+        merged_profile_count = _session.query(FOIRequestApplicant).filter(
+            FOIRequestApplicant.foirequestapplicantid.in_(foirequestapplicantids)
+        ).update(
+            {"merged_into_id": primary_applicantprofileid[0], "is_active": False}, 
+            synchronize_session=False
+        )
+        print('merged_profile_count: ', merged_profile_count)
+
+        # Update the profiles for retrieved merged_into_ids
+        # First get the highest foirequestapplicantid for each applicantprofileid from merged_into_ids
+        applicantprofileids_subquery = _session.query(
+            func.max(FOIRequestApplicant.foirequestapplicantid)
+        ).filter(
+            FOIRequestApplicant.applicantprofileid.in_(merged_into_ids)
+        ).group_by(
+            FOIRequestApplicant.applicantprofileid
+        ).subquery()
+
+        # Then update the relevant profiles
+        merged_into_ids_update_count = _session.query(FOIRequestApplicant).filter(
+            FOIRequestApplicant.foirequestapplicantid.in_(applicantprofileids_subquery)
+        ).update(
+            {"merged_into_id": primary_applicantprofileid[0], "is_active": False}, 
+            synchronize_session=False
+        )
+        print('merged_into_ids_update_count: ', merged_into_ids_update_count)
+
+        # Deactivate all applicantprofileids that have been merged
+        all_applicantprofileids = applicant_profile_ids + merged_into_ids
+        id_subquery = _session.query(
+            FOIRequestApplicant.foirequestapplicantid
+        ).filter(
+            FOIRequestApplicant.applicantprofileid.in_(all_applicantprofileids)
+        ).subquery()
+
+        deactivated_profile_count = _session.query(FOIRequestApplicant).filter(
+            FOIRequestApplicant.foirequestapplicantid.in_(id_subquery)
+        ).update(
+            {"is_active": False}, 
+            synchronize_session=False
+        )
+        print('deactivated_profile_count: ', deactivated_profile_count)
+        
+        _session.commit()
+        return all_applicantprofileids
 
 class FOIRequestApplicantSchema(ma.Schema):
     class Meta:

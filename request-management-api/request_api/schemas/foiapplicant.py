@@ -47,3 +47,10 @@ class ApplicantProfilePayloadSchema(Schema):
     rawrequestid = fields.Int(data_key="rawRequestId", required=False, allow_none=True)
     previousrequestapplicantid = fields.Int(data_key="previousRequestApplicantId", required=False, allow_none=True)
     # applicant = fields.Nested(FOIRequestApplicantSchema, required=True, allow_none=False)
+
+class MergeApplicantsPayloadSchema(Schema):
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields in the deserialized output."""
+        unknown = EXCLUDE
+    merged_profile_ids = fields.List(fields.Int(), data_key="mergedProfileIds", required=True, allow_none=False, validate=validate.Length(min=1))
+    primary_id = fields.Int(data_key="primaryId", required=True, allow_none=False)
