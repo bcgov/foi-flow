@@ -237,7 +237,7 @@ class FOIProactiveDisclosureRequests(db.Model):
                 created_at=updated_at,
                 createdby="publishingservice",
                 oipublicationstatus_id=latest.oipublicationstatus_id,
-                processingstatus="ready for sitemap",
+                processingstatus="published",
                 processingmessage=message,
                 sitemap_pages=latest.sitemap_pages,
             )
