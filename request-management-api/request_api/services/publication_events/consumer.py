@@ -45,6 +45,29 @@ class OpenInfoPublishCompletedConsumer:
         return self.openinfo_model.create_published_version_from_openinfo_id(openinfo_id, message)
 
 
+class OpenInfoUnpublishCompletedConsumer:
+    """Logs completed unpublish events for OpenInfo records."""
+
+    def handle(self, envelope):
+        """Validate and log a publication.unpublish.completed event for OpenInfo."""
+        if envelope.get("event_type") != PublicationEventType.UNPUBLISH_COMPLETED:
+            return DefaultMethodResult(False, "Unsupported event type")
+
+        payload = envelope.get("payload") or {}
+        # FIXME: status needs to be updated
+        logging.info(
+            "Handling OpenInfo unpublish completed event | "
+            f"event_id={envelope.get('event_id')} "
+            f"correlation_id={envelope.get('correlation_id')} "
+            f"kind={payload.get('kind')} "
+            f"publication_id={payload.get('publication_id')} "
+            f"status={payload.get('status')} "
+            f"objects_deleted={payload.get('objects_deleted')} "
+            f"sitemap_result={payload.get('sitemap_result')}"
+        )
+        return DefaultMethodResult(True, "Unpublish completion logged")
+
+
 class ProactiveDisclosurePublishCompletedConsumer:
     """Handles completed publication events for Proactive Disclosure records."""
 
@@ -85,3 +108,26 @@ class ProactiveDisclosurePublishCompletedConsumer:
             proactive_id,
             message,
         )
+
+
+class ProactiveDisclosureUnpublishCompletedConsumer:
+    """Logs completed unpublish events for Proactive Disclosure records."""
+
+    def handle(self, envelope):
+        """Validate and log a publication.unpublish.completed event for Proactive Disclosure."""
+        if envelope.get("event_type") != PublicationEventType.UNPUBLISH_COMPLETED:
+            return DefaultMethodResult(False, "Unsupported event type")
+        payload = envelope.get("payload") or {}
+
+        # FIXME: status needs to be updated
+        logging.info(
+            "Handling Proactive Disclosure unpublish completed event | "
+            f"event_id={envelope.get('event_id')} "
+            f"correlation_id={envelope.get('correlation_id')} "
+            f"kind={payload.get('kind')} "
+            f"publication_id={payload.get('publication_id')} "
+            f"status={payload.get('status')} "
+            f"objects_deleted={payload.get('objects_deleted')} "
+            f"sitemap_result={payload.get('sitemap_result')}"
+        )
+        return DefaultMethodResult(True, "Unpublish completion logged")

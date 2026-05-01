@@ -120,15 +120,17 @@ class UnpublishRequestedMapper:
         self.path_resolver = path_resolver or PublicationPathResolver()
         self.public_base_url = os.getenv(
             "PUBLICATION_PUBLIC_BASE_URL",
-            "https://openinfo.gov.bc.ca",
-        )
+            "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages",
+        ).rstrip("/")
 
     def map(self, row, publication_type="openinfo"):
         axis_request_id = row.get("axisrequestid")
         return UnpublishRequestedPayload(
             tenant_id=self.path_resolver.resolve_tenant_id(row),
             publication_id=axis_request_id,
-            public_url=f"{self.public_base_url}/public/{axis_request_id}.html",
+            public_url=(
+                f"{self.public_base_url}/{axis_request_id}/openinfo/{axis_request_id}.html"
+            ),
             public_repository=S3Location(
                 bucket=self.path_resolver.openinfo_publication_bucket,
                 prefix=f"{publication_type}/{axis_request_id}",
