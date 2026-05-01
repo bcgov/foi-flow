@@ -8,6 +8,7 @@ from request_api.models.FOIProactiveDisclosureRequests import FOIProactiveDisclo
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.services.publication_events.types import PublicationEventType
 from request_api.resources.foirequest import FOIRequestUpdateBySection
+from request_api.utils.enums import OIStatusEnum
 
 
 class OpenInfoPublishCompletedConsumer:
@@ -22,7 +23,7 @@ class OpenInfoPublishCompletedConsumer:
         payload = envelope.get("payload") or {} 
         foirequestid = payload.get('request_id')
         foiministryrequestid = payload.get('ministry_request_id')
-        oistatus_id = 4 if envelope.get("event_type") == PublicationEventType.PUBLISH_COMPLETED else 6 if envelope.get("event_type") == PublicationEventType.UNPUBLISH_COMPLETED else None
+        oistatus_id = OIStatusEnum.PUBLISHED.value
         result = FOIRequestUpdateBySection().handle_oistatusid_update(foirequestid, foiministryrequestid, oistatus_id)
         if result is not None and result["success"]:
             return DefaultMethodResult(True, "FOIMinistryRequest data updated")
@@ -53,21 +54,33 @@ class OpenInfoPublishCompletedConsumer:
             f"openinfo_id={openinfo_id} "
             f"request_event_id={payload.get('request_event_id')}"
         )
-        self.handle_foiministryrequest_update(envelope)
+        update_result = self.handle_foiministryrequest_update(envelope)
 
+        if update_result.success is False:
+            return update_result
+        
         return self.openinfo_model.create_published_version_from_openinfo_id(openinfo_id, message)
 
 
 class OpenInfoUnpublishCompletedConsumer:
     """Logs completed unpublish events for OpenInfo records."""
 
+    def handle_foiministryrequest_update(self, envelope):
+        payload = envelope.get("payload") or {} 
+        foirequestid = payload.get('request_id')
+        foiministryrequestid = payload.get('ministry_request_id')
+        oistatus_id = OIStatusEnum.UNPUBLISHED.value
+        result = FOIRequestUpdateBySection().handle_oistatusid_update(foirequestid, foiministryrequestid, oistatus_id)
+        if result is not None and result["success"]:
+            return DefaultMethodResult(True, "FOIMinistryRequest data updated")
+        return DefaultMethodResult(False, "Unable to update FOIMinistryRequest data") 
+    
     def handle(self, envelope):
         """Validate and log a publication.unpublish.completed event for OpenInfo."""
         if envelope.get("event_type") != PublicationEventType.UNPUBLISH_COMPLETED:
             return DefaultMethodResult(False, "Unsupported event type")
 
         payload = envelope.get("payload") or {}
-        # FIXME: status needs to be updated
         logging.info(
             "Handling OpenInfo unpublish completed event | "
             f"event_id={envelope.get('event_id')} "
@@ -78,6 +91,11 @@ class OpenInfoUnpublishCompletedConsumer:
             f"objects_deleted={payload.get('objects_deleted')} "
             f"sitemap_result={payload.get('sitemap_result')}"
         )
+        update_result = self.handle_foiministryrequest_update(envelope)
+
+        if update_result.success is False:
+            return update_result
+    
         return DefaultMethodResult(True, "Unpublish completion logged")
 
 
@@ -95,7 +113,7 @@ class ProactiveDisclosurePublishCompletedConsumer:
         payload = envelope.get("payload") or {} 
         foirequestid = payload.get('request_id')
         foiministryrequestid = payload.get('ministry_request_id')
-        oistatus_id = 4 if envelope.get("event_type") == PublicationEventType.PUBLISH_COMPLETED else 6 if envelope.get("event_type") == PublicationEventType.UNPUBLISH_COMPLETED else None
+        oistatus_id = OIStatusEnum.PUBLISHED.value
         result = FOIRequestUpdateBySection().handle_oistatusid_update(foirequestid, foiministryrequestid, oistatus_id)
         if result is not None and result["success"]:
             return DefaultMethodResult(True, "FOIMinistryRequest data updated")
@@ -126,8 +144,11 @@ class ProactiveDisclosurePublishCompletedConsumer:
             f"proactive_id={proactive_id} "
             f"request_event_id={payload.get('request_event_id')}"
         )
-        self.handle_foiministryrequest_update(envelope)
+        update_result = self.handle_foiministryrequest_update(envelope)
 
+        if update_result.success is False:
+            return update_result
+        
         return self.proactive_model.create_published_version_from_proactive_id(
             proactive_id,
             message,
@@ -137,13 +158,22 @@ class ProactiveDisclosurePublishCompletedConsumer:
 class ProactiveDisclosureUnpublishCompletedConsumer:
     """Logs completed unpublish events for Proactive Disclosure records."""
 
+    def handle_foiministryrequest_update(self, envelope):
+        payload = envelope.get("payload") or {} 
+        foirequestid = payload.get('request_id')
+        foiministryrequestid = payload.get('ministry_request_id')
+        oistatus_id = OIStatusEnum.UNPUBLISHED.value
+        result = FOIRequestUpdateBySection().handle_oistatusid_update(foirequestid, foiministryrequestid, oistatus_id)
+        if result is not None and result["success"]:
+            return DefaultMethodResult(True, "FOIMinistryRequest data updated")
+        return DefaultMethodResult(False, "Unable to update FOIMinistryRequest data")
+    
     def handle(self, envelope):
         """Validate and log a publication.unpublish.completed event for Proactive Disclosure."""
         if envelope.get("event_type") != PublicationEventType.UNPUBLISH_COMPLETED:
             return DefaultMethodResult(False, "Unsupported event type")
         payload = envelope.get("payload") or {}
 
-        # FIXME: status needs to be updated
         logging.info(
             "Handling Proactive Disclosure unpublish completed event | "
             f"event_id={envelope.get('event_id')} "
@@ -154,4 +184,9 @@ class ProactiveDisclosureUnpublishCompletedConsumer:
             f"objects_deleted={payload.get('objects_deleted')} "
             f"sitemap_result={payload.get('sitemap_result')}"
         )
+        update_result = self.handle_foiministryrequest_update(envelope)
+
+        if update_result.success is False:
+            return update_result
+
         return DefaultMethodResult(True, "Unpublish completion logged")
