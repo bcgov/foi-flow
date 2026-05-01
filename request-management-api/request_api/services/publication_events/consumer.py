@@ -20,8 +20,8 @@ class OpenInfoPublishCompletedConsumer:
         self.openinfo_model = openinfo_model or FOIOpenInformationRequests
 
     def handle_foiministryrequest_update(self, payload):
-        foirequestid = payload.get('request_id')
-        foiministryrequestid = payload.get('ministry_request_id')
+        foirequestid = payload.get('foirequest_id')
+        foiministryrequestid = payload.get('foiministryrequest_id')
         oistatus_id = OIStatusEnum.PUBLISHED.value
         result = FOIRequestUpdateBySection().handle_oistatusid_update(foirequestid, foiministryrequestid, oistatus_id)
         if result is not None and result["success"]:
@@ -65,8 +65,8 @@ class OpenInfoUnpublishCompletedConsumer:
     """Logs completed unpublish events for OpenInfo records."""
 
     def handle_foiministryrequest_update(self, payload):
-        foirequestid = payload.get('request_id')
-        foiministryrequestid = payload.get('ministry_request_id')
+        foirequestid = payload.get('foirequest_id')
+        foiministryrequestid = payload.get('foiministryrequest_id')
         oistatus_id = OIStatusEnum.UNPUBLISHED.value
         result = FOIRequestUpdateBySection().handle_oistatusid_update(foirequestid, foiministryrequestid, oistatus_id)
         if result is not None and result["success"]:
@@ -108,8 +108,8 @@ class ProactiveDisclosurePublishCompletedConsumer:
         self.proactive_model = proactive_model or FOIProactiveDisclosureRequests
     
     def handle_foiministryrequest_update(self, payload):
-        foirequestid = payload.get('request_id')
-        foiministryrequestid = payload.get('ministry_request_id')
+        foirequestid = payload.get('foirequest_id')
+        foiministryrequestid = payload.get('foiministryrequest_id')
         oistatus_id = OIStatusEnum.PUBLISHED.value
         result = FOIRequestUpdateBySection().handle_oistatusid_update(foirequestid, foiministryrequestid, oistatus_id)
         if result is not None and result["success"]:
@@ -156,8 +156,8 @@ class ProactiveDisclosureUnpublishCompletedConsumer:
     """Logs completed unpublish events for Proactive Disclosure records."""
 
     def handle_foiministryrequest_update(self, payload):
-        foirequestid = payload.get('request_id')
-        foiministryrequestid = payload.get('ministry_request_id')
+        foirequestid = payload.get('foirequest_id')
+        foiministryrequestid = payload.get('foiministryrequest_id')
         oistatus_id = OIStatusEnum.UNPUBLISHED.value
         result = FOIRequestUpdateBySection().handle_oistatusid_update(foirequestid, foiministryrequestid, oistatus_id)
         if result is not None and result["success"]:
