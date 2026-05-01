@@ -7,6 +7,7 @@ from request_api.models.FOIOpenInformationRequests import FOIOpenInformationRequ
 from request_api.models.FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.services.publication_events.types import PublicationEventType
+from request_api.resources.foirequest import FOIRequestUpdateBySection
 
 
 class OpenInfoPublishCompletedConsumer:
@@ -17,6 +18,16 @@ class OpenInfoPublishCompletedConsumer:
     def __init__(self, openinfo_model=None):
         self.openinfo_model = openinfo_model or FOIOpenInformationRequests
 
+    def handle_foiministryrequest_update(self, envelope):
+        payload = envelope.get("payload") or {} 
+        foirequestid = payload.get('request_id')
+        foiministryrequestid = payload.get('ministry_request_id')
+        oistatus_id = 4 if envelope.get("event_type") == PublicationEventType.PUBLISH_COMPLETED else 6 if envelope.get("event_type") == PublicationEventType.UNPUBLISH_COMPLETED else None
+        result = FOIRequestUpdateBySection().handle_oistatusid_update(foirequestid, foiministryrequestid, oistatus_id)
+        if result is not None and result["success"]:
+            return DefaultMethodResult(True, "FOIMinistryRequest data updated")
+        return DefaultMethodResult(False, "Unable to update FOIMinistryRequest data") 
+        
     def handle(self, envelope):
         """Validate and apply a publication.publish.completed event for OpenInfo."""
         if envelope.get("event_type") != PublicationEventType.PUBLISH_COMPLETED:
@@ -42,6 +53,8 @@ class OpenInfoPublishCompletedConsumer:
             f"openinfo_id={openinfo_id} "
             f"request_event_id={payload.get('request_event_id')}"
         )
+        self.handle_foiministryrequest_update(envelope)
+
         return self.openinfo_model.create_published_version_from_openinfo_id(openinfo_id, message)
 
 
@@ -77,6 +90,16 @@ class ProactiveDisclosurePublishCompletedConsumer:
 
     def __init__(self, proactive_model=None):
         self.proactive_model = proactive_model or FOIProactiveDisclosureRequests
+    
+    def handle_foiministryrequest_update(self, envelope):
+        payload = envelope.get("payload") or {} 
+        foirequestid = payload.get('request_id')
+        foiministryrequestid = payload.get('ministry_request_id')
+        oistatus_id = 4 if envelope.get("event_type") == PublicationEventType.PUBLISH_COMPLETED else 6 if envelope.get("event_type") == PublicationEventType.UNPUBLISH_COMPLETED else None
+        result = FOIRequestUpdateBySection().handle_oistatusid_update(foirequestid, foiministryrequestid, oistatus_id)
+        if result is not None and result["success"]:
+            return DefaultMethodResult(True, "FOIMinistryRequest data updated")
+        return DefaultMethodResult(False, "Unable to update FOIMinistryRequest data") 
 
     def handle(self, envelope):
         """Validate and apply a publication.publish.completed event for Proactive Disclosure."""
@@ -103,6 +126,7 @@ class ProactiveDisclosurePublishCompletedConsumer:
             f"proactive_id={proactive_id} "
             f"request_event_id={payload.get('request_event_id')}"
         )
+        self.handle_foiministryrequest_update(envelope)
 
         return self.proactive_model.create_published_version_from_proactive_id(
             proactive_id,
