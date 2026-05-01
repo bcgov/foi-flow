@@ -153,7 +153,7 @@ def test_publish_openinfo_posts_rest_wrapper_and_updates_sitemap_page(monkeypatc
     assert payload["tenant_id"] == str(uuid.uuid5(uuid.NAMESPACE_DNS, "bcgov:fin"))
     assert payload["axis_request_id"] == "FIN-2026-047533"
     assert payload["source"]["bucket"] == "fin-dev-e"
-    assert payload["source"]["prefix"] == "FIN-2026-047533/openinfo/"
+    assert payload["source"]["prefix"] == "FIN-2026-047533/responsepackage/"
     assert payload["destination"]["bucket"] == "dev-openinfopub"
     assert payload["destination"]["prefix"] == "packages/FIN-2026-047533/openinfo/"
     assert updater.openinfo_updates == [(22318, "sitemap_pages_1.xml")]
@@ -202,10 +202,11 @@ def test_publish_proactive_disclosure_posts_rest_wrapper_and_updates_sitemap_pag
     assert result.identifier == "PD-FIN-2026-047533"
     assert client.calls[0][0] == "proactivedisclosure"
     payload = client.calls[0][1]
+    assert payload["kind"] == "proactivedisclosure"
     assert payload["proactivedisclosure_category"] == "Calendars"
     assert payload["report_period"] == "Quarter 1 2026-27"
     assert payload["source"]["bucket"] == "fin-dev-e"
-    assert payload["source"]["prefix"] == "PD-FIN-2026-047533/openinfo/"
+    assert payload["source"]["prefix"] == "PD-FIN-2026-047533/responsepackage/"
     assert payload["destination"]["bucket"] == "dev-openinfopub"
     assert payload["destination"]["prefix"] == "packages/PD-FIN-2026-047533/openinfo/"
     assert "foiministryrequest_id" not in payload
