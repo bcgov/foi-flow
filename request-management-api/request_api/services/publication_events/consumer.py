@@ -19,8 +19,7 @@ class OpenInfoPublishCompletedConsumer:
     def __init__(self, openinfo_model=None):
         self.openinfo_model = openinfo_model or FOIOpenInformationRequests
 
-    def handle_foiministryrequest_update(self, envelope):
-        payload = envelope.get("payload") or {} 
+    def handle_foiministryrequest_update(self, payload):
         foirequestid = payload.get('request_id')
         foiministryrequestid = payload.get('ministry_request_id')
         oistatus_id = OIStatusEnum.PUBLISHED.value
@@ -54,7 +53,7 @@ class OpenInfoPublishCompletedConsumer:
             f"openinfo_id={openinfo_id} "
             f"request_event_id={payload.get('request_event_id')}"
         )
-        update_result = self.handle_foiministryrequest_update(envelope)
+        update_result = self.handle_foiministryrequest_update(payload)
 
         if update_result.success is False:
             return update_result
@@ -65,8 +64,7 @@ class OpenInfoPublishCompletedConsumer:
 class OpenInfoUnpublishCompletedConsumer:
     """Logs completed unpublish events for OpenInfo records."""
 
-    def handle_foiministryrequest_update(self, envelope):
-        payload = envelope.get("payload") or {} 
+    def handle_foiministryrequest_update(self, payload):
         foirequestid = payload.get('request_id')
         foiministryrequestid = payload.get('ministry_request_id')
         oistatus_id = OIStatusEnum.UNPUBLISHED.value
@@ -91,7 +89,7 @@ class OpenInfoUnpublishCompletedConsumer:
             f"objects_deleted={payload.get('objects_deleted')} "
             f"sitemap_result={payload.get('sitemap_result')}"
         )
-        update_result = self.handle_foiministryrequest_update(envelope)
+        update_result = self.handle_foiministryrequest_update(payload)
 
         if update_result.success is False:
             return update_result
@@ -109,8 +107,7 @@ class ProactiveDisclosurePublishCompletedConsumer:
     def __init__(self, proactive_model=None):
         self.proactive_model = proactive_model or FOIProactiveDisclosureRequests
     
-    def handle_foiministryrequest_update(self, envelope):
-        payload = envelope.get("payload") or {} 
+    def handle_foiministryrequest_update(self, payload):
         foirequestid = payload.get('request_id')
         foiministryrequestid = payload.get('ministry_request_id')
         oistatus_id = OIStatusEnum.PUBLISHED.value
@@ -144,7 +141,7 @@ class ProactiveDisclosurePublishCompletedConsumer:
             f"proactive_id={proactive_id} "
             f"request_event_id={payload.get('request_event_id')}"
         )
-        update_result = self.handle_foiministryrequest_update(envelope)
+        update_result = self.handle_foiministryrequest_update([payload])
 
         if update_result.success is False:
             return update_result
@@ -158,8 +155,7 @@ class ProactiveDisclosurePublishCompletedConsumer:
 class ProactiveDisclosureUnpublishCompletedConsumer:
     """Logs completed unpublish events for Proactive Disclosure records."""
 
-    def handle_foiministryrequest_update(self, envelope):
-        payload = envelope.get("payload") or {} 
+    def handle_foiministryrequest_update(self, payload):
         foirequestid = payload.get('request_id')
         foiministryrequestid = payload.get('ministry_request_id')
         oistatus_id = OIStatusEnum.UNPUBLISHED.value
@@ -184,7 +180,7 @@ class ProactiveDisclosureUnpublishCompletedConsumer:
             f"objects_deleted={payload.get('objects_deleted')} "
             f"sitemap_result={payload.get('sitemap_result')}"
         )
-        update_result = self.handle_foiministryrequest_update(envelope)
+        update_result = self.handle_foiministryrequest_update(payload)
 
         if update_result.success is False:
             return update_result
