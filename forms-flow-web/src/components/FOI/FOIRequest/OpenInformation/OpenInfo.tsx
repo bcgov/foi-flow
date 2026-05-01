@@ -223,7 +223,7 @@ const OpenInfo = ({
         formattedData,
         (err: any, _res: any) => {
           if (!err) {
-            const toastMsg = _res.status === 202 ? "FOI Open Information request has successfully been sent for publishing." : "No data found to publish for this FOI Open Information request.";
+            const toastMsg = _res.data.message;
             toast.update(toastID, {
               type: "success",
               render:
@@ -272,7 +272,7 @@ const OpenInfo = ({
         formattedData,
         (err: any, _res: any) => {
           if (!err) {
-            const toastMsg = _res.status === 202 ? "FOI Open Information request has successfully been sent for unpublishing." : "No data found to unpublish for this FOI Open Information request.";
+            const toastMsg = _res.data.message;
             toast.update(toastID, {
               type: "success",
               render:
