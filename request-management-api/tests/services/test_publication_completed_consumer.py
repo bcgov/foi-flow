@@ -7,7 +7,9 @@ from request_api.models.FOIOpenInformationRequests import FOIOpenInformationRequ
 from request_api.models.FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 from request_api.services.publication_events.consumer import (
     OpenInfoPublishCompletedConsumer,
+    OpenInfoUnpublishCompletedConsumer,
     ProactiveDisclosurePublishCompletedConsumer,
+    ProactiveDisclosureUnpublishCompletedConsumer,
 )
 
 proactive_module = import_module("request_api.models.FOIProactiveDisclosureRequests")
@@ -61,6 +63,25 @@ def proactive_completed_envelope(**overrides):
     return envelope
 
 
+def unpublish_completed_envelope(**overrides):
+    envelope = {
+        "event_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d93",
+        "event_type": "publication.unpublish.completed",
+        "correlation_id": "openinfo-unpublish-345",
+        "payload": {
+            "tenant_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d91",
+            "kind": "openinfo",
+            "publication_id": "EDU-2024-12345",
+            "request_event_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d90",
+            "status": "completed",
+            "objects_deleted": 4,
+            "sitemap_result": "removed",
+        },
+    }
+    envelope.update(overrides)
+    return envelope
+
+
 def test_handle_openinfo_publish_completed_updates_published_version():
     openinfo_model = FakeOpenInfoModel()
     consumer = OpenInfoPublishCompletedConsumer(openinfo_model=openinfo_model)
@@ -69,6 +90,51 @@ def test_handle_openinfo_publish_completed_updates_published_version():
 
     assert result.success is True
     assert openinfo_model.calls == [(345, "Publication completed")]
+
+
+def test_handle_openinfo_unpublish_completed_logs_without_model_side_effects(caplog):
+    consumer = OpenInfoUnpublishCompletedConsumer()
+
+    result = consumer.handle(unpublish_completed_envelope())
+
+    assert result.success is True
+    assert result.message == "Unpublish completion logged"
+    assert "Handling OpenInfo unpublish completed event" in caplog.text
+    assert "publication_id=EDU-2024-12345" in caplog.text
+    assert "objects_deleted=4" in caplog.text
+
+
+def test_handle_proactive_disclosure_unpublish_completed_logs_without_model_side_effects(caplog):
+    consumer = ProactiveDisclosureUnpublishCompletedConsumer()
+
+    result = consumer.handle(
+        unpublish_completed_envelope(
+            correlation_id="proactivedisclosure-unpublish-71",
+            payload={
+                "tenant_id": "tenant-1",
+                "kind": "proactivedisclosure",
+                "publication_id": "PD-2024-56789",
+                "request_event_id": "request-event-1",
+                "status": "completed",
+                "objects_deleted": 2,
+                "sitemap_result": "removed",
+            },
+        )
+    )
+
+    assert result.success is True
+    assert result.message == "Unpublish completion logged"
+    assert "Handling Proactive Disclosure unpublish completed event" in caplog.text
+    assert "publication_id=PD-2024-56789" in caplog.text
+
+
+def test_handle_openinfo_unpublish_completed_rejects_wrong_event_type():
+    consumer = OpenInfoUnpublishCompletedConsumer()
+
+    result = consumer.handle(unpublish_completed_envelope(event_type="publication.publish.completed"))
+
+    assert result.success is False
+    assert result.message == "Unsupported event type"
 
 
 def test_handle_openinfo_publish_completed_uses_payload_message():

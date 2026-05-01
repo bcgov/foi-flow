@@ -37,6 +37,7 @@ class FakeHandler:
 
 def test_from_env_configures_completed_streams(monkeypatch):
     monkeypatch.setenv("PUBLICATION_PUBLISH_COMPLETED_STREAM_NAME", "publication.publish.completed")
+    monkeypatch.setenv("PUBLICATION_UNPUBLISH_COMPLETED_STREAM_NAME", "publication.unpublish.completed")
     monkeypatch.setenv("PUBLICATION_COMPLETED_CONSUMER_GROUP", "request-management-api")
     monkeypatch.setenv("PUBLICATION_COMPLETED_CONSUMER_NAME", "request-management-api-1")
 
@@ -44,6 +45,7 @@ def test_from_env_configures_completed_streams(monkeypatch):
 
     assert consumer.stream_names == {
         "publication.publish.completed": "publication.publish.completed",
+        "publication.unpublish.completed": "publication.unpublish.completed",
     }
     assert consumer.group_name == "request-management-api"
     assert consumer.consumer_name == "request-management-api-1"
@@ -55,6 +57,7 @@ def test_ensure_groups_creates_configured_stream_groups():
         redis_client=redis_client,
         stream_names={
             PublicationEventType.PUBLISH_COMPLETED: "publication.publish.completed",
+            PublicationEventType.UNPUBLISH_COMPLETED: "publication.unpublish.completed",
         },
         group_name="request-management-api",
         consumer_name="worker-1",
@@ -64,6 +67,7 @@ def test_ensure_groups_creates_configured_stream_groups():
 
     assert redis_client.created_groups == [
         ("publication.publish.completed", "request-management-api", "0", True),
+        ("publication.unpublish.completed", "request-management-api", "0", True),
     ]
 
 
@@ -137,3 +141,46 @@ def test_read_once_does_not_ack_failed_handler_result():
     assert pd_handler.calls == [envelope]
     assert oi_handler.calls == []
     assert redis_client.acked == []
+
+
+def test_read_once_dispatches_unpublish_completion_by_payload_kind_and_acks_success(caplog):
+    envelope = {
+        "event_type": "publication.unpublish.completed",
+        "correlation_id": "corr-unpub-123",
+        "payload": {
+            "tenant_id": "tenant-1",
+            "kind": "openinfo",
+            "publication_id": "EDU-2024-12345",
+            "request_event_id": "request-event-1",
+            "status": "completed",
+            "objects_deleted": 4,
+            "sitemap_result": "removed",
+        },
+    }
+    redis_client = FakeRedisClient(
+        messages=[
+            [
+                (
+                    "publication.unpublish.completed",
+                    [("1700000000000-2", {"payload": json.dumps(envelope)})],
+                )
+            ]
+        ]
+    )
+    consumer = PublicationCompletedStreamConsumer(
+        redis_client=redis_client,
+        stream_names={
+            PublicationEventType.UNPUBLISH_COMPLETED: "publication.unpublish.completed"
+        },
+        group_name="request-management-api",
+        consumer_name="worker-1",
+    )
+
+    processed = consumer.read_once()
+
+    assert processed == 1
+    assert redis_client.acked == [
+        ("publication.unpublish.completed", "request-management-api", "1700000000000-2")
+    ]
+    assert "Handling OpenInfo unpublish completed event" in caplog.text
+    assert "publication_id=EDU-2024-12345" in caplog.text
