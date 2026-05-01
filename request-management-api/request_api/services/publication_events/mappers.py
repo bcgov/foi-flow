@@ -136,6 +136,8 @@ class UnpublishRequestedMapper:
                 prefix=f"{publication_type}/{axis_request_id}",
             ),
             last_modified=row.get("publicationdate", ""),
+            foirequest_id=row.get("foirequest_id"),
+            foiministryrequest_id=row.get("foiministryrequestid"),
             kind=publication_type,
         )
 

@@ -76,6 +76,8 @@ class UnpublishRequestedPayload:
     public_url: str
     public_repository: S3Location
     last_modified: str
+    foirequest_id: Optional[int] = None
+    foiministryrequest_id: Optional[int] = None
     kind: str = "openinfo"
 
     def to_dict(self):
