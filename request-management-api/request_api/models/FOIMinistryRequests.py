@@ -253,7 +253,7 @@ class FOIMinistryRequest(db.Model):
         query = db.session.query(*selectedcolumns).distinct(FOIMinistryRequest.foiministryrequestid).filter(
             FOIMinistryRequest.foirequest_id.in_(requestids),
             FOIMinistryRequest.requeststatusid != 3
-        ).order_by(FOIMinistryRequest.foiministryrequestid.asc(), FOIMinistryRequest.version.asc())
+        ).order_by(FOIMinistryRequest.foiministryrequestid.desc(), FOIMinistryRequest.version.desc())
         return [r._asdict() for r in query]
     
     @classmethod
