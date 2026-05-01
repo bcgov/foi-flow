@@ -15,6 +15,7 @@ from request_api.services.publication_events.rest_client import PublicationRestC
 
 
 REST_PAYLOAD_FIELDS = {
+    "kind",
     "tenant_id",
     "axis_request_id",
     "description",
