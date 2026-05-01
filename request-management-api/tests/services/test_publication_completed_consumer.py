@@ -11,6 +11,7 @@ from request_api.services.publication_events.consumer import (
     ProactiveDisclosurePublishCompletedConsumer,
     ProactiveDisclosureUnpublishCompletedConsumer,
 )
+from request_api.utils.enums import OIStatusEnum
 
 proactive_module = import_module("request_api.models.FOIProactiveDisclosureRequests")
 
@@ -35,6 +36,38 @@ class FakeProactiveDisclosureModel:
         return self.result
 
 
+class FakeSectionUpdater:
+    def __init__(self, response=None):
+        self.calls = []
+        self.response = response or (
+            {"success": True, "message": "updated", "id": 22318, "ministryRequests": []},
+            200,
+        )
+
+    def update_section(
+        self,
+        foirequestid,
+        foiministryrequestid,
+        section,
+        request_json,
+        userid,
+        username,
+        is_ministry_member,
+    ):
+        self.calls.append(
+            (
+                foirequestid,
+                foiministryrequestid,
+                section,
+                request_json,
+                userid,
+                username,
+                is_ministry_member,
+            )
+        )
+        return self.response
+
+
 def completed_envelope(**overrides):
     envelope = {
         "event_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d92",
@@ -43,6 +76,8 @@ def completed_envelope(**overrides):
         "payload": {
             "tenant_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d91",
             "request_event_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d90",
+            "foirequest_id": 22317,
+            "foiministryrequest_id": 22318,
         },
     }
     envelope.update(overrides)
@@ -57,6 +92,8 @@ def proactive_completed_envelope(**overrides):
         "payload": {
             "tenant_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d81",
             "request_event_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d80",
+            "foirequest_id": 22317,
+            "foiministryrequest_id": 22318,
         },
     }
     envelope.update(overrides)
@@ -73,6 +110,8 @@ def unpublish_completed_envelope(**overrides):
             "kind": "openinfo",
             "publication_id": "EDU-2024-12345",
             "request_event_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d90",
+            "foirequest_id": 22317,
+            "foiministryrequest_id": 22318,
             "status": "completed",
             "objects_deleted": 4,
             "sitemap_result": "removed",
@@ -84,16 +123,32 @@ def unpublish_completed_envelope(**overrides):
 
 def test_handle_openinfo_publish_completed_updates_published_version():
     openinfo_model = FakeOpenInfoModel()
-    consumer = OpenInfoPublishCompletedConsumer(openinfo_model=openinfo_model)
+    section_updater = FakeSectionUpdater()
+    consumer = OpenInfoPublishCompletedConsumer(
+        openinfo_model=openinfo_model,
+        section_updater=section_updater,
+    )
 
     result = consumer.handle(completed_envelope())
 
     assert result.success is True
     assert openinfo_model.calls == [(345, "Publication completed")]
+    assert section_updater.calls == [
+        (
+            22317,
+            22318,
+            "oistatusid",
+            {"oistatusid": OIStatusEnum.PUBLISHED.value},
+            "publishingservice",
+            "Publishing Service",
+            False,
+        )
+    ]
 
 
 def test_handle_openinfo_unpublish_completed_logs_without_model_side_effects(caplog):
-    consumer = OpenInfoUnpublishCompletedConsumer()
+    section_updater = FakeSectionUpdater()
+    consumer = OpenInfoUnpublishCompletedConsumer(section_updater=section_updater)
 
     result = consumer.handle(unpublish_completed_envelope())
 
@@ -102,10 +157,22 @@ def test_handle_openinfo_unpublish_completed_logs_without_model_side_effects(cap
     assert "Handling OpenInfo unpublish completed event" in caplog.text
     assert "publication_id=EDU-2024-12345" in caplog.text
     assert "objects_deleted=4" in caplog.text
+    assert section_updater.calls == [
+        (
+            22317,
+            22318,
+            "oistatusid",
+            {"oistatusid": OIStatusEnum.UNPUBLISHED.value},
+            "publishingservice",
+            "Publishing Service",
+            False,
+        )
+    ]
 
 
 def test_handle_proactive_disclosure_unpublish_completed_logs_without_model_side_effects(caplog):
-    consumer = ProactiveDisclosureUnpublishCompletedConsumer()
+    section_updater = FakeSectionUpdater()
+    consumer = ProactiveDisclosureUnpublishCompletedConsumer(section_updater=section_updater)
 
     result = consumer.handle(
         unpublish_completed_envelope(
@@ -115,6 +182,8 @@ def test_handle_proactive_disclosure_unpublish_completed_logs_without_model_side
                 "kind": "proactivedisclosure",
                 "publication_id": "PD-2024-56789",
                 "request_event_id": "request-event-1",
+                "foirequest_id": 22317,
+                "foiministryrequest_id": 22318,
                 "status": "completed",
                 "objects_deleted": 2,
                 "sitemap_result": "removed",
@@ -126,6 +195,17 @@ def test_handle_proactive_disclosure_unpublish_completed_logs_without_model_side
     assert result.message == "Unpublish completion logged"
     assert "Handling Proactive Disclosure unpublish completed event" in caplog.text
     assert "publication_id=PD-2024-56789" in caplog.text
+    assert section_updater.calls == [
+        (
+            22317,
+            22318,
+            "oistatusid",
+            {"oistatusid": OIStatusEnum.UNPUBLISHED.value},
+            "publishingservice",
+            "Publishing Service",
+            False,
+        )
+    ]
 
 
 def test_handle_openinfo_unpublish_completed_rejects_wrong_event_type():
@@ -139,11 +219,16 @@ def test_handle_openinfo_unpublish_completed_rejects_wrong_event_type():
 
 def test_handle_openinfo_publish_completed_uses_payload_message():
     openinfo_model = FakeOpenInfoModel()
-    consumer = OpenInfoPublishCompletedConsumer(openinfo_model=openinfo_model)
+    consumer = OpenInfoPublishCompletedConsumer(
+        openinfo_model=openinfo_model,
+        section_updater=FakeSectionUpdater(),
+    )
     envelope = completed_envelope(
         payload={
             "tenant_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d91",
             "request_event_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d90",
+            "foirequest_id": 22317,
+            "foiministryrequest_id": 22318,
             "message": "Published to OpenInfo",
         }
     )
@@ -156,7 +241,10 @@ def test_handle_openinfo_publish_completed_uses_payload_message():
 
 def test_handle_openinfo_publish_completed_rejects_wrong_event_type():
     openinfo_model = FakeOpenInfoModel()
-    consumer = OpenInfoPublishCompletedConsumer(openinfo_model=openinfo_model)
+    consumer = OpenInfoPublishCompletedConsumer(
+        openinfo_model=openinfo_model,
+        section_updater=FakeSectionUpdater(),
+    )
     envelope = completed_envelope(event_type="publication.unpublish.completed")
 
     result = consumer.handle(envelope)
@@ -168,7 +256,10 @@ def test_handle_openinfo_publish_completed_rejects_wrong_event_type():
 
 def test_handle_openinfo_publish_completed_rejects_invalid_correlation_id():
     openinfo_model = FakeOpenInfoModel()
-    consumer = OpenInfoPublishCompletedConsumer(openinfo_model=openinfo_model)
+    consumer = OpenInfoPublishCompletedConsumer(
+        openinfo_model=openinfo_model,
+        section_updater=FakeSectionUpdater(),
+    )
     envelope = completed_envelope(correlation_id="corr-123")
 
     result = consumer.handle(envelope)
@@ -180,7 +271,10 @@ def test_handle_openinfo_publish_completed_rejects_invalid_correlation_id():
 
 def test_handle_openinfo_publish_completed_requires_payload_fields():
     openinfo_model = FakeOpenInfoModel()
-    consumer = OpenInfoPublishCompletedConsumer(openinfo_model=openinfo_model)
+    consumer = OpenInfoPublishCompletedConsumer(
+        openinfo_model=openinfo_model,
+        section_updater=FakeSectionUpdater(),
+    )
     envelope = completed_envelope(payload={"tenant_id": "tenant-1"})
 
     result = consumer.handle(envelope)
@@ -190,11 +284,36 @@ def test_handle_openinfo_publish_completed_requires_payload_fields():
     assert openinfo_model.calls == []
 
 
+def test_handle_openinfo_publish_completed_requires_request_ids():
+    openinfo_model = FakeOpenInfoModel()
+    section_updater = FakeSectionUpdater()
+    consumer = OpenInfoPublishCompletedConsumer(
+        openinfo_model=openinfo_model,
+        section_updater=section_updater,
+    )
+    envelope = completed_envelope(
+        payload={
+            "tenant_id": "tenant-1",
+            "request_event_id": "request-event-1",
+        }
+    )
+
+    result = consumer.handle(envelope)
+
+    assert result.success is False
+    assert result.message == "Missing required payload fields: foirequest_id, foiministryrequest_id"
+    assert openinfo_model.calls == []
+    assert section_updater.calls == []
+
+
 def test_handle_openinfo_publish_completed_returns_model_failure():
     openinfo_model = FakeOpenInfoModel(
         result=DefaultMethodResult(False, "FOIOpenInfo request not found", 345)
     )
-    consumer = OpenInfoPublishCompletedConsumer(openinfo_model=openinfo_model)
+    consumer = OpenInfoPublishCompletedConsumer(
+        openinfo_model=openinfo_model,
+        section_updater=FakeSectionUpdater(),
+    )
 
     result = consumer.handle(completed_envelope())
 
@@ -206,21 +325,41 @@ def test_handle_openinfo_publish_completed_returns_model_failure():
 
 def test_handle_proactive_disclosure_publish_completed_updates_published_version():
     proactive_model = FakeProactiveDisclosureModel()
-    consumer = ProactiveDisclosurePublishCompletedConsumer(proactive_model=proactive_model)
+    section_updater = FakeSectionUpdater()
+    consumer = ProactiveDisclosurePublishCompletedConsumer(
+        proactive_model=proactive_model,
+        section_updater=section_updater,
+    )
 
     result = consumer.handle(proactive_completed_envelope())
 
     assert result.success is True
     assert proactive_model.calls == [(71, "Publication completed")]
+    assert section_updater.calls == [
+        (
+            22317,
+            22318,
+            "oistatusid",
+            {"oistatusid": OIStatusEnum.PUBLISHED.value},
+            "publishingservice",
+            "Publishing Service",
+            False,
+        )
+    ]
 
 
 def test_handle_proactive_disclosure_publish_completed_uses_payload_message():
     proactive_model = FakeProactiveDisclosureModel()
-    consumer = ProactiveDisclosurePublishCompletedConsumer(proactive_model=proactive_model)
+    consumer = ProactiveDisclosurePublishCompletedConsumer(
+        proactive_model=proactive_model,
+        section_updater=FakeSectionUpdater(),
+    )
     envelope = proactive_completed_envelope(
         payload={
             "tenant_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d81",
             "request_event_id": "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d80",
+            "foirequest_id": 22317,
+            "foiministryrequest_id": 22318,
             "message": "Proactive disclosure published",
         }
     )
@@ -233,7 +372,10 @@ def test_handle_proactive_disclosure_publish_completed_uses_payload_message():
 
 def test_handle_proactive_disclosure_publish_completed_rejects_wrong_event_type():
     proactive_model = FakeProactiveDisclosureModel()
-    consumer = ProactiveDisclosurePublishCompletedConsumer(proactive_model=proactive_model)
+    consumer = ProactiveDisclosurePublishCompletedConsumer(
+        proactive_model=proactive_model,
+        section_updater=FakeSectionUpdater(),
+    )
     envelope = proactive_completed_envelope(event_type="publication.unpublish.completed")
 
     result = consumer.handle(envelope)
@@ -245,7 +387,10 @@ def test_handle_proactive_disclosure_publish_completed_rejects_wrong_event_type(
 
 def test_handle_proactive_disclosure_publish_completed_rejects_invalid_correlation_id():
     proactive_model = FakeProactiveDisclosureModel()
-    consumer = ProactiveDisclosurePublishCompletedConsumer(proactive_model=proactive_model)
+    consumer = ProactiveDisclosurePublishCompletedConsumer(
+        proactive_model=proactive_model,
+        section_updater=FakeSectionUpdater(),
+    )
     envelope = proactive_completed_envelope(correlation_id="proactive-71")
 
     result = consumer.handle(envelope)
@@ -257,7 +402,10 @@ def test_handle_proactive_disclosure_publish_completed_rejects_invalid_correlati
 
 def test_handle_proactive_disclosure_publish_completed_requires_payload_fields():
     proactive_model = FakeProactiveDisclosureModel()
-    consumer = ProactiveDisclosurePublishCompletedConsumer(proactive_model=proactive_model)
+    consumer = ProactiveDisclosurePublishCompletedConsumer(
+        proactive_model=proactive_model,
+        section_updater=FakeSectionUpdater(),
+    )
     envelope = proactive_completed_envelope(payload={"tenant_id": "tenant-1"})
 
     result = consumer.handle(envelope)
@@ -271,7 +419,10 @@ def test_handle_proactive_disclosure_publish_completed_returns_model_failure():
     proactive_model = FakeProactiveDisclosureModel(
         result=DefaultMethodResult(False, "FOI Proactive Disclosure request not found", 71)
     )
-    consumer = ProactiveDisclosurePublishCompletedConsumer(proactive_model=proactive_model)
+    consumer = ProactiveDisclosurePublishCompletedConsumer(
+        proactive_model=proactive_model,
+        section_updater=FakeSectionUpdater(),
+    )
 
     result = consumer.handle(proactive_completed_envelope())
 

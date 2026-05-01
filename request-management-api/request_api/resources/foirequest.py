@@ -306,6 +306,34 @@ class FOIRequestUpdateBySection(Resource):
     def post(foirequestid,foiministryrequestid,section):
         try:
             request_json = request.get_json()
+            return FOIRequestUpdateBySection.update_section(
+                foirequestid,
+                foiministryrequestid,
+                section,
+                request_json,
+                AuthHelper.getuserid(),
+                AuthHelper.getusername(),
+                AuthHelper.isministrymember(),
+            )
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            traceback.print_exc()
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message': exception.message}, 500
+
+    @staticmethod
+    def update_section(
+        foirequestid,
+        foiministryrequestid,
+        section,
+        request_json,
+        userid,
+        username,
+        is_ministry_member,
+    ):
+        try:
             foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
             if (section == "oipc"):
                 foirequest['isoipcreview'] = request_json['isoipcreview']
@@ -322,14 +350,14 @@ class FOIRequestUpdateBySection(Resource):
                 foirequestschema = FOIPDRequestWrapperSchema().load(foirequest)
             else:
                 foirequestschema = FOIRequestWrapperSchema().load(foirequest)
-            result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
+            result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid, userid)
             if result.success == True:
                 event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()), event_loop)
+                asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",userid,username,is_ministry_member), event_loop)
                 if (section == 'oistatusid'):
-                    eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
+                    eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, userid,username)
                     if(request_json['oistatusid'] == OIStatusEnum.EXEMPTION_REQUEST.value):
-                        eventservice().postopeninfoexemptionevent(foiministryrequestid, foirequestid, AuthHelper.getuserid(),AuthHelper.getusername(), OpenInfoNotificationType.EXEMPTION_REQUEST.value, None)
+                        eventservice().postopeninfoexemptionevent(foiministryrequestid, foirequestid, userid,username, OpenInfoNotificationType.EXEMPTION_REQUEST.value, None)
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
                 return {'success': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
