@@ -147,7 +147,10 @@ def test_unpublish_mapper_sets_kind_for_proactivedisclosure(monkeypatch):
 
 def test_unpublish_mapper_maps_openinfo_row(monkeypatch):
     monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
-    monkeypatch.setenv("PUBLICATION_PUBLIC_BASE_URL", "https://openinfo.gov.bc.ca")
+    monkeypatch.setenv(
+        "PUBLICATION_PUBLIC_BASE_URL",
+        "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages",
+    )
 
     mapper = UnpublishRequestedMapper()
     row = {
@@ -161,7 +164,10 @@ def test_unpublish_mapper_maps_openinfo_row(monkeypatch):
 
     assert payload.tenant_id == str(uuid.uuid5(uuid.NAMESPACE_DNS, "bcgov:edu"))
     assert payload.publication_id == "EDU-2024-12345"
-    assert payload.public_url == "https://openinfo.gov.bc.ca/public/EDU-2024-12345.html"
+    assert (
+        payload.public_url
+        == "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages/EDU-2024-12345/openinfo/EDU-2024-12345.html"
+    )
     assert payload.public_repository.bucket == "dev-openinfopub"
     assert payload.public_repository.prefix == "openinfo/EDU-2024-12345"
     assert payload.last_modified == "2026-04-27"
@@ -169,7 +175,10 @@ def test_unpublish_mapper_maps_openinfo_row(monkeypatch):
 
 def test_unpublish_mapper_maps_pd_row(monkeypatch):
     monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
-    monkeypatch.setenv("PUBLICATION_PUBLIC_BASE_URL", "https://openinfo.gov.bc.ca")
+    monkeypatch.setenv(
+        "PUBLICATION_PUBLIC_BASE_URL",
+        "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages",
+    )
 
     mapper = UnpublishRequestedMapper()
     row = {
@@ -183,6 +192,10 @@ def test_unpublish_mapper_maps_pd_row(monkeypatch):
 
     assert payload.tenant_id == str(uuid.uuid5(uuid.NAMESPACE_DNS, "bcgov:fin"))
     assert payload.publication_id == "PD-FIN-2026-001"
+    assert (
+        payload.public_url
+        == "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages/PD-FIN-2026-001/openinfo/PD-FIN-2026-001.html"
+    )
     assert payload.public_repository.prefix == "proactivedisclosure/PD-FIN-2026-001"
     assert payload.last_modified == "2026-04-20"
 
@@ -288,7 +301,10 @@ class FakeOpenInfoService:
 
 def test_queue_openinfo_unpublish_builds_correct_envelope(monkeypatch):
     monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
-    monkeypatch.setenv("PUBLICATION_PUBLIC_BASE_URL", "https://openinfo.gov.bc.ca")
+    monkeypatch.setenv(
+        "PUBLICATION_PUBLIC_BASE_URL",
+        "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages",
+    )
 
     from request_api.services.publication_events.unpublish_service import UnpublishEventService
 
@@ -321,7 +337,10 @@ def test_queue_openinfo_unpublish_builds_correct_envelope(monkeypatch):
     assert envelope["correlation_id"] == "openinfo-unpublish-42"
     assert envelope["payload"]["tenant_id"] == str(uuid.uuid5(uuid.NAMESPACE_DNS, "bcgov:edu"))
     assert envelope["payload"]["publication_id"] == "EDU-2024-12345"
-    assert envelope["payload"]["public_url"] == "https://openinfo.gov.bc.ca/public/EDU-2024-12345.html"
+    assert (
+        envelope["payload"]["public_url"]
+        == "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages/EDU-2024-12345/openinfo/EDU-2024-12345.html"
+    )
     assert envelope["payload"]["public_repository"]["bucket"] == "dev-openinfopub"
     assert envelope["payload"]["public_repository"]["prefix"] == "openinfo/EDU-2024-12345"
     assert envelope["payload"]["last_modified"] == "2026-04-27"
@@ -332,7 +351,10 @@ def test_queue_openinfo_unpublish_builds_correct_envelope(monkeypatch):
 
 def test_queue_pd_unpublish_builds_correct_envelope(monkeypatch):
     monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
-    monkeypatch.setenv("PUBLICATION_PUBLIC_BASE_URL", "https://openinfo.gov.bc.ca")
+    monkeypatch.setenv(
+        "PUBLICATION_PUBLIC_BASE_URL",
+        "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages",
+    )
 
     from request_api.services.publication_events.unpublish_service import UnpublishEventService
 
@@ -363,6 +385,10 @@ def test_queue_pd_unpublish_builds_correct_envelope(monkeypatch):
     assert envelope["payload"]["kind"] == "proactivedisclosure"
     assert envelope["correlation_id"] == "proactivedisclosure-unpublish-99"
     assert envelope["payload"]["publication_id"] == "PD-FIN-2026-001"
+    assert (
+        envelope["payload"]["public_url"]
+        == "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages/PD-FIN-2026-001/openinfo/PD-FIN-2026-001.html"
+    )
     assert envelope["payload"]["public_repository"]["prefix"] == "proactivedisclosure/PD-FIN-2026-001"
 
 
