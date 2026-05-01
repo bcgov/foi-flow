@@ -252,7 +252,7 @@ class FOIMinistryRequest(db.Model):
         query = db.session.query(*selectedcolumns).distinct(FOIMinistryRequest.foiministryrequestid).filter(
             FOIMinistryRequest.foirequest_id.in_(requestids),
             FOIMinistryRequest.requeststatusid != 3
-        ).order_by(FOIMinistryRequest.foiministryrequestid.asc(), FOIMinistryRequest.version.asc())
+        ).order_by(FOIMinistryRequest.foiministryrequestid.desc(), FOIMinistryRequest.version.desc())
         return [r._asdict() for r in query]
     
     @classmethod
@@ -286,7 +286,8 @@ class FOIMinistryRequest(db.Model):
                                 FOIRequestApplicantMapping,
                                 and_(
                                     FOIRequestApplicantMapping.foirequestapplicantid == FOIRequestApplicant.foirequestapplicantid,
-                                    FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id,
+                                    FOIRequestApplicantMapping.foirequest_id == subquery_ministry_maxversion.c.foirequest_id,
+                                    FOIRequestApplicantMapping.foirequestversion_id == subquery_ministry_maxversion.c.max_version,
                                     FOIRequestApplicantMapping.requestortypeid == requestortypeid)
                             ).filter(
                                 # FOIRequestApplicant.foirequestapplicantid == applicantid,
