@@ -12,7 +12,9 @@ import redis
 
 from request_api.services.publication_events.consumer import (
     OpenInfoPublishCompletedConsumer,
+    OpenInfoUnpublishCompletedConsumer,
     ProactiveDisclosurePublishCompletedConsumer,
+    ProactiveDisclosureUnpublishCompletedConsumer,
 )
 from request_api.services.publication_events.types import PublicationEventType
 
@@ -21,7 +23,7 @@ _PD_CORRELATION = re.compile(r"^proactivedisclosure-")
 
 
 class PublicationCompletedStreamConsumer:
-    """Consumes unified publication.publish.completed Redis Stream messages and routes by correlation_id."""
+    """Consumes completed publication Redis Stream messages and routes by event type and kind."""
 
     def __init__(
         self,
@@ -40,8 +42,14 @@ class PublicationCompletedStreamConsumer:
         self.group_name = group_name
         self.consumer_name = consumer_name
         self.handlers = handlers or {
-            "openinfo": OpenInfoPublishCompletedConsumer(),
-            "proactivedisclosure": ProactiveDisclosurePublishCompletedConsumer(),
+            PublicationEventType.PUBLISH_COMPLETED: {
+                "openinfo": OpenInfoPublishCompletedConsumer(),
+                "proactivedisclosure": ProactiveDisclosurePublishCompletedConsumer(),
+            },
+            PublicationEventType.UNPUBLISH_COMPLETED: {
+                "openinfo": OpenInfoUnpublishCompletedConsumer(),
+                "proactivedisclosure": ProactiveDisclosureUnpublishCompletedConsumer(),
+            },
         }
         self.app = app
         self.count = count
@@ -69,6 +77,10 @@ class PublicationCompletedStreamConsumer:
                 PublicationEventType.PUBLISH_COMPLETED: os.getenv(
                     "PUBLICATION_PUBLISH_COMPLETED_STREAM_NAME",
                     "publication.publish.completed",
+                ),
+                PublicationEventType.UNPUBLISH_COMPLETED: os.getenv(
+                    "PUBLICATION_UNPUBLISH_COMPLETED_STREAM_NAME",
+                    "publication.unpublish.completed",
                 ),
             },
             group_name=os.getenv(
@@ -149,7 +161,12 @@ class PublicationCompletedStreamConsumer:
 
     @staticmethod
     def _resolve_kind(envelope):
-        """Determine kind from correlation_id pattern."""
+        """Determine kind from payload discriminator, falling back to correlation_id pattern."""
+        payload = envelope.get("payload") or {}
+        kind = payload.get("kind")
+        if kind in ("openinfo", "proactivedisclosure"):
+            return kind
+
         correlation_id = envelope.get("correlation_id", "")
         if _OI_CORRELATION.match(correlation_id):
             return "openinfo"
@@ -157,13 +174,21 @@ class PublicationCompletedStreamConsumer:
             return "proactivedisclosure"
         return None
 
+    def _resolve_handler(self, envelope, kind):
+        event_type = envelope.get("event_type")
+        handlers_for_event = self.handlers.get(event_type)
+        if isinstance(handlers_for_event, dict):
+            return handlers_for_event.get(kind)
+        return self.handlers.get(kind)
+
     def _handle_message(self, stream_name, message_id, fields):
         envelope = self._parse_envelope(fields)
         kind = self._resolve_kind(envelope)
-        handler = self.handlers.get(kind)
+        handler = self._resolve_handler(envelope, kind)
         if handler is None:
             logging.error(
-                "No publication completed handler for kind=%s correlation_id=%s",
+                "No publication completed handler for event_type=%s kind=%s correlation_id=%s",
+                envelope.get("event_type"),
                 kind,
                 envelope.get("correlation_id"),
             )
