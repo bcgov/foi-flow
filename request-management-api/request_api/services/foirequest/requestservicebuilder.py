@@ -13,7 +13,7 @@ from request_api.models.FOIRequestOIPC import FOIRequestOIPC
 from request_api.models.FOIRawRequests import FOIRawRequest
 
 from datetime import datetime as datetime2
-from request_api.utils.enums import MinistryTeamWithKeycloackGroup, StateName, RequestType
+from request_api.utils.enums import MinistryTeamWithKeycloackGroup, StateName, RequestType, OIStatusEnum
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
 from request_api.services.foirequest.requestserviceministrybuilder import requestserviceministrybuilder
 from request_api.services.openinfoservice import openinfoservice
@@ -112,7 +112,7 @@ class requestservicebuilder(requestserviceconfigurator):
         # foiministryrequest_dict = foiministryrequest.__dict__
         # print("foiministryrequest in createministry:",foiministryrequest_dict)
         # First instance of FOIOpeninformation data is created either when: A) An exemption request is created via "Publication Tab" B) A request is closed and no exemption request has been made previously
-        if 'closereasonid' in requestschema and ministryid is not None:
+        if 'closereasonid' in requestschema and ministryid is not None and requestschema.get("requestType") != RequestType.PROACTIVE_DISCLOSURE.value:
             current_foiopeninforequest = openinfoservice().getcurrentfoiopeninforequest(ministryid)
             foiopeninforequest = current_foiopeninforequest
             is_publish_request = requestschema['closereasonid'] in (4,7) and not foiministryrequest.isconsultflag
@@ -121,7 +121,8 @@ class requestservicebuilder(requestserviceconfigurator):
             if current_foiopeninforequest == {}:
                 result = openinfoservice().createopeninforequest(requestschema, userid, foiministryrequest, is_publish_request)
                 if result is not None and result.success:
-                    if not is_publish_request: foiministryrequest.oistatus_id = 7
+                    if not is_publish_request: 
+                        foiministryrequest.oistatus_id = OIStatusEnum.DO_NOT_PUBLISH.value
             else:
                 if current_foiopeninforequest["oipublicationstatus_id"] == 2:
                     # Update FOIOpenInformation receivedate if publishable and if previous FOIOpenInformation record exists
@@ -135,7 +136,7 @@ class requestservicebuilder(requestserviceconfigurator):
                         foiopeninforequest['oiexemption_id'] = 5
                         update_result = openinfoservice().updateopeninforequest(foiopeninforequest, userid, ministryid, foiopeninforequest["oiassignedto"])
                         if update_result.success:
-                            foiministryrequest.oistatus_id = 7
+                            foiministryrequest.oistatus_id = OIStatusEnum.DO_NOT_PUBLISH.value
 
         foiministryrequest.closedate = self.getpropertyvaluefromschema(requestschema, 'closedate')
         if requestschema.get('reopen'):

@@ -38,6 +38,7 @@ from request_api.services.linkedrequestservice import linkedrequestservice
 import json
 import asyncio
 import traceback
+from datetime import datetime
 
 API = Namespace('FOIRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
@@ -342,8 +343,11 @@ class FOIRequestUpdateBySection(Resource):
             #     foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
             #     foirequest['userrecordslockstatus'] = request_json['userrecordslockstatus']
             if (section == "oistatusid"):
-                foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
-                foirequest['oistatusid'] = request_json['oistatusid']
+                oistatusid = request_json['oistatusid']
+                if (foirequest['requestType'] == RequestType.PROACTIVE_DISCLOSURE.value and oistatusid == OIStatusEnum.PUBLISHED.value):
+                    foirequest['closereasonid'] = 10
+                    foirequest['closedate'] = datetime.now()
+                foirequest['oistatusid'] = oistatusid
             else:
                 foirequest[section] = request_json[section]
             if foirequest['requestType'] == RequestType.PROACTIVE_DISCLOSURE.value:
@@ -371,20 +375,20 @@ class FOIRequestUpdateBySection(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
     
-    def handle_oistatusid_update(self, foirequestid, foiministryrequestid, oistatus_id):
-        foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
-        foirequest["oistatus_id"] = oistatus_id
-        foirequestschema = FOIPDRequestWrapperSchema().load(foirequest)
-        result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
-        if result is not None:
-            if result.success == True:
-                event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()), event_loop)
-                eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
-                metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
-                requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
-                return {'success': True, 'message':result.message,'id':result.identifier}
-            return {'success': False, 'message': result.message,'id': result.identifier}
+    # def handle_oistatusid_update(self, foirequestid, foiministryrequestid, oistatus_id):
+    #     foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
+    #     foirequest["oistatus_id"] = oistatus_id
+    #     foirequestschema = FOIPDRequestWrapperSchema().load(foirequest)
+    #     result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
+    #     if result is not None:
+    #         if result.success == True:
+    #             event_loop = asyncio.get_running_loop()
+    #             asyncio.run_coroutine_threadsafe(eventservice().postevent(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember()), event_loop)
+    #             eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
+    #             metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
+    #             requestservice().posteventtoworkflow(foiministryrequestid,  foirequestschema, json.loads(metadata),"iao")
+    #             return {'success': True, 'message':result.message,'id':result.identifier}
+    #         return {'success': False, 'message': result.message,'id': result.identifier}
         
 
 @cors_preflight('GET,OPTIONS')
