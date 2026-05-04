@@ -18,6 +18,7 @@ const ProactiveDisclosureRequestPublication = ({
     toast,
     currentPDRequestState,
     isOITeam,
+    saveRequestObject,
 }: any) => {
     const dispatch = useDispatch();
 
@@ -57,6 +58,9 @@ const ProactiveDisclosureRequestPublication = ({
     ) => {
         if (!isDataEdited) {
             setIsDataEdited(true);
+        }
+        if (pdDataKey === "publicationdate") {
+            saveRequestObject["publicationDate"] = value;
         }
         setPdPublicationData((prev: any) => ({
             ...prev,
