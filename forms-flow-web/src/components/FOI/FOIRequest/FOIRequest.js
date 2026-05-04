@@ -2273,6 +2273,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                   isOITeam={isOITeam}
                   foiministryrequestid={ministryId}
                   bcgovcode={bcgovcode ? JSON.parse(bcgovcode) : bcgovcode}
+                  saveRequestObject={saveRequestObject}
                 />
               ) : (
                 <OpenInfo
