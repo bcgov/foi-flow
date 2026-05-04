@@ -347,6 +347,8 @@ class FOIRequestUpdateBySection(Resource):
                 if (foirequest['requestType'] == RequestType.PROACTIVE_DISCLOSURE.value and oistatusid == OIStatusEnum.PUBLISHED.value):
                     foirequest['closereasonid'] = 10
                     foirequest['closedate'] = datetime.now()
+                    foirequest['requeststatusid'] = 3
+                    foirequest['requeststatuslabel'] = "closed"
                 foirequest['oistatusid'] = oistatusid
             else:
                 foirequest[section] = request_json[section]
