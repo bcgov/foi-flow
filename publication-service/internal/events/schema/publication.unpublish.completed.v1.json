@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foi.example/events/publication.unpublish.completed/v1.json",
+  "title": "publication.unpublish.completed payload v1",
+  "type": "object",
+  "required": ["tenant_id", "publication_id", "request_event_id", "status", "public_repository_bucket", "public_repository_prefix", "objects_deleted", "sitemap_index_key", "sitemap_result"],
+  "properties": {
+    "tenant_id": { "type": "string", "minLength": 1 },
+    "publication_id": { "type": "string", "minLength": 1 },
+    "request_event_id": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "minLength": 1 },
+    "public_repository_bucket": { "type": "string", "minLength": 1 },
+    "public_repository_prefix": { "type": "string", "minLength": 1 },
+    "objects_deleted": { "type": "integer", "minimum": 0 },
+    "sitemap_index_key": { "type": "string" },
+    "sitemap_page_key": { "type": "string" },
+    "sitemap_result": { "type": "string", "minLength": 1 },
+    "kind": { "type": "string", "enum": ["openinfo", "proactivedisclosure"] },
+    "foiministryrequest_id": { "type": "integer" },
+    "foirequest_id": { "type": "integer" }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,37 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight
+    ports:
+      - "5540:5540"
+    depends_on:
+      - redis
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: foi
+      POSTGRES_PASSWORD: foi
+      POSTGRES_DB: foi
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foi -d foi"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+
+  seaweedfs:
+    image: chrislusf/seaweedfs:3.72
+    command: server -s3 -s3.config=/etc/seaweedfs/s3.json -dir=/data
+    ports:
+      - "9333:9333"
+      - "8888:8888"
+      - "8333:8333"
+      - "8080:8080"
+    volumes:
+      - ./dev/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
