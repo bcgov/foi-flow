@@ -1,0 +1,14 @@
+.git
+.gitignore
+.github
+.claude
+.codex
+docs
+README.md
+Dockerfile
+.dockerignore
+*.md
+bin
+dist
+tmp
+coverage.out
