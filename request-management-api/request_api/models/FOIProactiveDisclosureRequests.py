@@ -1,7 +1,7 @@
 from flask.app import Flask
 from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
 from .db import  db, ma
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.orm import relationship, backref, aliased
 from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc
 from sqlalchemy.sql.sqltypes import String
@@ -252,6 +252,99 @@ class FOIProactiveDisclosureRequests(db.Model):
             db.session.rollback()
             logging.error(f"Error updating Proactive Disclosure publication status: {exception}")
             return DefaultMethodResult(False, str(exception), proactivedisclosureid)
+        finally:
+            db.session.close()
+
+    @classmethod
+    def getpdrecordsforprepublishing(cls, now=None):
+        try:
+            publication_cutoff = ((now or datetime2.now()) + timedelta(days=1)).strftime('%Y-%m-%d')
+            sql = """
+                SELECT
+                    pd.proactivedisclosureid,
+                    mr.foiministryrequestid,
+                    r.foirequestid,
+                    mr.axisrequestid,
+                    mr.description,
+                    to_char(pd.publicationdate, 'YYYY-MM-DD') AS published_date,
+                    pa.name as contributor,
+                    ac.name as applicant_type,
+                    COALESCE((fee.feedata->>'amountpaid')::Numeric, 0) as fees,
+                    LOWER(pa.bcgovcode) AS bcgovcode,
+                    COALESCE(pd.sitemap_pages, '') as sitemap_pages,
+                    'publish' as type,
+                    COALESCE(pdc.name, '') as proactivedisclosurecategory,
+                    COALESCE(pd.reportperiod, '') as reportperiod,
+                    COALESCE(
+                        json_agg(
+                            json_build_object(
+                                'additionalfileid', oifiles.additionalfileid,
+                                'filename', oifiles.filename,
+                                's3uripath', oifiles.s3uripath,
+                                'isactive', oifiles.isactive
+                            )
+                        ) FILTER (WHERE oifiles.additionalfileid IS NOT NULL), '[]'::json
+                    ) AS additionalfiles
+                FROM public."FOIMinistryRequests" mr
+                INNER JOIN public."FOIRequests" r
+                    ON mr.foirequest_id = r.foirequestid AND mr.foirequestversion_id = r.version
+                INNER JOIN public."ProgramAreas" pa
+                    ON mr.programareaid = pa.programareaid
+                INNER JOIN public."ApplicantCategories" ac
+                    ON r.applicantcategoryid = ac.applicantcategoryid
+                LEFT JOIN (
+                    SELECT ministryrequestid, MAX(version) as max_version
+                    FROM public."FOIRequestCFRFees"
+                    GROUP BY ministryrequestid
+                ) latest_payment
+                    ON mr.foiministryrequestid = latest_payment.ministryrequestid
+                LEFT JOIN public."FOIRequestCFRFees" fee
+                    ON mr.foiministryrequestid = fee.ministryrequestid
+                    AND latest_payment.max_version = fee.version
+                    AND mr.version = fee.ministryrequestversion
+                INNER JOIN public."FOIProactiveDisclosureRequests" pd
+                    ON mr.foiministryrequestid = pd.foiministryrequest_id AND pd.isactive = TRUE
+                LEFT JOIN public."ProactiveDisclosureCategories" pdc
+                    ON pd.proactivedisclosurecategoryid = pdc.proactivedisclosurecategoryid
+                INNER JOIN public."OpenInformationStatuses" oistatus
+                    ON mr.oistatus_id = oistatus.oistatusid
+                INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype
+                    ON pd.oipublicationstatus_id = oirequesttype.oipublicationstatusid
+                LEFT JOIN public."FOIOpenInfoAdditionalFiles" oifiles
+                    ON mr.foiministryrequestid = oifiles.ministryrequestid
+                WHERE oistatus.name IN (:ready_status, :published_status)
+                  AND oirequesttype.name = :publication_status
+                  AND pd.publicationdate < :publication_cutoff
+                  AND pd.processingstatus IS NULL
+                  AND mr.isactive = TRUE
+                GROUP BY
+                    pd.proactivedisclosureid,
+                    mr.foiministryrequestid,
+                    r.foirequestid,
+                    mr.axisrequestid,
+                    mr.description,
+                    pd.publicationdate,
+                    pa.name,
+                    ac.name,
+                    COALESCE((fee.feedata->>'amountpaid')::Numeric, 0),
+                    pa.bcgovcode,
+                    pd.sitemap_pages,
+                    pdc.name,
+                    pd.reportperiod;
+            """
+            result = db.session.execute(
+                text(sql),
+                {
+                    'ready_status': 'Ready to Publish',
+                    'published_status': 'Published',
+                    'publication_status': 'Publish',
+                    'publication_cutoff': publication_cutoff,
+                },
+            )
+            return [dict(row) for row in result]
+        except Exception as exception:
+            logging.error(f"Error fetching Proactive Disclosure pre-publishing records: {exception}")
+            return []
         finally:
             db.session.close()
                 
