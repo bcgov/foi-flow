@@ -61,7 +61,6 @@ class requestservicecreate:
         result = FOIRequest.saverequest(openfoirequest)
         ##Auto Link requests for multiple ministries
         if result.success == True:
-            print("Inside auto linking!")
             self.__linkministries(openfoirequest.ministryRequests, userid)
         return result
         
