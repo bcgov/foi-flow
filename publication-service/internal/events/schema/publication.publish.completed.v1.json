@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foi.example/events/publication.publish.completed/v1.json",
+  "title": "publication.publish.completed payload v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["tenant_id", "request_event_id", "correlation_id"],
+  "properties": {
+    "tenant_id": {"type": "string", "format": "uuid"},
+    "request_event_id": {"type": "string", "format": "uuid"},
+    "correlation_id": {"type": "string"},
+    "publication_id": {"type": "string"},
+    "public_url": {"type": "string", "format": "uri"},
+    "html_key": {"type": "string"},
+    "sitemap_index_key": {"type": "string"},
+    "sitemap_page_key": {"type": "string"},
+    "sitemap_page_url": {"type": "string", "format": "uri"},
+    "sitemap_result": {"type": "string"},
+    "sitemap_index_updated": {"type": "boolean"},
+    "kind": {"type": "string", "enum": ["openinfo", "proactivedisclosure"]},
+    "foiministryrequest_id": {"type": "integer"},
+    "foirequest_id": {"type": "integer"}
+  }
+}
