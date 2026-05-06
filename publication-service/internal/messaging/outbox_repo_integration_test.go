@@ -154,3 +154,41 @@ func TestOutboxRepo_ClaimBatch_NoDuplicates(t *testing.T) {
 		t.Fatalf("batch2 len = %d, want 2", len(batch2))
 	}
 }
+
+func TestOutboxRepo_BumpAttempts_ResetsClaim(t *testing.T) {
+	repo := setupOutbox(t)
+	ctx := context.Background()
+
+	err := repo.Insert(ctx, OutboxRow{
+		EventID:   "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d99",
+		EventType: "test.event",
+		TenantID:  "a7d9b2f1-4c3e-4e8b-9a21-1c2e8f7b9d10",
+		Envelope:  json.RawMessage(`{}`),
+		Kind:      pub.KindOpenInfo,
+	})
+	if err != nil {
+		t.Fatalf("Insert: %v", err)
+	}
+
+	claimed, err := repo.ClaimBatch(ctx, 10)
+	if err != nil {
+		t.Fatalf("ClaimBatch: %v", err)
+	}
+	if len(claimed) != 1 {
+		t.Fatalf("len(claimed) = %d", len(claimed))
+	}
+
+	// Bump (simulates publish failure) — should reset claimed_at.
+	if err := repo.BumpAttempts(ctx, claimed[0].ID); err != nil {
+		t.Fatalf("BumpAttempts: %v", err)
+	}
+
+	// Row should be immediately re-claimable.
+	again, err := repo.ClaimBatch(ctx, 10)
+	if err != nil {
+		t.Fatalf("ClaimBatch after bump: %v", err)
+	}
+	if len(again) != 1 {
+		t.Fatalf("expected 1 re-claimable row, got %d", len(again))
+	}
+}
