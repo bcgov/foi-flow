@@ -144,6 +144,8 @@ class ProactiveDisclosurePublishRequestedMapper:
                 return ""
 
     def _generate_pd_year(self, report_period_arr):
+        if len(report_period_arr) == 1:
+            return report_period_arr[0]
         if report_period_arr[0] == "Quarter":
             quarter = report_period_arr[1]
             try:
@@ -158,6 +160,8 @@ class ProactiveDisclosurePublishRequestedMapper:
             return report_period_arr[1]
 
     def _generate_pd_month(self, report_period_arr):
+        if len(report_period_arr) == 1:
+            return ""
         if report_period_arr[0] == "Quarter":
             quarter = report_period_arr[0]
             match quarter:
