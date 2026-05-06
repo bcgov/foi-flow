@@ -158,14 +158,14 @@ func TestConsumerAdapter_FOIIDsInCompletionPayload(t *testing.T) {
 		result: shared.Result{TenantID: "tenant-1", PublicationID: "EDU-2024-12345"},
 	})
 	payload, _ := json.Marshal(map[string]any{
-		"tenant_id":              "tenant-1",
-		"publication_id":         "EDU-2024-12345",
-		"public_url":             "https://example/public/EDU-2024-12345.html",
-		"public_repository":      map[string]string{"bucket": "public-bucket", "prefix": "openinfo/EDU-2024-12345"},
-		"last_modified":          "2026-04-27",
-		"kind":                   "openinfo",
-		"foiministryrequest_id":  22318,
-		"foirequest_id":          22319,
+		"tenant_id":             "tenant-1",
+		"publication_id":        "EDU-2024-12345",
+		"public_url":            "https://example/public/EDU-2024-12345.html",
+		"public_repository":     map[string]string{"bucket": "public-bucket", "prefix": "openinfo/EDU-2024-12345"},
+		"last_modified":         "2026-04-27",
+		"kind":                  "openinfo",
+		"foiministryrequest_id": 22318,
+		"foirequest_id":         22319,
 	})
 	env := &events.Envelope{
 		EventID:       "event-1",

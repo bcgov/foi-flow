@@ -13,20 +13,20 @@ import (
 
 func TestRunEventFlow_FailsWithoutPostgresReachable(t *testing.T) {
 	cfg := &config.Config{
-		PostgresURL:                   "postgres://u:p@localhost:15432/db?sslmode=disable&connect_timeout=1",
-		RedisAddr:                     "localhost:16379",
-		RedisStreamPublishRequested:   "publication.publish.requested",
-		RedisStreamPublishCompleted:   "publication.publish.completed",
-		RedisPublishConsumerGroup:     "publication-publish",
-		RedisPublishConsumerName:      "test",
-		SourceAllowlist:               []string{"openinfo.enqueue.service"},
-		HandlerTimeout:                0,
-		SchedulerInterval:             time.Second,
-		OutboxInterval:                time.Second,
-		RetryMaxAttempts:              5,
-		PoisonRepeatThreshold:         3,
-		StuckTimeout:                  0,
-		StreamMaxLen:                  1000,
+		PostgresURL:                 "postgres://u:p@localhost:15432/db?sslmode=disable&connect_timeout=1",
+		RedisAddr:                   "localhost:16379",
+		RedisStreamPublishRequested: "publication.publish.requested",
+		RedisStreamPublishCompleted: "publication.publish.completed",
+		RedisPublishConsumerGroup:   "publication-publish",
+		RedisPublishConsumerName:    "test",
+		SourceAllowlist:             []string{"openinfo.enqueue.service"},
+		HandlerTimeout:              0,
+		SchedulerInterval:           time.Second,
+		OutboxInterval:              time.Second,
+		RetryMaxAttempts:            5,
+		PoisonRepeatThreshold:       3,
+		StuckTimeout:                0,
+		StreamMaxLen:                1000,
 	}
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	ctx, cancel := context.WithCancel(context.Background())

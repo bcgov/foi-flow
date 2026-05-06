@@ -108,8 +108,8 @@ func Load() (*Config, error) {
 		ServiceName: envOr("SERVICE_NAME", defaultServiceName),
 		Environment: envOr("ENVIRONMENT", defaultEnvironment),
 
-		RedisAddr:     getEnvDefault("REDIS_ADDR", "localhost:6379"),
-		RedisPassword: os.Getenv("REDIS_PASSWORD"),
+		RedisAddr:       getEnvDefault("REDIS_ADDR", "localhost:6379"),
+		RedisPassword:   os.Getenv("REDIS_PASSWORD"),
 		SourceAllowlist: splitAndTrim(getEnvDefault("SOURCE_ALLOWLIST", "openinfo.enqueue.service")),
 	}
 
