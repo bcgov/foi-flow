@@ -125,25 +125,27 @@ class ProactiveDisclosurePublishRequestedMapper:
     def _generate_pd_description(self, pd_category, ministry, report_period):
         match pd_category:
             case "Direct Award Contracts":
-                return f"This document is a summary of directly-awarded contracts for the ${ministry} for the time period of ${report_period}."
+                return f"This document is a summary of directly-awarded contracts for the {ministry} for the time period of {report_period}."
             case "Calendars":
-                return f"This document represents the calendars for the ${ministry}, for the time period of ${report_period}."
+                return f"This document represents the calendars for the {ministry}, for the time period of {report_period}."
             case "Contracts over $10,000":
-                return f"This document is a summary of contracts with values over $10,000 CAD for the ${ministry} for the time period of ${report_period}."
+                return f"This document is a summary of contracts with values over $10,000 CAD for the {ministry} for the time period of {report_period}."
             case "Minister Quarterly Travel Expenses":
-                return f"This document represents the Travel Expense report for the Minister of ${ministry} for the time period of ${report_period}."
+                return f"This document represents the Travel Expense report for the Minister of {ministry} for the time period of {report_period}."
             case "Estimates":
                 return f"Estimates notes prepared for the Minister."
             case "Transition Binders":
-                return f"Transition Binder for ${ministry}, prepared for the incoming Minister."
+                return f"Transition Binder for {ministry}, prepared for the incoming Minister."
             case "Briefing Notes":
-                return f"This document is a summary of Briefing Notes for the ${ministry} for the time period of ${report_period}."
+                return f"This document is a summary of Briefing Notes for the {ministry} for the time period of {report_period}."
             case "DM Travel Expenses":
-                return f"This document represents the Travel Expense report for the Deputy Minister ${ministry} for the time period of ${report_period}."
+                return f"This document represents the Travel Expense report for the Deputy Minister {ministry} for the time period of {report_period}."
             case _:
                 return ""
 
     def _generate_pd_year(self, report_period_arr):
+        if len(report_period_arr) == 1:
+            return report_period_arr[0]
         if report_period_arr[0] == "Quarter":
             quarter = report_period_arr[1]
             try:
@@ -158,6 +160,8 @@ class ProactiveDisclosurePublishRequestedMapper:
             return report_period_arr[1]
 
     def _generate_pd_month(self, report_period_arr):
+        if len(report_period_arr) == 1:
+            return ""
         if report_period_arr[0] == "Quarter":
             quarter = report_period_arr[0]
             match quarter:
