@@ -44,17 +44,17 @@ func buildTemplateVars(d *Domain, res pub.CopyResult, publicURL string, now time
 	}
 
 	metaTags := []htmlindex.MetaTag{
-		{Name: "dc.title", Content: dcTitle},
+		{Name: "dc.title", Content: d.Title},
 		{Name: "dc.description", Content: d.Description},
-		{Name: "high_level_subject", Content: subject},
-		{Name: "dc.subject", Content: subject},
+		{Name: "high_level_subject", Content: d.High_level_subject},
+		{Name: "dc.subject", Content: d.Subject},
 		{Name: "dc.published_date", Content: d.PublishedDate},
 		{Name: "timestamp", Content: fmt.Sprintf("%d", now.Unix())},
 		{Name: "dc.contributor", Content: d.Contributor},
 		{Name: "recorduid", Content: d.RequestID},
 		{Name: "recordurl", Content: htmlURL},
-		{Name: "month", Content: now.Format("01")},
-		{Name: "year", Content: now.Format("2006")},
+		{Name: "month", Content: d.Month,
+		{Name: "year", Content: d.Year},
 		{Name: "letter", Content: strings.Join(letterNames, ",")},
 		{Name: "letter_file_sizes", Content: strings.Join(letterSizes, ",")},
 		{Name: "notes", Content: ""},
