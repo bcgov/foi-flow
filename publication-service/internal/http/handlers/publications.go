@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"io"
@@ -13,6 +14,9 @@ import (
 )
 
 const maxPublicationsBodyBytes = 1 << 20
+
+// utf8BOM is the byte-order mark sometimes prepended by Windows tools.
+var utf8BOM = []byte{0xEF, 0xBB, 0xBF}
 
 type PublicationsOrchestrator interface {
 	Publish(context.Context, []byte) (publishnow.Response, error)
@@ -36,15 +40,16 @@ func Publications(orchestrator PublicationsOrchestrator) http.Handler {
 				slog.String("event_type", "publications.bad_request"),
 				slog.Any("error", err),
 			)
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			http.Error(w, "request body could not be read: "+err.Error(), http.StatusBadRequest)
 			return
 		}
+		body = bytes.TrimPrefix(body, utf8BOM)
 		if !json.Valid(body) {
 			log.WarnContext(r.Context(), "publish request body is not valid JSON",
 				slog.String("event_type", "publications.bad_request"),
 				slog.String("body", string(body)),
 			)
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			http.Error(w, "request body is not valid JSON", http.StatusBadRequest)
 			return
 		}
 
@@ -92,15 +97,16 @@ func PublicationsUnpublish(orchestrator PublicationsUnpublishOrchestrator) http.
 				slog.String("event_type", "publications.bad_request"),
 				slog.Any("error", err),
 			)
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			http.Error(w, "request body could not be read: "+err.Error(), http.StatusBadRequest)
 			return
 		}
+		body = bytes.TrimPrefix(body, utf8BOM)
 		if !json.Valid(body) {
 			log.WarnContext(r.Context(), "unpublish request body is not valid JSON",
 				slog.String("event_type", "publications.bad_request"),
 				slog.String("body", string(body)),
 			)
-			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+			http.Error(w, "request body is not valid JSON", http.StatusBadRequest)
 			return
 		}
 
