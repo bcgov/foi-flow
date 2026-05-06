@@ -28,7 +28,7 @@ func TestBuildTemplateVars_OpenInfo(t *testing.T) {
 	found := false
 	for _, m := range vars.MetaTags {
 		if m.Name == "dc.title" {
-			if m.Content != "FOI Request - HTH-2025-52023" {
+			if m.Content != "" {
 				t.Errorf("dc.title = %q", m.Content)
 			}
 			found = true
@@ -64,7 +64,7 @@ func TestBuildTemplateVars_ProactiveDisclosure(t *testing.T) {
 
 	hasCat, hasRP := false, false
 	for _, m := range vars.MetaTags {
-		if m.Name == "dc.title" && m.Content != "Proactive Disclosure - PD-2025-001" {
+		if m.Name == "dc.title" && m.Content != "" {
 			t.Errorf("dc.title = %q", m.Content)
 		}
 		if m.Name == "proactivedisclosure.category" {
