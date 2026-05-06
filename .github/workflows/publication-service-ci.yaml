@@ -30,7 +30,7 @@ jobs:
 
   # Build the Publication Service Image, Tag with Pull Request number
       - name: Build Publication Service Image
-        working-directory: ./request-management-api
+        working-directory: ./publication-service
         run: |
           docker build -t ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/publication-service:${{github.event.pull_request.number}} -f Dockerfile .
 
