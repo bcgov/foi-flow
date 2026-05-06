@@ -158,7 +158,7 @@ func TestEndToEnd_PublishedRequestProducesCompleted(t *testing.T) {
 		t.Fatalf("s3 client: %v", err)
 	}
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
-	svc := pubpub.NewService(s3Client, s3Client, "", logger)
+	svc := pubpub.NewService(s3Client, s3Client, "", logger, pubpub.WithFileCopier(s3Client))
 	sitemapWriter := sitemapping.NewWriter(s3Client, sitemapping.NewRequestRepo(pool), map[pub.Kind]sitemapping.Target{
 		pub.KindOpenInfoSitemap: {
 			Bucket:          "published",

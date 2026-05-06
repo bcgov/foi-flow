@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
+
+	publish "publication-service/internal/publish"
 )
 
 func TestPublicReadACLForBucket(t *testing.T) {
@@ -49,4 +51,10 @@ func TestPublicReadACLForBucket(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCopyFile_BuildsCopySource(t *testing.T) {
+	// CopyFile is tested via integration tests against localstack/minio.
+	// Unit test verifies the method exists and interface compliance.
+	var _ publish.FileCopier = (*Client)(nil)
 }

@@ -2,6 +2,7 @@ package publish
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log/slog"
 	"strings"
@@ -80,5 +81,81 @@ func TestService_Handle_CopierError(t *testing.T) {
 	_, err := svc.Handle(context.Background(), d)
 	if err == nil {
 		t.Fatal("expected error")
+	}
+}
+
+type fakeFileCopier struct {
+	copies []fileCopyCall
+	err    error
+}
+
+type fileCopyCall struct {
+	srcBucket, srcKey, dstBucket, dstKey string
+}
+
+func (f *fakeFileCopier) CopyFile(_ context.Context, srcBucket, srcKey, dstBucket, dstKey string) (int64, error) {
+	f.copies = append(f.copies, fileCopyCall{srcBucket, srcKey, dstBucket, dstKey})
+	return 2048, f.err
+}
+
+func TestService_Handle_CopiesAdditionalFiles(t *testing.T) {
+	copier := &fakeCopier{result: pub.CopyResult{
+		ObjectsCopied: 1, BytesCopied: 100,
+		Objects: []pub.CopiedObject{{Key: "doc.pdf", Size: 100}},
+	}}
+	uploader := &fakeUploader{}
+	fileCopier := &fakeFileCopier{}
+	svc := NewService(copier, uploader, "https://public.example", discardLogger(), WithFileCopier(fileCopier))
+
+	d := &Domain{
+		Kind:        pub.KindOpenInfo,
+		RequestID:   "HTH-001",
+		Source:      pub.S3Location{Bucket: "raw", Prefix: "in/"},
+		Destination: pub.S3Location{Bucket: "pub", Prefix: "out/"},
+		AdditionalFiles: []AdditionalFile{
+			{ID: 67, Filename: "extra.pdf", S3URI: "https://store.example/src-bucket/path/to/extra.pdf"},
+		},
+	}
+	result, err := svc.Handle(context.Background(), d)
+	if err != nil {
+		t.Fatalf("Handle: %v", err)
+	}
+	if len(fileCopier.copies) != 1 {
+		t.Fatalf("expected 1 file copy, got %d", len(fileCopier.copies))
+	}
+	cp := fileCopier.copies[0]
+	if cp.srcBucket != "src-bucket" {
+		t.Errorf("srcBucket = %q", cp.srcBucket)
+	}
+	if cp.srcKey != "path/to/extra.pdf" {
+		t.Errorf("srcKey = %q", cp.srcKey)
+	}
+	if cp.dstBucket != "pub" {
+		t.Errorf("dstBucket = %q", cp.dstBucket)
+	}
+	if cp.dstKey != "out/extra.pdf" {
+		t.Errorf("dstKey = %q", cp.dstKey)
+	}
+	_ = result
+}
+
+func TestService_Handle_AdditionalFileError_FailsPublish(t *testing.T) {
+	copier := &fakeCopier{result: pub.CopyResult{ObjectsCopied: 1, BytesCopied: 100,
+		Objects: []pub.CopiedObject{{Key: "doc.pdf", Size: 100}}}}
+	fileCopier := &fakeFileCopier{err: fmt.Errorf("not found")}
+	svc := NewService(copier, &fakeUploader{}, "https://x", discardLogger(), WithFileCopier(fileCopier))
+
+	d := &Domain{
+		Kind:        pub.KindOpenInfo,
+		RequestID:   "HTH-001",
+		Source:      pub.S3Location{Bucket: "raw", Prefix: "in/"},
+		Destination: pub.S3Location{Bucket: "pub", Prefix: "out/"},
+		AdditionalFiles: []AdditionalFile{
+			{ID: 67, Filename: "fail.pdf", S3URI: "https://store.example/bucket/key.pdf"},
+		},
+	}
+	_, err := svc.Handle(context.Background(), d)
+	if err == nil {
+		t.Fatal("expected error when additional file copy fails")
 	}
 }
