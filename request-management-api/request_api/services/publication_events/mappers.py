@@ -54,14 +54,13 @@ class OpenInfoPublishRequestedMapper:
 
     def map(self, row):
         axis_request_id = row.get("axisrequestid")
-        fees = int(row.get("fees") or 0)
         return OpenInfoPublishRequestedPayload(
             tenant_id=self.path_resolver.resolve_tenant_id(row),
             axis_request_id=axis_request_id,
             description=row.get("description"),
             published_date=row.get("published_date"),
             contributor=row.get("contributor"),
-            fees=f"${fees / 100:.2f}",
+            fees=int(row.get("fees") or 0),
             applicant_type=row.get("applicant_type"),
             source=self.path_resolver.build_source(row),
             destination=self.path_resolver.build_destination(row),
@@ -106,7 +105,6 @@ class ProactiveDisclosurePublishRequestedMapper:
             description=self._generate_pd_description(category, ministry, report_period),
             published_date=row.get("published_date"),
             contributor=ministry,
-            fees="",
             applicant_type="",
             report_period=report_period,
             foiministryrequest_id=row.get("foiministryrequestid"),
