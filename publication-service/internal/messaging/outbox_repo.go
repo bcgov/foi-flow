@@ -74,14 +74,15 @@ RETURNING id, event_id, event_type, tenant_id, envelope, attempts, kind`
 
 // MarkPublished sets published_at and increments attempts.
 func (r *OutboxRepo) MarkPublished(ctx context.Context, id int64, now time.Time) error {
-	const q = `UPDATE event_outbox SET published_at=$2, attempts=attempts+1 WHERE id=$1`
+	const q = `UPDATE event_outbox SET published_at=$2, attempts=attempts+1, claimed_at=NULL WHERE id=$1`
 	_, err := r.pool.Exec(ctx, q, id, now)
 	return err
 }
 
-// BumpAttempts records a failed publish without marking the row published.
+// BumpAttempts records a failed publish and resets claimed_at so the row
+// is immediately eligible for the next ClaimBatch cycle.
 func (r *OutboxRepo) BumpAttempts(ctx context.Context, id int64) error {
-	const q = `UPDATE event_outbox SET attempts=attempts+1 WHERE id=$1`
+	const q = `UPDATE event_outbox SET attempts=attempts+1, claimed_at=NULL WHERE id=$1`
 	_, err := r.pool.Exec(ctx, q, id)
 	return err
 }
