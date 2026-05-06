@@ -32,10 +32,18 @@ func Publications(orchestrator PublicationsOrchestrator) http.Handler {
 
 		body, err := io.ReadAll(http.MaxBytesReader(w, r.Body, maxPublicationsBodyBytes))
 		if err != nil {
+			log.WarnContext(r.Context(), "publish request body read failed",
+				slog.String("event_type", "publications.bad_request"),
+				slog.Any("error", err),
+			)
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 		if !json.Valid(body) {
+			log.WarnContext(r.Context(), "publish request body is not valid JSON",
+				slog.String("event_type", "publications.bad_request"),
+				slog.String("body", string(body)),
+			)
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
@@ -43,6 +51,11 @@ func Publications(orchestrator PublicationsOrchestrator) http.Handler {
 		resp, err := orchestrator.Publish(r.Context(), body)
 		if err != nil {
 			if publishnow.IsClientError(err) {
+				log.WarnContext(r.Context(), "publish request client error",
+					slog.String("event_type", "publications.bad_request"),
+					slog.String("body", string(body)),
+					slog.Any("error", err),
+				)
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
@@ -75,10 +88,18 @@ func PublicationsUnpublish(orchestrator PublicationsUnpublishOrchestrator) http.
 
 		body, err := io.ReadAll(http.MaxBytesReader(w, r.Body, maxPublicationsBodyBytes))
 		if err != nil {
+			log.WarnContext(r.Context(), "unpublish request body read failed",
+				slog.String("event_type", "publications.bad_request"),
+				slog.Any("error", err),
+			)
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
 		if !json.Valid(body) {
+			log.WarnContext(r.Context(), "unpublish request body is not valid JSON",
+				slog.String("event_type", "publications.bad_request"),
+				slog.String("body", string(body)),
+			)
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		}
@@ -86,6 +107,11 @@ func PublicationsUnpublish(orchestrator PublicationsUnpublishOrchestrator) http.
 		resp, err := orchestrator.Unpublish(r.Context(), body)
 		if err != nil {
 			if unpublishnow.IsClientError(err) {
+				log.WarnContext(r.Context(), "unpublish request client error",
+					slog.String("event_type", "publications.bad_request"),
+					slog.String("body", string(body)),
+					slog.Any("error", err),
+				)
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
