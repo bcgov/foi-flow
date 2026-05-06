@@ -77,34 +77,19 @@ class PublishNowRestService:
     def _publish_and_update(self, publication_type, row, payload, update_status):
         try:
             logging.info(
-                "Publication REST request started publication_type=%s foiministryrequestid=%s axisrequestid=%s",
+                "Publication REST request payload publication_type=%s payload=%s",
                 publication_type,
-                row.get("foiministryrequestid"),
-                row.get("axisrequestid"),
+                payload,
             )
             response = self.publication_client.publish(publication_type, payload)
             logging.info(
-                "Publication REST response received publication_type=%s foiministryrequestid=%s axisrequestid=%s status=%s publication_id=%s sitemap_page_key=%s",
+                "Publication REST response publication_type=%s response=%s",
                 publication_type,
-                row.get("foiministryrequestid"),
-                row.get("axisrequestid"),
-                response.get("status"),
-                response.get("publication_id"),
-                response.get("sitemap_page_key"),
+                response,
             )
             self._validate_completed(response)
             sitemap_page = self._sitemap_page_name(response)
             update_result = update_status(sitemap_page)
-            logging.info(
-                "Publication REST database update completed publication_type=%s foiministryrequestid=%s axisrequestid=%s success=%s message=%s identifier=%s sitemap_page=%s",
-                publication_type,
-                row.get("foiministryrequestid"),
-                row.get("axisrequestid"),
-                update_result.success,
-                update_result.message,
-                update_result.identifier,
-                sitemap_page,
-            )
             if not update_result.success:
                 return update_result
             return DefaultMethodResult(
@@ -129,12 +114,6 @@ class PublishNowRestService:
             return DefaultMethodResult(True, "No data found to publish for this request")
 
         row = rows[0]
-        logging.info(
-            "OpenInfo publish-now source row found foiministryrequestid=%s openinfoid=%s axisrequestid=%s",
-            foiministryrequestid,
-            row.get("openinfoid"),
-            row.get("axisrequestid"),
-        )
         payload = self.openinfo_mapper.map(row).to_dict()
         return self._publish_and_update(
             "openinfo",
@@ -152,12 +131,6 @@ class PublishNowRestService:
             logging.info("PD publish-now found no publishable row foiministryrequestid=%s", foiministryrequestid)
             return DefaultMethodResult(True, "No data found to publish for this request")
 
-        logging.info(
-            "PD publish-now source row found foiministryrequestid=%s proactivedisclosureid=%s axisrequestid=%s",
-            foiministryrequestid,
-            row.get("proactivedisclosureid"),
-            row.get("axisrequestid"),
-        )
         payload = self._rest_payload(self.proactive_disclosure_mapper.map(row).to_dict())
         return self._publish_and_update(
             "proactivedisclosure",
