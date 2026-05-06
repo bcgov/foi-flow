@@ -67,4 +67,7 @@ func TestSitemapRequestInvalidPublishedDate(t *testing.T) {
 	if err == nil {
 		t.Fatal("SitemapRequest returned nil error for invalid date")
 	}
+	if _, ok := err.(*pub.PermanentError); !ok {
+		t.Fatalf("expected *PermanentError, got %T", err)
+	}
 }
