@@ -36,7 +36,7 @@ func buildTemplateVars(d *Domain, res pub.CopyResult, publicURL string, now time
 	allLinks := letterLinks
 	allLinks = append(allLinks, otherLinks...)
 
-	titlePrefix, subject := kindLabels(d.Kind)
+	titlePrefix, _ := kindLabels(d.Kind)
 
 	dcTitle := d.Title
 	if dcTitle == "" {
@@ -46,14 +46,14 @@ func buildTemplateVars(d *Domain, res pub.CopyResult, publicURL string, now time
 	metaTags := []htmlindex.MetaTag{
 		{Name: "dc.title", Content: d.Title},
 		{Name: "dc.description", Content: d.Description},
-		{Name: "high_level_subject", Content: d.High_level_subject},
+		{Name: "high_level_subject", Content: d.HighLevelSubject},
 		{Name: "dc.subject", Content: d.Subject},
 		{Name: "dc.published_date", Content: d.PublishedDate},
 		{Name: "timestamp", Content: fmt.Sprintf("%d", now.Unix())},
 		{Name: "dc.contributor", Content: d.Contributor},
 		{Name: "recorduid", Content: d.RequestID},
 		{Name: "recordurl", Content: htmlURL},
-		{Name: "month", Content: d.Month,
+		{Name: "month", Content: d.Month},
 		{Name: "year", Content: d.Year},
 		{Name: "letter", Content: strings.Join(letterNames, ",")},
 		{Name: "letter_file_sizes", Content: strings.Join(letterSizes, ",")},

@@ -36,8 +36,12 @@ type Domain struct {
 	Description   string
 	PublishedDate string
 	Contributor   string
-	Fees          *int
-	ApplicantType string
+	Fees             *int
+	ApplicantType    string
+	HighLevelSubject string
+	Subject          string
+	Month            string
+	Year             string
 
 	// Title is the caller-supplied dc.title value.
 	// When empty the template falls back to "<kind> - <RequestID>".
@@ -64,6 +68,10 @@ type requestedPayloadV1 struct {
 	Contributor          string          `json:"contributor"`
 	Fees                 *int            `json:"fees"`
 	ApplicantType        json.RawMessage `json:"applicant_type"`
+	HighLevelSubject     string          `json:"high_level_subject"`
+	Subject              string          `json:"subject"`
+	Month                string          `json:"month"`
+	Year                 string          `json:"year"`
 	Title                string          `json:"title"`
 	Category             string          `json:"proactivedisclosure_category"`
 	ReportPeriod         string          `json:"report_period"`
@@ -141,6 +149,10 @@ func Normalize(env *events.Envelope) (*Domain, error) {
 		Contributor:          p.Contributor,
 		Fees:                 p.Fees,
 		ApplicantType:        applicantType,
+		HighLevelSubject:     p.HighLevelSubject,
+		Subject:              p.Subject,
+		Month:                p.Month,
+		Year:                 p.Year,
 		Title:                p.Title,
 		Category:             p.Category,
 		ReportPeriod:         p.ReportPeriod,
