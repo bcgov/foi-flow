@@ -2,9 +2,10 @@
 name: Publication Service - Continuous Integration
 
 on:
+  workflow_dispatch: 
   pull_request:
     types: [opened, synchronize, ready_for_review] # Triggered by opened or changed pull requests.
-    branches: [main]
+    branches: [dev]
     paths:
       - 'publication-service/**' # Triggers on changes to files in the express-api/ directory.
 
