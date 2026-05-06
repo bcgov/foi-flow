@@ -2,6 +2,7 @@
 
 import os
 import uuid
+from datetime import datetime
 
 from request_api.services.publication_events.payloads import (
     AdditionalFilePayload,
@@ -52,9 +53,10 @@ class OpenInfoPublishRequestedMapper:
         self.path_resolver = path_resolver or PublicationPathResolver()
 
     def map(self, row):
+        axis_request_id = row.get("axisrequestid")
         return OpenInfoPublishRequestedPayload(
             tenant_id=self.path_resolver.resolve_tenant_id(row),
-            axis_request_id=row.get("axisrequestid"),
+            axis_request_id=axis_request_id,
             description=row.get("description"),
             published_date=row.get("published_date"),
             contributor=row.get("contributor"),
@@ -62,6 +64,11 @@ class OpenInfoPublishRequestedMapper:
             applicant_type=row.get("applicant_type"),
             source=self.path_resolver.build_source(row),
             destination=self.path_resolver.build_destination(row),
+            title="FOI Request" + " - " + axis_request_id,
+            subject="FOI Request",
+            high_level_subject="FOI Request",
+            month=datetime.now().strftime("%m"),
+            year=datetime.now().strftime("%Y"),
         )
 
     @staticmethod
@@ -89,16 +96,17 @@ class ProactiveDisclosurePublishRequestedMapper:
         ]
 
     def map(self, row):
+        category = row.get("proactivedisclosurecategory")
+        ministry = row.get("contributor")
+        report_period = row.get("reportperiod")
         return ProactiveDisclosurePublishRequestedPayload(
             tenant_id=self.path_resolver.resolve_tenant_id(row),
             axis_request_id=row.get("axisrequestid"),
-            description=row.get("description"),
+            description=self._generate_pd_description(category, ministry, report_period),
             published_date=row.get("published_date"),
-            contributor=row.get("contributor"),
-            fees=int(row.get("fees") or 0),
-            applicant_type=row.get("applicant_type"),
-            proactivedisclosure_category=row.get("proactivedisclosurecategory"),
-            report_period=row.get("reportperiod"),
+            contributor=ministry,
+            applicant_type="",
+            report_period=report_period,
             foiministryrequest_id=row.get("foiministryrequestid"),
             foirequest_id=row.get("foirequestid"),
             sitemap_pages=row.get("sitemap_pages"),
@@ -106,7 +114,63 @@ class ProactiveDisclosurePublishRequestedMapper:
             openinfo_id=row.get("openinfoid"),
             source=self.path_resolver.build_source(row),
             destination=self.path_resolver.build_destination(row),
+            title=ministry + " - " + category + " - " + report_period,
+            high_level_subject=category,
+            month=self._generate_pd_month(report_period.split()),
+            year=self._generate_pd_year(report_period.split()),
+            subject="Proactive Disclosure",
+            proactivedisclosure_category=category
         )
+    
+    def _generate_pd_description(self, pd_category, ministry, report_period):
+        match pd_category:
+            case "Direct Award Contracts":
+                return f"This document is a summary of directly-awarded contracts for the ${ministry} for the time period of ${report_period}."
+            case "Calendars":
+                return f"This document represents the calendars for the ${ministry}, for the time period of ${report_period}."
+            case "Contracts over $10,000":
+                return f"This document is a summary of contracts with values over $10,000 CAD for the ${ministry} for the time period of ${report_period}."
+            case "Minister Quarterly Travel Expenses":
+                return f"This document represents the Travel Expense report for the Minister of ${ministry} for the time period of ${report_period}."
+            case "Estimates":
+                return f"Estimates notes prepared for the Minister."
+            case "Transition Binders":
+                return f"Transition Binder for ${ministry}, prepared for the incoming Minister."
+            case "Briefing Notes":
+                return f"This document is a summary of Briefing Notes for the ${ministry} for the time period of ${report_period}."
+            case "DM Travel Expenses":
+                return f"This document represents the Travel Expense report for the Deputy Minister ${ministry} for the time period of ${report_period}."
+            case _:
+                return ""
+
+    def _generate_pd_year(self, report_period_arr):
+        if report_period_arr[0] == "Quarter":
+            quarter = report_period_arr[1]
+            try:
+                current_year, next_year = report_period_arr[2].split("-", 1)
+            except ValueError:
+                raise ValueError("invalid format")
+            if quarter == "4":
+                return current_year[:2] + next_year
+
+            return current_year
+        else:
+            return report_period_arr[1]
+
+    def _generate_pd_month(self, report_period_arr):
+        if report_period_arr[0] == "Quarter":
+            quarter = report_period_arr[0]
+            match quarter:
+                case "1":
+                    return "4"
+                case "2":
+                    return "7"
+                case "3":
+                    return "10"
+                case "4":
+                    return "1"
+        else:
+            return str(datetime.strptime(report_period_arr[0], "%B").month)
 
     @staticmethod
     def correlation_id(row):

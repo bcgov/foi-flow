@@ -1,4 +1,4 @@
-"""Background scheduler for publication pre-publishing jobs."""
+"""Background scheduler for publication publishing jobs."""
 
 import logging
 import os
@@ -8,10 +8,10 @@ from request_api.services.publication_events.scheduled_service import ScheduledP
 
 
 class PublicationPrePublishingScheduler:
-    """Runs the OpenInfo pre-publishing job on a fixed interval."""
+    """Runs the OpenInfo and PD publishing job on a fixed interval."""
 
     def __init__(self, job=None, interval_seconds=300, app=None, stop_event=None):
-        self.job = job or ScheduledPublicationService().publish_due_openinfo_records
+        self.job = job or ScheduledPublicationService().publish_all_due_records
         self.interval_seconds = interval_seconds
         self.app = app
         self._stop_event = stop_event or threading.Event()
@@ -33,7 +33,7 @@ class PublicationPrePublishingScheduler:
         )
         self.thread.start()
         logging.info(
-            "Publication pre-publishing scheduler started interval_seconds=%s",
+            "Publication publishing scheduler started interval_seconds=%s",
             self.interval_seconds,
         )
         return self.thread
@@ -54,5 +54,5 @@ class PublicationPrePublishingScheduler:
             try:
                 self.run_once()
             except Exception as err:
-                logging.exception("Error running publication pre-publishing scheduler: %s", err)
+                logging.exception("Error running publication publishing scheduler: %s", err)
             self._stop_event.wait(self.interval_seconds)
