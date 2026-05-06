@@ -24,7 +24,7 @@ class OpenInfoPublishRequestedPayload:
     published_date: Optional[str] = None
     description: Optional[str] = None
     contributor: Optional[str] = None
-    fees: str = "0"
+    fees: int = 0
     applicant_type: Optional[str] = None
     title: Optional[str] = None
     high_level_subject: Optional[str] = None
