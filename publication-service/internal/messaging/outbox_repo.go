@@ -40,15 +40,22 @@ VALUES ($1,$2,$3,$4,$5)`
 	return nil
 }
 
-// ClaimBatch reads up to limit unpublished rows with SKIP LOCKED.
+// ClaimBatch atomically marks up to limit unclaimed, unpublished rows as
+// claimed and returns them. Rows that were claimed more than 5 minutes ago
+// (stale) are eligible for re-claiming to handle publisher crashes.
 func (r *OutboxRepo) ClaimBatch(ctx context.Context, limit int) ([]OutboxRow, error) {
 	const q = `
-SELECT id, event_id, event_type, tenant_id, envelope, attempts, kind
-FROM event_outbox
-WHERE published_at IS NULL
-ORDER BY id
-LIMIT $1
-FOR UPDATE SKIP LOCKED`
+UPDATE event_outbox
+SET claimed_at = NOW()
+WHERE id IN (
+    SELECT id FROM event_outbox
+    WHERE published_at IS NULL
+      AND (claimed_at IS NULL OR claimed_at < NOW() - INTERVAL '5 minutes')
+    ORDER BY id
+    LIMIT $1
+    FOR UPDATE SKIP LOCKED
+)
+RETURNING id, event_id, event_type, tenant_id, envelope, attempts, kind`
 	rows, err := r.pool.Query(ctx, q, limit)
 	if err != nil {
 		return nil, fmt.Errorf("outbox.ClaimBatch: %w", err)
