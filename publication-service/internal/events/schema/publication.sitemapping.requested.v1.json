@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foi.example/events/publication.sitemapping.requested/v1.json",
+  "title": "publication.sitemapping.requested payload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tenant_id", "publication_id", "public_url", "last_modified", "publication_result_ref", "kind"],
+  "properties": {
+    "tenant_id": {"type": "string", "format": "uuid"},
+    "publication_id": {"type": "string", "minLength": 1},
+    "public_url": {"type": "string", "format": "uri"},
+    "last_modified": {"type": "string", "format": "date"},
+    "publication_result_ref": {"type": "string", "minLength": 1},
+    "kind": {"type": "string", "enum": ["openinfo", "proactivedisclosure"]},
+    "foiministryrequest_id": {"type": "integer"},
+    "foirequest_id": {"type": "integer"}
+  }
+}

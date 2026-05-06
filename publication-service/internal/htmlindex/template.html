@@ -1,0 +1,14 @@
+<html>
+<head>
+<title>{{.Title}}</title>
+{{range .MetaTags}}
+<meta name="{{.Name}}" content="{{.Content}}">
+{{end}}
+</head>
+<body>
+{{range .Links}}
+<a href="{{.URL}}">{{.FileName}}</a><br />
+{{end}}
+{{.Content}}
+</body>
+</html>
