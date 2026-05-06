@@ -3,11 +3,26 @@ package publish
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"publication-service/internal/events"
 	pub "publication-service/internal/publish"
 )
+
+// AdditionalFile is a single extra file to copy to the destination.
+type AdditionalFile struct {
+	ID       int
+	Filename string
+	S3URI    string
+}
+
+type rawAdditionalFile struct {
+	ID       int    `json:"additionalfileid"`
+	Filename string `json:"filename"`
+	S3URI    string `json:"s3uripath"`
+	IsActive bool   `json:"isactive"`
+}
 
 // Domain is the version-stripped, handler-friendly view of a publish request.
 type Domain struct {
@@ -33,6 +48,9 @@ type Domain struct {
 	ReportPeriod         string
 	FOIMinistryRequestID *int
 	FOIRequestID         *int
+
+	// AdditionalFiles are extra files to copy to the destination.
+	AdditionalFiles []AdditionalFile
 }
 
 type requestedPayloadV1 struct {
@@ -51,6 +69,7 @@ type requestedPayloadV1 struct {
 	ReportPeriod         string          `json:"report_period"`
 	FOIMinistryRequestID *int            `json:"foiministryrequest_id"`
 	FOIRequestID         *int            `json:"foirequest_id"`
+	AdditionalFiles      []rawAdditionalFile `json:"additionalfiles"`
 }
 
 type rawLocation struct {
@@ -98,6 +117,17 @@ func Normalize(env *events.Envelope) (*Domain, error) {
 		}
 	}
 
+	var additionalFiles []AdditionalFile
+	for _, af := range p.AdditionalFiles {
+		if af.IsActive {
+			additionalFiles = append(additionalFiles, AdditionalFile{
+				ID:       af.ID,
+				Filename: af.Filename,
+				S3URI:    af.S3URI,
+			})
+		}
+	}
+
 	return &Domain{
 		EventID:              env.EventID,
 		CorrelationID:        env.CorrelationID,
@@ -116,6 +146,7 @@ func Normalize(env *events.Envelope) (*Domain, error) {
 		ReportPeriod:         p.ReportPeriod,
 		FOIMinistryRequestID: p.FOIMinistryRequestID,
 		FOIRequestID:         p.FOIRequestID,
+		AdditionalFiles:      additionalFiles,
 	}, nil
 }
 
@@ -153,4 +184,25 @@ func checkNoOverlap(src, dst pub.S3Location) error {
 			src.Bucket, src.Prefix, dst.Prefix))
 	}
 	return nil
+}
+
+// parseS3URI extracts bucket and key from an HTTPS S3 URL.
+// Expected format: https://<host>/<bucket>/<key-path>
+func parseS3URI(uri string) (bucket, key string, err error) {
+	u, parseErr := url.Parse(uri)
+	if parseErr != nil || u.Scheme == "" || u.Host == "" {
+		return "", "", pub.NewPermanent(fmt.Sprintf("parseS3URI: invalid URL %q", uri))
+	}
+	// Trim leading slash, split into bucket + key
+	path := strings.TrimPrefix(u.Path, "/")
+	slashIdx := strings.Index(path, "/")
+	if slashIdx < 1 {
+		return "", "", pub.NewPermanent(fmt.Sprintf("parseS3URI: no key in URL %q", uri))
+	}
+	bucket = path[:slashIdx]
+	key = path[slashIdx+1:]
+	if key == "" {
+		return "", "", pub.NewPermanent(fmt.Sprintf("parseS3URI: empty key in URL %q", uri))
+	}
+	return bucket, key, nil
 }

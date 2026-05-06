@@ -11,3 +11,8 @@ type Copier interface {
 type Uploader interface {
 	Upload(ctx context.Context, bucket, key string, body []byte, contentType string) error
 }
+
+// FileCopier copies a single S3 object from one location to another.
+type FileCopier interface {
+	CopyFile(ctx context.Context, srcBucket, srcKey, dstBucket, dstKey string) (int64, error)
+}

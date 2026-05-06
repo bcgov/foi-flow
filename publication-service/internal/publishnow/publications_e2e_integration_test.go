@@ -65,6 +65,15 @@ func (s *memoryObjectStore) Delete(_ context.Context, bucket, key string) error 
 	return nil
 }
 
+func (s *memoryObjectStore) CopyFile(_ context.Context, srcBucket, srcKey, dstBucket, dstKey string) (int64, error) {
+	body := s.objects[srcBucket][srcKey]
+	if s.objects[dstBucket] == nil {
+		s.objects[dstBucket] = map[string][]byte{}
+	}
+	s.objects[dstBucket][dstKey] = body
+	return int64(len(body)), nil
+}
+
 type memoryResultStore struct {
 	results map[string]sitemapping.Result
 }
@@ -161,7 +170,7 @@ func newTestOrchestrator(store *memoryObjectStore) *Orchestrator {
 		},
 	}
 	writer := sitemapping.NewWriter(store, newMemoryResultStore(), targets)
-	svc := pubpub.NewService(store, store, "https://objects.example", logger)
+	svc := pubpub.NewService(store, store, "https://objects.example", logger, pubpub.WithFileCopier(store))
 	orchestrator := New(svc, writer)
 	orchestrator.now = func() time.Time { return time.Date(2026, 4, 27, 12, 0, 0, 0, time.UTC) }
 	return orchestrator
