@@ -26,16 +26,16 @@ type rawAdditionalFile struct {
 
 // Domain is the version-stripped, handler-friendly view of a publish request.
 type Domain struct {
-	EventID       string
-	CorrelationID string
-	TenantID      string
-	Kind          pub.Kind
-	Source        pub.S3Location
-	Destination   pub.S3Location
-	RequestID     string
-	Description   string
-	PublishedDate string
-	Contributor   string
+	EventID          string
+	CorrelationID    string
+	TenantID         string
+	Kind             pub.Kind
+	Source           pub.S3Location
+	Destination      pub.S3Location
+	RequestID        string
+	Description      string
+	PublishedDate    string
+	Contributor      string
 	Fees             *int
 	ApplicantType    string
 	HighLevelSubject string
@@ -58,25 +58,25 @@ type Domain struct {
 }
 
 type requestedPayloadV1 struct {
-	TenantID             string          `json:"tenant_id"`
-	Kind                 string          `json:"kind"`
-	Source               rawLocation     `json:"source"`
-	Destination          rawLocation     `json:"destination"`
-	AxisRequestID        string          `json:"axis_request_id"`
-	Description          string          `json:"description"`
-	PublishedDate        string          `json:"published_date"`
-	Contributor          string          `json:"contributor"`
-	Fees                 *int            `json:"fees"`
-	ApplicantType        json.RawMessage `json:"applicant_type"`
-	HighLevelSubject     string          `json:"high_level_subject"`
-	Subject              string          `json:"subject"`
-	Month                string          `json:"month"`
-	Year                 string          `json:"year"`
-	Title                string          `json:"title"`
-	Category             string          `json:"proactivedisclosure_category"`
-	ReportPeriod         string          `json:"report_period"`
-	FOIMinistryRequestID *int            `json:"foiministryrequest_id"`
-	FOIRequestID         *int            `json:"foirequest_id"`
+	TenantID             string              `json:"tenant_id"`
+	Kind                 string              `json:"kind"`
+	Source               rawLocation         `json:"source"`
+	Destination          rawLocation         `json:"destination"`
+	AxisRequestID        string              `json:"axis_request_id"`
+	Description          string              `json:"description"`
+	PublishedDate        string              `json:"published_date"`
+	Contributor          string              `json:"contributor"`
+	Fees                 *int                `json:"fees"`
+	ApplicantType        json.RawMessage     `json:"applicant_type"`
+	HighLevelSubject     string              `json:"high_level_subject"`
+	Subject              string              `json:"subject"`
+	Month                string              `json:"month"`
+	Year                 string              `json:"year"`
+	Title                string              `json:"title"`
+	Category             string              `json:"proactivedisclosure_category"`
+	ReportPeriod         string              `json:"report_period"`
+	FOIMinistryRequestID *int                `json:"foiministryrequest_id"`
+	FOIRequestID         *int                `json:"foirequest_id"`
 	AdditionalFiles      []rawAdditionalFile `json:"additionalfiles"`
 }
 

@@ -14,11 +14,11 @@ type PublicRepositoryLocation struct {
 }
 
 type Request struct {
-	Kind             pub.Kind
-	TenantID         string
-	PublicationID    string
-	PublicURL        string
-	PublicRepository PublicRepositoryLocation
+	Kind                 pub.Kind
+	TenantID             string
+	PublicationID        string
+	PublicURL            string
+	PublicRepository     PublicRepositoryLocation
 	LastModified         time.Time
 	SourceEventID        string
 	CorrelationID        string
