@@ -5,6 +5,7 @@ package messaging
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"testing"
 	"time"
 
@@ -105,5 +106,51 @@ func TestOutboxRepo_KindRoundTrip_PD(t *testing.T) {
 	}
 	if claimed[0].Kind != pub.KindProactiveDisclosure {
 		t.Errorf("Kind round-trip: got %q, want %q", claimed[0].Kind, pub.KindProactiveDisclosure)
+	}
+}
+
+func TestOutboxRepo_ClaimBatch_NoDuplicates(t *testing.T) {
+	repo := setupOutbox(t)
+	ctx := context.Background()
+
+	// Insert 5 rows.
+	for i := 0; i < 5; i++ {
+		err := repo.Insert(ctx, OutboxRow{
+			EventID:   fmt.Sprintf("018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d%02d", i),
+			EventType: "test.event",
+			TenantID:  "a7d9b2f1-4c3e-4e8b-9a21-1c2e8f7b9d10",
+			Envelope:  json.RawMessage(`{}`),
+			Kind:      pub.KindOpenInfo,
+		})
+		if err != nil {
+			t.Fatalf("Insert %d: %v", i, err)
+		}
+	}
+
+	// Claim two batches of 3; they must not overlap.
+	batch1, err := repo.ClaimBatch(ctx, 3)
+	if err != nil {
+		t.Fatalf("ClaimBatch 1: %v", err)
+	}
+	batch2, err := repo.ClaimBatch(ctx, 3)
+	if err != nil {
+		t.Fatalf("ClaimBatch 2: %v", err)
+	}
+
+	seen := map[int64]bool{}
+	for _, r := range batch1 {
+		seen[r.ID] = true
+	}
+	for _, r := range batch2 {
+		if seen[r.ID] {
+			t.Fatalf("row %d claimed by both batches", r.ID)
+		}
+	}
+
+	if len(batch1) != 3 {
+		t.Fatalf("batch1 len = %d, want 3", len(batch1))
+	}
+	if len(batch2) != 2 {
+		t.Fatalf("batch2 len = %d, want 2", len(batch2))
 	}
 }
