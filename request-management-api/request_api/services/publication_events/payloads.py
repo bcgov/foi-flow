@@ -24,8 +24,13 @@ class OpenInfoPublishRequestedPayload:
     published_date: Optional[str] = None
     description: Optional[str] = None
     contributor: Optional[str] = None
-    fees: int = 0
+    fees: str = "0"
     applicant_type: Optional[str] = None
+    title: Optional[str] = None
+    high_level_subject: Optional[str] = None
+    month: Optional[str] = None
+    year: Optional[str] = None
+    subject: Optional[str] = None
 
     def to_dict(self):
         return asdict(self)
@@ -55,13 +60,18 @@ class ProactiveDisclosurePublishRequestedPayload:
     proactivedisclosure_category: Optional[str] = None
     report_period: Optional[str] = None
     contributor: Optional[str] = None
-    fees: int = 0
+    fees: Optional[str] = None
     applicant_type: Optional[str] = None
     foiministryrequest_id: Optional[int] = None
     foirequest_id: Optional[int] = None
     sitemap_pages: Optional[str] = None
     additionalfiles: list[AdditionalFilePayload] = field(default_factory=list)
     openinfo_id: Optional[int] = None
+    title: Optional[str] = None
+    high_level_subject: Optional[str] = None
+    month: Optional[str] = None
+    year: Optional[str] = None
+    subject: Optional[str] = None
 
     def to_dict(self):
         return asdict(self)
