@@ -28,8 +28,12 @@ func (s *Service) Handle(ctx context.Context, req Request) (Result, error) {
 	if err != nil {
 		return Result{}, err
 	}
-	if existing, ok, err := s.store.FindCompleted(ctx, req.Kind, req.PublicationID); err != nil || ok {
-		return existing, err
+	if existing, ok, err := s.store.FindCompleted(ctx, req.Kind, req.PublicationID); err != nil {
+		return Result{}, err
+	} else if ok {
+		// Close out the current claim so it doesn't stay in 'processing'
+		_ = s.store.MarkSucceeded(ctx, req.SourceEventID, existing)
+		return existing, nil
 	}
 	deleted, err := s.repo.DeletePrefix(ctx, req.PublicRepository.Bucket, req.PublicRepository.Prefix)
 	if err != nil {
