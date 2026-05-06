@@ -23,15 +23,13 @@ RUN --mount=type=cache,target=/go/pkg/mod \
         -ldflags="-s -w -X main.version=${VERSION} -X main.commit=${COMMIT} -X main.buildDate=${BUILD_DATE}" \
         -o /out/service ./cmd/api
 
-FROM gcr.io/distroless/static-debian12:nonroot
+FROM golang:1.25-alpine
 
 WORKDIR /app
 
 COPY --from=build /out/service /app/service
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=build /usr/share/zoneinfo /usr/share/zoneinfo
-
-USER nonroot:nonroot
 
 EXPOSE 9085
 
