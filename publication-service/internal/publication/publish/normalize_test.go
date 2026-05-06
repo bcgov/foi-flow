@@ -254,3 +254,75 @@ func TestNormalize_EmptyPrefixPreserved(t *testing.T) {
 		t.Errorf("Source.Prefix = %q, want empty", d.Source.Prefix)
 	}
 }
+
+func TestNormalize_AdditionalFiles_ActiveOnly(t *testing.T) {
+	env := goodEnvelope()
+	env.Payload = json.RawMessage(`{
+		"tenant_id":       "a7d9b2f1-4c3e-4e8b-9a21-1c2e8f7b9d10",
+		"source":          {"bucket": "foi-raw",       "prefix": "incoming/"},
+		"destination":     {"bucket": "foi-published", "prefix": "out/"},
+		"axis_request_id": "HTH-2025-52023",
+		"kind":            "openinfo",
+		"additionalfiles": [
+			{"additionalfileid": 67, "filename": "s.pdf", "s3uripath": "https://store.example/bucket-a/path/to/file.pdf", "isactive": true},
+			{"additionalfileid": 68, "filename": "inactive.pdf", "s3uripath": "https://store.example/bucket-a/path/to/inactive.pdf", "isactive": false}
+		]
+	}`)
+	d, err := Normalize(env)
+	if err != nil {
+		t.Fatalf("Normalize: %v", err)
+	}
+	if len(d.AdditionalFiles) != 1 {
+		t.Fatalf("AdditionalFiles length = %d, want 1", len(d.AdditionalFiles))
+	}
+	af := d.AdditionalFiles[0]
+	if af.ID != 67 {
+		t.Errorf("ID = %d, want 67", af.ID)
+	}
+	if af.Filename != "s.pdf" {
+		t.Errorf("Filename = %q, want s.pdf", af.Filename)
+	}
+	if af.S3URI != "https://store.example/bucket-a/path/to/file.pdf" {
+		t.Errorf("S3URI = %q", af.S3URI)
+	}
+}
+
+func TestNormalize_AdditionalFiles_EmptyWhenAbsent(t *testing.T) {
+	env := goodEnvelope()
+	d, err := Normalize(env)
+	if err != nil {
+		t.Fatalf("Normalize: %v", err)
+	}
+	if len(d.AdditionalFiles) != 0 {
+		t.Errorf("AdditionalFiles length = %d, want 0", len(d.AdditionalFiles))
+	}
+}
+
+func TestParseS3URI_ValidURL(t *testing.T) {
+	bucket, key, err := parseS3URI("https://citz-foi-prod.objectstore.gov.bc.ca/psa-dev-e/PSA-2025-154571/openinfo/fdaef2d5.pdf")
+	if err != nil {
+		t.Fatalf("parseS3URI: %v", err)
+	}
+	if bucket != "psa-dev-e" {
+		t.Errorf("bucket = %q, want psa-dev-e", bucket)
+	}
+	if key != "PSA-2025-154571/openinfo/fdaef2d5.pdf" {
+		t.Errorf("key = %q", key)
+	}
+}
+
+func TestParseS3URI_InvalidURL(t *testing.T) {
+	cases := []string{
+		"",
+		"not-a-url",
+		"https://host.example/",        // no key
+		"https://host.example/bucket",  // no key after bucket
+		"https://host.example/bucket/", // empty key
+	}
+	for _, uri := range cases {
+		_, _, err := parseS3URI(uri)
+		if err == nil {
+			t.Errorf("parseS3URI(%q) expected error, got nil", uri)
+		}
+	}
+}

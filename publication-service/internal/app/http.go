@@ -40,7 +40,7 @@ func NewHTTPOptions(ctx context.Context, cfg *config.Config, logger *slog.Logger
 		return httpserver.Options{}, nil, fmt.Errorf("s3 client: %w", err)
 	}
 
-	pubService := pubpub.NewService(s3Client, s3Client, cfg.S3.PublicURL, logger)
+	pubService := pubpub.NewService(s3Client, s3Client, cfg.S3.PublicURL, logger, pubpub.WithFileCopier(s3Client))
 	sitemapRepo := sitemapping.NewRequestRepo(pool)
 	workflowRepo := pub.NewRepo(pool)
 	sitemapWriter := sitemapping.NewWriter(s3Client, sitemapRepo, SitemapTargets(cfg))

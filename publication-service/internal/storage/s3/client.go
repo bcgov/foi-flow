@@ -189,6 +189,45 @@ func (c *Client) Delete(ctx context.Context, bucket, key string) error {
 	return nil
 }
 
+// CopyFile copies a single object from srcBucket/srcKey to dstBucket/dstKey.
+// Returns the size of the copied object.
+func (c *Client) CopyFile(ctx context.Context, srcBucket, srcKey, dstBucket, dstKey string) (int64, error) {
+	copyCtx, cancel := context.WithTimeout(ctx, c.timeout)
+	defer cancel()
+
+	copySource := srcBucket + "/" + url.PathEscape(srcKey)
+	copyInput := &s3sdk.CopyObjectInput{
+		Bucket:     &dstBucket,
+		Key:        &dstKey,
+		CopySource: &copySource,
+	}
+	if acl := publicReadACLForBucket(dstBucket); acl != nil {
+		copyInput.ACL = *acl
+	}
+
+	resp, err := c.api.CopyObject(copyCtx, copyInput)
+	if err != nil {
+		return 0, classifyS3Error(err)
+	}
+
+	// CopyObject doesn't return size directly; use HeadObject.
+	headCtx, headCancel := context.WithTimeout(ctx, c.timeout)
+	defer headCancel()
+	head, err := c.api.HeadObject(headCtx, &s3sdk.HeadObjectInput{
+		Bucket: &dstBucket,
+		Key:    &dstKey,
+	})
+	if err != nil {
+		// Copy succeeded but head failed — return 0 size, not an error.
+		_ = resp
+		return 0, nil
+	}
+	if head.ContentLength != nil {
+		return *head.ContentLength, nil
+	}
+	return 0, nil
+}
+
 // DeletePrefix deletes every real object under prefix. Folder marker objects
 // are skipped to match Copy's behavior.
 func (c *Client) DeletePrefix(ctx context.Context, bucket, prefix string) (int, error) {
