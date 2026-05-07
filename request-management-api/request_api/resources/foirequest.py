@@ -39,6 +39,7 @@ import json
 import asyncio
 import traceback
 from datetime import datetime
+import logging
 
 API = Namespace('FOIRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
@@ -335,6 +336,16 @@ class FOIRequestUpdateBySection(Resource):
         is_ministry_member,
     ):
         try:
+            logging.debug(
+                "Updating FOIRequest section | "
+                f"foirequestid={foirequestid} "
+                f"foiministryrequestid={foiministryrequestid} "
+                f"section={section} "
+                f"request_json={request_json} "
+                f"userid={userid} "
+                f"username={username} "
+                f"is_ministry_member={is_ministry_member}"
+            )
             foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
             if (section == "oipc"):
                 foirequest['isoipcreview'] = request_json['isoipcreview']
@@ -344,7 +355,7 @@ class FOIRequestUpdateBySection(Resource):
             #     foirequest['userrecordslockstatus'] = request_json['userrecordslockstatus']
             if (section == "oistatusid"):
                 oistatusid = request_json['oistatusid']
-                if (foirequest['requestType'] == RequestType.PROACTIVE_DISCLOSURE.value and oistatusid == OIStatusEnum.PUBLISHED.value):
+                if (foirequest['requestType'] == RequestType.PROACTIVE_DISCLOSURE.value and OIStatusEnum.PUBLISHED.equals(oistatusid)):
                     foirequest['closereasonid'] = 10
                     foirequest['closedate'] = datetime.now()
                     foirequest['requeststatusid'] = 3
