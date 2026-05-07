@@ -163,7 +163,7 @@ class ProactiveDisclosurePublishRequestedMapper:
         if len(report_period_arr) == 1:
             return ""
         if report_period_arr[0] == "Quarter":
-            quarter = report_period_arr[0]
+            quarter = report_period_arr[1]
             match quarter:
                 case "1":
                     return "4"
@@ -173,6 +173,8 @@ class ProactiveDisclosurePublishRequestedMapper:
                     return "10"
                 case "4":
                     return "1"
+                case _:
+                    return ""
         else:
             return str(datetime.strptime(report_period_arr[0], "%B").month)
 
