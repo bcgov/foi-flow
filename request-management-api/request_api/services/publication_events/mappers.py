@@ -118,7 +118,7 @@ class ProactiveDisclosurePublishRequestedMapper:
             high_level_subject=category,
             month=self._generate_pd_month(report_period.split()),
             year=self._generate_pd_year(report_period.split()),
-            subject="Proactive Disclosure",
+            subject="",
             proactivedisclosure_category=category
         )
     
