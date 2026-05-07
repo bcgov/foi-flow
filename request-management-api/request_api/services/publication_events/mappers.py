@@ -115,7 +115,7 @@ class ProactiveDisclosurePublishRequestedMapper:
             source=self.path_resolver.build_source(row),
             destination=self.path_resolver.build_destination(row),
             title=ministry + " - " + category + " - " + report_period,
-            high_level_subject=self._generate_highlevel_subject(category),
+            high_level_subject=self._generate_high_level_subject(category),
             month=self._generate_pd_month(report_period.split()),
             year=self._generate_pd_year(report_period.split()),
             subject="",
@@ -178,7 +178,7 @@ class ProactiveDisclosurePublishRequestedMapper:
         else:
             return str(datetime.strptime(report_period_arr[0], "%B").month)
         
-    def _generate_highlevel_subject(self, pd_category):
+    def _generate_high_level_subject(self, pd_category):
         match pd_category:
             case "Direct Award Contracts":
                 return "Directly-Awarded Contract"
@@ -197,7 +197,7 @@ class ProactiveDisclosurePublishRequestedMapper:
             case "DM Travel Expenses":
                 return "Travel Expense"
             case _:
-                return ""
+                return pd_category
 
     @staticmethod
     def correlation_id(row):
