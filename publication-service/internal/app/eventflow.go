@@ -68,7 +68,7 @@ func RunEventFlow(ctx context.Context, cfg *config.Config, logger *slog.Logger) 
 	}
 
 	// Unified publish consumer
-	pubService := pubpub.NewService(s3Client, s3Client, cfg.S3.PublicURL, logger, pubpub.WithFileCopier(s3Client))
+	pubService := pubpub.NewService(s3Client, s3Client, cfg.S3.PublicURL, logger, pubpub.WithFileCopier(s3Client), pubpub.WithDeleter(s3Client))
 	pubNormalizer := pubpub.NewCompletionAdapter(pubService, sitemapWriter)
 	pubValidator, err := pubpub.NewValidator(events.TypePublicationPublishRequested, cfg.SourceAllowlist)
 	if err != nil {

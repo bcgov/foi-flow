@@ -21,11 +21,19 @@ func WithFileCopier(fc pub.FileCopier) Option {
 	}
 }
 
+// WithDeleter sets the Deleter used to remove original objects after renaming.
+func WithDeleter(d pub.Deleter) Option {
+	return func(s *Service) {
+		s.deleter = d
+	}
+}
+
 // Service handles publication.publish.requested events for all kinds.
 type Service struct {
 	copier     pub.Copier
 	uploader   pub.Uploader
 	fileCopier pub.FileCopier
+	deleter    pub.Deleter
 	publicURL  string
 	log        *slog.Logger
 }
@@ -46,6 +54,27 @@ func (s *Service) Handle(ctx context.Context, d *Domain) (pub.PublishResult, err
 		return pub.PublishResult{}, err
 	}
 
+	// Rename bulk-copied files that have spaces in their names.
+	if s.fileCopier != nil && s.deleter != nil {
+		for i := range res.Objects {
+			original := res.Objects[i].Key
+			sanitized := sanitizeFileName(original)
+			if sanitized == original {
+				continue
+			}
+			srcKey := d.Destination.Prefix + original
+			dstKey := d.Destination.Prefix + sanitized
+			_, copyErr := s.fileCopier.CopyFile(ctx, d.Destination.Bucket, srcKey, d.Destination.Bucket, dstKey)
+			if copyErr != nil {
+				return pub.PublishResult{}, fmt.Errorf("publish: rename %q to %q: %w", original, sanitized, copyErr)
+			}
+			if err := s.deleter.Delete(ctx, d.Destination.Bucket, srcKey); err != nil {
+				return pub.PublishResult{}, fmt.Errorf("publish: delete original %q after rename: %w", original, err)
+			}
+			res.Objects[i].Key = sanitized
+		}
+	}
+
 	// Copy additional files to destination.
 	if s.fileCopier != nil {
 		for _, af := range d.AdditionalFiles {
@@ -53,12 +82,13 @@ func (s *Service) Handle(ctx context.Context, d *Domain) (pub.PublishResult, err
 			if parseErr != nil {
 				return pub.PublishResult{}, parseErr
 			}
-			dstKey := d.Destination.Prefix + af.Filename
+			sanitizedName := sanitizeFileName(af.Filename)
+			dstKey := d.Destination.Prefix + sanitizedName
 			size, copyErr := s.fileCopier.CopyFile(ctx, srcBucket, srcKey, d.Destination.Bucket, dstKey)
 			if copyErr != nil {
 				return pub.PublishResult{}, fmt.Errorf("publish: copy additional file %q: %w", af.Filename, copyErr)
 			}
-			res.Objects = append(res.Objects, pub.CopiedObject{Key: af.Filename, Size: size})
+			res.Objects = append(res.Objects, pub.CopiedObject{Key: sanitizedName, Size: size})
 			res.ObjectsCopied++
 			res.BytesCopied += size
 		}
