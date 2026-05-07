@@ -224,6 +224,8 @@ class OIStatusEnum(Enum):
     
     def equals(self, value):
         try:
+            if isinstance(value, Enum):
+                value = value.value
             return self.value == int(value)
         except (ValueError, TypeError):
             return False
