@@ -337,7 +337,7 @@ class FOIRequestUpdateBySection(Resource):
     ):
         try:
             foirequest = requestservice().getrequest(foirequestid, foiministryrequestid)
-            logging.info(
+            logging.debug(
                 "Updating FOIRequest section | "
                 f"foirequestid={foirequestid} "
                 f"foiministryrequestid={foiministryrequestid} "
@@ -348,9 +348,6 @@ class FOIRequestUpdateBySection(Resource):
                 f"is_ministry_member={is_ministry_member}"
                 f"foirequest={foirequest}"
             )
-            print(foirequest['requestType'] == RequestType.PROACTIVE_DISCLOSURE.value)
-            print(OIStatusEnum.PUBLISHED.equals(request_json['oistatusid']))
-            print(foirequest['requestType'] == RequestType.PROACTIVE_DISCLOSURE.value and OIStatusEnum.PUBLISHED.equals(OIStatusEnum.PUBLISHED.equals(request_json['oistatusid'])))
             if (section == "oipc"):
                 foirequest['isoipcreview'] = request_json['isoipcreview']
                 foirequest['oipcdetails'] = request_json['oipcdetails']
@@ -360,7 +357,6 @@ class FOIRequestUpdateBySection(Resource):
             if (section == "oistatusid"):
                 oistatusid = request_json['oistatusid']
                 if (foirequest['requestType'] == RequestType.PROACTIVE_DISCLOSURE.value and OIStatusEnum.PUBLISHED.equals(oistatusid)):
-                    print("BANG")
                     foirequest['closereasonid'] = 10
                     foirequest['closedate'] = datetime.now()
                     foirequest['requeststatusid'] = 3
