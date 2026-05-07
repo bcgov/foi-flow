@@ -167,28 +167,6 @@ class FOIOpenInformationRequests(db.Model):
                 foiministryrequestid,
                 sitemap_page,
             )
-            ministry_status_sql = """
-                UPDATE public."FOIMinistryRequests"
-                SET oistatus_id = :oistatus_id,
-                    updated_at = now()
-                WHERE foiministryrequestid = :foiministryrequestid
-                  AND isactive = TRUE;
-            """
-            ministry_result = db.session.execute(
-                text(ministry_status_sql),
-                {
-                    'foiministryrequestid': foiministryrequestid,
-                    'oistatus_id': OIStatusEnum.PUBLISHED.value,
-                },
-            )
-            if ministry_result.rowcount == 0:
-                db.session.rollback()
-                return DefaultMethodResult(False, "No active FOIMinistryRequests row found to update", foiministryrequestid)
-            logging.info(
-                "FOIMinistryRequests oistatus_id updated to %s for ministry request %s",
-                OIStatusEnum.PUBLISHED.value,
-                foiministryrequestid,
-            )
             db.session.commit()
             return DefaultMethodResult(True, "OpenInfo publication status updated", foiministryrequestid)
         except Exception as exception:
