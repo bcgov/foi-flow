@@ -350,6 +350,7 @@ class FOIRequestUpdateBySection(Resource):
             )
             print(foirequest['requestType'] == RequestType.PROACTIVE_DISCLOSURE.value)
             print(OIStatusEnum.PUBLISHED.equals(request_json['oistatusid']))
+            print(foirequest['requestType'] == RequestType.PROACTIVE_DISCLOSURE.value and OIStatusEnum.PUBLISHED.equals(OIStatusEnum.PUBLISHED.equals(request_json['oistatusid'])))
             if (section == "oipc"):
                 foirequest['isoipcreview'] = request_json['isoipcreview']
                 foirequest['oipcdetails'] = request_json['oipcdetails']
