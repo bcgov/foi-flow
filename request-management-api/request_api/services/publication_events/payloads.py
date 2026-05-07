@@ -13,6 +13,16 @@ class S3Location:
 
 
 @dataclass
+class AdditionalFilePayload:
+    """Additional file metadata included in publication events."""
+
+    additionalfileid: int
+    filename: str
+    s3uripath: str
+    isactive: bool
+
+
+@dataclass
 class OpenInfoPublishRequestedPayload:
     """Payload for open information publish requested events."""
 
@@ -31,19 +41,10 @@ class OpenInfoPublishRequestedPayload:
     month: Optional[str] = None
     year: Optional[str] = None
     subject: Optional[str] = None
+    additionalfiles: list[AdditionalFilePayload] = field(default_factory=list)
 
     def to_dict(self):
         return asdict(self)
-
-
-@dataclass
-class AdditionalFilePayload:
-    """Additional file metadata included in publication events."""
-
-    additionalfileid: int
-    filename: str
-    s3uripath: str
-    isactive: bool
 
 
 @dataclass

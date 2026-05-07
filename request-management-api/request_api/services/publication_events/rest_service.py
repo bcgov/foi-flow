@@ -31,7 +31,8 @@ REST_PAYLOAD_FIELDS = {
     "high_level_subject",
     "subject",
     "month",
-    "year"
+    "year",
+    "additionalfiles",
 }
 
 
