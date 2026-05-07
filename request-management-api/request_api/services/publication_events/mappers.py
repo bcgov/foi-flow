@@ -13,6 +13,20 @@ from request_api.services.publication_events.payloads import (
 )
 
 
+def _map_additional_files(row):
+    """Map additional file entries from a database row."""
+    items = row.get("additionalfiles") or []
+    return [
+        AdditionalFilePayload(
+            additionalfileid=item.get("additionalfileid"),
+            filename=item.get("filename"),
+            s3uripath=item.get("s3uripath"),
+            isactive=bool(item.get("isactive")),
+        )
+        for item in items
+    ]
+
+
 class PublicationPathResolver:
     """Resolves publication S3 locations."""
 
@@ -69,6 +83,7 @@ class OpenInfoPublishRequestedMapper:
             high_level_subject="FOI Request",
             month=datetime.now().strftime("%m"),
             year=datetime.now().strftime("%Y"),
+            additionalfiles=_map_additional_files(row),
         )
 
     @staticmethod
@@ -81,19 +96,6 @@ class ProactiveDisclosurePublishRequestedMapper:
 
     def __init__(self, path_resolver=None):
         self.path_resolver = path_resolver or PublicationPathResolver()
-
-    @staticmethod
-    def _map_additional_files(row):
-        items = row.get("additionalfiles") or []
-        return [
-            AdditionalFilePayload(
-                additionalfileid=item.get("additionalfileid"),
-                filename=item.get("filename"),
-                s3uripath=item.get("s3uripath"),
-                isactive=bool(item.get("isactive")),
-            )
-            for item in items
-        ]
 
     def map(self, row):
         category = row.get("proactivedisclosurecategory")
@@ -110,7 +112,7 @@ class ProactiveDisclosurePublishRequestedMapper:
             foiministryrequest_id=row.get("foiministryrequestid"),
             foirequest_id=row.get("foirequestid"),
             sitemap_pages=row.get("sitemap_pages"),
-            additionalfiles=self._map_additional_files(row),
+            additionalfiles=_map_additional_files(row),
             openinfo_id=row.get("openinfoid"),
             source=self.path_resolver.build_source(row),
             destination=self.path_resolver.build_destination(row),
