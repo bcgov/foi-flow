@@ -12,6 +12,8 @@ from request_api.services.publication_events.mappers import (
     ProactiveDisclosurePublishRequestedMapper,
 )
 from request_api.services.publication_events.rest_client import PublicationRestClient
+from request_api.resources.foirequest import FOIRequestUpdateBySection
+from request_api.utils.enums import OIStatusEnum
 
 
 REST_PAYLOAD_FIELDS = {
@@ -33,6 +35,9 @@ REST_PAYLOAD_FIELDS = {
     "month",
     "year"
 }
+PUBLISHING_SERVICE_USER_ID = "publishingservice"
+PUBLISHING_SERVICE_USERNAME = "Publishing Service"
+OISTATUS_SECTION = "oistatusid"
 
 
 class PublicationStatusUpdater:
@@ -78,6 +83,37 @@ class PublishNowRestService:
     @staticmethod
     def _rest_payload(payload):
         return {key: value for key, value in payload.items() if key in REST_PAYLOAD_FIELDS}
+    
+    def _handle_foiministryrequest_update(self, payload, oistatus_id, section_updater):
+        missing = [
+            field
+            for field in ("foirequest_id", "foiministryrequest_id")
+            if not payload.get(field)
+        ]
+        if missing:
+            return DefaultMethodResult(
+                False,
+                f"Missing required payload fields: {', '.join(missing)}",
+            )
+
+        result = section_updater.update_section(
+            payload.get("foirequest_id"),
+            payload.get("foiministryrequest_id"),
+            OISTATUS_SECTION,
+            {OISTATUS_SECTION: oistatus_id},
+            PUBLISHING_SERVICE_USER_ID,
+            PUBLISHING_SERVICE_USERNAME,
+            False,
+        )
+        response, status_code = result if isinstance(result, tuple) else (result, 200)
+        if status_code < 400 and response is not None and response.get("success"):
+            return DefaultMethodResult(True, "FOIMinistryRequest data updated")
+        message = (
+            response.get("message")
+            if isinstance(response, dict) and response.get("message")
+            else "Unable to update FOIMinistryRequest data"
+        )
+        return DefaultMethodResult(False, message)
 
     def _publish_and_update(self, publication_type, row, payload, update_status):
         try:
@@ -94,9 +130,15 @@ class PublishNowRestService:
             )
             self._validate_completed(response)
             sitemap_page = self._sitemap_page_name(response)
+            
+            foiministry_update_result = self._handle_foiministryrequest_update(payload, OIStatusEnum.PUBLISHED.value, FOIRequestUpdateBySection)
+            if foiministry_update_result.success is False:
+                return foiministry_update_result
+            
             update_result = update_status(sitemap_page)
             if not update_result.success:
                 return update_result
+
             return DefaultMethodResult(
                 True,
                 "Request published successfully",
