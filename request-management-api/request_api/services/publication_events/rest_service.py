@@ -27,6 +27,12 @@ REST_PAYLOAD_FIELDS = {
     "report_period",
     "source",
     "destination",
+    "title",
+    "high_level_subject",
+    "subject",
+    "month",
+    "year",
+    "additionalfiles",
 }
 
 
