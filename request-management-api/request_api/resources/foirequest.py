@@ -38,7 +38,7 @@ from request_api.services.linkedrequestservice import linkedrequestservice
 import json
 import asyncio
 import traceback
-from datetime import datetime
+from datetime import date, datetime
 import logging
 
 API = Namespace('FOIRequests', description='Endpoints for FOI request management')
@@ -358,7 +358,7 @@ class FOIRequestUpdateBySection(Resource):
                 oistatusid = request_json['oistatusid']
                 if (foirequest['requestType'] == RequestType.PROACTIVE_DISCLOSURE.value and OIStatusEnum.PUBLISHED.equals(oistatusid)):
                     foirequest['closereasonid'] = 10
-                    foirequest['closedate'] = datetime.now()
+                    foirequest['closedate'] = date.today().isoformat()
                     foirequest['requeststatusid'] = 3
                     foirequest['requeststatuslabel'] = "closed"
                 foirequest['oistatusid'] = oistatusid
