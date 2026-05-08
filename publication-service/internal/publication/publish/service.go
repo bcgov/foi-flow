@@ -39,12 +39,15 @@ type Service struct {
 }
 
 // NewService constructs a handler backed by the given Copier, Uploader, and public S3 base URL.
-func NewService(c pub.Copier, u pub.Uploader, publicURL string, log *slog.Logger, opts ...Option) *Service {
+func NewService(c pub.Copier, u pub.Uploader, publicURL string, log *slog.Logger, opts ...Option) (*Service, error) {
 	svc := &Service{copier: c, uploader: u, publicURL: publicURL, log: log}
 	for _, opt := range opts {
 		opt(svc)
 	}
-	return svc
+	if (svc.fileCopier == nil) != (svc.deleter == nil) {
+		return nil, fmt.Errorf("publish: WithFileCopier and WithDeleter must both be provided or both omitted")
+	}
+	return svc, nil
 }
 
 // Handle copies source files, renders the HTML index, uploads it, and returns publication metadata.

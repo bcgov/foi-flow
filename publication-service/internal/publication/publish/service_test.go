@@ -43,7 +43,10 @@ func TestService_Handle_CopiesAndUploadsHTML(t *testing.T) {
 		Objects: []pub.CopiedObject{{Key: "doc.pdf", Size: 100}},
 	}}
 	uploader := &fakeUploader{}
-	svc := NewService(copier, uploader, "https://public.example", discardLogger())
+	svc, err := NewService(copier, uploader, "https://public.example", discardLogger())
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
 
 	d := &Domain{
 		Kind:        pub.KindOpenInfo,
@@ -71,14 +74,17 @@ func TestService_Handle_CopiesAndUploadsHTML(t *testing.T) {
 
 func TestService_Handle_CopierError(t *testing.T) {
 	copier := &fakeCopier{err: context.DeadlineExceeded}
-	svc := NewService(copier, &fakeUploader{}, "https://x", discardLogger())
+	svc, err := NewService(copier, &fakeUploader{}, "https://x", discardLogger())
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
 
 	d := &Domain{
 		Kind:        pub.KindOpenInfo,
 		Source:      pub.S3Location{Bucket: "a", Prefix: "b/"},
 		Destination: pub.S3Location{Bucket: "c", Prefix: "d/"},
 	}
-	_, err := svc.Handle(context.Background(), d)
+	_, err = svc.Handle(context.Background(), d)
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -119,7 +125,11 @@ func TestService_Handle_CopiesAdditionalFiles(t *testing.T) {
 	}}
 	uploader := &fakeUploader{}
 	fileCopier := &fakeFileCopier{}
-	svc := NewService(copier, uploader, "https://public.example", discardLogger(), WithFileCopier(fileCopier))
+	deleter := &fakeDeleter{}
+	svc, err := NewService(copier, uploader, "https://public.example", discardLogger(), WithFileCopier(fileCopier), WithDeleter(deleter))
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
 
 	d := &Domain{
 		Kind:        pub.KindOpenInfo,
@@ -157,7 +167,11 @@ func TestService_Handle_AdditionalFileError_FailsPublish(t *testing.T) {
 	copier := &fakeCopier{result: pub.CopyResult{ObjectsCopied: 1, BytesCopied: 100,
 		Objects: []pub.CopiedObject{{Key: "doc.pdf", Size: 100}}}}
 	fileCopier := &fakeFileCopier{err: fmt.Errorf("not found")}
-	svc := NewService(copier, &fakeUploader{}, "https://x", discardLogger(), WithFileCopier(fileCopier))
+	deleter := &fakeDeleter{}
+	svc, err := NewService(copier, &fakeUploader{}, "https://x", discardLogger(), WithFileCopier(fileCopier), WithDeleter(deleter))
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
 
 	d := &Domain{
 		Kind:        pub.KindOpenInfo,
@@ -168,7 +182,7 @@ func TestService_Handle_AdditionalFileError_FailsPublish(t *testing.T) {
 			{ID: 67, Filename: "fail.pdf", S3URI: "https://store.example/bucket/key.pdf"},
 		},
 	}
-	_, err := svc.Handle(context.Background(), d)
+	_, err = svc.Handle(context.Background(), d)
 	if err == nil {
 		t.Fatal("expected error when additional file copy fails")
 	}
@@ -185,8 +199,11 @@ func TestService_Handle_SanitizesBulkCopiedFileNames(t *testing.T) {
 	uploader := &fakeUploader{}
 	fileCopier := &fakeFileCopier{}
 	deleter := &fakeDeleter{}
-	svc := NewService(copier, uploader, "https://public.example", discardLogger(),
+	svc, err := NewService(copier, uploader, "https://public.example", discardLogger(),
 		WithFileCopier(fileCopier), WithDeleter(deleter))
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
 
 	d := &Domain{
 		Kind:        pub.KindOpenInfo,
@@ -243,8 +260,12 @@ func TestService_Handle_SanitizesAdditionalFileNames(t *testing.T) {
 	}}
 	uploader := &fakeUploader{}
 	fileCopier := &fakeFileCopier{}
-	svc := NewService(copier, uploader, "https://public.example", discardLogger(),
-		WithFileCopier(fileCopier))
+	deleter := &fakeDeleter{}
+	svc, err := NewService(copier, uploader, "https://public.example", discardLogger(),
+		WithFileCopier(fileCopier), WithDeleter(deleter))
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
 
 	d := &Domain{
 		Kind:        pub.KindOpenInfo,
@@ -280,8 +301,11 @@ func TestService_Handle_NoSpaces_NoRename(t *testing.T) {
 	uploader := &fakeUploader{}
 	fileCopier := &fakeFileCopier{}
 	deleter := &fakeDeleter{}
-	svc := NewService(copier, uploader, "https://public.example", discardLogger(),
+	svc, err := NewService(copier, uploader, "https://public.example", discardLogger(),
 		WithFileCopier(fileCopier), WithDeleter(deleter))
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
 
 	d := &Domain{
 		Kind:        pub.KindOpenInfo,
@@ -289,7 +313,7 @@ func TestService_Handle_NoSpaces_NoRename(t *testing.T) {
 		Source:      pub.S3Location{Bucket: "raw", Prefix: "in/"},
 		Destination: pub.S3Location{Bucket: "pub", Prefix: "out/"},
 	}
-	_, err := svc.Handle(context.Background(), d)
+	_, err = svc.Handle(context.Background(), d)
 	if err != nil {
 		t.Fatalf("Handle: %v", err)
 	}
@@ -300,5 +324,48 @@ func TestService_Handle_NoSpaces_NoRename(t *testing.T) {
 	}
 	if len(deleter.deleted) != 0 {
 		t.Errorf("expected 0 deletes, got %d", len(deleter.deleted))
+	}
+}
+
+func TestNewService_ErrorWhenFileCopierWithoutDeleter(t *testing.T) {
+	copier := &fakeCopier{}
+	uploader := &fakeUploader{}
+	_, err := NewService(copier, uploader, "https://x", discardLogger(), WithFileCopier(&fakeFileCopier{}))
+	if err == nil {
+		t.Fatal("expected error when fileCopier set without deleter")
+	}
+}
+
+func TestNewService_ErrorWhenDeleterWithoutFileCopier(t *testing.T) {
+	copier := &fakeCopier{}
+	uploader := &fakeUploader{}
+	_, err := NewService(copier, uploader, "https://x", discardLogger(), WithDeleter(&fakeDeleter{}))
+	if err == nil {
+		t.Fatal("expected error when deleter set without fileCopier")
+	}
+}
+
+func TestNewService_OKWhenBothNil(t *testing.T) {
+	copier := &fakeCopier{}
+	uploader := &fakeUploader{}
+	svc, err := NewService(copier, uploader, "https://x", discardLogger())
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if svc == nil {
+		t.Fatal("service is nil")
+	}
+}
+
+func TestNewService_OKWhenBothSet(t *testing.T) {
+	copier := &fakeCopier{}
+	uploader := &fakeUploader{}
+	svc, err := NewService(copier, uploader, "https://x", discardLogger(),
+		WithFileCopier(&fakeFileCopier{}), WithDeleter(&fakeDeleter{}))
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if svc == nil {
+		t.Fatal("service is nil")
 	}
 }
