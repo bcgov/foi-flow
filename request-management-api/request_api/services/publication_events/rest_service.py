@@ -12,6 +12,9 @@ from request_api.services.publication_events.mappers import (
     ProactiveDisclosurePublishRequestedMapper,
 )
 from request_api.services.publication_events.rest_client import PublicationRestClient
+from request_api.services.publication_events.consumer import handle_foiministryrequest_update
+from request_api.resources.foirequest import FOIRequestUpdateBySection
+from request_api.utils.enums import OIStatusEnum
 
 
 REST_PAYLOAD_FIELDS = {
@@ -32,6 +35,8 @@ REST_PAYLOAD_FIELDS = {
     "subject",
     "month",
     "year",
+    "foirequest_id",
+    "foiministryrequest_id",
     "additionalfiles",
 }
 
@@ -95,9 +100,15 @@ class PublishNowRestService:
             )
             self._validate_completed(response)
             sitemap_page = self._sitemap_page_name(response)
+            
+            foiministry_update_result = handle_foiministryrequest_update(payload, OIStatusEnum.PUBLISHED.value, FOIRequestUpdateBySection())
+            if foiministry_update_result.success is False:
+                return foiministry_update_result
+            
             update_result = update_status(sitemap_page)
             if not update_result.success:
                 return update_result
+
             return DefaultMethodResult(
                 True,
                 "Request published successfully",
