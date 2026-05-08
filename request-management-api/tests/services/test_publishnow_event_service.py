@@ -42,6 +42,57 @@ def test_openinfo_mapper_sets_kind(monkeypatch):
     assert payload.kind == "openinfo"
 
 
+def test_openinfo_mapper_maps_additionalfiles(monkeypatch):
+    monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
+    monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
+    from request_api.services.publication_events.mappers import OpenInfoPublishRequestedMapper
+
+    mapper = OpenInfoPublishRequestedMapper()
+    row = {
+        "openinfoid": 1,
+        "axisrequestid": "EDU-2024-001",
+        "bcgovcode": "edu",
+        "additionalfiles": [
+            {
+                "additionalfileid": 10,
+                "filename": "attachment.pdf",
+                "s3uripath": "s3://bucket/path/attachment.pdf",
+                "isactive": True,
+            },
+            {
+                "additionalfileid": 11,
+                "filename": "notes.docx",
+                "s3uripath": "s3://bucket/path/notes.docx",
+                "isactive": False,
+            },
+        ],
+    }
+    payload = mapper.map(row)
+    serialized = payload.to_dict()
+    assert len(serialized["additionalfiles"]) == 2
+    assert serialized["additionalfiles"][0]["filename"] == "attachment.pdf"
+    assert serialized["additionalfiles"][0]["additionalfileid"] == 10
+    assert serialized["additionalfiles"][0]["isactive"] is True
+    assert serialized["additionalfiles"][1]["filename"] == "notes.docx"
+    assert serialized["additionalfiles"][1]["isactive"] is False
+
+
+def test_openinfo_mapper_defaults_additionalfiles_to_empty_list(monkeypatch):
+    monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
+    monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
+    from request_api.services.publication_events.mappers import OpenInfoPublishRequestedMapper
+
+    mapper = OpenInfoPublishRequestedMapper()
+    row = {
+        "openinfoid": 1,
+        "axisrequestid": "EDU-2024-001",
+        "bcgovcode": "edu",
+    }
+    payload = mapper.map(row)
+    serialized = payload.to_dict()
+    assert serialized["additionalfiles"] == []
+
+
 def test_proactive_disclosure_mapper_sets_kind(monkeypatch):
     monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
     monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
@@ -74,6 +125,14 @@ def test_queue_openinfo_publishnow_builds_openinfo_envelope(monkeypatch):
                     "fees": 0,
                     "applicant_type": "Media",
                     "bcgovcode": "fin",
+                    "additionalfiles": [
+                        {
+                            "additionalfileid": 99,
+                            "filename": "budget.pdf",
+                            "s3uripath": "s3://fin-dev-e/FIN-2026-047533/openinfo/budget.pdf",
+                            "isactive": True,
+                        }
+                    ],
                 }
             ]
         ),
@@ -94,6 +153,9 @@ def test_queue_openinfo_publishnow_builds_openinfo_envelope(monkeypatch):
     assert envelope["payload"]["source"]["prefix"] == "FIN-2026-047533/responsepackage/"
     assert envelope["payload"]["destination"]["bucket"] == "dev-openinfopub"
     assert envelope["payload"]["destination"]["prefix"] == "packages/FIN-2026-047533/openinfo/"
+    assert len(envelope["payload"]["additionalfiles"]) == 1
+    assert envelope["payload"]["additionalfiles"][0]["filename"] == "budget.pdf"
+    assert envelope["payload"]["additionalfiles"][0]["additionalfileid"] == 99
 
 
 def test_queue_proactive_disclosure_publishnow_builds_pd_envelope(monkeypatch):
