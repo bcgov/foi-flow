@@ -829,7 +829,7 @@ class FOIOpenInformationRequests(db.Model):
                 INNER JOIN public."OpenInformationStatuses" oistatus on mr.oistatus_id = oistatus.oistatusid
                 INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on oi.oipublicationstatus_id = oirequesttype.oipublicationstatusid
                 WHERE mr.foiministryrequestid = :foiministryrequestid 
-                  AND oi.processingstatus != 'unpublished'
+                  AND oi.processingstatus is NULL
                   AND oi.isactive = TRUE;
             """
             
