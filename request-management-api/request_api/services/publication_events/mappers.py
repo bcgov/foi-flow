@@ -69,6 +69,8 @@ class OpenInfoPublishRequestedMapper:
             high_level_subject="FOI Request",
             month=datetime.now().strftime("%m"),
             year=datetime.now().strftime("%Y"),
+            foiministryrequest_id=row.get("foiministryrequestid"),
+            foirequest_id=row.get("foirequestid"),
         )
 
     @staticmethod
