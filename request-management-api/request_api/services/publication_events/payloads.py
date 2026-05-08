@@ -41,6 +41,8 @@ class OpenInfoPublishRequestedPayload:
     month: Optional[str] = None
     year: Optional[str] = None
     subject: Optional[str] = None
+    foirequest_id: Optional[int] = None
+    foiministryrequest_id: Optional[int] = None
     additionalfiles: list[AdditionalFilePayload] = field(default_factory=list)
 
     def to_dict(self):

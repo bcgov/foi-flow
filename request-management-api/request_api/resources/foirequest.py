@@ -38,7 +38,7 @@ from request_api.services.linkedrequestservice import linkedrequestservice
 import json
 import asyncio
 import traceback
-from datetime import date, datetime
+from datetime import date
 import logging
 
 API = Namespace('FOIRequests', description='Endpoints for FOI request management')

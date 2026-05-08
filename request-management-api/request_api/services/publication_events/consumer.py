@@ -16,7 +16,7 @@ PUBLISHING_SERVICE_USERNAME = "Publishing Service"
 OISTATUS_SECTION = "oistatusid"
 
 
-def _handle_foiministryrequest_update(payload, oistatus_id, section_updater):
+def handle_foiministryrequest_update(payload, oistatus_id, section_updater):
     missing = [
         field
         for field in ("foirequest_id", "foiministryrequest_id")
@@ -57,8 +57,8 @@ class OpenInfoPublishCompletedConsumer:
         self.openinfo_model = openinfo_model or FOIOpenInformationRequests
         self.section_updater = section_updater or FOIRequestUpdateBySection()
 
-    def handle_foiministryrequest_update(self, payload):
-        return _handle_foiministryrequest_update(
+    def _handle_foiministryrequest_update(self, payload):
+        return handle_foiministryrequest_update(
             payload,
             OIStatusEnum.PUBLISHED.value,
             self.section_updater,
@@ -89,7 +89,7 @@ class OpenInfoPublishCompletedConsumer:
             f"openinfo_id={openinfo_id} "
             f"request_event_id={payload.get('request_event_id')}"
         )
-        update_result = self.handle_foiministryrequest_update(payload)
+        update_result = self._handle_foiministryrequest_update(payload)
 
         if update_result.success is False:
             return update_result
@@ -103,8 +103,8 @@ class OpenInfoUnpublishCompletedConsumer:
     def __init__(self, section_updater=None):
         self.section_updater = section_updater or FOIRequestUpdateBySection()
 
-    def handle_foiministryrequest_update(self, payload):
-        return _handle_foiministryrequest_update(
+    def _handle_foiministryrequest_update(self, payload):
+        return handle_foiministryrequest_update(
             payload,
             OIStatusEnum.UNPUBLISHED.value,
             self.section_updater,
@@ -126,7 +126,7 @@ class OpenInfoUnpublishCompletedConsumer:
             f"objects_deleted={payload.get('objects_deleted')} "
             f"sitemap_result={payload.get('sitemap_result')}"
         )
-        update_result = self.handle_foiministryrequest_update(payload)
+        update_result = self._handle_foiministryrequest_update(payload)
 
         if update_result.success is False:
             return update_result
@@ -145,8 +145,8 @@ class ProactiveDisclosurePublishCompletedConsumer:
         self.proactive_model = proactive_model or FOIProactiveDisclosureRequests
         self.section_updater = section_updater or FOIRequestUpdateBySection()
     
-    def handle_foiministryrequest_update(self, payload):
-        return _handle_foiministryrequest_update(
+    def _handle_foiministryrequest_update(self, payload):
+        return handle_foiministryrequest_update(
             payload,
             OIStatusEnum.PUBLISHED.value,
             self.section_updater,
@@ -177,7 +177,7 @@ class ProactiveDisclosurePublishCompletedConsumer:
             f"proactive_id={proactive_id} "
             f"request_event_id={payload.get('request_event_id')}"
         )
-        update_result = self.handle_foiministryrequest_update(payload)
+        update_result = self._handle_foiministryrequest_update(payload)
 
         if update_result.success is False:
             return update_result
@@ -194,8 +194,8 @@ class ProactiveDisclosureUnpublishCompletedConsumer:
     def __init__(self, section_updater=None):
         self.section_updater = section_updater or FOIRequestUpdateBySection()
 
-    def handle_foiministryrequest_update(self, payload):
-        return _handle_foiministryrequest_update(
+    def _handle_foiministryrequest_update(self, payload):
+        return handle_foiministryrequest_update(
             payload,
             OIStatusEnum.UNPUBLISHED.value,
             self.section_updater,
@@ -217,7 +217,7 @@ class ProactiveDisclosureUnpublishCompletedConsumer:
             f"objects_deleted={payload.get('objects_deleted')} "
             f"sitemap_result={payload.get('sitemap_result')}"
         )
-        update_result = self.handle_foiministryrequest_update(payload)
+        update_result = self._handle_foiministryrequest_update(payload)
 
         if update_result.success is False:
             return update_result
