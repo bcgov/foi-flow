@@ -158,7 +158,10 @@ func TestEndToEnd_PD_PublishedRequestProducesCompleted(t *testing.T) {
 		t.Fatalf("s3 client: %v", err)
 	}
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
-	svc := pubpub.NewService(s3Client, s3Client, "", logger, pubpub.WithFileCopier(s3Client))
+	svc, err := pubpub.NewService(s3Client, s3Client, "", logger, pubpub.WithFileCopier(s3Client), pubpub.WithDeleter(s3Client))
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
 	sitemapWriter := sitemapping.NewWriter(s3Client, sitemapping.NewRequestRepo(pool), map[pub.Kind]sitemapping.Target{
 		pub.KindProactiveDisclosureSitemap: {
 			Bucket:          "pd-published",
