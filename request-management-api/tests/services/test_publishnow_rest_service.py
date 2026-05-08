@@ -28,13 +28,13 @@ class FakePublicationClient:
         self.response = response
         self.calls = []
 
-    def publish(self, publication_type, payload):
-        self.calls.append((publication_type, payload))
+    def publish(self, publication_type, payload, correlation_id=None):
+        self.calls.append((publication_type, payload, correlation_id))
         return self.response
 
 
 class FailingPublicationClient:
-    def publish(self, publication_type, payload):
+    def publish(self, publication_type, payload, correlation_id=None):
         raise RuntimeError("publication service unavailable")
 
 
@@ -269,8 +269,15 @@ def test_publish_failure_log_includes_context_in_message(caplog):
                 "foiministryrequestid": 22318,
                 "axisrequestid": "PD-FIN-2026-047533",
                 "bcgovcode": "fin",
+                "contributor": "Ministry of Finance",
                 "proactivedisclosurecategory": "Calendars",
                 "reportperiod": "Quarter 1 2026-27",
+                "published_date": "2026-04-20",
+                "fees": 0,
+                "applicant_type": None,
+                "sitemap_pages": "",
+                "additionalfiles": [],
+                "openinfoid": 0,
             }
         ),
         publication_client=FailingPublicationClient(),
@@ -284,6 +291,43 @@ def test_publish_failure_log_includes_context_in_message(caplog):
     assert "publication_type=proactivedisclosure" in caplog.text
     assert "foiministryrequestid=22318" in caplog.text
     assert "axisrequestid=PD-FIN-2026-047533" in caplog.text
+    assert "correlation_id=proactivedisclosure-publish-71" in caplog.text
+
+
+def test_publication_rest_client_generates_uuid_when_no_correlation_id():
+    http_client = FakeHttpClient(
+        FakeHttpResponse(status_code=200, payload={"status": "completed"})
+    )
+    client = PublicationRestClient(
+        base_url="http://localhost:9085",
+        timeout=5,
+        http_client=http_client,
+    )
+
+    client.publish("openinfo", {"axis_request_id": "FIN-2026-001"})
+
+    headers = http_client.calls[0]["headers"]
+    correlation_id = headers["X-Correlation-ID"]
+    parsed = uuid.UUID(correlation_id)
+    assert str(parsed) == correlation_id
+
+
+def test_publication_rest_client_sends_correlation_id_header():
+    http_client = FakeHttpClient(
+        FakeHttpResponse(status_code=200, payload={"status": "completed"})
+    )
+    client = PublicationRestClient(
+        base_url="http://localhost:9085",
+        timeout=5,
+        http_client=http_client,
+    )
+
+    client.publish("openinfo", {"axis_request_id": "FIN-2026-001"}, correlation_id="openinfo-publish-345")
+
+    assert len(http_client.calls) == 1
+    headers = http_client.calls[0]["headers"]
+    assert headers["X-Correlation-ID"] == "openinfo-publish-345"
+    assert headers["Content-Type"] == "application/json"
 
 
 def test_publication_rest_client_includes_upstream_error_body():
@@ -350,3 +394,78 @@ def test_proactive_ready_for_crawling_fails_when_ministry_status_not_updated(mon
     assert "FOIMinistryRequests" in result.message
     assert session.committed is False
     assert session.rolled_back is True
+
+
+def test_publish_openinfo_passes_correlation_id_to_client(monkeypatch):
+    monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
+    monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
+    monkeypatch.setenv("FLASK_ENV", "production")
+    client = FakePublicationClient(
+        {
+            "status": "completed",
+            "publication_id": "FIN-2026-047533",
+            "sitemap_page_key": "openinfopub/sitemap/sitemap_pages_1.xml",
+        }
+    )
+    service = PublishNowRestService(
+        openinfo_service=FakeOpenInfoService(
+            openinfo_rows=[
+                {
+                    "openinfoid": 345,
+                    "axisrequestid": "FIN-2026-047533",
+                    "description": "Budget briefing records",
+                    "published_date": "2026-04-20",
+                    "contributor": "Ministry of Finance",
+                    "fees": 0,
+                    "applicant_type": "Media",
+                    "bcgovcode": "fin",
+                }
+            ]
+        ),
+        publication_client=client,
+        publication_status_updater=FakePublicationStatusUpdater(),
+    )
+
+    service.publish_openinfo_now(22318)
+
+    assert client.calls[0][2] == "openinfo-publish-345"
+
+
+def test_publish_proactive_disclosure_passes_correlation_id_to_client(monkeypatch):
+    monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
+    monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
+    monkeypatch.setenv("FLASK_ENV", "production")
+    client = FakePublicationClient(
+        {
+            "status": "completed",
+            "publication_id": "PD-FIN-2026-047533",
+            "sitemap_page_key": "pdpublishing/sitemap/sitemap_pages_2.xml",
+        }
+    )
+    service = PublishNowRestService(
+        openinfo_service=FakeOpenInfoService(
+            proactive_row={
+                "proactivedisclosureid": 71,
+                "foiministryrequestid": 22318,
+                "foirequestid": 22318,
+                "axisrequestid": "PD-FIN-2026-047533",
+                "description": "Ministerial Directive",
+                "published_date": "2026-04-20",
+                "contributor": "Ministry of Finance",
+                "fees": 0,
+                "applicant_type": None,
+                "bcgovcode": "fin",
+                "sitemap_pages": "",
+                "proactivedisclosurecategory": "Calendars",
+                "reportperiod": "Quarter 1 2026-27",
+                "additionalfiles": [],
+                "openinfoid": 0,
+            }
+        ),
+        publication_client=client,
+        publication_status_updater=FakePublicationStatusUpdater(),
+    )
+
+    service.publish_proactive_disclosure_now(22318)
+
+    assert client.calls[0][2] == "proactivedisclosure-publish-71"
