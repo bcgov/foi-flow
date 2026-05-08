@@ -25,7 +25,7 @@
       "type": "array",
       "items": { "$ref": "#/$defs/additional_file" }
     },
-    "openinfo_id":                  { "type": "integer" },
+    "openinfo_id":                  { "type": ["integer", "null"] },
     "high_level_subject":           { "type": "string" },
     "subject":                      { "type": "string" },
     "year":                         { "type": "string" },
