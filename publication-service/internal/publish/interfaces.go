@@ -16,3 +16,8 @@ type Uploader interface {
 type FileCopier interface {
 	CopyFile(ctx context.Context, srcBucket, srcKey, dstBucket, dstKey string) (int64, error)
 }
+
+// Deleter removes a single object from an S3 bucket.
+type Deleter interface {
+	Delete(ctx context.Context, bucket, key string) error
+}

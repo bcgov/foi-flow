@@ -268,7 +268,7 @@ class FOIProactiveDisclosureRequests(db.Model):
                     ON mr.foirequest_id = r.foirequestid AND mr.foirequestversion_id = r.version
                 INNER JOIN public."ProgramAreas" pa
                     ON mr.programareaid = pa.programareaid
-                INNER JOIN public."ApplicantCategories" ac
+                LEFT JOIN public."ApplicantCategories" ac
                     ON r.applicantcategoryid = ac.applicantcategoryid
                 LEFT JOIN (
                     SELECT ministryrequestid, MAX(version) as max_version

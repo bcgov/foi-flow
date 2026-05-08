@@ -98,7 +98,7 @@ func (s *memoryResultStore) MarkSucceeded(_ context.Context, _ string, result si
 func TestPublish_OpenInfoEndToEndWithoutRedis(t *testing.T) {
 	store := newMemoryObjectStore()
 	store.put("foi-raw", "incoming/a/Response_Letter_HTH-2025-52023.pdf", []byte("letter"))
-	orchestrator := newTestOrchestrator(store)
+	orchestrator := newTestOrchestrator(t, store)
 
 	resp, err := orchestrator.Publish(context.Background(), wrapperJSON(PublicationTypeOpenInfo, openInfoPayload()))
 	if err != nil {
@@ -125,7 +125,7 @@ func TestPublish_OpenInfoEndToEndWithoutRedis(t *testing.T) {
 func TestPublish_ProactiveDisclosureEndToEndWithoutRedis(t *testing.T) {
 	store := newMemoryObjectStore()
 	store.put("foi-raw", "incoming/a/notes.pdf", []byte("notes"))
-	orchestrator := newTestOrchestrator(store)
+	orchestrator := newTestOrchestrator(t, store)
 
 	resp, err := orchestrator.Publish(context.Background(), wrapperJSON(PublicationTypeProactiveDisclosure, pdPayload()))
 	if err != nil {
@@ -149,7 +149,7 @@ func TestPublish_ProactiveDisclosureEndToEndWithoutRedis(t *testing.T) {
 	}
 }
 
-func newTestOrchestrator(store *memoryObjectStore) *Orchestrator {
+func newTestOrchestrator(t *testing.T, store *memoryObjectStore) *Orchestrator {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	targets := map[pub.Kind]sitemapping.Target{
 		pub.KindOpenInfoSitemap: {
@@ -170,7 +170,10 @@ func newTestOrchestrator(store *memoryObjectStore) *Orchestrator {
 		},
 	}
 	writer := sitemapping.NewWriter(store, newMemoryResultStore(), targets)
-	svc := pubpub.NewService(store, store, "https://objects.example", logger, pubpub.WithFileCopier(store))
+	svc, err := pubpub.NewService(store, store, "https://objects.example", logger, pubpub.WithFileCopier(store), pubpub.WithDeleter(store))
+	if err != nil {
+		t.Fatalf("NewService: %v", err)
+	}
 	orchestrator := New(svc, writer)
 	orchestrator.now = func() time.Time { return time.Date(2026, 4, 27, 12, 0, 0, 0, time.UTC) }
 	return orchestrator
