@@ -31,6 +31,8 @@ class OpenInfoPublishRequestedPayload:
     month: Optional[str] = None
     year: Optional[str] = None
     subject: Optional[str] = None
+    foirequest_id: Optional[int] = None
+    foiministryrequest_id: Optional[int] = None
 
     def to_dict(self):
         return asdict(self)
