@@ -16,6 +16,7 @@ type EventMetrics struct {
 	outboxLag          metric.Float64Gauge
 	consumerLag        metric.Int64Gauge
 	deadLetter         metric.Int64Counter
+	windowSkipped      metric.Int64Counter
 }
 
 // NewEventMetrics builds a metrics container from a Meter.
@@ -48,9 +49,15 @@ func NewEventMetrics(meter metric.Meter) (*EventMetrics, error) {
 	if err != nil {
 		return nil, err
 	}
+	ws, err := meter.Int64Counter("publish_window_skipped_total",
+		metric.WithDescription("Events discarded because the publish window was closed"))
+	if err != nil {
+		return nil, err
+	}
 	return &EventMetrics{
 		received: rcv, processed: prc, retryCount: rt,
 		processingDuration: pd, outboxLag: ol, consumerLag: cl, deadLetter: dl,
+		windowSkipped: ws,
 	}, nil
 }
 
@@ -92,4 +99,8 @@ func (m *EventMetrics) RecordDeadLetter(ctx context.Context, eventType, lastErro
 		attribute.String("event_type", eventType),
 		attribute.String("last_error_class", lastErrorClass),
 	))
+}
+
+func (m *EventMetrics) RecordWindowSkipped(ctx context.Context) {
+	m.windowSkipped.Add(ctx, 1)
 }
