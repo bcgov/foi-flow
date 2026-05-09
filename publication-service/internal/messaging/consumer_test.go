@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"publication-service/internal/config"
 	"publication-service/internal/events"
 	pub "publication-service/internal/publish"
 )
@@ -349,5 +350,89 @@ func TestConsumer_RunRetriesEnsureGroupWithBackoff(t *testing.T) {
 	}
 	if elapsed := time.Since(start); elapsed < 40*time.Millisecond {
 		t.Fatalf("Run retried EnsureGroup without backoff; elapsed = %s", elapsed)
+	}
+}
+
+func TestConsumer_GateClosed_DiscardsMessage(t *testing.T) {
+	broker := &fakeReadBroker{messages: []*StreamMessage{
+		{ID: "redis-gate-1", Payload: sampleEnvelope(t)},
+	}}
+	repo := &fakeRepo{}
+	outbox := &fakeOutbox{}
+	normalizer := &fakeNormalizer{handlerErr: nil}
+
+	closedGate := NewTimeWindowGate(config.PublishWindowConfig{
+		Enabled:  true,
+		Start:    config.TimeOfDay{Hour: 13, Minute: 0},
+		End:      config.TimeOfDay{Hour: 15, Minute: 0},
+		Location: time.UTC,
+	}, WithNowFunc(func() time.Time {
+		// 10:00 UTC on a Wednesday — outside 13:00–15:00
+		return time.Date(2026, time.May, 6, 10, 0, 0, 0, time.UTC)
+	}))
+
+	c := newConsumerForTest(broker, repo, outbox, normalizer).WithTimeWindow(closedGate)
+	if err := c.Step(context.Background()); err != nil {
+		t.Fatalf("Step: %v", err)
+	}
+	if repo.claimed {
+		t.Error("repo should not have been claimed when gate is closed")
+	}
+	if repo.complete {
+		t.Error("repo should not have been marked complete")
+	}
+	if outbox.inserted != 0 {
+		t.Error("outbox should not have an entry")
+	}
+	if len(broker.acked) != 1 || broker.acked[0] != "redis-gate-1" {
+		t.Errorf("message should be ACKed; acked = %v", broker.acked)
+	}
+}
+
+func TestConsumer_GateOpen_ProcessesNormally(t *testing.T) {
+	broker := &fakeReadBroker{messages: []*StreamMessage{
+		{ID: "redis-gate-2", Payload: sampleEnvelope(t)},
+	}}
+	repo := &fakeRepo{}
+	outbox := &fakeOutbox{}
+	normalizer := &fakeNormalizer{handlerErr: nil}
+
+	openGate := NewTimeWindowGate(config.PublishWindowConfig{
+		Enabled:  true,
+		Start:    config.TimeOfDay{Hour: 13, Minute: 0},
+		End:      config.TimeOfDay{Hour: 15, Minute: 0},
+		Location: time.UTC,
+	}, WithNowFunc(func() time.Time {
+		// 14:00 UTC on a Wednesday — inside 13:00–15:00
+		return time.Date(2026, time.May, 6, 14, 0, 0, 0, time.UTC)
+	}))
+
+	c := newConsumerForTest(broker, repo, outbox, normalizer).WithTimeWindow(openGate)
+	if err := c.Step(context.Background()); err != nil {
+		t.Fatalf("Step: %v", err)
+	}
+	if !repo.complete {
+		t.Error("expected MarkCompleted when gate is open")
+	}
+	if outbox.inserted != 1 {
+		t.Errorf("outbox.inserted = %d, want 1", outbox.inserted)
+	}
+}
+
+func TestConsumer_NilGate_ProcessesNormally(t *testing.T) {
+	// This is equivalent to the existing happy path — confirming nil gate doesn't break.
+	broker := &fakeReadBroker{messages: []*StreamMessage{
+		{ID: "redis-nil-gate", Payload: sampleEnvelope(t)},
+	}}
+	repo := &fakeRepo{}
+	outbox := &fakeOutbox{}
+	normalizer := &fakeNormalizer{handlerErr: nil}
+
+	c := newConsumerForTest(broker, repo, outbox, normalizer) // no WithTimeWindow
+	if err := c.Step(context.Background()); err != nil {
+		t.Fatalf("Step: %v", err)
+	}
+	if !repo.complete {
+		t.Error("expected MarkCompleted with nil gate")
 	}
 }
