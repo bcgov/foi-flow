@@ -79,6 +79,7 @@ type Consumer struct {
 	validator  Validator
 	logger     *slog.Logger
 	metrics    *observability.EventMetrics
+	gate       *TimeWindowGate
 }
 
 // NewConsumer constructs a Consumer.
@@ -91,6 +92,10 @@ func (c *Consumer) WithLogger(l *slog.Logger) *Consumer { c.logger = l; return c
 
 // WithMetrics attaches event metrics to the consumer.
 func (c *Consumer) WithMetrics(m *observability.EventMetrics) *Consumer { c.metrics = m; return c }
+
+// WithTimeWindow attaches a time window gate to the consumer.
+// When the gate is closed, messages are ACKed and discarded.
+func (c *Consumer) WithTimeWindow(g *TimeWindowGate) *Consumer { c.gate = g; return c }
 
 // Run loops Step until ctx is done.
 func (c *Consumer) Run(ctx context.Context) error {
@@ -137,6 +142,15 @@ func (c *Consumer) Step(ctx context.Context) error {
 	}
 	if msg == nil {
 		return nil
+	}
+
+	if c.gate != nil && !c.gate.IsOpen() {
+		c.logger.Info("publish window closed — discarding event",
+			slog.String("redis_id", msg.ID))
+		if c.metrics != nil {
+			c.metrics.RecordWindowSkipped(ctx)
+		}
+		return c.broker.Ack(ctx, c.cfg.Stream, c.cfg.Group, msg.ID)
 	}
 
 	env, err := events.UnmarshalEnvelope(msg.Payload)
