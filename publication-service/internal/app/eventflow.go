@@ -90,6 +90,15 @@ func RunEventFlow(ctx context.Context, cfg *config.Config, logger *slog.Logger) 
 		PoisonRepeatThreshold: cfg.PoisonRepeatThreshold,
 	}, broker, sharedRepo, outboxRepo, pubNormalizer, pubValidator).WithMetrics(metrics).WithLogger(logger)
 
+	if cfg.PublishWindow.Enabled {
+		gate := messaging.NewTimeWindowGate(cfg.PublishWindow)
+		pubConsumer = pubConsumer.WithTimeWindow(gate)
+		logger.Info("publish time window enabled",
+			slog.String("start", cfg.PublishWindow.Start.String()),
+			slog.String("end", cfg.PublishWindow.End.String()),
+			slog.String("timezone", cfg.PublishWindow.Location.String()))
+	}
+
 	// Unified unpublish consumer
 	unpubNormalizer := pubunpub.NewNormalizerAdapter(unpublishService)
 	unpubValidator, err := pubunpub.NewValidator(cfg.UnpublishSourceAllowlist)
