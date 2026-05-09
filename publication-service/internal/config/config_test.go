@@ -339,6 +339,105 @@ func TestLoad_LogLevelInvalid(t *testing.T) {
 	}
 }
 
+func TestLoad_PublishWindowDefaults(t *testing.T) {
+	setBaseEnv(t)
+	t.Setenv("PUBLISH_WINDOW_ENABLED", "")
+	t.Setenv("PUBLISH_WINDOW_START", "")
+	t.Setenv("PUBLISH_WINDOW_END", "")
+	t.Setenv("PUBLISH_WINDOW_TIMEZONE", "")
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if !cfg.PublishWindow.Enabled {
+		t.Error("PublishWindow.Enabled should default to true")
+	}
+	if cfg.PublishWindow.Start != (TimeOfDay{Hour: 13, Minute: 0}) {
+		t.Errorf("PublishWindow.Start = %+v, want 13:00", cfg.PublishWindow.Start)
+	}
+	if cfg.PublishWindow.End != (TimeOfDay{Hour: 15, Minute: 0}) {
+		t.Errorf("PublishWindow.End = %+v, want 15:00", cfg.PublishWindow.End)
+	}
+	if cfg.PublishWindow.Location.String() != "America/Vancouver" {
+		t.Errorf("PublishWindow.Location = %q, want America/Vancouver", cfg.PublishWindow.Location)
+	}
+}
+
+func TestLoad_PublishWindowCustom(t *testing.T) {
+	setBaseEnv(t)
+	t.Setenv("PUBLISH_WINDOW_ENABLED", "true")
+	t.Setenv("PUBLISH_WINDOW_START", "09:30")
+	t.Setenv("PUBLISH_WINDOW_END", "16:45")
+	t.Setenv("PUBLISH_WINDOW_TIMEZONE", "America/Toronto")
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if cfg.PublishWindow.Start != (TimeOfDay{Hour: 9, Minute: 30}) {
+		t.Errorf("Start = %+v", cfg.PublishWindow.Start)
+	}
+	if cfg.PublishWindow.End != (TimeOfDay{Hour: 16, Minute: 45}) {
+		t.Errorf("End = %+v", cfg.PublishWindow.End)
+	}
+	if cfg.PublishWindow.Location.String() != "America/Toronto" {
+		t.Errorf("Location = %q", cfg.PublishWindow.Location)
+	}
+}
+
+func TestLoad_PublishWindowDisabled(t *testing.T) {
+	setBaseEnv(t)
+	t.Setenv("PUBLISH_WINDOW_ENABLED", "false")
+	t.Setenv("PUBLISH_WINDOW_START", "garbage")
+	t.Setenv("PUBLISH_WINDOW_END", "garbage")
+	t.Setenv("PUBLISH_WINDOW_TIMEZONE", "garbage")
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load: %v (disabled window should skip parsing)", err)
+	}
+	if cfg.PublishWindow.Enabled {
+		t.Error("expected disabled")
+	}
+}
+
+func TestLoad_PublishWindowInvalidStart(t *testing.T) {
+	setBaseEnv(t)
+	t.Setenv("PUBLISH_WINDOW_ENABLED", "true")
+	t.Setenv("PUBLISH_WINDOW_START", "25:99")
+	t.Setenv("PUBLISH_WINDOW_END", "15:00")
+	t.Setenv("PUBLISH_WINDOW_TIMEZONE", "America/Vancouver")
+
+	if _, err := Load(); err == nil {
+		t.Fatal("expected error for invalid start time")
+	}
+}
+
+func TestLoad_PublishWindowInvalidTimezone(t *testing.T) {
+	setBaseEnv(t)
+	t.Setenv("PUBLISH_WINDOW_ENABLED", "true")
+	t.Setenv("PUBLISH_WINDOW_START", "13:00")
+	t.Setenv("PUBLISH_WINDOW_END", "15:00")
+	t.Setenv("PUBLISH_WINDOW_TIMEZONE", "Mars/Olympus")
+
+	if _, err := Load(); err == nil {
+		t.Fatal("expected error for invalid timezone")
+	}
+}
+
+func TestLoad_PublishWindowStartAfterEnd(t *testing.T) {
+	setBaseEnv(t)
+	t.Setenv("PUBLISH_WINDOW_ENABLED", "true")
+	t.Setenv("PUBLISH_WINDOW_START", "17:00")
+	t.Setenv("PUBLISH_WINDOW_END", "09:00")
+	t.Setenv("PUBLISH_WINDOW_TIMEZONE", "America/Vancouver")
+
+	if _, err := Load(); err == nil {
+		t.Fatal("expected error when start >= end")
+	}
+}
+
 func setSitemapEnv(t *testing.T) {
 	t.Helper()
 	t.Setenv("SITEMAP_BUCKET", "foi-published")

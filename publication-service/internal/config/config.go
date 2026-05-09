@@ -69,6 +69,8 @@ type Config struct {
 
 	S3      S3Config
 	Sitemap SitemapConfig
+
+	PublishWindow PublishWindowConfig
 }
 
 type S3Config struct {
@@ -100,6 +102,26 @@ type SitemapTargetConfig struct {
 	PublicBaseURL   string
 	IndexFileName   string
 	PageFilePattern string
+}
+
+type TimeOfDay struct {
+	Hour   int
+	Minute int
+}
+
+func (t TimeOfDay) String() string {
+	return fmt.Sprintf("%02d:%02d", t.Hour, t.Minute)
+}
+
+func (t TimeOfDay) Before(other TimeOfDay) bool {
+	return t.Hour < other.Hour || (t.Hour == other.Hour && t.Minute < other.Minute)
+}
+
+type PublishWindowConfig struct {
+	Enabled  bool
+	Start    TimeOfDay
+	End      TimeOfDay
+	Location *time.Location
 }
 
 func Load() (*Config, error) {
@@ -230,7 +252,37 @@ func Load() (*Config, error) {
 		"openinfo.workflow.service,proactivedisclosure.workflow.service",
 	))
 
+	if cfg.PublishWindow.Enabled, err = parseBoolDefault("PUBLISH_WINDOW_ENABLED", true); err != nil {
+		return nil, err
+	}
+	if cfg.PublishWindow.Enabled {
+		startStr := getEnvDefault("PUBLISH_WINDOW_START", "13:00")
+		if cfg.PublishWindow.Start, err = parseTimeOfDay(startStr); err != nil {
+			return nil, fmt.Errorf("config: PUBLISH_WINDOW_START: %w", err)
+		}
+		endStr := getEnvDefault("PUBLISH_WINDOW_END", "15:00")
+		if cfg.PublishWindow.End, err = parseTimeOfDay(endStr); err != nil {
+			return nil, fmt.Errorf("config: PUBLISH_WINDOW_END: %w", err)
+		}
+		if !cfg.PublishWindow.Start.Before(cfg.PublishWindow.End) {
+			return nil, errors.New("config: PUBLISH_WINDOW_START must be before PUBLISH_WINDOW_END")
+		}
+		tzName := getEnvDefault("PUBLISH_WINDOW_TIMEZONE", "America/Vancouver")
+		cfg.PublishWindow.Location, err = time.LoadLocation(tzName)
+		if err != nil {
+			return nil, fmt.Errorf("config: PUBLISH_WINDOW_TIMEZONE: %w", err)
+		}
+	}
+
 	return cfg, nil
+}
+
+func parseTimeOfDay(s string) (TimeOfDay, error) {
+	t, err := time.Parse("15:04", s)
+	if err != nil {
+		return TimeOfDay{}, fmt.Errorf("invalid time %q: %w", s, err)
+	}
+	return TimeOfDay{Hour: t.Hour(), Minute: t.Minute()}, nil
 }
 
 func envOr(key, fallback string) string {
