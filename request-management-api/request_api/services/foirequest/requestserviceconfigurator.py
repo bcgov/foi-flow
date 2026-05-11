@@ -81,7 +81,7 @@ class requestserviceconfigurator:
         proactivedisclosure.processingstatus = foirequestschema.get("processingStatus", foirequestschema.get("processingstatus", current_proactive.get("processingstatus")))
         proactivedisclosure.processingmessage = foirequestschema.get("processingMessage", foirequestschema.get("processingmessage", current_proactive.get("processingmessage")))
         proactivedisclosure.sitemap_pages = foirequestschema.get("sitemapPages", foirequestschema.get("sitemap_pages", current_proactive.get("sitemap_pages")))
-        proactivedisclosure.oipublicationstatus_id = foirequestschema.get("pdPublicationStatusId", foirequestschema.get("oipublicationstatus_id", current_proactive.get("oipublicationstatus_id", 1)))
+        proactivedisclosure.oipublicationstatus_id = foirequestschema.get("pdPublicationStatusId", foirequestschema.get("oipublicationstatus_id", current_proactive.get("oipublicationstatus_id", 2)))
         proactivedisclosure.isactive = foirequestschema.get("isactive", True)
         
         category_name = None

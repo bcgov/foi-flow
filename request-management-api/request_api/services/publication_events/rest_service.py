@@ -34,10 +34,9 @@ REST_PAYLOAD_FIELDS = {
     "subject",
     "month",
     "year",
-    "additionalfiles",
-    "year",
     "foirequest_id",
-    "foiministryrequest_id"
+    "foiministryrequest_id",
+    "additionalfiles",
 }
 
 

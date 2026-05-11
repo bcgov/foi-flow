@@ -101,7 +101,7 @@ class FOIProactiveDisclosureRequests(db.Model):
                     isactive=True,
                     created_at=createddate,
                     createdby=userid,
-                    oipublicationstatus_id=foiproactiverequest.get("oipublicationstatus_id", 1),
+                    oipublicationstatus_id=foiproactiverequest.get("oipublicationstatus_id", 2),
                     processingstatus=foiproactiverequest.get("processingstatus"),
                     processingmessage=foiproactiverequest.get("processingmessage"),
                     sitemap_pages=foiproactiverequest.get("sitemap_pages")
