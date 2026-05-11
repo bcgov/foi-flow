@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://foi.example/events/publication.publish.requested/v1.json",
+  "title": "publication.publish.requested payload v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["tenant_id", "source", "destination", "axis_request_id", "kind"],
+  "properties": {
+    "tenant_id":                    { "type": "string", "format": "uuid" },
+    "source":                       { "$ref": "#/$defs/s3_location" },
+    "destination":                  { "$ref": "#/$defs/s3_location" },
+    "axis_request_id":              { "type": "string", "minLength": 1 },
+    "kind":                         { "type": "string", "enum": ["openinfo", "proactivedisclosure"] },
+    "description":                  { "type": "string" },
+    "published_date":               { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "contributor":                  { "type": "string" },
+    "fees":                         { "type": ["integer", "null"], "minimum": 0 },
+    "applicant_type":               { "type": ["string", "null"] },
+    "proactivedisclosure_category": { "type": "string", "minLength": 1 },
+    "report_period":                { "type": "string", "minLength": 1 },
+    "foiministryrequest_id":        { "type": "integer" },
+    "foirequest_id":                { "type": "integer" },
+    "sitemap_pages":                { "type": "string" },
+    "additionalfiles": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/additional_file" }
+    },
+    "openinfo_id":                  { "type": ["integer", "null"] },
+    "high_level_subject":           { "type": "string" },
+    "subject":                      { "type": "string" },
+    "year":                         { "type": "string" },
+    "month":                        { "type": "string" },
+    "title":                        { "type": "string" }
+  },
+  "$defs": {
+    "additional_file": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["additionalfileid", "filename", "s3uripath", "isactive"],
+      "properties": {
+        "additionalfileid": { "type": "integer" },
+        "filename":         { "type": "string" },
+        "s3uripath":        { "type": "string" },
+        "isactive":         { "type": "boolean" }
+      }
+    },
+    "s3_location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bucket", "prefix"],
+      "properties": {
+        "bucket": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 63,
+          "pattern": "^[a-z0-9][a-z0-9.\\-]{1,61}[a-z0-9]$"
+        },
+        "prefix": { "type": "string", "maxLength": 1024 }
+      }
+    }
+  }
+}

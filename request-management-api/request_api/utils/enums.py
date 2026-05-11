@@ -221,6 +221,14 @@ class OIStatusEnum(Enum):
     @classmethod
     def list(cls):
         return [status.value for status in cls]
+    
+    def equals(self, value):
+        try:
+            if isinstance(value, Enum):
+                value = value.value
+            return self.value == int(value)
+        except (ValueError, TypeError):
+            return False
 
 class OpenInfoNotificationType(Enum):
     EXEMPTION_REQUEST = "Exemption Request"

@@ -2,15 +2,18 @@ from flask import g, request
 from flask_restx import Namespace, Resource
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
-from request_api.services.eventservice import eventservice
 from request_api.tracer import Tracer
-from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships
+from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException
 from request_api.schemas.foiopeninfo import FOIOpenInfoSchema, FOIOpenInfoAdditionalFilesSchema, FOIOpenInfoAdditionalFilesDeleteSchema
 from request_api.services.openinfoservice import openinfoservice
+from request_api.services.publication_events.rest_service import PublishNowRestService
 from request_api.utils.enums import IAOTeamWithKeycloackGroup
-from marshmallow import Schema, fields, validate, ValidationError
+from marshmallow import ValidationError
 import json
+from request_api.services.publication_events.unpublish_service import UnpublishEventService
+import logging
+
 
 API = Namespace('FOIOPENINFO', description='Endpoints for FOI OpenInformation management')
 TRACER = Tracer.get_instance()
@@ -137,3 +140,133 @@ class FOIOpenInfoAdditionalFilesDelete(Resource):
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/publishnow')
+class FOIOpenInfoPublishNow(Resource):
+    """Publish Now"""
+    
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    @TRACER.trace()
+    @auth.require
+    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
+    def post(foiministryrequestid):
+        try:
+            result = PublishNowRestService().publish_openinfo_now(foiministryrequestid)
+            status_code = 200 if result.success else 500
+            logging.info(
+                "OpenInfo publish-now request completed for ministry request %s with status_code=%s success=%s identifier=%s message=%s",
+                foiministryrequestid,
+                status_code,
+                result.success,
+                result.identifier,
+                result.message,
+            )
+            return {'status': result.success, 'message': result.message}, status_code
+            
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message': exception.message}, 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/unpublish')
+class FOIOpenInfoUnpublish(Resource):
+    """Unpublish"""
+    
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    @TRACER.trace()
+    @auth.require
+    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
+    def post(foiministryrequestid):
+        try:
+            result = UnpublishEventService().queue_openinfo_unpublish(foiministryrequestid)
+            status_code = 202 if result.success else 500
+            logging.info(
+                "OpenInfo unpublish request completed for ministry request %s with status_code=%s success=%s message=%s",
+                foiministryrequestid,
+                status_code,
+                result.success,
+                result.message,
+            )
+            return {'status': result.success, 'message': result.message}, status_code
+
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message': exception.message}, 500
+
+# for proactive disclosure
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/pdpublishnow')
+class FOIPDOpenInfoPublishNow(Resource):
+    """Publish Now"""
+    
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    @TRACER.trace()
+    @auth.require
+    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
+    def post(foiministryrequestid):
+        try:
+            logging.info(
+                "PD publish-now request received foiministryrequestid=%s",
+                foiministryrequestid,
+            )
+            result = PublishNowRestService().publish_proactive_disclosure_now(foiministryrequestid)
+            if not result.success:
+                status_code = 500
+            else:
+                status_code = 200
+            logging.info(
+                "PD publish-now request completed for ministry request %s with status_code=%s success=%s identifier=%s message=%s",
+                foiministryrequestid,
+                status_code,
+                result.success,
+                result.identifier,
+                result.message,
+            )
+            return {'status': result.success, 'message': result.message}, status_code
+            
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400    
+        except BusinessException as exception:            
+            return {'status': exception.status_code, 'message': exception.message}, 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiopeninfo/ministryrequest/<int:foiministryrequestid>/pdunpublish')
+class FOIPDOpenInfoUnpublish(Resource):
+    """Unpublish"""
+    
+    @staticmethod
+    @cross_origin(origins=allowedorigins())
+    @TRACER.trace()
+    @auth.require
+    @auth.ismemberofgroups(",".join(IAOTeamWithKeycloackGroup.list()))
+    def post(foiministryrequestid):
+        try:
+            result = UnpublishEventService().queue_pd_unpublish(foiministryrequestid)
+            status_code = 202 if result.success else 500
+            logging.info(
+                "PD unpublish request completed for ministry request %s with status_code=%s success=%s message=%s",
+                foiministryrequestid,
+                status_code,
+                result.success,
+                result.message,
+            )
+            return {'status': result.success, 'message': result.message}, status_code
+
+        except ValidationError as err:
+            return {'status': False, 'message': str(err)}, 400
+        except KeyError as error:
+            return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
+        except BusinessException as exception:
+            return {'status': exception.status_code, 'message': exception.message}, 500

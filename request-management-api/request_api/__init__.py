@@ -20,11 +20,13 @@ import json
 import os
 import logging
 from flask import Flask
+from flask_jwt_oidc.exceptions import AuthError
 
 import request_api.config as config
 from request_api.config import _Config
 
 from request_api.models import db, ma
+from request_api.utils.auth_error_handler import auth_error_response
 from request_api.utils.util_logging import configure_logging
 from request_api.auth import jwt
 from flask_cors import CORS
@@ -99,6 +101,7 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     #print("Hello, world!")
 
 
+    register_auth_error_handler(app)
     register_shellcontext(app)
     
     return app
@@ -115,6 +118,14 @@ def setup_jwt_manager(app, jwt_manager):
     jwt_manager.init_app(app)
 
 
+def register_auth_error_handler(app):
+    """Register handlers for authentication exceptions."""
+
+    @app.errorhandler(AuthError)
+    def handle_auth_error(error):
+        return auth_error_response(error, app.logger)
+
+
 
 def register_shellcontext(app):
     """Register shell context objects."""
@@ -124,6 +135,4 @@ def register_shellcontext(app):
         return {'app': app, 'jwt': jwt, 'db': db, 'models': models}  # pragma: no cover
 
     app.shell_context_processor(shell_context)
-
-
 
