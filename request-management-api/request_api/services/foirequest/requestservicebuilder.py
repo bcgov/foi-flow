@@ -1,5 +1,4 @@
 
-from re import T
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIMinistryRequestDivisions import FOIMinistryRequestDivision
 from request_api.models.RequestorType import RequestorType
