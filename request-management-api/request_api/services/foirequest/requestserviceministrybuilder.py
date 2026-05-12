@@ -41,6 +41,15 @@ class requestserviceministrybuilder(requestserviceconfigurator):
     def createfoiministryrequestfromobject(self, ministryschema, requestschema, userid, usertype = None):
         requestdict = self.createfoiministryrequestfromobject1(ministryschema, requestschema)
         foiministryrequest = FOIMinistryRequest()
+        # Can at some point change this to update columns automatically
+        # # this will still miss the migrationreference column
+        # previous_request = FOIMinistryRequest.getrequest(ministryschema["foiministryrequestid"])
+        # for key, value in previous_request.items():
+        #     if hasattr(foiministryrequest, key):
+        #         setattr(foiministryrequest, key, value)
+        # for key, value in ministryschema.items():
+        #     if hasattr(foiministryrequest, key):
+        #         setattr(foiministryrequest, key, value)
         foiministryrequest.foiministryrequestid = ministryschema["foiministryrequestid"] 
         foiministryrequest.version = ministryschema["version"] + 1
         foiministryrequest.foirequest_id = ministryschema["foirequest_id"] 
@@ -56,6 +65,9 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.originalldd = ministryschema['originalldd']
         foiministryrequest.axispagecount = ministryschema["axispagecount"]
         foiministryrequest.recordspagecount = ministryschema["recordspagecount"]
+        foiministryrequest.axislanpagecount = ministryschema.get("axislanpagecount")
+        foiministryrequest.estimatedpagecount = ministryschema.get("estimatedpagecount")
+        foiministryrequest.estimatedtaggedpagecount = ministryschema.get("estimatedtaggedpagecount")
         foiministryrequest.cfrduedate = requestdict['cfrduedate']
         foiministryrequest.startdate = requestdict['startdate']
         foiministryrequest.duedate = requestdict['duedate']
@@ -140,10 +152,10 @@ class requestserviceministrybuilder(requestserviceconfigurator):
             'assignedgroup': requestschema['assignedgroup'] if 'assignedgroup' in requestschema  else ministryschema["assignedgroup"],
             'requeststatuslabel': requestschema['requeststatuslabel'] if  'requeststatuslabel' in requestschema  else  ministryschema["requeststatuslabel"],
             'programareaid': ministryschema["programarea.programareaid"] if 'programarea.programareaid' in ministryschema  else None,
-            'closedate': requestschema['closedate'] if 'closedate' in requestschema  else None,
-            'closereasonid': requestschema['closereasonid'] if 'closereasonid' in requestschema  else None,
+            'closedate': ministryschema['closedate'] if 'closedate' in ministryschema  else None,
+            'closereasonid': ministryschema['closereasonid'] if 'closereasonid' in ministryschema  else None,
             'linkedrequests': requestschema['linkedrequests'] if 'linkedrequests' in requestschema  else None,
-            'ministrysignoffapproval': requestschema['ministrysignoffapproval'] if 'ministrysignoffapproval' in requestschema else None,
+            'ministrysignoffapproval': ministryschema['ministrysignoffapproval'] if 'ministrysignoffapproval' in ministryschema else None,
         }
     
     def createfoirequestdocuments(self,requestschema, ministryrequestid, activeversion, userid):
