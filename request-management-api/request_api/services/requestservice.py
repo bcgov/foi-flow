@@ -1,4 +1,3 @@
-from re import T
 
 from request_api.services.documentservice import documentservice
 from request_api.services.workflowservice import workflowservice

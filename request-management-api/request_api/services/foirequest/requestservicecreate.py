@@ -1,5 +1,4 @@
 
-from re import T
 from request_api.models.FOIRequests import FOIRequest
 from request_api.models.ContactTypes import ContactType
 from request_api.models.PersonalInformationAttributes import PersonalInformationAttribute

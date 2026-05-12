@@ -1,6 +1,7 @@
 """REST client for the publication service."""
 
 import os
+import uuid
 
 import requests
 from requests.exceptions import HTTPError
@@ -18,9 +19,12 @@ class PublicationRestClient:
         self.timeout = timeout or int(os.getenv("PUBLICATION_API_TIMEOUT", "30"))
         self.http_client = http_client or requests
 
-    def publish(self, publication_type, payload):
+    def publish(self, publication_type, payload, correlation_id=None):
         if not self.base_url:
             raise ValueError("PUBLICATION_API_BASE_URL is not configured")
+
+        if correlation_id is None:
+            correlation_id = str(uuid.uuid4())
 
         response = self.http_client.post(
             f"{self.base_url}/publications",
@@ -28,7 +32,10 @@ class PublicationRestClient:
                 "publication_type": publication_type,
                 "payload": payload,
             },
-            headers={"Content-Type": "application/json"},
+            headers={
+                "Content-Type": "application/json",
+                "X-Correlation-ID": correlation_id,
+            },
             timeout=self.timeout,
         )
         try:

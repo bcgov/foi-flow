@@ -1,5 +1,4 @@
 
-from re import T
 from request_api.models.FOIRequests import FOIRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRequestContactInformation import FOIRequestContactInformation
