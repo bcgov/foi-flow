@@ -7,6 +7,9 @@ from .FOIApplicantCorrespondenceAttachmentsRawRequests import FOIApplicantCorres
 from .FOIApplicantCorrespondenceEmailsRawRequests import FOIApplicantCorrespondenceEmailRawRequest
 from sqlalchemy.dialects.postgresql import JSON
 import logging
+
+logger = logging.getLogger(__name__)
+
 class FOIApplicantCorrespondenceRawRequest(db.Model):
     # Name of the table in our database
     __tablename__ = 'FOIApplicantCorrespondencesRawRequests'
@@ -137,9 +140,12 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
             if len(correspondenceemails) > 0:
                 FOIApplicantCorrespondenceEmailRawRequest().saveapplicantcorrespondenceemail(newapplicantcorrepondencelog.applicantcorrespondenceid , correspondenceemails)
             return DefaultMethodResult(True,'applicantcorrepondence log added',newapplicantcorrepondencelog.applicantcorrespondenceid)
-        except Exception as e:
-            print('EXCEPTION: ')
-            print(e)
+        except Exception:
+            logger.exception(
+                "Error saving raw request applicant correspondence: rawrequestid=%s correspondenceid=%s",
+                newapplicantcorrepondencelog.foirawrequest_id,
+                newapplicantcorrepondencelog.applicantcorrespondenceid,
+            )
             return DefaultMethodResult(False,'applicantcorrepondence log exception while adding attachments',newapplicantcorrepondencelog.applicantcorrespondenceid)
         finally:
             db.session.close()

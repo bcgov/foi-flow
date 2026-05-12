@@ -12,8 +12,11 @@ import pytz
 import maya
 from request_api.auth import AuthHelper
 import holidays
+import logging
 
 from flask import jsonify
+
+logger = logging.getLogger(__name__)
 
 SHORT_DATEFORMAT = '%Y %b, %d'
 LONG_DATEFORMAT = '%Y-%m-%d %H:%M:%S.%f'
@@ -307,8 +310,8 @@ class dashboardservice:
                 closed_date += dt.timedelta(days=1)
 
             return str(business_days) if business_days >= 0 else "N/A"
-        except Exception as e:
-            print("Error in calculate_from_closed: ", e)
+        except Exception:
+            logger.exception("Error calculating business days from closed date")
             return "N/A"
 
     def __handle_oi_request(self, request):

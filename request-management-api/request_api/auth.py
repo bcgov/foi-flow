@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Bring in the common JWT Manager."""
+import logging
 from functools import wraps
 from http import HTTPStatus
 
@@ -21,6 +22,9 @@ from flask_jwt_oidc import JwtManager
 from jose import JWTError, jwt as josejwt
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
+
+logger = logging.getLogger(__name__)
+
 jwt = (
     JwtManager()
 )  # pylint: disable=invalid-name; lower case name as used by convention in most Flask apps
@@ -180,9 +184,9 @@ class AuthHelper:
                 return claim_value+'@idir' if claim_value.endswith("@idir") == False else claim_value
             return unverified_claims['preferred_username']
         except JWTError as exception:
-            print("JWTError >>> ", str(exception))
+            logger.warning("JWT validation failed: %s", exception)
         except Exception as ex:
-            print("Exception >>> ", str(ex))
+            logger.exception("Unexpected JWT validation error")
     
     @classmethod
     def getusername(cls):

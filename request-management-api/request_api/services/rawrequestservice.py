@@ -20,6 +20,8 @@ from request_api.services.foirequest.requestserviceconfigurator import requestse
 from request_api.utils.enums import StateName
 import logging
 
+logger = logging.getLogger(__name__)
+
 class rawrequestservice:
     """ FOI Raw Request management service
 
@@ -161,7 +163,7 @@ class rawrequestservice:
                 # if statusid == 16:                    
                 #     return 'Peer Review'   
             except  KeyError:
-                print("Key Error on requeststatusid, ignore will be intake in Progress")
+                logger.warning("Raw request status label not found; defaulting to intake in progress: statuslabel=%s", statuslabel)
         return StateName.intakeinprogress.value, StateName.intakeinprogress.name
 
     def getaxisequestids(self):
