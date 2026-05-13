@@ -145,12 +145,11 @@ class FOIOpenInformationRequests(db.Model):
             sql = """
                 UPDATE public."FOIOpenInformationRequests"
                 SET processingstatus = 'ready for crawling',
-                    processingmessage = 'sitemap ready',
+                    processingmessage = 'Published',
                     sitemap_pages = :sitemap_page,
                     updated_at = now()
                 WHERE foiministryrequest_id = :foiministryrequestid
                   AND isactive = TRUE
-                  AND processingstatus IS NULL;
             """
             result = db.session.execute(
                 text(sql),
@@ -177,7 +176,7 @@ class FOIOpenInformationRequests(db.Model):
             db.session.close()
 
     @classmethod
-    def create_published_version_from_openinfo_id(cls, foiopeninforequestid, message)->DefaultMethodResult:
+    def create_published_version_from_openinfo_id(cls, foiopeninforequestid, message, sitemap=None)->DefaultMethodResult:
         try:
             current = (
                 db.session.query(cls)
@@ -226,9 +225,9 @@ class FOIOpenInformationRequests(db.Model):
                 copyrightsevered=latest.copyrightsevered,
                 created_at=updated_at,
                 createdby="publishingservice",
-                processingstatus="published",
+                processingstatus="ready for crawling",
                 processingmessage=message,
-                sitemap_pages=latest.sitemap_pages,
+                sitemap_pages=sitemap,
                 isactive=True,
             )
             db.session.add(new_foiopeninforequest)
@@ -705,7 +704,7 @@ class FOIOpenInformationRequests(db.Model):
                 INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on oi.oipublicationstatus_id = oirequesttype.oipublicationstatusid
                 LEFT JOIN public."FOIOpenInfoAdditionalFiles" oifiles on mr.foiministryrequestid = oifiles.ministryrequestid
                 WHERE mr.foiministryrequestid = :foiministryrequestid 
-                  AND oi.processingstatus is NULL 
+                  AND (oi.processingmessage != 'Published' OR oi.processingmessage is NULL)
                   AND mr.isactive = TRUE
                 GROUP BY 
                     oi.foiopeninforequestid,
@@ -779,7 +778,7 @@ class FOIOpenInformationRequests(db.Model):
                 WHERE oistatus.name IN (:ready_status, :published_status)
                   AND oirequesttype.name = :publication_status
                   AND oi.publicationdate < :publication_cutoff
-                  AND oi.processingstatus is NULL
+                  AND (oi.processingmessage != 'Published' OR oi.processingmessage is NULL)
                   AND mr.isactive = TRUE
                 GROUP BY
                     oi.foiopeninforequestid,
@@ -829,7 +828,7 @@ class FOIOpenInformationRequests(db.Model):
                 INNER JOIN public."OpenInformationStatuses" oistatus on mr.oistatus_id = oistatus.oistatusid
                 INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on oi.oipublicationstatus_id = oirequesttype.oipublicationstatusid
                 WHERE mr.foiministryrequestid = :foiministryrequestid 
-                  AND oi.processingstatus is NULL
+                  AND oi.processingmessage = 'Published'
                   AND oi.isactive = TRUE;
             """
             
@@ -891,7 +890,7 @@ class FOIOpenInformationRequests(db.Model):
                 INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on pd.oipublicationstatus_id = oirequesttype.oipublicationstatusid
                 LEFT JOIN public."FOIOpenInfoAdditionalFiles" oifiles on mr.foiministryrequestid = oifiles.ministryrequestid
                 WHERE mr.foiministryrequestid = :foiministryrequestid 
-                  AND pd.processingstatus is NULL 
+                  AND (pd.processingmessage != 'Published' OR pd.processingmessage is NULL) 
                   AND mr.isactive = TRUE
                 GROUP BY 
                     pd.proactivedisclosureid,
@@ -938,7 +937,7 @@ class FOIOpenInformationRequests(db.Model):
                 INNER JOIN public."OpenInformationStatuses" oistatus on mr.oistatus_id = oistatus.oistatusid
                 INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on pd.oipublicationstatus_id = oirequesttype.oipublicationstatusid
                 WHERE mr.foiministryrequestid = :foiministryrequestid 
-                  AND pd.processingstatus != 'unpublished'
+                  AND pd.processingmessage = 'Published'
                   AND pd.isactive = TRUE;
             """
             

@@ -119,12 +119,11 @@ class FOIProactiveDisclosureRequests(db.Model):
             sql = """
                 UPDATE public."FOIProactiveDisclosureRequests"
                 SET processingstatus = 'ready for crawling',
-                    processingmessage = 'sitemap ready',
+                    processingmessage = 'Published',
                     sitemap_pages = :sitemap_page,
                     updated_at = now()
                 WHERE foiministryrequest_id = :foiministryrequestid
                   AND isactive = TRUE
-                  AND processingstatus IS NULL;
             """
             result = db.session.execute(
                 text(sql),
@@ -166,7 +165,7 @@ class FOIProactiveDisclosureRequests(db.Model):
             db.session.close()
 
     @classmethod
-    def create_published_version_from_proactive_id(cls, proactivedisclosureid, message)->DefaultMethodResult:
+    def create_published_version_from_proactive_id(cls, proactivedisclosureid, message, sitemap=None)->DefaultMethodResult:
         try:
             current = (
                 db.session.query(cls)
@@ -215,9 +214,9 @@ class FOIProactiveDisclosureRequests(db.Model):
                 created_at=updated_at,
                 createdby="publishingservice",
                 oipublicationstatus_id=latest.oipublicationstatus_id,
-                processingstatus="published",
-                processingmessage=message,
-                sitemap_pages=latest.sitemap_pages,
+                processingstatus="ready for crawling",
+                processingmessage=message, 
+                sitemap_pages=sitemap
             )
             db.session.add(new_proactive)
             db.session.commit()
@@ -293,7 +292,7 @@ class FOIProactiveDisclosureRequests(db.Model):
                 WHERE oistatus.name IN (:ready_status, :published_status)
                   AND oirequesttype.name = :publication_status
                   AND pd.publicationdate < :publication_cutoff
-                  AND pd.processingstatus IS NULL
+                  AND (pd.processingmessage != 'Published' OR pd.processingmessage is NULL) 
                   AND mr.isactive = TRUE
                 GROUP BY
                     pd.proactivedisclosureid,
