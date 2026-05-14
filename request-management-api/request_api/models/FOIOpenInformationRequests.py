@@ -142,27 +142,60 @@ class FOIOpenInformationRequests(db.Model):
     @classmethod
     def mark_ready_for_crawling(cls, foiministryrequestid, sitemap_page)->DefaultMethodResult:
         try:
-            sql = """
-                UPDATE public."FOIOpenInformationRequests"
-                SET processingstatus = 'ready for crawling',
-                    processingmessage = 'Published',
-                    sitemap_pages = :sitemap_page,
-                    updated_at = now()
-                WHERE foiministryrequest_id = :foiministryrequestid
-                  AND isactive = TRUE
-            """
-            result = db.session.execute(
-                text(sql),
-                {
-                    'foiministryrequestid': foiministryrequestid,
-                    'sitemap_page': sitemap_page,
-                },
+            current = (
+                db.session.query(cls)
+                .filter(cls.foiministryrequest_id == foiministryrequestid)
+                .order_by(cls.version.desc())
+                .first()
             )
-            if result.rowcount == 0:
-                db.session.rollback()
-                return DefaultMethodResult(False, "No active OpenInfo row found to update", foiministryrequestid)
+            if current is None:
+                return DefaultMethodResult(False, "FOIOpenInfo request not found", foiministryrequestid)
+
+            updated_at = datetime2.now().isoformat()
+
+            active_rows = (
+                db.session.query(cls)
+                .filter(cls.foiministryrequest_id == foiministryrequestid)
+                .filter(or_(cls.isactive == True, cls.isactive.is_(None)))
+                .all()
+            )
+            for row in active_rows:
+                row.isactive = False
+                row.updated_at = updated_at
+                row.updatedby = "publishingservice"
+
+            latest = (
+                db.session.query(cls)
+                .filter(cls.foiministryrequest_id == foiministryrequestid)
+                .order_by(cls.version.desc())
+                .first()
+            )
+
+            new_foiopeninforequest = FOIOpenInformationRequests(
+                foiopeninforequestid=latest.foiopeninforequestid,
+                version=latest.version + 1,
+                foiministryrequest_id=latest.foiministryrequest_id,
+                foiministryrequestversion_id=latest.foiministryrequestversion_id,
+                oipublicationstatus_id=latest.oipublicationstatus_id,
+                oiexemption_id=latest.oiexemption_id,
+                oiassignedto=latest.oiassignedto,
+                oiexemptionapproved=latest.oiexemptionapproved,
+                pagereference=latest.pagereference,
+                iaorationale=latest.iaorationale,
+                oifeedback=latest.oifeedback,
+                publicationdate=latest.publicationdate,
+                receiveddate=latest.receiveddate,
+                copyrightsevered=latest.copyrightsevered,
+                created_at=updated_at,
+                createdby="publishingservice",
+                processingstatus="ready for crawling",
+                processingmessage="Published",
+                sitemap_pages=sitemap_page,
+                isactive=True,
+            )
+            db.session.add(new_foiopeninforequest)
             logging.info(
-                "OpenInfo publication row updated for ministry request %s with sitemap page %s",
+                "FOIOpenInfo row updated for ministry request %s with sitemap page %s",
                 foiministryrequestid,
                 sitemap_page,
             )
