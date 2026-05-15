@@ -221,7 +221,7 @@ class FOIOpenInformationRequests(db.Model):
                 pagereference=latest.pagereference,
                 iaorationale=latest.iaorationale,
                 oifeedback=latest.oifeedback,
-                publicationdate=latest.publicationdate,
+                publicationdate=datetime.now(),
                 receiveddate=latest.receiveddate,
                 copyrightsevered=latest.copyrightsevered,
                 created_at=updated_at,

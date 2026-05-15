@@ -209,7 +209,7 @@ class FOIProactiveDisclosureRequests(db.Model):
                 foiministryrequestversion_id=latest.foiministryrequestversion_id,
                 proactivedisclosurecategoryid=latest.proactivedisclosurecategoryid,
                 reportperiod=latest.reportperiod,
-                publicationdate=latest.publicationdate,
+                publicationdate=datetime.now(),
                 earliesteligiblepublicationdate=latest.earliesteligiblepublicationdate,
                 isactive=True,
                 created_at=updated_at,
