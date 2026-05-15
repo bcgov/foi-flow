@@ -26,6 +26,7 @@ from request_api.utils.enums import ProcessingTeamWithKeycloackGroup, IAOTeamWit
 from .FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 from request_api.models.ProgramAreas import ProgramArea
 from os import getenv
+from sqlalchemy.dialects import postgresql
 
 class FOIRawRequest(db.Model):
     # Name of the table in our database
@@ -421,8 +422,10 @@ class FOIRawRequest(db.Model):
         ).filter(
             filter_condition,
             FOIRawRequest.status.notin_(['Archived', 'Closed'])
-        ).order_by(FOIRawRequest.requestid.desc()).all()
-        return request_schema.dump(query)
+        ).order_by(FOIRawRequest.requestid.desc())
+        print('\n\n ***getrawrequestsbyapplicantid: \n')
+        print(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
+        return request_schema.dump(query.all())
     
     @classmethod
     def getLastStatusUpdateDate(cls,requestid,status):

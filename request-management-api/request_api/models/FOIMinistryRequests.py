@@ -32,6 +32,7 @@ from .ProactiveDisclosureCategories import ProactiveDisclosureCategory
 from request_api.models import FOIProactiveDisclosureRequests
 from .FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 from .OpenInformationStatuses import OpenInformationStatuses
+from sqlalchemy.dialects import postgresql
 
 class FOIMinistryRequest(db.Model):
     # Name of the table in our database
@@ -253,6 +254,8 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.foirequest_id.in_(requestids),
             FOIMinistryRequest.requeststatusid != 3
         ).order_by(FOIMinistryRequest.foiministryrequestid.desc(), FOIMinistryRequest.version.desc())
+        print('\n\n ***getopenrequestsbyrequestId: \n')
+        print(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
         return [r._asdict() for r in query]
     
     @classmethod
@@ -296,6 +299,8 @@ class FOIMinistryRequest(db.Model):
                             ).order_by(
                                 FOIMinistryRequest.foiministryrequestid.asc(),
                                 FOIMinistryRequest.version.desc())
+        print('\n\n ***getopenrequestsbyapplicantid: \n')
+        print(query.statement.compile(dialect=postgresql.dialect(), compile_kwargs={"literal_binds": True}))
         return [r._asdict() for r in query]
 
     @classmethod

@@ -193,7 +193,7 @@ services:
   forms-flow-bpm:
     build:
       context: ./apps/forms-flow-ai/forms-flow-bpm/
-      dockerfile: windows.Dockerfile
+      dockerfile: mac.Dockerfile
     restart: always
     links:
       - forms-flow-bpm-db
@@ -298,8 +298,10 @@ services:
     volumes:
       - ".:/app"
       - "/app/node_modules"
+      - "./forms-flow-web:/forms-flow-web/app/"
     ports:
-      - "3000:8080"
+      # - "3000:8080"
+      - "3000:3000"
     tty: true
     
 volumes:
