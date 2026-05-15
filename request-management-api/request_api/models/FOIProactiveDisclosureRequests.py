@@ -197,7 +197,7 @@ class FOIProactiveDisclosureRequests(db.Model):
             db.session.close()
 
     @classmethod
-    def create_published_version_from_proactive_id(cls, proactivedisclosureid, message, sitemap)->DefaultMethodResult:
+    def create_published_version_from_proactive_id(cls, proactivedisclosureid, message, sitemap, publicationdate)->DefaultMethodResult:
         try:
             current = (
                 db.session.query(cls)
@@ -240,7 +240,7 @@ class FOIProactiveDisclosureRequests(db.Model):
                 foiministryrequestversion_id=latest.foiministryrequestversion_id,
                 proactivedisclosurecategoryid=latest.proactivedisclosurecategoryid,
                 reportperiod=latest.reportperiod,
-                publicationdate=latest.publicationdate,
+                publicationdate=publicationdate if publicationdate is not None else latest.publicationdate,
                 earliesteligiblepublicationdate=latest.earliesteligiblepublicationdate,
                 isactive=True,
                 created_at=updated_at,
