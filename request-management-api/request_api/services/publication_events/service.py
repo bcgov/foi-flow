@@ -12,6 +12,7 @@ from request_api.services.publication_events.mappers import (
 from request_api.services.publication_events.publisher import PublicationEventPublisher
 from request_api.services.publication_events.types import PublicationEventType
 
+# Currently, we are not using this right now (Publish Now is hanlded by rest_service/api) but in the future we may move Publish Now to the event service (via redis)
 
 class PublishNowEventService:
     """Builds and publishes production event envelopes for publish-now endpoints."""

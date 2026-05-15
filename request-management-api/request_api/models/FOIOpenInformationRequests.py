@@ -142,28 +142,60 @@ class FOIOpenInformationRequests(db.Model):
     @classmethod
     def mark_ready_for_crawling(cls, foiministryrequestid, sitemap_page)->DefaultMethodResult:
         try:
-            sql = """
-                UPDATE public."FOIOpenInformationRequests"
-                SET processingstatus = 'ready for crawling',
-                    processingmessage = 'sitemap ready',
-                    sitemap_pages = :sitemap_page,
-                    updated_at = now()
-                WHERE foiministryrequest_id = :foiministryrequestid
-                  AND isactive = TRUE
-                  AND processingstatus IS NULL;
-            """
-            result = db.session.execute(
-                text(sql),
-                {
-                    'foiministryrequestid': foiministryrequestid,
-                    'sitemap_page': sitemap_page,
-                },
+            current = (
+                db.session.query(cls)
+                .filter(cls.foiministryrequest_id == foiministryrequestid)
+                .order_by(cls.version.desc())
+                .first()
             )
-            if result.rowcount == 0:
-                db.session.rollback()
-                return DefaultMethodResult(False, "No active OpenInfo row found to update", foiministryrequestid)
+            if current is None:
+                return DefaultMethodResult(False, "FOIOpenInfo request not found", foiministryrequestid)
+
+            updated_at = datetime2.now().isoformat()
+
+            active_rows = (
+                db.session.query(cls)
+                .filter(cls.foiministryrequest_id == foiministryrequestid)
+                .filter(or_(cls.isactive == True, cls.isactive.is_(None)))
+                .all()
+            )
+            for row in active_rows:
+                row.isactive = False
+                row.updated_at = updated_at
+                row.updatedby = "publishingservice"
+
+            latest = (
+                db.session.query(cls)
+                .filter(cls.foiministryrequest_id == foiministryrequestid)
+                .order_by(cls.version.desc())
+                .first()
+            )
+
+            new_foiopeninforequest = FOIOpenInformationRequests(
+                foiopeninforequestid=latest.foiopeninforequestid,
+                version=latest.version + 1,
+                foiministryrequest_id=latest.foiministryrequest_id,
+                foiministryrequestversion_id=latest.foiministryrequestversion_id,
+                oipublicationstatus_id=latest.oipublicationstatus_id,
+                oiexemption_id=latest.oiexemption_id,
+                oiassignedto=latest.oiassignedto,
+                oiexemptionapproved=latest.oiexemptionapproved,
+                pagereference=latest.pagereference,
+                iaorationale=latest.iaorationale,
+                oifeedback=latest.oifeedback,
+                publicationdate=latest.publicationdate,
+                receiveddate=latest.receiveddate,
+                copyrightsevered=latest.copyrightsevered,
+                created_at=updated_at,
+                createdby="publishingservice",
+                processingstatus="ready for crawling",
+                processingmessage="Published",
+                sitemap_pages=sitemap_page,
+                isactive=True,
+            )
+            db.session.add(new_foiopeninforequest)
             logging.info(
-                "OpenInfo publication row updated for ministry request %s with sitemap page %s",
+                "FOIOpenInfo row updated for ministry request %s with sitemap page %s",
                 foiministryrequestid,
                 sitemap_page,
             )
@@ -177,7 +209,7 @@ class FOIOpenInformationRequests(db.Model):
             db.session.close()
 
     @classmethod
-    def create_published_version_from_openinfo_id(cls, foiopeninforequestid, message)->DefaultMethodResult:
+    def create_published_version_from_openinfo_id(cls, foiopeninforequestid, message, sitemap)->DefaultMethodResult:
         try:
             current = (
                 db.session.query(cls)
@@ -226,9 +258,9 @@ class FOIOpenInformationRequests(db.Model):
                 copyrightsevered=latest.copyrightsevered,
                 created_at=updated_at,
                 createdby="publishingservice",
-                processingstatus="published",
+                processingstatus="ready for crawling",
                 processingmessage=message,
-                sitemap_pages=latest.sitemap_pages,
+                sitemap_pages=sitemap,
                 isactive=True,
             )
             db.session.add(new_foiopeninforequest)
@@ -705,7 +737,7 @@ class FOIOpenInformationRequests(db.Model):
                 INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on oi.oipublicationstatus_id = oirequesttype.oipublicationstatusid
                 LEFT JOIN public."FOIOpenInfoAdditionalFiles" oifiles on mr.foiministryrequestid = oifiles.ministryrequestid
                 WHERE mr.foiministryrequestid = :foiministryrequestid 
-                  AND oi.processingstatus is NULL 
+                  AND (oi.processingmessage != 'Published' OR oi.processingmessage is NULL)
                   AND mr.isactive = TRUE
                 GROUP BY 
                     oi.foiopeninforequestid,
@@ -779,7 +811,7 @@ class FOIOpenInformationRequests(db.Model):
                 WHERE oistatus.name IN (:ready_status, :published_status)
                   AND oirequesttype.name = :publication_status
                   AND oi.publicationdate < :publication_cutoff
-                  AND oi.processingstatus is NULL
+                  AND (oi.processingmessage != 'Published' OR oi.processingmessage is NULL)
                   AND mr.isactive = TRUE
                 GROUP BY
                     oi.foiopeninforequestid,
@@ -829,7 +861,7 @@ class FOIOpenInformationRequests(db.Model):
                 INNER JOIN public."OpenInformationStatuses" oistatus on mr.oistatus_id = oistatus.oistatusid
                 INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on oi.oipublicationstatus_id = oirequesttype.oipublicationstatusid
                 WHERE mr.foiministryrequestid = :foiministryrequestid 
-                  AND oi.processingstatus is NULL
+                  AND oi.processingmessage = 'Published'
                   AND oi.isactive = TRUE;
             """
             
@@ -891,7 +923,7 @@ class FOIOpenInformationRequests(db.Model):
                 INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on pd.oipublicationstatus_id = oirequesttype.oipublicationstatusid
                 LEFT JOIN public."FOIOpenInfoAdditionalFiles" oifiles on mr.foiministryrequestid = oifiles.ministryrequestid
                 WHERE mr.foiministryrequestid = :foiministryrequestid 
-                  AND pd.processingstatus is NULL 
+                  AND (pd.processingmessage != 'Published' OR pd.processingmessage is NULL) 
                   AND mr.isactive = TRUE
                 GROUP BY 
                     pd.proactivedisclosureid,
@@ -938,7 +970,7 @@ class FOIOpenInformationRequests(db.Model):
                 INNER JOIN public."OpenInformationStatuses" oistatus on mr.oistatus_id = oistatus.oistatusid
                 INNER JOIN public."OpenInfoPublicationStatuses" oirequesttype on pd.oipublicationstatus_id = oirequesttype.oipublicationstatusid
                 WHERE mr.foiministryrequestid = :foiministryrequestid 
-                  AND pd.processingstatus != 'unpublished'
+                  AND pd.processingmessage = 'Published'
                   AND pd.isactive = TRUE;
             """
             

@@ -116,28 +116,59 @@ class FOIProactiveDisclosureRequests(db.Model):
     @classmethod
     def mark_ready_for_crawling(cls, foiministryrequestid, sitemap_page)->DefaultMethodResult:
         try:
-            sql = """
-                UPDATE public."FOIProactiveDisclosureRequests"
-                SET processingstatus = 'ready for crawling',
-                    processingmessage = 'sitemap ready',
-                    sitemap_pages = :sitemap_page,
-                    updated_at = now()
-                WHERE foiministryrequest_id = :foiministryrequestid
-                  AND isactive = TRUE
-                  AND processingstatus IS NULL;
-            """
-            result = db.session.execute(
-                text(sql),
-                {
-                    'foiministryrequestid': foiministryrequestid,
-                    'sitemap_page': sitemap_page,
-                },
+            current = (
+                db.session.query(cls)
+                .filter(cls.foiministryrequest_id == foiministryrequestid)
+                .order_by(cls.version.desc())
+                .first()
             )
-            if result.rowcount == 0:
-                db.session.rollback()
-                return DefaultMethodResult(False, "No active Proactive Disclosure row found to update", foiministryrequestid)
+            if current is None:
+                return DefaultMethodResult(
+                    False,
+                    "FOI Proactive Disclosure request not found",
+                    foiministryrequestid,
+                )
+
+            updated_at = datetime2.now().isoformat()
+
+            active_rows = (
+                db.session.query(cls)
+                .filter(cls.foiministryrequest_id == foiministryrequestid)
+                .filter(or_(cls.isactive == True, cls.isactive.is_(None)))
+                .all()
+            )
+            for row in active_rows:
+                row.isactive = False
+                row.updated_at = updated_at
+                row.updatedby = "publishingservice"
+
+            latest = (
+                db.session.query(cls)
+                .filter(cls.foiministryrequest_id == foiministryrequestid)
+                .order_by(cls.version.desc())
+                .first()
+            )
+
+            new_proactive = FOIProactiveDisclosureRequests(
+                proactivedisclosureid=latest.proactivedisclosureid,
+                version=latest.version + 1,
+                foiministryrequest_id=latest.foiministryrequest_id,
+                foiministryrequestversion_id=latest.foiministryrequestversion_id,
+                proactivedisclosurecategoryid=latest.proactivedisclosurecategoryid,
+                reportperiod=latest.reportperiod,
+                publicationdate=latest.publicationdate,
+                earliesteligiblepublicationdate=latest.earliesteligiblepublicationdate,
+                isactive=True,
+                created_at=updated_at,
+                createdby="publishingservice",
+                oipublicationstatus_id=latest.oipublicationstatus_id,
+                processingstatus="ready for crawling",
+                processingmessage="Published", 
+                sitemap_pages=sitemap_page
+            )
+            db.session.add(new_proactive)
             logging.info(
-                "Proactive Disclosure publication row updated for ministry request %s with sitemap page %s",
+                "FOIProactiveDisclsoure row updated for ministry request %s with sitemap page %s",
                 foiministryrequestid,
                 sitemap_page,
             )
@@ -166,7 +197,7 @@ class FOIProactiveDisclosureRequests(db.Model):
             db.session.close()
 
     @classmethod
-    def create_published_version_from_proactive_id(cls, proactivedisclosureid, message)->DefaultMethodResult:
+    def create_published_version_from_proactive_id(cls, proactivedisclosureid, message, sitemap)->DefaultMethodResult:
         try:
             current = (
                 db.session.query(cls)
@@ -215,9 +246,9 @@ class FOIProactiveDisclosureRequests(db.Model):
                 created_at=updated_at,
                 createdby="publishingservice",
                 oipublicationstatus_id=latest.oipublicationstatus_id,
-                processingstatus="published",
-                processingmessage=message,
-                sitemap_pages=latest.sitemap_pages,
+                processingstatus="ready for crawling",
+                processingmessage=message, 
+                sitemap_pages=sitemap
             )
             db.session.add(new_proactive)
             db.session.commit()
@@ -293,7 +324,7 @@ class FOIProactiveDisclosureRequests(db.Model):
                 WHERE oistatus.name IN (:ready_status, :published_status)
                   AND oirequesttype.name = :publication_status
                   AND pd.publicationdate < :publication_cutoff
-                  AND pd.processingstatus IS NULL
+                  AND (pd.processingmessage != 'Published' OR pd.processingmessage is NULL) 
                   AND mr.isactive = TRUE
                 GROUP BY
                     pd.proactivedisclosureid,
