@@ -209,7 +209,7 @@ class FOIOpenInformationRequests(db.Model):
             db.session.close()
 
     @classmethod
-    def create_published_version_from_openinfo_id(cls, foiopeninforequestid, message, sitemap=None)->DefaultMethodResult:
+    def create_published_version_from_openinfo_id(cls, foiopeninforequestid, message, sitemap)->DefaultMethodResult:
         try:
             current = (
                 db.session.query(cls)

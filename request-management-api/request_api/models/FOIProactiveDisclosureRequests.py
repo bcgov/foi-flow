@@ -197,7 +197,7 @@ class FOIProactiveDisclosureRequests(db.Model):
             db.session.close()
 
     @classmethod
-    def create_published_version_from_proactive_id(cls, proactivedisclosureid, message, sitemap=None)->DefaultMethodResult:
+    def create_published_version_from_proactive_id(cls, proactivedisclosureid, message, sitemap)->DefaultMethodResult:
         try:
             current = (
                 db.session.query(cls)

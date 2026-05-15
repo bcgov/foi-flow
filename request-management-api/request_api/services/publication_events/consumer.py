@@ -49,7 +49,7 @@ def handle_foiministryrequest_update(payload, oistatus_id, section_updater):
     return DefaultMethodResult(False, message)
 
 
-class OpenInfoPublishCompletedConsumer:
+class OpenInfoPublicationCompletedConsumer:
     """Handles completed publication events for OpenInfo records."""
 
     _CORRELATION_ID_PATTERN = re.compile(r"^openinfo-publish-(?P<openinfo_id>\d+)$")
@@ -58,67 +58,26 @@ class OpenInfoPublishCompletedConsumer:
         self.openinfo_model = openinfo_model or FOIOpenInformationRequests
         self.section_updater = section_updater or FOIRequestUpdateBySection()
 
-    def _handle_foiministryrequest_update(self, payload):
+    def _handle_foiministryrequest_update(self, payload, oistatusid):
         return handle_foiministryrequest_update(
             payload,
-            OIStatusEnum.PUBLISHED.value,
-            self.section_updater,
-        )
-        
-    def handle(self, envelope):
-        """Validate and apply a publication.publish.completed event for OpenInfo."""
-        if envelope.get("event_type") != PublicationEventType.PUBLISH_COMPLETED:
-            return DefaultMethodResult(False, "Unsupported event type")
-
-        payload = envelope.get("payload") or {}
-        missing = [field for field in ("tenant_id", "request_event_id") if not payload.get(field)]
-        if missing:
-            return DefaultMethodResult(False, f"Missing required payload fields: {', '.join(missing)}")
-
-        correlation_id = envelope.get("correlation_id")
-        match = self._CORRELATION_ID_PATTERN.match(correlation_id or "")
-        if not match:
-            return DefaultMethodResult(False, "Invalid OpenInfo publish correlation_id")
-
-        openinfo_id = int(match.group("openinfo_id"))
-        message = payload.get("message") or "Published"
-        sitemap_page_key = payload.get("sitemap_page_key")
-
-        logging.info(
-            "Handling OpenInfo publish completed event | "
-            f"event_id={envelope.get('event_id')} "
-            f"correlation_id={correlation_id} "
-            f"openinfo_id={openinfo_id} "
-            f"request_event_id={payload.get('request_event_id')}"
-        )
-        update_result = self._handle_foiministryrequest_update(payload)
-
-        if update_result.success is False:
-            return update_result
-        
-        return self.openinfo_model.create_published_version_from_openinfo_id(openinfo_id, message, PurePosixPath(sitemap_page_key).name)
-
-
-class OpenInfoUnpublishCompletedConsumer:
-    """Logs completed unpublish events for OpenInfo records."""
-
-    _CORRELATION_ID_PATTERN = re.compile(r"^openinfo-publish-(?P<openinfo_id>\d+)$")
-
-    def __init__(self, openinfo_model=None, section_updater=None):
-        self.section_updater = section_updater or FOIRequestUpdateBySection()
-        self.openinfo_model = openinfo_model or FOIOpenInformationRequests
-
-    def _handle_foiministryrequest_update(self, payload):
-        return handle_foiministryrequest_update(
-            payload,
-            OIStatusEnum.UNPUBLISHED.value,
+            oistatusid,
             self.section_updater,
         )
     
+    def _get_sitemap(self, payload):
+        sitemap_page_key = payload.get("sitemap_page_key")
+        if not sitemap_page_key:
+            raise ValueError("Publication API payload did not include sitemap_page_key")
+        return PurePosixPath(sitemap_page_key).name
+
     def handle(self, envelope):
-        """Validate and log a publication.unpublish.completed event for OpenInfo."""
-        if envelope.get("event_type") != PublicationEventType.UNPUBLISH_COMPLETED:
+        """Validate publication event for OpenInfo."""
+        event_type = envelope.get("event_type")
+        if event_type != PublicationEventType.PUBLISH_COMPLETED or event_type != PublicationEventType.UNPUBLISH_COMPLETED:
             return DefaultMethodResult(False, "Unsupported event type")
+        print("LOG:payload", envelope.get("payload"))
+        print("LOG:eventtype", event_type)
 
         payload = envelope.get("payload") or {}
         missing = [field for field in ("tenant_id", "request_event_id") if not payload.get(field)]
@@ -131,27 +90,32 @@ class OpenInfoUnpublishCompletedConsumer:
             return DefaultMethodResult(False, "Invalid OpenInfo publish correlation_id")
 
         openinfo_id = int(match.group("openinfo_id"))
-        message = payload.get("message") or "Unpublished"
-        
+        if event_type == PublicationEventType.PUBLISH_COMPLETED:
+            message = "Published"
+            sitemap = self._get_sitemap(payload)
+            oistatusid = OIStatusEnum.PUBLISHED.value
+        else:
+            message = "Unpublished"
+            sitemap = None
+            oistatusid = OIStatusEnum.UNPUBLISHED.value
+
         logging.info(
-            "Handling OpenInfo unpublish completed event | "
+            "Handling OpenInfo publication completed event | "
             f"event_id={envelope.get('event_id')} "
             f"correlation_id={envelope.get('correlation_id')} "
             f"kind={payload.get('kind')} "
             f"publication_id={payload.get('publication_id')} "
-            f"status={payload.get('status')} "
-            f"objects_deleted={payload.get('objects_deleted')} "
-            f"sitemap_result={payload.get('sitemap_result')}"
+            f"status={payload.get('status')}"
         )
-        update_result = self._handle_foiministryrequest_update(payload)
 
+        update_result = self._handle_foiministryrequest_update(payload, oistatusid)
         if update_result.success is False:
             return update_result
-    
-        return self.openinfo_model.create_published_version_from_openinfo_id(openinfo_id, message, None)
+        
+        return self.openinfo_model.create_published_version_from_openinfo_id(openinfo_id, message, sitemap)
 
 
-class ProactiveDisclosurePublishCompletedConsumer:
+class ProactiveDisclosurePublicationCompletedConsumer:
     """Handles completed publication events for Proactive Disclosure records."""
 
     _CORRELATION_ID_PATTERN = re.compile(
@@ -162,74 +126,27 @@ class ProactiveDisclosurePublishCompletedConsumer:
         self.proactive_model = proactive_model or FOIProactiveDisclosureRequests
         self.section_updater = section_updater or FOIRequestUpdateBySection()
     
-    def _handle_foiministryrequest_update(self, payload):
+    def _handle_foiministryrequest_update(self, payload, oistatusid):
         return handle_foiministryrequest_update(
             payload,
-            OIStatusEnum.PUBLISHED.value,
-            self.section_updater,
-        )
-
-    def handle(self, envelope):
-        """Validate and apply a publication.publish.completed event for Proactive Disclosure."""
-        if envelope.get("event_type") != PublicationEventType.PUBLISH_COMPLETED:
-            return DefaultMethodResult(False, "Unsupported event type")
-
-        payload = envelope.get("payload") or {}
-        missing = [field for field in ("tenant_id", "request_event_id") if not payload.get(field)]
-        if missing:
-            return DefaultMethodResult(False, f"Missing required payload fields: {', '.join(missing)}")
-
-        correlation_id = envelope.get("correlation_id")
-        match = self._CORRELATION_ID_PATTERN.match(correlation_id or "")
-        if not match:
-            return DefaultMethodResult(False, "Invalid Proactive Disclosure publish correlation_id")
-
-        proactive_id = int(match.group("proactive_id"))
-        message = payload.get("message") or "Published"
-        sitemap_page_key = payload.get("sitemap_page_key")
-
-        logging.info(
-            "Handling Proactive Disclosure publish completed event | "
-            f"event_id={envelope.get('event_id')} "
-            f"correlation_id={correlation_id} "
-            f"proactive_id={proactive_id} "
-            f"request_event_id={payload.get('request_event_id')}"
-        )
-        update_result = self._handle_foiministryrequest_update(payload)
-
-        if update_result.success is False:
-            return update_result
-        
-        return self.proactive_model.create_published_version_from_proactive_id(
-            proactive_id,
-            message,
-            PurePosixPath(sitemap_page_key).name
-        )
-
-
-class ProactiveDisclosureUnpublishCompletedConsumer:
-    """Logs completed unpublish events for Proactive Disclosure records."""
-
-    _CORRELATION_ID_PATTERN = re.compile(
-        r"^proactivedisclosure-publish-(?P<proactive_id>\d+)$"
-    )
-
-    def __init__(self, proactive_model=None, section_updater=None):
-        self.section_updater = section_updater or FOIRequestUpdateBySection()
-        self.proactive_model = proactive_model or FOIProactiveDisclosureRequests
-
-    def _handle_foiministryrequest_update(self, payload):
-        return handle_foiministryrequest_update(
-            payload,
-            OIStatusEnum.UNPUBLISHED.value,
+            oistatusid,
             self.section_updater,
         )
     
+    def _get_sitemap(self, payload):
+        sitemap_page_key = payload.get("sitemap_page_key")
+        if not sitemap_page_key:
+            raise ValueError("Publication API payload did not include sitemap_page_key")
+        return PurePosixPath(sitemap_page_key).name
+
     def handle(self, envelope):
-        """Validate and log a publication.unpublish.completed event for Proactive Disclosure."""
-        if envelope.get("event_type") != PublicationEventType.UNPUBLISH_COMPLETED:
+        """Validate publication event for Proactive Disclosure."""
+        event_type = envelope.get("event_type")
+        if event_type != PublicationEventType.PUBLISH_COMPLETED or event_type != PublicationEventType.UNPUBLISH_COMPLETED:
             return DefaultMethodResult(False, "Unsupported event type")
-        
+        print("LOG:payload", envelope.get("payload"))
+        print("LOG:eventtype", event_type)
+
         payload = envelope.get("payload") or {}
         missing = [field for field in ("tenant_id", "request_event_id") if not payload.get(field)]
         if missing:
@@ -241,25 +158,30 @@ class ProactiveDisclosureUnpublishCompletedConsumer:
             return DefaultMethodResult(False, "Invalid Proactive Disclosure publish correlation_id")
 
         proactive_id = int(match.group("proactive_id"))
-        message = payload.get("message") or "Unpublished"
-
+        if event_type == PublicationEventType.PUBLISH_COMPLETED:
+            message = "Published"
+            sitemap = self._get_sitemap(payload)
+            oistatusid = OIStatusEnum.PUBLISHED.value
+        else:
+            message = "Unpublished"
+            sitemap = None
+            oistatusid = OIStatusEnum.UNPUBLISHED.value
+        
         logging.info(
-            "Handling Proactive Disclosure unpublish completed event | "
+            "Handling Proactive Disclosure publication completed event | "
             f"event_id={envelope.get('event_id')} "
             f"correlation_id={envelope.get('correlation_id')} "
             f"kind={payload.get('kind')} "
             f"publication_id={payload.get('publication_id')} "
-            f"status={payload.get('status')} "
-            f"objects_deleted={payload.get('objects_deleted')} "
-            f"sitemap_result={payload.get('sitemap_result')}"
+            f"status={payload.get('status')}"
         )
-        update_result = self._handle_foiministryrequest_update(payload)
 
+        update_result = self._handle_foiministryrequest_update(payload, oistatusid)
         if update_result.success is False:
             return update_result
-
+        
         return self.proactive_model.create_published_version_from_proactive_id(
             proactive_id,
             message,
-            None
+            sitemap
         )
