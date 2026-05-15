@@ -209,7 +209,7 @@ class FOIOpenInformationRequests(db.Model):
             db.session.close()
 
     @classmethod
-    def create_published_version_from_openinfo_id(cls, foiopeninforequestid, message, sitemap)->DefaultMethodResult:
+    def create_published_version_from_openinfo_id(cls, foiopeninforequestid, message, sitemap, publicationdate)->DefaultMethodResult:
         try:
             current = (
                 db.session.query(cls)
@@ -253,7 +253,7 @@ class FOIOpenInformationRequests(db.Model):
                 pagereference=latest.pagereference,
                 iaorationale=latest.iaorationale,
                 oifeedback=latest.oifeedback,
-                publicationdate=datetime.now(),
+                publicationdate=publicationdate if publicationdate is not None else latest.publicationdate,
                 receiveddate=latest.receiveddate,
                 copyrightsevered=latest.copyrightsevered,
                 created_at=updated_at,

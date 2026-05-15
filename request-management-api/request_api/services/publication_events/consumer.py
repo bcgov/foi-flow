@@ -10,6 +10,7 @@ from request_api.models.default_method_result import DefaultMethodResult
 from request_api.services.publication_events.types import PublicationEventType
 from request_api.resources.foirequest import FOIRequestUpdateBySection
 from request_api.utils.enums import OIStatusEnum
+from datetime import datetime
 
 
 PUBLISHING_SERVICE_USER_ID = "publishingservice"
@@ -94,10 +95,12 @@ class OpenInfoPublicationCompletedConsumer:
             message = "Published"
             sitemap = self._get_sitemap(payload)
             oistatusid = OIStatusEnum.PUBLISHED.value
+            publicationdate = datetime.now()
         else:
             message = "Unpublished"
             sitemap = None
             oistatusid = OIStatusEnum.UNPUBLISHED.value
+            publicationdate = None
 
         logging.info(
             "Handling OpenInfo publication completed event | "
@@ -112,7 +115,7 @@ class OpenInfoPublicationCompletedConsumer:
         if update_result.success is False:
             return update_result
         
-        return self.openinfo_model.create_published_version_from_openinfo_id(openinfo_id, message, sitemap)
+        return self.openinfo_model.create_published_version_from_openinfo_id(openinfo_id, message, sitemap, publicationdate)
 
 
 class ProactiveDisclosurePublicationCompletedConsumer:
@@ -162,10 +165,12 @@ class ProactiveDisclosurePublicationCompletedConsumer:
             message = "Published"
             sitemap = self._get_sitemap(payload)
             oistatusid = OIStatusEnum.PUBLISHED.value
+            publicationdate = datetime.now()
         else:
             message = "Unpublished"
             sitemap = None
             oistatusid = OIStatusEnum.UNPUBLISHED.value
+            publicationdate = None
         
         logging.info(
             "Handling Proactive Disclosure publication completed event | "
@@ -183,5 +188,6 @@ class ProactiveDisclosurePublicationCompletedConsumer:
         return self.proactive_model.create_published_version_from_proactive_id(
             proactive_id,
             message,
-            sitemap
+            sitemap,
+            publicationdate
         )
