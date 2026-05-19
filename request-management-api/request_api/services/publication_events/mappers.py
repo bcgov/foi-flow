@@ -2,7 +2,7 @@
 
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from request_api.services.publication_events.payloads import (
     AdditionalFilePayload,
@@ -90,7 +90,9 @@ class OpenInfoPublishRequestedMapper:
 
     @staticmethod
     def correlation_id(row):
-        return f"openinfo-publish-{row.get('openinfoid')}"
+        created_at = row.get("created_at")
+        timestamp = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=timezone.utc).timestamp()
+        return f"openinfo-publish-{row.get('openinfoid')}-{timestamp}"
 
 
 class ProactiveDisclosurePublishRequestedMapper:
@@ -205,7 +207,9 @@ class ProactiveDisclosurePublishRequestedMapper:
 
     @staticmethod
     def correlation_id(row):
-        return f"proactivedisclosure-publish-{row.get('proactivedisclosureid')}"
+        created_at = row.get("created_at")
+        timestamp = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=timezone.utc).timestamp()
+        return f"proactivedisclosure-publish-{row.get('proactivedisclosureid')}-{timestamp}"
 
 
 class UnpublishRequestedMapper:
@@ -236,5 +240,7 @@ class UnpublishRequestedMapper:
 
     @staticmethod
     def correlation_id(row, publication_type="openinfo"):
+        created_at = row.get("created_at")
+        timestamp = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=timezone.utc).timestamp()
         id_field = "openinfoid" if publication_type == "openinfo" else "proactivedisclosureid"
-        return f"{publication_type}-unpublish-{row.get(id_field)}"
+        return f"{publication_type}-unpublish-{row.get(id_field)}-{timestamp}"
