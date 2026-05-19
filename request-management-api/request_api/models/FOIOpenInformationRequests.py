@@ -699,6 +699,7 @@ class FOIOpenInformationRequests(db.Model):
             sql = """
                 SELECT
                     oi.foiopeninforequestid as openinfoid,
+                    oi.created_at,
                     mr.foiministryrequestid,
                     r.foirequestid,
                     mr.axisrequestid,
@@ -743,6 +744,7 @@ class FOIOpenInformationRequests(db.Model):
                   AND mr.isactive = TRUE
                 GROUP BY 
                     oi.foiopeninforequestid,
+                    oi.created_at,
                     mr.foiministryrequestid,
                     r.foirequestid,
                     mr.axisrequestid,
@@ -771,6 +773,7 @@ class FOIOpenInformationRequests(db.Model):
             sql = """
                 SELECT
                     oi.foiopeninforequestid as openinfoid,
+                    oi.created_at,
                     mr.foiministryrequestid,
                     r.foirequestid,
                     mr.axisrequestid,
@@ -817,6 +820,7 @@ class FOIOpenInformationRequests(db.Model):
                   AND mr.isactive = TRUE
                 GROUP BY
                     oi.foiopeninforequestid,
+                    oi.created_at,
                     mr.foiministryrequestid,
                     r.foirequestid,
                     mr.axisrequestid,
@@ -850,6 +854,7 @@ class FOIOpenInformationRequests(db.Model):
             sql = """
                 SELECT
                     oi.foiopeninforequestid AS openinfoid,
+                    oi.created_at,
                     mr.foiministryrequestid,
                     mr.foirequest_id,
                     mr.axisrequestid,
@@ -884,6 +889,7 @@ class FOIOpenInformationRequests(db.Model):
             sql = """
                 SELECT
                     pd.proactivedisclosureid,
+                    pd.created_at,
                     mr.foiministryrequestid,
                     r.foirequestid,
                     mr.axisrequestid,
@@ -929,6 +935,7 @@ class FOIOpenInformationRequests(db.Model):
                   AND mr.isactive = TRUE
                 GROUP BY 
                     pd.proactivedisclosureid,
+                    pd.created_at,
                     mr.foiministryrequestid,
                     r.foirequestid,
                     mr.axisrequestid,
@@ -959,6 +966,7 @@ class FOIOpenInformationRequests(db.Model):
             sql = """
                 SELECT
                     pd.proactivedisclosureid,
+                    pd.created_at,
                     mr.foiministryrequestid,
                     mr.foirequest_id,
                     mr.axisrequestid,
