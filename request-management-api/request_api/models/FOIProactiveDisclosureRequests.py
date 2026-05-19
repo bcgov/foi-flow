@@ -271,6 +271,7 @@ class FOIProactiveDisclosureRequests(db.Model):
             sql = """
                 SELECT
                     pd.proactivedisclosureid,
+                    pd.created_at,
                     mr.foiministryrequestid,
                     r.foirequestid,
                     mr.axisrequestid,
@@ -328,6 +329,7 @@ class FOIProactiveDisclosureRequests(db.Model):
                   AND mr.isactive = TRUE
                 GROUP BY
                     pd.proactivedisclosureid,
+                    pd.created_at,
                     mr.foiministryrequestid,
                     r.foirequestid,
                     mr.axisrequestid,
