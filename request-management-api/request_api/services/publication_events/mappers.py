@@ -220,16 +220,14 @@ class UnpublishRequestedMapper:
 
     def map(self, row, publication_type="openinfo"):
         axis_request_id = row.get("axisrequestid")
+        public_repository = self.path_resolver.build_destination(row)
         return UnpublishRequestedPayload(
             tenant_id=self.path_resolver.resolve_tenant_id(row),
             publication_id=axis_request_id,
             public_url=(
                 f"{self.public_base_url}/{axis_request_id}/openinfo/{axis_request_id}.html"
             ),
-            public_repository=S3Location(
-                bucket=self.path_resolver.openinfo_publication_bucket,
-                prefix=f"{publication_type}/{axis_request_id}",
-            ),
+            public_repository=public_repository,
             last_modified=row.get("publicationdate", ""),
             foirequest_id=row.get("foirequest_id"),
             foiministryrequest_id=row.get("foiministryrequestid"),
