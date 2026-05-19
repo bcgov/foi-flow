@@ -173,7 +173,7 @@ def test_unpublish_mapper_maps_openinfo_row(monkeypatch):
         == "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages/EDU-2024-12345/openinfo/EDU-2024-12345.html"
     )
     assert payload.public_repository.bucket == "dev-openinfopub"
-    assert payload.public_repository.prefix == "openinfo/EDU-2024-12345"
+    assert payload.public_repository.prefix == "packages/EDU-2024-12345/openinfo/"
     assert payload.last_modified == "2026-04-27"
 
 
@@ -200,7 +200,7 @@ def test_unpublish_mapper_maps_pd_row(monkeypatch):
         payload.public_url
         == "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages/PD-FIN-2026-001/openinfo/PD-FIN-2026-001.html"
     )
-    assert payload.public_repository.prefix == "proactivedisclosure/PD-FIN-2026-001"
+    assert payload.public_repository.prefix == "packages/PD-FIN-2026-001/openinfo/"
     assert payload.last_modified == "2026-04-20"
 
 
@@ -346,7 +346,7 @@ def test_queue_openinfo_unpublish_builds_correct_envelope(monkeypatch):
         == "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages/EDU-2024-12345/openinfo/EDU-2024-12345.html"
     )
     assert envelope["payload"]["public_repository"]["bucket"] == "dev-openinfopub"
-    assert envelope["payload"]["public_repository"]["prefix"] == "openinfo/EDU-2024-12345"
+    assert envelope["payload"]["public_repository"]["prefix"] == "packages/EDU-2024-12345/openinfo/"
     assert envelope["payload"]["last_modified"] == "2026-04-27"
     assert envelope["payload"]["foirequest_id"] == 200
     assert envelope["payload"]["foiministryrequest_id"] == 100
@@ -395,7 +395,7 @@ def test_queue_pd_unpublish_builds_correct_envelope(monkeypatch):
         envelope["payload"]["public_url"]
         == "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages/PD-FIN-2026-001/openinfo/PD-FIN-2026-001.html"
     )
-    assert envelope["payload"]["public_repository"]["prefix"] == "proactivedisclosure/PD-FIN-2026-001"
+    assert envelope["payload"]["public_repository"]["prefix"] == "packages/PD-FIN-2026-001/openinfo/"
     assert envelope["payload"]["foirequest_id"] == 400
     assert envelope["payload"]["foiministryrequest_id"] == 300
 
