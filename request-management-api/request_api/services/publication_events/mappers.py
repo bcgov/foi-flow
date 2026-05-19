@@ -91,7 +91,9 @@ class OpenInfoPublishRequestedMapper:
     @staticmethod
     def correlation_id(row):
         created_at = row.get("created_at")
-        timestamp = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=timezone.utc).timestamp()
+        if isinstance(created_at, str):
+            created_at = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S.%f")
+        timestamp = created_at.replace(tzinfo=timezone.utc).timestamp()
         return f"openinfo-publish-{row.get('openinfoid')}-{timestamp}"
 
 
@@ -208,7 +210,9 @@ class ProactiveDisclosurePublishRequestedMapper:
     @staticmethod
     def correlation_id(row):
         created_at = row.get("created_at")
-        timestamp = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=timezone.utc).timestamp()
+        if isinstance(created_at, str):
+            created_at = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S.%f")
+        timestamp = created_at.replace(tzinfo=timezone.utc).timestamp()
         return f"proactivedisclosure-publish-{row.get('proactivedisclosureid')}-{timestamp}"
 
 
@@ -241,6 +245,8 @@ class UnpublishRequestedMapper:
     @staticmethod
     def correlation_id(row, publication_type="openinfo"):
         created_at = row.get("created_at")
-        timestamp = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=timezone.utc).timestamp()
+        if isinstance(created_at, str):
+            created_at = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S.%f")
+        timestamp = created_at.replace(tzinfo=timezone.utc).timestamp()
         id_field = "openinfoid" if publication_type == "openinfo" else "proactivedisclosureid"
         return f"{publication_type}-unpublish-{row.get(id_field)}-{timestamp}"
