@@ -53,7 +53,7 @@ def handle_foiministryrequest_update(payload, oistatus_id, section_updater):
 class OpenInfoPublicationCompletedConsumer:
     """Handles completed publication events for OpenInfo records."""
 
-    _CORRELATION_ID_PATTERN = re.compile(r"^openinfo-publish-(?P<openinfo_id>\d+)$")
+    _CORRELATION_ID_PATTERN = re.compile(r"^openinfo-(publish|unpublish)-(?P<openinfo_id>\d+)-\d+\.\d+$")
 
     def __init__(self, openinfo_model=None, section_updater=None):
         self.openinfo_model = openinfo_model or FOIOpenInformationRequests
@@ -122,7 +122,7 @@ class ProactiveDisclosurePublicationCompletedConsumer:
     """Handles completed publication events for Proactive Disclosure records."""
 
     _CORRELATION_ID_PATTERN = re.compile(
-        r"^proactivedisclosure-publish-(?P<proactive_id>\d+)$"
+        r"^proactivedisclosure-(publish|unpublish)-(?P<proactive_id>\d+)-\d+\.\d+$"
     )
 
     def __init__(self, proactive_model=None, section_updater=None):
