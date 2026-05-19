@@ -75,7 +75,7 @@ class OpenInfoPublicationCompletedConsumer:
     def handle(self, envelope):
         """Validate publication event for OpenInfo."""
         event_type = envelope.get("event_type")
-        if event_type != PublicationEventType.PUBLISH_COMPLETED or event_type != PublicationEventType.UNPUBLISH_COMPLETED:
+        if event_type != PublicationEventType.PUBLISH_COMPLETED and event_type != PublicationEventType.UNPUBLISH_COMPLETED:
             return DefaultMethodResult(False, "Unsupported event type")
         print("LOG:payload", envelope.get("payload"))
         print("LOG:eventtype", event_type)
@@ -145,7 +145,7 @@ class ProactiveDisclosurePublicationCompletedConsumer:
     def handle(self, envelope):
         """Validate publication event for Proactive Disclosure."""
         event_type = envelope.get("event_type")
-        if event_type != PublicationEventType.PUBLISH_COMPLETED or event_type != PublicationEventType.UNPUBLISH_COMPLETED:
+        if event_type != PublicationEventType.PUBLISH_COMPLETED and event_type != PublicationEventType.UNPUBLISH_COMPLETED:
             return DefaultMethodResult(False, "Unsupported event type")
         print("LOG:payload", envelope.get("payload"))
         print("LOG:eventtype", event_type)
