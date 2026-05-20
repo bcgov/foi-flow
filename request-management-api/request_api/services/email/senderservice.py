@@ -20,6 +20,8 @@ from request_api.models.default_method_result import DefaultMethodResult
 from request_api.services.email.templates.embeddedimagehandler import embeddedimagehandler
 import base64
 
+logger = logging.getLogger(__name__)
+
 MAIL_SERVER_SMTP = os.getenv('EMAIL_SERVER_SMTP')
 MAIL_SERVER_SMTP_PORT = os.getenv('EMAIL_SERVER_SMTP_PORT')
 MAIL_SERVER_IMAP = os.getenv('EMAIL_SERVER_IMAP')
@@ -90,7 +92,7 @@ class senderservice:
                 smtpobj.ehlo()
                 #smtpobj.login(MAIL_SRV_USERID, MAIL_SRV_PASSWORD)
                 smtpresponse = smtpobj.sendmail(msg['From'], all_recipients, msg.as_string())
-                print('*SMTP Response: ', smtpresponse)
+                logger.debug("SMTP send response: recipient_count=%s response=%s", len(all_recipients), smtpresponse)
                 smtpobj.quit()
                 logging.debug("End: Send email for request")
                 return {"success" : True, "message": "Sent successfully", "identifier": -1, "from_email": msg['From']}

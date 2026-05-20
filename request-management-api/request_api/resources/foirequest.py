@@ -41,6 +41,8 @@ import traceback
 from datetime import date
 import logging
 
+logger = logging.getLogger(__name__)
+
 API = Namespace('FOIRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
 EXCEPTION_MESSAGE_NOTFOUND_REQUEST='Record not found'
@@ -447,7 +449,7 @@ class LinkedRequests(Resource):
             return results, 200
         except Exception as ex:
             message = str(ex)
-            print("ERROR:", message)
+            logger.exception("Failed to find linked requests: axisrequestid=%s ministrycode=%s", axisrequestid, ministrycode)
             return {'success': False, 'message': message, 'id': axisrequestid}, 500
 
 @cors_preflight('POST, PUT, OPTIONS')
@@ -470,7 +472,7 @@ class LinkedRequestsInfo(Resource):
                 return {'success': False, 'message': "Failed to remove linkedrequest data",'id': axisrequestid} , 404
         except Exception as ex:
             message = str(ex)
-            print("ERROR:", message)
+            logger.exception("Failed to remove linked request: axisrequestid=%s", axisrequestid)
             return {'success': False, 'message': message, 'id': axisrequestid}, 500
 
 @cors_preflight('POST, PUT, OPTIONS')
@@ -494,5 +496,5 @@ class LinkedRequestsInfo(Resource):
             else:
                 return {'success': False, 'message': "Failed to save linkedrequest data",'id': axisrequestid} , 404
         except Exception as ex:
-            print("ERROR:", str(ex))
+            logger.exception("Failed to create linked request: axisrequestid=%s", axisrequestid)
             return {'success': False, 'message': str(ex), 'id': axisrequestid}, 500

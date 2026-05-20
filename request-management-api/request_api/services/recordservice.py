@@ -20,6 +20,8 @@ from request_api.services.records.recordservicegetter import recordservicegetter
 from request_api.services.records.recordservicebase import recordservicebase
 from sqlalchemy import inspect
 
+logger = logging.getLogger(__name__)
+
 class recordservice(recordservicebase):
     """ FOI record management service
     """
@@ -474,7 +476,12 @@ class recordservice(recordservicebase):
             elif self.pdfstitchstreamkey:
                 return eventqueueservice().add(self.pdfstitchstreamkey, streamobject)
         else:
-            print("pdfstitch stream key is missing. Message is not pushed to the stream.")
+            logger.warning(
+                "PDF stitch stream key missing; message not pushed: requestid=%s ministryrequestid=%s category=%s",
+                requestid,
+                ministryrequestid,
+                message.get("category"),
+            )
             return DefaultMethodResult(False,'pdfstitch stream key is missing. Message is not pushed to the stream.', -1, ministryrequestid)
 
     def __bulkcreate(self, requestid, ministryrequestid, records, userid):
@@ -605,7 +612,7 @@ class recordservice(recordservicebase):
     
     # this is for inflight request pagecount calculation option 2
     def __calculatepagecount(self, records):
-        print(f'records = {records}')
+        logger.debug("Calculating page count for records: count=%s", len(records) if records else 0)
         page_count = 0
         for record in records:
             if self.__pagecountcalculationneeded(record):
@@ -627,7 +634,6 @@ class recordservice(recordservicebase):
         if(len(documentmasterids) > 0):
             _apiresponse, err = self.makedocreviewerrequest('POST', '/api/document/update/retrieveversion', {'ministryrequestid': ministryrequestid, 
                                             'documentmasterids': documentmasterids, "recordretrieveversion":recordretrieveversion})
-            #print("_apiresponse:", _apiresponse)
             if err and err is not None:
                 return DefaultMethodResult(False,f"Error in contacting Doc Reviewer API in retrieving record version - {err}", -1, ministryrequestid )
             return DefaultMethodResult(True,'Record version retrieved in Doc Reviewer DB ', -1, ministryrequestid)

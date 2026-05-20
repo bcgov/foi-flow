@@ -20,10 +20,11 @@ rather than reading environment variables directly or by accessing this configur
 """
 
 import os
-import sys
+import logging
 
 from dotenv import find_dotenv, load_dotenv
 
+logger = logging.getLogger(__name__)
 
 # this will load all the envars from a .env file located in the project root (api)
 load_dotenv(find_dotenv())
@@ -195,7 +196,7 @@ class ProdConfig(_Config):  # pylint: disable=too-few-public-methods
 
     if not SECRET_KEY:
         SECRET_KEY = os.urandom(24)
-        print('WARNING: SECRET_KEY being set as a one-shot', file=sys.stderr)
+        logger.warning("SECRET_KEY is missing; generated one-shot secret key for this process")
 
     TESTING = False
     DEBUG = False

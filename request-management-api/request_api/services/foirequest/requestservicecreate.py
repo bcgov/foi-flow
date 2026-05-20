@@ -55,8 +55,6 @@ class requestservicecreate:
            openfoirequest.foirequestid = foirequestid
         openfoirequest.wfinstanceid = wfinstanceid if wfinstanceid is not None else None
         openfoirequest.createdby = userid
-        # openfoirequest_dict = openfoirequest.__dict__
-        # print("\n-openfoirequest in saveRequest:",openfoirequest_dict)     
         result = FOIRequest.saverequest(openfoirequest)
         ##Auto Link requests for multiple ministries
         if result.success == True:

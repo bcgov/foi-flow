@@ -9,6 +9,10 @@ from datetime import datetime as datetime2
 from request_api.services.external.keycloakadminservice import KeycloakAdminService
 from flask import current_app
 import json
+import logging
+
+logger = logging.getLogger(__name__)
+
 class axissyncservice:
 
     AXIS_BASE_URL = os.getenv('AXIS_API_URL', None)
@@ -28,21 +32,21 @@ class axissyncservice:
             axisids = self.__getaxisids(batchrequest)
             #Fetch pagecount from axis : Begin
             axis_pageinfo = self.axis_getpageinfo(axisids)
-            print("axis_pageinfo=",axis_pageinfo)
+            logger.debug("Fetched AXIS page info: axis_id_count=%s response_count=%s", len(axisids), len(axis_pageinfo))
             #Fetch pagecount from axis : End
             if axis_pageinfo != {}:                
                 response = FOIMinistryRequest.bulk_update_axispagecount(self.updatepagecount(batchrequest, axis_pageinfo))
                 if response.success == False:
-                    print("batch update failed for ids=", axisids)
+                    logger.error("AXIS page count batch update failed: axisids=%s", axisids)
             else:
-                print("axis page response is empty for ids=", axisids) 
+                logger.warning("AXIS page count response is empty: axisids=%s", axisids)
         return DefaultMethodResult(True,'Batch execution completed for iaocode=%s | requesttype=%s', iaocode, requesttype)       
         
 
     def axis_getpageinfo(self, axis_payload):
         try:
             if self.AXIS_BASE_URL not in (None,''):
-                print('axis_payload:',axis_payload)
+                logger.debug("Requesting AXIS page info: axis_id_count=%s", len(axis_payload) if axis_payload else 0)
                 access_token = KeycloakAdminService().get_token()
                 axis_page_endpoint = f'{self.AXIS_BASE_URL}/api/requestspagecount'
                 response = requests.post(
@@ -58,8 +62,8 @@ class axissyncservice:
                 if response.status_code == 200:
                     return response.json()
             return {}
-        except Exception as ex:
-            print('Exception occured in fetching page details', ex)
+        except Exception:
+            logger.exception("Exception occurred while fetching AXIS page details")
             return {}
 
     def updatepagecount(self, requests, axisresponse):
@@ -75,4 +79,3 @@ class axissyncservice:
     def __getaxisids(self, requests):
         return [entry['axisrequestid'] for entry in requests]
     
-

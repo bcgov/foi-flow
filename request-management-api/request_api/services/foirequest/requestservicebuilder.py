@@ -108,8 +108,6 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.version = activeversion
         oistatusid = self.getpropertyvaluefromschema(requestschema, 'oistatusid')
         foiministryrequest.oistatus_id = oistatusid
-        # foiministryrequest_dict = foiministryrequest.__dict__
-        # print("foiministryrequest in createministry:",foiministryrequest_dict)
         # First instance of FOIOpeninformation data is created either when: A) An exemption request is created via "Publication Tab" B) A request is closed and no exemption request has been made previously
         if 'closereasonid' in requestschema and ministryid is not None and requestschema.get("requestType") != RequestType.PROACTIVE_DISCLOSURE.value:
             current_foiopeninforequest = openinfoservice().getcurrentfoiopeninforequest(ministryid)
