@@ -12,7 +12,7 @@ class PublicationPrePublishingScheduler:
     """Runs the OpenInfo and PD publishing job on a fixed interval."""
 
     def __init__(self, job=None, interval_seconds=300, app=None, stop_event=None,
-                 window_start=time(13, 0), window_end=time(13, 30)):
+                 window_start=time(13, 0), window_end=time(15, 00)):
         self.job = job or ScheduledPublicationService().publish_all_due_records
         self.interval_seconds = interval_seconds
         self.app = app
