@@ -31,6 +31,7 @@ import asyncio
 import traceback
 import logging
 
+logger = logging.getLogger(__name__)
 
 API = Namespace('FOIWatcher', description='Endpoints for FOI record management')
 TRACER = Tracer.get_instance()
@@ -223,16 +224,33 @@ class FOIRequestPDFStitchStatus(Resource):
     def get(requestid, ministryrequestid, recordstype):
         try:
             result = recordservice().getpdfstichstatus(ministryrequestid, recordstype.lower())
-            #("getpdfstichstatus result == ", result)
             return result, 200
         except KeyError as error:
-            print(CUSTOM_KEYERROR_MESSAGE + str(error))
+            logger.warning(
+                "PDF stitch status request failed due to missing key: requestid=%s ministryrequestid=%s recordstype=%s error=%s",
+                requestid,
+                ministryrequestid,
+                recordstype,
+                error,
+            )
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400  
         except BusinessException as exception:
-            print("BusinessException == ", exception.message)
+            logger.error(
+                "PDF stitch status business error: requestid=%s ministryrequestid=%s recordstype=%s status=%s message=%s",
+                requestid,
+                ministryrequestid,
+                recordstype,
+                exception.status_code,
+                exception.message,
+            )
             return {'status': exception.status_code, 'message':exception.message}, 500
         except Exception as error:
-            print("Exception error == ", error)
+            logger.exception(
+                "Unexpected PDF stitch status error: requestid=%s ministryrequestid=%s recordstype=%s",
+                requestid,
+                ministryrequestid,
+                recordstype,
+            )
             return {'status': False, 'message': str(error)}, 500
     
 @cors_preflight('GET,OPTIONS')
@@ -249,16 +267,33 @@ class FOIRequestRecordsChanged(Resource):
     def get(requestid, ministryrequestid, recordstype):
         try:
             result = recordservice().isrecordschanged(ministryrequestid, recordstype.lower())
-            #print("records changed == ", result)
             return result, 200
         except KeyError as error:
-            print(CUSTOM_KEYERROR_MESSAGE + str(error))
+            logger.warning(
+                "Record changed request failed due to missing key: requestid=%s ministryrequestid=%s recordstype=%s error=%s",
+                requestid,
+                ministryrequestid,
+                recordstype,
+                error,
+            )
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400
         except BusinessException as exception:
-            print("BusinessException == ", exception.message)
+            logger.error(
+                "Record changed business error: requestid=%s ministryrequestid=%s recordstype=%s status=%s message=%s",
+                requestid,
+                ministryrequestid,
+                recordstype,
+                exception.status_code,
+                exception.message,
+            )
             return {'status': exception.status_code, 'message':exception.message}, 500
         except Exception as error:
-            print("Exception error == ", error)
+            logger.exception(
+                "Unexpected record changed error: requestid=%s ministryrequestid=%s recordstype=%s",
+                requestid,
+                ministryrequestid,
+                recordstype,
+            )
             return {'status': False, 'message': str(error)}, 500
 
 
@@ -302,7 +337,11 @@ class UpdateRequestsPageCountOption2(Resource):
             requestjson = request.get_json()
             ministryrequestid = requestjson['ministryrequestid']  if requestjson.get("ministryrequestid") != None else None
             requestid = requestjson['requestid']  if requestjson.get("requestid") != None else None
-            print(f'option 2 >>> requestid = {requestid}, ministryrequestid = {ministryrequestid}')
+            logger.info(
+                "Scheduling page count calculation: requestid=%s ministryrequestid=%s",
+                requestid,
+                ministryrequestid,
+            )
             if ministryrequestid:
                 event_loop = asyncio.get_running_loop()
                 asyncio.run_coroutine_threadsafe(recordservice().calculatepagecount(requestid, ministryrequestid, AuthHelper.getuserid()), event_loop)
@@ -513,4 +552,3 @@ class FOIRequestRecordGroupRecord(Resource):
                 "success": False,
                 "message": "Unexpected error.",
             }, 500
-

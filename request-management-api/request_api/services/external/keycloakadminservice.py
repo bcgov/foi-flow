@@ -5,6 +5,9 @@ import request_api
 from request_api.models.OperatingTeams import OperatingTeam
 from request_api.exceptions import BusinessException, Error
 import redis
+import logging
+
+logger = logging.getLogger(__name__)
 
 class KeycloakAdminService:
 
@@ -40,7 +43,7 @@ class KeycloakAdminService:
                 _accesstoken = str(ast.literal_eval(x)['access_token'])                
                 cache_client.set("foi:kcsrcacnttoken",_accesstoken,ex=int(self.kctokenexpiry))
         except BusinessException as exception:
-            print("Error happened while accessing token on KeycloakAdminService {0}".format(exception.message))
+            logger.error("Error accessing token on KeycloakAdminService: %s", exception.message)
         finally:
             cache_client = None    
         return _accesstoken       

@@ -11,6 +11,9 @@ import json
 from request_api.models.default_method_result import DefaultMethodResult
 from request_api.utils.enums import OpenInfoNotificationType
 from request_api.models.OpenInformationExemptions import OpenInformationExemptions
+import logging
+
+logger = logging.getLogger(__name__)
 
 class openinfoevent:
     """ FOI Event management service
@@ -75,15 +78,21 @@ class openinfoevent:
                 return DefaultMethodResult(True, 'notification posted', requestid)
             else:
                 return DefaultMethodResult(False, 'Unable to post notification', requestid)  
-        except Exception as e:
-            print("========= error : ",e)
+        except Exception:
+            logger.exception(
+                "Error handling OpenInfo exemption request: requestid=%s ministryrequestid=%s event_type=%s exemption_id=%s",
+                requestid,
+                ministryrequestid,
+                event_type,
+                exemption_id,
+            )
             return DefaultMethodResult(False, 'Unable to post notification', requestid)
     
     def dismiss_exemption_notifications(self, requestid):
         try:
             notificationservice().dismissnotifications_by_requestid_type(requestid, "ministryrequest", OpenInfoNotificationType.EXEMPTION_REQUEST.value)
-        except Exception as e:
-            print("Error dismissing exemption notifications:", str(e))
+        except Exception:
+            logger.exception("Error dismissing OpenInfo exemption notifications: requestid=%s", requestid)
 
     def __createcomment(self, ministryrequestid, userid, username, event_type, exemption_id):
         comment = self.__preparecomment(ministryrequestid, userid, username, event_type, exemption_id)

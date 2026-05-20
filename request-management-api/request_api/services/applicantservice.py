@@ -1,4 +1,5 @@
 
+import logging
 from os import stat
 from re import VERBOSE
 from request_api.models.FOIRequestApplicants import FOIRequestApplicant
@@ -14,6 +15,8 @@ from request_api.utils.commons.datetimehandler import datetimehandler
 from request_api.models.default_method_result import DefaultMethodResult
 import re
 import maya
+
+logger = logging.getLogger(__name__)
 
 class applicantservice:
     """ FOI Event Dashboard
@@ -44,7 +47,12 @@ class applicantservice:
         if applicantpayload.get('foirequestid', None) and requesttype == 'foirequest':
             requests = FOIMinistryRequest.getopenrequestsbyrequestId([applicantpayload['foirequestid']])
             for request in requests:
-                print('\n\n**SETTING NEW APPLICANT FOR REQUEST: ', request, '\n\n')
+                logger.info(
+                    "Setting new applicant for open FOI request: foirequestid=%s ministryrequestid=%s applicanttype=%s",
+                    request.get('foirequest_id'),
+                    request.get('foiministryrequestid'),
+                    applicanttype,
+                )
                 requestschema = requestservicegetter().getrequest(request['foirequest_id'], request['foiministryrequestid'])
                 self.__update_requestschema(requestschema, applicantschema, applicanttype)
                 responseschema = requestservicecreate().saverequestversion(
@@ -56,7 +64,11 @@ class applicantservice:
         if applicantpayload.get('rawrequestid', None) and requesttype == 'rawrequest':
             rawrequest = FOIRawRequest.get_request(applicantpayload['rawrequestid'])
             raw_data = rawrequest["requestrawdata"]
-            print('\n\n**SETTING NEW APPLICANT FOR RAW REQUEST ID: ', applicantpayload['rawrequestid'], '\n\n')
+            logger.info(
+                "Setting new applicant for raw request: rawrequestid=%s applicanttype=%s",
+                applicantpayload.get('rawrequestid'),
+                applicantpayload.get('applicanttype'),
+            )
             self.__update_requestschema(raw_data, applicantschema, applicantpayload["applicanttype"])
             rawrequestservice().saverawrequestversion(
                 rawrequest['requestrawdata'],
@@ -145,7 +157,12 @@ class applicantservice:
             ministryrequest = FOIMinistryRequest.getopenrequestsbyrequestId([applicantpayload['foirequestid']])
             foirequestid = applicantpayload['foirequestid']
             foiministryrequestid = ministryrequest[0]['foiministryrequestid']
-            print('\n***REASSIGNING MINISTRY REQUEST: ', ministryrequest)
+            logger.info(
+                "Reassigning applicant profile for ministry request: foirequestid=%s ministryrequestid=%s applicanttype=%s",
+                foirequestid,
+                foiministryrequestid,
+                applicantpayload.get("applicanttype"),
+            )
             requestschema = requestservicegetter().getrequest(foirequestid, foiministryrequestid)
             self.__update_requestschema(requestschema, applicantschema, applicantpayload["applicanttype"])
             responseschema = requestservicecreate().saverequestversion(
@@ -156,7 +173,11 @@ class applicantservice:
         elif applicantpayload['requesttype'] == 'rawrequest':
             rawrequest = FOIRawRequest.get_request(applicantpayload['rawrequestid'])
             raw_data = rawrequest["requestrawdata"]
-            print('\n***REASSIGNING RAW REQUEST: ', rawrequest)
+            logger.info(
+                "Reassigning applicant profile for raw request: rawrequestid=%s applicanttype=%s",
+                applicantpayload.get('rawrequestid'),
+                applicantpayload.get('applicanttype'),
+            )
             self.__update_requestschema(raw_data, applicantschema, applicantpayload["applicanttype"])
             rawrequestservice().saverawrequestversion(
                 rawrequest['requestrawdata'],

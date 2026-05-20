@@ -1,18 +1,19 @@
 import contextlib
+import logging
 import os
-import sys
 
 import sqlalchemy
 import sqlalchemy.exc
 
 from request_api.config import ProdConfig
 
+logger = logging.getLogger(__name__)
 
 DB_ADMIN_PASSWORD = os.getenv('DB_ADMIN_PASSWORD', None)
 
 if not hasattr(ProdConfig, 'DB_NAME') or not DB_ADMIN_PASSWORD:
-    print("Unable to create database.", sys.stdout)
-    sys.exit(-1)
+    logger.error("Unable to create database: missing database name or admin password")
+    raise SystemExit(-1)
 
 DATABASE_URI = 'postgresql://postgres:{password}@{host}:{port}/{name}'.format(
     password=DB_ADMIN_PASSWORD,
