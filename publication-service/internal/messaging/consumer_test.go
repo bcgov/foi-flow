@@ -89,12 +89,14 @@ func (f *failingReadBroker) calls() int {
 }
 
 type fakeRepo struct {
-	mu       sync.Mutex
-	claimed  bool
-	complete bool
-	retry    bool
-	dead     bool
-	bumpHash string
+	mu              sync.Mutex
+	claimed         bool
+	complete        bool
+	retry           bool
+	dead            bool
+	bumpHash        string
+	retryCount      int
+	errorHashRepeat int
 }
 
 func (f *fakeRepo) Claim(_ context.Context, _ pub.ClaimRequest) (pub.ClaimResult, error) {
@@ -114,12 +116,26 @@ func (f *fakeRepo) MarkCompleted(_ context.Context, _ string, _ time.Time) error
 	return nil
 }
 
-func (f *fakeRepo) MarkRetry(_ context.Context, _, _, hash string, _ time.Time) error {
+func (f *fakeRepo) MarkRetry(_ context.Context, _, _, hash string, _ time.Time, maxRetries, poisonRepeatThreshold int) (pub.RetryResult, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-	f.retry = true
+	repeat := 1
+	if f.bumpHash == hash {
+		repeat = f.errorHashRepeat + 1
+	}
+	f.retryCount++
+	f.errorHashRepeat = repeat
 	f.bumpHash = hash
-	return nil
+	if maxRetries > 0 && f.retryCount >= maxRetries {
+		f.dead = true
+		return pub.RetryResult{Dead: true}, nil
+	}
+	if poisonRepeatThreshold > 0 && repeat >= poisonRepeatThreshold {
+		f.dead = true
+		return pub.RetryResult{Dead: true}, nil
+	}
+	f.retry = true
+	return pub.RetryResult{}, nil
 }
 
 func (f *fakeRepo) MarkDead(_ context.Context, _, _ string, _ pub.Class) error {
@@ -258,6 +274,49 @@ func TestConsumer_TransientErrorSchedulesRetry(t *testing.T) {
 	}
 	if repo.bumpHash == "" {
 		t.Error("expected non-empty error hash")
+	}
+}
+
+func TestConsumer_TransientErrorGoesDeadAfterMaxRetries(t *testing.T) {
+	broker := &fakeReadBroker{messages: []*StreamMessage{
+		{ID: "redis-4", Payload: sampleEnvelope(t)},
+	}}
+	repo := &fakeRepo{retryCount: 4}
+	outbox := &fakeOutbox{}
+	normalizer := &fakeNormalizer{handlerErr: pub.NewTransient("S3 5xx")}
+
+	c := newConsumerForTest(broker, repo, outbox, normalizer)
+	if err := c.Step(context.Background()); err != nil {
+		t.Fatalf("Step: %v", err)
+	}
+	if !repo.dead {
+		t.Error("expected transient error to go dead after max retries")
+	}
+	if repo.retry {
+		t.Error("did not expect another retry after max retries")
+	}
+}
+
+func TestConsumer_TransientErrorGoesDeadAfterPoisonRepeatThreshold(t *testing.T) {
+	broker := &fakeReadBroker{messages: []*StreamMessage{
+		{ID: "redis-5", Payload: sampleEnvelope(t)},
+	}}
+	repo := &fakeRepo{
+		bumpHash:        pub.ErrorHash(pub.ClassTransient, "S3 5xx"),
+		errorHashRepeat: 2,
+	}
+	outbox := &fakeOutbox{}
+	normalizer := &fakeNormalizer{handlerErr: pub.NewTransient("S3 5xx")}
+
+	c := newConsumerForTest(broker, repo, outbox, normalizer)
+	if err := c.Step(context.Background()); err != nil {
+		t.Fatalf("Step: %v", err)
+	}
+	if !repo.dead {
+		t.Error("expected repeated transient error to go dead")
+	}
+	if repo.retry {
+		t.Error("did not expect another retry after poison repeat threshold")
 	}
 }
 
