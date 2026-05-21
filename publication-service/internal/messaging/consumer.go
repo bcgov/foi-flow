@@ -44,7 +44,7 @@ type Validator interface {
 type PublishRepo interface {
 	Claim(ctx context.Context, req pub.ClaimRequest) (pub.ClaimResult, error)
 	MarkCompleted(ctx context.Context, eventID string, now time.Time) error
-	MarkRetry(ctx context.Context, eventID, msg, hash string, nextAt time.Time) error
+	MarkRetry(ctx context.Context, eventID, msg, hash string, nextAt time.Time, maxRetries, poisonRepeatThreshold int) (pub.RetryResult, error)
 	MarkDead(ctx context.Context, eventID, msg string, class pub.Class) error
 }
 
@@ -256,10 +256,33 @@ func (c *Consumer) Step(ctx context.Context) error {
 		slog.String("err", cl.Message),
 		slog.String("error_hash", hash),
 		slog.Time("next_retry_at", next))
+	retry, err := c.repo.MarkRetry(
+		ctx,
+		env.EventID,
+		cl.Message,
+		hash,
+		next,
+		c.cfg.MaxRetries,
+		c.cfg.PoisonRepeatThreshold,
+	)
+	if err != nil {
+		return err
+	}
+	if retry.Dead {
+		log.Warn("transient error retry limit reached → dead",
+			slog.String("err", cl.Message),
+			slog.String("error_hash", hash),
+			slog.String("class", string(retry.Class)))
+		if c.metrics != nil {
+			c.metrics.RecordProcessed(ctx, env.EventType, "dead")
+			c.metrics.RecordDeadLetter(ctx, env.EventType, string(retry.Class))
+		}
+		return nil
+	}
 	if c.metrics != nil {
 		c.metrics.RecordProcessed(ctx, env.EventType, "retry")
 	}
-	return c.repo.MarkRetry(ctx, env.EventID, cl.Message, hash, next)
+	return nil
 }
 
 // backoff returns the wait duration for retry attempt n (0-indexed).

@@ -37,6 +37,13 @@ type Classified struct {
 	Message string
 }
 
+// RetryResult reports whether a transient failure was scheduled again or
+// converted to a dead-letter state by retry policy.
+type RetryResult struct {
+	Dead  bool
+	Class Class
+}
+
 // Classify turns any error into a (class, message) decision.
 // Unknown errors default to transient — fail safe.
 func Classify(err error) Classified {
