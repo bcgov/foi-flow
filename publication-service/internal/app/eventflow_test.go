@@ -67,3 +67,40 @@ func TestEventFlowWorkerCount(t *testing.T) {
 		t.Fatalf("eventFlowWorkerCount = %d, want 5", eventFlowWorkerCount)
 	}
 }
+
+func TestSchedulerSourceUsesConfiguredAllowlist(t *testing.T) {
+	tests := []struct {
+		name      string
+		allowlist []string
+		want      string
+	}{
+		{
+			name:      "publish source allowlist",
+			allowlist: []string{"request-management-api"},
+			want:      "request-management-api",
+		},
+		{
+			name:      "sitemap source allowlist",
+			allowlist: []string{"request-management-api"},
+			want:      "request-management-api",
+		},
+		{
+			name:      "unpublish source allowlist",
+			allowlist: []string{"request-management-api"},
+			want:      "request-management-api",
+		},
+		{
+			name:      "empty allowlist",
+			allowlist: nil,
+			want:      "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := schedulerSource(tt.allowlist); got != tt.want {
+				t.Fatalf("schedulerSource = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
