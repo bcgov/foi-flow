@@ -263,7 +263,6 @@ const OpenInfo = ({
     const formattedData = {
       ...oiPublicationData,
       oipublicationstatus_id: OIPublicationStatuses.UnpublishRequest,
-      publicationdate: null,
     };
     dispatch(
       unpublishFOIOpenInfoRequest(
