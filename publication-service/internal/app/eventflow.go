@@ -26,6 +26,13 @@ import (
 
 const eventFlowWorkerCount = 5
 
+func schedulerSource(allowlist []string) string {
+	if len(allowlist) > 0 {
+		return allowlist[0]
+	}
+	return ""
+}
+
 // RunEventFlow wires and runs the consumer, scheduler, and outbox publisher.
 // It blocks until ctx is cancelled, then waits for goroutines to stop.
 func RunEventFlow(ctx context.Context, cfg *config.Config, logger *slog.Logger) error {
@@ -139,11 +146,11 @@ func RunEventFlow(ctx context.Context, cfg *config.Config, logger *slog.Logger) 
 
 	scheduler := messaging.NewScheduler(messaging.SchedulerConfig{
 		PublishStream:   cfg.RedisStreamPublishRequested,
-		PublishSource:   "publication.publish.service",
+		PublishSource:   schedulerSource(cfg.SourceAllowlist),
 		SitemapStream:   cfg.Sitemap.RequestedStream,
-		SitemapSource:   "publication.sitemapping.service",
+		SitemapSource:   schedulerSource(cfg.Sitemap.SourceAllowlist),
 		UnpublishStream: cfg.RedisStreamUnpublishRequested,
-		UnpublishSource: "publication.unpublish.service",
+		UnpublishSource: schedulerSource(cfg.UnpublishSourceAllowlist),
 		BatchSize:       100,
 		StreamMaxLen:    cfg.StreamMaxLen,
 		Interval:        cfg.SchedulerInterval,
