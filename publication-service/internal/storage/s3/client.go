@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	s3sdk "github.com/aws/aws-sdk-go-v2/service/s3"
@@ -267,16 +266,21 @@ func (c *Client) DeletePrefix(ctx context.Context, bucket, prefix string) (int, 
 			continue
 		}
 
-		deleteCtx, deleteCancel := context.WithTimeout(ctx, c.timeout)
-		_, err = c.api.DeleteObjects(deleteCtx, &s3sdk.DeleteObjectsInput{
-			Bucket: &bucket,
-			Delete: &s3types.Delete{Objects: objects, Quiet: aws.Bool(true)},
-		})
-		deleteCancel()
-		if err != nil {
-			return deleted, classifyS3Error(err)
+		for _, object := range objects {
+			if object.Key == nil {
+				continue
+			}
+			deleteCtx, deleteCancel := context.WithTimeout(ctx, c.timeout)
+			_, err = c.api.DeleteObject(deleteCtx, &s3sdk.DeleteObjectInput{
+				Bucket: &bucket,
+				Key:    object.Key,
+			})
+			deleteCancel()
+			if err != nil {
+				return deleted, classifyS3Error(err)
+			}
+			deleted++
 		}
-		deleted += len(objects)
 	}
 	return deleted, nil
 }
