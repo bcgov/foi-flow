@@ -12,18 +12,19 @@ const OpenInfoConfirmationModal = ({
   confirm,
   setModal,
   modal,
+  isProactiveDisclosure,
 }: any) => {
   const handleConfirmation = () => {
-    if (modal.title === "Change Publication Date") {
+    if (modal.title === "Change Publication Date" && !isProactiveDisclosure) {
       confirm(modal.confirmationData);
     } else {
       confirm();
     }
     setModal((prev : any) => ({
-      ...prev,     
-      show: false, 
-      title: "", 
-      message: "", 
+      ...prev,
+      show: false,
+      title: "",
+      message: "",
       description: "",
       confirmButtonTitle: "",
       confirmationData: null,
@@ -31,10 +32,10 @@ const OpenInfoConfirmationModal = ({
   };
   const handleClose = () => {
     setModal((prev : any) => ({
-      ...prev,     
-      show: false, 
-      title: "", 
-      message: "", 
+      ...prev,
+      show: false,
+      title: "",
+      message: "",
       description: "",
       confirmButtonTitle: "",
       confirmationData: null,

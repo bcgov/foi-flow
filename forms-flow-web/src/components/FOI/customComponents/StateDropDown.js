@@ -268,16 +268,19 @@ const StateDropDown = ({
         }
       case "Ready to Publish".toLowerCase():
         if (isProactiveDisclosure && isOITeam) {
-          return _stateList.readytopublishPD
+          return _stateList.readytopublishPD;
         }
+        break;
       case "Published".toLowerCase():
         if (isProactiveDisclosure && isOITeam) {
-          return _stateList.publishedPD
+          return _stateList.publishedPD;
         }
+        break;
       case "Unpublished".toLowerCase():
         if (isProactiveDisclosure && isOITeam) {
-          return _stateList.unpublishedPD
+          return _stateList.unpublishedPD;
         }
+        break;
       default:
         return [];
     }
@@ -287,7 +290,7 @@ const StateDropDown = ({
       return status === requestState || status === 'Do Not Publish' || status === 'Unpublished';
     }
     if (isProactiveDisclosure) {
-      return status === requestState || status === 'Published' || status === 'Unpublished';
+      return status === requestState || status === 'Published' || status === 'Unpublished'
     }
     if (index === 0) {
       return false;
@@ -296,7 +299,7 @@ const StateDropDown = ({
     return isValidationError || requestState === StateEnum.unopened.name
     //   || (isBeforeOpen(requestDetails) ////comment back in after axis decomission
     //   && status === 'Open'
-    //   && !requestDetails.foiRequestApplicantID 
+    //   && !requestDetails.foiRequestApplicantID
     // );
   };
   const statusList = getStatusList();

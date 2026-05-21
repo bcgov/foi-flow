@@ -197,55 +197,24 @@ const OpenInfoHeader = ({
     <>
       {isProactiveDisclosure ? (
         <>
-          <div className="col-lg-12">
-            <div className="foi-request-header-card">
-              <div className="foi-request-number-header-pd">
-                <h1 className="foi-request-number-text">{headerText}</h1>
-              </div>
-              {proactiveDisclosureCategory &&
-                <div className='foi-request-calendar'>
-                  <button type="button" className="btn-calendar">
-                    {proactiveDisclosureCategory?.toLowerCase() == "calendar"
-                      ? <FontAwesomeIcon icon={faCalendar as IconProp} size="lg" />
-                      : ""
-                    }
-                    {proactiveDisclosureCategory}
-                  </button>
+          <div className='row'>
+            <div className="col-lg-12">
+              <div className="foi-request-header-card">
+                <div className="foi-request-number-header-pd">
+                  <h1 className="foi-request-number-text">{headerText}</h1>
                 </div>
-              }
-            </div>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <div className="oi-assignment">
-              <TextField
-                id="assignedTo"
-                label={"FOI Ops Assigned To"}
-                inputProps={{ "aria-labelledby": "assignedTo-label", readOnly: true }}
-                InputLabelProps={{ shrink: true }}
-                style={{ paddingBottom: "4%" }}
-                value={selectedAssignedTo}
-                variant="outlined"
-                fullWidth
-                disabled={isOIUser}
-              ></TextField>
-              <TextField
-                id="oiAssignedTo"
-                label={"OI Assigned To"}
-                inputProps={{
-                  "aria-labelledby": "assignedTo-label"
-                }}
-                InputLabelProps={{ shrink: true }}
-                value={selectedOIAssignedTo}
-                onChange={handleOIAssigneeUpdate}
-                variant="outlined"
-                fullWidth
-                select={isOIUser}
-                required={isOIUser}
-                disabled={!isOIUser}
-                error={isOIUser && selectedOIAssignedTo.toLowerCase().includes("unassigned")}
-              >
-                {menuItems}
-              </TextField>
+                {proactiveDisclosureCategory &&
+                  <div className='foi-request-calendar'>
+                    <button type="button" className="btn-calendar">
+                      {proactiveDisclosureCategory?.toLowerCase() == "calendar"
+                        ? <FontAwesomeIcon icon={faCalendar as IconProp} size="lg" />
+                        : ""
+                      }
+                      {proactiveDisclosureCategory}
+                    </button>
+                  </div>
+                }
+              </div>
             </div>
           </div>
         </>

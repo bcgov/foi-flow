@@ -1,5 +1,4 @@
 import React, {useState} from 'react';
-import { useParams } from 'react-router-dom';
 import { useSelector } from "react-redux";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -44,7 +43,6 @@ const RequestDetails = React.memo(
     });
     const classes = useStyles();
     const disableFieldForMinistryRequest = shouldDisableFieldForMinistryRequests(requestStatus)
-    const {ministryId} = useParams();
     const disableInput = isHistoricalRequest || StateEnum.closed.name.toLowerCase() === requestDetails?.currentState?.toLowerCase()
     const validateFields = (request, name, value) => {
       if (request !== undefined) {
@@ -111,7 +109,7 @@ const RequestDetails = React.memo(
 
     //updates the default values from the request details
     React.useEffect(() => {
-      const initialRequestType = validateFields(saveRequestObject && Object.keys(saveRequestObject).length !== 0 && 
+      const initialRequestType = validateFields(saveRequestObject && Object.keys(saveRequestObject).length !== 0 &&
         saveRequestObject.requestType ? saveRequestObject : requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE);
       setSelectedRequestType(initialRequestType);
       setSelectedReceivedMode(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE));
@@ -182,7 +180,7 @@ const RequestDetails = React.memo(
     const [dueDateText, setDueDate] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, getProcessStartDateForLocalState()));
 
     //local state management for RequestType, ReceivedMode and DeliveryMode
-    const [selectedRequestType, setSelectedRequestType] = React.useState(validateFields(saveRequestObject && Object.keys(saveRequestObject).length !== 0 && 
+    const [selectedRequestType, setSelectedRequestType] = React.useState(validateFields(saveRequestObject && Object.keys(saveRequestObject).length !== 0 &&
       saveRequestObject.requestType ? saveRequestObject : requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE));
     const [selectedReceivedMode, setSelectedReceivedMode] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE));
     const [selectedDeliveryMode, setSelectedDeliveryMode] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE));
@@ -408,26 +406,24 @@ const RequestDetails = React.memo(
 
                 {!isHistoricalRequest ?
                   <TextField
-                        id="deliveryMode"
-                        label="Delivery Mode"
-                        inputProps={{ "aria-labelledby": "deliveryMode-label"}}
-                        InputLabelProps={{ shrink: true, }}
-                        select
-                        value={selectedDeliveryMode}
-                        onChange={handleDeliveryModeChange}
-                        input={<Input />}
-                        variant="outlined"
-                        fullWidth
-                        //required
-                        disabled={disableInput}
-                        SelectProps={{ displayEmpty: true }}
-                        //error={selectedDeliveryMode.toLowerCase().includes("select")}
-                    >
-                    {/* {deliveryModes} */}
-                      <MenuItem value="">
-                        No Delivery Mode
-                      </MenuItem>
-                     {deliveryModes}
+                    id="deliveryMode"
+                    label="Delivery Mode"
+                    inputProps={{ "aria-labelledby": "deliveryMode-label" }}
+                    InputLabelProps={{ shrink: true, }}
+                    select
+                    value={selectedDeliveryMode}
+                    onChange={handleDeliveryModeChange}
+                    input={<Input />}
+                    variant="outlined"
+                    fullWidth
+                    //required
+                    disabled={disableInput}
+                    SelectProps={{ displayEmpty: true }}
+                  >
+                    <MenuItem value="">
+                      No Delivery Mode
+                    </MenuItem>
+                    {deliveryModes}
                   </TextField>
                   :
                   <TextField
