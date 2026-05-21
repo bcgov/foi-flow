@@ -12,8 +12,8 @@ on:
     branches: [dev]
     paths:
       - 'publication-service/**' # Triggers on changes to files in the express-api/ directory.
-env:
-  IMAGE_TAG: ${{ github.event.inputs.image_tag }}
+#env:
+#  IMAGE_TAG: ${{ github.event.inputs.image_tag }}
 
 jobs:
 # Job for automated unit tests goes HERE
