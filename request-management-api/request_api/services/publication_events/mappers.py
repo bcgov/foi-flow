@@ -59,6 +59,12 @@ class PublicationPathResolver:
             prefix=f"packages/{row.get('axisrequestid')}/openinfo/",
         )
 
+    def build_public_repository_prefix(self, row):
+        return S3Location(
+            bucket=self.openinfo_publication_bucket,
+            prefix=f"packages/{row.get('axisrequestid')}/",
+        )
+
 
 class OpenInfoPublishRequestedMapper:
     """Maps OI query rows to requested-event payloads."""
@@ -228,7 +234,7 @@ class UnpublishRequestedMapper:
 
     def map(self, row, publication_type="openinfo"):
         axis_request_id = row.get("axisrequestid")
-        public_repository = self.path_resolver.build_destination(row)
+        public_repository = self.path_resolver.build_public_repository_prefix(row)
         return UnpublishRequestedPayload(
             tenant_id=self.path_resolver.resolve_tenant_id(row),
             publication_id=axis_request_id,

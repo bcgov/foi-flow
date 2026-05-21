@@ -173,7 +173,7 @@ def test_unpublish_mapper_maps_openinfo_row(monkeypatch):
         == "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages/EDU-2024-12345/openinfo/EDU-2024-12345.html"
     )
     assert payload.public_repository.bucket == "dev-openinfopub"
-    assert payload.public_repository.prefix == "packages/EDU-2024-12345/openinfo/"
+    assert payload.public_repository.prefix == "packages/EDU-2024-12345/"
     assert payload.last_modified == "2026-04-27"
 
 
@@ -200,18 +200,21 @@ def test_unpublish_mapper_maps_pd_row(monkeypatch):
         payload.public_url
         == "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages/PD-FIN-2026-001/openinfo/PD-FIN-2026-001.html"
     )
-    assert payload.public_repository.prefix == "packages/PD-FIN-2026-001/openinfo/"
+    assert payload.public_repository.prefix == "packages/PD-FIN-2026-001/"
     assert payload.last_modified == "2026-04-20"
 
 
 def test_unpublish_mapper_correlation_id_openinfo():
-    row = {"openinfoid": 42}
-    assert UnpublishRequestedMapper.correlation_id(row, "openinfo") == "openinfo-unpublish-42"
+    row = {"openinfoid": 42, "created_at": "2026-04-27 08:15:00.000000"}
+    assert UnpublishRequestedMapper.correlation_id(row, "openinfo") == "openinfo-unpublish-42-1777277700.0"
 
 
 def test_unpublish_mapper_correlation_id_pd():
-    row = {"proactivedisclosureid": 99}
-    assert UnpublishRequestedMapper.correlation_id(row, "proactivedisclosure") == "proactivedisclosure-unpublish-99"
+    row = {"proactivedisclosureid": 99, "created_at": "2026-04-20 10:30:00.000000"}
+    assert (
+        UnpublishRequestedMapper.correlation_id(row, "proactivedisclosure")
+        == "proactivedisclosure-unpublish-99-1776681000.0"
+    )
 
 
 def test_unpublish_mapper_handles_missing_publicationdate(monkeypatch):
@@ -325,6 +328,7 @@ def test_queue_openinfo_unpublish_builds_correct_envelope(monkeypatch):
                     "type": "unpublish",
                     "bcgovcode": "edu",
                     "publicationdate": "2026-04-27",
+                    "created_at": "2026-04-27 08:15:00.000000",
                 }
             ]
         ),
@@ -338,7 +342,7 @@ def test_queue_openinfo_unpublish_builds_correct_envelope(monkeypatch):
     envelope = publisher.published_envelopes[0].to_dict()
     assert envelope["event_type"] == PublicationEventType.UNPUBLISH_REQUESTED
     assert envelope["payload"]["kind"] == "openinfo"
-    assert envelope["correlation_id"] == "openinfo-unpublish-42"
+    assert envelope["correlation_id"] == "openinfo-unpublish-42-1777277700.0"
     assert envelope["payload"]["tenant_id"] == str(uuid.uuid5(uuid.NAMESPACE_DNS, "bcgov:edu"))
     assert envelope["payload"]["publication_id"] == "EDU-2024-12345"
     assert (
@@ -346,7 +350,7 @@ def test_queue_openinfo_unpublish_builds_correct_envelope(monkeypatch):
         == "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages/EDU-2024-12345/openinfo/EDU-2024-12345.html"
     )
     assert envelope["payload"]["public_repository"]["bucket"] == "dev-openinfopub"
-    assert envelope["payload"]["public_repository"]["prefix"] == "packages/EDU-2024-12345/openinfo/"
+    assert envelope["payload"]["public_repository"]["prefix"] == "packages/EDU-2024-12345/"
     assert envelope["payload"]["last_modified"] == "2026-04-27"
     assert envelope["payload"]["foirequest_id"] == 200
     assert envelope["payload"]["foiministryrequest_id"] == 100
@@ -377,6 +381,7 @@ def test_queue_pd_unpublish_builds_correct_envelope(monkeypatch):
                     "type": "unpublish",
                     "bcgovcode": "fin",
                     "publicationdate": "2026-04-20",
+                    "created_at": "2026-04-20 10:30:00.000000",
                 }
             ]
         ),
@@ -389,13 +394,13 @@ def test_queue_pd_unpublish_builds_correct_envelope(monkeypatch):
     envelope = publisher.published_envelopes[0].to_dict()
     assert envelope["event_type"] == PublicationEventType.UNPUBLISH_REQUESTED
     assert envelope["payload"]["kind"] == "proactivedisclosure"
-    assert envelope["correlation_id"] == "proactivedisclosure-unpublish-99"
+    assert envelope["correlation_id"] == "proactivedisclosure-unpublish-99-1776681000.0"
     assert envelope["payload"]["publication_id"] == "PD-FIN-2026-001"
     assert (
         envelope["payload"]["public_url"]
         == "https://citz-foi-prod.objectstore.gov.bc.ca/dev-openinfopub/packages/PD-FIN-2026-001/openinfo/PD-FIN-2026-001.html"
     )
-    assert envelope["payload"]["public_repository"]["prefix"] == "packages/PD-FIN-2026-001/openinfo/"
+    assert envelope["payload"]["public_repository"]["prefix"] == "packages/PD-FIN-2026-001/"
     assert envelope["payload"]["foirequest_id"] == 400
     assert envelope["payload"]["foiministryrequest_id"] == 300
 
@@ -446,6 +451,7 @@ def test_queue_openinfo_unpublish_publisher_failure(monkeypatch):
                     "axisrequestid": "EDU-2024-12345",
                     "bcgovcode": "edu",
                     "publicationdate": "2026-04-27",
+                    "created_at": "2026-04-27 08:15:00.000000",
                 }
             ]
         ),

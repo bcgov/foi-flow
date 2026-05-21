@@ -103,6 +103,9 @@ def test_proactive_disclosure_mapper_sets_kind(monkeypatch):
         "proactivedisclosureid": 1,
         "axisrequestid": "PD-001",
         "bcgovcode": "fin",
+        "contributor": "Ministry of Finance",
+        "proactivedisclosurecategory": "Calendars",
+        "reportperiod": "Quarter 1 2026-27",
     }
     payload = mapper.map(row)
     assert payload.kind == "proactivedisclosure"
@@ -125,6 +128,7 @@ def test_queue_openinfo_publishnow_builds_openinfo_envelope(monkeypatch):
                     "fees": 0,
                     "applicant_type": "Media",
                     "bcgovcode": "fin",
+                    "created_at": "2026-04-20 10:30:00.000000",
                     "additionalfiles": [
                         {
                             "additionalfileid": 99,
@@ -146,7 +150,7 @@ def test_queue_openinfo_publishnow_builds_openinfo_envelope(monkeypatch):
     envelope = publisher.published_envelopes[0].to_dict()
     assert envelope["event_type"] == PublicationEventType.PUBLISH_REQUESTED
     assert envelope["payload"]["kind"] == "openinfo"
-    assert envelope["correlation_id"] == "openinfo-publish-345"
+    assert envelope["correlation_id"] == "openinfo-publish-345-1776681000.0"
     assert envelope["payload"]["tenant_id"] == str(uuid.uuid5(uuid.NAMESPACE_DNS, "bcgov:fin"))
     assert envelope["payload"]["axis_request_id"] == "FIN-2026-047533"
     assert envelope["payload"]["source"]["bucket"] == "fin-dev-e"
@@ -176,6 +180,7 @@ def test_queue_proactive_disclosure_publishnow_builds_pd_envelope(monkeypatch):
                 "fees": 0,
                 "applicant_type": None,
                 "bcgovcode": "fin",
+                "created_at": "2026-04-20 10:30:00.000000",
                 "sitemap_pages": "",
                 "type": "publishnow",
                 "proactivedisclosurecategory": "Calendars",
@@ -201,7 +206,7 @@ def test_queue_proactive_disclosure_publishnow_builds_pd_envelope(monkeypatch):
     envelope = publisher.published_envelopes[0].to_dict()
     assert envelope["event_type"] == PublicationEventType.PUBLISH_REQUESTED
     assert envelope["payload"]["kind"] == "proactivedisclosure"
-    assert envelope["correlation_id"] == "proactivedisclosure-publish-71"
+    assert envelope["correlation_id"] == "proactivedisclosure-publish-71-1776681000.0"
     assert envelope["payload"]["tenant_id"] == str(uuid.uuid5(uuid.NAMESPACE_DNS, "bcgov:fin"))
     assert envelope["payload"]["proactivedisclosure_category"] == "Calendars"
     assert envelope["payload"]["report_period"] == "Quarter 1 2026-27"
