@@ -237,6 +237,115 @@ func TestClient_Copy_EmptySourceIsNoOp(t *testing.T) {
 	}
 }
 
+func TestClient_DeletePrefix_RemovesPackageObjects(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
+	defer cancel()
+
+	req := tc.ContainerRequest{
+		Image:        "chrislusf/seaweedfs:3.72",
+		Cmd:          []string{"server", "-s3"},
+		ExposedPorts: []string{"8333/tcp"},
+		WaitingFor: wait.ForHTTP("/").
+			WithPort("8333/tcp").
+			WithStatusCodeMatcher(func(status int) bool { return status < 500 }).
+			WithStartupTimeout(60 * time.Second),
+	}
+	container, err := tc.GenericContainer(ctx, tc.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+	})
+	if err != nil {
+		t.Fatalf("seaweedfs: %v", err)
+	}
+	t.Cleanup(func() { _ = container.Terminate(context.Background()) })
+
+	host, err := container.Host(ctx)
+	if err != nil {
+		t.Fatalf("host: %v", err)
+	}
+	port, err := container.MappedPort(ctx, "8333/tcp")
+	if err != nil {
+		t.Fatalf("port: %v", err)
+	}
+	endpoint := fmt.Sprintf("http://%s:%s", host, port.Port())
+
+	awsCfg, err := awsconfig.LoadDefaultConfig(ctx,
+		awsconfig.WithRegion("us-east-1"),
+		awsconfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
+			"test-key", "test-secret", "")),
+	)
+	if err != nil {
+		t.Fatalf("aws cfg: %v", err)
+	}
+	raw := s3sdk.NewFromConfig(awsCfg, func(o *s3sdk.Options) {
+		o.BaseEndpoint = &endpoint
+		o.UsePathStyle = true
+	})
+
+	const bucket = "dev-openinfopub"
+	const prefix = "packages/PD-AGR-2026-047535/"
+	_, err = raw.CreateBucket(ctx, &s3sdk.CreateBucketInput{Bucket: aws.String(bucket)})
+	if err != nil {
+		t.Fatalf("create bucket %q: %v", bucket, err)
+	}
+
+	objects := map[string]string{
+		prefix + "openinfo/PD-AGR-2026-047535.html":     "html",
+		prefix + "openinfo/document.pdf":                "pdf",
+		prefix + "attachments/supporting.txt":           "supporting",
+		"packages/PD-AGR-2026-OTHER/openinfo/keep.html": "keep",
+	}
+	for key, body := range objects {
+		_, err := raw.PutObject(ctx, &s3sdk.PutObjectInput{
+			Bucket: aws.String(bucket),
+			Key:    aws.String(key),
+			Body:   bytes.NewReader([]byte(body)),
+		})
+		if err != nil {
+			t.Fatalf("put %q: %v", key, err)
+		}
+	}
+
+	client, err := pubs3.NewClient(config.S3Config{
+		Endpoint:        endpoint,
+		Region:          "us-east-1",
+		AccessKeyID:     "test-key",
+		SecretAccessKey: "test-secret",
+		UsePathStyle:    true,
+		RequestTimeout:  10 * time.Second,
+	})
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+
+	deleted, err := client.DeletePrefix(ctx, bucket, prefix)
+	if err != nil {
+		t.Fatalf("DeletePrefix: %v", err)
+	}
+	if deleted != 3 {
+		t.Fatalf("DeletePrefix deleted %d objects, want 3", deleted)
+	}
+
+	list, err := raw.ListObjectsV2(ctx, &s3sdk.ListObjectsV2Input{
+		Bucket: aws.String(bucket),
+		Prefix: aws.String(prefix),
+	})
+	if err != nil {
+		t.Fatalf("list deleted prefix: %v", err)
+	}
+	if len(list.Contents) != 0 {
+		t.Fatalf("expected no objects under %q after DeletePrefix, found %d", prefix, len(list.Contents))
+	}
+
+	_, err = raw.HeadObject(ctx, &s3sdk.HeadObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String("packages/PD-AGR-2026-OTHER/openinfo/keep.html"),
+	})
+	if err != nil {
+		t.Fatalf("outside package object was removed: %v", err)
+	}
+}
+
 func TestClient_Get(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
