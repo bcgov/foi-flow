@@ -88,7 +88,7 @@ func TestDeletePrefixDeletesObjectsIndividually(t *testing.T) {
   <IsTruncated>false</IsTruncated>
   <Contents><Key>openinfo/pub/a.txt</Key><Size>1</Size></Contents>
   <Contents><Key>openinfo/pub/nested/b.txt</Key><Size>1</Size></Contents>
-  <Contents><Key>openinfo/pub/folder/</Key><Size>0</Size></Contents>
+  <Contents><Key>openinfo/pub/</Key><Size>0</Size></Contents>
 </ListBucketResult>`))
 		case r.Method == http.MethodPost && r.URL.Path == "/public" && hasDeleteQuery(r.URL):
 			sawMultiDelete = true
@@ -121,11 +121,11 @@ func TestDeletePrefixDeletesObjectsIndividually(t *testing.T) {
 	if sawMultiDelete {
 		t.Fatal("DeletePrefix used multi-object delete")
 	}
-	if got != 2 {
-		t.Fatalf("DeletePrefix deleted %d objects, want 2", got)
+	if got != 3 {
+		t.Fatalf("DeletePrefix deleted %d objects, want 3", got)
 	}
 	sort.Strings(deleted)
-	want := []string{"/public/openinfo/pub/a.txt", "/public/openinfo/pub/nested/b.txt"}
+	want := []string{"/public/openinfo/pub/", "/public/openinfo/pub/a.txt", "/public/openinfo/pub/nested/b.txt"}
 	for i := range want {
 		if deleted[i] != want[i] {
 			t.Fatalf("deleted paths = %v, want %v", deleted, want)
