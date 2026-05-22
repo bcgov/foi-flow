@@ -22,11 +22,20 @@ import (
 	pubs3 "publication-service/internal/storage/s3"
 )
 
-func TestClient_Copy_PreservesKeysAndSkipsFolderMarkers(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
-	defer cancel()
+const (
+	testAccessKey = "test-key"
+	testSecretKey = "test-secret"
+	testRegion    = "us-east-1"
+)
 
-	// Start SeaweedFS in S3 mode.
+type s3IntegrationHarness struct {
+	raw    *s3sdk.Client
+	client *pubs3.Client
+}
+
+func newS3IntegrationHarness(t *testing.T, ctx context.Context, buckets ...string) s3IntegrationHarness {
+	t.Helper()
+
 	req := tc.ContainerRequest{
 		Image:        "chrislusf/seaweedfs:3.72",
 		Cmd:          []string{"server", "-s3"},
@@ -55,11 +64,10 @@ func TestClient_Copy_PreservesKeysAndSkipsFolderMarkers(t *testing.T) {
 	}
 	endpoint := fmt.Sprintf("http://%s:%s", host, port.Port())
 
-	// Raw SDK client for seeding and assertions.
 	awsCfg, err := awsconfig.LoadDefaultConfig(ctx,
-		awsconfig.WithRegion("us-east-1"),
+		awsconfig.WithRegion(testRegion),
 		awsconfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
-			"test-key", "test-secret", "")),
+			testAccessKey, testSecretKey, "")),
 	)
 	if err != nil {
 		t.Fatalf("aws cfg: %v", err)
@@ -69,13 +77,48 @@ func TestClient_Copy_PreservesKeysAndSkipsFolderMarkers(t *testing.T) {
 		o.UsePathStyle = true
 	})
 
-	// Create source and destination buckets.
-	for _, b := range []string{"raw", "published"} {
-		_, err := raw.CreateBucket(ctx, &s3sdk.CreateBucketInput{Bucket: aws.String(b)})
+	for _, bucket := range buckets {
+		_, err := raw.CreateBucket(ctx, &s3sdk.CreateBucketInput{Bucket: aws.String(bucket)})
 		if err != nil {
-			t.Fatalf("create bucket %q: %v", b, err)
+			t.Fatalf("create bucket %q: %v", bucket, err)
 		}
 	}
+
+	client, err := pubs3.NewClient(config.S3Config{
+		Endpoint:        endpoint,
+		Region:          testRegion,
+		AccessKeyID:     testAccessKey,
+		SecretAccessKey: testSecretKey,
+		UsePathStyle:    true,
+		RequestTimeout:  10 * time.Second,
+	})
+	if err != nil {
+		t.Fatalf("NewClient: %v", err)
+	}
+
+	return s3IntegrationHarness{raw: raw, client: client}
+}
+
+func putS3Objects(t *testing.T, ctx context.Context, client *s3sdk.Client, bucket string, objects map[string]string) {
+	t.Helper()
+
+	for key, body := range objects {
+		_, err := client.PutObject(ctx, &s3sdk.PutObjectInput{
+			Bucket: aws.String(bucket),
+			Key:    aws.String(key),
+			Body:   bytes.NewReader([]byte(body)),
+		})
+		if err != nil {
+			t.Fatalf("put %q: %v", key, err)
+		}
+	}
+}
+
+func TestClient_Copy_PreservesKeysAndSkipsFolderMarkers(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
+	defer cancel()
+
+	h := newS3IntegrationHarness(t, ctx, "raw", "published")
 
 	// Seed three real objects plus one folder-marker.
 	objects := map[string]string{
@@ -83,18 +126,10 @@ func TestClient_Copy_PreservesKeysAndSkipsFolderMarkers(t *testing.T) {
 		"src/b.txt":      "BBB",
 		"src/deep/c.txt": "CCC",
 	}
-	for k, v := range objects {
-		_, err := raw.PutObject(ctx, &s3sdk.PutObjectInput{
-			Bucket: aws.String("raw"),
-			Key:    aws.String(k),
-			Body:   bytes.NewReader([]byte(v)),
-		})
-		if err != nil {
-			t.Fatalf("put %q: %v", k, err)
-		}
-	}
+	putS3Objects(t, ctx, h.raw, "raw", objects)
+
 	// Folder marker: zero-byte object whose key ends in "/".
-	_, err = raw.PutObject(ctx, &s3sdk.PutObjectInput{
+	_, err := h.raw.PutObject(ctx, &s3sdk.PutObjectInput{
 		Bucket: aws.String("raw"),
 		Key:    aws.String("src/folder/"),
 		Body:   bytes.NewReader(nil),
@@ -103,20 +138,7 @@ func TestClient_Copy_PreservesKeysAndSkipsFolderMarkers(t *testing.T) {
 		t.Fatalf("put folder marker: %v", err)
 	}
 
-	// Build the Client under test.
-	client, err := pubs3.NewClient(config.S3Config{
-		Endpoint:        endpoint,
-		Region:          "us-east-1",
-		AccessKeyID:     "test-key",
-		SecretAccessKey: "test-secret",
-		UsePathStyle:    true,
-		RequestTimeout:  10 * time.Second,
-	})
-	if err != nil {
-		t.Fatalf("NewClient: %v", err)
-	}
-
-	res, err := client.Copy(ctx,
+	res, err := h.client.Copy(ctx,
 		pub.S3Location{Bucket: "raw", Prefix: "src/"},
 		pub.S3Location{Bucket: "published", Prefix: "dst/"},
 	)
@@ -138,7 +160,7 @@ func TestClient_Copy_PreservesKeysAndSkipsFolderMarkers(t *testing.T) {
 		"dst/deep/c.txt": "CCC",
 	}
 	for k, want := range expected {
-		got, err := raw.GetObject(ctx, &s3sdk.GetObjectInput{
+		got, err := h.raw.GetObject(ctx, &s3sdk.GetObjectInput{
 			Bucket: aws.String("published"),
 			Key:    aws.String(k),
 		})
@@ -156,7 +178,7 @@ func TestClient_Copy_PreservesKeysAndSkipsFolderMarkers(t *testing.T) {
 	}
 
 	// Assert the folder-marker was NOT copied.
-	_, err = raw.HeadObject(ctx, &s3sdk.HeadObjectInput{
+	_, err = h.raw.HeadObject(ctx, &s3sdk.HeadObjectInput{
 		Bucket: aws.String("published"),
 		Key:    aws.String("dst/folder/"),
 	})
@@ -169,63 +191,9 @@ func TestClient_Copy_EmptySourceIsNoOp(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
 
-	req := tc.ContainerRequest{
-		Image:        "chrislusf/seaweedfs:3.72",
-		Cmd:          []string{"server", "-s3"},
-		ExposedPorts: []string{"8333/tcp"},
-		WaitingFor: wait.ForHTTP("/").
-			WithPort("8333/tcp").
-			WithStatusCodeMatcher(func(status int) bool { return status < 500 }).
-			WithStartupTimeout(60 * time.Second),
-	}
-	container, err := tc.GenericContainer(ctx, tc.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
-	})
-	if err != nil {
-		t.Fatalf("seaweedfs: %v", err)
-	}
-	t.Cleanup(func() { _ = container.Terminate(context.Background()) })
+	h := newS3IntegrationHarness(t, ctx, "raw", "published")
 
-	host, err := container.Host(ctx)
-	if err != nil {
-		t.Fatalf("host: %v", err)
-	}
-	port, err := container.MappedPort(ctx, "8333/tcp")
-	if err != nil {
-		t.Fatalf("port: %v", err)
-	}
-	endpoint := fmt.Sprintf("http://%s:%s", host, port.Port())
-
-	awsCfg, err := awsconfig.LoadDefaultConfig(ctx,
-		awsconfig.WithRegion("us-east-1"),
-		awsconfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
-			"test-key", "test-secret", "")),
-	)
-	if err != nil {
-		t.Fatalf("aws cfg: %v", err)
-	}
-	raw := s3sdk.NewFromConfig(awsCfg, func(o *s3sdk.Options) {
-		o.BaseEndpoint = &endpoint
-		o.UsePathStyle = true
-	})
-	for _, b := range []string{"raw", "published"} {
-		_, err := raw.CreateBucket(ctx, &s3sdk.CreateBucketInput{Bucket: aws.String(b)})
-		if err != nil {
-			t.Fatalf("create bucket %q: %v", b, err)
-		}
-	}
-
-	client, err := pubs3.NewClient(config.S3Config{
-		Endpoint: endpoint, Region: "us-east-1",
-		AccessKeyID: "test-key", SecretAccessKey: "test-secret",
-		UsePathStyle: true, RequestTimeout: 10 * time.Second,
-	})
-	if err != nil {
-		t.Fatalf("NewClient: %v", err)
-	}
-
-	res, err := client.Copy(ctx,
+	res, err := h.client.Copy(ctx,
 		pub.S3Location{Bucket: "raw", Prefix: "nothing/"},
 		pub.S3Location{Bucket: "published", Prefix: "dst/"},
 	)
@@ -241,53 +209,9 @@ func TestClient_DeletePrefix_RemovesPackageObjects(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
 
-	req := tc.ContainerRequest{
-		Image:        "chrislusf/seaweedfs:3.72",
-		Cmd:          []string{"server", "-s3"},
-		ExposedPorts: []string{"8333/tcp"},
-		WaitingFor: wait.ForHTTP("/").
-			WithPort("8333/tcp").
-			WithStatusCodeMatcher(func(status int) bool { return status < 500 }).
-			WithStartupTimeout(60 * time.Second),
-	}
-	container, err := tc.GenericContainer(ctx, tc.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
-	})
-	if err != nil {
-		t.Fatalf("seaweedfs: %v", err)
-	}
-	t.Cleanup(func() { _ = container.Terminate(context.Background()) })
-
-	host, err := container.Host(ctx)
-	if err != nil {
-		t.Fatalf("host: %v", err)
-	}
-	port, err := container.MappedPort(ctx, "8333/tcp")
-	if err != nil {
-		t.Fatalf("port: %v", err)
-	}
-	endpoint := fmt.Sprintf("http://%s:%s", host, port.Port())
-
-	awsCfg, err := awsconfig.LoadDefaultConfig(ctx,
-		awsconfig.WithRegion("us-east-1"),
-		awsconfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
-			"test-key", "test-secret", "")),
-	)
-	if err != nil {
-		t.Fatalf("aws cfg: %v", err)
-	}
-	raw := s3sdk.NewFromConfig(awsCfg, func(o *s3sdk.Options) {
-		o.BaseEndpoint = &endpoint
-		o.UsePathStyle = true
-	})
-
 	const bucket = "dev-openinfopub"
 	const prefix = "packages/PD-AGR-2026-047535/"
-	_, err = raw.CreateBucket(ctx, &s3sdk.CreateBucketInput{Bucket: aws.String(bucket)})
-	if err != nil {
-		t.Fatalf("create bucket %q: %v", bucket, err)
-	}
+	h := newS3IntegrationHarness(t, ctx, bucket)
 
 	objects := map[string]string{
 		prefix + "openinfo/PD-AGR-2026-047535.html":     "html",
@@ -295,30 +219,9 @@ func TestClient_DeletePrefix_RemovesPackageObjects(t *testing.T) {
 		prefix + "attachments/supporting.txt":           "supporting",
 		"packages/PD-AGR-2026-OTHER/openinfo/keep.html": "keep",
 	}
-	for key, body := range objects {
-		_, err := raw.PutObject(ctx, &s3sdk.PutObjectInput{
-			Bucket: aws.String(bucket),
-			Key:    aws.String(key),
-			Body:   bytes.NewReader([]byte(body)),
-		})
-		if err != nil {
-			t.Fatalf("put %q: %v", key, err)
-		}
-	}
+	putS3Objects(t, ctx, h.raw, bucket, objects)
 
-	client, err := pubs3.NewClient(config.S3Config{
-		Endpoint:        endpoint,
-		Region:          "us-east-1",
-		AccessKeyID:     "test-key",
-		SecretAccessKey: "test-secret",
-		UsePathStyle:    true,
-		RequestTimeout:  10 * time.Second,
-	})
-	if err != nil {
-		t.Fatalf("NewClient: %v", err)
-	}
-
-	deleted, err := client.DeletePrefix(ctx, bucket, prefix)
+	deleted, err := h.client.DeletePrefix(ctx, bucket, prefix)
 	if err != nil {
 		t.Fatalf("DeletePrefix: %v", err)
 	}
@@ -326,7 +229,7 @@ func TestClient_DeletePrefix_RemovesPackageObjects(t *testing.T) {
 		t.Fatalf("DeletePrefix deleted %d objects, want 3", deleted)
 	}
 
-	list, err := raw.ListObjectsV2(ctx, &s3sdk.ListObjectsV2Input{
+	list, err := h.raw.ListObjectsV2(ctx, &s3sdk.ListObjectsV2Input{
 		Bucket: aws.String(bucket),
 		Prefix: aws.String(prefix),
 	})
@@ -337,7 +240,7 @@ func TestClient_DeletePrefix_RemovesPackageObjects(t *testing.T) {
 		t.Fatalf("expected no objects under %q after DeletePrefix, found %d", prefix, len(list.Contents))
 	}
 
-	_, err = raw.HeadObject(ctx, &s3sdk.HeadObjectInput{
+	_, err = h.raw.HeadObject(ctx, &s3sdk.HeadObjectInput{
 		Bucket: aws.String(bucket),
 		Key:    aws.String("packages/PD-AGR-2026-OTHER/openinfo/keep.html"),
 	})
@@ -350,63 +253,12 @@ func TestClient_Get(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
 	defer cancel()
 
-	req := tc.ContainerRequest{
-		Image:        "chrislusf/seaweedfs:3.72",
-		Cmd:          []string{"server", "-s3"},
-		ExposedPorts: []string{"8333/tcp"},
-		WaitingFor: wait.ForHTTP("/").
-			WithPort("8333/tcp").
-			WithStatusCodeMatcher(func(status int) bool { return status < 500 }).
-			WithStartupTimeout(60 * time.Second),
-	}
-	container, err := tc.GenericContainer(ctx, tc.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
-	})
-	if err != nil {
-		t.Fatalf("seaweedfs: %v", err)
-	}
-	t.Cleanup(func() { _ = container.Terminate(context.Background()) })
+	h := newS3IntegrationHarness(t, ctx, "published")
 
-	host, err := container.Host(ctx)
-	if err != nil {
-		t.Fatalf("host: %v", err)
-	}
-	port, err := container.MappedPort(ctx, "8333/tcp")
-	if err != nil {
-		t.Fatalf("port: %v", err)
-	}
-	endpoint := fmt.Sprintf("http://%s:%s", host, port.Port())
-
-	awsCfg, err := awsconfig.LoadDefaultConfig(ctx,
-		awsconfig.WithRegion("us-east-1"),
-		awsconfig.WithCredentialsProvider(credentials.NewStaticCredentialsProvider(
-			"test-key", "test-secret", "")),
-	)
-	if err != nil {
-		t.Fatalf("aws cfg: %v", err)
-	}
-	raw := s3sdk.NewFromConfig(awsCfg, func(o *s3sdk.Options) {
-		o.BaseEndpoint = &endpoint
-		o.UsePathStyle = true
-	})
-	_, err = raw.CreateBucket(ctx, &s3sdk.CreateBucketInput{Bucket: aws.String("published")})
-	if err != nil {
-		t.Fatalf("create bucket: %v", err)
-	}
-
-	client, err := pubs3.NewClient(config.S3Config{
-		Endpoint: endpoint, Region: "us-east-1",
-		AccessKeyID: "test-key", SecretAccessKey: "test-secret",
-		UsePathStyle: true, RequestTimeout: 10 * time.Second,
-	})
-	if err != nil {
-		t.Fatalf("NewClient: %v", err)
-	}
-	if err := client.Upload(ctx, "published", "sitemap/sitemap_pages_1.xml", []byte("<xml/>"), "application/xml"); err != nil {
+	if err := h.client.Upload(ctx, "published", "sitemap/sitemap_pages_1.xml", []byte("<xml/>"), "application/xml"); err != nil {
 		t.Fatalf("Upload: %v", err)
 	}
-	got, err := client.Get(ctx, "published", "sitemap/sitemap_pages_1.xml")
+	got, err := h.client.Get(ctx, "published", "sitemap/sitemap_pages_1.xml")
 	if err != nil {
 		t.Fatalf("Get: %v", err)
 	}
