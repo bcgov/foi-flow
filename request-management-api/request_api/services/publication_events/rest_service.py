@@ -12,7 +12,6 @@ from request_api.services.publication_events.mappers import (
     ProactiveDisclosurePublishRequestedMapper,
 )
 from request_api.services.publication_events.rest_client import PublicationRestClient
-from request_api.resources.foirequest import FOIRequestUpdateBySection
 from request_api.utils.enums import OIStatusEnum
 
 
@@ -84,23 +83,26 @@ class PublishNowRestService:
     def _rest_payload(payload):
         return {key: value for key, value in payload.items() if key in REST_PAYLOAD_FIELDS}
 
-    def _publish_and_update(self, publication_type, row, payload, update_status):
+    def _publish_and_update(self, publication_type, row, payload, update_status, correlation_id):
         try:
             logging.info(
-                "Publication REST request payload publication_type=%s payload=%s",
+                "Publication REST request payload publication_type=%s correlation_id=%s payload=%s",
                 publication_type,
+                correlation_id,
                 payload,
             )
-            response = self.publication_client.publish(publication_type, payload)
+            response = self.publication_client.publish(publication_type, payload, correlation_id=correlation_id)
             logging.info(
-                "Publication REST response publication_type=%s response=%s",
+                "Publication REST response publication_type=%s correlation_id=%s response=%s",
                 publication_type,
+                correlation_id,
                 response,
             )
             self._validate_completed(response)
             sitemap_page = self._sitemap_page_name(response)
             
             from request_api.services.publication_events.consumer import handle_foiministryrequest_update
+            from request_api.resources.foirequest import FOIRequestUpdateBySection
             foiministry_update_result = handle_foiministryrequest_update(payload, OIStatusEnum.PUBLISHED.value, FOIRequestUpdateBySection())
             if foiministry_update_result.success is False:
                 return foiministry_update_result
@@ -116,8 +118,9 @@ class PublishNowRestService:
             )
         except Exception as exception:
             logging.exception(
-                "Publication REST integration failed publication_type=%s foiministryrequestid=%s axisrequestid=%s error=%s",
+                "Publication REST integration failed publication_type=%s correlation_id=%s foiministryrequestid=%s axisrequestid=%s error=%s",
                 publication_type,
+                correlation_id,
                 row.get("foiministryrequestid"),
                 row.get("axisrequestid"),
                 exception,
@@ -132,6 +135,7 @@ class PublishNowRestService:
 
         row = rows[0]
         payload = self.openinfo_mapper.map(row).to_dict()
+        correlation_id = self.openinfo_mapper.correlation_id(row)
         return self._publish_and_update(
             "openinfo",
             row,
@@ -140,6 +144,7 @@ class PublishNowRestService:
                 foiministryrequestid,
                 sitemap_page,
             ),
+            correlation_id,
         )
 
     def publish_proactive_disclosure_now(self, foiministryrequestid):
@@ -149,6 +154,7 @@ class PublishNowRestService:
             return DefaultMethodResult(True, "No data found to publish for this request")
 
         payload = self._rest_payload(self.proactive_disclosure_mapper.map(row).to_dict())
+        correlation_id = self.proactive_disclosure_mapper.correlation_id(row)
         return self._publish_and_update(
             "proactivedisclosure",
             row,
@@ -157,4 +163,5 @@ class PublishNowRestService:
                 foiministryrequestid,
                 sitemap_page,
             ),
+            correlation_id,
         )

@@ -25,6 +25,8 @@ from request_api import models  # pylint: disable=unused-import
 from request_api import create_app
 from request_api.models import db
 
+logger = logging.getLogger(__name__)
+
 ## python manage.py db migrate
 ## python manage.py db upgrade
 
@@ -51,7 +53,7 @@ def list_routes():
         output.append(line)
 
     for line in sorted(output):
-        print(line)
+        logger.info("%s", line)
 
 
 if __name__ == '__main__':

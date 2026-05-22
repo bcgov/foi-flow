@@ -51,16 +51,14 @@ def __validatejwt(message):
         try:
             return AuthHelper.getwsuserid(message.get("x-jwt-token"))            
         except BusinessException as exception:
-            print("BusinessException >> ", str(exception))
-            # current_app.logger.error("%s,%s" % ('Unable to get user details', exception.message))
-        except Exception as ex:
-            print("__validatejwt Exception >>> ", str(ex))
+            current_app.logger.warning("Websocket JWT validation failed: %s", exception)
+        except Exception:
+            current_app.logger.exception("Unexpected websocket JWT validation error")
     return None 
 
 @socketio.on_error()
 def error_handler(e):
-    # current_app.logger.error("%s,%s" % ('Socket error', e.message))
-    print('Socket error', str(e))
+    current_app.logger.error("Socket error: %s", e, exc_info=(type(e), e, e.__traceback__))
 
 APP = create_app()
 if __name__ == "__main__":

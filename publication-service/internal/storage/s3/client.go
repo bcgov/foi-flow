@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	s3sdk "github.com/aws/aws-sdk-go-v2/service/s3"
@@ -228,8 +227,8 @@ func (c *Client) CopyFile(ctx context.Context, srcBucket, srcKey, dstBucket, dst
 	return 0, nil
 }
 
-// DeletePrefix deletes every real object under prefix. Folder marker objects
-// are skipped to match Copy's behavior.
+// DeletePrefix deletes every object under prefix, including optional folder
+// marker objects whose keys end in "/".
 func (c *Client) DeletePrefix(ctx context.Context, bucket, prefix string) (int, error) {
 	if strings.TrimSpace(prefix) == "" {
 		return 0, publish.NewPermanent("s3: delete prefix must not be empty")
@@ -257,7 +256,7 @@ func (c *Client) DeletePrefix(ctx context.Context, bucket, prefix string) (int, 
 
 		objects := make([]s3types.ObjectIdentifier, 0, len(page.Contents))
 		for _, obj := range page.Contents {
-			if obj.Key == nil || strings.HasSuffix(*obj.Key, "/") {
+			if obj.Key == nil {
 				continue
 			}
 			key := *obj.Key
@@ -267,16 +266,21 @@ func (c *Client) DeletePrefix(ctx context.Context, bucket, prefix string) (int, 
 			continue
 		}
 
-		deleteCtx, deleteCancel := context.WithTimeout(ctx, c.timeout)
-		_, err = c.api.DeleteObjects(deleteCtx, &s3sdk.DeleteObjectsInput{
-			Bucket: &bucket,
-			Delete: &s3types.Delete{Objects: objects, Quiet: aws.Bool(true)},
-		})
-		deleteCancel()
-		if err != nil {
-			return deleted, classifyS3Error(err)
+		for _, object := range objects {
+			if object.Key == nil {
+				continue
+			}
+			deleteCtx, deleteCancel := context.WithTimeout(ctx, c.timeout)
+			_, err = c.api.DeleteObject(deleteCtx, &s3sdk.DeleteObjectInput{
+				Bucket: &bucket,
+				Key:    object.Key,
+			})
+			deleteCancel()
+			if err != nil {
+				return deleted, classifyS3Error(err)
+			}
+			deleted++
 		}
-		deleted += len(objects)
 	}
 	return deleted, nil
 }

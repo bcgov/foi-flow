@@ -2,9 +2,13 @@
 from os import stat
 from re import VERBOSE
 import json
+import logging
 import os
 from request_api.models.NotificationTypes import NotificationType
 from request_api.models.NotificationUserTypes import NotificationUserType
+
+logger = logging.getLogger(__name__)
+
 notificationuserfile = open('common/notificationusertypes.json', encoding="utf8")
 notificationusertypes_cache = json.load(notificationuserfile)
 
@@ -24,7 +28,7 @@ class notificationconfig:
         if notificationtype_format in notificationtypes_cache:
             return notificationtypes_cache[notificationtype_format]['notificationtypelabel']
         else:
-            print("Notification type not found in json. Fetching from DB", notificationtype)
+            logger.warning("Notification type not found in JSON cache; fetching from DB: notificationtype=%s", notificationtype)
             id = NotificationType().getnotificationtypeid(notificationtype)
             if id is not None:
                 return id['notificationtypelabel']
@@ -44,7 +48,10 @@ class notificationconfig:
         if notificationusertype_format in notificationusertypes_cache:
             return notificationusertypes_cache[notificationusertype_format]['notificationusertypelabel']
         else:
-            print("Notification user type not found in json. Fetching from DB", notificationusertype)
+            logger.warning(
+                "Notification user type not found in JSON cache; fetching from DB: notificationusertype=%s",
+                notificationusertype,
+            )
             id = NotificationUserType().getnotificationusertypesid(notificationusertype)
             if id is not None:
                 return id['notificationusertypelabel']

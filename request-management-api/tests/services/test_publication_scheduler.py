@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, time
+from unittest.mock import patch
 import importlib
 
 import request_api.models.FOIOpenInformationRequests as openinfo_module
@@ -171,12 +172,63 @@ def test_scheduler_runs_job_then_waits_configured_interval():
         job=lambda: calls.append("ran"),
         interval_seconds=300,
         stop_event=stop_event,
+        window_start=time(0, 0),
+        window_end=time(23, 59),
     )
 
     scheduler.run_forever()
 
     assert calls == ["ran"]
     assert stop_event.waits == [300]
+
+
+def test_scheduler_skips_job_outside_window():
+    calls = []
+    stop_event = FakeStopEvent()
+    scheduler = PublicationPrePublishingScheduler(
+        job=lambda: calls.append("ran"),
+        interval_seconds=300,
+        stop_event=stop_event,
+        window_start=time(13, 0),
+        window_end=time(13, 30),
+    )
+
+    with patch(
+        "request_api.services.publication_events.scheduler.datetime"
+    ) as mock_dt:
+        mock_dt.now.return_value = datetime(2026, 5, 8, 10, 0, 0)
+        mock_dt.side_effect = lambda *a, **kw: datetime(*a, **kw)
+        result = scheduler.run_once()
+
+    assert calls == []
+    assert result is None
+
+
+def test_scheduler_runs_job_inside_window():
+    calls = []
+    scheduler = PublicationPrePublishingScheduler(
+        job=lambda: calls.append("ran"),
+        interval_seconds=300,
+        window_start=time(13, 0),
+        window_end=time(13, 30),
+    )
+
+    with patch(
+        "request_api.services.publication_events.scheduler.datetime"
+    ) as mock_dt:
+        mock_dt.now.return_value = datetime(2026, 5, 8, 13, 15, 0)
+        mock_dt.side_effect = lambda *a, **kw: datetime(*a, **kw)
+        scheduler.run_once()
+
+    assert calls == ["ran"]
+
+
+def test_from_env_reads_window_env_vars(monkeypatch):
+    monkeypatch.setenv("PUBLICATION_WINDOW_START", "14:00")
+    monkeypatch.setenv("PUBLICATION_WINDOW_END", "14:45")
+    scheduler = PublicationPrePublishingScheduler.from_env(job=lambda: None)
+    assert scheduler.window_start == time(14, 0)
+    assert scheduler.window_end == time(14, 45)
 
 
 def test_getpdrecordsforprepublishing_filters_publishable_rows(monkeypatch):

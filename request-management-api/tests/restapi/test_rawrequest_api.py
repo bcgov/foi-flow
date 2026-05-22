@@ -25,7 +25,6 @@ with open('tests/samplerequestjson/rawrequest.json') as f:
 def test_post_foirawrequests(app, client):    
     response = client.post('/api/foirawrequests',data=json.dumps(requestjson), content_type='application/json')
     jsondata = json.loads(response.data)
-    print(str(jsondata["id"]))
     wfinstanceid={"wfinstanceid":str(uuid.uuid4())}
     wfupdateresponse = client.put('/api/foirawrequestbpm/addwfinstanceid/'+str(jsondata["id"]),data=json.dumps(wfinstanceid), headers=factory_auth_header(app, client), content_type='application/json')
     assert response.status_code == 200 and wfupdateresponse.status_code == 200  and len(jsondata) >=1
@@ -39,7 +38,6 @@ def test_post_foirawrequestspii(app, client):
     jsondata = json.loads(response.data)    
     updatejson = generalupdaterequestjson
     updatejson["id"] = str(jsondata["id"])
-    print(str(jsondata["id"]))    
     updatejson['ispiiredacted'] = True
     updatejson['assignedTo'] = "Intake Team"
     wfupdateresponse = client.post('/api/foirawrequest/'+str(jsondata["id"]),data=json.dumps(updatejson), headers=factory_auth_header(app, client), content_type='application/json')
@@ -54,7 +52,6 @@ def test_post_foirawrequestscancel(app, client):
     jsondata = json.loads(response.data)
     updatejson = generalupdaterequestjson
     updatejson["id"] = str(jsondata["id"])
-    print(str(jsondata["id"]))    
     updatejson['ispiiredacted'] = True
     updatejson['requeststatusid'] = 3
     updatejson['closedate'] = '2021-10-26'
@@ -69,7 +66,6 @@ with open('tests/samplerequestjson/rawrequest.json') as x, open('tests/samplereq
 def test_post_foirawrequestsredirect(app, client):    
     response = client.post('/api/foirawrequests',data=json.dumps(requestjson), content_type='application/json')
     jsondata = json.loads(response.data)
-    print(str(jsondata["id"]))
     updatejson = generalupdaterequestjson
     updatejson['ispiiredacted'] = True
     updatejson['assignedTo'] = "Intake Team"
@@ -102,7 +98,6 @@ def test_get_applicantcategories(app,client):
     response = client.get('api/foiflow/applicantcategories', headers=factory_auth_header(app, client), content_type='application/json')    
     jsondata = json.loads(response.data)     
     assert response.status_code == 200 and len(jsondata) >=1
-
 
 
 

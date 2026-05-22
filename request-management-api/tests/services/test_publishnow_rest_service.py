@@ -1,5 +1,6 @@
 import logging
 import uuid
+from types import SimpleNamespace
 
 import requests
 
@@ -28,13 +29,13 @@ class FakePublicationClient:
         self.response = response
         self.calls = []
 
-    def publish(self, publication_type, payload):
-        self.calls.append((publication_type, payload))
+    def publish(self, publication_type, payload, correlation_id=None):
+        self.calls.append((publication_type, payload, correlation_id))
         return self.response
 
 
 class FailingPublicationClient:
-    def publish(self, publication_type, payload):
+    def publish(self, publication_type, payload, correlation_id=None):
         raise RuntimeError("publication service unavailable")
 
 
@@ -90,12 +91,21 @@ class FakeDbResult:
 
 
 class FakeDbSession:
-    def __init__(self, rowcounts=None):
+    def __init__(self, rowcounts=None, current=None, active_rows=None):
         self.calls = []
         self.rowcounts = rowcounts or []
+        self.current = current
+        self.active_rows = active_rows if active_rows is not None else ([current] if current is not None else [])
+        self.added = []
         self.committed = False
         self.rolled_back = False
         self.closed = False
+
+    def query(self, model):
+        return FakeQuery(self)
+
+    def add(self, row):
+        self.added.append(row)
 
     def execute(self, sql, params):
         self.calls.append((str(sql), params))
@@ -112,10 +122,31 @@ class FakeDbSession:
         self.closed = True
 
 
+class FakeQuery:
+    def __init__(self, session):
+        self.session = session
+
+    def filter(self, *args):
+        return self
+
+    def order_by(self, *args):
+        return self
+
+    def first(self):
+        return self.session.current
+
+    def all(self):
+        return self.session.active_rows
+
+
 def test_publish_openinfo_posts_rest_wrapper_and_updates_sitemap_page(monkeypatch):
     monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
     monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
     monkeypatch.setenv("FLASK_ENV", "production")
+    monkeypatch.setattr(
+        "request_api.services.publication_events.consumer.handle_foiministryrequest_update",
+        lambda payload, oistatus_id, section_updater: DefaultMethodResult(True, "Updated", payload.get("foiministryrequest_id")),
+    )
     updater = FakePublicationStatusUpdater()
     client = FakePublicationClient(
         {
@@ -137,6 +168,7 @@ def test_publish_openinfo_posts_rest_wrapper_and_updates_sitemap_page(monkeypatc
                     "fees": 0,
                     "applicant_type": "Media",
                     "bcgovcode": "fin",
+                    "created_at": "2026-04-20 10:30:00.000000",
                 }
             ]
         ),
@@ -163,6 +195,10 @@ def test_publish_proactive_disclosure_posts_rest_wrapper_and_updates_sitemap_pag
     monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
     monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
     monkeypatch.setenv("FLASK_ENV", "production")
+    monkeypatch.setattr(
+        "request_api.services.publication_events.consumer.handle_foiministryrequest_update",
+        lambda payload, oistatus_id, section_updater: DefaultMethodResult(True, "Updated", payload.get("foiministryrequest_id")),
+    )
     updater = FakePublicationStatusUpdater()
     client = FakePublicationClient(
         {
@@ -185,6 +221,7 @@ def test_publish_proactive_disclosure_posts_rest_wrapper_and_updates_sitemap_pag
                 "fees": 0,
                 "applicant_type": None,
                 "bcgovcode": "fin",
+                "created_at": "2026-04-20 10:30:00.000000",
                 "sitemap_pages": "",
                 "proactivedisclosurecategory": "Calendars",
                 "reportperiod": "Quarter 1 2026-27",
@@ -209,9 +246,9 @@ def test_publish_proactive_disclosure_posts_rest_wrapper_and_updates_sitemap_pag
     assert payload["source"]["prefix"] == "PD-FIN-2026-047533/responsepackage/"
     assert payload["destination"]["bucket"] == "dev-openinfopub"
     assert payload["destination"]["prefix"] == "packages/PD-FIN-2026-047533/openinfo/"
-    assert "foiministryrequest_id" not in payload
-    assert "additionalfiles" not in payload
-    assert "sitemap_pages" not in payload
+    assert payload["foiministryrequest_id"] == 22318
+    assert payload["foirequest_id"] == 22318
+    assert payload["additionalfiles"] == []
     assert updater.proactive_updates == [(22318, "sitemap_pages_2.xml")]
 
 
@@ -224,6 +261,7 @@ def test_publish_openinfo_does_not_update_when_response_is_not_completed():
                     "openinfoid": 345,
                     "axisrequestid": "FIN-2026-047533",
                     "bcgovcode": "fin",
+                    "created_at": "2026-04-20 10:30:00.000000",
                 }
             ]
         ),
@@ -247,6 +285,7 @@ def test_publish_openinfo_requires_sitemap_page_key():
                     "openinfoid": 345,
                     "axisrequestid": "FIN-2026-047533",
                     "bcgovcode": "fin",
+                    "created_at": "2026-04-20 10:30:00.000000",
                 }
             ]
         ),
@@ -269,8 +308,16 @@ def test_publish_failure_log_includes_context_in_message(caplog):
                 "foiministryrequestid": 22318,
                 "axisrequestid": "PD-FIN-2026-047533",
                 "bcgovcode": "fin",
+                "created_at": "2026-04-20 10:30:00.000000",
+                "contributor": "Ministry of Finance",
                 "proactivedisclosurecategory": "Calendars",
                 "reportperiod": "Quarter 1 2026-27",
+                "published_date": "2026-04-20",
+                "fees": 0,
+                "applicant_type": None,
+                "sitemap_pages": "",
+                "additionalfiles": [],
+                "openinfoid": 0,
             }
         ),
         publication_client=FailingPublicationClient(),
@@ -284,6 +331,43 @@ def test_publish_failure_log_includes_context_in_message(caplog):
     assert "publication_type=proactivedisclosure" in caplog.text
     assert "foiministryrequestid=22318" in caplog.text
     assert "axisrequestid=PD-FIN-2026-047533" in caplog.text
+    assert "correlation_id=proactivedisclosure-publish-71-1776681000.0" in caplog.text
+
+
+def test_publication_rest_client_generates_uuid_when_no_correlation_id():
+    http_client = FakeHttpClient(
+        FakeHttpResponse(status_code=200, payload={"status": "completed"})
+    )
+    client = PublicationRestClient(
+        base_url="http://localhost:9085",
+        timeout=5,
+        http_client=http_client,
+    )
+
+    client.publish("openinfo", {"axis_request_id": "FIN-2026-001"})
+
+    headers = http_client.calls[0]["headers"]
+    correlation_id = headers["X-Correlation-ID"]
+    parsed = uuid.UUID(correlation_id)
+    assert str(parsed) == correlation_id
+
+
+def test_publication_rest_client_sends_correlation_id_header():
+    http_client = FakeHttpClient(
+        FakeHttpResponse(status_code=200, payload={"status": "completed"})
+    )
+    client = PublicationRestClient(
+        base_url="http://localhost:9085",
+        timeout=5,
+        http_client=http_client,
+    )
+
+    client.publish("openinfo", {"axis_request_id": "FIN-2026-001"}, correlation_id="openinfo-publish-345")
+
+    assert len(http_client.calls) == 1
+    headers = http_client.calls[0]["headers"]
+    assert headers["X-Correlation-ID"] == "openinfo-publish-345"
+    assert headers["Content-Type"] == "application/json"
 
 
 def test_publication_rest_client_includes_upstream_error_body():
@@ -311,42 +395,152 @@ def test_publication_rest_client_includes_upstream_error_body():
 
 
 def test_openinfo_ready_for_crawling_updates_ministry_oi_status(monkeypatch):
-    session = FakeDbSession()
+    current = SimpleNamespace(
+        foiopeninforequestid=11,
+        version=3,
+        foiministryrequest_id=22318,
+        foiministryrequestversion_id=7,
+        oipublicationstatus_id=2,
+        oiexemption_id=None,
+        oiassignedto=None,
+        oiexemptionapproved=False,
+        pagereference="1-2",
+        iaorationale=None,
+        oifeedback=None,
+        publicationdate=None,
+        receiveddate=None,
+        copyrightsevered=False,
+        isactive=True,
+    )
+    session = FakeDbSession(current=current)
     monkeypatch.setattr(db, "session", session)
 
     result = FOIOpenInformationRequests.mark_ready_for_crawling(22318, "sitemap_pages_1.xml")
 
     assert result.success is True
     assert session.committed is True
-    assert any('"FOIOpenInformationRequests"' in call[0] for call in session.calls)
-    ministry_update = [call for call in session.calls if '"FOIMinistryRequests"' in call[0]][0]
-    assert "oistatus_id = :oistatus_id" in ministry_update[0]
-    assert ministry_update[1]["foiministryrequestid"] == 22318
-    assert ministry_update[1]["oistatus_id"] == 4
+    assert current.isactive is False
+    assert len(session.added) == 1
+    new_row = session.added[0]
+    assert new_row.version == 4
+    assert new_row.processingstatus == "ready for crawling"
+    assert new_row.processingmessage == "Published"
+    assert new_row.sitemap_pages == "sitemap_pages_1.xml"
 
 
 def test_proactive_ready_for_crawling_updates_ministry_oi_status(monkeypatch):
-    session = FakeDbSession()
+    current = SimpleNamespace(
+        proactivedisclosureid=71,
+        version=2,
+        foiministryrequest_id=22318,
+        foiministryrequestversion_id=7,
+        proactivedisclosurecategoryid=3,
+        reportperiod="Quarter 1 2026-27",
+        publicationdate=None,
+        earliesteligiblepublicationdate=None,
+        oipublicationstatus_id=2,
+        isactive=True,
+    )
+    session = FakeDbSession(current=current)
     monkeypatch.setattr(db, "session", session)
 
     result = FOIProactiveDisclosureRequests.mark_ready_for_crawling(22318, "sitemap_pages_2.xml")
 
     assert result.success is True
     assert session.committed is True
-    assert any('"FOIProactiveDisclosureRequests"' in call[0] for call in session.calls)
-    ministry_update = [call for call in session.calls if '"FOIMinistryRequests"' in call[0]][0]
-    assert "oistatus_id = :oistatus_id" in ministry_update[0]
-    assert ministry_update[1]["foiministryrequestid"] == 22318
-    assert ministry_update[1]["oistatus_id"] == 4
+    assert current.isactive is False
+    assert len(session.added) == 1
+    new_row = session.added[0]
+    assert new_row.version == 3
+    assert new_row.processingstatus == "ready for crawling"
+    assert new_row.processingmessage == "Published"
+    assert new_row.sitemap_pages == "sitemap_pages_2.xml"
 
 
-def test_proactive_ready_for_crawling_fails_when_ministry_status_not_updated(monkeypatch):
-    session = FakeDbSession(rowcounts=[1, 0])
+def test_proactive_ready_for_crawling_fails_when_request_not_found(monkeypatch):
+    session = FakeDbSession(current=None)
     monkeypatch.setattr(db, "session", session)
 
     result = FOIProactiveDisclosureRequests.mark_ready_for_crawling(22318, "sitemap_pages_2.xml")
 
     assert result.success is False
-    assert "FOIMinistryRequests" in result.message
+    assert result.message == "FOI Proactive Disclosure request not found"
     assert session.committed is False
-    assert session.rolled_back is True
+    assert session.closed is True
+
+
+def test_publish_openinfo_passes_correlation_id_to_client(monkeypatch):
+    monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
+    monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
+    monkeypatch.setenv("FLASK_ENV", "production")
+    client = FakePublicationClient(
+        {
+            "status": "completed",
+            "publication_id": "FIN-2026-047533",
+            "sitemap_page_key": "openinfopub/sitemap/sitemap_pages_1.xml",
+        }
+    )
+    service = PublishNowRestService(
+        openinfo_service=FakeOpenInfoService(
+            openinfo_rows=[
+                {
+                    "openinfoid": 345,
+                    "axisrequestid": "FIN-2026-047533",
+                    "description": "Budget briefing records",
+                    "published_date": "2026-04-20",
+                    "contributor": "Ministry of Finance",
+                    "fees": 0,
+                    "applicant_type": "Media",
+                    "bcgovcode": "fin",
+                    "created_at": "2026-04-20 10:30:00.000000",
+                }
+            ]
+        ),
+        publication_client=client,
+        publication_status_updater=FakePublicationStatusUpdater(),
+    )
+
+    service.publish_openinfo_now(22318)
+
+    assert client.calls[0][2] == "openinfo-publish-345-1776681000.0"
+
+
+def test_publish_proactive_disclosure_passes_correlation_id_to_client(monkeypatch):
+    monkeypatch.setenv("OPENINFO_PUBLICATION_BUCKET", "dev-openinfopub")
+    monkeypatch.setenv("OPENINFO_SOURCE_BUCKET_SUFFIX", "dev-e")
+    monkeypatch.setenv("FLASK_ENV", "production")
+    client = FakePublicationClient(
+        {
+            "status": "completed",
+            "publication_id": "PD-FIN-2026-047533",
+            "sitemap_page_key": "pdpublishing/sitemap/sitemap_pages_2.xml",
+        }
+    )
+    service = PublishNowRestService(
+        openinfo_service=FakeOpenInfoService(
+            proactive_row={
+                "proactivedisclosureid": 71,
+                "foiministryrequestid": 22318,
+                "foirequestid": 22318,
+                "axisrequestid": "PD-FIN-2026-047533",
+                "description": "Ministerial Directive",
+                "published_date": "2026-04-20",
+                "contributor": "Ministry of Finance",
+                "fees": 0,
+                "applicant_type": None,
+                "bcgovcode": "fin",
+                "created_at": "2026-04-20 10:30:00.000000",
+                "sitemap_pages": "",
+                "proactivedisclosurecategory": "Calendars",
+                "reportperiod": "Quarter 1 2026-27",
+                "additionalfiles": [],
+                "openinfoid": 0,
+            }
+        ),
+        publication_client=client,
+        publication_status_updater=FakePublicationStatusUpdater(),
+    )
+
+    service.publish_proactive_disclosure_now(22318)
+
+    assert client.calls[0][2] == "proactivedisclosure-publish-71-1776681000.0"

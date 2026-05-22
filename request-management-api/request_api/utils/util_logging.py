@@ -14,6 +14,8 @@
 """Centralized setup of logging for the service."""
 import os, logging, logging.config
 
+logger = logging.getLogger(__name__)
+
 LOG_ROOT = os.getenv('LOG_ROOT', "DEBUG").upper()
 LOG_BASIC = os.getenv('LOG_BASIC', "WARNING").upper()
 LOG_TRACING = os.getenv('LOG_TRACING', "ERROR").upper()
@@ -23,14 +25,14 @@ def configure_logging():
     # Set up basic logging for the application.
     logging.basicConfig(format=LOGGING_FORMAT, level=string_to_debug_level(LOG_ROOT))
     temp_logger = logging.getLogger()
-    print("==> Root logger of '" + temp_logger.name + "' set to level: " + LOG_ROOT)
+    logger.info("Root logger configured: name=%s level=%s", temp_logger.name or "root", LOG_ROOT)
     
     #   Set up defaults.   
     for name in logging.root.manager.loggerDict:        
         module_logger = logging.getLogger(name)
         module_prefix = name.split('.')[0] if name not in (None,'') else "NOTSET"
         module_logger_level = os.getenv(make_env_name(module_prefix), LOG_BASIC).upper()
-        print("--> Logger " + name + " set to level LOG_BASIC level of " + module_logger_level)
+        logger.debug("Logger configured: name=%s level=%s", name, module_logger_level)
         module_logger.setLevel(string_to_debug_level(module_logger_level))
     
     # Tracing Log Config    
@@ -46,4 +48,3 @@ def string_to_debug_level(debug_string):
     else:
         result = logging.WARNING
     return result
-

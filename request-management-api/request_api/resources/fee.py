@@ -14,7 +14,6 @@
 """API endpoints for managing a Feee resource."""
 
 from datetime import datetime
-from re import template
 
 from flask import request, send_file, Response
 from flask_cors import cross_origin

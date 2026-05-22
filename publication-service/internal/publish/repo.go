@@ -82,20 +82,60 @@ WHERE event_id=$1`
 	return nil
 }
 
-// MarkRetry transitions a claimed row back to pending_retry with backoff.
-func (r *Repo) MarkRetry(ctx context.Context, eventID string, msg string, hash string, nextAt time.Time) error {
+// MarkRetry transitions a claimed row back to pending_retry with backoff, or
+// to dead when retry policy has been exhausted.
+func (r *Repo) MarkRetry(
+	ctx context.Context,
+	eventID string,
+	msg string,
+	hash string,
+	nextAt time.Time,
+	maxRetries int,
+	poisonRepeatThreshold int,
+) (RetryResult, error) {
 	const q = `
+WITH next_values AS (
+    SELECT
+        event_id,
+        retry_count + 1 AS next_retry_count,
+        CASE WHEN error_hash=$4 THEN error_hash_repeat + 1 ELSE 1 END AS next_error_hash_repeat
+    FROM workflow_request
+    WHERE event_id=$1
+),
+decision AS (
+    SELECT
+        event_id,
+        next_retry_count,
+        next_error_hash_repeat,
+        CASE
+            WHEN $5 > 0 AND next_retry_count >= $5 THEN 'dead'
+            WHEN $6 > 0 AND next_error_hash_repeat >= $6 THEN 'dead'
+            ELSE 'pending_retry'
+        END AS next_state,
+        CASE
+            WHEN $6 > 0 AND next_error_hash_repeat >= $6 THEN 'poison'
+            ELSE 'transient'
+        END AS next_error_class
+    FROM next_values
+)
 UPDATE workflow_request
-SET state='pending_retry',
-    retry_count=retry_count+1,
-    next_retry_at=$2,
+SET state=decision.next_state,
+    retry_count=decision.next_retry_count,
+    next_retry_at=CASE WHEN decision.next_state='dead' THEN NULL ELSE $2 END,
     last_error=$3,
-    last_error_class='transient',
-    error_hash_repeat=CASE WHEN error_hash=$4 THEN error_hash_repeat+1 ELSE 1 END,
+    last_error_class=decision.next_error_class,
+    error_hash_repeat=decision.next_error_hash_repeat,
     error_hash=$4
-WHERE event_id=$1`
-	_, err := r.pool.Exec(ctx, q, eventID, nextAt, msg, hash)
-	return err
+FROM decision
+WHERE workflow_request.event_id=decision.event_id
+RETURNING workflow_request.state, workflow_request.last_error_class`
+	var state State
+	var class Class
+	err := r.pool.QueryRow(ctx, q, eventID, nextAt, msg, hash, maxRetries, poisonRepeatThreshold).Scan(&state, &class)
+	if err != nil {
+		return RetryResult{}, err
+	}
+	return RetryResult{Dead: state == StateDead, Class: class}, nil
 }
 
 // MarkDead transitions a row to dead and redacts the payload.

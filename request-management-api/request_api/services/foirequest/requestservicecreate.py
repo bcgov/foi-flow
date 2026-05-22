@@ -1,5 +1,4 @@
 
-from re import T
 from request_api.models.FOIRequests import FOIRequest
 from request_api.models.ContactTypes import ContactType
 from request_api.models.PersonalInformationAttributes import PersonalInformationAttribute
@@ -56,8 +55,6 @@ class requestservicecreate:
            openfoirequest.foirequestid = foirequestid
         openfoirequest.wfinstanceid = wfinstanceid if wfinstanceid is not None else None
         openfoirequest.createdby = userid
-        # openfoirequest_dict = openfoirequest.__dict__
-        # print("\n-openfoirequest in saveRequest:",openfoirequest_dict)     
         result = FOIRequest.saverequest(openfoirequest)
         ##Auto Link requests for multiple ministries
         if result.success == True:

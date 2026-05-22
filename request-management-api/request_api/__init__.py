@@ -85,7 +85,7 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
 
     from request_api.resources import API_BLUEPRINT #, DEFAULT_API_BLUEPRINT #, OPS_BLUEPRINT  # pylint: disable=import-outside-toplevel
 
-    print("environment :" + run_mode)
+    app.logger.info("Creating request API app: environment=%s", run_mode)
     
     CORS(app, supports_credentials=True)
     db.init_app(app)
@@ -94,12 +94,10 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     app.register_blueprint(API_BLUEPRINT)
 
     if os.getenv('FLASK_ENV', 'production') != 'testing':
-        print("JWTSET DONE!!!!!!!!!!!!!!!!")
+        app.logger.info("Initializing JWT manager")
         setup_jwt_manager(app, jwt)
 
     #ExceptionHandler(app)
-    #print("Hello, world!")
-
 
     register_auth_error_handler(app)
     register_shellcontext(app)
@@ -135,4 +133,3 @@ def register_shellcontext(app):
         return {'app': app, 'jwt': jwt, 'db': db, 'models': models}  # pragma: no cover
 
     app.shell_context_processor(shell_context)
-

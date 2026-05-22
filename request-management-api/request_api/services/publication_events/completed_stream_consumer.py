@@ -11,10 +11,8 @@ import time
 import redis
 
 from request_api.services.publication_events.consumer import (
-    OpenInfoPublishCompletedConsumer,
-    OpenInfoUnpublishCompletedConsumer,
-    ProactiveDisclosurePublishCompletedConsumer,
-    ProactiveDisclosureUnpublishCompletedConsumer,
+    OpenInfoPublicationCompletedConsumer,
+    ProactiveDisclosurePublicationCompletedConsumer,
 )
 from request_api.services.publication_events.types import PublicationEventType
 
@@ -42,14 +40,8 @@ class PublicationCompletedStreamConsumer:
         self.group_name = group_name
         self.consumer_name = consumer_name
         self.handlers = handlers or {
-            PublicationEventType.PUBLISH_COMPLETED: {
-                "openinfo": OpenInfoPublishCompletedConsumer(),
-                "proactivedisclosure": ProactiveDisclosurePublishCompletedConsumer(),
-            },
-            PublicationEventType.UNPUBLISH_COMPLETED: {
-                "openinfo": OpenInfoUnpublishCompletedConsumer(),
-                "proactivedisclosure": ProactiveDisclosureUnpublishCompletedConsumer(),
-            },
+            "openinfo": OpenInfoPublicationCompletedConsumer(),
+            "proactivedisclosure": ProactiveDisclosurePublicationCompletedConsumer(),
         }
         self.app = app
         self.count = count
@@ -175,10 +167,10 @@ class PublicationCompletedStreamConsumer:
         return None
 
     def _resolve_handler(self, envelope, kind):
-        event_type = envelope.get("event_type")
-        handlers_for_event = self.handlers.get(event_type)
-        if isinstance(handlers_for_event, dict):
-            return handlers_for_event.get(kind)
+        # event_type = envelope.get("event_type")
+        # handlers_for_event = self.handlers.get(event_type)
+        # if isinstance(handlers_for_event, dict):
+        #     return handlers_for_event.get(kind)
         return self.handlers.get(kind)
 
     def _handle_message(self, stream_name, message_id, fields):

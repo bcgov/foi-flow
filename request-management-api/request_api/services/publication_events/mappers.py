@@ -2,7 +2,7 @@
 
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from request_api.services.publication_events.payloads import (
     AdditionalFilePayload,
@@ -59,6 +59,12 @@ class PublicationPathResolver:
             prefix=f"packages/{row.get('axisrequestid')}/openinfo/",
         )
 
+    def build_public_repository_prefix(self, row):
+        return S3Location(
+            bucket=self.openinfo_publication_bucket,
+            prefix=f"packages/{row.get('axisrequestid')}/",
+        )
+
 
 class OpenInfoPublishRequestedMapper:
     """Maps OI query rows to requested-event payloads."""
@@ -72,7 +78,7 @@ class OpenInfoPublishRequestedMapper:
             tenant_id=self.path_resolver.resolve_tenant_id(row),
             axis_request_id=axis_request_id,
             description=row.get("description"),
-            published_date=row.get("published_date"),
+            published_date=datetime.now().strftime("%Y-%m-%d"),
             contributor=row.get("contributor"),
             fees=int(row.get("fees") or 0),
             applicant_type=row.get("applicant_type"),
@@ -90,7 +96,11 @@ class OpenInfoPublishRequestedMapper:
 
     @staticmethod
     def correlation_id(row):
-        return f"openinfo-publish-{row.get('openinfoid')}"
+        created_at = row.get("created_at")
+        if isinstance(created_at, str):
+            created_at = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S.%f")
+        timestamp = created_at.replace(tzinfo=timezone.utc).timestamp()
+        return f"openinfo-publish-{row.get('openinfoid')}-{timestamp}"
 
 
 class ProactiveDisclosurePublishRequestedMapper:
@@ -107,7 +117,7 @@ class ProactiveDisclosurePublishRequestedMapper:
             tenant_id=self.path_resolver.resolve_tenant_id(row),
             axis_request_id=row.get("axisrequestid"),
             description=self._generate_pd_description(category, ministry, report_period),
-            published_date=row.get("published_date"),
+            published_date=datetime.now().strftime("%Y-%m-%d"),
             contributor=ministry,
             applicant_type="",
             report_period=report_period,
@@ -205,7 +215,11 @@ class ProactiveDisclosurePublishRequestedMapper:
 
     @staticmethod
     def correlation_id(row):
-        return f"proactivedisclosure-publish-{row.get('proactivedisclosureid')}"
+        created_at = row.get("created_at")
+        if isinstance(created_at, str):
+            created_at = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S.%f")
+        timestamp = created_at.replace(tzinfo=timezone.utc).timestamp()
+        return f"proactivedisclosure-publish-{row.get('proactivedisclosureid')}-{timestamp}"
 
 
 class UnpublishRequestedMapper:
@@ -220,16 +234,14 @@ class UnpublishRequestedMapper:
 
     def map(self, row, publication_type="openinfo"):
         axis_request_id = row.get("axisrequestid")
+        public_repository = self.path_resolver.build_public_repository_prefix(row)
         return UnpublishRequestedPayload(
             tenant_id=self.path_resolver.resolve_tenant_id(row),
             publication_id=axis_request_id,
             public_url=(
                 f"{self.public_base_url}/{axis_request_id}/openinfo/{axis_request_id}.html"
             ),
-            public_repository=S3Location(
-                bucket=self.path_resolver.openinfo_publication_bucket,
-                prefix=f"{publication_type}/{axis_request_id}",
-            ),
+            public_repository=public_repository,
             last_modified=row.get("publicationdate", ""),
             foirequest_id=row.get("foirequest_id"),
             foiministryrequest_id=row.get("foiministryrequestid"),
@@ -238,5 +250,9 @@ class UnpublishRequestedMapper:
 
     @staticmethod
     def correlation_id(row, publication_type="openinfo"):
+        created_at = row.get("created_at")
+        if isinstance(created_at, str):
+            created_at = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S.%f")
+        timestamp = created_at.replace(tzinfo=timezone.utc).timestamp()
         id_field = "openinfoid" if publication_type == "openinfo" else "proactivedisclosureid"
-        return f"{publication_type}-unpublish-{row.get(id_field)}"
+        return f"{publication_type}-unpublish-{row.get(id_field)}-{timestamp}"
