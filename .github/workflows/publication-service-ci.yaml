@@ -53,5 +53,5 @@ jobs:
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
-            **Tag:** `${{ github.event.inputs.image_tag  }}`  
+            **Tag:** `${{ env.IMAGE_TAG  }}`  
             **Image:** `${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/publication-service:${{ env.IMAGE_TAG }}`
