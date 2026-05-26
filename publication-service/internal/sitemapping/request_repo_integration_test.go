@@ -45,13 +45,13 @@ func setupRequestRepo(t *testing.T) (*RequestRepo, *pub.Repo, *pgxpool.Pool) {
 	return NewRequestRepo(pool), pub.NewRepo(pool), pool
 }
 
-func claimSitemapRequest(t *testing.T, repo *pub.Repo, eventID string) {
+func claimSitemapRequest(t *testing.T, repo *pub.Repo, eventID string, correlationID string) {
 	t.Helper()
 	_, err := repo.Claim(context.Background(), pub.ClaimRequest{
 		EventID:       eventID,
 		EventType:     events.TypePublicationSitemappingRequested,
 		TenantID:      "a7d9b2f1-4c3e-4e8b-9a21-1c2e8f7b9d10",
-		CorrelationID: eventID,
+		CorrelationID: correlationID,
 		SchemaVersion: events.SchemaVersionV1,
 		Payload: json.RawMessage(`{
 			"tenant_id":"a7d9b2f1-4c3e-4e8b-9a21-1c2e8f7b9d10",
@@ -87,9 +87,14 @@ func sampleSitemapResult() Result {
 
 func TestRequestRepo_FindCompletedFalseBeforeSuccess(t *testing.T) {
 	repo, pubRepo, _ := setupRequestRepo(t)
-	claimSitemapRequest(t, pubRepo, "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d90")
+	claimSitemapRequest(t, pubRepo, "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d90", "corr-1")
 
-	_, ok, err := repo.FindCompleted(context.Background(), pub.KindOpenInfoSitemap, "HTH-2025-52023:v1")
+	_, ok, err := repo.FindCompleted(
+		context.Background(),
+		pub.KindOpenInfoSitemap,
+		"a7d9b2f1-4c3e-4e8b-9a21-1c2e8f7b9d10",
+		"corr-1",
+	)
 	if err != nil {
 		t.Fatalf("FindCompleted: %v", err)
 	}
@@ -101,7 +106,7 @@ func TestRequestRepo_FindCompletedFalseBeforeSuccess(t *testing.T) {
 func TestRequestRepo_MarkSucceededStoresFullResult(t *testing.T) {
 	repo, pubRepo, pool := setupRequestRepo(t)
 	eventID := "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d90"
-	claimSitemapRequest(t, pubRepo, eventID)
+	claimSitemapRequest(t, pubRepo, eventID, "corr-1")
 	result := sampleSitemapResult()
 
 	if err := repo.MarkSucceeded(context.Background(), eventID, result); err != nil {
@@ -127,16 +132,21 @@ func TestRequestRepo_MarkSucceededStoresFullResult(t *testing.T) {
 	}
 }
 
-func TestRequestRepo_FindCompletedReturnsStoredResultByKindAndPublicationID(t *testing.T) {
+func TestRequestRepo_FindCompletedReturnsStoredResultByKindTenantAndCorrelationID(t *testing.T) {
 	repo, pubRepo, _ := setupRequestRepo(t)
 	eventID := "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d90"
-	claimSitemapRequest(t, pubRepo, eventID)
+	claimSitemapRequest(t, pubRepo, eventID, "corr-1")
 	want := sampleSitemapResult()
 	if err := repo.MarkSucceeded(context.Background(), eventID, want); err != nil {
 		t.Fatalf("MarkSucceeded: %v", err)
 	}
 
-	got, ok, err := repo.FindCompleted(context.Background(), pub.KindOpenInfoSitemap, "HTH-2025-52023:v1")
+	got, ok, err := repo.FindCompleted(
+		context.Background(),
+		pub.KindOpenInfoSitemap,
+		"a7d9b2f1-4c3e-4e8b-9a21-1c2e8f7b9d10",
+		"corr-1",
+	)
 	if err != nil {
 		t.Fatalf("FindCompleted: %v", err)
 	}
@@ -145,5 +155,51 @@ func TestRequestRepo_FindCompletedReturnsStoredResultByKindAndPublicationID(t *t
 	}
 	if got != want {
 		t.Fatalf("FindCompleted result mismatch:\n got: %#v\nwant: %#v", got, want)
+	}
+}
+
+func TestRequestRepo_FindCompletedDoesNotMatchDifferentCorrelationID(t *testing.T) {
+	repo, pubRepo, _ := setupRequestRepo(t)
+	eventID := "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d90"
+	claimSitemapRequest(t, pubRepo, eventID, "corr-original")
+	want := sampleSitemapResult()
+	if err := repo.MarkSucceeded(context.Background(), eventID, want); err != nil {
+		t.Fatalf("MarkSucceeded: %v", err)
+	}
+
+	_, ok, err := repo.FindCompleted(
+		context.Background(),
+		pub.KindOpenInfoSitemap,
+		"a7d9b2f1-4c3e-4e8b-9a21-1c2e8f7b9d10",
+		"corr-new",
+	)
+	if err != nil {
+		t.Fatalf("FindCompleted: %v", err)
+	}
+	if ok {
+		t.Fatal("FindCompleted returned true for a different correlation ID")
+	}
+}
+
+func TestRequestRepo_FindCompletedDoesNotMatchDifferentKind(t *testing.T) {
+	repo, pubRepo, _ := setupRequestRepo(t)
+	eventID := "018f2e7a-1c6b-7c0a-9f8d-3e4a2b1c5d90"
+	claimSitemapRequest(t, pubRepo, eventID, "corr-1")
+	want := sampleSitemapResult()
+	if err := repo.MarkSucceeded(context.Background(), eventID, want); err != nil {
+		t.Fatalf("MarkSucceeded: %v", err)
+	}
+
+	_, ok, err := repo.FindCompleted(
+		context.Background(),
+		pub.KindProactiveDisclosureSitemap,
+		"a7d9b2f1-4c3e-4e8b-9a21-1c2e8f7b9d10",
+		"corr-1",
+	)
+	if err != nil {
+		t.Fatalf("FindCompleted: %v", err)
+	}
+	if ok {
+		t.Fatal("FindCompleted returned true for a different sitemap kind")
 	}
 }
