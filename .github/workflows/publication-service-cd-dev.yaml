@@ -100,4 +100,4 @@ jobs:
         uses: thollander/actions-comment-pull-request@v3
         with:
           message: |
-            Your deployment is live in the DEV environment [here](${{ secrets.OPENSHIFT_BASE_URL }}/${{ secrets.OPENSHIFT_POD_PATH}}/$POD_NAME)
+            Your deployment is live in the DEV environment [here](${{ secrets.OPENSHIFT_BASE_URL }}/$POD_NAME)
