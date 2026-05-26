@@ -37,12 +37,20 @@ func (f *fakeStore) Delete(_ context.Context, bucket, key string) error {
 }
 
 type fakeResultStore struct {
-	completed   Result
-	completedOK bool
-	marked      []Result
+	completed           Result
+	completedOK         bool
+	marked              []Result
+	findCompletedKind   pub.Kind
+	findCompletedTenant string
+	findCompletedCorrID string
+	findCompletedCalls  int
 }
 
-func (f *fakeResultStore) FindCompleted(_ context.Context, _ pub.Kind, _ string) (Result, bool, error) {
+func (f *fakeResultStore) FindCompleted(_ context.Context, kind pub.Kind, tenantID string, correlationID string) (Result, bool, error) {
+	f.findCompletedKind = kind
+	f.findCompletedTenant = tenantID
+	f.findCompletedCorrID = correlationID
+	f.findCompletedCalls++
 	return f.completed, f.completedOK, nil
 }
 
@@ -118,6 +126,28 @@ func TestWriter_WritesFirstURLAndIndex(t *testing.T) {
 	}
 	if len(repo.marked) != 1 {
 		t.Fatalf("MarkSucceeded calls = %d, want 1", len(repo.marked))
+	}
+}
+
+func TestWriter_FindsCompletedByKindTenantAndCorrelationID(t *testing.T) {
+	store := &fakeStore{objects: map[string][]byte{}}
+	repo := &fakeResultStore{}
+	w := NewWriter(store, repo, map[pub.Kind]Target{pub.KindOpenInfoSitemap: testTarget()})
+
+	if _, err := w.Handle(context.Background(), testRequest()); err != nil {
+		t.Fatalf("Handle: %v", err)
+	}
+	if repo.findCompletedCalls != 1 {
+		t.Fatalf("FindCompleted calls = %d, want 1", repo.findCompletedCalls)
+	}
+	if repo.findCompletedKind != testRequest().Kind {
+		t.Fatalf("FindCompleted kind = %q, want %q", repo.findCompletedKind, testRequest().Kind)
+	}
+	if repo.findCompletedTenant != testRequest().TenantID {
+		t.Fatalf("FindCompleted tenant = %q, want %q", repo.findCompletedTenant, testRequest().TenantID)
+	}
+	if repo.findCompletedCorrID != testRequest().CorrelationID {
+		t.Fatalf("FindCompleted correlation = %q, want %q", repo.findCompletedCorrID, testRequest().CorrelationID)
 	}
 }
 

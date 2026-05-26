@@ -75,23 +75,32 @@ func (s *memoryObjectStore) CopyFile(_ context.Context, srcBucket, srcKey, dstBu
 }
 
 type memoryResultStore struct {
-	results map[string]sitemapping.Result
+	results     map[string]sitemapping.Result
+	lastFindKey string
 }
 
 func newMemoryResultStore() *memoryResultStore {
 	return &memoryResultStore{results: map[string]sitemapping.Result{}}
 }
 
-func (s *memoryResultStore) FindCompleted(_ context.Context, kind pub.Kind, publicationID string) (sitemapping.Result, bool, error) {
-	result, ok := s.results[string(kind)+":"+publicationID]
+func (s *memoryResultStore) FindCompleted(_ context.Context, kind pub.Kind, tenantID string, correlationID string) (sitemapping.Result, bool, error) {
+	key := string(kind) + ":" + tenantID + ":" + correlationID
+	s.lastFindKey = key
+	result, ok := s.results[key]
 	return result, ok, nil
 }
 
 func (s *memoryResultStore) MarkSucceeded(_ context.Context, _ string, result sitemapping.Result) error {
+	if result.TenantID == "" {
+		return errors.New("tenant id required")
+	}
 	if result.PublicationID == "" {
 		return errors.New("publication id required")
 	}
-	s.results[string(result.Kind)+":"+result.PublicationID] = result
+	if s.lastFindKey == "" {
+		return errors.New("find completed must be called before mark succeeded")
+	}
+	s.results[s.lastFindKey] = result
 	return nil
 }
 
