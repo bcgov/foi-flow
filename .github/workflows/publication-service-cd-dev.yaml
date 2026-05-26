@@ -20,7 +20,7 @@ jobs:
 # Job for automated unit tests goes HERE
 
   PUBLICATION-SERVICE-UPDATE-ARGO:
-    if: github.event.review.state == 'approved'
+    if: github.event.review.state == 'approved' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
   # Install yaml parser to alter Helm env file
