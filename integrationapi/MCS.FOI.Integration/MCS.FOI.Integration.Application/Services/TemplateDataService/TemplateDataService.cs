@@ -295,10 +295,12 @@
             }
 
             const string query = @"
-                SELECT oir.*, ps.name as PublicationStatus
+                SELECT oir.*, ps.name as PublicationStatus, ex.name as ExemptionName
                 FROM public.""FOIOpenInformationRequests"" oir
                 JOIN public.""OpenInfoPublicationStatuses"" ps 
                 ON ps.oipublicationstatusid = oir.oipublicationstatus_id
+                LEFT JOIN public.""OpenInformationExemptions"" ex
+                ON ex.oiexemptionid = oir.oiexemption_id
                 WHERE foiministryrequest_id = @MinistryRequestId and foiministryrequestversion_id = @MinistryRequestVersionId;";
 
             var parameters = new { MinistryRequestId = ministryRequestId, MinistryRequestVersionId = versionId };
