@@ -9,7 +9,7 @@ on:
 #        required: true
   pull_request:
     types: [opened, synchronize, ready_for_review] # Triggered by opened or changed pull requests.
-    branches: [dev]
+    branches: [dev, main]
     paths:
       - 'publication-service/**' # Triggers on changes to files in the express-api/ directory.
 #env:
