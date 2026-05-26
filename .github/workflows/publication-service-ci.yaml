@@ -13,7 +13,7 @@ on:
     paths:
       - 'publication-service/**' # Triggers on changes to files in the express-api/ directory.
 env:
-  IMAGE_TAG: ${{ github.event.inputs.image_tag }}
+  IMAGE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.image_tag || github.event.pull_request.number }}
 
 jobs:
 # Job for automated unit tests goes HERE
