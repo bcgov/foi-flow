@@ -46,7 +46,7 @@ jobs:
           docker push ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/publication-service:${{ env.IMAGE_TAG }}
 
   PUBLICATION-SERVICE-PR-COMMENT:
-    if: ${{ github.event_name != 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'pull_request' }}
     needs: PUBLICATION-SERVICE-IMAGE-BUILD
     runs-on: ubuntu-latest
     steps:
