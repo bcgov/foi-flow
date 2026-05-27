@@ -41,10 +41,18 @@ func (f *fakeSitemapRemover) Remove(_ context.Context, req sitemapping.RemovalRe
 }
 
 type fakeResultStore struct {
-	marked Result
+	marked              Result
+	findCompletedKind   pub.Kind
+	findCompletedTenant string
+	findCompletedCorrID string
+	findCompletedCalls  int
 }
 
-func (f *fakeResultStore) FindCompleted(context.Context, pub.Kind, string) (Result, bool, error) {
+func (f *fakeResultStore) FindCompleted(_ context.Context, kind pub.Kind, tenantID string, correlationID string) (Result, bool, error) {
+	f.findCompletedKind = kind
+	f.findCompletedTenant = tenantID
+	f.findCompletedCorrID = correlationID
+	f.findCompletedCalls++
 	return Result{}, false, nil
 }
 
@@ -81,6 +89,41 @@ func TestService_HandleDeletesPrefixThenRemovesSitemap(t *testing.T) {
 	}
 	if store.marked.PublicationID != "pub" {
 		t.Fatalf("result not stored: %#v", store.marked)
+	}
+}
+
+func TestService_HandleFindsCompletedByKindTenantAndCorrelationID(t *testing.T) {
+	repo := &fakePublicRepo{count: 2}
+	sitemap := &fakeSitemapRemover{}
+	store := &fakeResultStore{}
+	svc := NewService(repo, sitemap, store)
+
+	req := Request{
+		Kind:          pub.KindOpenInfoUnpublish,
+		TenantID:      "tenant",
+		PublicationID: "pub",
+		PublicURL:     "https://example/pub.html",
+		PublicRepository: PublicRepositoryLocation{
+			Bucket: "public",
+			Prefix: "openinfo/pub",
+		},
+		SourceEventID: "event-1",
+		CorrelationID: "corr-1",
+	}
+	if _, err := svc.Handle(context.Background(), req); err != nil {
+		t.Fatalf("Handle: %v", err)
+	}
+	if store.findCompletedCalls != 1 {
+		t.Fatalf("FindCompleted calls = %d, want 1", store.findCompletedCalls)
+	}
+	if store.findCompletedKind != req.Kind {
+		t.Fatalf("FindCompleted kind = %q, want %q", store.findCompletedKind, req.Kind)
+	}
+	if store.findCompletedTenant != req.TenantID {
+		t.Fatalf("FindCompleted tenant = %q, want %q", store.findCompletedTenant, req.TenantID)
+	}
+	if store.findCompletedCorrID != req.CorrelationID {
+		t.Fatalf("FindCompleted correlation = %q, want %q", store.findCompletedCorrID, req.CorrelationID)
 	}
 }
 
