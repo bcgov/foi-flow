@@ -12,7 +12,7 @@ import (
 )
 
 type ResultStore interface {
-	FindCompleted(ctx context.Context, kind pub.Kind, publicationID string) (Result, bool, error)
+	FindCompleted(ctx context.Context, kind pub.Kind, tenantID string, correlationID string) (Result, bool, error)
 	MarkSucceeded(ctx context.Context, eventID string, result Result) error
 }
 
@@ -33,7 +33,7 @@ func NewWriter(store ObjectStore, repo ResultStore, targets map[pub.Kind]Target)
 }
 
 func (w *Writer) Handle(ctx context.Context, req Request) (Result, error) {
-	if existing, ok, err := w.repo.FindCompleted(ctx, req.Kind, req.PublicationID); err != nil || ok {
+	if existing, ok, err := w.repo.FindCompleted(ctx, req.Kind, req.TenantID, req.CorrelationID); err != nil || ok {
 		return existing, err
 	}
 	target, ok := w.targets[req.Kind]
