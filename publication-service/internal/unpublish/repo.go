@@ -21,18 +21,20 @@ func NewRequestRepo(pool *pgxpool.Pool) *RequestRepo {
 	return &RequestRepo{pool: pool}
 }
 
-func (r *RequestRepo) FindCompleted(ctx context.Context, kind pub.Kind, publicationID string) (Result, bool, error) {
+// FindCompleted returns a previous successful unpublish result for a workflow correlation.
+func (r *RequestRepo) FindCompleted(ctx context.Context, kind pub.Kind, tenantID string, correlationID string) (Result, bool, error) {
 	const q = `
 SELECT result
 FROM workflow_request
 WHERE state='completed'
   AND kind=$1
-  AND payload->>'publication_id'=$2
+  AND tenant_id=$2
+  AND correlation_id=$3
   AND result IS NOT NULL
 ORDER BY completed_at DESC NULLS LAST
 LIMIT 1`
 	var raw []byte
-	err := r.pool.QueryRow(ctx, q, string(kind), publicationID).Scan(&raw)
+	err := r.pool.QueryRow(ctx, q, string(kind), tenantID, correlationID).Scan(&raw)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return Result{}, false, nil
 	}

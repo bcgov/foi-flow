@@ -49,6 +49,6 @@ type SitemapRemover interface {
 }
 
 type ResultStore interface {
-	FindCompleted(ctx context.Context, kind pub.Kind, publicationID string) (Result, bool, error)
+	FindCompleted(ctx context.Context, kind pub.Kind, tenantID string, correlationID string) (Result, bool, error)
 	MarkSucceeded(ctx context.Context, eventID string, result Result) error
 }
