@@ -119,4 +119,4 @@ jobs:
       - name: Rollout Restart of Deployment in Dev
         shell: bash
         run: |
-          oc rollout restart deployment/template-api -n d7abee-test
+          oc rollout restart deployment/template-api -n d7abee-dev
