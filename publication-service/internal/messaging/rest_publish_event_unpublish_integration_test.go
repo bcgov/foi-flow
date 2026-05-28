@@ -27,13 +27,21 @@ import (
 	sharedunpublish "publication-service/internal/unpublish"
 )
 
+// TestRestPublishEventUnpublishRestRepublishCopiesFilesAndUpdatesSitemap
+// verifies the mixed control-plane flow used by "Publish Now":
+//
+//   - publish through the REST API,
+//   - unpublish through the Redis event consumer,
+//   - publish the same request through REST again.
+//
+// The regression this protects is REST republish failing after an event-driven
+// unpublish because the second REST publish receives a new event ID while the
+// sitemap workflow row already exists for the same public URL.
 func TestRestPublishEventUnpublishRestRepublishCopiesFilesAndUpdatesSitemap(t *testing.T) {
 	h := setupSitemapHarness(t)
 	ctx := h.ctx
 
-	createBucket(t, ctx, h.rawS3, "raw")
-	putObject(t, ctx, h.rawS3, "raw", "src/a/response letter.pdf", "letter")
-	putObject(t, ctx, h.rawS3, "raw", "src/a/package.json", `{"ok":true}`)
+	seedRestPublishSource(t, ctx, h.rawS3)
 
 	publishHandler := newRESTPublishHandler(t, h)
 
@@ -59,6 +67,48 @@ func TestRestPublishEventUnpublishRestRepublishCopiesFilesAndUpdatesSitemap(t *t
 	assertObjectContains(t, h, "published", "openinfopub/sitemap/sitemap_pages_1.xml", second.PublicURL)
 }
 
+// TestRestRepublishWithDifferentEventIDReusesSitemapWorkflowRow verifies that
+// repeated REST publishes of the same public URL are idempotent even though
+// each REST request creates a new generated event ID.
+//
+// The expected behavior is to reuse the existing sitemap workflow row keyed by
+// kind, tenant, and public URL, leaving one sitemap URL entry and one workflow
+// row for that public URL.
+func TestRestRepublishWithDifferentEventIDReusesSitemapWorkflowRow(t *testing.T) {
+	h := setupSitemapHarness(t)
+	ctx := h.ctx
+
+	seedRestPublishSource(t, ctx, h.rawS3)
+
+	publishHandler := newRESTPublishHandler(t, h)
+
+	first := postPublication(t, publishHandler, restPublishBody())
+	second := postPublication(t, publishHandler, restPublishBody())
+	if second.PublicURL != first.PublicURL {
+		t.Fatalf("republished public URL = %q, want %q", second.PublicURL, first.PublicURL)
+	}
+
+	assertS3ObjectContains(t, ctx, h.rawS3, "published", "dst/a/response_letter.pdf", "letter")
+	assertS3ObjectContains(t, ctx, h.rawS3, "published", "dst/a/package.json", `{"ok":true}`)
+	assertS3ObjectContains(t, ctx, h.rawS3, "published", "dst/a/HTH-2025-52023.html", "HTH-2025-52023")
+	assertObjectContains(t, h, "published", "openinfopub/sitemap/sitemap_pages_1.xml", second.PublicURL)
+	assertSitemapURLCount(t, h, second.PublicURL, 1)
+	assertWorkflowRowCountByPublicURL(t, h, pub.KindOpenInfoSitemap, second.PublicURL, 1)
+}
+
+// seedRestPublishSource creates the raw S3 objects used by the REST publish
+// payload. The filenames intentionally include a space so the test also
+// exercises publish-time filename sanitization.
+func seedRestPublishSource(t *testing.T, ctx context.Context, client *s3sdk.Client) {
+	t.Helper()
+	createBucket(t, ctx, client, "raw")
+	putObject(t, ctx, client, "raw", "src/a/response letter.pdf", "letter")
+	putObject(t, ctx, client, "raw", "src/a/package.json", `{"ok":true}`)
+}
+
+// newRESTPublishHandler wires the real REST publish handler against the
+// integration Postgres pool and S3 client. It mirrors the application wiring
+// closely enough to exercise sitemap claiming and result persistence.
 func newRESTPublishHandler(t *testing.T, h sitemapHarness) http.Handler {
 	t.Helper()
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
@@ -78,6 +128,9 @@ func newRESTPublishHandler(t *testing.T, h sitemapHarness) http.Handler {
 	return handlers.Publications(orchestrator)
 }
 
+// publishCycleSitemapWriter returns one sitemap writer shared by publish and
+// unpublish paths so the test uses the same sitemap bucket and key layout
+// through the full lifecycle.
 func publishCycleSitemapWriter(h sitemapHarness) *sitemapping.Writer {
 	target := sitemapping.Target{
 		Bucket:          "published",
@@ -95,6 +148,8 @@ func publishCycleSitemapWriter(h sitemapHarness) *sitemapping.Writer {
 	})
 }
 
+// postPublication sends a wrapped REST publish request and fails the test on
+// any non-OK response, returning the decoded response for follow-up assertions.
 func postPublication(t *testing.T, handler http.Handler, body []byte) publishnow.Response {
 	t.Helper()
 	rec := httptest.NewRecorder()
@@ -110,6 +165,8 @@ func postPublication(t *testing.T, handler http.Handler, body []byte) publishnow
 	return resp
 }
 
+// restPublishBody builds the wrapped JSON shape expected by the /publications
+// REST endpoint.
 func restPublishBody() []byte {
 	payload := map[string]any{
 		"tenant_id":       "a7d9b2f1-4c3e-4e8b-9a21-1c2e8f7b9d10",
@@ -262,5 +319,27 @@ func assertS3ObjectMissingText(t *testing.T, ctx context.Context, client *s3sdk.
 	}
 	if bytes.Contains(body, []byte(text)) {
 		t.Fatalf("%s/%s contains %q, want removed:\n%s", bucket, key, text, body)
+	}
+}
+
+func assertSitemapURLCount(t *testing.T, h sitemapHarness, publicURL string, want int) {
+	t.Helper()
+	body := readObject(t, h, "published", "openinfopub/sitemap/sitemap_pages_1.xml")
+	if got := bytes.Count(body, []byte(publicURL)); got != want {
+		t.Fatalf("sitemap public URL count = %d, want %d\n%s", got, want, body)
+	}
+}
+
+func assertWorkflowRowCountByPublicURL(t *testing.T, h sitemapHarness, kind pub.Kind, publicURL string, want int) {
+	t.Helper()
+	var got int
+	if err := h.pool.QueryRow(h.ctx,
+		`SELECT count(*) FROM workflow_request WHERE kind=$1 AND payload->>'public_url'=$2`,
+		string(kind), publicURL,
+	).Scan(&got); err != nil {
+		t.Fatalf("count workflow rows for %s: %v", publicURL, err)
+	}
+	if got != want {
+		t.Fatalf("workflow rows for %s = %d, want %d", publicURL, got, want)
 	}
 }
