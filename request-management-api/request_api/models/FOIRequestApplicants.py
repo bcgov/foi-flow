@@ -196,6 +196,9 @@ class FOIRequestApplicant(db.Model):
             updatedapplicant.section43_info = oldapplicant.section43_info
             updatedapplicant.request_history = oldapplicant.request_history
         db.session.add(updatedapplicant)
+        db.session.query(FOIRequestApplicant).filter(
+            FOIRequestApplicant.foirequestapplicantid == foirequestapplicantid
+        ).update({"is_active": False})
         db.session.commit()
         return DefaultMethodResult(True,'Applicant profile updated',updatedapplicant.foirequestapplicantid)
         
@@ -226,15 +229,6 @@ class FOIRequestApplicant(db.Model):
 
         applicantrequest_schema = ApplicantProfileBaseSchema(many=False)
         return applicantrequest_schema.dump(query.first())
-    
-    @classmethod
-    def getlatestprofilebyaxisapplicantid(cls, axisapplicantid):
-        schema = FOIRequestApplicantSchema(many=False)
-        sq = db.session.query(FOIRequestApplicant).filter_by(axisapplicantid=axisapplicantid).first()
-        if sq is None or (not sq.applicantprofileid):
-            return schema.dump(sq)
-        query = db.session.query(FOIRequestApplicant).filter(FOIRequestApplicant.applicantprofileid == sq.applicantprofileid).order_by(FOIRequestApplicant.foirequestapplicantid.desc()).first()
-        return schema.dump(query)
 
     # Search applicant by id
     @classmethod
@@ -507,10 +501,23 @@ class FOIRequestApplicant(db.Model):
         if not conditions:
             return []
 
+        # Subquery: get the latest foirequestapplicantid per applicantprofileid
+        latest_subquery = (
+            db.session.query(
+                func.max(FOIRequestApplicant.foirequestapplicantid).label("latest_id")
+            )
+            .filter(FOIRequestApplicant.is_active.is_(True))
+            .group_by(FOIRequestApplicant.applicantprofileid)
+            .subquery()
+        )
+
         query = (
             db.session.query(FOIRequestApplicant)
             .filter(and_(*conditions))
             .filter(FOIRequestApplicant.is_active.is_(True))
+            .filter(FOIRequestApplicant.foirequestapplicantid.in_(
+                db.session.query(latest_subquery.c.latest_id)
+            ))
             .order_by(
                 FOIRequestApplicant.applicantprofileid,
                 desc(FOIRequestApplicant.foirequestapplicantid)
