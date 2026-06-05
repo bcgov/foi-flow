@@ -118,6 +118,8 @@ class FOIRequests(Resource):
 
             
             if rawresult.success == True:
+                foirequestschema["lastStatusUpdateDate"] = request_json["lastStatusUpdateDate"]
+                foirequestschema["currentState"] = request_json["currentState"]
                 result = requestservice().saverequest(foirequestschema,AuthHelper.getuserid(), rawrequestid=rawresult.identifier)
                 if result.success == True:
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
