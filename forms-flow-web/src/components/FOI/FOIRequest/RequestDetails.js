@@ -42,8 +42,9 @@ const RequestDetails = React.memo(
       }
     });
     const classes = useStyles();
-    const disableFieldForMinistryRequest = shouldDisableFieldForMinistryRequests(requestStatus)
-    const disableInput = isHistoricalRequest || StateEnum.closed.name.toLowerCase() === requestDetails?.currentState?.toLowerCase()
+    const disableFieldForMinistryRequest = shouldDisableFieldForMinistryRequests(requestStatus);
+    const disableInput = isHistoricalRequest || StateEnum.closed.name.toLowerCase() === requestDetails?.currentState?.toLowerCase();
+    const disableLDD = requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || requestDetails?.currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase() || requestDetails?.currentState?.toLowerCase() === StateEnum.section5pending.name.toLowerCase() || requestDetails?.currentState?.toLowerCase() === StateEnum.appfeeowing.name.toLowerCase();
     const validateFields = (request, name, value) => {
       if (request !== undefined) {
         const startDate = !!request.requestProcessStart ? formatDate(request.requestProcessStart) : "";
@@ -298,8 +299,8 @@ const RequestDetails = React.memo(
                 <TextField
                   id="dueDate"
                   label="Legislated Due Date"
-                  type={(requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || requestDetails?.currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) ? "text" : "date"}
-                  value={(requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || requestDetails?.currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) ? 'N/A' : (dueDateText || '')}
+                  type={disableLDD ? "text" : "date"}
+                  value={disableLDD ? 'N/A' : (dueDateText || '')}
                   onChange={handleDueDateChange}
                   inputProps={{ "aria-labelledby": "dueDate-label" }}
                   InputLabelProps={{
@@ -309,7 +310,7 @@ const RequestDetails = React.memo(
                   InputProps={{ inputProps: { min: startDateText } }}
                   required
                   error={dueDateText === undefined || dueDateText === ""}
-                  disabled={(requestDetails?.currentState?.toLowerCase() === StateEnum.onhold.name.toLowerCase() || requestDetails?.currentState?.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) || disableInput}
+                  disabled={disableLDD || disableInput}
                   fullWidth
                 />
               </div>

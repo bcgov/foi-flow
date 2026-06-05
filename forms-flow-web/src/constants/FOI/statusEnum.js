@@ -26,6 +26,15 @@ const StateList = Object.freeze({
   ],
   open: [
     { status: "Open", isSelected: false },
+    { status: "App Fee Owing", isSelected: false },
+    { status: "Call For Records", isSelected: false },
+    { status: "Peer Review", isSelected: false },
+    { status: "On Hold - Other", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
+  openpersonal: [
+    { status: "Open", isSelected: false },
+    { status: "Section 5 Pending", isSelected: false },
     { status: "Call For Records", isSelected: false },
     { status: "Peer Review", isSelected: false },
     { status: "On Hold - Other", isSelected: false },

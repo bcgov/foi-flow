@@ -28,6 +28,9 @@ export const getTabBottomText = ({
     StateEnum.onhold.name,
     StateEnum.closed.name,
     StateEnum.intakeinprogress.name,
+    StateEnum.section5pending.name,
+    StateEnum.appfeeowing.name,
+    StateEnum.peerreview,
     StateEnum.redirect.name,
     StateEnum.onholdother.name,
   ];
