@@ -1,4 +1,4 @@
-from marshmallow import EXCLUDE, Schema, fields, validate
+from marshmallow import EXCLUDE, Schema, fields, validate, ValidationError
 from request_api.utils.constants import BLANK_EXCEPTION_MESSAGE, MAX_EXCEPTION_MESSAGE
 
 """
@@ -81,14 +81,22 @@ class FOIMinistryRequestOIPCSchema(Schema):
     receiveddate = fields.Str(data_key="receiveddate",allow_none=True)
     closeddate = fields.Str(data_key="closeddate",allow_none=True)
 
-# class FOIMinistryRequestPDSchema(Schema):
-#     class Meta:  # pylint: disable=too-few-public-methods
-#         """Exclude unknown fields in the deserialized output."""
+class StringOrListOfStrings(fields.Field):
+    def _deserialize(self, value, attr, data, **kwargs):
+        if value is None:
+            return None
 
-#         unknown = EXCLUDE
-#     proactivedisclosurecategoryid = fields.Int(data_key="proactivedisclosurecategoryid",allow_none=True)
-#     reportperiod = fields.Str(data_key="reportperiod",allow_none=True, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])  
-#     publicationdate = fields.Str(data_key="publicationdate",allow_none=True)
+        # Case 1: single string
+        if isinstance(value, str):
+            return value
+
+        # Case 2: list of strings
+        if isinstance(value, list):
+            if all(isinstance(item, str) for item in value):
+                return value
+            raise ValidationError("All items must be strings")
+
+        raise ValidationError("Must be a string or list of strings")
 
 class FOIRequestWrapperSchema(Schema):
 
@@ -176,11 +184,8 @@ class FOIRequestWrapperSchema(Schema):
     estimatedtaggedpagecount = fields.Int(data_key="estimatedtaggedpagecount",allow_none=True)
 
     axislanpagecount = fields.Int(data_key="axislanpagecount",allow_none=True)
-    #proactivedisclosuredetails = fields.Nested(FOIMinistryRequestPDSchema, many=True,allow_none=True)
-    # proactivedisclosurecategory = fields.Str(data_key="proactiveDisclosureCategory", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
-    # reportperiod = fields.Str(data_key="reportperiod",allow_none=True, validate=[validate.Length(max=500, error=MAX_EXCEPTION_MESSAGE)])  
-    # publicationdate = fields.Str(data_key="publicationdate",allow_none=True)
-    # category = fields.Str(data_key="category", required=True,validate=[validate.Length(min=1, error=BLANK_EXCEPTION_MESSAGE)])
+    lastStatusUpdateDate = StringOrListOfStrings(data_key="lastStatusUpdateDate", required=False, allow_none=True)
+    currentState = fields.Str(data_key="currentState", required=False, allow_none=True)
 
 
     
