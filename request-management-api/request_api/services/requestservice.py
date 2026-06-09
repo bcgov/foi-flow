@@ -144,8 +144,7 @@ class requestservice:
             if (
                 ((currentstatus == StateName.onhold.value
                 and nextstatename != StateName.response.value)
-                or (currentstatus == StateName.onholdother.value
-                and nextstatename != StateName.open.value))
+                or (currentstatus == StateName.onholdother.value))
             ):
                 skipcalculation = self.__skipduedatecalculation(
                     ministryrequestid, offholddate, currentstatus, nextstatename
