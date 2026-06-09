@@ -112,6 +112,7 @@ const AddExtensionModal = () => {
   );
 
   const [reason, setReason] = useState("");
+  const applicantConsentSelected = reason?.reason === "Public Body - Applicant Consent";
   const publicBodySelected = reason?.extensiontype === "Public Body";
 
   const [numberDays, setNumberDays] = useState("");
@@ -341,7 +342,7 @@ const AddExtensionModal = () => {
 
   const errorExists = Object.values({
     reason: !reason,
-    numberDays: checkPublicBodyError(numberDays, publicBodySelected),
+    numberDays: checkPublicBodyError(numberDays, publicBodySelected, applicantConsentSelected),
     approvedDate:
       status === extensionStatusId.approved &&
       !publicBodySelected &&
@@ -375,7 +376,7 @@ const AddExtensionModal = () => {
     return reasons;
   };
 
-  const showStatusOptions = reason && !publicBodySelected;
+  const showStatusOptions = reason && (!publicBodySelected || applicantConsentSelected);
 
   return (
     <>
@@ -474,7 +475,7 @@ const AddExtensionModal = () => {
                   }}
                   onChange={handleNumberDaysChange}
                   fullWidth
-                  error={checkPublicBodyError(numberDays, publicBodySelected)}
+                  error={checkPublicBodyError(numberDays, publicBodySelected, applicantConsentSelected)}
                 />
               </Grid>
 
@@ -542,7 +543,7 @@ const AddExtensionModal = () => {
                         setApprovedDate(e.target.value);
                       }}
                       InputProps={{
-                        inputProps: { max: formatDate(new Date()) , "aria-labelledby": "approvedDate-label"},
+                        inputProps: {"aria-labelledby": "approvedDate-label"},
                       }}
                       variant="outlined"
                       fullWidth
@@ -587,7 +588,7 @@ const AddExtensionModal = () => {
                         setDeniedDate(e.target.value);
                       }}
                       InputProps={{
-                        inputProps: { max: formatDate(new Date()) , "aria-labelledby": "deniedDate-label"},
+                        inputProps: {"aria-labelledby": "deniedDate-label"},
                       }}
                       variant="outlined"
                       fullWidth
