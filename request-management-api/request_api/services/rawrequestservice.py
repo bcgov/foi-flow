@@ -19,6 +19,8 @@ from request_api.models.FOIRequestApplicants import FOIRequestApplicant
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator
 from request_api.utils.enums import StateName
 import logging
+from request_api.services.commons.duecalculator import duecalculator
+from request_api.utils.commons.datetimehandler import datetimehandler
 
 logger = logging.getLogger(__name__)
 
@@ -113,6 +115,20 @@ class rawrequestservice:
 
     def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid, assigneefirstname, assigneemiddlename, assigneelastname, statuslabel, actiontype=None):
         ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False        
+        
+        # LDD Extension Checks
+        currentstatus = _requestdatajson["currentState"]
+        if currentstatus is not (None, ""):
+            # Check for App Fee Owing
+            state_offhold_date = datetimehandler().gettoday()
+            if currentstatus == StateName.appfeeowing.value:
+                apefeeowing_date = _requestdatajson["lastStatusUpdateDate"]
+                _requestdatajson["dueDate"] = duecalculator().calculate_appfeeowing_ldd_ext(_requestdatajson["dueDate"], apefeeowing_date, state_offhold_date).strftime("%Y-%m-%d")
+            #Check for Section 5 Pending
+            if currentstatus == StateName.section5pending.value:
+                _requestdatajson["startDate"] = state_offhold_date
+                _requestdatajson["dueDate"] =  duecalculator().calculate_section5_ldd_ext(_requestdatajson["startDate"], state_offhold_date).strftime("%Y-%m-%d")
+        
         #Get documents
         if actiontype == "assignee":
             result = FOIRawRequest.saverawrequestassigneeversion(_requestid, _assigneegroup, _assignee, userid, assigneefirstname, assigneemiddlename, assigneelastname)
@@ -176,4 +192,4 @@ class rawrequestservice:
         return False
 
     def israwrequestwatcher(self,requestid, userid):
-        return FOIRawRequestWatcher.isawatcher(requestid,userid)    
+        return FOIRawRequestWatcher.isawatcher(requestid,userid)
