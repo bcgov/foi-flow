@@ -81,22 +81,6 @@ class FOIMinistryRequestOIPCSchema(Schema):
     receiveddate = fields.Str(data_key="receiveddate",allow_none=True)
     closeddate = fields.Str(data_key="closeddate",allow_none=True)
 
-class StringOrListOfStrings(fields.Field):
-    def _deserialize(self, value, attr, data, **kwargs):
-        if value is None:
-            return None
-
-        # Case 1: single string
-        if isinstance(value, str):
-            return value
-
-        # Case 2: list of strings
-        if isinstance(value, list):
-            if all(isinstance(item, str) for item in value):
-                return value
-            raise ValidationError("All items must be strings")
-
-        raise ValidationError("Must be a string or list of strings")
 
 class FOIRequestWrapperSchema(Schema):
 
@@ -184,7 +168,7 @@ class FOIRequestWrapperSchema(Schema):
     estimatedtaggedpagecount = fields.Int(data_key="estimatedtaggedpagecount",allow_none=True)
 
     axislanpagecount = fields.Int(data_key="axislanpagecount",allow_none=True)
-    lastStatusUpdateDate = StringOrListOfStrings(data_key="lastStatusUpdateDate", required=False, allow_none=True)
+    lastStatusUpdateDate = fields.Raw(data_key="lastStatusUpdateDate", required=False, allow_none=True)
     currentState = fields.Str(data_key="currentState", required=False, allow_none=True)
 
 
