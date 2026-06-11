@@ -163,6 +163,8 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
             var faxNumber = _configuration.GetValue<string>("FaxNumber") ?? "(250) 3879843";
             var assigneeEmail = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty;
             var branchName = _configuration.GetValue<string>("BRANCH_NAME") ?? string.Empty;
+            var publicationStatus = openInformation?.PublicationStatus?.ToString();
+            var exemptionName = openInformation?.ExemptionName?.ToString();
 
 
             string? GetPersonalAttribute(string dataFormat) =>
@@ -240,12 +242,12 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
                     ["[WORKPHONEPRIMARY]"] = GetContactInfo("workPhonePrimary"),
                     ["[SUBJECTCODE]"] = subjectCodes?.Name?.ToString(),
                     ["[OIPCREASON]"] = oipcDetails?.Reason?.ToString(),
-                    ["[PUBLICATIONSTATUS]"] = openInformation?.PublicationStatus?.ToString(),
+                    ["[PUBLICATIONSTATUS]"] = string.IsNullOrEmpty(publicationStatus) ? "Publish" : publicationStatus,
                     ["[OPENINFORELEASE]"] = openInformation?.ExemptionName?.ToString(),
                     ["[CORRECTIONNUMBER]"] = GetPersonalAttribute("BC Correctional Service Number"),
                     ["[REQFORDOCSDUEDATE]"] = DateHelper.FormatDate(requestMinistry?.CFRDueDate),
                     ["[REQUESTSTARTDATE]"] = DateHelper.FormatDate(requestMinistry?.StartDate),
-                    ["[DONOTPUBLISHREASON]"] = openInformation?.ExemptionName?.ToString(),
+                    ["[DONOTPUBLISHREASON]"] = string.IsNullOrEmpty(exemptionName) ? " " : exemptionName,
                     ["[BRANCH]"] = branchName,
 
             };

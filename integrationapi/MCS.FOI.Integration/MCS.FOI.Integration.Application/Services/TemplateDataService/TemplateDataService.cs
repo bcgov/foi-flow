@@ -301,7 +301,7 @@
                 ON ps.oipublicationstatusid = oir.oipublicationstatus_id
                 LEFT JOIN public.""OpenInformationExemptions"" ex
                 ON ex.oiexemptionid = oir.oiexemption_id
-                WHERE foiministryrequest_id = @MinistryRequestId and foiministryrequestversion_id = @MinistryRequestVersionId;";
+                WHERE foiministryrequest_id = @MinistryRequestId and oir.isactive IS TRUE;";
 
             var parameters = new { MinistryRequestId = ministryRequestId, MinistryRequestVersionId = versionId };
 
