@@ -110,7 +110,12 @@ class FOIAssigneesByGroup(Resource):
                 intaketeam = assigneeservice().getmembersbygroupname('intaketeam')
                 bcpsteam = assigneeservice().getmembersbygroupname('bcpsteam')
                 result = [*intaketeam, *bcpsteam]
-            else: result = assigneeservice().getmembersbygroupname(groupname)
+            elif groupname == "intakewithchildrenfamily":
+                intaketeam =  assigneeservice().getmembersbygroupname("intaketeam")
+                childrenfamilyteam = assigneeservice().getmembersbygroupname("childrenandfamilyteam")
+                result = [*intaketeam, *childrenfamilyteam]
+            else: 
+                result = assigneeservice().getmembersbygroupname(groupname)
             if result is not None:
                 return json.dumps(result), 200
             else:
