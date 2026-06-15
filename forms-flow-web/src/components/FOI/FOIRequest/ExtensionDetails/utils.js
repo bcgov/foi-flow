@@ -107,6 +107,7 @@ export const getPublicBodyTotalExtendedDays = (extensions) => {
 }
 
 export const getMaxExtendDays = (totalPublicBodyDays, defaultDays, publicBodySelected, selectedExtendedduedays) => {
+  if (defaultDays == 0) return 0;
   if (publicBodySelected && totalPublicBodyDays && selectedExtendedduedays)
     return defaultDays - totalPublicBodyDays + selectedExtendedduedays
   else if (publicBodySelected && totalPublicBodyDays)
