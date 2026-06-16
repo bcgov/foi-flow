@@ -3651,7 +3651,7 @@
                                             "value": ""
                                         }
                                     ],
-                                    "content": "<center class='mobilesubcontent' style='color: #003366'>If you would like to contact an Information Access Operations representative to better clarify your request and try to reduce your fee, <br/> please email: <a href='mailto:FOI.Requests@gov.bc.ca' style='color: #0051A8'>FOI.Requests@gov.bc.ca</a>, or call <a href=\"tel:+1 250-387-1321\" style='color: #0051A8'>250-387-1321</a> | Toll Free: <a href='tel:+1833-283-8200' style='color: #0051A8'>833-283-8200</a> </center>",
+                                    "content": "<center class='mobilesubcontent' style='color: #003366'>If you would like to contact an Access & Information Management Branch representative to better clarify your request and try to reduce your fee, <br/> please email: <a href='mailto:FOI.Requests@gov.bc.ca' style='color: #0051A8'>FOI.Requests@gov.bc.ca</a>, or call <a href=\"tel:+1 250-387-1321\" style='color: #0051A8'>250-387-1321</a> | Toll Free: <a href='tel:+1833-283-8200' style='color: #0051A8'>833-283-8200</a> </center>",
                                     "refreshOnChange": false,
                                     "customClass": "",
                                     "hidden": false,
@@ -5524,7 +5524,7 @@
                                             "value": ""
                                         }
                                     ],
-                                    "content": "<center class='mobilesubcontent' style='color: #003366'>If you would like to contact an Information Access Operations representative to better clarify your request and try to reduce your fee, <br/> please email: <a href='mailto:FOI.Requests@gov.bc.ca' style='color: #0051A8'>FOI.Requests@gov.bc.ca</a>, or call <a href=\"tel:+1 250-387-1321\" style='color: #0051A8'>250-387-1321</a> | Toll Free: <a href='tel:+1833-283-8200' style='color: #0051A8'>833-283-8200</a> </center>",
+                                    "content": "<center class='mobilesubcontent' style='color: #003366'>If you would like to contact an Access & Information Management Branch representative to better clarify your request and try to reduce your fee, <br/> please email: <a href='mailto:FOI.Requests@gov.bc.ca' style='color: #0051A8'>FOI.Requests@gov.bc.ca</a>, or call <a href=\"tel:+1 250-387-1321\" style='color: #0051A8'>250-387-1321</a> | Toll Free: <a href='tel:+1833-283-8200' style='color: #0051A8'>833-283-8200</a> </center>",
                                     "refreshOnChange": false,
                                     "customClass": "",
                                     "hidden": false,
@@ -5752,7 +5752,7 @@
                                             "value": ""
                                         }
                                     ],
-                                    "content": "<br/>\n<br/>\n<h3 style=\"text-align:center; color: #003366;\">For Freedom of Information Request:&nbsp;</h3>\n<br/>\n<center><h1 style=\"text-align:center; color: #003366;\">#{{data.axisRequestId}}</h1></center>\n<br/>\n<br/>\n<br/>\n<h3 style=\"text-align:center; color: #ff0000;\">Information Access Operations is unable to process your payment online at this time.</h3>\n<br/>\n<p style=\"text-align:center; color: #ff0000;\">To receive additional assistance please call, Phone: 250-387-1321</p>\n<p style=\"text-align:center; color: #ff0000;\">Toll Free: 833-283-8200 or Email FOI at: FOI.Requests@gov.bc.ca</p>\n<br/>\n<br/>",
+                                    "content": "<br/>\n<br/>\n<h3 style=\"text-align:center; color: #003366;\">For Freedom of Information Request:&nbsp;</h3>\n<br/>\n<center><h1 style=\"text-align:center; color: #003366;\">#{{data.axisRequestId}}</h1></center>\n<br/>\n<br/>\n<br/>\n<h3 style=\"text-align:center; color: #ff0000;\">The Access & Information Management Branch is unable to process your payment online at this time.</h3>\n<br/>\n<p style=\"text-align:center; color: #ff0000;\">To receive additional assistance please call, Phone: 250-387-1321</p>\n<p style=\"text-align:center; color: #ff0000;\">Toll Free: 833-283-8200 or Email FOI at: FOI.Requests@gov.bc.ca</p>\n<br/>\n<br/>",
                                     "refreshOnChange": false,
                                     "customClass": "",
                                     "hidden": false,
