@@ -134,6 +134,7 @@ const ExtensionsTable = ({ showActions = true }) => {
             </TableCell>
             <TableCell className={classes.columnLabel}>DAYS</TableCell>
             <TableCell className={classes.columnLabel}>NEW DUE DATE</TableCell>
+            <TableCell className={classes.columnLabel}>APPROVED DATE</TableCell>
             <TableCell className={classes.columnLabel}>STATUS</TableCell>
             <ConditionalTableCell className={classes.columnLabel}
               condition={showActions}
@@ -142,6 +143,15 @@ const ExtensionsTable = ({ showActions = true }) => {
         </TableHead>
         <ConditionalTableBody empty={!extensions || extensions.length < 1}>
           {extensions.map((extension, index) => {
+            let approvedDate;
+            if (extension.extensionstatusid === extensionStatusId.approved && extension.decisiondate) {
+              approvedDate = extension.decisiondate;
+            } else if (extension.extensionstatusid === extensionStatusId.approved && !extension.decisiondate) {
+              const formattedDate = extension.created_at.split(" ")[0];
+              approvedDate = formattedDate;
+            } else {
+              approvedDate = null;
+            }
               return (
                 <TableRow key={`extenstion-row-${index}`} hover>
                   <TableCell>{extension.extensionreson}</TableCell>
@@ -151,6 +161,7 @@ const ExtensionsTable = ({ showActions = true }) => {
                       : extension.extendedduedays}
                   </TableCell>
                   <TableCell>{extension.extendedduedate}</TableCell>
+                  <TableCell>{approvedDate}</TableCell>
                   <TableCell>{extension.extensionstatus}</TableCell>
                   <ConditionalTableCell condition={showActions}>
                     <IconButton
