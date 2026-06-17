@@ -136,6 +136,8 @@ const BottomButtonGroup = React.memo(
         setIsAddRequest(false);
       }
 
+      console.log("RESULT", JSON.stringify(saveRequestObject))
+
       //Logic to reset user lock records status to null (and have FE useEffect in FOIRequest.js/MinistryView.js logic takeover) if request is in unlocked request states
       if (!validLockRecordsState(currentSelectedStatus)) {
         saveRequestObject.userrecordslockstatus = null;
@@ -232,16 +234,13 @@ const BottomButtonGroup = React.memo(
         if (currentSelectedStatus === StateEnum.open.name && ministryId) {
           saveRequestModal();
         }
-        // else if(saveRequestObject.currentState === StateEnum.intakeinprogress.name) { //open a request
-        //   const previousState = saveRequestObject.stateTransition[0].status;  
-
-        //   openRequest();
-        // }
         else if (currentSelectedStatus &&
           currentSelectedStatus === StateEnum.open.name)
           openRequest();
       }
     }, [currentSelectedStatus, stateChanged]);
+
+    console.log("currentSelectedStatus", currentSelectedStatus)
 
     React.useEffect(() => {
       if (unSavedRequest || recordsUploading || CFRUnsaved) {
@@ -264,6 +263,7 @@ const BottomButtonGroup = React.memo(
     };
 
     const saveRequestModal = () => {
+      console.log("SNAKEE", currentSelectedStatus, saveRequestObject?.currentState)
       if (currentSelectedStatus !== saveRequestObject?.currentState) setsaveModal(true)
       else if (isProactiveDisclosure && userGroups.includes("OI Team")) setsaveModal(true);
     };
@@ -317,6 +317,7 @@ const BottomButtonGroup = React.memo(
     const [documents, setDocuments] = useState([]);
 
     const saveStatusId = () => {
+      console.log("RESULT 3", JSON.stringify(saveRequestObject))
       const currentOIState = openInfoStates.find(s => s.name === currentSelectedStatus);
       if (userGroups.includes("OI Team") && !isProactiveDisclosure) {
         saveRequestObject.oistatusid = currentOIState?.oistatusid;
@@ -326,6 +327,7 @@ const BottomButtonGroup = React.memo(
         if (isProactiveDisclosure && saveRequestObject.oistatusid !== null) saveRequestObject.oistatusid = null;
         switch (currentSelectedStatus) {
           case StateEnum.closed.name:
+            console.log("NOPE")
             saveRequestObject.requeststatuslabel = StateEnum.closed.label;
             saveRequestObject.closedate = closingDate;
             saveRequestObject.closereasonid = closingReasonId;
@@ -343,6 +345,7 @@ const BottomButtonGroup = React.memo(
             }
             break;
 
+          case StateEnum.unopened.name:
           case StateEnum.redirect.name:
           case StateEnum.open.name:
           case StateEnum.intakeinprogress.name:
@@ -372,6 +375,7 @@ const BottomButtonGroup = React.memo(
             break;
         }
       }
+      console.log("RESULT 2", JSON.stringify(saveRequestObject))
     };
 
     React.useEffect(() => {
@@ -398,6 +402,7 @@ const BottomButtonGroup = React.memo(
       }
 
       if (!files || files.length < 1) {
+        console.log("RAIDEN")
         saveStatusId();
         saveRequest();
         hasStatusRequestSaved(currentSelectedStatus);
@@ -427,6 +432,7 @@ const BottomButtonGroup = React.memo(
         }
       });
     };
+    console.log("MODAL", opensaveModal)
 
     return (
       <div className={classes.root}>

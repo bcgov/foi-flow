@@ -1508,6 +1508,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               isHistoricalRequest={isHistoricalRequest}
               consultflag={requestDetails?.isconsultflag}
               isProactiveDisclosure={isProactiveDisclosure}
+              ministryId={ministryId}
             />
           </div>
 

@@ -2,6 +2,7 @@ const StateList = Object.freeze({
   unopened: [
     { status: "Unopened", isSelected: false },
     { status: "Intake in Progress", isSelected: false },
+    { status: "Closed", isSelected: false },
   ],
   intakeinprogress: [
     { status: "Intake in Progress", isSelected: false },
