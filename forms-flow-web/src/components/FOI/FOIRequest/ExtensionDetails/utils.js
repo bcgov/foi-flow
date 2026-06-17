@@ -57,10 +57,11 @@ export const uploadFiles = async (
   );
 };
 
-export const checkPublicBodyError = (numberDays, publicBodySelected) => {
+export const checkPublicBodyError = (numberDays, publicBodySelected, applicantConsentSelected) => {
   if (!numberDays) {
     return true;
   }
+  if (applicantConsentSelected) return false;
   if (publicBodySelected) {
     return numberDays > 30;
   }
@@ -89,6 +90,7 @@ export const filterExtensionReason = (
   const totalPublicBodyExtendedDays = getPublicBodyTotalExtendedDays(extensions);
   if (publicBodyExtensions.size > 0 && totalPublicBodyExtendedDays >= 30) {
     return extensionReasonsToFilter.filter((ex) => {
+      if (ex.reason == 'Public Body - Applicant Consent') return true;
       return ex.extensiontype !== "Public Body";
     });
   }
@@ -101,10 +103,11 @@ export const getSelectedDays = (extensiontype, extendedduedays) => {
 }
 
 export const getPublicBodyTotalExtendedDays = (extensions) => {
-  return extensions.filter(ex => ex.extensiontype === "Public Body").map(ex => ex.extendedduedays).reduce((prev, curr) => prev + curr, 0);
+  return extensions.filter(ex => ex.extensiontype === "Public Body" && ex.extensionreson !== "Public Body - Applicant Consent").map(ex => ex.extendedduedays).reduce((prev, curr) => prev + curr, 0);
 }
 
 export const getMaxExtendDays = (totalPublicBodyDays, defaultDays, publicBodySelected, selectedExtendedduedays) => {
+  if (defaultDays == 0) return 0;
   if (publicBodySelected && totalPublicBodyDays && selectedExtendedduedays)
     return defaultDays - totalPublicBodyDays + selectedExtendedduedays
   else if (publicBodySelected && totalPublicBodyDays)

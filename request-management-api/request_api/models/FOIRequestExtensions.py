@@ -50,8 +50,7 @@ class FOIRequestExtension(db.Model):
         denieddate = extension['denieddate'] if 'denieddate' in extension else None
         decisiondate = approveddate if approveddate else denieddate
         approvednoofdays = extension['approvednoofdays'] if 'approvednoofdays' in extension else None
-
-        if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body': 
+        if 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == 'Public Body' and extensionreason['reason'] != 'Public Body - Applicant Consent':
             extensionstatusid = 2
         elif 'extensionstatusid' in extension:
             extensionstatusid = extension['extensionstatusid']
@@ -185,7 +184,9 @@ class FOIRequestExtension(db.Model):
         
     @classmethod
     def getlastextensiondays(cls, ministryid):
-        return db.session.query(FOIRequestExtension.extendedduedays).filter(FOIRequestExtension.foiministryrequest_id == ministryid, FOIRequestExtension.extensionreasonid == 2).order_by(FOIRequestExtension.foiministryrequest_id.desc(), FOIRequestExtension.version.desc()).first()[0]
+        result = db.session.query(FOIRequestExtension.extendedduedays).filter(FOIRequestExtension.foiministryrequest_id == ministryid, FOIRequestExtension.extensionstatusid == 2).order_by(FOIRequestExtension.foiministryrequest_id.desc(), FOIRequestExtension.version.desc()).first()
+        if result: return result[0]
+        if not result: return None
             
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:
