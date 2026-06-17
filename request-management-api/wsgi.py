@@ -30,7 +30,7 @@ def connect(message):
 
  
 @socketio.on('disconnect')
-def disconnect():
+def disconnect(reason=None):
     current_app.logger.info('socket disconnected for sid: '+request.sid)
     
 
