@@ -85,8 +85,18 @@ const ApplicantProfileModalContent = ({
       flex: 1,
     },
     {
+      field: "startdate",
+      headerName: "RECORDS START DATE",
+      flex: 1,
+    },
+    {
+      field: "enddate",
+      headerName: "RECORDS END DATE",
+      flex: 1,
+    },
+    {
       field: "description",
-      headerName: "REQUEST DESRCIPTION",
+      headerName: "REQUEST DESCRIPTION",
       flex: 2,
     },
   ];
