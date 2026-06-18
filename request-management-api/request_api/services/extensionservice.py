@@ -41,8 +41,10 @@ class extensionservice:
                     "createdby": entry["createdby"]})        
         return extensions
 
-    def __ispublicbodyextension(self, reasonid):
+    def __ispublicbodyextensionexceptapplicantconsent(self, reasonid):
         extensionreason = extensionreasonservice().getextensionreasonbyid(reasonid)
+        if 'reason' in  extensionreason and extensionreason['reason'] == 'Public Body - Applicant Consent':
+            return False
         return 'extensiontype' in  extensionreason and extensionreason['extensiontype'] == ExtensionType.publicbody.value
 
     def getrequestextension(self, extensionid):
@@ -57,9 +59,9 @@ class extensionservice:
         version = self.__getversionforrequest(ministryrequestid)
         reasonid = extensionschema['extensionreasonid']
         extensionreason = extensionreasonservice().getextensionreasonbyid(reasonid)
-        ispublicbodyextension = self.__ispublicbodyextension(reasonid)
-        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or ispublicbodyextension == True:
-            self.validatecreateextension(ministryrequestid, extensionschema, ispublicbodyextension)
+        ispublicbodyextensionexceptapplicantconsent = self.__ispublicbodyextensionexceptapplicantconsent(reasonid)
+        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or ispublicbodyextensionexceptapplicantconsent == True:
+            self.validatecreateextension(ministryrequestid, extensionschema, ispublicbodyextensionexceptapplicantconsent)
             ministryrequestschema = {
                 "duedate": extensionschema['extendedduedate']
             }
@@ -84,13 +86,14 @@ class extensionservice:
 
     def validatecreateextension(self, ministryrequestid, extensionschema, ispublicbodyextension= None):
         if ispublicbodyextension is None:
-            ispublicbodyextension = self.__ispublicbodyextension(extensionschema['extensionreasonid'])
+            ispublicbodyextension = self.__ispublicbodyextensionexceptapplicantconsent(extensionschema['extensionreasonid'])
             
         if not ispublicbodyextension:
             return
-        
+
         extensions = self.getrequestextensions(ministryrequestid)
-        publicbodyextensiondays = [extension['extendedduedays'] for extension in extensions if extension['extensiontype'] == ExtensionType.publicbody.value]
+        # Exclude Applicant Consent from pb extension days
+        publicbodyextensiondays = [extension['extendedduedays'] for extension in extensions if extension['extensiontype'] == ExtensionType.publicbody.value and extension['extensionreson'] != 'Public Body - Applicant Consent']
         if sum(publicbodyextensiondays) + extensionschema['extendedduedays'] > 30:
             raise BusinessException(Error.INVALID_INPUT)
         
@@ -324,6 +327,8 @@ class extensionservice:
             # duedate = FOIMinistryRequest.getrequestoriginalduedate(ministryrequestid)
             duedate = FOIMinistryRequest.getduedate(ministryrequestid)
             latest_extension_days = FOIRequestExtension().getlastextensiondays(ministryrequestid)
+            if not latest_extension_days:
+                return None
             return duecalculator().subtract_businessdays(duedate, latest_extension_days)
         #if current and prev status is Pending or Denied
         else:
@@ -384,7 +389,7 @@ class extensionservice:
         copyextension['version'] = version +1
         copyextension['extensionreasonid'] = extensionschema['extensionreasonid'] if 'extensionreasonid' in extensionschema  else copyextension['extensionreasonid']   
 
-        ispublicbodyextension = self.__ispublicbodyextension(copyextension['extensionreasonid'])
+        ispublicbodyextension = self.__ispublicbodyextensionexceptapplicantconsent(copyextension['extensionreasonid'])
         if ispublicbodyextension == True:
             extensionstatusid = 2
         else:

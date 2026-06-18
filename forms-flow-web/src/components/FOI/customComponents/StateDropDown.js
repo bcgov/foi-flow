@@ -168,6 +168,9 @@ const StateDropDown = ({
           return consultflag ? _stateList.peerreviewforConsult : _stateList.peerreview;
         }
       case StateEnum.open.name.toLowerCase():
+        if (personalIAO) {
+          return consultflag ? _stateList.openforconsult : _stateList.openpersonal;
+        }
         return consultflag ? _stateList.openforconsult : _stateList.open;
       case StateEnum.closed.name.toLowerCase():
         return getClosedList();
