@@ -12,7 +12,7 @@ from request_api.models.FOIRequestOIPC import FOIRequestOIPC
 from request_api.models.FOIRawRequests import FOIRawRequest
 
 from datetime import datetime as datetime2
-from request_api.utils.enums import MinistryTeamWithKeycloackGroup, StateName, RequestType, OIStatusEnum
+from request_api.utils.enums import MinistryTeamWithKeycloackGroup, StateName, RequestType, OIStatusEnum, OICloseReason
 from request_api.services.foirequest.requestserviceconfigurator import requestserviceconfigurator 
 from request_api.services.foirequest.requestserviceministrybuilder import requestserviceministrybuilder
 from request_api.services.openinfoservice import openinfoservice
@@ -112,7 +112,8 @@ class requestservicebuilder(requestserviceconfigurator):
         if 'closereasonid' in requestschema and ministryid is not None and requestschema.get("requestType") != RequestType.PROACTIVE_DISCLOSURE.value:
             current_foiopeninforequest = openinfoservice().getcurrentfoiopeninforequest(ministryid)
             foiopeninforequest = current_foiopeninforequest
-            is_publish_request = requestschema['closereasonid'] in (4,7) and not foiministryrequest.isconsultflag
+            eligible_oi_closereasons = OICloseReason.list()
+            is_publish_request = requestschema['closereasonid'] in eligible_oi_closereasons and not foiministryrequest.isconsultflag
 
             # Create a new FOIOpenInfoRequest (as publish or do not publish) after FOIMinistryRequest has been closed and if no other FOIOpenInfoRequest exists in DB (ie. through OI exemption flow)
             if current_foiopeninforequest == {}:
