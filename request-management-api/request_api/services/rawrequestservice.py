@@ -127,7 +127,7 @@ class rawrequestservice:
             #Check for Section 5 Pending
             if currentstatus == StateName.section5pending.value:
                 _requestdatajson["startDate"] = state_offhold_date
-                _requestdatajson["dueDate"] =  duecalculator().calculate_section5_ldd_ext(_requestdatajson["startDate"], state_offhold_date).strftime("%Y-%m-%d")
+                _requestdatajson["dueDate"] =  duecalculator().calculate_section5_ldd_ext(_requestdatajson["startDate"]).strftime("%Y-%m-%d")
         
         #Get documents
         if actiontype == "assignee":
