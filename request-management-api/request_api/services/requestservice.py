@@ -59,7 +59,7 @@ class requestservice:
                 foirequestschema["dueDate"] = duecalculator().calculate_appfeeowing_ldd_ext(foirequestschema["dueDate"], appfeeowing_transition_date, state_offhold_date)
             if currentstatus == StateName.section5pending.value:
                 foirequestschema["startDate"] = state_offhold_date
-                foirequestschema["dueDate"] = duecalculator().calculate_section5_ldd_ext(foirequestschema["startDate"], state_offhold_date)
+                foirequestschema["dueDate"] = duecalculator().calculate_section5_ldd_ext(foirequestschema["startDate"])
 
         return requestservicecreate().saverequest(
             foirequestschema,
@@ -168,7 +168,7 @@ class requestservice:
             #Check for Section 5 Pending
             if currentstatus == StateName.section5pending.value:
                 foirequestschema["startDate"] = offholddate
-                foirequestschema["dueDate"] = duecalculator().calculate_section5_ldd_ext(foirequestschema["startDate"], offholddate)
+                foirequestschema["dueDate"] = duecalculator().calculate_section5_ldd_ext(foirequestschema["startDate"])
         
         return foirequestschema
 
