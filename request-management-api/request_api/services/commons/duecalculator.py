@@ -123,8 +123,7 @@ class duecalculator:
         duedate_extend_days = onhold_extend_days + 1 if isoffhold_businessday == True else onhold_extend_days
         return self.addbusinessdays(current_duedate, duedate_extend_days)
     
-    def calculate_section5_ldd_ext(self, current_statedate, offholddate):
-        isoffhold_businessday = self.isbusinessday(offholddate)
-        extension_days = 30 + 1 if isoffhold_businessday == True else 30
+    def calculate_section5_ldd_ext(self, current_statedate):
+        extension_days = 30
         return self.addbusinessdays(current_statedate, extension_days)  
       

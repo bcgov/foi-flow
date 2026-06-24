@@ -245,7 +245,7 @@ const AddExtensionModal = () => {
   };
 
   const handleFileChanges = async () => {
-    if (publicBodySelected) {
+    if (publicBodySelected && !applicantConsentSelected) {
       return [];
     }
 
