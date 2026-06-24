@@ -140,8 +140,8 @@ class requestservice:
             else None
         )
         if currentstatus not in (None, ""):
-            # Check for On Hold
-            if currentstatus == StateName.onhold.value and nextstatename != StateName.response.value:
+            # Check for On Hold and On Hold - Other
+            if (currentstatus == StateName.onhold.value and nextstatename != StateName.response.value) or currentstatus == StateName.onholdother.value:
                 skipcalculation = self.__skipduedatecalculation(
                     ministryrequestid, offholddate, currentstatus, nextstatename
                 )
@@ -149,7 +149,7 @@ class requestservice:
                 if skipcalculation == True:
                     calc_duedate, calc_cfrduedate = (
                         foirequest["dueDate"],
-                        foirequest["cfrDueDate"],
+                        foirequest["cfrDueDate"] if "cfrDueDate" in foirequest else None
                     )
                 else:
                     calc_duedate, calc_cfrduedate = self.calculateduedate(
@@ -157,17 +157,6 @@ class requestservice:
                     )
                 foirequestschema["dueDate"] = calc_duedate
                 foirequestschema["cfrDueDate"] = calc_cfrduedate
-            # Check On Hold - Other
-            if currentstatus == StateName.onholdother.value:
-                skipcalculation = self.__skipduedatecalculation(
-                    ministryrequestid, offholddate, currentstatus, nextstatename
-                )
-                # Skip multiple off hold in a day
-                if skipcalculation == True:
-                    calc_duedate = foirequest["dueDate"],
-                else:
-                    calc_duedate = self.calculateduedate(foirequest, offholddate)[0]
-                foirequestschema["dueDate"] = calc_duedate
             # Check for App Fee Owing
             if currentstatus == StateName.appfeeowing.value:
                 apefeeowing_date = datetime.strptime(foirequest["stateTransition"][0]["created_at"], "%Y-%m-%d %H:%M:%S.%f")
