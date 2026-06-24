@@ -184,7 +184,7 @@ class FOIRequestExtension(db.Model):
         
     @classmethod
     def getlastextensiondays(cls, ministryid):
-        result = db.session.query(FOIRequestExtension.extendedduedays).filter(FOIRequestExtension.foiministryrequest_id == ministryid, FOIRequestExtension.extensionstatusid == 2).order_by(FOIRequestExtension.foiministryrequest_id.desc(), FOIRequestExtension.version.desc()).first()
+        result = db.session.query(FOIRequestExtension.extendedduedays).filter(FOIRequestExtension.foiministryrequest_id == ministryid, FOIRequestExtension.extensionstatusid == 2, FOIRequestExtension.isactive == True).order_by(FOIRequestExtension.foiministryrequest_id.desc(), FOIRequestExtension.version.desc()).first()
         if result: return result[0]
         if not result: return None
             

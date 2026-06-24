@@ -190,7 +190,7 @@ class extensionservice:
             approvedextension = self.getlatestapprovedrequest(extensionid, ministryrequestid, ministryversion)
             # gets the latest approved due date if any else gets the original due date
             updatedduedate = self.getlatestapprovedduedate(prevstatus, ministryrequestid, approvedextension)
-       
+
         isdeletedocument = self.__isdeletedocument(isstatuschangedfromapproved, extensionid, extensionversion)
         if isdeletedocument == True:
             self.deletedocuments(extensionid, extensionversion, ministryrequestid, userid)  
@@ -313,7 +313,7 @@ class extensionservice:
     def getextendedduedate(self, extensionschema):
         extensionreason = extensionreasonservice().getextensionreasonbyid(extensionschema['extensionreasonid'])
         # if status is Approved or reason is Public Body then directly take the extendedduedate
-        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or extensionreason['extensiontype'] == ExtensionType.publicbody.value:
+        if ('extensionstatusid' in extensionschema and extensionschema['extensionstatusid'] == 2) or (extensionreason['extensiontype'] == ExtensionType.publicbody.value and extensionreason['reason'] != 'Public Body - Applicant Consent'):
             return extensionschema['extendedduedate']
 
     def getlatestapprovedrequest(self, extensionid, ministryrequestid, ministryversion):
