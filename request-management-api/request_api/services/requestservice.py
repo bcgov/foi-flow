@@ -141,11 +141,7 @@ class requestservice:
         )
         if currentstatus not in (None, ""):
             # Check for On Hold
-            if (
-                ((currentstatus == StateName.onhold.value
-                and nextstatename != StateName.response.value)
-                or (currentstatus == StateName.onholdother.value))
-            ):
+            if currentstatus == StateName.onhold.value and nextstatename != StateName.response.value:
                 skipcalculation = self.__skipduedatecalculation(
                     ministryrequestid, offholddate, currentstatus, nextstatename
                 )
@@ -161,6 +157,17 @@ class requestservice:
                     )
                 foirequestschema["dueDate"] = calc_duedate
                 foirequestschema["cfrDueDate"] = calc_cfrduedate
+            # Check On Hold - Other
+            if currentstatus == StateName.onholdother.value:
+                skipcalculation = self.__skipduedatecalculation(
+                    ministryrequestid, offholddate, currentstatus, nextstatename
+                )
+                # Skip multiple off hold in a day
+                if skipcalculation == True:
+                    calc_duedate = foirequest["dueDate"],
+                else:
+                    calc_duedate = self.calculateduedate(foirequest, offholddate)[0]
+                foirequestschema["dueDate"] = calc_duedate
             # Check for App Fee Owing
             if currentstatus == StateName.appfeeowing.value:
                 apefeeowing_date = datetime.strptime(foirequest["stateTransition"][0]["created_at"], "%Y-%m-%d %H:%M:%S.%f")
@@ -169,7 +176,6 @@ class requestservice:
             if currentstatus == StateName.section5pending.value:
                 foirequestschema["startDate"] = offholddate
                 foirequestschema["dueDate"] = duecalculator().calculate_section5_ldd_ext(foirequestschema["startDate"])
-        
         return foirequestschema
 
     def getrequest(self, foirequestid, foiministryrequestid):
@@ -289,10 +295,14 @@ class requestservice:
         onhold_extend_days = duecalculator().getbusinessdaysbetween(foirequest["onholdTransitionDate"], paymentdate)
         isoffhold_businessday = duecalculator().isbusinessday(paymentdate)
         duedate_extend_days = onhold_extend_days + 1 if isoffhold_businessday == True and duedate_includeoffhold == True else onhold_extend_days
-        cfrduedate_extend_days = onhold_extend_days + 1 if isoffhold_businessday == True and cfrduedate_includeoffhold == True else onhold_extend_days
         calc_duedate = duecalculator().addbusinessdays(foirequest["dueDate"], duedate_extend_days)    
-        calc_cfrduedate = duecalculator().addbusinessdays(foirequest["cfrDueDate"], cfrduedate_extend_days) 
-        return calc_duedate, calc_cfrduedate
+        if "cfrDueDate" in foirequest:
+            cfrduedate_extend_days = onhold_extend_days + 1 if isoffhold_businessday == True and cfrduedate_includeoffhold == True else onhold_extend_days
+            calc_cfrduedate = duecalculator().addbusinessdays(foirequest["cfrDueDate"], cfrduedate_extend_days) 
+            return calc_duedate, calc_cfrduedate
+        else:
+            return calc_duedate, None
+
 
     
     
