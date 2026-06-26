@@ -14,6 +14,7 @@ from request_api.services.applicantcorrespondence.applicantcorrespondencelog imp
     applicantcorrespondenceservice,
 )
 from request_api.services.subjectcodeservice import subjectcodeservice
+from request_api.services.applicationfeeservice import applicationfeeservice
 from request_api.models.FOIRequestStatus import FOIRequestStatus
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
@@ -223,6 +224,12 @@ class requestservice:
                 subjectcodeservice().savesubjectcode(
                     ministry["id"], subjectcode, userid
                 )
+
+    def copyapplicationfee(self, rawrequestid, requestid, ministries, userid):
+        applicationfee = applicationfeeservice().getapplicationfee(int(rawrequestid))
+        if applicationfee:
+            for ministry in ministries:
+                applicationfeeservice().saveapplicationfee(rawrequestid, requestid, ministry["id"], applicationfee, userid)
 
     def postopeneventtoworkflow(self, id, requestschema, ministries):
         pid = workflowservice().syncwfinstance("rawrequest", requestschema["id"])
