@@ -185,7 +185,7 @@
             return await _repository.QueryAsync<FOIRequestExtensionsDto>(query, parameters);
         }
 
-        public async Task<IEnumerable<FOIRequestApplicationFeeDto>> GetApplicationFees(int? rawRequestId)
+        public async Task<IEnumerable<FOIRequestApplicationFeeDto>> GetApplicationFees(int? rawRequestId, int? ministryRequestId = null)
         {
             bool tableExists = await TableExistsAsync("FOIRequestApplicationFees");
 
@@ -194,13 +194,25 @@
                 return new List<FOIRequestApplicationFeeDto>();
             }
 
-            const string query = @"
-                SELECT * FROM public.""FOIRequestApplicationFees""
-                WHERE rawrequestid = @RawRequestId
-                ORDER BY version DESC"
-            ;
+            string query;
+            object parameters;
 
-            var parameters = new { RawRequestId = rawRequestId };
+            if (ministryRequestId.HasValue)
+            {
+                query = @"
+                    SELECT * FROM public.""FOIRequestApplicationFees""
+                    WHERE ministryrequestid = @MinistryRequestId
+                    ORDER BY version DESC";
+                parameters = new { MinistryRequestId = ministryRequestId };
+            }
+            else
+            {
+                query = @"
+                    SELECT * FROM public.""FOIRequestApplicationFees""
+                    WHERE rawrequestid = @RawRequestId AND ministryrequestid IS NULL
+                    ORDER BY version DESC";
+                parameters = new { RawRequestId = rawRequestId };
+            }
 
             return await _repository.QueryAsync<FOIRequestApplicationFeeDto>(query, parameters);
         }

@@ -5,6 +5,7 @@
         public int ApplicationFeeId { get; set; }
         public int Version { get; set; }
         public int RawRequestId { get; set; }
+        public int? FoiMinistryRequestId { get; set; }
         public string? ApplicationFeeStatus { get; set; }
         public double? AmountPaid { get; set; }
         public string? PaymentSource { get; set; }

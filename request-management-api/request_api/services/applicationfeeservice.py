@@ -12,17 +12,20 @@ class applicationfeeservice:
     Supports creation, update and delete of Application fee form
     """
     def saveapplicationfee(self, rawrequestid, requestid, ministryrequestid, data, userid = 'system', username = 'system'):
-        applicationfee = self.__prepareapplicationfee(rawrequestid, data, data.get('applicationfeeid') is not None)
+        applicationfee = self.__prepareapplicationfee(rawrequestid, ministryrequestid, data, data.get('applicationfeeid') is not None)
         result = FOIRequestApplicationFee.saveapplicationfee(applicationfee, userid)
-        if result.success == True and applicationfeeservice().applicationfeestatushaschanged(rawrequestid):
+        if result.success == True and applicationfeeservice().applicationfeestatushaschanged(rawrequestid, ministryrequestid=ministryrequestid):
             data['applicationfeestatus'] = applicationfee.applicationfeestatus
             applicationfeeformevent().createfeestatuschangeevent(rawrequestid, requestid, ministryrequestid, data, userid, username)
-        if result.success == True and applicationfeeservice().applicationfeerefundupdated(rawrequestid):
+        if result.success == True and applicationfeeservice().applicationfeerefundupdated(rawrequestid, ministryrequestid=ministryrequestid):
             applicationfeeformevent().createfeerefundevent(rawrequestid, requestid, ministryrequestid, data['refundamount'], userid, username)
         return result
     
     def getapplicationfee(self, rawrequestid, requestid = None, ministryrequestid = None):
-        applicationfee = FOIRequestApplicationFee.getapplicationfee(rawrequestid)
+        if ministryrequestid:
+            applicationfee = FOIRequestApplicationFee.getapplicationfee(rawrequestid, ministryrequestid=ministryrequestid)
+        else:
+            applicationfee = FOIRequestApplicationFee.getapplicationfee(rawrequestid)
         # Check for raw requests (from online form) with IGE status
         payments = Payment.find_application_fee_payments_by_requestid(rawrequestid)
         receipts = FOIRequestApplicationFeeReceipt.getapplicationfeereceipts(applicationfee.get('applicationfeeid'))
@@ -62,15 +65,15 @@ class applicationfeeservice:
     def deactivateapplicationfeereceipt(self, applicationfeereceiptid, userid):
         return FOIRequestApplicationFeeReceipt.deactivateapplicationfeereceipt(applicationfeereceiptid, userid)
 
-    def applicationfeestatushaschanged(self, rawrequestid):
-        return FOIRequestApplicationFee.applicationfeestatushaschanged(rawrequestid)
+    def applicationfeestatushaschanged(self, rawrequestid, ministryrequestid=None):
+        return FOIRequestApplicationFee.applicationfeestatushaschanged(rawrequestid, ministryrequestid=ministryrequestid)
 
-    def applicationfeerefundupdated(self, rawrequestid):
-        return FOIRequestApplicationFee.applicationfeerefundamountupdated(rawrequestid)
+    def applicationfeerefundupdated(self, rawrequestid, ministryrequestid=None):
+        return FOIRequestApplicationFee.applicationfeerefundamountupdated(rawrequestid, ministryrequestid=ministryrequestid)
 
-    def __prepareapplicationfee(self, rawrequestid, data={}, getprevious=True):
+    def __prepareapplicationfee(self, rawrequestid, ministryrequestid=None, data={}, getprevious=True):
         applicationfee = FOIRequestApplicationFee()
-        lkupapplicationfee = self.getapplicationfee(rawrequestid) if getprevious else None
+        lkupapplicationfee = self.getapplicationfee(rawrequestid, ministryrequestid=ministryrequestid) if getprevious else None
         _version = 1
         if lkupapplicationfee:
             applicationfee.__dict__.update(lkupapplicationfee)
@@ -80,6 +83,7 @@ class applicationfeeservice:
         applicationfee.applicationfeestatus = data.get('applicationfeestatus', None)   
         applicationfee.version = _version
         applicationfee.rawrequestid = rawrequestid
+        applicationfee.ministryrequestid = ministryrequestid
         applicationfee.amountpaid = data.get('amountpaid', None)
         applicationfee.paymentsource = data.get('paymentsource', None)
         applicationfee.paymentdate = data.get('paymentdate', None)
