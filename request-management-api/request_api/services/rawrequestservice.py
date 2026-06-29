@@ -117,7 +117,7 @@ class rawrequestservice:
         ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False        
         
         # LDD Extension Checks
-        currentstatus = _requestdatajson["currentState"]
+        currentstatus = _requestdatajson["currentState"] if "currentState" in _requestdatajson else None
         if currentstatus is not (None, ""):
             # Check for App Fee Owing
             state_offhold_date = datetimehandler().gettoday()

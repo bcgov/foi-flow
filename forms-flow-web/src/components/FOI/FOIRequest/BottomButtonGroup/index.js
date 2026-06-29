@@ -80,6 +80,7 @@ const BottomButtonGroup = React.memo(
     oipcData,
     validLockRecordsState,
     isProactiveDisclosure,
+    requestDetails,
   }) => {
     /**
      * Bottom Button Group of Review request Page
@@ -135,6 +136,8 @@ const BottomButtonGroup = React.memo(
         saveRequestObject.requeststatuslabel = StateEnum.intakeinprogress.label;
         setIsAddRequest(false);
       }
+      
+      if (currentSelectedStatus === StateEnum.unopened.name && requestDetails?.sourceOfSubmission === "onlineform") saveRequestObject.requeststatuslabel = StateEnum.intakeinprogress.label;
 
       //Logic to reset user lock records status to null (and have FE useEffect in FOIRequest.js/MinistryView.js logic takeover) if request is in unlocked request states
       if (!validLockRecordsState(currentSelectedStatus)) {
@@ -232,11 +235,6 @@ const BottomButtonGroup = React.memo(
         if (currentSelectedStatus === StateEnum.open.name && ministryId) {
           saveRequestModal();
         }
-        // else if(saveRequestObject.currentState === StateEnum.intakeinprogress.name) { //open a request
-        //   const previousState = saveRequestObject.stateTransition[0].status;  
-
-        //   openRequest();
-        // }
         else if (currentSelectedStatus &&
           currentSelectedStatus === StateEnum.open.name)
           openRequest();
@@ -343,6 +341,7 @@ const BottomButtonGroup = React.memo(
             }
             break;
 
+          case StateEnum.unopened.name:
           case StateEnum.redirect.name:
           case StateEnum.open.name:
           case StateEnum.intakeinprogress.name:

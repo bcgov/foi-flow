@@ -100,7 +100,7 @@ import {
   
   export const fetchFOIAssignedToList = (requestType, status, bcgovcode, isagbcpsteam = false) => {
     let apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEGROUP_LIST_API;
-    if (isagbcpsteam) apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_BCPSWITHINTAKEGROUP_LIST_API
+    if (isagbcpsteam) apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_BCPSWITHINTAKEGROUP_LIST_API;
     if (requestType && status) {
       if (requestType?.toLowerCase() === 'proactive disclosure') {
         apiUrlGETAssignedToList = replaceUrl(replaceUrl(
@@ -108,6 +108,9 @@ import {
           "<requesttype>",
           requestType
         ), "<curentstate>", status);
+      }
+      else if (status === "unopened") {
+        apiUrlGETAssignedToList = API.FOI_GET_ASSIGNEDTO_INTAKEWITHCHILDRENFAMILYTEAM_LIST_API;
       }
       else if (bcgovcode) {
         apiUrlGETAssignedToList = replaceUrl(replaceUrl(replaceUrl(
