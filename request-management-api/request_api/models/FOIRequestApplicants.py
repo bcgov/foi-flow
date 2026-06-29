@@ -1137,8 +1137,6 @@ class FOIRequestApplicant(db.Model):
             FOIMinistryRequest.foiministryrequestid,
             FOIRequestStatus.name.label('requeststatus'),
             func.to_char(FOIRequest.receiveddate, 'MON DD YYYY').label('receiveddate'),
-            func.to_char(FOIMinistryRequest.recordsearchfromdate, 'MON DD YYYY').label('recordsearchfromdate'),
-            func.to_char(FOIMinistryRequest.recordsearchtodate, 'MON DD YYYY').label('recordsearchtodate'),
             FOIMinistryRequest.description
         ]
 
@@ -1237,7 +1235,7 @@ class ApplicantProfileCompositeSchema(ma.Schema): # For profiles with data deriv
 
 class ApplicantRequestSchema(ma.Schema):
     class Meta:
-        fields = ('applicantprofileid','foirequestapplicantid','axisrequestid','foirequest_id','foiministryrequestid','filenumber', 'requeststatus','receiveddate', 'recordsearchfromdate', 'recordsearchtodate', 'description')
+        fields = ('applicantprofileid','foirequestapplicantid','axisrequestid','foirequest_id','foiministryrequestid','filenumber', 'requeststatus','receiveddate','description')
 
 class ApplicantProfileBaseSchema(ma.Schema): # For profiles with data solely from FOIRequestApplicants table
     address2 = fields.String(attribute="address_secondary")
