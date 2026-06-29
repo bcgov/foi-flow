@@ -371,29 +371,17 @@ class applicantservice:
             'filenumber': request["filenumber"],
             'requeststatus': request["requeststatus"],
             'receiveddate': request["receiveddate"],
-            'startdate': request["recordsearchfromdate"],
-            'enddate': request["recordsearchtodate"],
             'description': request["description"],
         }
     
     def __preparerawrequest(self, request):
-        def format_date(date_str):
-            if date_str:
-                try:
-                    return maya.parse(date_str).datetime(to_timezone='America/Vancouver', naive=False).strftime('%b %d %Y').upper()
-                except Exception as e:
-                    logger.error(f"Error parsing date: {date_str} - {e}")
-                    return date_str
-            return None
         return {
             'foirequestapplicantid': request["requestrawdata"]['foiRequestApplicantID'],
             'axisrequestid': request["axisrequestid"],
             'filenumber': 'U-00' + str(request["requestid"]),
             'requestid': request["requestid"],
             'requeststatus': request["status"],
-            'receiveddate': format_date(request["requestrawdata"]["receivedDate"]),
-            'startdate': format_date(request["requestrawdata"]["fromDate"]),
-            'enddate': format_date(request["requestrawdata"]["toDate"]),
+            'receiveddate': maya.parse(request["requestrawdata"]["receivedDate"]).datetime(to_timezone='America/Vancouver', naive=False).strftime('%b %d %Y').upper(),
             # 'receiveddate': request["requestrawdata"]["receivedDate"],
             'description': request["requestrawdata"]["description"],
         }
