@@ -1,7 +1,7 @@
 """Add new CloseReasons (Intake Redirect & Outside Scope s.3)
 
 Revision ID: 5a7ce876a293
-Revises: 9aff8eac5dda
+Revises: f7c3b1d2e9f4
 Create Date: 2026-06-19 21:15:06.873290
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '5a7ce876a293'
-down_revision = '9aff8eac5dda'
+down_revision = 'f7c3b1d2e9f4'
 branch_labels = None
 depends_on = None
 
