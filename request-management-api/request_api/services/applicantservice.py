@@ -375,14 +375,6 @@ class applicantservice:
         }
     
     def __preparerawrequest(self, request):
-        def format_date(date_str):
-            if date_str:
-                try:
-                    return maya.parse(date_str).datetime(to_timezone='America/Vancouver', naive=False).strftime('%b %d %Y').upper()
-                except Exception as e:
-                    logger.error(f"Error parsing date: {date_str} - {e}")
-                    return date_str
-            return None
         return {
             'foirequestapplicantid': request["requestrawdata"]['foiRequestApplicantID'],
             'axisrequestid': request["axisrequestid"],
