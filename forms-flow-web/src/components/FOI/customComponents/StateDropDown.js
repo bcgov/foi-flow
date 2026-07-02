@@ -24,10 +24,10 @@ const StateDropDown = ({
   requestType,
   isDivisionalCoordinator,
   isHistoricalRequest,
-  disabled,
   isOITeam,
   consultflag,
-  isProactiveDisclosure
+  isProactiveDisclosure,
+  ministryid,
 }) => {
   const _isMinistryCoordinator = isMinistryCoordinator;
 
@@ -83,7 +83,7 @@ const StateDropDown = ({
         (_state) =>
           _state.status.toLowerCase() !== StateEnum.open.name.toLowerCase()
       );
-    } else if (isUnopened) {
+    } else if (isUnopened && ministryid) {
       resultArray = stateArray.filter(
         (_state) =>
           _state.status.toLowerCase() !== StateEnum.unopened.name.toLowerCase()
@@ -304,7 +304,7 @@ const StateDropDown = ({
       return false;
     }
 
-    return isValidationError || requestState === StateEnum.unopened.name
+    return isValidationError || (requestState === StateEnum.unopened.name && status === StateEnum.intakeinprogress.name);
     //   || (isBeforeOpen(requestDetails) ////comment back in after axis decomission
     //   && status === 'Open'
     //   && !requestDetails.foiRequestApplicantID

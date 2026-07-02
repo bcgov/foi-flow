@@ -56,7 +56,7 @@ class rawrequestservicegetter:
     def getrawrequestforid(self, requestid):
         request = FOIRawRequest.get_request(requestid)
         request = self.__attachministriesinfo(request)
-        if request != {} and (request['version'] == 1 or request['status'] == StateName.unopened.value) and  request['sourceofsubmission'] != "intake":
+        if request != {} and (request['version'] == 1 or (request['status'] == StateName.unopened.value and 'rawRequestId' not in request["requestrawdata"])) and request['sourceofsubmission'] != "intake":
             requestrawdata = request['requestrawdata']
             requesttype = requestrawdata['requestType']['requestType']
             baserequestinfo = self.__preparebaserequestinfo(requestid, request, requesttype, requestrawdata)
@@ -183,6 +183,7 @@ class rawrequestservicegetter:
                                'requestStartDate': requestrawdata.get('requestStartDate'),
                                'cfrDueDate': requestrawdata.get('cfrDueDate'),
                                'earliestEligiblePublicationDate': requestrawdata.get('earliestEligiblePublicationDate'),
+                               'requeststatuslabel': request["requeststatuslabel"]
                                }
 
     def __prepareadditionalpersonalinfo(self, requestrawdata):

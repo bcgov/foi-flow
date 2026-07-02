@@ -1508,6 +1508,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
               isHistoricalRequest={isHistoricalRequest}
               consultflag={requestDetails?.isconsultflag}
               isProactiveDisclosure={isProactiveDisclosure}
+              ministryId={ministryId}
             />
           </div>
 
@@ -1991,6 +1992,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         oipcData={oipcData}
                         validLockRecordsState={validLockRecordsState}
                         isProactiveDisclosure={isProactiveDisclosure}
+                        requestDetails={requestDetails}
                       />
                     </>
                   </ConditionalComponent>

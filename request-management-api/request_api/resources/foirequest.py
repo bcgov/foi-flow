@@ -123,6 +123,7 @@ class FOIRequests(Resource):
                     requestservice().copywatchers(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copycomments(request_json['id'],result.args[0],AuthHelper.getuserid())
                     requestservice().copydocuments(request_json['id'],result.args[0],AuthHelper.getuserid())
+                    requestservice().copyapplicationfee(request_json['id'], result.identifier, result.args[0], AuthHelper.getuserid())
                     if 'subjectCode' in request_json:
                         requestservice().copysubjectcode(request_json['subjectCode'],result.args[0],AuthHelper.getuserid())
                     requestservice().postopeneventtoworkflow(result.identifier, request_json,result.args[0])

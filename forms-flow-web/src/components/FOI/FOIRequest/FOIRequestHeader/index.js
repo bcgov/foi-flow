@@ -160,9 +160,8 @@ const FOIRequestHeader = React.memo(
     }
 
     const saveAssigneeDetails = (assigneeVal, assigneeName) => {
-      const isOnlineFormUnopenedReq = requestDetails?.currentState?.toLowerCase() === StateEnum.unopened.name.toLowerCase() && requestDetails?.sourceOfSubmission === "onlineform";
       setAssignedTo(assigneeVal);
-      if (isAddRequest || isOnlineFormUnopenedReq) {
+      if (isAddRequest) {
         //event bubble up - to validate required fields
         handleAssignedToValue(assigneeVal);
         createSaveRequestObject(

@@ -130,7 +130,7 @@ namespace MCS.FOI.Integration.Application.Services.TemplateService
 
         private async Task<Dictionary<string, string?>> PopulateProcessedRequestData(FOIRequestDto request, FOIMinistryRequestDto requestMinistry)
         {
-            var applicationFees = await _templateDataService.GetApplicationFees(request.FOIRawRequestId);
+            var applicationFees = await _templateDataService.GetApplicationFees(request.FOIRawRequestId, requestMinistry.FOIMinistryRequestId);
             var requestContactInfo = await _templateDataService.GetRequestContactInformation(request.FOIRequestId, request.Version);
             var requestApplicants = await _templateDataService.GetRequestApplicantInfos(request.FOIRequestId, request.Version, RequestorType.Self);
             var anotherPerson = await _templateDataService.GetRequestApplicantInfos(request.FOIRequestId, request.Version, RequestorType.OnBehalfOf);
