@@ -12,6 +12,13 @@ const StateList = Object.freeze({
     { status: "App Fee Owing", isSelected: false },
     { status: "Closed", isSelected: false },
   ],
+  intakeinprogresspd: [
+    { status: "Intake in Progress", isSelected: false },
+    { status: "Open", isSelected: false },
+    { status: "Peer Review", isSelected: false },
+    { status: "Redirect", isSelected: false },
+    { status: "Closed", isSelected: false },
+  ],
   intakeinprogressforpersonals: [
     { status: "Intake in Progress", isSelected: false },
     { status: "Open", isSelected: false },

@@ -144,6 +144,8 @@ const StateDropDown = ({
       case StateEnum.intakeinprogress.name.toLowerCase():
         if (personalIAO) {
           return _stateList.intakeinprogressforpersonals;
+        } else if (isProactiveDisclosure) {
+          return _stateList.intakeinprogresspd;
         } else {
           return _stateList.intakeinprogress;
         }
