@@ -52,7 +52,7 @@ class requestservice:
         wfinstanceid=None,
     ):
         # LDD Extension Checks
-        currentstatus = foirequestschema["currentState"]
+        currentstatus = foirequestschema["currentState"] if "currentState" in foirequestschema else None
         if currentstatus is not (None, ""):
             state_offhold_date = datetimehandler().gettoday()
             if currentstatus == StateName.appfeeowing.value:
