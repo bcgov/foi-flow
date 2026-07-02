@@ -171,6 +171,9 @@ const StateDropDown = ({
         if (personalIAO) {
           return consultflag ? _stateList.openforconsult : _stateList.openpersonal;
         }
+        if (isProactiveDisclosure) {
+          return consultflag ? _stateList.openforconsult : _stateList.openpd;
+        }
         return consultflag ? _stateList.openforconsult : _stateList.open;
       case StateEnum.closed.name.toLowerCase():
         return getClosedList();
