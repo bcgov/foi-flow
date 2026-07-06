@@ -3,7 +3,8 @@
 # Maven build
 FROM maven:3.6.3-amazoncorretto-11 AS MAVEN_TOOL_CHAIN
 
-RUN yum update && yum install --assumeyes git
+RUN yum update -y
+RUN yum install -y git
 
 RUN git clone -b ${FORMIO_SOURCE_REPO_BRANCH} ${FORMIO_SOURCE_REPO_URL} /bpm/
 
