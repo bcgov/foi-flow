@@ -31,10 +31,9 @@ RUN mvn -s /usr/share/maven/ref/settings-docker.xml package -Dmaven.test.skip
 # Final custom slim java image (for apk command see jdk-11.0.3_7-alpine-slim)
 FROM openjdk:11.0.16-slim
 
-
-ENV JAVA_VERSION jdk-11.0.16
-ENV JAVA_HOME=/opt/java/openjdk \
-    PATH="/opt/java/openjdk/bin:$PATH"
+# ENV JAVA_VERSION jdk-11.0.16
+# ENV JAVA_HOME=/opt/java/openjdk \
+#     PATH="/opt/java/openjdk/bin:$PATH"
 
 EXPOSE 8080
 # OpenShift has /app in the image, but it's missing when doing local development - Create it when missing
