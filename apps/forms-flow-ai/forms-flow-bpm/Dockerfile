@@ -47,7 +47,7 @@ RUN chmod a+rwx -R /app
 RUN keytool -import -trustcacerts \
     -alias sslcom-cert \
     -file /app/sslcom.crt \
-    -keystore /opt/java/openjdk/lib/security/cacerts \
+    -keystore "$JAVA_HOME/lib/security/cacerts" \
     -storepass changeit \
     -noprompt
 WORKDIR /app
