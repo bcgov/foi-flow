@@ -29,7 +29,7 @@ RUN mvn -s /usr/share/maven/ref/settings-docker.xml package -Dmaven.test.skip
 
 
 # Final custom slim java image (for apk command see jdk-11.0.3_7-alpine-slim)
-FROM artifacts.developer.gov.bc.ca/docker-remote/openjdk/openjdk:11.0.16-slim
+FROM openjdk:11.0.16-slim
 
 
 ENV JAVA_VERSION jdk-11.0.16
