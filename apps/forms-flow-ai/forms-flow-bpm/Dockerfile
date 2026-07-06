@@ -1,7 +1,7 @@
 # Modified by Yichun Zhao and Walter Moar
 
 # Maven build
-FROM artifacts.developer.gov.bc.ca/docker-remote/maven:3.6.1-jdk-11-slim AS MAVEN_TOOL_CHAIN
+FROM maven:3.6.3-amazoncorretto-11 AS MAVEN_TOOL_CHAIN
 
 RUN apt-get update \
     && apt-get install -y git
