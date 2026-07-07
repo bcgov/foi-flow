@@ -124,6 +124,7 @@ const BottomButtonGroup = React.memo(
     };
 
     const [saveConfirmationModal, setSaveConfirmationModal] = useState(false);
+    const skipUnopenedValidation = (saveRequestObject.currentState === StateEnum.closed.name && currentSelectedStatus === StateEnum.unopened.name) || (saveRequestObject.currentState === StateEnum.unopened.name && currentSelectedStatus === StateEnum.closed.name);
 
     useEffect(() => {
       if (stateChanged) {
@@ -137,8 +138,6 @@ const BottomButtonGroup = React.memo(
         setIsAddRequest(false);
       }
       
-      if (currentSelectedStatus === StateEnum.unopened.name && requestDetails?.sourceOfSubmission === "onlineform") saveRequestObject.requeststatuslabel = StateEnum.intakeinprogress.label;
-
       //Logic to reset user lock records status to null (and have FE useEffect in FOIRequest.js/MinistryView.js logic takeover) if request is in unlocked request states
       if (!validLockRecordsState(currentSelectedStatus)) {
         saveRequestObject.userrecordslockstatus = null;
@@ -200,7 +199,7 @@ const BottomButtonGroup = React.memo(
     };
 
     React.useEffect(() => {
-      if (isValidationError || !stateChanged) {
+      if ((isValidationError && !skipUnopenedValidation) || !stateChanged) {
         return;
       }
 
@@ -392,7 +391,7 @@ const BottomButtonGroup = React.memo(
         return;
       }
 
-      if (isValidationError) {
+      if (isValidationError && !skipUnopenedValidation) {
         return;
       }
 
@@ -499,6 +498,7 @@ const BottomButtonGroup = React.memo(
               if (urlIndexCreateRequest > -1) {
                 setSaveConfirmationModal(true);
               } else {
+                if (currentSelectedStatus === StateEnum.unopened.name && requestDetails?.sourceOfSubmission === "onlineform") saveRequestObject.requeststatuslabel = StateEnum.intakeinprogress.label; 
                 saveRequest(true);
               }
             }}

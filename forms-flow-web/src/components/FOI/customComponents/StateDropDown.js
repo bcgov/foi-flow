@@ -303,8 +303,15 @@ const StateDropDown = ({
     if (index === 0) {
       return false;
     }
+    if (requestState === StateEnum.unopened.name) {
+      if (status === StateEnum.closed.name) return false;
+      return status === StateEnum.intakeinprogress.name;
+    }
+    if (requestState === StateEnum.closed.name && status === StateEnum.unopened.name) {
+      return false;
+    }
 
-    return isValidationError || (requestState === StateEnum.unopened.name && status === StateEnum.intakeinprogress.name);
+    return isValidationError;
     //   || (isBeforeOpen(requestDetails) ////comment back in after axis decomission
     //   && status === 'Open'
     //   && !requestDetails.foiRequestApplicantID
