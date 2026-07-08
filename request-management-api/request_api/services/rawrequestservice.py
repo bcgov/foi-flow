@@ -114,10 +114,12 @@ class rawrequestservice:
         raise BusinessException(Error.DATA_NOT_FOUND)    
 
     def saverawrequestversion(self, _requestdatajson, _requestid, _assigneegroup, _assignee, status, userid, assigneefirstname, assigneemiddlename, assigneelastname, statuslabel, actiontype=None):
-        ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False        
+        ispiiredacted = _requestdatajson["ispiiredacted"] if 'ispiiredacted' in _requestdatajson  else False
+        currentstatus = _requestdatajson["currentState"] if "currentState" in _requestdatajson else None
+        nextstate = requestserviceconfigurator().getstatusname(_requestdatajson["requeststatuslabel"]) if 'requeststatuslabel' in _requestdatajson else None
+        skip_unopened_applicantprofile_creation = currentstatus is not None and nextstate is not None and ((currentstatus == StateName.unopened.value and nextstate == StateName.closed.value) or (nextstate == StateName.unopened.value and currentstatus == StateName.closed.value))    
         
         # LDD Extension Checks
-        currentstatus = _requestdatajson["currentState"] if "currentState" in _requestdatajson else None
         if currentstatus is not (None, ""):
             # Check for App Fee Owing
             state_offhold_date = datetimehandler().gettoday()
@@ -134,7 +136,7 @@ class rawrequestservice:
             result = FOIRawRequest.saverawrequestassigneeversion(_requestid, _assigneegroup, _assignee, userid, assigneefirstname, assigneemiddlename, assigneelastname)
         else:
             # This should mostly be used for onlineform requests
-            if not _requestdatajson.get("foiRequestApplicantID", None):
+            if not _requestdatajson.get("foiRequestApplicantID", None) and not skip_unopened_applicantprofile_creation:
                 applicant = FOIRequestApplicant.from_request_data(_requestdatajson, is_new=True)
                 result = FOIRequestApplicant.save_instance(applicant, userid)
                 applicantid = result.identifier
