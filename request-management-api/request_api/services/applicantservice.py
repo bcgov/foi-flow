@@ -148,8 +148,10 @@ class applicantservice:
                 rawrequest['requeststatuslabel']
             )
             updated_onbehalfof_requests.append(rawrequest.get("axisrequestid"))
-        update_message = f'Updated primary applicant requests: {", ".join(updated_primary_requests)}. \n' \
-        'Updated onbehalfof applicant on: f{", ".join(updated_onbehalfof_requests)}'
+        update_message = (
+            f'Updated primary applicant requests: {", ".join(updated_primary_requests)}.\n'
+            f'Updated onbehalfof applicant on: {", ".join(updated_onbehalfof_requests)}'
+        )
         return DefaultMethodResult(True, update_message, applicantschema['foiRequestApplicantID'])
     
     def reassignapplicantprofilelinkedtorequest(self, applicantschema, applicantpayload, userid):
@@ -385,26 +387,26 @@ class applicantservice:
                     logger.error(f"Error parsing date: {date_str} - {e}")
                     return date_str
             return None
+        raw_data = request.get("requestrawdata") or {}
         return {
-            'foirequestapplicantid': request["requestrawdata"]['foiRequestApplicantID'],
-            'axisrequestid': request["axisrequestid"],
+            'foirequestapplicantid': raw_data.get('foiRequestApplicantID'),
+            'axisrequestid': request.get("axisrequestid"),
             'filenumber': 'U-00' + str(request["requestid"]),
             'requestid': request["requestid"],
-            'requeststatus': request["status"],
-            'receiveddate': format_date(request["requestrawdata"]["receivedDate"]),
-            'startdate': format_date(request["requestrawdata"]["fromDate"]),
-            'enddate': format_date(request["requestrawdata"]["toDate"]),
-            # 'receiveddate': request["requestrawdata"]["receivedDate"],
-            'description': request["requestrawdata"]["description"],
+            'requeststatus': request.get("status"),
+            'receiveddate': format_date(raw_data.get("receivedDate")),
+            'startdate': format_date(raw_data.get("fromDate")),
+            'enddate': format_date(raw_data.get("toDate")),
+            'description': raw_data.get("description"),
         }
 
     def __prepare_historical_request(self, historical_request, applicant):
         return {
-            'foirequestapplicantid': applicant["foirequestapplicantid"],
-            'axisrequestid': historical_request["axisrequestid"],
-            'requeststatus': historical_request["requeststatus"],
+            'foirequestapplicantid': applicant.get("foirequestapplicantid"),
+            'axisrequestid': historical_request.get("axisrequestid"),
+            'requeststatus': historical_request.get("requeststatus"),
             'receiveddate': "Historical Request",
-            'description': historical_request["description"],
+            'description': historical_request.get("description"),
         }
 
     def __update_requestschema(self, requestschema, applicantschema, applicanttype):
