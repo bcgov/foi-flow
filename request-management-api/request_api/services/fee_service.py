@@ -10,6 +10,7 @@ from flask import current_app
 
 from request_api.exceptions import BusinessException, Error
 from request_api.models import FeeCode, Payment, RevenueAccount, FOIRawRequest, FOIMinistryRequest
+from request_api.models.FOIRequestApplicationFees import FOIRequestApplicationFee
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.utils.enums import FeeType
 from .hash_service import HashService
@@ -115,6 +116,26 @@ class FeeService:
         self.payment.completed_on = datetime.now()
         self.payment.status = 'PAID' if paybc_status == 'PAID' else parsed_args.get('messageText').upper()
         self.payment.commit()
+
+        # Create FOIRequestApplicationFees record for the paid application fee
+        if self.fee_code.code == FeeType.application.value and self.payment.status == 'PAID':
+            applicationfee = FOIRequestApplicationFee()
+            applicationfee.version = 1
+            applicationfee.rawrequestid = self.request.get("requestid")
+            applicationfee.applicationfeestatus = 'paid'
+            applicationfee.amountpaid = self.payment.total
+            applicationfee.paymentdate = self.payment.completed_on
+            applicationfee.paymentsource = 'creditcardonline'
+            applicationfee.orderid = self.payment.order_id
+            applicationfee.transactionnumber = self.payment.transaction_number
+            applicationfee.paymentid = self.payment.payment_id
+            if self.request:
+                isIGE = self.request.get('requestrawdata', {}).get('contactInfo', {}).get('IGE', {})
+                if isIGE:
+                    applicationfee.applicationfeestatus = 'na-ige'
+                    applicationfee.paymentsource = 'init'
+            if applicationfee:
+                FOIRequestApplicationFee().saveapplicationfee(applicationfee, 'system')
 
         return self._dump(), parsed_args
 

@@ -31,23 +31,6 @@ class applicationfeeservice:
         receipts = FOIRequestApplicationFeeReceipt.getapplicationfeereceipts(applicationfee.get('applicationfeeid'))
         if receipts != []:
             applicationfee['receipts'] = receipts
-        if applicationfee == {}:
-            request = FOIRawRequest.get_request(rawrequestid)
-            for payment in payments:
-                applicationfee['applicationfeestatus'] = 'paid'
-                applicationfee['amountpaid'] = payment["total"]
-                applicationfee['paymentdate'] = payment["completed_on"]
-                applicationfee['paymentsource'] = 'creditcardonline'
-                applicationfee['orderid'] = payment["order_id"]
-                applicationfee['transactionnumber'] = payment["transaction_number"]
-                applicationfee['paymentid'] = payment["payment_id"]
-            if request != {}:
-                isIGE = request.get('requestrawdata', {}).get('contactInfo', {}).get('IGE', {})
-                if isIGE:
-                    applicationfee['applicationfeestatus'] = 'na-ige'
-                    applicationfee['paymentsource'] = 'init'
-            if applicationfee != {}:
-                self.saveapplicationfee(rawrequestid, requestid, ministryrequestid, applicationfee, 'system')
         if 'paymentsource' in applicationfee and applicationfee['paymentsource'] == 'creditcardonline':
             for payment in payments:
                 applicationfee['paymentid'] = payment["payment_id"]
