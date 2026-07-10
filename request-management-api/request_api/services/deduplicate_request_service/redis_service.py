@@ -34,7 +34,7 @@ class RedisService:
             return DefaultMethodResult(True, 'Key added to redis service', KEY_PREFIX + hashed_payload)
         except Exception as exception:
            logging.exception(
-               "Error in accessing to Redis",
+               "Error in accessing Redis",
                 exception,
             )
            raise exception
@@ -49,7 +49,7 @@ class RedisService:
             return self.client.exists(KEY_PREFIX + hashed_payload)
         except Exception as exception:
             logging.exception(
-               "Error in accessing to Redis",
+               "Error in accessing Redis",
                 exception,
             )
             raise exception
