@@ -5,7 +5,7 @@ import redis
 from request_api.models.default_method_result import DefaultMethodResult
 from walrus import Database
 
-REDIS_KEY_TTL_SECONDS = 1800
+REDIS_KEY_TTL_SECONDS = os.getenv("FOIREQUEST_DEDUPE_REDIS_KEY_TTL", 1800)
 KEY_PREFIX = "foirequest-dedupe:"
 
 class RedisService:
