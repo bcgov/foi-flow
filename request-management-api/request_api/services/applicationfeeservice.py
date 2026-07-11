@@ -11,13 +11,13 @@ class applicationfeeservice:
     """ FOI Application Fee Form management service
     Supports creation, update and delete of Application fee form
     """
-    def saveapplicationfee(self, rawrequestid, requestid, ministryrequestid, data, userid = 'system', username = 'system'):
+    def saveapplicationfee(self, rawrequestid, requestid, ministryrequestid, data, userid = 'system', username = 'system', iscopy = False):
         applicationfee = self.__prepareapplicationfee(rawrequestid, ministryrequestid, data, data.get('applicationfeeid') is not None)
         result = FOIRequestApplicationFee.saveapplicationfee(applicationfee, userid)
-        if result.success == True and applicationfeeservice().applicationfeestatushaschanged(rawrequestid, ministryrequestid=ministryrequestid):
+        if result.success == True and (not iscopy) and applicationfeeservice().applicationfeestatushaschanged(rawrequestid, ministryrequestid=ministryrequestid):
             data['applicationfeestatus'] = applicationfee.applicationfeestatus
             applicationfeeformevent().createfeestatuschangeevent(rawrequestid, requestid, ministryrequestid, data, userid, username)
-        if result.success == True and applicationfeeservice().applicationfeerefundupdated(rawrequestid, ministryrequestid=ministryrequestid):
+        if result.success == True and (not iscopy) and applicationfeeservice().applicationfeerefundupdated(rawrequestid, ministryrequestid=ministryrequestid):
             applicationfeeformevent().createfeerefundevent(rawrequestid, requestid, ministryrequestid, data['refundamount'], userid, username)
         return result
     
@@ -70,6 +70,7 @@ class applicationfeeservice:
         applicationfee.amountpaid = data.get('amountpaid', None)
         applicationfee.paymentsource = data.get('paymentsource', None)
         applicationfee.paymentdate = data.get('paymentdate', None)
+        applicationfee.refunddate = data.get('refunddate') or None
         v = [applicationfee.amountpaid, applicationfee.paymentsource, applicationfee.paymentdate]
         setstatustopaid = False if None in v or '' in v or 0 in v or 'init' in v else True
         # If newly selected date with datepicker (format as string 'YYYY-MM-DD'), add time to create a datetime object
