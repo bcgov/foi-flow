@@ -220,7 +220,7 @@ export const Fees = ({
     }
 
     const validateApplicationFeeRefundAmount = () => {
-      return applicationFeeFormData?.refundAmount % 10 == 0 && applicationFeeFormData?.refundAmount > 0 && applicationFeeFormData?.refundAmount <= applicationFeeFormData?.amountPaid ? true : false;
+      return applicationFeeFormData?.refundAmount % 10 == 0 && applicationFeeFormData?.refundAmount >= 0 && applicationFeeFormData?.refundAmount <= applicationFeeFormData?.amountPaid ? true : false;
     }
   
     const validateApplicationFeeFields = () => {
@@ -251,7 +251,7 @@ export const Fees = ({
       }
       if (!_.isEqual(initialApplicationFeeFormData?.refundAmount, applicationFeeFormData?.refundAmount) ||
         !_.isEqual(initialApplicationFeeFormData?.refundDate, applicationFeeFormData?.refundDate)) {
-        if (!validateApplicationFeeRefundAmount() || !applicationFeeFormData?.refundDate) {
+        if (!validateApplicationFeeRefundAmount() || (applicationFeeFormData?.refundAmount && !applicationFeeFormData?.refundDate)) {
           return false;
         }
       }

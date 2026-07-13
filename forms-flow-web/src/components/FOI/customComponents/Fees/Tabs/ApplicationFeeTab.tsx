@@ -384,8 +384,7 @@ export const ApplicationFeeTab = ({
     }
 
     const refundAmountFieldError = () => {
-      let refundDateBlank = formData?.refundDate == '' || formData?.refundDate == null
-      if (!refundDateBlank && formData?.refundAmount == 0) return true;
+      if (formData?.refundAmount < 0) return true;
       if (formData?.refundAmount % 10 != 0 || formData?.refundAmount > formData?.amountPaid) return true
       return false;
     }
