@@ -229,7 +229,7 @@ class requestservice:
         applicationfee = applicationfeeservice().getapplicationfee(int(rawrequestid))
         if applicationfee:
             for ministry in ministries:
-                applicationfeeservice().saveapplicationfee(rawrequestid, requestid, ministry["id"], applicationfee, userid, iscopy=True)
+                applicationfeeservice().copyapplicationfee(rawrequestid, requestid, ministry["id"], applicationfee, userid)
 
     def postopeneventtoworkflow(self, id, requestschema, ministries):
         pid = workflowservice().syncwfinstance("rawrequest", requestschema["id"])
