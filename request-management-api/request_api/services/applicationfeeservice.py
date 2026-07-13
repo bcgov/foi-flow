@@ -11,14 +11,19 @@ class applicationfeeservice:
     """ FOI Application Fee Form management service
     Supports creation, update and delete of Application fee form
     """
-    def saveapplicationfee(self, rawrequestid, requestid, ministryrequestid, data, userid = 'system', username = 'system', iscopy = False):
+    def saveapplicationfee(self, rawrequestid, requestid, ministryrequestid, data, userid = 'system', username = 'system'):
         applicationfee = self.__prepareapplicationfee(rawrequestid, ministryrequestid, data, data.get('applicationfeeid') is not None)
         result = FOIRequestApplicationFee.saveapplicationfee(applicationfee, userid)
-        if result.success == True and (not iscopy) and applicationfeeservice().applicationfeestatushaschanged(rawrequestid, ministryrequestid=ministryrequestid):
+        if result.success == True and applicationfeeservice().applicationfeestatushaschanged(rawrequestid, ministryrequestid=ministryrequestid):
             data['applicationfeestatus'] = applicationfee.applicationfeestatus
             applicationfeeformevent().createfeestatuschangeevent(rawrequestid, requestid, ministryrequestid, data, userid, username)
-        if result.success == True and (not iscopy) and applicationfeeservice().applicationfeerefundupdated(rawrequestid, ministryrequestid=ministryrequestid):
+        if result.success == True and applicationfeeservice().applicationfeerefundupdated(rawrequestid, ministryrequestid=ministryrequestid):
             applicationfeeformevent().createfeerefundevent(rawrequestid, requestid, ministryrequestid, data['refundamount'], userid, username)
+        return result
+    
+    def copyapplicationfee(self, rawrequestid, requestid, ministryrequestid, data, userid = 'system', username = 'system'):
+        applicationfee = self.__prepareapplicationfee(rawrequestid, ministryrequestid, data, data.get('applicationfeeid') is not None)
+        result = FOIRequestApplicationFee.saveapplicationfee(applicationfee, userid)
         return result
     
     def getapplicationfee(self, rawrequestid, requestid = None, ministryrequestid = None):
