@@ -6,8 +6,6 @@ from request_api.models.default_method_result import DefaultMethodResult
 
 class RequestDeduplicationService:
     """Validate/deduplicate FOI request received from foirequests webform by pushhing and retrieving hashed request payloads from redis stream"""
-    # ADD LOGS TO ERROR HANLDINGS AND PROCESS OF REDIS AND SEVICE AND ADD LOGS TO HELP FIND THE ROOT ISSUE
-    # ADDRESS issue 1 from copilot - > race condiiton
     def __init__(self, request_payload, redis_service = None):
         self.request_paylod = request_payload
         self.redis_service = redis_service or RedisService()
