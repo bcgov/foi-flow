@@ -72,7 +72,7 @@ export const saveFOIProactiveDisclosureRequest = (
 };
 
 const updateFOIMinistryRequestOIStatus = (
-  foiministryrequestid, 
+  foiministryrequestid,
   foirequestId
 ) => {
   let apiUrl= replaceUrl(replaceUrl(

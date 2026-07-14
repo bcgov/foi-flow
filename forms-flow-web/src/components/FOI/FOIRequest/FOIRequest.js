@@ -1173,7 +1173,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
-    
+
     if (
       _state?.toLowerCase() === StateEnum.unopened.name.toLowerCase() &&
       (saveRequestObject.isconsultflag === null ||

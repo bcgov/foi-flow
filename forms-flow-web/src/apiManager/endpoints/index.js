@@ -108,7 +108,7 @@ const API = {
   FOI_GET_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/ministryrequest/<ministryrequestid>`,
   FOI_POST_CFR_FORM: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
   FOI_POST_CFR_FORM_IAO: `${FOI_BASE_API_URL}/api/foicfrfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>/sanction`,
-  
+
   FOI_POST_CFR_INVOICE: `${FOI_BASE_API_URL}/api/foirequestinvoice/foicfrfee/<foicfrfeeid>`,
 
   FOI_GET_APPLICATION_FEES_FORM: `${FOI_BASE_API_URL}/api/foiapplicationfee/foirequest/<requestid>/ministryrequest/<ministryrequestid>`,
@@ -229,7 +229,7 @@ const API = {
   FOI_PUT_RECORD_GROUP: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups/<groupid>`,
   FOI_GET_RECORD_GROUP: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups`,
   FOI_DELETE_RECORD_GROUP: `${FOI_BASE_API_URL}/api/foirecord/<requestid>/ministryrequest/<ministryrequestid>/groups/<groupid>/records/<recordid>`,
-  
+
   FOI_GET_PROACTIVE_DISCLOSURE_CATEGORIES_API: `${FOI_BASE_API_URL}/api/foiflow/proactivedisclosurecategories`,
 
   FOI_GET_LINKED_REQUESTS_LIST: `${FOI_BASE_API_URL}/api/linkrequests/<ministrycode>/axisrequestid/<axisrequestid>`,
@@ -238,7 +238,7 @@ const API = {
 
   FOI_GET_PROACTIVE_DISCLOSURE_REQUEST: `${FOI_BASE_API_URL}/api/foiproactivedisclosure/ministryrequest/<ministryrequestid>`,
   FOI_POST_PROACTIVE_DISCLOSURE_REQUEST: `${FOI_BASE_API_URL}/api/foiproactivedisclosure/foirequest/<foirequestid>/ministryrequest/<foiministryrequestid>`,
-  
+
   FOI_PUBLISHNOW_PROACTIVE_DISCLOSURE: `${FOI_BASE_API_URL}/api/foiopeninfo/ministryrequest/<foiministryrequestid>/pdpublishnow`,
   FOI_UNPUBLISH_PROACTIVE_DISCLOSURE: `${FOI_BASE_API_URL}/api/foiopeninfo/ministryrequest/<foiministryrequestid>/pdunpublish`,
 
