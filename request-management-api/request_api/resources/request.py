@@ -238,7 +238,7 @@ class FOIRawRequests(Resource):
                 if result.success:
                     documentservice().uploadpersonaldocuments(result.identifier, attachments)                   
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
-            return {'status': False, 'message':"Duplicate Request. Request was not processed."} , 200
+            return {'status': False, 'message':"Duplicate Request. Request was not processed, please try again later.", "id": None} , 200
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            
