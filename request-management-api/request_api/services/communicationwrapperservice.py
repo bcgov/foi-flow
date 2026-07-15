@@ -7,6 +7,7 @@ from datetime import datetime
 import dateutil.parser
 import maya
 import json
+import logging
 from enum import Enum
 from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice 
 from request_api.services.requestservice import requestservice
@@ -18,9 +19,37 @@ from request_api.services.email.templates.templateconfig import templateconfig
 from request_api.services.emailservice import emailservice
 from request_api.schemas.foiemail import  FOIEmailSchema
 
+logger = logging.getLogger(__name__)
+
 class communicationwrapperservice:
     """ FOI communication wrapper service
     """
+
+    def _validate_attachment_ownership(self, attachments, ministrycode, requestnumber):
+        """Filter out attachments whose S3 URL does not belong to this request.
+
+        Expected S3 path convention: .../{ministrycode}/{requestnumber}/...
+        Any attachment whose URL does not contain that prefix is dropped
+        and logged as a WARNING (cross-request ownership violation).
+        """
+        if not attachments:
+            return attachments or []
+        expected_prefix = f"{ministrycode}/{requestnumber}/"
+        valid, rejected = [], []
+        for att in attachments:
+            url = att.get('url') or att.get('documenturipath') or ''
+            if expected_prefix in url:
+                valid.append(att)
+            else:
+                rejected.append(att)
+        if rejected:
+            logger.warning(
+                "Attachment ownership violation blocked: requestnumber=%s ministrycode=%s "
+                "rejected_count=%d rejected_filenames=%s",
+                requestnumber, ministrycode, len(rejected),
+                [a.get('filename') for a in rejected]
+            )
+        return valid
 
     def send_email(self, requestid, rawrequestid, ministryrequestid, applicantcorrespondencelog):
         # Get the correct email subject
@@ -42,6 +71,37 @@ class communicationwrapperservice:
         else:
             emailsubject = templateconfig().getsubject(template.name, attributes)
         applicantcorrespondencelog['emailsubject'] = emailsubject
+        # FOIMOD-4270 — reject attachments that do not belong to this request
+        if ministryrequestid not in ('None', None):
+            ministry = FOIMinistryRequest.getrequest(ministryrequestid) or {}
+            requestnumber = ministry.get('filenumber')
+            ministrycode = ministry.get('bcgovcode')
+            if not ministrycode:
+                # bcgovcode is joined via ProgramArea; fall back to direct SQL if missing
+                from request_api.models.db import db
+                from sqlalchemy import text
+                row = db.session.execute(
+                    text(
+                        'SELECT lower(pa.bcgovcode) AS bcgovcode '
+                        'FROM "FOIMinistryRequests" mr '
+                        'JOIN "ProgramAreas" pa ON pa.programareaid = mr.programareaid '
+                        'WHERE mr.foiministryrequestid = :mid '
+                        'ORDER BY mr.version DESC LIMIT 1'
+                    ),
+                    {"mid": ministryrequestid},
+                ).fetchone()
+                ministrycode = row[0] if row else None
+            if requestnumber and ministrycode:
+                applicantcorrespondencelog['attachments'] = self._validate_attachment_ownership(
+                    applicantcorrespondencelog.get('attachments', []),
+                    ministrycode,
+                    requestnumber,
+                )
+            else:
+                logger.warning(
+                    "Skipping attachment ownership check: missing ministrycode/requestnumber "
+                    "for ministryrequestid=%s", ministryrequestid
+                )
         # Save correspondence log based on request type
         if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
