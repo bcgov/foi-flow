@@ -13,7 +13,7 @@ class RequestDeduplicationService:
 
     def dedupe_service(self):
         try:
-            if self.request_payload in ({}, None):
+            if self.request_payload is None or self.request_payload == {}:
                 logging.info("FOI request dedupe service skipped: empty request payload")
                 return False
             logging.info(
@@ -21,20 +21,20 @@ class RequestDeduplicationService:
                 "request_data=%s",
                 self.request_payload
             )
-            encrypted_payload = self._hash_payload()
-            duplicate_payload = self.redis_service.find_key(encrypted_payload)
+            hashed_payload = self._hash_payload()
+            duplicate_payload = self.redis_service.find_key(hashed_payload)
             if not duplicate_payload:
                 logging.info(
                     "No duplicate FOI request found | "
                     "hash=%s",
-                    encrypted_payload,
+                    hashed_payload,
                 )
-                self.redis_service.add_key(encrypted_payload)
+                self.redis_service.add_key(hashed_payload)
                 return False
             logging.info(
                 "Duplicate FOI request found | "
                 "hash=%s",
-                encrypted_payload
+                hashed_payload
             )
             return True
         except Exception:
