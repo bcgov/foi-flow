@@ -3,6 +3,14 @@ import { render, screen } from "@testing-library/react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
 import { ContactApplicant } from "./index";
+import * as ossServices from "../../../../apiManager/services/FOI/foiOSSServices";
+import { saveAttachmentsPure } from "./saveAttachments";
+
+jest.mock("../../../../apiManager/services/FOI/foiOSSServices", () => ({
+  getOSSHeaderDetails: jest.fn(),
+  saveFilesinS3: jest.fn(),
+  getFileFromS3: jest.fn(),
+}));
 
 const mockStore = configureStore([]);
 
@@ -59,14 +67,6 @@ describe("ContactApplicant state isolation (FOIMOD-4270)", () => {
   });
 });
 
-import * as ossServices from "../../../../apiManager/services/FOI/foiOSSServices";
-
-jest.mock("../../../../apiManager/services/FOI/foiOSSServices", () => ({
-  getOSSHeaderDetails: jest.fn(),
-  saveFilesinS3: jest.fn(),
-  getFileFromS3: jest.fn(),
-}));
-
 describe("saveAttachments filename-collision pairing (FOIMOD-4270)", () => {
   it("pairs two same-named files by index, not by filename", async () => {
     const fileA = new File(["A"], "P-Acknowledgement.pdf", { type: "application/pdf" });
@@ -87,7 +87,6 @@ describe("saveAttachments filename-collision pairing (FOIMOD-4270)", () => {
       }
     );
 
-    const { saveAttachmentsPure } = await import("./saveAttachments");
     const result = await saveAttachmentsPure(
       [fileA, fileB],
       { ministryCode: "MIN", requestNumber: "MIN-2026-00001", requestId: 100, dispatch: () => {} }
