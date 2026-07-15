@@ -115,10 +115,19 @@ class communicationwrapperservice:
                     requestnumber,
                 )
             else:
-                logger.warning(
-                    "Skipping attachment ownership check: missing ministrycode/requestnumber "
-                    "for ministryrequestid=%s", ministryrequestid
+                # Fail closed: if we cannot resolve the request's ownership
+                # coordinates we cannot verify any attachment belongs to it.
+                # Drop them all rather than leak a foreign attachment. Log at
+                # ERROR so this is alertable — it should never happen for a
+                # valid ministryrequestid.
+                original_count = len(applicantcorrespondencelog.get('attachments') or [])
+                logger.error(
+                    "Attachment ownership check could not resolve requestnumber/ministrycode "
+                    "for ministryrequestid=%s (requestnumber=%r ministrycode=%r); "
+                    "dropping %d attachment(s) to fail closed.",
+                    ministryrequestid, requestnumber, ministrycode, original_count,
                 )
+                applicantcorrespondencelog['attachments'] = []
         # Save correspondence log based on request type
         if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
