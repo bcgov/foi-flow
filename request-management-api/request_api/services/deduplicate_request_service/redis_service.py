@@ -43,7 +43,7 @@ class RedisService:
                 "redis_key=%s",
                 KEY_PREFIX + hashed_payload
             )
-            return self.client.exists(KEY_PREFIX + hashed_payload)
+            return bool(self.client.exists(KEY_PREFIX + hashed_payload))
         except Exception:
             logging.exception("Error in accessing Redis")
             raise
