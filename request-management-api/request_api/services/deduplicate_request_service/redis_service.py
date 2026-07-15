@@ -16,7 +16,7 @@ class RedisService:
         self.password = os.getenv("PUBLICATION_REDIS_PASSWORD")
         self.client = redis.Redis(
             host=self.host,
-            port=self.password,
+            port=self.port,
             db=0,
             password=self.password,
             decode_responses=True
@@ -25,19 +25,16 @@ class RedisService:
     def add_key(self, hashed_payload):
         try:
             logging.info(
-                "Adding foirequest-dedupe key to redis | ",
+                "Adding foirequest-dedupe key to redis | "
                 "redis_key=%s",
                 KEY_PREFIX + hashed_payload
             )
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            self.client.set(KEY_PREFIX + hashed_payload, timestamp, ex=REDIS_KEY_TTL_SECONDS)
+            self.client.set(KEY_PREFIX + hashed_payload, timestamp, ex=int(REDIS_KEY_TTL_SECONDS))
             return DefaultMethodResult(True, 'Key added to redis service', KEY_PREFIX + hashed_payload)
-        except Exception as exception:
-           logging.exception(
-               "Error in accessing Redis",
-                exception,
-            )
-           raise exception
+        except Exception:
+           logging.exception("Error in accessing Redis")
+           raise
 
     def find_key(self, hashed_payload):
         try:
@@ -47,9 +44,6 @@ class RedisService:
                 KEY_PREFIX + hashed_payload
             )
             return self.client.exists(KEY_PREFIX + hashed_payload)
-        except Exception as exception:
-            logging.exception(
-               "Error in accessing Redis",
-                exception,
-            )
-            raise exception
+        except Exception:
+            logging.exception("Error in accessing Redis")
+            raise
