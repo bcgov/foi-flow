@@ -165,3 +165,38 @@ class TestSendEmailStripsForeignAttachments:
         sent_log = sent_call.args[1]
         assert len(sent_log["attachments"]) == 1
         assert sent_log["attachments"][0]["filename"] == "ours.pdf"
+
+    @patch("request_api.services.communicationwrapperservice.AuthHelper")
+    @patch("request_api.services.communicationwrapperservice.communicationemailservice")
+    @patch("request_api.services.communicationwrapperservice.applicantcorrespondenceservice")
+    @patch("request_api.services.communicationwrapperservice.FOIMinistryRequest")
+    def test_no_attachments_skips_ministry_lookup(
+        self, mock_ministry, mock_appservice, mock_emailservice, mock_auth
+    ):
+        """When there are no attachments the ownership check must not run a DB lookup."""
+        mock_auth.getuserid.return_value = "tester"
+        save_result = MagicMock(success=True, identifier=42, message="ok")
+        mock_appservice.return_value.saveapplicantcorrespondencelog.return_value = save_result
+        tpl = MagicMock()
+        tpl.name = "GENERIC"
+        mock_appservice.return_value.gettemplatebyid.return_value = tpl
+        mock_emailservice.return_value.send.return_value = {
+            "success": True, "from_email": "noreply@gov.bc.ca"
+        }
+
+        payload = {
+            "correspondencemessagejson": '{"body":"hi"}',
+            "attributes": [{}],
+            "correspondencesubject": "S",
+            "templatename": "GENERIC",
+            "templateid": None,
+            "emails": ["a@x.com"],
+            "attachments": [],
+        }
+
+        communicationwrapperservice().send_email(
+            requestid=1, rawrequestid=None, ministryrequestid=99,
+            applicantcorrespondencelog=payload,
+        )
+
+        mock_ministry.getrequest.assert_not_called()
