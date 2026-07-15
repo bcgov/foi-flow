@@ -1,8 +1,6 @@
 import logging
 from unittest.mock import patch, MagicMock
 
-import pytest
-
 from request_api.services.communicationwrapperservice import communicationwrapperservice
 
 
