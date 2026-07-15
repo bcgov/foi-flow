@@ -22,7 +22,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import CommunicationStructure from './CommunicationStructure'
 import AttachmentModal from '../Attachments/AttachmentModal';
-import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
+import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
 import { saveAttachmentsPure } from "./saveAttachments";
 import { dueDateCalculation } from '../../FOIRequest/BottomButtonGroup/utils';
 import { PAYMENT_EXPIRY_DAYS } from "../../../../constants/FOI/constants";
