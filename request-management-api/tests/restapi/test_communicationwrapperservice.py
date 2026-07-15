@@ -198,3 +198,65 @@ class TestSendEmailStripsForeignAttachments:
         )
 
         mock_ministry.getrequest.assert_not_called()
+
+    @patch("request_api.services.communicationwrapperservice.AuthHelper")
+    @patch("request_api.services.communicationwrapperservice.communicationemailservice")
+    @patch("request_api.services.communicationwrapperservice.applicantcorrespondenceservice")
+    @patch("request_api.services.communicationwrapperservice.FOIMinistryRequest")
+    def test_fails_closed_when_ownership_coordinates_cannot_be_resolved(
+        self, mock_ministry, mock_appservice, mock_emailservice, mock_auth, caplog
+    ):
+        """If we cannot resolve ministrycode/requestnumber, drop all attachments."""
+        import logging as _logging
+
+        mock_auth.getuserid.return_value = "tester"
+        # Simulate an unresolvable request — getrequest returns None so both
+        # filenumber and bcgovcode are missing. The fallback SQL is also
+        # patched to return nothing via a broken db import path; simplest is
+        # to have getrequest return {} and monkeypatch db.session.execute
+        # inside the module to yield no row. We rely on the {}-return path
+        # plus a patched db.
+        mock_ministry.getrequest.return_value = {}
+
+        save_result = MagicMock(success=True, identifier=42, message="ok")
+        mock_appservice.return_value.saveapplicantcorrespondencelog.return_value = save_result
+        tpl = MagicMock()
+        tpl.name = "GENERIC"
+        mock_appservice.return_value.gettemplatebyid.return_value = tpl
+        mock_emailservice.return_value.send.return_value = {
+            "success": True, "from_email": "noreply@gov.bc.ca"
+        }
+
+        payload = {
+            "correspondencemessagejson": '{"body":"hi"}',
+            "attributes": [{}],
+            "correspondencesubject": "S",
+            "templatename": "GENERIC",
+            "templateid": None,
+            "emails": ["a@x.com"],
+            "attachments": [
+                {"filename": "unknown.pdf",
+                 "url": "https://bucket/forms/WHO/KNOWS/unknown.pdf"},
+            ],
+        }
+
+        # Patch the fallback SQL lookup to also return nothing.
+        with patch("request_api.models.db.db") as mock_db:
+            mock_db.session.execute.return_value.fetchone.return_value = None
+            with caplog.at_level(_logging.ERROR):
+                communicationwrapperservice().send_email(
+                    requestid=1, rawrequestid=None, ministryrequestid=99,
+                    applicantcorrespondencelog=payload,
+                )
+
+        # Fail-closed: the saved log must have zero attachments.
+        saved_call = mock_appservice.return_value.saveapplicantcorrespondencelog.call_args
+        saved_log = saved_call.args[2] if len(saved_call.args) >= 3 else saved_call.kwargs["applicantcorrespondencelog"]
+        assert saved_log["attachments"] == []
+
+        # And an ERROR log was emitted so this is alertable.
+        assert any(
+            "Attachment ownership check could not resolve" in r.getMessage()
+            and "fail closed" in r.getMessage()
+            for r in caplog.records
+        )
