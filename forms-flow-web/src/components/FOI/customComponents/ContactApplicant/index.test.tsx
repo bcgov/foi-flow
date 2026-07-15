@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { Provider } from "react-redux";
 import configureStore from "redux-mock-store";
 import { ContactApplicant } from "./index";
@@ -40,20 +40,29 @@ const baseProps = (overrides: Partial<any> = {}) => ({
 });
 
 describe("ContactApplicant state isolation (FOIMOD-4270)", () => {
-  it("mounts with empty files list", () => {
+  // NOTE: these are smoke/regression tests. ContactApplicant renders attachments
+  // via `<div className="email-attachment-item">` and its `files` state is only
+  // populated by user interaction with the internal file picker, which is not
+  // easily driven from a unit test. Full end-to-end validation of the
+  // request-switch reset lives in the manual smoke checklist for FOIMOD-4270.
+  // What these tests do assert:
+  //   1. The component mounts cleanly with an empty file list.
+  //   2. Rerendering with a different requestId does not throw and produces
+  //      zero attachment items in the DOM (the useEffect + parent key prop
+  //      guarantee a fresh render).
+  it("mounts with no attachment items in the DOM", () => {
     const store = mockStore(baseState);
-    render(
+    const { container } = render(
       <Provider store={store}>
         <ContactApplicant {...baseProps()} />
       </Provider>
     );
-    // No attachment chips should be present on initial render
-    expect(screen.queryByTestId("attachment-chip")).toBeNull();
+    expect(container.querySelectorAll(".email-attachment-item")).toHaveLength(0);
   });
 
-  it("clears files when requestId changes (defensive reset)", () => {
+  it("renders cleanly with zero attachment items after switching requestId", () => {
     const store = mockStore(baseState);
-    const { rerender } = render(
+    const { rerender, container } = render(
       <Provider store={store}>
         <ContactApplicant {...baseProps({ requestId: 100 })} />
       </Provider>
@@ -63,7 +72,7 @@ describe("ContactApplicant state isolation (FOIMOD-4270)", () => {
         <ContactApplicant {...baseProps({ requestId: 200 })} />
       </Provider>
     );
-    expect(screen.queryByTestId("attachment-chip")).toBeNull();
+    expect(container.querySelectorAll(".email-attachment-item")).toHaveLength(0);
   });
 });
 
