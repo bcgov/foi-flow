@@ -87,8 +87,9 @@ class communicationwrapperservice:
         else:
             emailsubject = templateconfig().getsubject(template.name, attributes)
         applicantcorrespondencelog['emailsubject'] = emailsubject
-        # FOIMOD-4270 — reject attachments that do not belong to this request
-        if ministryrequestid not in ('None', None):
+        # FOIMOD-4270 — reject attachments that do not belong to this request.
+        # Skip the DB lookup entirely when there are no attachments to check.
+        if ministryrequestid not in ('None', None) and applicantcorrespondencelog.get('attachments'):
             ministry = FOIMinistryRequest.getrequest(ministryrequestid) or {}
             requestnumber = ministry.get('filenumber')
             ministrycode = ministry.get('bcgovcode')
