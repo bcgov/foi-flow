@@ -59,6 +59,54 @@ class TestValidateAttachmentOwnership:
         result = svc._validate_attachment_ownership(attachments, "MIN", "MIN-2026-00001")
         assert result == []
 
+    def test_match_is_case_insensitive(self):
+        svc = communicationwrapperservice()
+        attachments = [
+            {"filename": "ack.pdf",
+             "url": "https://bucket.example/forms-bucket/min/min-2026-00001/ack.pdf"},
+        ]
+        result = svc._validate_attachment_ownership(attachments, "MIN", "MIN-2026-00001")
+        assert result == attachments
+
+    def test_querystring_containing_prefix_does_not_match(self):
+        """A malicious/misplaced querystring must not satisfy ownership."""
+        svc = communicationwrapperservice()
+        attachments = [
+            {"filename": "leaked.pdf",
+             "url": "https://bucket.example/forms-bucket/OTHER/OTHER-2026-99999/leaked.pdf"
+                    "?ref=/MIN/MIN-2026-00001/x"},
+        ]
+        result = svc._validate_attachment_ownership(attachments, "MIN", "MIN-2026-00001")
+        assert result == []
+
+    def test_partial_segment_does_not_match(self):
+        """MIN-2026-00001 must not match a request whose number is MIN-2026-000010."""
+        svc = communicationwrapperservice()
+        attachments = [
+            {"filename": "leaked.pdf",
+             "url": "https://bucket.example/forms-bucket/MIN/MIN-2026-000010/leaked.pdf"},
+        ]
+        result = svc._validate_attachment_ownership(attachments, "MIN", "MIN-2026-00001")
+        assert result == []
+
+    def test_percent_encoded_path_is_matched(self):
+        svc = communicationwrapperservice()
+        attachments = [
+            {"filename": "ack.pdf",
+             "url": "https://bucket.example/forms-bucket/%4D%49%4E/MIN-2026-00001/ack.pdf"},
+        ]
+        result = svc._validate_attachment_ownership(attachments, "MIN", "MIN-2026-00001")
+        assert result == attachments
+
+    def test_raw_s3_key_without_scheme_is_matched(self):
+        svc = communicationwrapperservice()
+        attachments = [
+            {"filename": "ack.pdf",
+             "url": "forms-bucket/MIN/MIN-2026-00001/ack.pdf"},
+        ]
+        result = svc._validate_attachment_ownership(attachments, "MIN", "MIN-2026-00001")
+        assert result == attachments
+
 
 class TestSendEmailStripsForeignAttachments:
     @patch("request_api.services.communicationwrapperservice.AuthHelper")

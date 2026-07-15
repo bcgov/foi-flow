@@ -9,6 +9,7 @@ import maya
 import json
 import logging
 from enum import Enum
+from urllib.parse import unquote, urlsplit
 from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice 
 from request_api.services.requestservice import requestservice
 from request_api.services.cfrfeeservice import cfrfeeservice
@@ -29,16 +30,31 @@ class communicationwrapperservice:
         """Filter out attachments whose S3 URL does not belong to this request.
 
         Expected S3 path convention: .../{ministrycode}/{requestnumber}/...
-        Any attachment whose URL does not contain that prefix is dropped
-        and logged as a WARNING (cross-request ownership violation).
+        The match is case-insensitive, path-segment bounded (leading and
+        trailing '/'), and evaluated against the URL path only — the
+        querystring and fragment are stripped so signed-URL parameters
+        (e.g. ?X-Amz-...) cannot cause false positives, and raw S3 keys
+        without a scheme are still accepted. Any attachment whose URL does
+        not contain that prefix is dropped and logged as a WARNING.
         """
         if not attachments:
             return attachments or []
-        expected_prefix = f"{ministrycode}/{requestnumber}/"
+        expected_segment = f"/{ministrycode}/{requestnumber}/".lower()
         valid, rejected = [], []
         for att in attachments:
-            url = att.get('url') or att.get('documenturipath') or ''
-            if expected_prefix in url:
+            raw = att.get('url') or att.get('documenturipath') or ''
+            if not raw:
+                rejected.append(att)
+                continue
+            # Extract just the path portion; for scheme-less raw keys
+            # urlsplit puts the whole string in .path.
+            path = urlsplit(raw).path or raw
+            # Normalize percent-encoding and ensure a leading slash so the
+            # first path segment is bounded on both sides for the match.
+            normalized = unquote(path).lower()
+            if not normalized.startswith('/'):
+                normalized = '/' + normalized
+            if expected_segment in normalized:
                 valid.append(att)
             else:
                 rejected.append(att)
