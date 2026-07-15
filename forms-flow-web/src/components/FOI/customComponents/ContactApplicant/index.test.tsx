@@ -98,4 +98,44 @@ describe("saveAttachments filename-collision pairing (FOIMOD-4270)", () => {
     expect(result[0].url).toContain("/a");
     expect(result[1].url).toContain("/b");
   });
+
+  it("aborts upload and returns empty list when header count does not match file count", async () => {
+    const fileA = new File(["A"], "a.pdf", { type: "application/pdf" });
+    const fileB = new File(["B"], "b.pdf", { type: "application/pdf" });
+
+    (ossServices.getOSSHeaderDetails as jest.Mock).mockResolvedValue({
+      // Only one header returned for two files → must not upload either.
+      data: [{ filename: "a.pdf", filepath: "s3://.../MIN/MIN-2026-00001/a" }],
+    });
+    (ossServices.saveFilesinS3 as jest.Mock).mockImplementation(
+      async (_header: any, _file: File, _dispatch: any, cb: any) => {
+        cb(null, 200);
+      }
+    );
+    const errSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+    const result = await saveAttachmentsPure(
+      [fileA, fileB],
+      { ministryCode: "MIN", requestNumber: "MIN-2026-00001", requestId: 100, dispatch: () => {} }
+    );
+
+    expect(result).toEqual([]);
+    expect(ossServices.saveFilesinS3).not.toHaveBeenCalled();
+    expect(errSpy).toHaveBeenCalled();
+    errSpy.mockRestore();
+  });
+
+  it("returns empty list without calling OSS when there are no files", async () => {
+    (ossServices.getOSSHeaderDetails as jest.Mock).mockClear();
+    (ossServices.saveFilesinS3 as jest.Mock).mockClear();
+
+    const result = await saveAttachmentsPure(
+      [{ notAFile: true }],
+      { ministryCode: "MIN", requestNumber: "MIN-2026-00001", requestId: 100, dispatch: () => {} }
+    );
+
+    expect(result).toEqual([]);
+    expect(ossServices.getOSSHeaderDetails).not.toHaveBeenCalled();
+    expect(ossServices.saveFilesinS3).not.toHaveBeenCalled();
+  });
 });

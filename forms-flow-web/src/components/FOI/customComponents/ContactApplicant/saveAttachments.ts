@@ -23,10 +23,26 @@ export async function saveAttachmentsPure(
   }));
 
   const attachments: Array<{ filename: string; url: string }> = [];
+  if (onlyFiles.length === 0) {
+    return attachments;
+  }
   try {
     const response = await getOSSHeaderDetails(fileInfoList, ctx.dispatch);
-    for (let i = 0; i < response.data.length; i++) {
-      const header = response.data[i];
+    const headers: any[] = Array.isArray(response?.data) ? response.data : [];
+    // Fail safe: if the OSS service returned a different number of headers
+    // than files, we cannot trust index-based pairing (would mis-wire or
+    // pass undefined to saveFilesinS3). Abort the whole batch and log —
+    // the caller sees an empty attachments list rather than a silent
+    // cross-request leak.
+    if (headers.length !== onlyFiles.length) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `saveAttachmentsPure: OSS returned ${headers.length} headers for ${onlyFiles.length} files; aborting upload to prevent mis-pairing.`
+      );
+      return attachments;
+    }
+    for (let i = 0; i < headers.length; i++) {
+      const header = headers[i];
       const _file = onlyFiles[i]; // index-based pairing — filenames may collide
       await saveFilesinS3(header, _file, ctx.dispatch, (_err: any, _res: any) => {
         if (_res === 200) {
