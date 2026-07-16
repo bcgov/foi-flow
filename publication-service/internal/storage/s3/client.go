@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	s3sdk "github.com/aws/aws-sdk-go-v2/service/s3"
@@ -42,9 +43,15 @@ func NewClient(cfg config.S3Config) (*Client, error) {
 		return nil, fmt.Errorf("s3: load aws config: %w", err)
 	}
 
+	// Ceph/RadosGW (BC Gov Object Storage) does not accept the SDK's default
+	// flexible-checksum trailer (x-amz-sdk-checksum-algorithm) and returns
+	// "Missing required header for this request: Content-MD5". Restrict
+	// checksums to operations that strictly require them.
 	api := s3sdk.NewFromConfig(awsCfg, func(o *s3sdk.Options) {
 		o.BaseEndpoint = &cfg.Endpoint
 		o.UsePathStyle = cfg.UsePathStyle
+		o.RequestChecksumCalculation = aws.RequestChecksumCalculationWhenRequired
+		o.ResponseChecksumValidation = aws.ResponseChecksumValidationWhenRequired
 	})
 
 	timeout := cfg.RequestTimeout
