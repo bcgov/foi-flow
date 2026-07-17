@@ -42,5 +42,10 @@ class RequestDeduplicationService:
             return False
         
     def _hash_payload(self):
+        self._normalize_request_data(self.request_payload)
         serialized_data = json.dumps(self.request_payload, sort_keys=True, separators=(',', ':'))
         return hashlib.sha256(serialized_data.encode('utf-8')).hexdigest()
+    
+    def _normalize_request_data(self, request_data):
+        request_data.pop("requestId", None)
+        request_data.pop("receivedDateUF", None)
