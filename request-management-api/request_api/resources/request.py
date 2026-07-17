@@ -26,6 +26,7 @@ from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.documentservice import documentservice
 from request_api.services.eventservice import eventservice
 from request_api.services.unopenedreportservice import unopenedreportservice
+from request_api.services.deduplicate_request_service.request_deduplication_service import RequestDeduplicationService
 from request_api.utils.enums import StateName
 import json
 import asyncio
@@ -216,24 +217,28 @@ class FOIRawRequests(Resource):
         """ POST Method for capturing RAW FOI requests before processing"""
         try:
             request_json = request.get_json()
-            requestdatajson = request_json['requestData']  
+            requestdatajson = request_json['requestData']
+            # Call dedupe request service to ensure foi request sent from foirequests webform is not a duplicate
+            request_dedupe_service = RequestDeduplicationService(requestdatajson)
+            is_duplicate_request = request_dedupe_service.dedupe_service()
+            if not is_duplicate_request:
+                #add received date to json
+                receiveddatetext = requestdatajson["receivedDateUF"] if 'receivedDateUF' in requestdatajson else datetime.now(pytz.timezone("America/Vancouver")).strftime(LONG_DATE_FORMAT)
+                receiveddate = _skiptoworkday(receiveddatetext, 0)
+                requestdatajson['receivedDate'] = receiveddate.strftime(SHORT_DATE_FORMAT)
+                requestdatajson['receivedDateUF'] = receiveddate.strftime(LONG_DATE_FORMAT)
 
-            #add received date to json
-            receiveddatetext = requestdatajson["receivedDateUF"] if 'receivedDateUF' in requestdatajson else datetime.now(pytz.timezone("America/Vancouver")).strftime(LONG_DATE_FORMAT)
-            receiveddate = _skiptoworkday(receiveddatetext, 0)
-            requestdatajson['receivedDate'] = receiveddate.strftime(SHORT_DATE_FORMAT)
-            requestdatajson['receivedDateUF'] = receiveddate.strftime(LONG_DATE_FORMAT)
-
-            #get attachments
-            attachments = requestdatajson['Attachments'] if 'Attachments' in requestdatajson else None
-            notes = 'Request submission from FOI WebForm'
-            #save request
-            if attachments is not None:
-                requestdatajson.pop('Attachments')
-            result = rawrequestservice().saverawrequest(requestdatajson=requestdatajson,sourceofsubmission="onlineform",userid=None,notes=notes)
-            if result.success:
-                documentservice().uploadpersonaldocuments(result.identifier, attachments)                   
-            return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+                #get attachments
+                attachments = requestdatajson['Attachments'] if 'Attachments' in requestdatajson else None
+                notes = 'Request submission from FOI WebForm'
+                #save request
+                if attachments is not None:
+                    requestdatajson.pop('Attachments')
+                result = rawrequestservice().saverawrequest(requestdatajson=requestdatajson,sourceofsubmission="onlineform",userid=None,notes=notes)
+                if result.success:
+                    documentservice().uploadpersonaldocuments(result.identifier, attachments)                   
+                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
+            return {'status': False, 'message':"Duplicate Request. Request was not processed, please try again later."}, 409
         except TypeError:
             return {'status': "TypeError", 'message':"Error while parsing JSON in request"}, 500   
         except BusinessException as exception:            
