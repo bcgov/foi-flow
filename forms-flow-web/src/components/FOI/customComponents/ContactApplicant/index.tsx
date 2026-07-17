@@ -22,7 +22,8 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import CommunicationStructure from './CommunicationStructure'
 import AttachmentModal from '../Attachments/AttachmentModal';
-import { getOSSHeaderDetails, saveFilesinS3, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
+import { getOSSHeaderDetails, getFileFromS3 } from "../../../../apiManager/services/FOI/foiOSSServices";
+import { saveAttachmentsPure } from "./saveAttachments";
 import { dueDateCalculation } from '../../FOIRequest/BottomButtonGroup/utils';
 import { PAYMENT_EXPIRY_DAYS } from "../../../../constants/FOI/constants";
 import { PreviewModal } from './PreviewModal';
@@ -577,6 +578,12 @@ export const ContactApplicant = ({
   const requestExtensions: any = useSelector((state: any) => state.foiRequests.foiRequestExtesions);
 
   const [files, setFiles] = useState<any[]>([]);
+
+  useEffect(() => {
+    clearcorrespondence();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestId, ministryId]);
+
   const [templates, setTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at: "" }]);
   const [initialTemplates, setInitialTemplates] = useState<any[]>([{ value: "", label: "", templateid: null, text: "", disabled: true, created_at: "" }]);
 
@@ -851,37 +858,12 @@ export const ContactApplicant = ({
   };
 
   const saveAttachments = async (attachmentfiles: any) => {
-    attachmentfiles = attachmentfiles.filter((file: any) => {
-      return file instanceof File
-    }
-    )
-    const fileInfoList = attachmentfiles?.map((file: any) => {
-      return {
-        ministrycode: ministryCode,
-        requestnumber: requestNumber ? requestNumber : `U-00${requestId}`,
-        filestatustransition: 'email-attachment',
-        filename: file.filename ? file.filename : file.name,
-      }
+    return saveAttachmentsPure(attachmentfiles, {
+      ministryCode,
+      requestNumber,
+      requestId,
+      dispatch,
     });
-    let attachments: any = [];
-    try {
-      const response = await getOSSHeaderDetails(fileInfoList, dispatch);
-      for (let header of response.data) {
-        const _file = attachmentfiles.find((file: any) => file.filename === header.filename);
-        await saveFilesinS3(header, _file, dispatch, (_err: any, _res: any) => {
-          if (_res === 200) {
-            attachments.push({ filename: header.filename, url: header.filepath })
-            console.log("success")
-          }
-          else {
-            console.log("failure")
-          }
-        })
-      }
-    } catch (error) {
-      console.log(error)
-    }
-    return attachments
   }
 
   // send email
