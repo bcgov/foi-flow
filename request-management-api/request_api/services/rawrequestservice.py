@@ -120,7 +120,7 @@ class rawrequestservice:
         skip_unopened_applicantprofile_creation = currentstatus is not None and nextstate is not None and ((currentstatus == StateName.unopened.value and nextstate == StateName.closed.value) or (nextstate == StateName.unopened.value and currentstatus == StateName.closed.value))    
         
         # LDD Extension Checks
-        if currentstatus is not (None, ""):
+        if currentstatus not in (None, ""):
             # Check for App Fee Owing
             state_offhold_date = datetimehandler().gettoday()
             if currentstatus == StateName.appfeeowing.value:
