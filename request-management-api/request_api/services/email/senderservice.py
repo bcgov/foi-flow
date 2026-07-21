@@ -41,6 +41,14 @@ class senderservice:
         return self.send(subject, content, _messageattachmentlist, requestjson["email"])
 
     def send(self, subject, content, _messageattachmentlist, emails, ccemails = None, from_email = None):
+        logger.info(
+            "Sending email: subject=%s to_count=%d cc_count=%d attachment_count=%d attachment_filenames=%s",
+            subject,
+            len(emails) if isinstance(emails, list) else 1,
+            len(ccemails) if isinstance(ccemails, list) else (1 if ccemails else 0),
+            len(_messageattachmentlist) if _messageattachmentlist else 0,
+            [a.get('filename') for a in (_messageattachmentlist or [])],
+        )
         logging.debug("Begin: Send email for request ")
 
         content = content.replace('src=\\\"', 'src="')

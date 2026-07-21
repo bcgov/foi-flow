@@ -7,7 +7,9 @@ from datetime import datetime
 import dateutil.parser
 import maya
 import json
+import logging
 from enum import Enum
+from urllib.parse import unquote, urlsplit
 from request_api.services.applicantcorrespondence.applicantcorrespondencelog import applicantcorrespondenceservice 
 from request_api.services.requestservice import requestservice
 from request_api.services.cfrfeeservice import cfrfeeservice
@@ -18,9 +20,52 @@ from request_api.services.email.templates.templateconfig import templateconfig
 from request_api.services.emailservice import emailservice
 from request_api.schemas.foiemail import  FOIEmailSchema
 
+logger = logging.getLogger(__name__)
+
 class communicationwrapperservice:
     """ FOI communication wrapper service
     """
+
+    def _validate_attachment_ownership(self, attachments, ministrycode, requestnumber):
+        """Filter out attachments whose S3 URL does not belong to this request.
+
+        Expected S3 path convention: .../{ministrycode}/{requestnumber}/...
+        The match is case-insensitive, path-segment bounded (leading and
+        trailing '/'), and evaluated against the URL path only — the
+        querystring and fragment are stripped so signed-URL parameters
+        (e.g. ?X-Amz-...) cannot cause false positives, and raw S3 keys
+        without a scheme are still accepted. Any attachment whose URL does
+        not contain that prefix is dropped and logged as a WARNING.
+        """
+        if not attachments:
+            return attachments or []
+        expected_segment = f"/{ministrycode}/{requestnumber}/".lower()
+        valid, rejected = [], []
+        for att in attachments:
+            raw = att.get('url') or att.get('documenturipath') or ''
+            if not raw:
+                rejected.append(att)
+                continue
+            # Extract just the path portion; for scheme-less raw keys
+            # urlsplit puts the whole string in .path.
+            path = urlsplit(raw).path or raw
+            # Normalize percent-encoding and ensure a leading slash so the
+            # first path segment is bounded on both sides for the match.
+            normalized = unquote(path).lower()
+            if not normalized.startswith('/'):
+                normalized = '/' + normalized
+            if expected_segment in normalized:
+                valid.append(att)
+            else:
+                rejected.append(att)
+        if rejected:
+            logger.warning(
+                "Attachment ownership violation blocked: requestnumber=%s ministrycode=%s "
+                "rejected_count=%d rejected_filenames=%s",
+                requestnumber, ministrycode, len(rejected),
+                [a.get('filename') for a in rejected]
+            )
+        return valid
 
     def send_email(self, requestid, rawrequestid, ministryrequestid, applicantcorrespondencelog):
         # Get the correct email subject
@@ -42,6 +87,47 @@ class communicationwrapperservice:
         else:
             emailsubject = templateconfig().getsubject(template.name, attributes)
         applicantcorrespondencelog['emailsubject'] = emailsubject
+        # FOIMOD-4270 — reject attachments that do not belong to this request.
+        # Skip the DB lookup entirely when there are no attachments to check.
+        if ministryrequestid not in ('None', None) and applicantcorrespondencelog.get('attachments'):
+            ministry = FOIMinistryRequest.getrequest(ministryrequestid) or {}
+            requestnumber = ministry.get('filenumber')
+            ministrycode = ministry.get('bcgovcode')
+            if not ministrycode:
+                # bcgovcode is joined via ProgramArea; fall back to direct SQL if missing
+                from request_api.models.db import db
+                from sqlalchemy import text
+                row = db.session.execute(
+                    text(
+                        'SELECT lower(pa.bcgovcode) AS bcgovcode '
+                        'FROM "FOIMinistryRequests" mr '
+                        'JOIN "ProgramAreas" pa ON pa.programareaid = mr.programareaid '
+                        'WHERE mr.foiministryrequestid = :mid '
+                        'ORDER BY mr.version DESC LIMIT 1'
+                    ),
+                    {"mid": ministryrequestid},
+                ).fetchone()
+                ministrycode = row[0] if row else None
+            if requestnumber and ministrycode:
+                applicantcorrespondencelog['attachments'] = self._validate_attachment_ownership(
+                    applicantcorrespondencelog.get('attachments', []),
+                    ministrycode,
+                    requestnumber,
+                )
+            else:
+                # Fail closed: if we cannot resolve the request's ownership
+                # coordinates we cannot verify any attachment belongs to it.
+                # Drop them all rather than leak a foreign attachment. Log at
+                # ERROR so this is alertable — it should never happen for a
+                # valid ministryrequestid.
+                original_count = len(applicantcorrespondencelog.get('attachments') or [])
+                logger.error(
+                    "Attachment ownership check could not resolve requestnumber/ministrycode "
+                    "for ministryrequestid=%s (requestnumber=%r ministrycode=%r); "
+                    "dropping %d attachment(s) to fail closed.",
+                    ministryrequestid, requestnumber, ministrycode, original_count,
+                )
+                applicantcorrespondencelog['attachments'] = []
         # Save correspondence log based on request type
         if ministryrequestid == 'None' or ministryrequestid is None or ("israwrequest" in applicantcorrespondencelog and applicantcorrespondencelog["israwrequest"]) is True:
             result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, applicantcorrespondencelog, AuthHelper.getuserid())
