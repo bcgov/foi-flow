@@ -21,10 +21,10 @@ const OpenInfoConfirmationModal = ({
       confirm();
     }
     setModal((prev : any) => ({
-      ...prev,     
-      show: false, 
-      title: "", 
-      message: "", 
+      ...prev,
+      show: false,
+      title: "",
+      message: "",
       description: "",
       confirmButtonTitle: "",
       confirmationData: null,
@@ -32,10 +32,10 @@ const OpenInfoConfirmationModal = ({
   };
   const handleClose = () => {
     setModal((prev : any) => ({
-      ...prev,     
-      show: false, 
-      title: "", 
-      message: "", 
+      ...prev,
+      show: false,
+      title: "",
+      message: "",
       description: "",
       confirmButtonTitle: "",
       confirmationData: null,
