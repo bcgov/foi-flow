@@ -92,14 +92,16 @@ class communicationwrapperservice:
         if ministryrequestid not in ('None', None) and applicantcorrespondencelog.get('attachments'):
             ministry = FOIMinistryRequest.getrequest(ministryrequestid) or {}
             requestnumber = ministry.get('filenumber')
-            ministrycode = ministry.get('bcgovcode')
+            ministrycode = ministry.get('iaocode')
             if not ministrycode:
-                # bcgovcode is joined via ProgramArea; fall back to direct SQL if missing
+                # iaocode is joined via ProgramArea; fall back to direct SQL if missing.
+                # Note: S3 attachment keys are written with iaocode (e.g. 'JER'),
+                # not bcgovcode ('jeri') — see FOIMOD-4270.
                 from request_api.models.db import db
                 from sqlalchemy import text
                 row = db.session.execute(
                     text(
-                        'SELECT lower(pa.bcgovcode) AS bcgovcode '
+                        'SELECT lower(pa.iaocode) AS iaocode '
                         'FROM "FOIMinistryRequests" mr '
                         'JOIN "ProgramAreas" pa ON pa.programareaid = mr.programareaid '
                         'WHERE mr.foiministryrequestid = :mid '
