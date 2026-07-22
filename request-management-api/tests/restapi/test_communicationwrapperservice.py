@@ -118,7 +118,7 @@ class TestSendEmailStripsForeignAttachments:
         mock_auth.getuserid.return_value = "tester"
         mock_ministry.getrequest.return_value = {
             "filenumber": "MIN-2026-00001",
-            "bcgovcode": "MIN",
+            "iaocode": "MIN",
         }
         save_result = MagicMock(success=True, identifier=42, message="ok")
         mock_appservice.return_value.saveapplicantcorrespondencelog.return_value = save_result
@@ -210,8 +210,8 @@ class TestSendEmailStripsForeignAttachments:
         import logging as _logging
 
         mock_auth.getuserid.return_value = "tester"
-        # Simulate an unresolvable request — getrequest returns None so both
-        # filenumber and bcgovcode are missing. The fallback SQL is also
+        # Simulate an unresolvable request — getrequest returns {} so both
+        # filenumber and iaocode are missing. The fallback SQL is also
         # patched to return nothing via a broken db import path; simplest is
         # to have getrequest return {} and monkeypatch db.session.execute
         # inside the module to yield no row. We rely on the {}-return path
@@ -260,3 +260,61 @@ class TestSendEmailStripsForeignAttachments:
             and "fail closed" in r.getMessage()
             for r in caplog.records
         )
+
+    @patch("request_api.services.communicationwrapperservice.AuthHelper")
+    @patch("request_api.services.communicationwrapperservice.communicationemailservice")
+    @patch("request_api.services.communicationwrapperservice.applicantcorrespondenceservice")
+    @patch("request_api.services.communicationwrapperservice.FOIMinistryRequest")
+    def test_attachment_matched_by_iaocode_is_retained(
+        self, mock_ministry, mock_appservice, mock_emailservice, mock_auth
+    ):
+        """Regression for FOIMOD-4270: S3 keys use iaocode (e.g. 'JER'), not bcgovcode ('jeri').
+
+        The ministry lookup must expose iaocode so the ownership prefix
+        (/{iaocode}/{filenumber}/) matches the real S3 key layout.
+        """
+        mock_auth.getuserid.return_value = "tester"
+        # ProgramAreas row for ministryrequest 760: bcgovcode='jeri', iaocode='JER'.
+        # Only iaocode should be consulted.
+        mock_ministry.getrequest.return_value = {
+            "filenumber": "EAO-2026-00777",
+            "iaocode": "JER",
+        }
+        save_result = MagicMock(success=True, identifier=42, message="ok")
+        mock_appservice.return_value.saveapplicantcorrespondencelog.return_value = save_result
+        tpl = MagicMock()
+        tpl.name = "GENERIC"
+        mock_appservice.return_value.gettemplatebyid.return_value = tpl
+        mock_emailservice.return_value.send.return_value = {
+            "success": True, "from_email": "noreply@gov.bc.ca"
+        }
+
+        payload = {
+            "correspondencemessagejson": '{"body":"hi"}',
+            "attributes": [{}],
+            "correspondencesubject": "S",
+            "templatename": "GENERIC",
+            "templateid": None,
+            "emails": ["a@x.com"],
+            "attachments": [
+                # Mixed case survives thanks to the .lower() in the validator.
+                {"filename": "ours.pdf",
+                 "url": "https://bucket/forms/JER/EAO-2026-00777/ours.pdf"},
+                {"filename": "also-ours.pdf",
+                 "url": "https://bucket/forms/jer/EAO-2026-00777/also-ours.pdf"},
+                # Anything under the bcgovcode 'jeri' must be rejected — that
+                # would prove the code is still (incorrectly) reading bcgovcode.
+                {"filename": "wrong-code.pdf",
+                 "url": "https://bucket/forms/jeri/EAO-2026-00777/wrong-code.pdf"},
+            ],
+        }
+
+        communicationwrapperservice().send_email(
+            requestid=1, rawrequestid=None, ministryrequestid=760,
+            applicantcorrespondencelog=payload,
+        )
+
+        saved_call = mock_appservice.return_value.saveapplicantcorrespondencelog.call_args
+        saved_log = saved_call.args[2] if len(saved_call.args) >= 3 else saved_call.kwargs["applicantcorrespondencelog"]
+        kept = sorted(a["filename"] for a in saved_log["attachments"])
+        assert kept == ["also-ours.pdf", "ours.pdf"]
