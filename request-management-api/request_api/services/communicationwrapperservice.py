@@ -26,20 +26,126 @@ class communicationwrapperservice:
     """ FOI communication wrapper service
     """
 
-    def _validate_attachment_ownership(self, attachments, ministrycode, requestnumber):
+    def _resolve_ownership_coords(self, ministryrequestid):
+        """Resolve (ministrycode, requestnumbers) for attachment ownership validation.
+
+        - ``ministrycode`` is the ``bcgovcode`` of the ministry that owns this
+          request (matches S3 key segment 1). Read from the schema dump under
+          the dotted key ``'programarea.bcgovcode'``; falls back to a direct
+          SQL lookup if absent.
+        - ``requestnumbers`` is the set of every value that may legally appear
+          as the request-number segment of an S3 key for this request
+          (FOIMOD-4270). S3 keys are stamped at upload time and are never
+          rewritten, so the set includes:
+
+            * the current ``filenumber`` (covers AXIS-era rows where the S3
+              key equals the filenumber),
+            * the current ``axisrequestid`` (covers modern rows where the S3
+              key equals the current axisrequestid), and
+            * every historical ``axisrequestid`` ever recorded on any version
+              of this request (covers requests that were renumbered mid-life,
+              whose older S3 keys still reference an old axisrequestid value
+              no longer present on the current row).
+
+        Returns ``(None, set())`` when resolution fails so callers can fail
+        closed.
+        """
+        from request_api.models.db import db
+        from sqlalchemy import text
+
+        ministry = FOIMinistryRequest.getrequest(ministryrequestid) or {}
+        # FOIMinistryRequestSchema dumps bcgovcode under the dotted key
+        # 'programarea.bcgovcode'. Keep the bare 'bcgovcode' as a defensive
+        # alias for tests and any future schema flattening.
+        ministrycode = ministry.get('programarea.bcgovcode') or ministry.get('bcgovcode')
+
+        requestnumbers = set()
+        for key in ('filenumber', 'axisrequestid'):
+            v = ministry.get(key)
+            if v:
+                requestnumbers.add(v)
+
+        # Historical axisrequestids: renumbers overwrite the current row's
+        # value, but earlier row versions retain the older value that some
+        # S3 keys still reference. Cheap indexed lookup, runs only when
+        # there are attachments to check.
+        try:
+            rows = db.session.execute(
+                text(
+                    'SELECT DISTINCT axisrequestid FROM "FOIMinistryRequests" '
+                    'WHERE foiministryrequestid = :mid AND axisrequestid IS NOT NULL'
+                ),
+                {"mid": ministryrequestid},
+            ).fetchall()
+            for row in rows or []:
+                val = row[0]
+                if val:
+                    requestnumbers.add(val)
+        except Exception:
+            logger.exception(
+                "Historical axisrequestid lookup failed for ministryrequestid=%s; "
+                "continuing with current-row values only.",
+                ministryrequestid,
+            )
+
+        if not ministrycode:
+            try:
+                row = db.session.execute(
+                    text(
+                        'SELECT lower(pa.bcgovcode) AS bcgovcode '
+                        'FROM "FOIMinistryRequests" mr '
+                        'JOIN "ProgramAreas" pa ON pa.programareaid = mr.programareaid '
+                        'WHERE mr.foiministryrequestid = :mid '
+                        'ORDER BY mr.version DESC LIMIT 1'
+                    ),
+                    {"mid": ministryrequestid},
+                ).fetchone()
+                if row and row[0]:
+                    ministrycode = row[0]
+            except Exception:
+                logger.exception(
+                    "bcgovcode fallback lookup failed for ministryrequestid=%s",
+                    ministryrequestid,
+                )
+
+        return ministrycode, requestnumbers
+
+    def _validate_attachment_ownership(self, attachments, ministrycode, requestnumbers):
         """Filter out attachments whose S3 URL does not belong to this request.
 
-        Expected S3 path convention: .../{ministrycode}/{requestnumber}/...
+        Expected S3 path convention: ``.../{ministrycode}/{requestnumber}/...``
+        where ``requestnumber`` is any value that has been the request's
+        ``filenumber`` or ``axisrequestid`` over its lifetime — S3 keys are
+        stamped at upload time and are not rewritten when a request is
+        renumbered (FOIMOD-4270). ``requestnumbers`` may therefore be a set
+        (or any iterable) of multiple accepted values; a bare string is also
+        accepted for backwards compatibility.
+
         The match is case-insensitive, path-segment bounded (leading and
         trailing '/'), and evaluated against the URL path only — the
         querystring and fragment are stripped so signed-URL parameters
         (e.g. ?X-Amz-...) cannot cause false positives, and raw S3 keys
         without a scheme are still accepted. Any attachment whose URL does
-        not contain that prefix is dropped and logged as a WARNING.
+        not contain any accepted prefix is dropped and logged as a WARNING.
         """
         if not attachments:
             return attachments or []
-        expected_segment = f"/{ministrycode}/{requestnumber}/".lower()
+        if isinstance(requestnumbers, str):
+            candidates = [requestnumbers]
+        else:
+            candidates = [rn for rn in (requestnumbers or []) if rn]
+        expected_segments = {
+            f"/{ministrycode}/{rn}/".lower()
+            for rn in candidates
+            if rn
+        }
+        if not expected_segments:
+            logger.warning(
+                "Attachment ownership check invoked with no accepted "
+                "requestnumbers (ministrycode=%s); rejecting %d attachment(s).",
+                ministrycode, len(attachments),
+            )
+            return []
         valid, rejected = [], []
         for att in attachments:
             raw = att.get('url') or att.get('documenturipath') or ''
@@ -54,15 +160,15 @@ class communicationwrapperservice:
             normalized = unquote(path).lower()
             if not normalized.startswith('/'):
                 normalized = '/' + normalized
-            if expected_segment in normalized:
+            if any(seg in normalized for seg in expected_segments):
                 valid.append(att)
             else:
                 rejected.append(att)
         if rejected:
             logger.warning(
-                "Attachment ownership violation blocked: requestnumber=%s ministrycode=%s "
+                "Attachment ownership violation blocked: requestnumbers=%s ministrycode=%s "
                 "rejected_count=%d rejected_filenames=%s",
-                requestnumber, ministrycode, len(rejected),
+                sorted(candidates), ministrycode, len(rejected),
                 [a.get('filename') for a in rejected]
             )
         return valid
@@ -90,31 +196,12 @@ class communicationwrapperservice:
         # FOIMOD-4270 — reject attachments that do not belong to this request.
         # Skip the DB lookup entirely when there are no attachments to check.
         if ministryrequestid not in ('None', None) and applicantcorrespondencelog.get('attachments'):
-            ministry = FOIMinistryRequest.getrequest(ministryrequestid) or {}
-            requestnumber = ministry.get('filenumber')
-            ministrycode = ministry.get('iaocode')
-            if not ministrycode:
-                # iaocode is joined via ProgramArea; fall back to direct SQL if missing.
-                # Note: S3 attachment keys are written with iaocode (e.g. 'JER'),
-                # not bcgovcode ('jeri') — see FOIMOD-4270.
-                from request_api.models.db import db
-                from sqlalchemy import text
-                row = db.session.execute(
-                    text(
-                        'SELECT lower(pa.iaocode) AS iaocode '
-                        'FROM "FOIMinistryRequests" mr '
-                        'JOIN "ProgramAreas" pa ON pa.programareaid = mr.programareaid '
-                        'WHERE mr.foiministryrequestid = :mid '
-                        'ORDER BY mr.version DESC LIMIT 1'
-                    ),
-                    {"mid": ministryrequestid},
-                ).fetchone()
-                ministrycode = row[0] if row else None
-            if requestnumber and ministrycode:
+            ministrycode, requestnumbers = self._resolve_ownership_coords(ministryrequestid)
+            if ministrycode and requestnumbers:
                 applicantcorrespondencelog['attachments'] = self._validate_attachment_ownership(
                     applicantcorrespondencelog.get('attachments', []),
                     ministrycode,
-                    requestnumber,
+                    requestnumbers,
                 )
             else:
                 # Fail closed: if we cannot resolve the request's ownership
@@ -125,9 +212,9 @@ class communicationwrapperservice:
                 original_count = len(applicantcorrespondencelog.get('attachments') or [])
                 logger.error(
                     "Attachment ownership check could not resolve requestnumber/ministrycode "
-                    "for ministryrequestid=%s (requestnumber=%r ministrycode=%r); "
+                    "for ministryrequestid=%s (requestnumbers=%r ministrycode=%r); "
                     "dropping %d attachment(s) to fail closed.",
-                    ministryrequestid, requestnumber, ministrycode, original_count,
+                    ministryrequestid, sorted(requestnumbers), ministrycode, original_count,
                 )
                 applicantcorrespondencelog['attachments'] = []
         # Save correspondence log based on request type
