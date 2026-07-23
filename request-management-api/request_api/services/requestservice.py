@@ -53,7 +53,7 @@ class requestservice:
     ):
         # LDD Extension Checks
         currentstatus = foirequestschema["currentState"] if "currentState" in foirequestschema else None
-        if currentstatus is not (None, ""):
+        if currentstatus not in (None, ""):
             state_offhold_date = datetimehandler().gettoday()
             if currentstatus == StateName.appfeeowing.value:
                 appfeeowing_transition_date = foirequestschema["lastStatusUpdateDate"]
