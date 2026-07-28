@@ -2,13 +2,14 @@ from .redis_service import RedisService
 import hashlib
 import logging
 import json
+from copy import deepcopy
 from request_api.models.default_method_result import DefaultMethodResult
 
 class RequestDeduplicationService:
     """Validate/deduplicate FOI request received from foirequests webform by caching and checking a hash of the request payload in Redis."""
     
     def __init__(self, request_payload, redis_service = None):
-        self.request_payload = request_payload
+        self.request_payload = deepcopy(request_payload)
         self.redis_service = redis_service or RedisService()
 
     def dedupe_service(self):
