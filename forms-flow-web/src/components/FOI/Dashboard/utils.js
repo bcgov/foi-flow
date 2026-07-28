@@ -339,6 +339,26 @@ export const cellTooltipRender = (params) => {
   </LightTooltip>
 };
 
+export const selectedMinTooltipRender = (params) => {
+  const ministryJSON = JSON.parse(params.row.selectedMinistries);
+  const firstMinistry = ministryJSON[0].code;
+  const count = ministryJSON.length;
+  let selectedMinistries = [];
+
+  for (let ministry of ministryJSON) {
+    if (ministry.isSelected) {
+      selectedMinistries.push(ministry.code)
+    }
+  }
+  return <LightTooltip placement="bottom-start" title={
+    <div style={{ whiteSpace: "pre-line" }}>
+      {selectedMinistries.join(", ")}
+    </div>
+  }>
+    <span className="table-cell-truncate">{firstMinistry + (count > 1 ? ` (${count})` : "")}</span>
+  </LightTooltip>
+};
+
 export const pagecountcellTooltipRender = (params) => {
   const axispagecount = params.row.axispagecount;
   const recordspagecount = params.row.recordspagecount;

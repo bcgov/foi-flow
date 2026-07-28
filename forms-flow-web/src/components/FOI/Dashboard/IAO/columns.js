@@ -7,6 +7,7 @@ import {
   displayHeaderIcon,
   displayQueueFlagIcons,
   cellTooltipRender,
+  selectedMinTooltipRender,
   pagecountcellTooltipRender,
   calculateFromClosed,
 } from "../utils";
@@ -131,6 +132,25 @@ const IntakeTeamColumns = [
     renderCell: cellTooltipRender,
   },
   {
+    field: "selectedMinistries",
+    headerName: "MIN SELECTED",
+    headerAlign: "left",
+    valueGetter: (params) => {
+      const ministryJSON = JSON.parse(params.row.selectedMinistries);
+      const firstMinistry = ministryJSON[0].code;
+      const count = ministryJSON.length;
+      return firstMinistry + (count > 1 ? ` (${count})` : "");
+    },
+    width: 160,
+    renderCell: selectedMinTooltipRender,
+  },
+  {
+    field: "requestType",
+    headerName: "TYPE",
+    headerAlign: "left",
+    flex: 1,
+  },
+  {
     field: "applicantName",
     headerName: "APPLICANT NAME",
     headerAlign: "left",
@@ -162,12 +182,6 @@ const IntakeTeamColumns = [
     flex: 1,
   },
   {
-    field: "requestType",
-    headerName: "TYPE",
-    headerAlign: "left",
-    flex: 1,
-  },
-  {
     field: "currentState",
     headerName: "CURRENT STATE",
     headerAlign: "left",
@@ -175,17 +189,9 @@ const IntakeTeamColumns = [
   },
   {
     field: "assignedToFormatted",
-    headerName: "ASSIGNEE",
+    headerName: "ASSIGNED TO",
     headerAlign: "left",
     flex: 1,
-  },
-  {
-    field: "cfrduedate",
-    headerName: "CFR DUE",
-    flex: 1,
-    headerAlign: "left",
-    valueGetter: (params) =>
-      formatDate(params.row.cfrduedate, "MMM dd yyyy").toUpperCase(),
   },
   {
     field: "DaysLeftValue",
@@ -209,14 +215,6 @@ const IntakeTeamColumns = [
     headerAlign: "left",
     valueGetter: getReceivedDate,
     flex: 1,
-  },
-  {
-    field: "requestpagecount",
-    headerName: "PAGES",
-    headerAlign: "left",
-    flex: 0.5,
-    valueGetter: (params) => parseInt(params.row.requestpagecount),
-    renderCell: pagecountcellTooltipRender,
   },
 ];
 
@@ -299,17 +297,9 @@ const FlexTeamColumns = [
 
 const OITeamColumns = [
   {
-    field: "receivedDate",
-    headerName: "RECEIVED DATE",
-    flex: 1,
-    headerAlign: "left",
-    // valueGetter: (params) => params.row.requestType == "PD" ?
-    //   "N/A" : params.row.receivedDate
-  },
-  {
     field: "axisRequestId",
     headerName: "ID NUMBER",
-    flex: 1,
+    minWidth: 150,
     headerAlign: "left",
     valueGetter: (params) => params.row.requestType == "PD" && !params.row.axisRequestId ?
       params.row.idNumber : params.row.axisRequestId
@@ -321,15 +311,18 @@ const OITeamColumns = [
     flex: 1,
   },
   {
-    field: "requestType",
-    headerName: "TYPE",
+    field: "reportPeriod",
+    headerName: "REPORT PERIOD",
     flex: 1,
     headerAlign: "left",
+    valueGetter: (params) => params.row.requestType == "PD" ?
+      params.row.reportperiod : null
   },
   {
     field: "recordspagecount",
     headerName: "PAGES",
-    flex: 1,
+    minWidth: 60,
+    flex: 0.5,
     headerAlign: "left",
   },
   {
@@ -341,13 +334,8 @@ const OITeamColumns = [
   {
     field: "closedDate",
     headerName: "FROM CLOSED",
-    flex: 1,
-    headerAlign: "left",
-  },
-  {
-    field: "cfrduedate",
-    headerName: "CFR DUE DATE",
-    flex: 1,
+    minWidth: 110,
+    flex: 0.5,
     headerAlign: "left",
   },
   {
