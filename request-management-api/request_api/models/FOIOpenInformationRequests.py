@@ -347,6 +347,7 @@ class FOIOpenInformationRequests(db.Model):
             FOIMinistryRequest.closedate.label('closedate_1'),
             FOIMinistryRequest.cfrduedate.label('cfrduedate'),
             literal(None).label('proactivedisclosurecategory'),
+            literal(None).label('reportperiod'),
         ]   
 
         basequery = (
@@ -480,7 +481,7 @@ class FOIOpenInformationRequests(db.Model):
     @classmethod
     def validatefield(cls, field):
         valid_fields = ['receivedDate', 'axisRequestId', 'requestType', 'recordspagecount', 
-                        'publicationStatus', 'closedDate', 'publicationDate', 'assignedTo', 'applicantType']
+                        'publicationStatus', 'closedDate', 'publicationDate', 'assignedTo', 'applicantType', 'currentState','reportPeriod']
         return field in valid_fields
 
     @classmethod
@@ -586,13 +587,13 @@ class FOIOpenInformationRequests(db.Model):
         elif field == 'pageCount':
             return literal_column('recordspagecount')
         elif field == 'recordspagecount':
-            return literal_column('recordspagecount')
+            return cast(literal_column('recordspagecount'), Integer)
         elif field == 'publicationStatus':
             return literal_column('"oiStatusName"')
         elif (field == 'closedDate' or field == 'from_closed'):
             return literal_column('closedate')
         elif field == 'applicantType':
-            return literal_column('applicantcategory')
+            return func.coalesce(literal_column('proactivedisclosurecategory'), literal_column('applicantcategory'))
         elif (field == 'publicationdate' or field == 'publicationDate'):
             return literal_column('publicationdate')
         elif field == 'assignee':
@@ -604,7 +605,7 @@ class FOIOpenInformationRequests(db.Model):
         elif field == 'axisRequestId':
             return literal_column('"axisRequestId"')
         elif field == 'currentState':   
-            return literal_column('currentState')
+            return literal_column('"currentState"')
         elif field == 'subjectcode':
             return literal_column('subjectcode')
         else:
