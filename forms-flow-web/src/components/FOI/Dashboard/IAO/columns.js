@@ -136,10 +136,15 @@ const IntakeTeamColumns = [
     headerName: "MIN SELECTED",
     headerAlign: "left",
     valueGetter: (params) => {
-      const ministryJSON = JSON.parse(params.row.selectedMinistries);
-      const firstMinistry = ministryJSON[0].code;
-      const count = ministryJSON.length;
-      return firstMinistry + (count > 1 ? ` (${count})` : "");
+      try {
+        const ministryJSON = JSON.parse(params.row.selectedMinistries);
+        if (!Array.isArray(ministryJSON) || ministryJSON.length === 0) return "None";
+        let firstMinistry = ministryJSON[0]?.code ?? "None";
+        const count = ministryJSON.length;
+        return firstMinistry + (count > 1 ? ` (${count})` : "");
+      } catch {
+        return "None";
+      }
     },
     width: 160,
     renderCell: selectedMinTooltipRender,
@@ -369,18 +374,22 @@ const getTableInfo = (userGroups) => {
   if (!userGroups || isIntakeTeam(userGroups)) {
     defaultTableInfo.columns = IntakeTeamColumns;
     defaultTableInfo.sort = [{ field: "intakeSorting", sort: "asc" }];
+    return defaultTableInfo;
   }
 
   if (isProcessingTeam(userGroups)) {
     defaultTableInfo.columns = ProcessingTeamColumns;
+    return defaultTableInfo;
   }
 
   if (isFlexTeam(userGroups)) {
     defaultTableInfo.columns = FlexTeamColumns;
+    return defaultTableInfo;
   }
 
   if (isOITeam(userGroups)) {
     defaultTableInfo.columns = OITeamColumns;
+    return defaultTableInfo;
   }
 
   return defaultTableInfo;

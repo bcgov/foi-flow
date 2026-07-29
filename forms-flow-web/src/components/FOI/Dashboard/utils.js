@@ -340,23 +340,30 @@ export const cellTooltipRender = (params) => {
 };
 
 export const selectedMinTooltipRender = (params) => {
-  const ministryJSON = JSON.parse(params.row.selectedMinistries);
-  const firstMinistry = ministryJSON[0].code;
-  const count = ministryJSON.length;
-  let selectedMinistries = [];
-
-  for (let ministry of ministryJSON) {
-    if (ministry.isSelected) {
-      selectedMinistries.push(ministry.code)
+  try {
+    const ministryJSON = JSON.parse(params.row.selectedMinistries);
+    if (!Array.isArray(ministryJSON) || ministryJSON.length === 0) {
+      return <span className="table-cell-truncate">None</span>;
     }
+    let firstMinistry = ministryJSON[0]?.code ?? "None";
+    const count = ministryJSON.length;
+    let selectedMinistries = [];
+
+    for (let ministry of ministryJSON) {
+      if (ministry.isSelected) {
+        selectedMinistries.push(ministry.code)
+      }
+    }
+    return <LightTooltip placement="bottom-start" title={
+      <div style={{ whiteSpace: "pre-line" }}>
+        {selectedMinistries.join(", ")}
+      </div>
+    }>
+      <span className="table-cell-truncate">{firstMinistry + (count > 1 ? ` (${count})` : "")}</span>
+    </LightTooltip>
+  } catch {
+    return <span className="table-cell-truncate">None</span>;
   }
-  return <LightTooltip placement="bottom-start" title={
-    <div style={{ whiteSpace: "pre-line" }}>
-      {selectedMinistries.join(", ")}
-    </div>
-  }>
-    <span className="table-cell-truncate">{firstMinistry + (count > 1 ? ` (${count})` : "")}</span>
-  </LightTooltip>
 };
 
 export const pagecountcellTooltipRender = (params) => {
