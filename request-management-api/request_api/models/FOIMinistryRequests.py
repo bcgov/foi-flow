@@ -630,6 +630,7 @@ class FOIMinistryRequest(db.Model):
             cast(func.json_build_array(
                 func.json_build_object(
                     'code', func.upper(ProgramArea.bcgovcode),
+                    'name', ProgramArea.name,
                     'isSelected', literal(True)
                 )
             ), String).label('selectedMinistries')
@@ -1337,6 +1338,13 @@ class FOIMinistryRequest(db.Model):
             literal(None).label('oipc_number'),
             CloseReason.name.label('closereason'),
             ProactiveDisclosureCategory.name.label('proactivedisclosurecategory'),
+            cast(func.json_build_array(
+                func.json_build_object(
+                    'code', func.upper(ProgramArea.bcgovcode),
+                    'name', ProgramArea.name,
+                    'isSelected', literal(True)
+                )
+            ), String).label('selectedMinistries'),
         ]
         if is_oi_team:
             oiAssignedToFormatted = case([
