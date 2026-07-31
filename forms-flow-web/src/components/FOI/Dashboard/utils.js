@@ -350,7 +350,7 @@ export const selectedMinTooltipRender = (params) => {
     let selectedMinistries = [];
 
     for (let ministry of ministryJSON) {
-      if (ministry.isSelected) {
+      if (ministry.isSelected || ministry.selected) {
         selectedMinistries.push(ministry.code)
       }
     }
