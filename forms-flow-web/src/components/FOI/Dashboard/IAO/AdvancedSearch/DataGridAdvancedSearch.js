@@ -17,6 +17,7 @@ import {
   getIDNumber,
   getOIReceivedDate,
   getOIApplicantCategory,
+  selectedMinTooltipRender
 } from "../../utils";
 import { ActionContext } from "./ActionContext";
 import {
@@ -272,6 +273,24 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       flex: 1,
     },
     {
+      field: "selectedMinistries",
+      headerName: "MIN SELECTED",
+      headerAlign: "left",
+      valueGetter: (params) => {
+        try {
+          const ministryJSON = JSON.parse(params.row.selectedMinistries);
+          if (!Array.isArray(ministryJSON) || ministryJSON.length === 0) return "None";
+          let firstMinistry = ministryJSON[0]?.code ?? "None";
+          const count = ministryJSON.length;
+          return firstMinistry + (count > 1 ? ` (${count})` : "");
+        } catch {
+          return "None";
+        }
+      },
+      width: 160,
+      renderCell: selectedMinTooltipRender,
+    },
+    {
       field: "currentState",
       headerName: "CURRENT STATE",
       headerAlign: "left",
@@ -441,35 +460,27 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
 
   const OITeamColumns = [
     {
-      field: "oiReceivedDate",
-      headerName: "RECEIVED DATE",
-      flex: 1,
-      renderCell: hyperlinkRenderCell,
-      cellClassName: 'foi-advanced-search-result-cell',
-      headerAlign: "left",
-      valueGetter: getOIReceivedDate,
-    },
-    {
       field: "axisRequestId",
       headerName: "ID NUMBER",
-      flex: 1,
+      minWidth: 150,
       renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getIDNumber,
       headerAlign: "left"
     },
     {
-      field: "requestType",
-      headerName: "TYPE",
+      field: "reportPeriod",
+      headerName: "REPORT PERIOD",
       flex: 1,
-      renderCell: hyperlinkRenderCell,
-      cellClassName: 'foi-advanced-search-result-cell',
       headerAlign: "left",
+      valueGetter: (params) => params.row.requestType == "PD" ?
+        params.row.reportperiod : null
     },
     {
       field: "requestpagecount",
       headerName: "PAGES",
-      flex: 1,
+      minWidth: 60,
+      flex: 0.5,
       renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       headerAlign: "left",
@@ -485,7 +496,8 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     {
       field: "closedate",
       headerName: "FROM CLOSED",
-      flex: 1,
+      minWidth: 110,
+      flex: 0.5,
       renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       headerAlign: "left",
