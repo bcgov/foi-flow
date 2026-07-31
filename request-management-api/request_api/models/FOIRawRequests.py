@@ -632,6 +632,12 @@ class FOIRawRequest(db.Model):
             ],
             else_ = cast(FOIRawRequest.requestrawdata['proactiveDisclosureCategory'], String)).label('proactivedisclosurecategory')
 
+        selectedministries = case([
+                            (FOIRawRequest.status == StateName.unopened.value,
+                             FOIRawRequest.requestrawdata['ministry']['selectedMinistry'].astext),
+                           ],
+                           else_ = FOIRawRequest.requestrawdata['selectedMinistries'].astext).label('selectedMinistries')
+
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
             FOIRawRequest.version,
@@ -682,7 +688,8 @@ class FOIRawRequest(db.Model):
             literal(None).label('isphasedrelease'),
             literal(None).label('oipc_number'),
             literal(None).label('closereason'),
-            proactivedisclosurecategory
+            proactivedisclosurecategory,
+            selectedministries
         ]
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
@@ -848,6 +855,7 @@ class FOIRawRequest(db.Model):
 
         publicationdate = cast(func.nullif(FOIRawRequest.requestrawdata['earliestEligiblePublicationDate'].astext, ''), db.DateTime).label('publicationdate')
         cfrduedate = cast(func.nullif(FOIRawRequest.requestrawdata['cfrDueDate'].astext, ''), db.DateTime).label('cfrduedate')
+        reportperiod = cast(func.nullif(FOIRawRequest.requestrawdata['reportPeriod'].astext, ''), String).label('reportperiod')
 
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'), 
@@ -872,6 +880,7 @@ class FOIRawRequest(db.Model):
             FOIRawRequest.closedate.label('closedate_1'),
             cfrduedate,
             proactivedisclosurecategory,
+            reportperiod,
         ]   
 
         basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)

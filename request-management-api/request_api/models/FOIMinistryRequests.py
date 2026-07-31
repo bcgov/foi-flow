@@ -627,6 +627,13 @@ class FOIMinistryRequest(db.Model):
             literal(None).label('closereason'),
             ProactiveDisclosureCategory.name.label('proactivedisclosurecategory'),
             #latest_proactive.foiministryrequestversion_id.label(""),
+            cast(func.json_build_array(
+                func.json_build_object(
+                    'code', func.upper(ProgramArea.bcgovcode),
+                    'name', ProgramArea.name,
+                    'isSelected', literal(True)
+                )
+            ), String).label('selectedMinistries')
         ]
 
         basequery = _session.query(
@@ -1331,6 +1338,13 @@ class FOIMinistryRequest(db.Model):
             literal(None).label('oipc_number'),
             CloseReason.name.label('closereason'),
             ProactiveDisclosureCategory.name.label('proactivedisclosurecategory'),
+            cast(func.json_build_array(
+                func.json_build_object(
+                    'code', func.upper(ProgramArea.bcgovcode),
+                    'name', ProgramArea.name,
+                    'isSelected', literal(True)
+                )
+            ), String).label('selectedMinistries'),
         ]
         if is_oi_team:
             oiAssignedToFormatted = case([
@@ -1943,6 +1957,7 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.closedate.label('closedate_1'),
             FOIMinistryRequest.cfrduedate.label('cfrduedate'),
             ProactiveDisclosureCategory.name.label('proactivedisclosurecategory'),
+            latest_proactive.reportperiod.label('reportperiod'),
         ]   
         basequery = (
             _session.query(*selectedcolumns)

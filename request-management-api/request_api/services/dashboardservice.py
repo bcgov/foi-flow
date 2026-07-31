@@ -72,6 +72,7 @@ class dashboardservice:
         isoipcreview = request.isoipcreview if request.isoipcreview == True else False
         baserequestinfo.update({'isoipcreview': isoipcreview})
         baserequestinfo.update({'isphasedrelease': request.isphasedrelease if request.isphasedrelease == True else False})
+        baserequestinfo.update({'selectedMinistries': request.selectedMinistries})
         
         proactivecategory = ""
         if request.requestType in ['proactive disclosure', 'PD']:
@@ -289,7 +290,8 @@ class dashboardservice:
             'closedDate': fromClosed,
             'cfrduedate': cfrDueDate,
             'currentState': request.currentState,
-            'proactivedisclosurecategory': request.proactivedisclosurecategory if request.requestType in ['proactive disclosure', 'PD'] else None
+            'proactivedisclosurecategory': request.proactivedisclosurecategory if request.requestType in ['proactive disclosure', 'PD'] else None,
+            'reportperiod': getattr(request, 'reportperiod', None) if request.requestType in ['proactive disclosure', 'PD'] else None,
         }
 
     def __calculate_from_closed(self, closedate):
