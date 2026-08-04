@@ -462,7 +462,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     {
       field: "axisRequestId",
       headerName: "ID NUMBER",
-      minWidth: 150,
+      minWidth: 160,
       renderCell: hyperlinkRenderCell,
       cellClassName: 'foi-advanced-search-result-cell',
       valueGetter: getIDNumber,

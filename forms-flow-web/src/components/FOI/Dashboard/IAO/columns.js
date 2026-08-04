@@ -304,7 +304,7 @@ const OITeamColumns = [
   {
     field: "axisRequestId",
     headerName: "ID NUMBER",
-    minWidth: 150,
+    minWidth: 160,
     headerAlign: "left",
     valueGetter: (params) => params.row.requestType == "PD" && !params.row.axisRequestId ?
       params.row.idNumber : params.row.axisRequestId
