@@ -73,6 +73,7 @@ class dashboardservice:
         baserequestinfo.update({'isoipcreview': isoipcreview})
         baserequestinfo.update({'isphasedrelease': request.isphasedrelease if request.isphasedrelease == True else False})
         baserequestinfo.update({'selectedMinistries': request.selectedMinistries})
+        baserequestinfo.update({'reportperiod': request.reportperiod})
         
         proactivecategory = ""
         if request.requestType in ['proactive disclosure', 'PD']:

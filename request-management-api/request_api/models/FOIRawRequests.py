@@ -10,7 +10,7 @@ from sqlalchemy.dialects.postgresql import JSON, UUID
 from .default_method_result import DefaultMethodResult
 from datetime import datetime
 from sqlalchemy.orm import relationship, backref, aliased
-from sqlalchemy import insert, and_, or_, text, func, literal, cast, asc, desc, case, nullsfirst, nullslast, TIMESTAMP
+from sqlalchemy import insert, and_, or_, text, func, literal, literal_column, cast, asc, desc, case, nullsfirst, nullslast, column, TIMESTAMP
 
 from .FOIMinistryRequests import FOIMinistryRequest
 from .FOIRawRequestWatchers import FOIRawRequestWatcher
@@ -638,6 +638,32 @@ class FOIRawRequest(db.Model):
                            ],
                            else_ = FOIRawRequest.requestrawdata['selectedMinistries'].astext).label('selectedMinistries')
 
+        onbehalf_applicant = aliased(FOIRequestApplicant)
+
+        onbehalf_firstname = case([
+                            (FOIRawRequest.requestrawdata['foiRequestOnBehalfOfApplicantID'].is_(None),
+                             literal(None)),
+                           ],
+                           else_ = onbehalf_applicant.firstname).label('onBehalfFirstName')
+
+        onbehalf_lastname = case([
+                            (FOIRawRequest.requestrawdata['foiRequestOnBehalfOfApplicantID'].is_(None),
+                             literal(None)),
+                           ],
+                           else_ = onbehalf_applicant.lastname).label('onBehalfLastName')
+
+        onbehalfformatted = case([
+                                    (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
+                                     func.concat(onbehalf_applicant.lastname, ', ', onbehalf_applicant.firstname)),
+                                    (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.is_(None)),
+                                     onbehalf_applicant.lastname),
+                                    (and_(onbehalf_applicant.lastname.is_(None), onbehalf_applicant.firstname.isnot(None)),
+                                     onbehalf_applicant.firstname),
+                                   ],
+                                   else_ = None).label('onBehalfFormatted')
+
+        reportperiod = cast(func.nullif(FOIRawRequest.requestrawdata['reportPeriod'].astext, ''), String).label('reportperiod')
+
         selectedcolumns = [
             FOIRawRequest.requestid.label('id'),
             FOIRawRequest.version,
@@ -671,15 +697,15 @@ class FOIRawRequest(db.Model):
             description,
             recordsearchfromdate,
             recordsearchtodate,
-            literal(None).label('onBehalfFirstName'),
-            literal(None).label('onBehalfLastName'),
+            onbehalf_firstname,
+            onbehalf_lastname,
             literal(None).label('defaultSorting'),
             intakesorting,
             literal(None).label('ministrySorting'),
             assignedtoformatted,
             literal(None).label('ministryAssignedToFormatted'),
             literal(None).label('closedate'),
-            literal(None).label('onBehalfFormatted'),
+            onbehalfformatted,
             literal(None).label('extensions'),
             isiaorestricted,
             literal(None).label('isministryrestricted'),
@@ -689,10 +715,15 @@ class FOIRawRequest(db.Model):
             literal(None).label('oipc_number'),
             literal(None).label('closereason'),
             proactivedisclosurecategory,
-            selectedministries
+            selectedministries,
+            reportperiod
         ]
 
-        basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True)
+        basequery = _session.query(*selectedcolumns).join(subquery_maxversion, and_(*joincondition)).join(FOIAssignee, FOIAssignee.username == FOIRawRequest.assignedto, isouter=True).join(
+            onbehalf_applicant,
+            onbehalf_applicant.foirequestapplicantid == FOIRawRequest.requestrawdata['foiRequestOnBehalfOfApplicantID'].astext.cast(db.Integer),
+            isouter=True
+        )
 
         return FOIRawRequest.handleadditionalfilter(basequery, additionalfilter, userid, isiaorestrictedfilemanager, groups)
     
@@ -1008,6 +1039,7 @@ class FOIRawRequest(db.Model):
             'cfrduedate',
             'applicantcategory',
             'onBehalfFormatted',
+            'selectedMinistries',
             'extensions',
             'isiaorestricted',
             'closedate',
@@ -1015,7 +1047,9 @@ class FOIRawRequest(db.Model):
             'publicationDate',
             'oiReceivedDate',
             'oiAssignedTo',
-            'publicationStatus'
+            'publicationStatus',
+            'flags',
+            'reportPeriod'
         ]
         if x in validfields:
             return True
@@ -1029,7 +1063,43 @@ class FOIRawRequest(db.Model):
             for field in sortingitems:
                 if(FOIRawRequest.validatefield(field)):
                     order = sortingorders.pop(0)
-                    if(order == 'desc'):
+                    if field == 'selectedMinistries':
+                        sort_expr = literal_column("""CASE WHEN "selectedMinistries" LIKE '[%' THEN ("selectedMinistries"::jsonb -> 0 ->> 'code') ELSE "selectedMinistries" END""")
+                        if order == 'desc':
+                            sortingcondition.append(nullslast(sort_expr.desc()))
+                        else:
+                            sortingcondition.append(nullsfirst(sort_expr.asc()))
+                    elif field == 'cfrduedate':
+                        sort_expr = literal_column("""CAST(NULLIF(cfrduedate, '') AS TIMESTAMP)""")
+                        if order == 'desc':
+                            sortingcondition.append(nullslast(sort_expr.desc()))
+                        else:
+                            sortingcondition.append(nullsfirst(sort_expr.asc()))
+                    elif field == 'receivedDate':
+                        sort_expr = func.nullif(column('receivedDateUF'), '')
+                        if order == 'desc':
+                            sortingcondition.append(nullslast(sort_expr.desc()))
+                        else:
+                            sortingcondition.append(nullslast(sort_expr.asc()))
+                    elif field == 'publicationDate':
+                        sort_expr = func.nullif(column('publicationdate'), '')
+                        if order == 'desc':
+                            sortingcondition.append(nullslast(sort_expr.desc()))
+                        else:
+                            sortingcondition.append(nullslast(sort_expr.asc()))
+                    elif field == 'flags':
+                        sort_expr = literal_column("""CASE WHEN "isiaorestricted" = true OR "isoipcreview" = true OR "isphasedrelease" = true THEN 1 ELSE 0 END""")
+                        if order == 'desc':
+                            sortingcondition.append(nullslast(sort_expr.desc()))
+                        else:
+                            sortingcondition.append(nullsfirst(sort_expr.asc()))
+                    elif field == 'reportPeriod':
+                        sort_expr = literal_column("""TO_DATE("reportperiod", 'Month YYYY')""")
+                        if order == 'desc':
+                            sortingcondition.append(nullslast(sort_expr.desc()))
+                        else:
+                            sortingcondition.append(nullsfirst(sort_expr.asc()))
+                    elif(order == 'desc'):
                         sortingcondition.append(nullslast(desc(field)))
                     else:
                         sortingcondition.append(nullsfirst(asc(field)))

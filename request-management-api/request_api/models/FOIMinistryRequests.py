@@ -1,4 +1,6 @@
 from flask.app import Flask
+from sqlalchemy.dialects import postgresql
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.sql.schema import ForeignKey, ForeignKeyConstraint
 from .db import  db, ma
 from datetime import datetime
@@ -564,7 +566,7 @@ class FOIMinistryRequest(db.Model):
                             (and_(onbehalf_applicant.lastname.is_(None), onbehalf_applicant.firstname.isnot(None)),
                              onbehalf_applicant.firstname),
                            ],
-                           else_ = 'N/A').label('onBehalfFormatted')
+                           else_ = None).label('onBehalfFormatted')
         
         extensions = case([
                             (subquery_extension_count.c.extensions.is_(None),
@@ -1279,7 +1281,7 @@ class FOIMinistryRequest(db.Model):
                             (and_(onbehalf_applicant.lastname.is_(None), onbehalf_applicant.firstname.isnot(None)),
                              onbehalf_applicant.firstname),
                            ],
-                           else_ = 'N/A').label('onBehalfFormatted')
+                           else_ = None).label('onBehalfFormatted')
         
         extensions = case([
                             (subquery_extension_count.c.extensions.is_(None),
@@ -1345,6 +1347,7 @@ class FOIMinistryRequest(db.Model):
                     'isSelected', literal(True)
                 )
             ), String).label('selectedMinistries'),
+            latest_proactive.reportperiod.label('reportperiod')
         ]
         if is_oi_team:
             oiAssignedToFormatted = case([
