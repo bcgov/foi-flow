@@ -606,6 +606,8 @@ class FOIOpenInformationRequests(db.Model):
             return literal_column('"axisRequestId"')
         elif field == 'currentState':   
             return literal_column('"currentState"')
+        elif field == 'reportPeriod':
+            return literal_column("to_date(reportperiod, 'Month YYYY')")
         elif field == 'subjectcode':
             return literal_column('subjectcode')
         else:

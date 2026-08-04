@@ -474,7 +474,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       headerName: "REPORT PERIOD",
       flex: 1,
       headerAlign: "left",
-      valueGetter: (params) => params.row.requestType == "PD" ?
+      valueGetter: (params) => (params.row.requestType == "PD" || params.row.requestType == "proactive disclosure") ?
         params.row.reportperiod : null
     },
     {
@@ -717,7 +717,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
             <DataGrid
               autoHeight
               className="foi-data-grid"
-              getRowId={(row) => row.idNumber}
+              getRowId={(row) => `${row.idNumber}-${row.id}`}
               rows={searchResults?.data || []}
               columns={columnsRef}
               rowHeight={30}
