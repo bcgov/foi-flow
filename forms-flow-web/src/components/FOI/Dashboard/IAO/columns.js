@@ -146,7 +146,8 @@ const IntakeTeamColumns = [
         return "None";
       }
     },
-    width: 160,
+    minWidth: 70,
+    flex: 0.75,
     renderCell: selectedMinTooltipRender,
   },
   {
