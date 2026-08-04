@@ -146,7 +146,8 @@ const IntakeTeamColumns = [
         return "None";
       }
     },
-    width: 160,
+    minWidth: 70,
+    flex: 0.75,
     renderCell: selectedMinTooltipRender,
   },
   {
@@ -304,7 +305,7 @@ const OITeamColumns = [
   {
     field: "axisRequestId",
     headerName: "ID NUMBER",
-    minWidth: 150,
+    minWidth: 160,
     headerAlign: "left",
     valueGetter: (params) => params.row.requestType == "PD" && !params.row.axisRequestId ?
       params.row.idNumber : params.row.axisRequestId
