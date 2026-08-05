@@ -1,0 +1,50 @@
+# GitHub Actions workflow for building and tagging the API image on PR
+name: FORMS FLOW WEB - Continuous Integration
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review] # Triggered by opened or changed pull requests.
+    branches: [dev]
+    paths:
+      - 'forms-flow-web/**' # Triggers on changes to files in the express-api/ directory.
+
+jobs:
+# Job for automated unit tests goes HERE
+
+# Build the docker image, tag with pull request
+  FORMS-FLOW-WEB-BUILD:
+    runs-on: ubuntu-latest
+    steps:
+  # Checkout repo
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+  # Login to BC Gov Openshift Image Repository via docker
+
+      - name: Login to Openshift Docker
+        run: |
+          echo "${{ secrets.OPENSHIFT_SA_TOOLS_TOKEN }}" | docker login ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}  -u ${{ secrets.OPENSHIFT_SA_NAME }} --password-stdin 
+
+  # Build the Forms-Flow Web API Image, Tag with Pull Request number
+      - name: Build Forms Flow Web Image
+        working-directory: ./forms-flow-web
+        run: |
+          docker build -t ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/forms-flow-web:${{github.event.pull_request.number}} -f Dockerfile .
+
+  # Push Built Image to BC Gov Openshift Image Repository
+      - name: Push Forms Flow Web Image
+        run: |
+          docker push ${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/forms-flow-web:${{github.event.pull_request.number}}
+
+  FORMS-FLOW-WEB-PR-COMMENT:
+    needs: FORMS-FLOW-WEB-BUILD
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on PR
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            **Tag:** `${{ github.event.pull_request.number }}`  
+            **Image:** `${{ secrets.PUBLIC_IMAGE_REPOSITORY }}/${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}/forms-flow-web:${{ github.event.pull_request.number }}`
