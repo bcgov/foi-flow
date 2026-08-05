@@ -28,6 +28,7 @@ from request_api.services.eventservice import eventservice
 from request_api.services.unopenedreportservice import unopenedreportservice
 from request_api.services.deduplicate_request_service.request_deduplication_service import RequestDeduplicationService
 from request_api.utils.enums import StateName
+from weasyprint import HTML
 import json
 import asyncio
 from jose import jwt as josejwt
@@ -349,3 +350,20 @@ class FOIRawRequestReport(Resource):
             return {'status': True, 'message': 'async report function called'} , 200
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foirawrequest/requestreceipt')
+class FOIRawRequestReceipt(Resource):
+    """Generates a pdf receipt of a raw request for applicants and intake users"""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    def post():
+        try:
+            request_data = request.get_json() 
+            pdf_bytes = HTML(string=request_data["requestHTML"]).write_pdf()
+            return {'success': True, 'message': 'Request receipt pdf generated', "pdf": pdf_bytes}, 200
+        except BusinessException as exception:
+            return {'success': False, 'message':exception.message, "pdf": None}, 500
