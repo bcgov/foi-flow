@@ -635,7 +635,8 @@ class FOIMinistryRequest(db.Model):
                     'name', ProgramArea.name,
                     'isSelected', literal(True)
                 )
-            ), String).label('selectedMinistries')
+            ), String).label('selectedMinistries'),
+            latest_proactive.reportperiod.label('reportperiod')
         ]
 
         basequery = _session.query(
