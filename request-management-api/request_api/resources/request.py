@@ -29,6 +29,7 @@ from request_api.services.unopenedreportservice import unopenedreportservice
 from request_api.services.deduplicate_request_service.request_deduplication_service import RequestDeduplicationService
 from request_api.utils.enums import StateName
 from weasyprint import HTML
+import logging
 import json
 import asyncio
 from jose import jwt as josejwt
@@ -361,6 +362,8 @@ class FOIRawRequestReceipt(Resource):
     @cross_origin(origins=allowedorigins())
     def post():
         try:
+            logging.getLogger("weasyprint").propagate = False
+            logging.getLogger("fontTools").propagate = False
             request_data = request.get_json()
             pdf_file = HTML(string=request_data["requestHTML"]).write_pdf()
             return Response(
