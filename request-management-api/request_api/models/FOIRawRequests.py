@@ -535,19 +535,19 @@ class FOIRawRequest(db.Model):
             subquery_maxversion.c.requestid == FOIRawRequest.requestid,
             subquery_maxversion.c.max_version == FOIRawRequest.version,
         ]
-
+        
         requesttype = case([
                             (FOIRawRequest.status == StateName.unopened.value,
                              FOIRawRequest.requestrawdata['requestType']['requestType'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['requestType'].astext).label('requestType')
         firstname = case([
-                            (FOIRawRequest.status == StateName.unopened.value,
+                            (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['contactInfo']['firstName'].astext.isnot(None)),
                              FOIRawRequest.requestrawdata['contactInfo']['firstName'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['firstName'].astext).label('firstName')
         lastname = case([
-                            (FOIRawRequest.status == StateName.unopened.value,
+                            (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext.isnot(None)),
                              FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['lastName'].astext).label('lastName')
