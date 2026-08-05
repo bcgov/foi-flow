@@ -14,7 +14,7 @@
 """API endpoints for managing a FOI Requests resource."""
 
 
-from flask import g, request
+from flask import g, request, Response
 from flask_restx import Namespace, Resource
 from flask_expects_json import expects_json
 from flask_cors import cross_origin
@@ -362,8 +362,11 @@ class FOIRawRequestReceipt(Resource):
     def post():
         try:
             request_data = request.get_json()
-            print("REQ DATA", request_data)
-            pdf_bytes = HTML(string=request_data["requestHTML"]).write_pdf()
-            return {'success': True, 'message': 'Request receipt pdf generated', "pdf": pdf_bytes}, 200
+            pdf_file = HTML(string=request_data["requestHTML"]).write_pdf()
+            return Response(
+                pdf_file,
+                status=200,
+                mimetype="application/pdf"
+            )
         except BusinessException as exception:
-            return {'success': False, 'message':exception.message, "pdf": None}, 500
+            return {'success': False, 'message':exception.message, "pdf_file": None}, 500
