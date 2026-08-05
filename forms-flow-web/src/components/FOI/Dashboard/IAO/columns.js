@@ -42,7 +42,7 @@ const ProcessingTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       params.row.requestType == "proactive disclosure"
-        ? "N/A"
+        ? null
         : getFullName(params.row.firstName, params.row.lastName),
     width: 180,
   },
@@ -162,7 +162,7 @@ const IntakeTeamColumns = [
     headerAlign: "left",
     valueGetter: (params) =>
       params.row.requestType == "proactive disclosure"
-        ? "N/A" :
+        ? null :
         getFullName(params.row.firstName, params.row.lastName),
     width: 180,
   },
@@ -173,7 +173,7 @@ const IntakeTeamColumns = [
     valueGetter: (params) =>
       params.row.onBehalfFormatted === undefined ||
         params.row.onBehalfFormatted === null
-        ? "N/A"
+        ? null
         : params.row.onBehalfFormatted,
     width: 120,
   },
@@ -321,7 +321,7 @@ const OITeamColumns = [
     headerName: "REPORT PERIOD",
     flex: 1,
     headerAlign: "left",
-    valueGetter: (params) => params.row.requestType == "PD" ?
+    valueGetter: (params) => (params.row.requestType == "PD" || params.row.requestType == "proactive disclosure") ?
       params.row.reportperiod : null
   },
   {
