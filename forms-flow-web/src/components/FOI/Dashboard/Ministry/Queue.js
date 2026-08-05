@@ -306,7 +306,7 @@ const Queue = ({ userDetail, tableInfo }) => {
         <DataGrid
           autoHeight
           className="foi-data-grid"
-          getRowId={(row) => row.idNumber}
+          getRowId={(row) => `${row.idNumber}-${row.id}`}
           rows={rows}
           columns={columns.current}
           rowHeight={30}
