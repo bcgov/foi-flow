@@ -359,7 +359,6 @@ class FOIRawRequestReceipt(Resource):
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
-    @auth.require
     def post():
         try:
             request_data = request.get_json()
