@@ -1,4 +1,3 @@
-# test
 # base image
 # FROM node:14.17.0-alpine as build-stage
 FROM node:22.23.1-alpine3.24 as build-stage
