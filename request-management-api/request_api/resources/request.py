@@ -362,7 +362,8 @@ class FOIRawRequestReceipt(Resource):
     @auth.require
     def post():
         try:
-            request_data = request.get_json() 
+            request_data = request.get_json()
+            print("REQ DATA", request_data)
             pdf_bytes = HTML(string=request_data["requestHTML"]).write_pdf()
             return {'success': True, 'message': 'Request receipt pdf generated', "pdf": pdf_bytes}, 200
         except BusinessException as exception:
