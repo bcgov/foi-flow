@@ -537,7 +537,7 @@ class FOIRawRequest(db.Model):
         ]
         
         requesttype = case([
-                            (FOIRawRequest.status == StateName.unopened.value,
+                            (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['requestType']['requestType'].astext.isnot(None)),
                              FOIRawRequest.requestrawdata['requestType']['requestType'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['requestType'].astext).label('requestType')
