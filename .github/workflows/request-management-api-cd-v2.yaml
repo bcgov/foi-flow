@@ -4,7 +4,7 @@ name: REQUEST MANAGEMENT API - Continuous Delivery
 on:
   pull_request:
     types: [submitted] # Triggered by opened or changed pull requests.
-    branches: [main]
+    branches: [dev]
     paths:
       - 'request-management-api/**' # Triggers on changes to files in the express-api/ directory.
     
