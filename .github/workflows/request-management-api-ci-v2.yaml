@@ -4,7 +4,7 @@ name: REQUEST MANAGEMENT API - Continuous Integration
 on:
   pull_request:
     types: [opened, synchronize, ready_for_review] # Triggered by opened or changed pull requests.
-    branches: [main]
+    branches: [dev]
     paths:
       - 'request-management-api/**' # Triggers on changes to files in the express-api/ directory.
 
