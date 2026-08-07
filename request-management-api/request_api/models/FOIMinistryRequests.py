@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship, backref, aliased
 from .default_method_result import DefaultMethodResult
 from .FOIRequests import FOIRequest, FOIRequestsSchema
 from sqlalchemy.sql.expression import distinct
-from sqlalchemy import or_, and_, text, func, literal, cast, case, nullslast, nullsfirst, desc, asc, true
+from sqlalchemy import or_, and_, text, func, literal, literal_column, cast, case, nullslast, nullsfirst, desc, asc, true
 from sqlalchemy.sql.sqltypes import String
 from sqlalchemy.dialects.postgresql import JSON
 from .FOIRequestApplicantMappings import FOIRequestApplicantMapping
@@ -626,12 +626,12 @@ class FOIMinistryRequest(db.Model):
             FOIMinistryRequest.isoipcreview.label('isoipcreview'),
             FOIMinistryRequest.isphasedrelease.label('isphasedrelease'),
             literal(None).label('oipc_number'),
-            literal(None).label('closereason'),
+            CloseReason.name.label('closereason'),
             ProactiveDisclosureCategory.name.label('proactivedisclosurecategory'),
             #latest_proactive.foiministryrequestversion_id.label(""),
             cast(func.json_build_array(
                 func.json_build_object(
-                    'code', func.upper(ProgramArea.bcgovcode),
+                    'code', func.upper(ProgramArea.iaocode),
                     'name', ProgramArea.name,
                     'isSelected', literal(True)
                 )
@@ -715,6 +715,10 @@ class FOIMinistryRequest(db.Model):
                                 and_(
                                     *joincondition_oipc
                                     ),
+                                isouter=True
+                            ).join(
+                                CloseReason,
+                                CloseReason.closereasonid == FOIMinistryRequest.closereasonid,
                                 isouter=True
                             ).filter(or_(FOIMinistryRequest.requeststatuslabel != StateName.closed.name, 
                                          and_(FOIMinistryRequest.isoipcreview == True, FOIMinistryRequest.requeststatusid == 3,subquery_with_oipc.c.outcomeid == None)))
@@ -815,6 +819,22 @@ class FOIMinistryRequest(db.Model):
                 return nullslast(desc(field))
             else:
                 return nullsfirst(asc(field))
+        if field == 'flags':
+            # sort_expr = literal_column("""CASE WHEN "isoipcreview" = true THEN 3 WHEN "isphasedrelease" = true THEN 2 ELSE 0 END""")
+            sort_expr = literal_column("""
+                                    CASE 
+                                        -- WHEN "isiaorestricted" = true AND "isoipcreview" = true AND "isphasedrelease" = true THEN 7
+                                        -- WHEN "isiaorestricted" = true AND "isoipcreview" = true THEN 6
+                                        -- WHEN "isiaorestricted" = true AND "isphasedrelease" = true THEN 5
+                                        -- WHEN "isiaorestricted" = true THEN 4
+                                        WHEN "isoipcreview" = true AND "isphasedrelease" = true THEN 3
+                                        WHEN "isoipcreview" = true THEN 2
+                                        WHEN "isphasedrelease" = true THEN 1
+                                    ELSE 0 END""")
+            if order == 'desc':
+                return nullslast(sort_expr.desc())
+            else:
+                return nullsfirst(sort_expr.asc())
         else:
             if(order == 'desc'):
                 return nullslast(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).desc())
@@ -1343,7 +1363,7 @@ class FOIMinistryRequest(db.Model):
             ProactiveDisclosureCategory.name.label('proactivedisclosurecategory'),
             cast(func.json_build_array(
                 func.json_build_object(
-                    'code', func.upper(ProgramArea.bcgovcode),
+                    'code', func.upper(ProgramArea.iaocode),
                     'name', ProgramArea.name,
                     'isSelected', literal(True)
                 )

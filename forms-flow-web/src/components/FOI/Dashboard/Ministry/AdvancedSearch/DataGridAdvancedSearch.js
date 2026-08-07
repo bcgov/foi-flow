@@ -144,7 +144,7 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
       cellClassName: 'foi-advanced-search-result-cell',
     },
     {
-      field: "CFRDueDateValue",
+      field: "cfrduedate",
       headerName: "RECORDS DUE",
       flex: 1,
       headerAlign: "left",
