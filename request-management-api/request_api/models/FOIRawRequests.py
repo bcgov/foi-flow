@@ -1088,7 +1088,16 @@ class FOIRawRequest(db.Model):
                         else:
                             sortingcondition.append(nullslast(sort_expr.asc()))
                     elif field == 'flags':
-                        sort_expr = literal_column("""CASE WHEN "isiaorestricted" = true OR "isoipcreview" = true OR "isphasedrelease" = true THEN 1 ELSE 0 END""")
+                        sort_expr = literal_column("""
+                        CASE 
+                            WHEN "isiaorestricted" = true AND "isoipcreview" = true AND "isphasedrelease" = true THEN 7
+                            WHEN "isiaorestricted" = true AND "isoipcreview" = true THEN 6
+                            WHEN "isiaorestricted" = true AND "isphasedrelease" = true THEN 5
+                            WHEN "isiaorestricted" = true THEN 4
+                            WHEN "isoipcreview" = true AND "isphasedrelease" = true THEN 3
+                            WHEN "isoipcreview" = true THEN 2
+                            WHEN "isphasedrelease" = true THEN 1
+                        ELSE 0 END""")
                         if order == 'desc':
                             sortingcondition.append(nullslast(sort_expr.desc()))
                         else:
