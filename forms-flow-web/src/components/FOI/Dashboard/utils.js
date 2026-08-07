@@ -179,7 +179,7 @@ export const getRecordsDue = (params) => {
   let receivedDateString = params.row.cfrduedate;
   const currentStatus = params.row.currentState;
   if (currentStatus.toLowerCase() === StateEnum.onhold.name.toLowerCase() || currentStatus.toLowerCase() === StateEnum.onholdother.name.toLowerCase()) {
-    return "N/A";
+    return null;
   } else if (!receivedDateString) {
     return "";
   } else {
@@ -205,7 +205,7 @@ export const getDaysLeft = (params) => {
   if (
     [StateEnum.onhold.name.toLowerCase(), StateEnum.closed.name.toLowerCase(), StateEnum.onholdother.name.toLowerCase()].includes(params.row.currentState.toLowerCase())
   ) {
-    return "N/A";
+    return null;
   } else if (!receivedDateString) {
     return "";
   } else {
