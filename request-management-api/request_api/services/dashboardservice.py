@@ -38,6 +38,7 @@ class dashboardservice:
     """
 
     def __preparefoirequestinfo(self, request, receiveddate, receiveddateuf, updated_selectedministries, idnumberprefix = ''):
+        print("SNAKE", updated_selectedministries)
         idnumber = self.__getidnumber(idnumberprefix, request.axisRequestId, request.idNumber)
         baserequestinfo = self.__preparebaserequestinfo(
             request.id, 
@@ -115,6 +116,7 @@ class dashboardservice:
                 requestqueue.append(self.__handle_oi_request(request))
             else:
                 # Handle Raw requests format
+                print("ODD", request)
                 # Update corresponding IAO code to selectedMinistries data
                 updated_selectedministries = self.__format_selectedministries(request)
 
