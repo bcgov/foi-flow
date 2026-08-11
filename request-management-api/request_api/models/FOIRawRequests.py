@@ -1064,7 +1064,6 @@ class FOIRawRequest(db.Model):
                 if(FOIRawRequest.validatefield(field)):
                     order = sortingorders.pop(0)
                     if field == 'selectedMinistries':
-                        print("BANG")
                         sort_expr = literal_column("""
                         COALESCE(
                             (SELECT pa."iaocode"
