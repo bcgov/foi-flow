@@ -3,8 +3,8 @@
 # Maven build
 FROM maven:3.6.3-amazoncorretto-11 AS MAVEN_TOOL_CHAIN
 
-RUN apt-get update \
-    && apt-get install -y git
+RUN yum update -y
+RUN yum install -y git
 
 RUN git clone -b ${FORMIO_SOURCE_REPO_BRANCH} ${FORMIO_SOURCE_REPO_URL} /bpm/
 
@@ -31,10 +31,9 @@ RUN mvn -s /usr/share/maven/ref/settings-docker.xml package -Dmaven.test.skip
 # Final custom slim java image (for apk command see jdk-11.0.3_7-alpine-slim)
 FROM openjdk:11.0.16-slim
 
-
-ENV JAVA_VERSION jdk-11.0.16
-ENV JAVA_HOME=/opt/java/openjdk \
-    PATH="/opt/java/openjdk/bin:$PATH"
+# ENV JAVA_VERSION jdk-11.0.16
+# ENV JAVA_HOME=/opt/java/openjdk \
+#     PATH="/opt/java/openjdk/bin:$PATH"
 
 EXPOSE 8080
 # OpenShift has /app in the image, but it's missing when doing local development - Create it when missing
@@ -48,7 +47,7 @@ RUN chmod a+rwx -R /app
 RUN keytool -import -trustcacerts \
     -alias sslcom-cert \
     -file /app/sslcom.crt \
-    -keystore /opt/java/openjdk/lib/security/cacerts \
+    -keystore "$JAVA_HOME/lib/security/cacerts" \
     -storepass changeit \
     -noprompt
 WORKDIR /app
