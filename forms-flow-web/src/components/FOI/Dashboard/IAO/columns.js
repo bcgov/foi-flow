@@ -139,7 +139,7 @@ const IntakeTeamColumns = [
       try {
         const ministryJSON = JSON.parse(params.row.selectedMinistries);
         if (!Array.isArray(ministryJSON) || ministryJSON.length === 0) return "None";
-        let firstMinistry = ministryJSON[0]?.code ?? "None";
+        let firstMinistry = ministryJSON[0]?.iaocode ?? ministryJSON[0]?.code ?? "None";
         const count = ministryJSON.length;
         return firstMinistry + (count > 1 ? ` (${count})` : "");
       } catch {
@@ -319,6 +319,8 @@ const OITeamColumns = [
   {
     field: "reportPeriod",
     headerName: "REPORT PERIOD",
+    sortable: false,
+    filterable: false,
     flex: 1,
     headerAlign: "left",
     valueGetter: (params) => (params.row.requestType == "PD" || params.row.requestType == "proactive disclosure") ?

@@ -5,6 +5,7 @@ from request_api.models.FOIRawRequestWatchers import FOIRawRequestWatcher
 from request_api.models.FOIRequestWatchers import FOIRequestWatcher
 from request_api.models.FOIOpenInformationRequests import FOIOpenInformationRequests
 from request_api.utils.enums import OIStatusEnum
+from request_api.models.ProgramAreas import ProgramArea
 from dateutil import tz, parser
 import datetime as dt
 from pytz import timezone
@@ -13,6 +14,7 @@ import maya
 from request_api.auth import AuthHelper
 import holidays
 import logging
+import json
 
 from flask import jsonify
 
@@ -35,7 +37,7 @@ class dashboardservice:
 
     """
 
-    def __preparefoirequestinfo(self, request, receiveddate, receiveddateuf, idnumberprefix = ''):
+    def __preparefoirequestinfo(self, request, receiveddate, receiveddateuf, updated_selectedministries, idnumberprefix = ''):
         idnumber = self.__getidnumber(idnumberprefix, request.axisRequestId, request.idNumber)
         baserequestinfo = self.__preparebaserequestinfo(
             request.id, 
@@ -72,7 +74,7 @@ class dashboardservice:
         isoipcreview = request.isoipcreview if request.isoipcreview == True else False
         baserequestinfo.update({'isoipcreview': isoipcreview})
         baserequestinfo.update({'isphasedrelease': request.isphasedrelease if request.isphasedrelease == True else False})
-        baserequestinfo.update({'selectedMinistries': request.selectedMinistries})
+        baserequestinfo.update({'selectedMinistries': updated_selectedministries if len(updated_selectedministries) > 0 else request.selectedMinistries})
         baserequestinfo.update({'reportperiod': request.reportperiod})
         
         proactivecategory = ""
@@ -113,12 +115,15 @@ class dashboardservice:
                 requestqueue.append(self.__handle_oi_request(request))
             else:
                 # Handle Raw requests format
+                # Update corresponding IAO code to selectedMinistries data
+                updated_selectedministries = self.__format_selectedministries(request)
+
                 if(request.receivedDateUF is None): #request from online form has no received date in json
                     _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
                 else:
                     _receiveddate = parser.parse(request.receivedDateUF)
                 if(request.ministryrequestid == None):                
-                    unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
+                    unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), updated_selectedministries, idnumberprefix= 'U-00')
                     unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                     unopenrequest.update({'isiaorestricted': request.isiaorestricted}) 
 
@@ -130,7 +135,7 @@ class dashboardservice:
                     requestqueue.append(unopenrequest) 
 
                 else:
-                    _openrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
+                    _openrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), updated_selectedministries)
                     _openrequest.update({'ministryrequestid': request.ministryrequestid})
                     _openrequest.update({'extensions': request.extensions})
                     _openrequest.update({'assignedToFormatted': request.assignedToFormatted})
@@ -212,13 +217,16 @@ class dashboardservice:
         
         requestqueue = []
         for request in requests.items:
+            # Update corresponding IAO code to selectedMinistries data
+            updated_selectedministries = self.__format_selectedministries(request)
+
             if(request.receivedDateUF is None): #request from online form has no received date in json
                 _receiveddate = maya.parse(request.created_at).datetime(to_timezone='America/Vancouver', naive=False)
             else:
                 _receiveddate = parser.parse(request.receivedDateUF)
 
             if(request.ministryrequestid == None):
-                unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), idnumberprefix= 'U-00')
+                unopenrequest = self.__preparefoirequestinfo(request, _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), updated_selectedministries, idnumberprefix= 'U-00')
                 unopenrequest.update({'description':request.description})
                 unopenrequest.update({'assignedToFormatted': request.assignedToFormatted})
                 unopenrequest.update({'isiaorestricted': request.isiaorestricted})
@@ -233,7 +241,7 @@ class dashboardservice:
 
                 requestqueue.append(unopenrequest)
             else:
-                _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT))
+                _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), updated_selectedministries)
                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
                 _openrequest.update({'extensions': request.extensions})
                 _openrequest.update({'description':request.description})
@@ -338,3 +346,16 @@ class dashboardservice:
         _cfrduedate = request.cfrduedate.strftime("%b %d %Y") if request.cfrduedate else None
             
         return self.__preparefoioirequestinfo(request, _receiveddate, _publicationdate, _from_closed, _cfrduedate)
+
+    def __format_selectedministries(self, request):
+        if (request.selectedMinistries):
+            programarea_mapping = {
+                programarea["bcgovcode"]: programarea["iaocode"] for programarea in ProgramArea.getprogramareas()
+            }
+            parsed_selectedministries = json.loads(request.selectedMinistries)
+            for selectedministry in parsed_selectedministries:
+                if selectedministry["code"] in programarea_mapping:
+                    selectedministry["iaocode"] = programarea_mapping[selectedministry["code"]]
+            return parsed_selectedministries
+
+        return []

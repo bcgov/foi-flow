@@ -1064,7 +1064,17 @@ class FOIRawRequest(db.Model):
                 if(FOIRawRequest.validatefield(field)):
                     order = sortingorders.pop(0)
                     if field == 'selectedMinistries':
-                        sort_expr = literal_column("""CASE WHEN "selectedMinistries" LIKE '[%' THEN ("selectedMinistries"::jsonb -> 0 ->> 'code') ELSE "selectedMinistries" END""")
+                        sort_expr = literal_column("""
+                        COALESCE(
+                            (SELECT pa."iaocode"
+                            FROM public."ProgramAreas" pa
+                            WHERE pa."bcgovcode" = 
+                                CASE WHEN "selectedMinistries" LIKE '[%' THEN ("selectedMinistries"::jsonb -> 0 ->> 'code') ELSE "selectedMinistries" END
+                            LIMIT 1
+                            ),
+                            CASE WHEN "selectedMinistries" LIKE '[%' THEN ("selectedMinistries"::jsonb -> 0 ->> 'code') ELSE "selectedMinistries" END
+                        )
+                        """)
                         if order == 'desc':
                             sortingcondition.append(nullslast(sort_expr.desc()))
                         else:
