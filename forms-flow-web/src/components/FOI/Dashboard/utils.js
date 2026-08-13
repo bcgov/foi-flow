@@ -345,13 +345,13 @@ export const selectedMinTooltipRender = (params) => {
     if (!Array.isArray(ministryJSON) || ministryJSON.length === 0) {
       return <span className="table-cell-truncate">None</span>;
     }
-    let firstMinistry = ministryJSON[0]?.code ?? "None";
+    let firstMinistry = ministryJSON[0]?.iaocode ?? ministryJSON[0]?.code ?? "None";
     const count = ministryJSON.length;
     let selectedMinistries = [];
 
     for (let ministry of ministryJSON) {
       if (ministry.isSelected || ministry.selected) {
-        selectedMinistries.push(ministry.code)
+        selectedMinistries.push(ministry.iaocode)
       }
     }
     return <LightTooltip placement="bottom-start" title={
