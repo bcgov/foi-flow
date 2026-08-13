@@ -472,6 +472,8 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
     {
       field: "reportPeriod",
       headerName: "REPORT PERIOD",
+      sortable: false,
+      filterable: false,
       flex: 1,
       headerAlign: "left",
       valueGetter: (params) => (params.row.requestType == "PD" || params.row.requestType == "proactive disclosure") ?
