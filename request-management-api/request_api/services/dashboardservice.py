@@ -241,7 +241,7 @@ class dashboardservice:
 
                 requestqueue.append(unopenrequest)
             else:
-                _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), updated_selectedministries, _receiveddate.strftime(LONG_DATEFORMAT))
+                _openrequest = self.__preparefoirequestinfo(request,  _receiveddate.strftime(SHORT_DATEFORMAT), _receiveddate.strftime(LONG_DATEFORMAT), updated_selectedministries)
                 _openrequest.update({'ministryrequestid':request.ministryrequestid})
                 _openrequest.update({'extensions': request.extensions})
                 _openrequest.update({'description':request.description})
