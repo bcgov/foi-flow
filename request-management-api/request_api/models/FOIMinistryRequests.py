@@ -835,6 +835,12 @@ class FOIMinistryRequest(db.Model):
                 return nullslast(sort_expr.desc())
             else:
                 return nullsfirst(sort_expr.asc())
+        elif field == 'applicantcategory':
+            sort_expr = func.coalesce(ApplicantCategory.name, ProactiveDisclosureCategory.name)
+            if order == 'desc':
+                return nullslast(sort_expr.desc())
+            else:
+                return nullsfirst(sort_expr.asc())
         else:
             if(order == 'desc'):
                 return nullslast(FOIMinistryRequest.findfield(field, iaoassignee, ministryassignee).desc())
