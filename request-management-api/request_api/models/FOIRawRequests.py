@@ -1079,6 +1079,17 @@ class FOIRawRequest(db.Model):
                             sortingcondition.append(nullslast(sort_expr.desc()))
                         else:
                             sortingcondition.append(nullsfirst(sort_expr.asc()))
+                    elif field == 'duedate':
+                        sort_expr = literal_column("""
+                        CASE
+                            WHEN "currentState" IN ('Closed', 'On Hold', 'On Hold - Other')
+                            THEN CAST('1900-01-01' AS TIMESTAMP)
+                            ELSE CAST(NULLIF(duedate, '') AS TIMESTAMP)
+                        END""")
+                        if order == 'desc':
+                            sortingcondition.append(nullslast(sort_expr.desc()))
+                        else:
+                            sortingcondition.append(nullsfirst(sort_expr.asc()))
                     elif field == 'cfrduedate':
                         sort_expr = literal_column("""CAST(NULLIF(cfrduedate, '') AS TIMESTAMP)""")
                         if order == 'desc':
@@ -1108,6 +1119,12 @@ class FOIRawRequest(db.Model):
                             WHEN "isoipcreview" = true THEN 2
                             WHEN "isphasedrelease" = true THEN 1
                         ELSE 0 END""")
+                        if order == 'desc':
+                            sortingcondition.append(nullslast(sort_expr.desc()))
+                        else:
+                            sortingcondition.append(nullsfirst(sort_expr.asc()))
+                    elif field == 'applicantcategory':
+                        sort_expr = literal_column("""COALESCE("applicantcategory", "proactivedisclosurecategory")""")
                         if order == 'desc':
                             sortingcondition.append(nullslast(sort_expr.desc()))
                         else:
