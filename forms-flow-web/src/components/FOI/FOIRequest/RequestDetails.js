@@ -110,7 +110,7 @@ const RequestDetails = React.memo(
 
     //updates the default values from the request details
     React.useEffect(() => {
-      const initialRequestType = validateFields(saveRequestObject && Object.keys(saveRequestObject).length !== 0 && 
+      const initialRequestType = validateFields(saveRequestObject && Object.keys(saveRequestObject).length !== 0 &&
         saveRequestObject.requestType ? saveRequestObject : requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE);
       setSelectedRequestType(initialRequestType);
       setSelectedReceivedMode(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE));
@@ -181,7 +181,7 @@ const RequestDetails = React.memo(
     const [dueDateText, setDueDate] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, getProcessStartDateForLocalState()));
 
     //local state management for RequestType, ReceivedMode and DeliveryMode
-    const [selectedRequestType, setSelectedRequestType] = React.useState(validateFields(saveRequestObject && Object.keys(saveRequestObject).length !== 0 && 
+    const [selectedRequestType, setSelectedRequestType] = React.useState(validateFields(saveRequestObject && Object.keys(saveRequestObject).length !== 0 &&
       saveRequestObject.requestType ? saveRequestObject : requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_TYPE));
     const [selectedReceivedMode, setSelectedReceivedMode] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_MODE));
     const [selectedDeliveryMode, setSelectedDeliveryMode] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DELIVERY_MODE));

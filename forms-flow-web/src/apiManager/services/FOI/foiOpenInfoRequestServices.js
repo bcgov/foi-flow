@@ -59,7 +59,7 @@ export const saveFOIOpenInfoRequest = (
   const isValidExemptionRequest = !isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && data.oiexemption_id !== OIExemptions.OutsideScopeOfPublication;
   const isValidExemptionDenial = isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && data.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && data.oiexemptionapproved === false;
   const isValidExemptionApproved = isOIUser && data.oipublicationstatus_id === OIPublicationStatuses.DoNotPublish && data.oiexemption_id !== OIExemptions.OutsideScopeOfPublication && data.oiexemptionapproved === true;
-  const manualPublicationStatusChange = requetsinfo.oistatusid === OIStates.ExemptionRequest && data.oipublicationstatus_id === OIPublicationStatuses.Publish;  
+  const manualPublicationStatusChange = requetsinfo.oistatusid === OIStates.ExemptionRequest && data.oipublicationstatus_id === OIPublicationStatuses.Publish;
   if (isValidExemptionDenial) {
     data.oipublicationstatus_id = 2;
     data.oiexemption_id = null;
@@ -161,8 +161,8 @@ export const unpublishFOIOpenInfoRequest = (foiministryrequestid, foirequestid, 
 }
 
 const updateFOIMinistryRequestOIStatus = (
-  foiministryrequestid, 
-  foirequestId, 
+  foiministryrequestid,
+  foirequestId,
   isValidExemptionRequest,
   isValidExemptionDenial,
   manualPublicationStatusChange,
@@ -176,7 +176,7 @@ const updateFOIMinistryRequestOIStatus = (
   // Update FOIMinistryRequest oistatusid to "Do Not Publish" if EXEMPTION is required from IAO
   if (isValidExemptionRequest) {
     return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: OIStates.ExemptionRequest });
-  // Update FOIMinistryRequest oistatusid to "Null" if Exemption Request denied OR if OpenInfo Publication status is manually changed from "Do not Publish" to Publish  
+  // Update FOIMinistryRequest oistatusid to "Null" if Exemption Request denied OR if OpenInfo Publication status is manually changed from "Do not Publish" to Publish
   } else if (isValidExemptionDenial || manualPublicationStatusChange) {
     return httpPOSTRequest(`${apiUrl}/oistatusid`, { oistatusid: null });
   } else if (isValidExemptionApproved) {

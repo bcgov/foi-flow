@@ -46,7 +46,7 @@ const ProactiveDisclosureRequestPublication = ({
         confirmationData: null,
     });
     const [isDataEdited, setIsDataEdited] = useState(false);
-    
+
     useEffect(() => {
         if (foiPDTransactionData) setPdPublicationData(foiPDTransactionData);
     }, [foiPDTransactionData]);
@@ -323,7 +323,7 @@ const ProactiveDisclosureRequestPublication = ({
                 onClick={handlePublishNow}
             >
                 Publish Now
-            </button> 
+            </button>
             }
             <OpenInfoConfirmationModal
                 modal={confirmationModal}

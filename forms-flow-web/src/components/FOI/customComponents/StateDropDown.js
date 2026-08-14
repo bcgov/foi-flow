@@ -314,7 +314,7 @@ const StateDropDown = ({
     return isValidationError;
     //   || (isBeforeOpen(requestDetails) ////comment back in after axis decomission
     //   && status === 'Open'
-    //   && !requestDetails.foiRequestApplicantID 
+    //   && !requestDetails.foiRequestApplicantID
     // );
   };
   const statusList = getStatusList();

@@ -15,7 +15,7 @@ import {
   setFOIRequestDescriptionHistory,
   setFOIMinistryRequestList,
   setOpenedMinistries,
-  setRestrictedReqTaglist,  
+  setRestrictedReqTaglist,
   setRequestExtensions,
 } from "../../../actions/FOI/foiRequestActions";
 import { fetchFOIAssignedToList, fetchFOIMinistryAssignedToList, fetchFOIProcessingTeamList } from "./foiMasterDataServices";
@@ -108,7 +108,7 @@ export const fetchFOIMinistryRequestList = () => {
           });
           dispatch(clearMinistryViewRequestDetails({}));
           if (foiRequests > 0)
-            dispatch(fetchFOIMinistryAssignedToList( foiRequests[0].bcgovcode.toLowerCase()));     
+            dispatch(fetchFOIMinistryAssignedToList( foiRequests[0].bcgovcode.toLowerCase()));
           dispatch(setFOIMinistryRequestList(data));
           dispatch(setFOILoader(false));
         } else {
@@ -116,7 +116,7 @@ export const fetchFOIMinistryRequestList = () => {
           throw new Error("Error in fetching dashboard data for Ministry");
         }
       })
-      .catch((error) => {        
+      .catch((error) => {
         catchError(error, dispatch);
       });
   };
@@ -150,7 +150,7 @@ export const fetchFOIMinistryRequestListByPage = (page = 1, size = 10, sort = [{
           dispatch(setFOIMinistryRequestList(res.data));
           dispatch(setFOILoader(false));
           if (res.data?.data[0]?.bcgovcode)
-            dispatch(fetchFOIMinistryAssignedToList(res.data.data[0].bcgovcode));     
+            dispatch(fetchFOIMinistryAssignedToList(res.data.data[0].bcgovcode));
         } else {
           dispatch(serviceActionError(res));
           throw new Error("Error in fetching dashboard data for IAO");
@@ -201,7 +201,7 @@ export const fetchFOIRawRequestDetails = (requestId, userGroups) => {
 };
 
 export const fetchFOIRequestDetails = (requestId, ministryId, userGroups) => {
-  
+
   const apiUrlgetRequestDetails = replaceUrl(replaceUrl(
     API.FOI_REQUEST_API,
     "<requestid>",
@@ -332,7 +332,7 @@ export const saveMinistryRequestDetails = (data, requestId, ministryId, ...rest)
             done(null, res.data);
           } else {
             dispatch(serviceActionError(res));
-            throw new Error(`Error while saving the ministry request (request# ${requestId}, ministry# ${ministryId})`);            
+            throw new Error(`Error while saving the ministry request (request# ${requestId}, ministry# ${ministryId})`);
           }
         })
         .catch((error) => {
@@ -468,7 +468,7 @@ export const fetchRequestDataFromAxis = (axisRequestId, isModal,requestDetails, 
           done(null,"Unauthorized-RestrictedAxisRequest");
         }
         else{
-        
+
         done(null,"Exception happened while GET operations of request");
         }
       });
@@ -483,7 +483,7 @@ export const restrictRequest = (data, requestId, ministryId, type="iao", ...rest
       API.FOI_POST_MINISTRYREQUEST_RESTRICTION,
       "<ministryrequestid>",
       ministryId),"<type>",type
-    ); 
+    );
   }
   else{
     apiUrl= replaceUrl(
@@ -552,7 +552,7 @@ export const deleteOIPCDetails = (requestId, ministryId, ...rest) => {
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
-          throw new Error(`Error while saving the OIPC Details for the (request# ${requestId}, ministry# ${ministryId})`);            
+          throw new Error(`Error while saving the OIPC Details for the (request# ${requestId}, ministry# ${ministryId})`);
         }
       })
       .catch((error) => {
@@ -563,7 +563,7 @@ export const deleteOIPCDetails = (requestId, ministryId, ...rest) => {
 }
 
 export const fetchHistoricalRequestDetails = (requestId) => {
-  
+
   const apiUrlgetRequestDetails = API.FOI_HISTORICAL_REQUEST_API + "/" + requestId;
   return (dispatch) => {
     httpGETRequest(apiUrlgetRequestDetails, {}, UserService.getToken())
@@ -643,7 +643,7 @@ export const updateSpecificRequestSection = (data, field, requestId, ministryId,
           done(null, res.data);
         } else {
           dispatch(serviceActionError(res));
-          throw new Error(`Error while updating ${field} for the (request# ${requestId}, ministry# ${ministryId})`);            
+          throw new Error(`Error while updating ${field} for the (request# ${requestId}, ministry# ${ministryId})`);
         }
       })
       .catch((error) => {
@@ -689,7 +689,7 @@ export const deleteLinkedRequest = (data, axisid, ...rest) => {
           done(null, res.data);
         } else {
           console.error("API failed to update and remove linkedrequest:", res);
-          dispatch(serviceActionError(res));       
+          dispatch(serviceActionError(res));
         }
       })
       .catch((error) => {
@@ -709,7 +709,7 @@ export const saveLinkedRequests = (data, axisid, ...rest) => {
           done(null, res.data);
         } else {
           console.error("API failed to update and remove linkedrequest:", res);
-          dispatch(serviceActionError(res)); 
+          dispatch(serviceActionError(res));
         }
       })
       .catch((err) => {
