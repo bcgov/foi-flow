@@ -351,7 +351,7 @@ export const selectedMinTooltipRender = (params) => {
 
     for (let ministry of ministryJSON) {
       if (ministry.isSelected || ministry.selected) {
-        selectedMinistries.push(ministry.iaocode)
+        selectedMinistries.push(ministry.iaocode || ministry.code)
       }
     }
     return <LightTooltip placement="bottom-start" title={
