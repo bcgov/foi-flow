@@ -136,6 +136,8 @@ class rawrequestservicegetter:
             assignee = FOIAssignee.getassignee(request["assignedto"])
         assignedgroup = request["assignedgroup"] if "assignedgroup" in request else "Unassigned"
         assignedgroupemail = self.__getassignedgroupemail(assignedgroup)
+        receiveddate = requestrawdata["receivedDate"] if "receivedDate" in requestrawdata else _createddate.strftime('%Y %b, %d')
+        receiveddateuf = requestrawdata["receivedDateUF"] if "receivedDateUF" in requestrawdata else _createddate.strftime('%Y-%m-%d %H:%M:%S.%f')
         return {'id': request['requestid'],
                                'wfinstanceid': request['wfinstanceid'],
                                'ispiiredacted': request['ispiiredacted'],
@@ -147,8 +149,8 @@ class rawrequestservicegetter:
                                'lastName': contactinfo['lastName'],
                                'businessName': contactinfo['businessName'],                               
                                'currentState': request['status'],
-                               'receivedDate': _createddate.strftime('%Y %b, %d'),
-                               'receivedDateUF': _createddate.strftime('%Y-%m-%d %H:%M:%S.%f'),
+                               'receivedDate': receiveddate,
+                               'receivedDateUF': receiveddateuf,
                                'assignedGroup': assignedgroup,
                                'assignedGroupEmail': assignedgroupemail,
                                'assignedTo': request["assignedto"] if "assignedto" in request else "Unassigned",
