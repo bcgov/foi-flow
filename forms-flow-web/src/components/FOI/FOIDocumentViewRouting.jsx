@@ -7,7 +7,6 @@ import UserService from "../../services/UserService";
 import { setUserAuth } from "../../actions/bpmActions";
 import Loading from "../../containers/Loading";
 import FOIHeader from "./Header";
-import FOIFooter from "./Footer";
 import UnAuthorized from "./UnAuthorized";
 import AttachmentViewer from "./customComponents/AttachmentViewer"
 
@@ -49,7 +48,6 @@ const FOIDocumentViewRouting = React.memo((props) => {
     return ( <Route path="/foidocument">
     <FOIHeader  unauthorized={true}/> 
     <UnAuthorized />
-    <FOIFooter />
   </Route>);
     
   }

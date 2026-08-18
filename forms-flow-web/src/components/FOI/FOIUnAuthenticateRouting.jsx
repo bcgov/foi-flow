@@ -9,7 +9,6 @@ import Home from "./Home";
 import Admin from "./Admin";
 import Divisions from "./Admin/Divisions";
 import FOIHeader from "./Header";
-import FOIFooter from "./Footer";
 import { decrypt } from "../../helper/FOI/helper";
 
 const FOIUnAuthenticateRouting = React.memo((props) => {
@@ -36,7 +35,6 @@ const FOIUnAuthenticateRouting = React.memo((props) => {
       <Route exact path="/">
         <FOIHeader />
         <Home />
-        <FOIFooter />
       </Route>
     </>
   );
