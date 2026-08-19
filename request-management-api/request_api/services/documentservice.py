@@ -128,7 +128,7 @@ class documentservice:
         attachmentlist = []
         if attachments:
             for attachment in attachments:
-                attachment['filestatustransition'] = 'personal' if attachment['filename'] != "RequestReceipt.pdf" else 'applicant'
+                attachment['filestatustransition'] = 'applicant' if attachment['filename'] == "RequestReceipt.pdf" else 'personal'
                 attachment['ministrycode'] = 'Misc'
                 attachment['requestnumber'] = str(requestid)
                 attachment['file'] = base64.b64decode(attachment['base64data'])
