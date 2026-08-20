@@ -77,6 +77,7 @@ pyasn1
 secure==0.3.0
 boto3==1.24.35
 walrus==0.8.2
+weasyprint==66.0
 imap-tools==0.56.0
 more-itertools==10.2.0
 beautifulsoup4==4.12.3

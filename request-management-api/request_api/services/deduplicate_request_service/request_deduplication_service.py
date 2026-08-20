@@ -50,3 +50,4 @@ class RequestDeduplicationService:
     def _normalize_request_data(self, request_data):
         request_data.pop("requestId", None)
         request_data.pop("receivedDateUF", None)
+        request_data.pop("Attachments", None)

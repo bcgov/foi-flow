@@ -14,7 +14,7 @@
 """API endpoints for managing a FOI Requests resource."""
 
 
-from flask import g, request
+from flask import g, request, Response
 from flask_restx import Namespace, Resource
 from flask_expects_json import expects_json
 from flask_cors import cross_origin
@@ -28,6 +28,8 @@ from request_api.services.eventservice import eventservice
 from request_api.services.unopenedreportservice import unopenedreportservice
 from request_api.services.deduplicate_request_service.request_deduplication_service import RequestDeduplicationService
 from request_api.utils.enums import StateName
+from weasyprint import HTML
+import logging
 import json
 import asyncio
 from jose import jwt as josejwt
@@ -349,3 +351,25 @@ class FOIRawRequestReport(Resource):
             return {'status': True, 'message': 'async report function called'} , 200
         except BusinessException as exception:
             return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foirawrequest/requestreceipt')
+class FOIRawRequestReceipt(Resource):
+    """Generates a pdf receipt of a raw request for applicants and intake users"""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    def post():
+        try:
+            logging.getLogger("weasyprint").propagate = False
+            logging.getLogger("fontTools").propagate = False
+            request_data = request.get_json()
+            pdf_file = HTML(string=request_data["requestHTML"]).write_pdf()
+            return Response(
+                pdf_file,
+                status=200,
+                mimetype="application/pdf"
+            )
+        except BusinessException as exception:
+            return {'success': False, 'message':exception.message, "pdf_file": None}, 500
