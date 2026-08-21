@@ -1,6 +1,6 @@
 # Use the official .NET SDK image as a parent image.
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-
+# test
 # Set the working directory in the container.
 WORKDIR /src
 COPY ["MCS.FOI.Integration.sln", "./"]
