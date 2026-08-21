@@ -195,10 +195,10 @@ jobs:
         run: |
 
           # Clone GitOps repository containing Helm values.
-          git clone git@github.com:bcgov-c/tenant-gitops-04d1a3.git
+          git clone git@github.com:bcgov-c/tenant-gitops-d7abee.git
 
 
-          cd tenant-gitops-04d1a3
+          cd tenant-gitops-d7abee
 
 
           VALUES_FILE="foi-requests/values-${{ needs.prepare-deployment.outputs.environment }}.yaml"
@@ -304,15 +304,15 @@ jobs:
       - name: Login to OpenShift
         run: |
           oc login \
-            --server="${{ secrets.OPENSHIFT4_LOGIN_REGISTRY }}" \
-            --token="${{ secrets.OPENSHIFT4_SA_TOKEN }}"
+            --server="${{ secrets.PUBLIC_IMAGE_REPOSITORY }}" \
+            --token="${{ secrets.OPENSHIFT_SA_TOOLS_TOKEN }}"
 
 
       - name: Verify Deployment
         shell: bash
         run: |
 
-          oc project 04d1a3-${{ needs.prepare-deployment.outputs.environment }}
+          oc project d7abee-${{ needs.prepare-deployment.outputs.environment }}
 
           if [[ "${{ matrix.kind }}" == "deployment" ]]; then
 
