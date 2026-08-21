@@ -6,7 +6,6 @@ import UserService from "../../services/UserService";
 import { setUserAuth } from "../../actions/bpmActions";
 import Loading from "../../containers/Loading";
 import FOIHeader from "./Header";
-import FOIFooter from "./Footer";
 import { Dashboard, MinistryDashboard } from "./Dashboard";
 import FOIRequest  from "./FOIRequest";
 import MinistryReview from "./FOIRequest/MinistryReview/MinistryReview";
@@ -83,7 +82,6 @@ const FOIAuthenticateRouting = React.memo((props) => {
               <Route exact path={["/foi", "/foi/dashboard/"]}>
                 <Redirect to="/foi/dashboard"/>
               </Route>
-              <FOIFooter />
               <ApplicantProfileModal
                 modalOpen={applicantProfileModalOpen}
                 handleModalClose={handleApplicantModalClose}
@@ -93,7 +91,6 @@ const FOIAuthenticateRouting = React.memo((props) => {
             <Route path="/foi">
               <FOIHeader  unauthorized={true}/> 
               <UnAuthorized />
-              <FOIFooter />
             </Route>
           )
         ) : (
