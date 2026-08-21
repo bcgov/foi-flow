@@ -201,7 +201,7 @@ jobs:
           cd tenant-gitops-d7abee
 
 
-          VALUES_FILE="foi-requests/values-${{ needs.prepare-deployment.outputs.environment }}.yaml"
+          VALUES_FILE="foi-flow/values-${{ needs.prepare-deployment.outputs.environment }}.yaml"
 
 
           # Update only services affected by the PR.
