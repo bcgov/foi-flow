@@ -1,0 +1,32 @@
+services:
+  - name: request-management-api
+    path: request-management-api
+    image: request-management-api
+    kind: deployment
+    deploymentOverride:
+      prod: request-management-api-002
+
+  - name: template-api
+    path: integrationapi/MCS.FOI.Integration
+    image: template-api
+    kind: deployment
+
+  - name: publication-service
+    path: publication-service
+    image: publication-service
+    kind: deployment
+
+  - name: historical-search-api
+    path: historical-search-api
+    image: historical-search-api
+    kind: deployment
+
+  - name: notification-manager
+    path: notification-manager
+    image: notification-manager
+    kind: deployment
+
+  - name: forms-flow-web
+    path: forms-flow-web
+    image: forms-flow-web
+    kind: deployment
