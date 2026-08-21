@@ -1,0 +1,404 @@
+name: CD - Automatic Deploy
+
+on:
+  # Runs after PR merge into dev/main.
+  # dev  -> deploy to dev environment
+  # main -> deploy to test environment with release label
+  pull_request:
+    types:
+      - closed
+    branches:
+      - dev
+      - main
+
+
+env:
+  # CI tags images using the PR number.
+  # The same tag is deployed after merge.
+  IMAGE_TAG: ${{ github.event.pull_request.number }}
+
+
+jobs:
+
+  # Determines:
+  # - target environment
+  # - services affected by this PR
+  # - release label (main only)
+  prepare-deployment:
+
+    if: github.event.pull_request.merged == true
+
+    permissions:
+      contents: read
+      pull-requests: read
+
+    runs-on: ubuntu-latest
+
+    outputs:
+      environment: ${{ steps.generate.outputs.environment }}
+      matrix: ${{ steps.generate.outputs.matrix }}
+      release_label: ${{ steps.generate.outputs.release_label }}
+
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v6
+
+
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq \
+            https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+
+      - name: Generate Deployment Configuration
+        id: generate
+        shell: bash
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          GH_TOKEN: ${{ github.token }} 
+
+        run: |
+
+          # Map Git branch to deployment environment.
+          # dev branch deploys automatically to dev.
+          # main branch deploys to test.
+          if [[ "${{ github.event.pull_request.base.ref }}" == "dev" ]]; then
+            TARGET_ENVIRONMENT="dev"
+          else
+            TARGET_ENVIRONMENT="test"
+          fi
+
+
+          # Release label is required only for main -> test deployments.
+          RELEASE_LABEL=""
+
+          if [[ "$TARGET_ENVIRONMENT" == "test" ]]; then
+
+            RELEASE_LABEL=$(grep '^Release Label:' <<< "$PR_BODY" \
+              | cut -d':' -f2- \
+              | xargs)
+
+            if [[ -z "$RELEASE_LABEL" ]]; then
+              echo "::error::Release label is required for main deployments."
+              exit 1
+            fi
+
+          fi
+
+
+          echo "release_label=${RELEASE_LABEL}" >> "$GITHUB_OUTPUT"
+
+
+          # Get files changed in the merged PR.
+          # Used to determine which services need deployment.
+          CHANGED_FILES=$(gh api \
+            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
+            --paginate \
+            --jq '.[].filename')
+
+
+          # Build deployment matrix from service catalog.
+          # Only services with changed files will be deployed.
+          MATRIX='{"include":['
+          FIRST=true
+
+          COUNT=$(yq '.services | length' .github/configuration/service-catalog.yaml)
+
+
+          for ((i=0;i<COUNT;i++))
+          do
+
+            NAME=$(yq ".services[$i].name" .github/configuration/service-catalog.yaml)
+            PATH_VALUE=$(yq ".services[$i].path" .github/configuration/service-catalog.yaml)
+            IMAGE=$(yq ".services[$i].image" .github/configuration/service-catalog.yaml)
+            KIND=$(yq ".services[$i].kind // \"deployment\"" .github/configuration/service-catalog.yaml)
+
+            # Override the deployment name for environments that differ.
+            OVERRIDE=$(yq ".services[$i].deploymentOverride.${TARGET_ENVIRONMENT}" \
+              .github/configuration/service-catalog.yaml)
+
+            if [[ "$OVERRIDE" != "null" ]]; then
+              NAME="$OVERRIDE"
+            fi
+
+
+            # Some services also deploy a companion "-largefiles" deployment
+            # using the same container image.
+            LARGEFILES=$(yq ".services[$i].largefiles // false" \
+              .github/configuration/service-catalog.yaml)
+
+
+            if echo "$CHANGED_FILES" | grep -q "^${PATH_VALUE}/"; then
+
+              if [[ "$FIRST" == false ]]; then
+                MATRIX="${MATRIX},"
+              fi
+
+              # Primary deployment.
+              MATRIX="${MATRIX}{\"name\":\"${NAME}\",\"path\":\"${PATH_VALUE}\",\"image\":\"${IMAGE}\",\"kind\":\"${KIND}\"}"
+              FIRST=false
+
+              # Companion largefiles deployment.
+              if [[ "$LARGEFILES" == "true" ]]; then
+                MATRIX="${MATRIX},"
+                MATRIX="${MATRIX}{\"name\":\"${NAME}-largefiles\",\"path\":\"${PATH_VALUE}\",\"image\":\"${IMAGE}\",\"kind\":\"${KIND}\"}"
+              fi
+
+            fi
+
+          done
+
+          MATRIX="${MATRIX}]}"
+
+
+          echo "environment=${TARGET_ENVIRONMENT}" >> "$GITHUB_OUTPUT"
+          echo "matrix=$(echo "$MATRIX" | jq -c .)" >> "$GITHUB_OUTPUT"
+
+
+
+  # Updates the GitOps repository with the new image tag and release label.
+  # ArgoCD will detect this change and deploy the application.
+  deploy:
+
+    name: Update GitOps Repository
+
+    permissions:
+      contents: read
+      
+    needs: prepare-deployment
+
+    runs-on: ubuntu-latest
+
+    if: ${{ fromJson(needs.prepare-deployment.outputs.matrix).include[0] != null }}
+
+
+    steps:
+
+      # Add deploy key to runner
+      - name: Setup SSH
+        shell: bash
+        env:
+          MANIFEST_REPO_DEPLOY_KEY: ${{ secrets.MANIFEST_REPO_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "${MANIFEST_REPO_DEPLOY_KEY}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
+      - name: Update GitOps manifests
+
+        shell: bash
+
+        run: |
+
+          # Clone GitOps repository containing Helm values.
+          git clone git@github.com:bcgov-c/tenant-gitops-04d1a3.git
+
+
+          cd tenant-gitops-04d1a3
+
+
+          VALUES_FILE="foi-requests/values-${{ needs.prepare-deployment.outputs.environment }}.yaml"
+
+
+          # Update only services affected by the PR.
+          echo '${{ needs.prepare-deployment.outputs.matrix }}' \
+          | jq -c '.include[]' \
+          | while read SERVICE
+          do
+
+            NAME=$(echo "$SERVICE" | jq -r '.name')
+
+
+            echo "Updating ${NAME}"
+            
+            KIND=$(echo "$SERVICE" | jq -r '.kind // "deployment"')
+            
+            if [[ "${KIND}" == "cronjob" ]]; then
+              GITOPS_SECTION="cronJobs"
+            else 
+              GITOPS_SECTION="deployments"
+            fi
+
+            # Update image tag.
+            yq e \
+              ".${GITOPS_SECTION}.${NAME}.image.tag = \"${{ env.IMAGE_TAG }}\"" \
+              -i "$VALUES_FILE"
+
+            # Update Pull Request Label
+            if [[ "${{ github.event.pull_request.base.ref }}" == "dev" ]]; then
+              yq e \
+                ".${GITOPS_SECTION}.${NAME}.labels.pull-request-number = \"${{ env.IMAGE_TAG }}\"" \
+                -i "$VALUES_FILE"
+            fi
+
+            # Add release label only for test deployments.
+            if [[ "${{ needs.prepare-deployment.outputs.environment }}" == "test" ]]; then
+
+              yq e \
+                ".${GITOPS_SECTION}.${NAME}.labels.releaseLabel = \"${{ needs.prepare-deployment.outputs.release_label }}\"" \
+                -i "$VALUES_FILE"
+
+            fi
+
+          done
+
+          git config user.email "manish.sihag@gov.bc.ca"
+          git config user.name "ManishSihag"
+
+          git add "$VALUES_FILE"
+
+          git commit \
+            -m "Deploy image tag ${{ env.IMAGE_TAG }} to ${{ needs.prepare-deployment.outputs.environment }}" \
+            || exit 0
+
+
+          # Retry push because multiple services may update GitOps simultaneously.
+          RETRY_DELAYS=(15 30 60 120 240)
+
+          for attempt in $(seq 1 5)
+          do
+            if git push origin main; then
+              exit 0
+            fi
+
+            sleep "${RETRY_DELAYS[$((attempt-1))]}"
+
+            git pull --rebase origin main || exit 1
+          done
+
+          exit 1
+
+
+  # Confirms OpenShift is running the expected image
+  # and waits until the deployment rollout completes.
+  validate-deployment:
+
+    name: Validate Deployment
+
+    needs:
+      - prepare-deployment
+      - deploy
+
+    permissions: {}
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.prepare-deployment.outputs.matrix) }}
+
+
+    runs-on: ubuntu-latest
+
+
+    steps:
+      # Install OC CLI
+      - name: Install OC CLI
+        uses: redhat-actions/oc-installer@35b60c3f9757ae4301521556e1b75ff6f59f8d7c
+        with:
+          oc_version: '4.6'
+
+      # Login and verify every service from the deployment matrix.
+      - name: Login to OpenShift
+        run: |
+          oc login \
+            --server="${{ secrets.OPENSHIFT4_LOGIN_REGISTRY }}" \
+            --token="${{ secrets.OPENSHIFT4_SA_TOKEN }}"
+
+
+      - name: Verify Deployment
+        shell: bash
+        run: |
+
+          oc project 04d1a3-${{ needs.prepare-deployment.outputs.environment }}
+
+          if [[ "${{ matrix.kind }}" == "deployment" ]]; then
+
+            oc rollout status \
+              deployment/${{ matrix.name }} \
+              --watch=true \
+              --timeout=10m
+
+          else
+
+            echo "Skipping rollout check for CronJob '${{ matrix.name }}'."
+
+          fi
+
+          # Verify the deployment is running the expected image tag.
+          DEPLOYED_IMAGE=$(oc get ${{ matrix.kind }}/${{ matrix.name }} \
+            -o jsonpath='{.spec.template.spec.containers[0].image}')
+
+          echo "Running image: ${DEPLOYED_IMAGE}"
+
+          EXPECTED_TAG=":${{ env.IMAGE_TAG }}"
+
+          if [[ "${DEPLOYED_IMAGE}" != *"${EXPECTED_TAG}" ]]; then
+            echo "::error::Expected image tag ${EXPECTED_TAG}, but deployment is using ${DEPLOYED_IMAGE}"
+            exit 1
+          fi
+
+          echo "Deployment is running the expected image tag."
+
+      # Adds deployment result back to the PR.
+  comment-pr:
+
+    name: Comment on Pull Request
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    needs:
+      - prepare-deployment
+      - validate-deployment
+
+    if: success()
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Generate Deployment Summary
+        id: summary
+        shell: bash
+        run: |
+
+          SERVICES=$(echo '${{ needs.prepare-deployment.outputs.matrix }}' | jq -r '
+            .include[]
+            | "- ✅ \(.name)"
+          ')
+
+          {
+            echo "comment<<EOF"
+            echo "## 🚀 Deployment Completed"
+            echo
+            echo "**Environment**"
+            echo "\`${{ needs.prepare-deployment.outputs.environment }}\`"
+            echo
+            echo "**Image Tag**"
+            echo "\`${{ env.IMAGE_TAG }}\`"
+            echo
+
+            if [[ "${{ needs.prepare-deployment.outputs.environment }}" == "test" ]]; then
+              echo "**Release Label**"
+              echo "\`${{ needs.prepare-deployment.outputs.release_label }}\`"
+              echo
+            fi
+
+            echo "### Services Deployed"
+            echo
+            echo "$SERVICES"
+            echo
+            echo "✅ GitOps manifests updated successfully."
+            echo "✅ ArgoCD synchronized the application."
+            echo "✅ All deployments completed successfully."
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Comment on Pull Request
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
+        with:
+          message: ${{ steps.summary.outputs.comment }}
