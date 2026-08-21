@@ -1,6 +1,6 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
 # FROM python:3.8
-
+# test
 # Necessary to pull images from bcgov and not hit Dockerhub quotas.
 FROM artifacts.developer.gov.bc.ca/docker-remote/python:3.10.8-bullseye
 EXPOSE 6402
