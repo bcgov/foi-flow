@@ -372,7 +372,7 @@ class FOIRawRequestReceipt(Resource):
                     "filename": "RequestReceipt.pdf",
                     "base64data": base64.b64encode(pdf_file).decode("utf-8")
                 }
-                documentservice().uploadpersonaldocuments(13, [attachment_obj]) 
+                documentservice().uploadpersonaldocuments(int(request_data["requestId"]), [attachment_obj]) 
             return Response(
                 pdf_file,
                 status=200,
