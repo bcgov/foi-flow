@@ -45,6 +45,14 @@ Settings are driven by `appsettings.json` within the main console app directory,
 - `SQLConnectionString`: The connection string to the legacy AXIS database.
 - `RequestToMigrate`: A comma-separated list of request numbers (e.g. `'CFD-2023-12345', 'CFD-2023-67890'`) denoting which specific FOI requests should be bulk-migrated during this execution run.
 
+**`TargetedRecordsMigration`**:
+- `Enabled`: Runs the targeted, upload-only records repair workflow.
+- `S3BasePath`: S3 bucket or top-level path, such as `syncfusion_fix`.
+- `Items`: Exact AXIS `FileNumber`/logical `FileName` pairs and destination `Key` values. The filename from each key is preserved during upload.
+- This workflow reads AXIS, stitches all AXIS pages for the selected document, and uploads the PDF. It does not update FOI Flow or document-reviewer databases and does not validate an external expected page count.
+
+Keep `S3Configuration:RecordsMigration` set to `False` when running the targeted workflow. See `AXIS_FILE_LOCATION_QUERY.md` for configuration examples and processing details.
+
 **`FOIFLOWConfiguration`**:
 - `FOIFLOWConnectionString`: The connection string to the main FOI Flow DB.
 - `FOIDocumentReviewerString`: The connection string to the FOI Flow Document Reviewer DB.

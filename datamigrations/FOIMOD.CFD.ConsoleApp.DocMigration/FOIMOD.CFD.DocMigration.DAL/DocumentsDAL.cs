@@ -176,6 +176,53 @@ namespace FOIMOD.CFD.DocMigration.DAL
             return documentToMigrates;
         }
 
+        public List<DocumentToMigrate>? GetRecordsByRequestAndFileName(
+            string requestNumber,
+            string fileName)
+        {
+            List<DocumentToMigrate>? records = null;
+            using var command = RecordLookupQuery.CreateCommand(
+                sqlConnection,
+                requestNumber,
+                fileName);
+            using var adapter = new SqlDataAdapter(command);
+
+            try
+            {
+                sqlConnection.Open();
+                using DataTable dataTable = new();
+                adapter.Fill(dataTable);
+
+                if (!dataTable.HasErrors && dataTable.Rows.Count > 0)
+                {
+                    records = new List<DocumentToMigrate>();
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        records.Add(new DocumentToMigrate
+                        {
+                            IDocID = Convert.ToInt32(row["iDocID"]),
+                            PageFilePath = Convert.ToString(row["FilePath"]),
+                            SiFolderID = Convert.ToString(row["siFolderID"]),
+                            TotalPageCount = Convert.ToString(row["siPageCount"]),
+                            PageSequenceNumber = Convert.ToInt32(row["siPageNum"]),
+                            AXISRequestNumber = requestNumber.Trim().ToUpperInvariant(),
+                            DocumentType = DocumentTypeFromAXIS.RequestRecords,
+                            FolderName = Convert.ToString(row["FolderName"]),
+                            FileType = Convert.ToString(row["FileType"]),
+                            ParentFolderName = Convert.ToString(row["ParentFolderName"]),
+                            ReviewFlag = Convert.ToString(row["PageReviewFlag"])
+                        });
+                    }
+                }
+            }
+            finally
+            {
+                sqlConnection.Close();
+            }
+
+            return records;
+        }
+
 
 
 

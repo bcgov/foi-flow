@@ -76,6 +76,10 @@ using (StreamWriter logFileWriter = new StreamWriter(logFilePath, append: true))
         SystemSettings.MinistryRecordsBucket = configurationbuilder.GetSection("S3Configuration:MinistryRecordsBucket").Value;
         SystemSettings.SyncfusionLicense = configurationbuilder.GetSection("S3Configuration:SyncfusionLicense").Value;
 
+        var targetedRecordsSettings = configurationbuilder
+            .GetSection("TargetedRecordsMigration")
+            .Get<TargetedRecordMigrationSettings>() ?? new TargetedRecordMigrationSettings();
+
         Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(SystemSettings.SyncfusionLicense);
 
         SqlConnection axissqlConnection = new SqlConnection(SystemSettings.AXISConnectionString);
@@ -93,6 +97,18 @@ using (StreamWriter logFileWriter = new StreamWriter(logFilePath, append: true))
         AmazonS3Client amazonS3Client = new AmazonS3Client(s3credentials, config);
 
         Console.WriteLine("Migration process Starting....");
+
+        if (targetedRecordsSettings.Enabled)
+        {
+            Console.WriteLine("TargetedRecordsMigration Starting...");
+            TargetedRecordsMigration targetedRecordsMigration = new(
+                axissqlConnection,
+                amazonS3Client,
+                logger,
+                targetedRecordsSettings);
+            await targetedRecordsMigration.RunMigration();
+            Console.WriteLine("TargetedRecordsMigration Completed");
+        }
 
         if (SystemSettings.CorrespondenceLogMigration)
         {
