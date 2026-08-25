@@ -525,7 +525,7 @@ const Attachment = React.memo(({ indexValue, attachment, handlePopupButtonClick,
     let result = false;
     AttachmentCategories.categorys.forEach((category) => {
       if (category.name?.toLowerCase() === attachment.category?.toLowerCase()) {
-        if (category.display?.toLowerCase().includes('>') || category.display?.toLowerCase().includes('applicant')) {
+        if (category.display?.toLowerCase().includes('>')) {
           result = true
         }
       }
