@@ -37,6 +37,7 @@ import holidays
 from datetime import datetime, timedelta
 import os
 import pytz
+import base64
 
 
 
@@ -366,6 +367,12 @@ class FOIRawRequestReceipt(Resource):
             logging.getLogger("fontTools").propagate = False
             request_data = request.get_json()
             pdf_file = HTML(string=request_data["requestHTML"]).write_pdf()
+            if pdf_file:
+                attachment_obj = {
+                    "filename": "RequestReceipt.pdf",
+                    "base64data": base64.b64encode(pdf_file).decode("utf-8")
+                }
+                documentservice().uploadpersonaldocuments(13, [attachment_obj]) 
             return Response(
                 pdf_file,
                 status=200,
