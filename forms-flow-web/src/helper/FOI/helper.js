@@ -97,10 +97,7 @@ const getPublicHoliDays = (startDate, endDate) => {
   let publicHoliDays = 0;
   const startYear = dayjs(startDate).year();
   const endYear = dayjs(endDate).year();
-  console.log("START", startDate)
-  console.log("END", endDate)
   const holidays = getHolidayList(startYear, endYear);
-  console.log("LIST", holidays)
   for (const entry of holidays) {
     if (
       entry.type === "public" &&
@@ -109,12 +106,10 @@ const getPublicHoliDays = (startDate, endDate) => {
       publicHoliDays++;
     }
   }
-  console.log("HOLIDAYZ GET", publicHoliDays)
   return publicHoliDays;
 };
 const reconcilePublicHoliDays = (startDate, endDate) => {
   let publicHoliDays = getPublicHoliDays(startDate, endDate);
-  console.log("HOLIDAYZ RECON", publicHoliDays)
   startDate = endDate;
   endDate = endDate.businessDaysAdd(publicHoliDays);
   if (publicHoliDays !== 0) {
@@ -128,8 +123,6 @@ const addBusinessDays = (dateText, days) => {
   }
   let startDate = dayjs(dateText);
   let endDate = startDate.businessDaysAdd(days);
-  console.log("START OG", startDate)
-  console.log("END OG", endDate)
   return reconcilePublicHoliDays(startDate, endDate).format("YYYY-MM-DD");
 };
 
