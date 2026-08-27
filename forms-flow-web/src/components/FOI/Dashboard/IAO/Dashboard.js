@@ -75,12 +75,17 @@ const Dashboard = ({ userDetail }) => {
         >
           <Grid
             item
-            lg={8}
-            xs={12}
+            xs
             container
             direction="row"
             justifyContent="flex-start"
             alignItems="center"
+            sx={{
+              flexWrap: {
+                xs: "wrap",
+                lg: "nowrap",
+              },
+            }}
           >
             <ButtonBase
               onClick={() => {
@@ -184,11 +189,16 @@ const Dashboard = ({ userDetail }) => {
               </h3>
             </ButtonBase>
           </Grid>
-          <Grid item container lg={4} xs={6} justifyContent="flex-end">
+          <Grid
+            item
+            xs="auto"
+            container
+            justifyContent="flex-end"
+          >
             {/* {!isOITeam && ( */}
             <button
               type="button"
-              className="btn foi-btn-create"
+              className="btn foi-btn-create foi-btn-add-request"
               onClick={addRequest}
             >
               {FOI_COMPONENT_CONSTANTS.ADD_REQUEST}
