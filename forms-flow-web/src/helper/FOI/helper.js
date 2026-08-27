@@ -110,8 +110,8 @@ const getPublicHoliDays = (startDate, endDate) => {
 };
 const reconcilePublicHoliDays = (startDate, endDate) => {
   let publicHoliDays = getPublicHoliDays(startDate, endDate);
-  endDate = endDate.businessDaysAdd(publicHoliDays);
   startDate = endDate;
+  endDate = endDate.businessDaysAdd(publicHoliDays);
   if (publicHoliDays !== 0) {
     return reconcilePublicHoliDays(startDate, endDate);
   }
@@ -125,6 +125,50 @@ const addBusinessDays = (dateText, days) => {
   let endDate = startDate.businessDaysAdd(days);
   return reconcilePublicHoliDays(startDate, endDate).format("YYYY-MM-DD");
 };
+
+const addBusinessDaysExt = (dateText, days) => {
+  const startDate = dayjs(dateText);
+  const endDate = startDate.businessDaysAdd(days);
+  const startYear = dayjs(startDate).year();
+  const endYear = dayjs(endDate).year();
+  const holidays = getHolidayList(startYear, endYear);
+  const expandedHolidays = expandHolidays(holidays);
+  let businessDays = 0;
+  let calcDate = dayjs(dateText);
+  
+  while (businessDays < days) {
+    calcDate = calcDate.add(1, 'day');
+    if (isBusinessDay(calcDate, expandedHolidays)) {
+        businessDays++;
+    }
+  }
+
+  return calcDate.format("YYYY-MM-DD");
+};
+
+const isBusinessDay = (calcDate, holidays) => {
+  const isBizDay = businessDay(calcDate);
+  const isHoliday = holidays.some((holiday) => {
+    return calcDate.isSame(holiday.date, "day") && holiday.type === "public"
+  });
+  return isBizDay && !isHoliday;
+}
+
+const expandHolidays = (holidays) => {
+  // Function to address situation where BC public holiday falls a on weekend (ie. Easter Monday)
+  return holidays.map(h => {
+    const d = dayjs(h.date);
+    if (d.day() === 6) {
+      const newDate = d.add(2, "day").format("YYYY-MM-DD");
+      return {...h, date: newDate};
+    }
+    if (d.day() === 0) {
+      const newDate = d.add(1, "day").format("YYYY-MM-DD");
+      return {...h, date: newDate};
+    }
+    return h;
+  });
+}
 
 const revertReconciledPublicHolidays = (startDate, endDate) => {
   let publicHoliDays = getPublicHoliDays(startDate, endDate);
@@ -146,6 +190,26 @@ const removeBusinessDays = (dateText, days) => {
   return revertReconciledPublicHolidays(startDate, endDate).format(
     "YYYY-MM-DD"
   );
+};
+
+const removeBusinessDaysExt = (dateText, days) => {
+  const startDate = dayjs(dateText);
+  const endDate = startDate.businessDaysAdd(days);
+  const startYear = dayjs(startDate).year();
+  const endYear = dayjs(endDate).year();
+  const holidays = getHolidayList(startYear, endYear);
+  const expandedHolidays = expandHolidays(holidays);
+  let businessDays = 0;
+  let calcDate = dayjs(dateText);
+
+  while (businessDays < days) {
+    calcDate = calcDate.subtract(1, 'day');
+    if (isBusinessDay(calcDate, expandedHolidays)) {
+        businessDays++;
+    }
+  }
+
+  return calcDate.format("YYYY-MM-DD");
 };
 
 const countWeekendDays = (startDate, endDate) => {
@@ -705,5 +769,7 @@ export {
   calculateBusinessDaysBetween,
   addBusinessDaysToDate,
   getIAOTagList,
-  isNotMinistryGroup
+  isNotMinistryGroup,
+  addBusinessDaysExt,
+  removeBusinessDaysExt,
 };
