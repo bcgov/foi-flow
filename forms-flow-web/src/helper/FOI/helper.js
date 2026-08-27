@@ -655,10 +655,39 @@ const setTeamTagList = (bcgovcode) => {
 };
 
 const getIAOTagList = (bcgovcode) => {
-  let _team = bcgovcode.toLowerCase()?.replace(/['"]+/g, '');
-  return getSessionData(`${_team}TagList`) || [];
-};
+  if (bcgovcode === null || bcgovcode === undefined) {
+    return [];
+  }
 
+  const team = bcgovcode.toLowerCase().replace(/['"]+/g, '');
+  let assignedToList = getAssignToList(team);
+
+  // Preserve the existing IAO behaviour: only include IAO teams.
+  if (team === 'iao') {
+    assignedToList = assignedToList.filter((entry) => entry?.type === 'iao');
+  }
+
+  const tagList = [];
+
+  assignedToList.forEach((group) => {
+    group?.members?.forEach((member) => {
+      if (
+        member?.username &&
+        !tagList.some((user) => user.username === member.username)
+      ) {
+        tagList.push({
+          username: member.username,
+          firstname: member.firstname,
+          lastname: member.lastname,
+          fullname: `${member.lastname}, ${member.firstname}`,
+          name: `${member.lastname}, ${member.firstname}`
+        });
+      }
+    });
+  });
+
+  return tagList;
+};
 export {
   replaceUrl,
   formatDate,
