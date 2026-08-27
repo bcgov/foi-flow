@@ -214,7 +214,7 @@ const AddExtensionModal = () => {
     if (!selectedExtension || !preExtendedDate) {
       return currentDueDate;
     }
-    console.log("GOT YA", preExtendedDate)
+    
     return preExtendedDate;
   };
 
