@@ -67,12 +67,17 @@ const MinistryDashboard = ({ userDetail }) => {
         >
           <Grid
             item
-            lg={8}
             xs={12}
             container
             direction="row"
             justifyContent="flex-start"
             alignItems="center"
+            sx={{
+              flexWrap: {
+                xs: "wrap",
+                lg: "nowrap",
+              },
+            }}
           >
             <ButtonBase
               onClick={() => {
