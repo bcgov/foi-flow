@@ -272,7 +272,8 @@ const RequestDescription = React.memo(({
                 required={true}
                 label="Request Description"
                 multiline
-                rows={4}
+                minRows={6}
+                maxRows={15}
                 value={requestDescriptionText}
                 variant="outlined"
                 InputLabelProps={{ shrink: true, }} 
