@@ -14,14 +14,16 @@ div .foi-dashboard {
 .foi-container {
     
     width: 100%!important;
+    max-width: none !important;
     height: 100vh;
     background-color: #f1f1f1;
 }
 
 .foi-grid-container {
-    padding: 7% 1% 10% 1% !important;
-    width: 80%!important;
+    padding: 72px 1% 10% 1% !important;
+    width: 96%!important;
     position: relative;
+    align-content: flex-start;
     margin-left: auto!important;
     margin-right: auto!important;
     background-color: white;   
@@ -30,7 +32,7 @@ div .foi-dashboard {
 }
 
 .foi-dashboard-row2 {
-    margin-top: 40px;
+    margin-top: 0;
 }
 
 .MuiDataGrid-cell {
@@ -192,6 +194,12 @@ div.MuiDataGrid-columnHeaderWrapper >  div:last-child {
     border: none !important;
     background-color: #38598A !important;
     color: #FFFFFF !important;
+}
+
+.foi-btn-add-request {
+    width: auto !important;
+    min-width: 160px;
+    flex-shrink: 0;
 }
 
 .form-control-label {
