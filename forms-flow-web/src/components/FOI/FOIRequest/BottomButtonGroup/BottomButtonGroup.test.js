@@ -67,7 +67,6 @@ describe('FOI BottomButtonGroup component', () => {
             handleOpenRequest: jest.fn(),
             currentSelectedStatus: "Open",
             hasStatusRequestSaved: false,
-            axisSyncedData: {}
         }
         useSelector.mockImplementation(callback => {
             return callback(localState);
@@ -75,7 +74,7 @@ describe('FOI BottomButtonGroup component', () => {
         useParams.mockImplementation(() => {
             return {ministryId: "123", requestId: "345"};
         }); 
-        const tree = renderer.create(<Provider store={store}><BottomButtonGroup isValidationError={localState.isValidationError} urlIndexCreateRequest={localState.urlIndexCreateRequest} saveRequestObject={localState.saveRequestObject} unSavedRequest={localState.unSavedRequest} handleSaveRequest={localState.handleSaveRequest} handleOpenRequest={localState.handleOpenRequest} currentSelectedStatus={localState.currentSelectedStatus} hasStatusRequestSaved={localState.hasStatusRequestSaved} axisSyncedData={localState.axisSyncedData} /></Provider>).toJSON();  
+        const tree = renderer.create(<Provider store={store}><BottomButtonGroup isValidationError={localState.isValidationError} urlIndexCreateRequest={localState.urlIndexCreateRequest} saveRequestObject={localState.saveRequestObject} unSavedRequest={localState.unSavedRequest} handleSaveRequest={localState.handleSaveRequest} handleOpenRequest={localState.handleOpenRequest} currentSelectedStatus={localState.currentSelectedStatus} hasStatusRequestSaved={localState.hasStatusRequestSaved} /></Provider>).toJSON();
         expect(tree).toMatchSnapshot();
     })
   })

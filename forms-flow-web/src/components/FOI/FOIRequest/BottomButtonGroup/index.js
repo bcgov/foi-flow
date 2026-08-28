@@ -27,7 +27,6 @@ import { dueDateCalculation, getRequestState, returnToQueue } from "./utils";
 import { handleBeforeUnload } from "../utils";
 import { setFOILoader } from '../../../../actions/FOI/foiRequestActions'
 import clsx from "clsx";
-import AxisSyncModal from "../AxisDetails/AxisSyncModal";
 
 import { PAYMENT_EXPIRY_DAYS } from "../../../../constants/FOI/constants";
 
@@ -74,8 +73,6 @@ const BottomButtonGroup = React.memo(
     stateChanged,
     setIsAddRequest,
     requestState,
-    axisSyncedData,
-    axisMessage,
     attachmentsArray,
     oipcData,
     validLockRecordsState,
@@ -101,7 +98,6 @@ const BottomButtonGroup = React.memo(
     const [closingDate, setClosingDate] = useState(formatDate(new Date()));
     const [closingReasonId, setClosingReasonId] = useState();
 
-    const [axisSyncModalOpen, setAxisSyncModalOpen] = useState(false);
 
     //get the assignedTo master data
     const assignedToList = useSelector(
@@ -473,20 +469,6 @@ const BottomButtonGroup = React.memo(
         }
 
         <div className="foi-bottom-button-group">
-          {urlIndexCreateRequest < 0 &&
-            (requestState?.toLowerCase() !== StateEnum.intakeinprogress.name.toLowerCase() &&
-              requestState?.toLowerCase() !== StateEnum.unopened.name.toLowerCase()) &&
-            <button
-              type="button"
-              className="btn btn-bottom"
-              disabled={Object.entries(axisSyncedData)?.length === 0 || axisMessage !== "WARNING"}
-              onClick={() => {
-                setAxisSyncModalOpen(true);
-              }}
-            >
-              Sync with AXIS
-            </button>
-          }
           <button
             type="button"
             className={clsx("btn", "btn-bottom", {
@@ -513,22 +495,6 @@ const BottomButtonGroup = React.memo(
             Return to Queue
           </button>
         </div>
-        {axisSyncModalOpen && (
-          <AxisSyncModal
-            axisSyncModalOpen={axisSyncModalOpen}
-            setAxisSyncModalOpen={setAxisSyncModalOpen}
-            saveRequest={saveRequest}
-            saveRequestObject={saveRequestObject}
-            urlIndexCreateRequest={urlIndexCreateRequest}
-            handleSaveRequest={handleSaveRequest}
-            currentSelectedStatus={currentSelectedStatus}
-            hasStatusRequestSaved={hasStatusRequestSaved}
-            requestState={requestState}
-            requestId={requestId}
-            ministryId={ministryId}
-            axisSyncedData={axisSyncedData}
-          />
-        )}
       </div>
     );
   }
