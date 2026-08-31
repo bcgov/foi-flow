@@ -90,6 +90,10 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   };
 
   const renderReviewRequestforMinistry = (e, row) => {
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) {
+      return;
+    }
+
     e.preventDefault()
     dispatch(push(`/foi/ministryreview/${row.id}/ministryrequest/${row.ministryrequestid}`));
   };
