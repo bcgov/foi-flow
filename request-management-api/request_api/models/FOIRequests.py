@@ -28,7 +28,9 @@ class FOIRequest(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
-    wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)   
+    wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
+    wfengine = db.Column(db.String(20), unique=False, nullable=True)
+    wfmetadata = db.Column(JSON, unique=False, nullable=True)
 
     #ForeignKey References
     
@@ -80,10 +82,114 @@ class FOIRequest(db.Model):
             setattr(currequest,'wfinstanceid',wfinstanceid)
             setattr(currequest,'updated_at',datetime.now().isoformat())
             setattr(currequest,'updatedby',userid)
-            db.session.commit()  
+            db.session.commit()
             return DefaultMethodResult(True,'Request updated',foirequestid)
         return DefaultMethodResult(True,'wfinstanceid is None',foirequestid)
-    
+
+    @classmethod
+    def updateWFExecutionInfo(cls, foirequestid, executionid, resumepath, userid)->DefaultMethodResult:
+        """n8n counterpart to updateWFInstance: stamps wfengine='n8n' and merges
+        {executionId, resumePath} into wfmetadata, leaving wfinstanceid untouched.
+        resumepath is optional - when absent (status-update payloads), any
+        resumePath already in wfmetadata is preserved rather than cleared."""
+        if executionid not in (None, ""):
+            currequest = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
+            if currequest is None:
+                return DefaultMethodResult(True,'foirequestid is None',foirequestid)
+            wfmetadata = dict(currequest.wfmetadata) if currequest.wfmetadata else {}
+            wfmetadata['executionId'] = executionid
+            if resumepath not in (None, ""):
+                wfmetadata['resumePath'] = resumepath
+            setattr(currequest,'wfengine','n8n')
+            setattr(currequest,'wfmetadata',wfmetadata)
+            setattr(currequest,'updated_at',datetime.now().isoformat())
+            setattr(currequest,'updatedby',userid)
+            db.session.commit()
+            return DefaultMethodResult(True,'Request updated',foirequestid)
+        return DefaultMethodResult(True,'executionId is None',foirequestid)
+
+    @classmethod
+    def getwfengine(cls, foirequestid):
+        currequest = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
+        if currequest is None:
+            return None
+        if currequest.wfengine not in (None, ""):
+            return currequest.wfengine
+        if currequest.foirawrequestid is not None:
+            from request_api.models.FOIRawRequests import FOIRawRequest
+            return FOIRawRequest.getwfengine(currequest.foirawrequestid)
+        return None
+
+    @classmethod
+    def getwfenginebyministryrequestid(cls, ministryrequestid):
+        try:
+            sql = """select fr3.wfengine, fr3.foirawrequestid from "FOIMinistryRequests" fr2, "FOIRequests" fr3
+                        where fr2.foirequest_id = fr3.foirequestid and fr2.foiministryrequestid=:requestid
+                        order by fr3."version" desc limit 1"""
+            rs = db.session.execute(text(sql), {'requestid': ministryrequestid})
+            for row in rs:
+                if row["wfengine"] not in (None, ""):
+                    return row["wfengine"]
+                if row["foirawrequestid"] is not None:
+                    from request_api.models.FOIRawRequests import FOIRawRequest
+                    return FOIRawRequest.getwfengine(row["foirawrequestid"])
+        except Exception as ex:
+            logging.error(ex)
+        finally:
+            db.session.close()
+        return None
+
+    @classmethod
+    def getwfmetadata(cls, foirequestid):
+        currequest = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
+        logging.info("FOIRequest.getwfmetadata: foirequestid=%r -> currequest=%r", foirequestid, currequest)
+        logging.info("FOIRequest.getwfmetadata: foirequestid=%r -> wfmetadata=%r", foirequestid, currequest.wfmetadata if currequest is not None else None)
+        return currequest.wfmetadata if currequest is not None else None
+
+    @classmethod
+    def getwfmetadatabyministryrequestid(cls, ministryrequestid):
+        try:
+            sql = """select fr3.wfmetadata from "FOIMinistryRequests" fr2, "FOIRequests" fr3
+                        where fr2.foirequest_id = fr3.foirequestid and fr2.foiministryrequestid=:requestid
+                        order by fr3."version" desc limit 1"""
+            rs = db.session.execute(text(sql), {'requestid': ministryrequestid})
+            for row in rs:
+                return row["wfmetadata"]
+        except Exception as ex:
+            logging.error(ex)
+        finally:
+            db.session.close()
+        return None
+
+    @classmethod
+    def updatewfmetadata(cls, foirequestid, wfmetadata, userid)->DefaultMethodResult:
+        currequest = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
+        if currequest is None:
+            return DefaultMethodResult(False,'Request not found',foirequestid)
+        merged = dict(currequest.wfmetadata) if currequest.wfmetadata else {}
+        merged.update(wfmetadata or {})
+        setattr(currequest,'wfmetadata',merged)
+        setattr(currequest,'updated_at',datetime.now().isoformat())
+        setattr(currequest,'updatedby',userid)
+        db.session.commit()
+        return DefaultMethodResult(True,'wfmetadata updated',foirequestid)
+
+    @classmethod
+    def updatewfmetadatabyministryrequestid(cls, ministryrequestid, wfmetadata, userid)->DefaultMethodResult:
+        foirequestid = None
+        try:
+            sql = """select fr3.foirequestid from "FOIMinistryRequests" fr2, "FOIRequests" fr3
+                        where fr2.foirequest_id = fr3.foirequestid and fr2.foiministryrequestid=:requestid
+                        order by fr3."version" desc limit 1"""
+            rs = db.session.execute(text(sql), {'requestid': ministryrequestid})
+            for row in rs:
+                foirequestid = row["foirequestid"]
+        except Exception as ex:
+            logging.error(ex)
+        if foirequestid is None:
+            return DefaultMethodResult(False,'Ministry request not found',ministryrequestid)
+        return cls.updatewfmetadata(foirequestid, wfmetadata, userid)
+
     @classmethod
     def updateStatus(cls, foirequestid, updatedministries, userid)->DefaultMethodResult:
         currequest = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
@@ -102,12 +208,12 @@ class FOIRequest(db.Model):
     def getworkflowinstance(cls,requestid)->DefaultMethodResult:
         request_schema = FOIRequestsSchema()
         try:
-            sql = """select fr3.wfinstanceid, fr3.foirequestid  from "FOIMinistryRequests" fr2, "FOIRequests" fr3 
-                        where fr2.foirequest_id = fr3.foirequestid and fr2.foiministryrequestid=:requestid 
+            sql = """select fr3.wfinstanceid, fr3.foirequestid, fr3.wfengine, fr3.wfmetadata  from "FOIMinistryRequests" fr2, "FOIRequests" fr3
+                        where fr2.foirequest_id = fr3.foirequestid and fr2.foiministryrequestid=:requestid
                         order by  fr3."version" desc limit 1"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
-            for row in rs:                
-                request_schema.__dict__.update({"wfinstanceid":row["wfinstanceid"] , "foirequestid": row["foirequestid"]})
+            for row in rs:
+                request_schema.__dict__.update({"wfinstanceid":row["wfinstanceid"] , "foirequestid": row["foirequestid"], "wfengine": row["wfengine"], "wfmetadata": row["wfmetadata"]})
         except Exception as ex:
             logging.error(ex)
         finally:
@@ -134,5 +240,5 @@ class FOIRequestsSchema(ma.Schema):
         fields = ('foirequestid','version','foirawrequestid','requesttype','receiveddate','initialdescription',
                 'initialrecordSearchFromDate','initialrecordsearchtodate','receivedmode.receivedmodeid',
                 'deliverymode.deliverymodeid','receivedmode.name','deliverymode.name',
-                'applicantcategory.applicantcategoryid','applicantcategory.name','wfinstanceid','ministryRequests')
+                'applicantcategory.applicantcategoryid','applicantcategory.name','wfinstanceid','wfengine','wfmetadata','ministryRequests')
     

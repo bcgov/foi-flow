@@ -38,7 +38,9 @@ class FOIRawRequest(db.Model):
     requeststatuslabel = db.Column(db.String(50), unique=False, nullable=False)
     notes = db.Column(db.String(120), unique=False, nullable=True)
     wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
-    assignedgroup = db.Column(db.String(250), unique=False, nullable=True) 
+    wfengine = db.Column(db.String(20), unique=False, nullable=True)
+    wfmetadata = db.Column(JSON, unique=False, nullable=True)
+    assignedgroup = db.Column(db.String(250), unique=False, nullable=True)
     assignedto = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), unique=False, nullable=True)    
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -158,6 +160,8 @@ class FOIRawRequest(db.Model):
                     assignedgroup=assigneegroup,
                     assignedto=_assginee,
                     wfinstanceid=request.wfinstanceid,
+                    wfengine=request.wfengine,
+                    wfmetadata=request.wfmetadata,
                     sourceofsubmission=request.sourceofsubmission,
                     ispiiredacted=ispiiredacted,
                     createdby=userid,
@@ -168,7 +172,7 @@ class FOIRawRequest(db.Model):
                     linkedrequests=linkedrequests,
                     isiaorestricted = request.isiaorestricted,
                     isconsultflag = isconsultflag
-                   
+
                 )
             )
             db.session.execute(insertstmt)               
@@ -195,6 +199,8 @@ class FOIRawRequest(db.Model):
                     assignedgroup=request.assignedgroup,
                     assignedto=request.assignedto,
                     wfinstanceid=request.wfinstanceid,
+                    wfengine=request.wfengine,
+                    wfmetadata=request.wfmetadata,
                     sourceofsubmission=request.sourceofsubmission,
                     ispiiredacted=request.ispiiredacted,
                     createdby=request.createdby,
@@ -246,6 +252,8 @@ class FOIRawRequest(db.Model):
                     assignedgroup=assigneegroup,
                     assignedto=_assginee,
                     wfinstanceid=request.wfinstanceid,
+                    wfengine=request.wfengine,
+                    wfmetadata=request.wfmetadata,
                     sourceofsubmission=request.sourceofsubmission,
                     ispiiredacted=request.ispiiredacted,
                     createdby=userid,
@@ -255,7 +263,7 @@ class FOIRawRequest(db.Model):
                     axissyncdate=axissyncdate,
                     linkedrequests=linkedrequests,
                     isiaorestricted = request.isiaorestricted,
-                    requeststatuslabel = request.requeststatuslabel                    
+                    requeststatuslabel = request.requeststatuslabel
                 )
             )
             db.session.execute(insertstmt)               
@@ -268,10 +276,10 @@ class FOIRawRequest(db.Model):
     def getworkflowinstancebyraw(cls,requestid)->DefaultMethodResult:
         request_schema = FOIRawRequestSchema()
         try:
-            sql = """select wfinstanceid, assignedto, assignedgroup, requestid  from "FOIRawRequests" fr where requestid = :requestid order by "version" desc limit 1;"""
+            sql = """select wfinstanceid, assignedto, assignedgroup, requestid, wfengine, wfmetadata  from "FOIRawRequests" fr where requestid = :requestid order by "version" desc limit 1;"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
-                request_schema.__dict__.update({"requestid": row["requestid"],"assignedto": row["assignedto"], "assignedgroup": row["assignedgroup"], "wfinstanceid": row["wfinstanceid"]})
+                request_schema.__dict__.update({"requestid": row["requestid"],"assignedto": row["assignedto"], "assignedgroup": row["assignedgroup"], "wfinstanceid": row["wfinstanceid"], "wfengine": row["wfengine"], "wfmetadata": row["wfmetadata"]})
         except Exception as ex:
             logging.error(ex)
         finally:
@@ -283,13 +291,13 @@ class FOIRawRequest(db.Model):
     def getworkflowinstancebyministry(cls,requestid)->DefaultMethodResult:
         request_schema = FOIRawRequestSchema()
         try:
-            sql = """select fr.wfinstanceid,  fr.assignedto,  fr.assignedgroup, fr.requestid 
-                        from "FOIMinistryRequests" fr2, "FOIRequests" fr3, "FOIRawRequests" fr 
-                        where fr2.foirequest_id = fr3.foirequestid and fr3.foirawrequestid  = fr.requestid 
+            sql = """select fr.wfinstanceid,  fr.assignedto,  fr.assignedgroup, fr.requestid, fr.wfengine, fr.wfmetadata
+                        from "FOIMinistryRequests" fr2, "FOIRequests" fr3, "FOIRawRequests" fr
+                        where fr2.foirequest_id = fr3.foirequestid and fr3.foirawrequestid  = fr.requestid
                         and fr2.foiministryrequestid= :requestid order by fr."version" desc limit 1"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
-                request_schema.__dict__.update({"requestid": row["requestid"], "assignedto": row["assignedto"], "assignedgroup": row["assignedgroup"], "wfinstanceid": row["wfinstanceid"]})
+                request_schema.__dict__.update({"requestid": row["requestid"], "assignedto": row["assignedto"], "assignedgroup": row["assignedgroup"], "wfinstanceid": row["wfinstanceid"], "wfengine": row["wfengine"], "wfmetadata": row["wfmetadata"]})
         except Exception as ex:
             logging.error(ex)
         finally:
@@ -321,9 +329,47 @@ class FOIRawRequest(db.Model):
         if(requestraqw.count() > 0) :            
             requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.updatedby:userid}, synchronize_session = False)
             db.session.commit()
-            return DefaultMethodResult(True,'Request updated',requestid)       
+            return DefaultMethodResult(True,'Request updated',requestid)
         else:
-            return DefaultMethodResult(False,'Requestid not exists',-1)        
+            return DefaultMethodResult(False,'Requestid not exists',-1)
+
+    @classmethod
+    def getwfengine(cls, requestid):
+        currequest = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        return currequest.wfengine if currequest is not None else None
+
+    @classmethod
+    def getwfmetadata(cls, requestid):
+        currequest = db.session.query(FOIRawRequest).filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        return currequest.wfmetadata if currequest is not None else None
+
+    @classmethod
+    def updateworkflowengine(cls, requestid, wfengine, wfmetadata, userid)->DefaultMethodResult:
+        updatedat = datetime.now()
+        dbquery = db.session.query(FOIRawRequest)
+        currequest = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        if currequest is None:
+            return DefaultMethodResult(False,'Requestid not exists',-1)
+        requestraqw = dbquery.filter_by(requestid=requestid, version=currequest.version)
+        requestraqw.update({FOIRawRequest.wfengine: wfengine, FOIRawRequest.wfmetadata: wfmetadata,
+                             FOIRawRequest.updated_at: updatedat, FOIRawRequest.updatedby: userid}, synchronize_session=False)
+        db.session.commit()
+        return DefaultMethodResult(True,'Workflow engine recorded',requestid)
+
+    @classmethod
+    def updatewfmetadata(cls, requestid, wfmetadata, userid)->DefaultMethodResult:
+        updatedat = datetime.now()
+        dbquery = db.session.query(FOIRawRequest)
+        currequest = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        if currequest is None:
+            return DefaultMethodResult(False,'Requestid not exists',-1)
+        merged = dict(currequest.wfmetadata) if currequest.wfmetadata else {}
+        merged.update(wfmetadata or {})
+        requestraqw = dbquery.filter_by(requestid=requestid, version=currequest.version)
+        requestraqw.update({FOIRawRequest.wfmetadata: merged, FOIRawRequest.updated_at: updatedat,
+                             FOIRawRequest.updatedby: userid}, synchronize_session=False)
+        db.session.commit()
+        return DefaultMethodResult(True,'wfmetadata updated',requestid)
 
     @classmethod
     def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,notes,userid)-> DefaultMethodResult:
@@ -338,9 +384,37 @@ class FOIRawRequest(db.Model):
                                 
             requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:notes,FOIRawRequest.status:status,FOIRawRequest.updatedby:userid}, synchronize_session = False)
             db.session.commit()
-            return DefaultMethodResult(True,'Request updated',requestid)       
+            return DefaultMethodResult(True,'Request updated',requestid)
         else:
-            return DefaultMethodResult(False,'Requestid not exists',-1)    
+            return DefaultMethodResult(False,'Requestid not exists',-1)
+
+    @classmethod
+    def updateworkflowmetadatawithstatus(cls,executionid,resumepath,requestid,notes,userid)-> DefaultMethodResult:
+        """n8n counterpart to updateworkflowinstancewithstatus: stamps
+        wfengine='n8n' and merges {executionId, resumePath} into wfmetadata,
+        leaving wfinstanceid untouched. resumepath is optional - when absent
+        (status-update payloads), any resumePath already in wfmetadata is
+        preserved rather than cleared. Status handling mirrors the existing
+        Camunda method exactly (re-persists the current status as-is)."""
+        updatedat = datetime.now()
+        dbquery = db.session.query(FOIRawRequest)
+        _requestraqw = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        requestraqw = dbquery.filter_by(requestid=requestid,version = _requestraqw.version)
+        if(requestraqw.count() > 0) :
+            request_schema = FOIRawRequestSchema()
+            request = request_schema.dump(_requestraqw)
+            status = request["status"]
+
+            wfmetadata = dict(_requestraqw.wfmetadata) if _requestraqw.wfmetadata else {}
+            wfmetadata['executionId'] = executionid
+            if resumepath not in (None, ""):
+                wfmetadata['resumePath'] = resumepath
+
+            requestraqw.update({FOIRawRequest.wfengine:"n8n", FOIRawRequest.wfmetadata:wfmetadata, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:notes,FOIRawRequest.status:status,FOIRawRequest.updatedby:userid}, synchronize_session = False)
+            db.session.commit()
+            return DefaultMethodResult(True,'Request updated',requestid)
+        else:
+            return DefaultMethodResult(False,'Requestid not exists',-1)
 
     @classmethod
     def getrequests(cls):

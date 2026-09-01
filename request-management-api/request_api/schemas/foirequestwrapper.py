@@ -186,6 +186,17 @@ class EditableFOIRequestWrapperSchema(Schema):
     wfinstanceid = fields.Str(data_key="wfinstanceId",allow_none=True)
     selectedMinistries = fields.Nested(EditableFOIMinistryRequestWrapperSchema, many=True)
 
+class CommonWorkflowRequestWrapperSchema(Schema):
+    """n8n counterpart to EditableFOIRequestWrapperSchema's wfinstanceid update -
+    used by FOIRequestUpdateById.put when the payload is n8n-shaped (has
+    executionId) rather than Camunda-shaped (has wfinstanceId)."""
+    class Meta:  # pylint: disable=too-few-public-methods
+        """Exclude unknown fields (e.g. notes, status) in the deserialized output."""
+
+        unknown = EXCLUDE
+    executionid = fields.Str(data_key="executionId", allow_none=True)
+    resumepath = fields.Str(data_key="resumePath", allow_none=True)
+
 class FOIRequestStatusSchema(Schema):
     nextstatename = fields.Str(data_key="nextStateName",allow_none=True) 
 
