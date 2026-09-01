@@ -14,6 +14,7 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { isBeforeOpen } from "./utils";
+import AdditionalApplicantDetails from "./AdditionalApplicantDetails";
 
 const ApplicantDetails = React.memo(
   ({
@@ -27,7 +28,9 @@ const ApplicantDetails = React.memo(
     showHistory,
     warning,
     openApplicantProfileModal,
-    displayOtherNotes = false
+    displayOtherNotes = false,
+    showAdditionalApplicantDetails = false,
+    setError = () => {}
   }) => {
 
     const useStyles = makeStyles({
@@ -297,6 +300,113 @@ const ApplicantDetails = React.memo(
       setIsConsultFlagFieldRequired(!requestDetails?.isconsultflag);
     }, [requestDetails?.isconsultflag]);
 
+
+    const leftApplicantFields = (
+      <>
+        <TextField
+          id="firstName"
+          label="Applicant First Name"
+          inputProps={{ "aria-labelledby": "firstName-label"}}
+          InputLabelProps={{ shrink: true }}
+          variant="outlined"
+          className={isConsultFlagFieldRequired && warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) && classes.warning}
+          value={applicantFirstNameText}
+          fullWidth
+          onChange={handleFirtNameChange}
+          required={isConsultFlagFieldRequired}
+          disabled={disableInput}
+          helperText={generateCharLengthMsg(applicantFirstNameText, "firstName")}
+          error={isConsultFlagFieldRequired && validateApplicantFieldCharLength(applicantFirstNameText, "firstName")}
+        />
+        <TextField
+          id="middleName"
+          label="Applicant Middle Name"
+          inputProps={{ "aria-labelledby": "middleName-label"}}
+          InputLabelProps={{ shrink: true }}
+          value={applicantMiddleNameText}
+          variant="outlined"
+          className={isConsultFlagFieldRequired && warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) && classes.warning}
+          fullWidth
+          disabled={disableInput}
+          helperText={generateCharLengthMsg(applicantMiddleNameText, "middleName")}
+          onChange={handleMiddleNameChange}
+          error={validateApplicantFieldCharLength(applicantMiddleNameText, "middleName")}
+        />
+        <TextField
+          id="lastName"
+          label="Applicant Last Name"
+          inputProps={{ "aria-labelledby": "lastName-label"}}
+          InputLabelProps={{ shrink: true }}
+          value={applicantLastNameText}
+          variant="outlined"
+          className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) && classes.warning}
+          fullWidth
+          onChange={handleLastNameChange}
+          helperText={generateCharLengthMsg(applicantLastNameText, "lastName")}
+          required={isConsultFlagFieldRequired}
+          disabled={disableInput}
+          error={isConsultFlagFieldRequired && validateApplicantFieldCharLength(applicantLastNameText, "lastName")}
+        />
+      </>
+    );
+
+    const rightApplicantFields = (
+      <>
+        <TextField
+          id="organization"
+          label="Organization"
+          inputProps={{ "aria-labelledby": "organization-label"}}
+          InputLabelProps={{ shrink: true }}
+          value={organizationText}
+          className={warning && warning(FOI_COMPONENT_CONSTANTS.ORGANIZATION) && classes.warning}
+          variant="outlined"
+          fullWidth
+          disabled={disableInput}
+          onChange={handleOrganizationChange}
+          helperText={generateCharLengthMsg(organizationText, "organization")}
+          error={validateApplicantFieldCharLength(organizationText, "organization")}
+        />
+        <TextField
+          id="category"
+          label="Category"
+          inputProps={{ "aria-labelledby": "category-label"}}
+          InputLabelProps={{ shrink: true }}
+          select
+          value={selectedCategory}
+          onChange={handleCategoryOnChange}
+          input={<Input />}
+          variant="outlined"
+          className={warning && warning(FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) && classes.warning}
+          fullWidth
+          required
+          disabled={disableInput}
+          error={selectedCategory.toLowerCase().includes("select")}
+        >
+          {menuItems}
+        </TextField>
+      </>
+    );
+    const otherNotesField = (
+      <TextField
+        id="otherNotes"
+        label="Other Applicant Notes"
+        inputProps={{ "aria-labelledby": "otherNotes-label"}}
+        InputLabelProps={{ shrink: true }}
+        value={otherNotes}
+        variant="outlined"
+        className={
+          warning &&
+          warning(FOI_COMPONENT_CONSTANTS.OTHER_NOTES) &&
+          classes.warning
+        }
+        fullWidth
+        disabled={disableInput}
+        onChange={handleOtherNotesChange}
+        multiline
+        minRows={4}
+      />
+    );
+
     return (
       <div className='request-accordian'>
         <Accordion defaultExpanded={defaultExpanded}>
@@ -321,104 +431,39 @@ const ApplicantDetails = React.memo(
               </button>
             }
           </div>
-          <div className="row foi-details-row">
-            <div className="col-lg-6 foi-details-col">
-              <TextField
-                id="firstName"
-                label="Applicant First Name"
-                inputProps={{ "aria-labelledby": "firstName-label"}}
-                InputLabelProps={{ shrink: true }}
-                variant="outlined"
-                className={isConsultFlagFieldRequired && warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_FIRST_NAME) && classes.warning}
-                value={applicantFirstNameText}
-                fullWidth
-                onChange={handleFirtNameChange}
-                required={isConsultFlagFieldRequired}
-                disabled={disableInput}
-                helperText={generateCharLengthMsg(applicantFirstNameText, "firstName")}
-                error={isConsultFlagFieldRequired && validateApplicantFieldCharLength(applicantFirstNameText, "firstName")}
+          {showAdditionalApplicantDetails ? (
+            <>
+              <AdditionalApplicantDetails
+                embedded
+                requestDetails={requestDetails}
+                createSaveRequestObject={createSaveRequestObject}
+                disableInput={disableInput}
+                warning={warning}
+                setError={setError}
+                leftApplicantFields={leftApplicantFields}
+                rightApplicantFields={rightApplicantFields}
               />
-              <TextField
-                id="middleName"
-                label="Applicant Middle Name"
-                inputProps={{ "aria-labelledby": "middleName-label"}}
-                InputLabelProps={{ shrink: true }}
-                value={applicantMiddleNameText}
-                variant="outlined"
-                className={isConsultFlagFieldRequired &&warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_MIDDLE_NAME) && classes.warning}
-                fullWidth
-                disabled={disableInput}
-                helperText={generateCharLengthMsg(applicantMiddleNameText, "middleName")}
-                onChange={handleMiddleNameChange}
-                error={validateApplicantFieldCharLength(applicantMiddleNameText, "middleName")}
-              />
-              <TextField
-                id="lastName"
-                label="Applicant Last Name"
-                inputProps={{ "aria-labelledby": "lastName-label"}}
-                InputLabelProps={{ shrink: true }}
-                value={applicantLastNameText}
-                variant="outlined"
-                className={warning && warning(FOI_COMPONENT_CONSTANTS.APPLICANT_LAST_NAME) && classes.warning}
-                fullWidth
-                onChange={handleLastNameChange}
-                helperText={generateCharLengthMsg(applicantLastNameText, "lastName")}
-                required={isConsultFlagFieldRequired}
-                disabled={disableInput}
-                error={isConsultFlagFieldRequired && validateApplicantFieldCharLength(applicantLastNameText, "lastName")}
-              />
+              {displayOtherNotes && (
+                <div className="row foi-details-row">
+                  <div className="col-lg-12 foi-details-col">
+                    {otherNotesField}
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="row foi-details-row">
+              <div className="col-lg-6 foi-details-col">
+                {leftApplicantFields}
+              </div>
+              <div className="col-lg-6 foi-details-col">
+                {rightApplicantFields}
+              </div>
+              <div className="col-lg-12 foi-details-col">
+                {displayOtherNotes && otherNotesField}
+              </div>
             </div>
-            <div className="col-lg-6 foi-details-col">
-              <TextField
-                id="organization"
-                label="Organization"
-                inputProps={{ "aria-labelledby": "organization-label"}}
-                InputLabelProps={{ shrink: true }}
-                value={organizationText}
-                className={warning && warning(FOI_COMPONENT_CONSTANTS.ORGANIZATION) && classes.warning}
-                variant="outlined"
-                fullWidth
-                disabled={disableInput}
-                onChange={handleOrganizationChange}
-                helperText={generateCharLengthMsg(organizationText, "organization")}
-                error={validateApplicantFieldCharLength(organizationText, "organization")}
-              />
-              <TextField
-                id="category"
-                label="Category"
-                inputProps={{ "aria-labelledby": "category-label"}}
-                InputLabelProps={{ shrink: true }}
-                select
-                value={selectedCategory}
-                onChange={handleCategoryOnChange}
-                input={<Input />}
-                variant="outlined"
-                className={warning && warning(FOI_COMPONENT_CONSTANTS.FOI_CATEGORY) && classes.warning}
-                fullWidth
-                required
-                disabled={disableInput}
-                error={selectedCategory.toLowerCase().includes("select")}
-              >
-                {menuItems}
-              </TextField>
-            </div>
-            <div className="col-lg-12 foi-details-col">
-              {displayOtherNotes && <TextField
-                id="otherNotes"
-                label="Other Applicant Notes"
-                inputProps={{ "aria-labelledby": "otherNotes-label"}}
-                InputLabelProps={{ shrink: true }}
-                value={otherNotes}
-                variant="outlined"
-                className={warning && warning(FOI_COMPONENT_CONSTANTS.OTHER_NOTES) && classes.warning}
-                fullWidth
-                disabled={disableInput}
-                onChange={handleOtherNotesChange}
-                multiline
-                minRows={4}
-              />}
-            </div>
-          </div>
+          )}
         </AccordionDetails>
       </Accordion>
       </div>
