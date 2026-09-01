@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Box, Fade } from "@mui/material";
 
-const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveRequestObject, disableInput, defaultExpanded, warning, setError}) => {
+const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveRequestObject, disableInput, defaultExpanded, warning, setError, embedded = false, leftApplicantFields = null, rightApplicantFields = null}) => {
     /**
      *  Addition Applicant details box in the UI
      *  No mandatory fields here
@@ -155,129 +155,234 @@ const AdditionalApplicantDetails = React.memo(({requestDetails, createSaveReques
     return value.length > 50;
   }
 
-     return (
-      <div className='request-accordian' >
-      <Accordion defaultExpanded={defaultExpanded}>
-      <AccordionSummary className={classes.accordionSummary} expandIcon={<ExpandMoreIcon />} 
-        id="additionalApplicantDetails-header">
-        <Typography className={classes.heading}>ADDITIONAL APPLICANT DETAILS</Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-          <div className="row foi-details-row">
-              <div className="col-lg-6 foi-details-col">                       
-                  <TextField   
-                      id='personalHealthNumber'                         
-                      label="Personal Health Number" 
-                      inputProps={{ "aria-labelledby": "personalHealthNumber-label"}}
-                      InputLabelProps={{ shrink: true, }} 
-                      variant="outlined" 
-                      className={warning && warning(FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) && classes.warning}
-                      value={personalHealthNumberText}
-                      onChange={handlePersonalHealthNumber}
-                      fullWidth
-                      disabled={disableInput}
-                      error={validateTextFieldError(personalHealthNumberText)}
-                      helperText={validateTextFieldError(personalHealthNumberText) ? TEXTFIELD_LENGTH_ERROR : null}
-                  />                 
-                  <TextField        
-                    id='DOB'
-                    label="Date of Birth"
-                    type="date" 
-                    value={birthDateText || ''} 
-                    onChange={handleBirthDate}
-                    inputProps={{ "aria-labelledby": "DOB-label"}}
-                    InputLabelProps={{
-                    shrink: true,
-                    }}
-                    variant="outlined" 
-                    className={warning && warning(FOI_COMPONENT_CONSTANTS.DOB) && classes.warning}
-                    fullWidth
-                    disabled={disableInput}
-                  />
-                  
-                  <TextField  
-                    id='identityVerified'                          
-                    label="Identity Verified" 
-                    inputProps={{ "aria-labelledby": "identityVerified-label"}}
-                    InputLabelProps={{ shrink: true, }}                       
-                    variant="outlined"
-                    value={identityVerifiedText}
-                    onChange={handleIdentityVerified}
-                    fullWidth
-                    disabled
-                  />                                                
-              </div>
+
+    const personalHealthNumberField = (
+      <TextField
+        id='personalHealthNumber'
+        label="Personal Health Number"
+        inputProps={{ "aria-labelledby": "personalHealthNumber-label"}}
+        InputLabelProps={{ shrink: true, }}
+        variant="outlined"
+        className={
+          warning &&
+          warning(FOI_COMPONENT_CONSTANTS.PERSONAL_HEALTH_NUMBER) &&
+          classes.warning
+        }
+        value={personalHealthNumberText}
+        onChange={handlePersonalHealthNumber}
+        fullWidth
+        disabled={disableInput}
+        error={validateTextFieldError(personalHealthNumberText)}
+        helperText={
+          validateTextFieldError(personalHealthNumberText)
+            ? TEXTFIELD_LENGTH_ERROR
+            : null
+        }
+      />
+    );
+
+    const dateOfBirthField = (
+      <TextField
+        id='DOB'
+        label="Date of Birth"
+        type="date"
+        value={birthDateText || ''}
+        onChange={handleBirthDate}
+        inputProps={{ "aria-labelledby": "DOB-label"}}
+        InputLabelProps={{
+          shrink: true,
+        }}
+        variant="outlined"
+        className={
+          warning &&
+          warning(FOI_COMPONENT_CONSTANTS.DOB) &&
+          classes.warning
+        }
+        fullWidth
+        disabled={disableInput}
+      />
+    );
+
+    const identityVerifiedField = (
+      <TextField
+        id='identityVerified'
+        label="Identity Verified"
+        inputProps={{
+          "aria-labelledby": "identityVerified-label"
+        }}
+        InputLabelProps={{ shrink: true, }}
+        variant="outlined"
+        value={identityVerifiedText}
+        onChange={handleIdentityVerified}
+        fullWidth
+        disabled
+      />
+    );
+
+    const correctionsNumberField = (
+      <TextField
+        id='correctionsNumber'
+        label="Corrections Number"
+        inputProps={{
+          "aria-labelledby": "correctionsNumber-label"
+        }}
+        InputLabelProps={{ shrink: true, }}
+        variant="outlined"
+        className={
+          warning &&
+          warning(FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) &&
+          classes.warning
+        }
+        value={correctionsNumberText}
+        onChange={handleCorrectionsNumber}
+        fullWidth
+        disabled={disableInput}
+        error={validateTextFieldError(correctionsNumberText)}
+        helperText={
+          validateTextFieldError(correctionsNumberText)
+            ? TEXTFIELD_LENGTH_ERROR
+            : null
+        }
+      />
+    );
+
+    const employeeNumberField = (
+      <TextField
+        id='employeeNumber'
+        label="Employee Number"
+        inputProps={{
+          "aria-labelledby": "employeeNumber-label"
+        }}
+        InputLabelProps={{ shrink: true, }}
+        variant="outlined"
+        value={employeeNumberText}
+        className={
+          warning &&
+          warning(FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) &&
+          classes.warning
+        }
+        onChange={handleEmployeeNumber}
+        fullWidth
+        disabled={disableInput}
+        error={validateTextFieldError(employeeNumberText)}
+        helperText={
+          validateTextFieldError(employeeNumberText)
+            ? TEXTFIELD_LENGTH_ERROR
+            : null
+        }
+      />
+    );
+
+    const alsoKnownAsField = (
+      <Box sx={{
+        ".MuiInputBase-multiline.Mui-disabled": {
+          background: "#eee",
+        }
+      }}>
+        <TextField
+          id='alsoKnownAsText'
+          label="Also Known As"
+          inputProps={{
+            "aria-labelledby": "alsoKnownAsText-label",
+            maxLength: 250
+          }}
+          InputLabelProps={{ shrink: true, }}
+          variant="outlined"
+          value={alsoKnownAsText}
+          className={
+            warning &&
+            warning(FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS) &&
+            classes.warning
+          }
+          onChange={handleAlsoKnownAs}
+          fullWidth
+          disabled={disableInput}
+          error={alsoKnownAsText.length >= 250}
+          helperText={
+            alsoKnownAsText.length >= 250
+              ? "250 character limit reached"
+              : ""
+          }
+          multiline
+          minRows={1}
+          maxRows={3}
+        />
+        <Fade
+          in={
+            alsoKnownAsText.length > 0 &&
+            alsoKnownAsText.length < 250
+          }
+          timeout={300}
+        >
+          <Typography
+            variant="caption"
+            sx={{
+              display: "block",
+              textAlign: "right",
+              mt: 0.5,
+              color:
+                alsoKnownAsText.length >= 250
+                  ? "error.main"
+                  : "text.secondary",
+              wordBreak: "break-word",
+            }}
+          >
+            {alsoKnownAsText.length}/{250} characters
+          </Typography>
+        </Fade>
+      </Box>
+    );
+
+    if (embedded) {
+      return (
+        <div className="row foi-details-row">
+          <div className="col-lg-6 foi-details-col">
+            {leftApplicantFields}
+            {alsoKnownAsField}
+            {dateOfBirthField}
+            {identityVerifiedField}
+          </div>
+
+          <div className="col-lg-6 foi-details-col">
+            {rightApplicantFields}
+            {correctionsNumberField}
+            {employeeNumberField}
+            {personalHealthNumberField}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className='request-accordian'>
+        <Accordion defaultExpanded={defaultExpanded}>
+          <AccordionSummary
+            className={classes.accordionSummary}
+            expandIcon={<ExpandMoreIcon />}
+            id="additionalApplicantDetails-header"
+          >
+            <Typography className={classes.heading}>
+              ADDITIONAL APPLICANT DETAILS
+            </Typography>
+          </AccordionSummary>
+
+          <AccordionDetails>
+            <div className="row foi-details-row">
               <div className="col-lg-6 foi-details-col">
-                  <TextField       
-                    id='correctionsNumber'                     
-                    label="Corrections Number" 
-                    inputProps={{ "aria-labelledby": "correctionsNumber-label"}}
-                    InputLabelProps={{ shrink: true, }} 
-                    variant="outlined" 
-                    className={warning && warning(FOI_COMPONENT_CONSTANTS.CORRECTIONS_NUMBER) && classes.warning}
-                    value={correctionsNumberText}
-                    onChange={handleCorrectionsNumber}
-                    fullWidth
-                    disabled={disableInput}
-                    error={validateTextFieldError(correctionsNumberText)}
-                    helperText={validateTextFieldError(correctionsNumberText) ? TEXTFIELD_LENGTH_ERROR : null}
-                  /> 
-                  <TextField   
-                      id='employeeNumber'                         
-                      label="Employee Number" 
-                      inputProps={{ "aria-labelledby": "employeeNumber-label"}}
-                      InputLabelProps={{ shrink: true, }}                       
-                      variant="outlined" 
-                      value={employeeNumberText}
-                      className={warning && warning(FOI_COMPONENT_CONSTANTS.EMPLOYEE_NUMBER) && classes.warning}
-                      onChange={handleEmployeeNumber}
-                      fullWidth
-                      disabled={disableInput}
-                      error={validateTextFieldError(employeeNumberText)}
-                      helperText={validateTextFieldError(employeeNumberText) ? TEXTFIELD_LENGTH_ERROR : null}
-                  />
-                  <Box sx={{
-                        ".MuiInputBase-multiline.Mui-disabled": {
-                                background: "#eee",
-                                }
-                    }}>
-                    <TextField   
-                        id='alsoKnownAsText'                         
-                        label="Also Known As" 
-                        inputProps={{ "aria-labelledby": "alsoKnownAsText-label", maxLength: 250}}
-                        InputLabelProps={{ shrink: true, }}                       
-                        variant="outlined" 
-                        value={alsoKnownAsText}
-                        className={warning && warning(FOI_COMPONENT_CONSTANTS.ALSO_KNOWN_AS) && classes.warning}
-                        onChange={handleAlsoKnownAs}
-                        fullWidth
-                        disabled={disableInput}
-                        error={alsoKnownAsText.length >= 250}
-                        helperText={(alsoKnownAsText.length >= 250) ? "250 character limit reached" : ""}
-                        multiline
-                        minRows={1}
-                        maxRows={3}
-                    />
-                    <Fade in={alsoKnownAsText.length > 0 && alsoKnownAsText.length < 250} timeout={300}>     
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          display: "block",
-                          textAlign: "right",
-                          mt: 0.5,
-                          color: alsoKnownAsText.length >= 250 ? "error.main" : "text.secondary",
-                          wordBreak: "break-word", // ensures text wraps instead of being cut off
-                        }}
-                      >
-                        {alsoKnownAsText.length}/{250} characters
-                      </Typography>
-                    </Fade> 
-                  </Box>              
+                {personalHealthNumberField}
+                {dateOfBirthField}
+                {identityVerifiedField}
               </div>
-          </div> 
-        </AccordionDetails>
-    </Accordion>
-  </div>
+
+              <div className="col-lg-6 foi-details-col">
+                {correctionsNumberField}
+                {employeeNumberField}
+                {alsoKnownAsField}
+              </div>
+            </div>
+          </AccordionDetails>
+        </Accordion>
+      </div>
     );
   });
 
