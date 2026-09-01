@@ -22,7 +22,7 @@ import json
 class requestservicecreate:
     """ This class consolidates the creation of new FOI request upon scenarios: open, save by both iao and ministry. 
     """    
-    def saverequest(self,foirequestschema, userid, foirequestid=None, ministryid=None, filenumber=None, version=None, rawrequestid=None, wfinstanceid=None):
+    def saverequest(self,foirequestschema, userid, foirequestid=None, ministryid=None, filenumber=None, version=None, rawrequestid=None, wfinstanceid=None, wfengine=None, wfmetadata=None):
         activeversion = 1 if version is None else version
         
         # FOI Request    
@@ -51,9 +51,19 @@ class requestservicecreate:
             openfoirequest.applicantcategoryid = requestserviceconfigurator().getvalueof("category",foirequestschema.get("category"))
         openfoirequest.personalAttributes = self._prearepersonalattributes(foirequestschema, userid)        
         openfoirequest.requestApplicants = self.__prepareapplicants(foirequestschema, userid)       
-        if foirequestid is not None:         
+        if foirequestid is not None:
            openfoirequest.foirequestid = foirequestid
         openfoirequest.wfinstanceid = wfinstanceid if wfinstanceid is not None else None
+        if foirequestid is not None:
+            # Versioning an existing FOIRequest: carry forward its own wfengine/wfmetadata
+            # (executionId/resumePath are specific to this request's n8n execution, not the
+            # raw request's) rather than re-deriving them from the raw request each time.
+            openfoirequest.wfengine = wfengine
+            openfoirequest.wfmetadata = wfmetadata
+        elif _foirawrequestid is not None:
+            from request_api.models.FOIRawRequests import FOIRawRequest
+            openfoirequest.wfengine = FOIRawRequest.getwfengine(_foirawrequestid)
+            openfoirequest.wfmetadata = FOIRawRequest.getwfmetadata(_foirawrequestid)
         openfoirequest.createdby = userid
         result = FOIRequest.saverequest(openfoirequest)
         ##Auto Link requests for multiple ministries
@@ -74,7 +84,7 @@ class requestservicecreate:
             else:
                 return _foirequest  
             self.__disablewatchers(ministryid, foirequestschema, userid)
-            result = self.saverequest(foirequestschema, userid, foirequestid,ministryid,filenumber,activeversion,_foirequest["foirawrequestid"],_foirequest["wfinstanceid"])
+            result = self.saverequest(foirequestschema, userid, foirequestid,ministryid,filenumber,activeversion,_foirequest["foirawrequestid"],_foirequest["wfinstanceid"],_foirequest["wfengine"],_foirequest["wfmetadata"])
             if result.success == True:
                 FOIMinistryRequest.deActivateFileNumberVersion(ministryid, filenumber, userid)
                 if foirequestschema.get("requestType") == "proactive disclosure":
