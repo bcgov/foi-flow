@@ -11,7 +11,6 @@ import AddressContactDetails from "./AddressContanctInfo";
 import RequestDescriptionBox from "./RequestDescriptionBox";
 import RequestDetails from "./RequestDetails";
 import ExtensionDetails from "./ExtensionDetails";
-import AdditionalApplicantDetails from "./AdditionalApplicantDetails";
 import BottomButtonGroup from "./BottomButtonGroup";
 import { useParams } from "react-router-dom";
 import {
@@ -1592,6 +1591,11 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             }
                             userDetail={userDetail}
                             openApplicantProfileModal={openApplicantProfileModal}
+                            showAdditionalApplicantDetails={
+                              requestDetails?.requestType?.toLowerCase() ===
+                              FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL
+                            }
+                            setError={setPersonalRequestDetailErrors}
                           />
                           {requiredRequestDetailsValues.requestType.toLowerCase() ===
                             FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
@@ -1679,16 +1683,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                             requestDetails={requestDetails}
                             requestState={requestState}
                           />
-                          {requiredRequestDetailsValues.requestType.toLowerCase() ===
-                            FOI_COMPONENT_CONSTANTS.REQUEST_TYPE_PERSONAL && (
-                              <AdditionalApplicantDetails
-                                requestDetails={requestDetails}
-                                createSaveRequestObject={createSaveRequestObject}
-                                disableInput={true}
-                                defaultExpanded={true}
-                                setError={setPersonalRequestDetailErrors}
-                              />
-                            )}
                           {showDivisionalTracking && (
                             <DivisionalTracking
                               divisions={requestDetails.divisions}
