@@ -192,19 +192,25 @@ class FOIRawRequestBPMProcess(Resource):
     def put(_requestid=None):
             request_json = request.get_json()
             try:
-
-                _wfinstanceid = request_json['wfinstanceid']
                 notes = request_json['notes'] if request_json.get('notes') is not None else 'Workflow Update'
-                requestid = int(_requestid)                                                               
-                result = rawrequestservice().updateworkflowinstancewithstatus(_wfinstanceid,requestid,notes,AuthHelper.getuserid())
-                if result.identifier != -1 :                
+                requestid = int(_requestid)
+                if 'executionId' in request_json:
+                    # n8n payload (workflow/resume update or status update) - wfengine/
+                    # wfmetadata only, never written into the Camunda wfinstanceid column.
+                    executionid = request_json['executionId']
+                    resumepath = request_json.get('resumePath')
+                    result = rawrequestservice().updateworkflowmetadatawithstatus(executionid, resumepath, requestid, notes, AuthHelper.getuserid())
+                else:
+                    _wfinstanceid = request_json['wfinstanceid']
+                    result = rawrequestservice().updateworkflowinstancewithstatus(_wfinstanceid,requestid,notes,AuthHelper.getuserid())
+                if result.identifier != -1 :
                     return {'status': result.success, 'message':result.message}, 200
                 else:
                     return {'status': result.success, 'message':result.message}, 404
             except KeyError:
                 return {'status': "Invalid PUT request", 'message':"Key Error on JSON input, please confirm requestid and wfinstanceid"}, 500
             except ValueError as valuexception:
-                return {'status': "BAD Request", 'message': str(valuexception)}, 500           
+                return {'status': "BAD Request", 'message': str(valuexception)}, 500
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequests')

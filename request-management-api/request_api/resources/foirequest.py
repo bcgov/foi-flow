@@ -26,7 +26,7 @@ from request_api.exceptions import BusinessException
 from request_api.services.requestservice import requestservice
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
-from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema, FOIPDRequestWrapperSchema
+from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, CommonWorkflowRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema, FOIPDRequestWrapperSchema
 from request_api.schemas.foiassignee import FOIRequestAssigneeSchema
 from request_api.utils.enums import StateName, IAOTeamWithKeycloackGroup, RequestType
 from marshmallow import Schema, fields, validate, ValidationError
@@ -241,8 +241,16 @@ class FOIRequestUpdateById(Resource):
         """ PUT Method for capturing FOI requests before processing"""
         try:
             request_json = request.get_json()
-            foirequestschema = EditableFOIRequestWrapperSchema().load(request_json)
-            result = requestservice().updaterequest(foirequestschema, foirequestid,AuthHelper.getuserid())
+            if 'executionId' in request_json:
+                # n8n payload (workflow/resume update or status update) - routed
+                # separately from the Camunda wfinstanceId path/schema below.
+                commonworkflowschema = CommonWorkflowRequestWrapperSchema().load(request_json)
+                result = requestservice().updateworkflowexecutioninfo(
+                    foirequestid, commonworkflowschema.get('executionid'), commonworkflowschema.get('resumepath'), AuthHelper.getuserid()
+                )
+            else:
+                foirequestschema = EditableFOIRequestWrapperSchema().load(request_json)
+                result = requestservice().updaterequest(foirequestschema, foirequestid,AuthHelper.getuserid())
             if result != {}:
                 return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
             else:

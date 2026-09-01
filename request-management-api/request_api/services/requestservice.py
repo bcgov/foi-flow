@@ -112,6 +112,11 @@ class requestservice:
             foirequestschema, foirequestid, userid
         )
 
+    def updateworkflowexecutioninfo(self, foirequestid, executionid, resumepath, userid):
+        return requestserviceupdate().updateworkflowexecutioninfo(
+            foirequestid, executionid, resumepath, userid
+        )
+
     def updateministryrequestduedate(self, ministryrequestid, duedate, userid):
         return requestserviceupdate().updateministryrequestduedate(
             ministryrequestid, duedate, userid
