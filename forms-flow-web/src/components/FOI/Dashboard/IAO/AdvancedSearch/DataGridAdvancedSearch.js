@@ -75,6 +75,10 @@ const DataGridAdvancedSearch = ({ userDetail }) => {
   };
 
   const renderReviewRequest = (e, row) => {
+    if (e.ctrlKey || e.metaKey || e.shiftKey || e.button !== 0) {
+      return;
+    }
+
     e.preventDefault()
     if (row.ministryrequestid) {
       dispatch(
