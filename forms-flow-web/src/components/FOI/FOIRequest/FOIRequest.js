@@ -117,7 +117,6 @@ import {
 } from "../../../helper/FOI/helper";
 import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
-import AxisDetails from "./AxisDetails/AxisDetails";
 import { toast } from "react-toastify";
 import HomeIcon from "@mui/icons-material/Home";
 import { RecordsLog } from "../customComponents/Records";
@@ -302,7 +301,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
-  const [, setAxisMessage] = React.useState("");
 
   const initialStatuses = {
     Request: {
@@ -725,9 +723,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     addressSecondary: ""
   };
 
-  const requiredAxisDetailsValue = {
-    axisRequestId: "",
-  };
 
   const requiredProactiveDetailsInitialValues = {
     proactiveDisclosureCategory: "",
@@ -772,9 +767,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [recordsUploading, setRecordsUploading] = React.useState(false);
   const [CFRUnsaved, setCFRUnsaved] = React.useState(false);
   const [headerValue, setHeader] = useState("");
-  const [requiredAxisDetails, setRequiredAxisDetails] = React.useState(
-    requiredAxisDetailsValue
-  );
+
   const [personalRequestDetailErrors, setPersonalRequestDetailErrors] = React.useState(personalRequestDetailErrorsInit);
   //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
   const handleInitialRequiredRequestDescriptionValues = React.useCallback(
@@ -792,9 +785,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const handleContactDetailsInitialValue = React.useCallback((value) => {
     setrequiredContactDetails(value);
   }, []);
-  const handleAxisDetailsInitialValue = React.useCallback((value) => {
-    setRequiredAxisDetails(value);
-  }, []);
+
   const handleProactiveDetailsInitialValue = React.useCallback((value) => {
     setRequiredProactiveDetailsValues(value);
   }, []);
@@ -807,11 +798,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     const detailsData = assignValue(requiredContactDetails, value, name);
     setrequiredContactDetails(detailsData);
   };
-  const handleAxisDetailsValue = (value, name) => {
-    if (value) setUnSavedRequest(true);
-    const detailsData = assignValue(requiredAxisDetailsValue, value, name);
-    setRequiredAxisDetails(detailsData);
-  };
+
   //Update required fields of request description box with latest value
   const handleOnChangeRequiredRequestDescriptionValues = (value, name) => {
     const descriptionData = assignValue(
@@ -905,9 +892,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const handleEmailValidation = (validationObj) => {
     setValidation(validationObj);
   };
-  const handleAxisIdValidation = (validationObj) => {
-    setValidation(validationObj);
-  };
+
 
   //to get the updated program area list with isChecked=true/false
   const [programAreaList, setProgramAreaList] = React.useState([]);
@@ -927,7 +912,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     validation,
     assignedToValue,
     requiredRequestDetailsValues,
-    requiredAxisDetails,
     isAddRequest,
     _currentrequestStatus,
     oipcData,
@@ -970,10 +954,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   };
   const [updateStateDropDown, setUpdateStateDropdown] = useState(false);
   const [stateChanged, setStateChanged] = useState(false);
-
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
-    
     if (
       _state?.toLowerCase() === StateEnum.unopened.name.toLowerCase() &&
       (saveRequestObject.isconsultflag === null ||
@@ -1516,21 +1498,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         handleConsultFlagChange={handleConsultFlagChange}
                         isProactiveDisclosure={isProactiveDisclosure}
                       />
-                      {(isAddRequest ||
-                        requestState === StateEnum.unopened.name) &&
-                        !isProactiveDisclosure && (
-                          <AxisDetails
-                            requestDetails={requestDetails}
-                            createSaveRequestObject={createSaveRequestObject}
-                            handleAxisDetailsInitialValue={
-                              handleAxisDetailsInitialValue
-                            }
-                            handleAxisDetailsValue={handleAxisDetailsValue}
-                            handleAxisIdValidation={handleAxisIdValidation}
-                            setAxisMessage={setAxisMessage}
-                            saveRequestObject={saveRequestObject}
-                          />
-                        )}
                       {isProactiveDisclosure ? (
                         <>
                           <ProactiveDisclosureDetails

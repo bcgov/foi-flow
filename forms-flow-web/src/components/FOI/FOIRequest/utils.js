@@ -399,7 +399,6 @@ export const checkValidationError = (
   validation,
   assignedToValue,
   requiredRequestDetailsValues,
-  requiredAxisDetails,
   isAddRequest,
   currentrequestStatus,
   oipcData,
@@ -469,7 +468,6 @@ export const checkValidationError = (
     !requiredRequestDetailsValues.requestStartDate ||
     !requiredRequestDetailsValues.dueDate ||
     ("recordsDueDate" in requiredRequestDetailsValues && !requiredRequestDetailsValues.recordsDueDate) ||
-    // !requiredAxisDetails.axisRequestId ||
     (Object.values(personalRequestDetailsErrors).some(personalReqestError => personalReqestError)) ||
     (oipcData?.length > 0 && isOipcReview && oipcData?.some((oipc) => {
       if (oipc.inquiryattributes?.inquirydate) {
