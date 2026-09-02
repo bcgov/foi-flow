@@ -5,6 +5,7 @@ import useStyles from "../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import { fetchFOIMinistryRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { saveDashboardQueuePageSize } from "../../../../apiManager/services/FOI/foiUserPreferenceServices";
 import Loading from "../../../../containers/Loading";
 import { debounce, ClickableChip, cellTooltipRender, displayQueueFlagIcons } from "../utils";
 import Grid from "@mui/material/Grid";
@@ -381,9 +382,17 @@ const Queue = ({ userDetail, tableInfo }) => {
           paginationMode="server"
           page={rowsState?.page}
           onPageChange={(newPage) => dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, page: newPage}}))}
-          onPageSizeChange={(newpageSize) =>
-            dispatch(setQueueParams({...queueParams, rowsState: {...rowsState, pageSize: newpageSize}}))
-          }
+          onPageSizeChange={(newpageSize) => {
+            dispatch(setQueueParams({
+              ...queueParams,
+              rowsState: {
+                ...rowsState,
+                page: 0,
+                pageSize: newpageSize
+              }
+            }));
+            dispatch(saveDashboardQueuePageSize(newpageSize));
+          }}
           components={{
             Footer: ()=> <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={tableInfo.sort} footerFor={"queue"}></CustomFooter>
           }}

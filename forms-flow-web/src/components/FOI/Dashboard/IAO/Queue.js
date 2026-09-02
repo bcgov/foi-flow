@@ -5,6 +5,7 @@ import useStyles from "../CustomStyle";
 import { useDispatch, useSelector } from "react-redux";
 import { push } from "connected-react-router";
 import { fetchFOIRequestListByPage } from "../../../../apiManager/services/FOI/foiRequestServices";
+import { saveDashboardQueuePageSize } from "../../../../apiManager/services/FOI/foiUserPreferenceServices";
 import Loading from "../../../../containers/Loading";
 import { setQueueFilter, setQueueParams } from "../../../../actions/FOI/foiRequestActions";
 import {
@@ -295,9 +296,17 @@ const Queue = ({ userDetail, tableInfo, isOITeam }) => {
           paginationMode="server"
           page={rowsState?.page || 0}
           onPageChange={(newPage) => dispatch(setQueueParams({ ...queueParams, rowsState: { ...rowsState, page: newPage } }))}
-          onPageSizeChange={(newpageSize) =>
-            dispatch(setQueueParams({ ...queueParams, rowsState: { ...rowsState, pageSize: newpageSize } }))
-          }
+          onPageSizeChange={(newpageSize) => {
+            dispatch(setQueueParams({
+              ...queueParams,
+              rowsState: {
+                ...rowsState,
+                page: 0,
+                pageSize: newpageSize
+              }
+            }));
+            dispatch(saveDashboardQueuePageSize(newpageSize));
+          }}
           components={{
             Footer: () => <CustomFooter rowCount={requestQueue?.meta?.total || 0} defaultSortModel={tableInfo?.sort || []} footerFor={"queue"}></CustomFooter>
           }}
