@@ -196,14 +196,75 @@ const Queue = ({ userDetail, tableInfo }) => {
     return requestQueue?.data || [];
   }, [JSON.stringify(requestQueue)]);
 
-  const renderReviewRequest = (e) => {
-    if (e.row.ministryrequestid) {
-      dispatch(
-        push(
-          `/foi/ministryreview/${e.row.id}/ministryrequest/${e.row.ministryrequestid}`
-        )
-      );
+  const getRowId = (row) => `${row.idNumber}-${row.id}`;
+
+  const getRequestUrl = (row) => {
+    if (!row.ministryrequestid) {
+      return null;
     }
+
+    return `/foi/ministryreview/${row.id}/ministryrequest/${row.ministryrequestid}`;
+  };
+
+  const openRequestInNewTab = (row) => {
+    const url = getRequestUrl(row);
+
+    if (!url) {
+      return;
+    }
+
+    window.open(
+      url,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
+
+  const getRowFromMouseEvent = (event) => {
+    const rowElement = event.target?.closest?.(".MuiDataGrid-row");
+    const rowId = rowElement?.getAttribute("data-id");
+
+    if (!rowId) {
+      return null;
+    }
+
+    return rows.find((row) => String(getRowId(row)) === rowId) || null;
+  };
+
+  const renderReviewRequest = (e, event) => {
+    const url = getRequestUrl(e.row);
+
+    if (!url) {
+      return;
+    }
+
+    if (event?.ctrlKey || event?.metaKey) {
+      openRequestInNewTab(e.row);
+      return;
+    }
+
+    dispatch(push(url));
+  };
+
+  const handleRowMouseDown = (event) => {
+    if (event.button === 1 && getRowFromMouseEvent(event)) {
+      event.preventDefault();
+    }
+  };
+
+  const handleRowAuxClick = (event) => {
+    if (event.button !== 1) {
+      return;
+    }
+
+    const row = getRowFromMouseEvent(event);
+
+    if (!row) {
+      return;
+    }
+
+    event.preventDefault();
+    openRequestInNewTab(row);
   };
 
   if (requestQueue === null) {
@@ -302,11 +363,11 @@ const Queue = ({ userDetail, tableInfo }) => {
           </Grid>
         </Paper>
       </Grid>
-      <Grid item xs={12} style={{ minHeight: 300 }} className={classes.root}>
+      <Grid item xs={12} style={{ minHeight: 300 }} className={classes.root} onMouseDown={handleRowMouseDown} onAuxClick={handleRowAuxClick}>
         <DataGrid
           autoHeight
           className="foi-data-grid"
-          getRowId={(row) => `${row.idNumber}-${row.id}`}
+          getRowId={getRowId}
           rows={rows}
           columns={columns.current}
           rowHeight={30}

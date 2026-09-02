@@ -41,7 +41,6 @@ import {
 import {
   fetchFOIRequestDetailsWrapper,
   fetchFOIRequestDescriptionList,
-  fetchRequestDataFromAxis,
   fetchRestrictedRequestCommentTagList,
   deleteOIPCDetails,
   fetchHistoricalRequestDetails,
@@ -103,8 +102,6 @@ import {
   handleBeforeUnload,
   findRequestState,
   isMandatoryField,
-  isAxisSyncDisplayField,
-  getUniqueIdentifier,
   closeContactInfo,
   closeApplicantDetails,
   getIsAddRequest
@@ -120,8 +117,6 @@ import {
 } from "../../../helper/FOI/helper";
 import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
-import AxisDetails from "./AxisDetails/AxisDetails";
-import AxisMessageBanner from "./AxisDetails/AxisMessageBanner";
 import { toast } from "react-toastify";
 import HomeIcon from "@mui/icons-material/Home";
 import { RecordsLog } from "../customComponents/Records";
@@ -306,7 +301,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
 
   //editorChange and removeComment added to handle Navigate away from Comments tabs
   const [editorChange, setEditorChange] = useState(false);
-  const [axisMessage, setAxisMessage] = React.useState("");
 
   const initialStatuses = {
     Request: {
@@ -361,8 +355,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     requestState.toLowerCase() !== StateEnum.open.name.toLowerCase() &&
     requestState.toLowerCase() !==
     StateEnum.intakeinprogress.name.toLowerCase();
-  const [axisSyncedData, setAxisSyncedData] = useState({});
-  const [checkExtension, setCheckExtension] = useState(true);
   let bcgovcode = isHistoricalRequest
     ? ""
     : getBCgovCode(ministryId, requestDetails);
@@ -583,7 +575,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           ? JSON.parse(requestDetails.linkedRequests)
           : requestDetails.linkedRequests
         : [];
-      if (requestDetails.axisRequestId) axisBannerCheck();
       setIsIAORestricted(isRequestRestricted(requestDetails, ministryId));
       if (
         requestDetails.requestType?.toLowerCase() ==
@@ -686,199 +677,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
       dispatch(fetchRestrictedRequestCommentTagList(requestId, ministryId));
   }, [isIAORestricted]);
 
-  useEffect(() => {
-    if (checkExtension && Object.entries(axisSyncedData).length !== 0) {
-      let axisDataUpdated = extensionComparison(axisSyncedData, "Extensions");
-      if (axisDataUpdated) setAxisMessage("WARNING");
-      else setAxisMessage("");
-    }
-  }, [axisSyncedData, requestExtensions, checkExtension]);
-
-  const axisBannerCheck = () => {
-    dispatch(
-      fetchRequestDataFromAxis(
-        requestDetails.axisRequestId,
-        saveRequestObject,
-        true,
-        (err, data) => {
-          if (!err) {
-            if (typeof data !== "string" && Object.entries(data).length > 0) {
-              data["linkedRequests"] =
-                typeof data["linkedRequests"] == "string"
-                  ? JSON.parse(data["linkedRequests"])
-                  : data["linkedRequests"];
-              data["axisApplicantID"] =
-                "axisApplicantID" in data
-                  ? parseInt(data["axisApplicantID"])
-                  : null;
-              setAxisSyncedData(data);
-              let axisDataUpdated = checkIfAxisDataUpdated(data);
-              if (axisDataUpdated) {
-                setCheckExtension(false);
-                setAxisMessage("WARNING");
-              } else {
-                setAxisMessage("");
-              }
-            } else if (data) {
-              let responseMsg = data;
-              responseMsg += "";
-              if (
-                responseMsg.indexOf(
-                  "Exception happened while GET operations of request"
-                ) >= 0
-              )
-                setAxisMessage("ERROR");
-            }
-          } else {
-            setAxisMessage("ERROR");
-          }
-        }
-      )
-    );
-  };
-
-  const checkIfAxisDataUpdated = (axisData) => {
-    let updateNeeded = false;
-    for (let key of Object.keys(axisData)) {
-      let updatedField = isAxisSyncDisplayField(key);
-      if (key !== "Extensions" && updatedField)
-        updateNeeded = checkValidation(key, axisData);
-      if (updateNeeded) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  const checkValidation = (key, axisData) => {
-    if (key === MANDATORY_FOI_REQUEST_FIELDS.TOTAL_NO_OF_PAGES) {
-      if (
-        (requestDetails["axispagecount"] || axisData[key]) &&
-        requestDetails["axispagecount"] !== axisData[key]
-      )
-        return true;
-      return false;
-
-      // if (requestDetails["recordspagecount"] > 0)
-      //   return false;
-      // else if ((requestDetails["axispagecount"] || axisData[key]) && requestDetails["axispagecount"] !== axisData[key])
-      //   return true;
-      // return false;
-    }
-    let mandatoryField = isMandatoryField(key);
-    if (key === "additionalPersonalInfo") {
-      if (axisData.requestType === "personal") {
-        let foiReqAdditionalPersonalInfo = requestDetails[key];
-        let axisAdditionalPersonalInfo = axisData[key];
-        for (let axisKey of Object.keys(axisAdditionalPersonalInfo)) {
-          for (let reqKey of Object.keys(foiReqAdditionalPersonalInfo)) {
-            if (axisKey === reqKey) {
-              if (
-                axisAdditionalPersonalInfo[axisKey] !==
-                foiReqAdditionalPersonalInfo[axisKey]
-              ) {
-                return true;
-              }
-            }
-          }
-        }
-      }
-    } else if (
-      key === "compareReceivedDate" &&
-      requestDetails["receivedDate"] !== axisData[key] &&
-      requestDetails["receivedDate"] !== axisData["receivedDate"]
-    ) {
-      return true;
-    } else if (key === "linkedRequests") {
-      if (linkedRequestsChanged(axisData, key) > 0) {
-        return true;
-      }
-    } else if (
-      key !== "compareReceivedDate" &&
-      ((mandatoryField && axisData[key]) || !mandatoryField)
-    ) {
-      if (
-        (requestDetails[key] || axisData[key]) &&
-        requestDetails[key] != axisData[key]
-      )
-        return true;
-    }
-    return false;
-  };
-
-  const linkedRequestsChanged = (axisData, key) => {
-    let dblinkedRequests = requestDetails[key]?.map((val) =>
-      Object.keys(val).toString()
-    );
-    let axislinkedRequests =
-      typeof axisData[key] == "string"
-        ? JSON.parse(axisData[key])
-        : axisData[key];
-    let linkedRequestsJson = axislinkedRequests.map((val) =>
-      Object.keys(val).toString()
-    );
-    if (linkedRequestsJson?.length != dblinkedRequests?.length) return true;
-    if (
-      linkedRequestsJson.filter((x) => !dblinkedRequests?.includes(x))?.length >
-      0
-    )
-      return true;
-    if (
-      dblinkedRequests.filter((x) => !linkedRequestsJson?.includes(x))?.length >
-      0
-    )
-      return true;
-    return false;
-  };
-
-  const extensionComparison = (axisData, key) => {
-    if (requestExtensions.length !== axisData[key].length) return true;
-    let axisUniqueIds = [];
-    let foiUniqueIds = [];
-    axisData[key]?.forEach((axisObj) => {
-      axisUniqueIds.push(
-        (
-          axisObj.extensionstatusid +
-          formatDate(axisObj.extendedduedate, "MMM dd yyyy") +
-          axisObj.extensionreasonid
-        ).replace(/\s+/g, "")
-      );
-    });
-    requestExtensions.forEach((obj) => {
-      foiUniqueIds.push(
-        (
-          obj.extensionstatusid +
-          formatDate(obj.extendedduedate, "MMM dd yyyy") +
-          obj.extensionreasonid
-        ).replace(/\s+/g, "")
-      );
-    });
-    if (axisUniqueIds.filter((x) => !foiUniqueIds.includes(x))?.length > 0) {
-      return true;
-    }
-
-    if (requestExtensions.length > 0 && axisData[key].length > 0) {
-      for (let axisObj of axisData[key]) {
-        for (let foiReqObj of requestExtensions) {
-          if (getUniqueIdentifier(axisObj) === getUniqueIdentifier(foiReqObj)) {
-            if (
-              axisObj.extensionstatusid !== foiReqObj.extensionstatusid ||
-              axisObj.extendedduedays !== foiReqObj.extendedduedays ||
-              !(
-                foiReqObj.decisiondate === axisObj.approveddate ||
-                foiReqObj.decisiondate === axisObj.denieddate
-              )
-            ) {
-              return true;
-            }
-          }
-        }
-      }
-    } else {
-      if (axisData[key]?.length > 0) return true;
-    }
-    return false;
-  };
 
   const requiredRequestDescriptionDefaultData = {
     startDate: "",
@@ -925,9 +723,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     addressSecondary: ""
   };
 
-  const requiredAxisDetailsValue = {
-    axisRequestId: "",
-  };
 
   const requiredProactiveDetailsInitialValues = {
     proactiveDisclosureCategory: "",
@@ -972,9 +767,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const [recordsUploading, setRecordsUploading] = React.useState(false);
   const [CFRUnsaved, setCFRUnsaved] = React.useState(false);
   const [headerValue, setHeader] = useState("");
-  const [requiredAxisDetails, setRequiredAxisDetails] = React.useState(
-    requiredAxisDetailsValue
-  );
+
   const [personalRequestDetailErrors, setPersonalRequestDetailErrors] = React.useState(personalRequestDetailErrorsInit);
   //get the initial value of the required fields to enable/disable bottom button at the initial load of review request
   const handleInitialRequiredRequestDescriptionValues = React.useCallback(
@@ -992,9 +785,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const handleContactDetailsInitialValue = React.useCallback((value) => {
     setrequiredContactDetails(value);
   }, []);
-  const handleAxisDetailsInitialValue = React.useCallback((value) => {
-    setRequiredAxisDetails(value);
-  }, []);
+
   const handleProactiveDetailsInitialValue = React.useCallback((value) => {
     setRequiredProactiveDetailsValues(value);
   }, []);
@@ -1007,11 +798,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     const detailsData = assignValue(requiredContactDetails, value, name);
     setrequiredContactDetails(detailsData);
   };
-  const handleAxisDetailsValue = (value, name) => {
-    if (value) setUnSavedRequest(true);
-    const detailsData = assignValue(requiredAxisDetailsValue, value, name);
-    setRequiredAxisDetails(detailsData);
-  };
+
   //Update required fields of request description box with latest value
   const handleOnChangeRequiredRequestDescriptionValues = (value, name) => {
     const descriptionData = assignValue(
@@ -1105,9 +892,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   const handleEmailValidation = (validationObj) => {
     setValidation(validationObj);
   };
-  const handleAxisIdValidation = (validationObj) => {
-    setValidation(validationObj);
-  };
+
 
   //to get the updated program area list with isChecked=true/false
   const [programAreaList, setProgramAreaList] = React.useState([]);
@@ -1127,7 +912,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     validation,
     assignedToValue,
     requiredRequestDetailsValues,
-    requiredAxisDetails,
     isAddRequest,
     _currentrequestStatus,
     oipcData,
@@ -1170,10 +954,8 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
   };
   const [updateStateDropDown, setUpdateStateDropdown] = useState(false);
   const [stateChanged, setStateChanged] = useState(false);
-
   const handleSaveRequest = (_state, _unSaved, id) => {
     setHeader(_state);
-
     if (
       _state?.toLowerCase() === StateEnum.unopened.name.toLowerCase() &&
       (saveRequestObject.isconsultflag === null ||
@@ -1360,19 +1142,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     );
   };
 
-  const disableBannerForClosed = () => {
-    if (
-      stateTransition?.find(
-        ({ status }) =>
-          status?.toLowerCase() ===
-          StateEnum.intakeinprogress.name.toLowerCase()
-      )
-    ) {
-      if (axisMessage === "WARNING") setAxisMessage("");
-      return true;
-    }
-    return false;
-  };
 
   const showFeesTab = () => {
     if (isMinistry) {
@@ -1485,10 +1254,7 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
     Object.keys(requestDetails).length !== 0) ||
     isAddRequest ? (
     <div
-      className={`foiformcontent ${axisMessage === "WARNING" &&
-        !disableBannerForClosed() &&
-        "request-scrollbar-height"
-        }`}
+      className="foiformcontent"
     >
       <div className="foitabbedContainer">
         <div className={foitabheaderBG}>
@@ -1624,13 +1390,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
           </div>
         </div>
         <div className="foitabpanelcollection">
-          {requestState !== StateEnum.intakeinprogress.name &&
-            !disableBannerForClosed() && (
-              <AxisMessageBanner
-                axisMessage={axisMessage}
-                requestDetails={requestDetails}
-              />
-            )}
           <div
             id="Request"
             className={clsx("tabcontent", {
@@ -1739,21 +1498,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         handleConsultFlagChange={handleConsultFlagChange}
                         isProactiveDisclosure={isProactiveDisclosure}
                       />
-                      {(isAddRequest ||
-                        requestState === StateEnum.unopened.name) &&
-                        !isProactiveDisclosure && (
-                          <AxisDetails
-                            requestDetails={requestDetails}
-                            createSaveRequestObject={createSaveRequestObject}
-                            handleAxisDetailsInitialValue={
-                              handleAxisDetailsInitialValue
-                            }
-                            handleAxisDetailsValue={handleAxisDetailsValue}
-                            handleAxisIdValidation={handleAxisIdValidation}
-                            setAxisMessage={setAxisMessage}
-                            saveRequestObject={saveRequestObject}
-                          />
-                        )}
                       {isProactiveDisclosure ? (
                         <>
                           <ProactiveDisclosureDetails
@@ -1986,8 +1730,6 @@ const FOIRequest = React.memo(({ userDetail, openApplicantProfileModal }) => {
                         requestState={requestState}
                         setSaveRequestObject={setSaveRequestObject}
                         setIsAddRequest={setIsAddRequest}
-                        axisSyncedData={axisSyncedData}
-                        axisMessage={axisMessage}
                         attachmentsArray={requestAttachments}
                         oipcData={oipcData}
                         validLockRecordsState={validLockRecordsState}
