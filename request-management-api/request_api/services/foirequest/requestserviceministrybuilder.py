@@ -61,7 +61,7 @@ class requestserviceministrybuilder(requestserviceconfigurator):
         foiministryrequest.axisrequestid = ministryschema["axisrequestid"]
         foiministryrequest.linkedrequests = ministryschema['linkedrequests']
         foiministryrequest.identityverified = ministryschema['identityverified']
-        foiministryrequest.originalldd = ministryschema['originalldd']
+        foiministryrequest.originalldd = ministryschema['originalldd'] if ministryschema['originalldd'] is not None else ministryschema['duedate']
         foiministryrequest.axispagecount = ministryschema["axispagecount"]
         foiministryrequest.recordspagecount = ministryschema["recordspagecount"]
         foiministryrequest.axislanpagecount = ministryschema.get("axislanpagecount")
