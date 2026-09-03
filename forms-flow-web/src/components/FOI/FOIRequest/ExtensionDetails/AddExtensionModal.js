@@ -599,7 +599,7 @@ const AddExtensionModal = () => {
                   </Grid>
                 </ConditionalComponent>
                 <ConditionalComponent
-                  condition={status !== extensionStatusId.pending}
+                  condition={status !== extensionStatusId.pending && reason?.extensiontype !== "OIPC" && reason?.extensionreasonid !== 1}
                 >
                   <Grid item xs={12}>
                     <FileUpload
