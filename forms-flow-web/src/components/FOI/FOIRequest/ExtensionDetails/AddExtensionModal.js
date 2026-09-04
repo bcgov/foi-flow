@@ -307,6 +307,7 @@ const AddExtensionModal = () => {
         extendedduedays: numberDays,
         extendedduedate: formatDate(extendedDate, "yyyy-MM-dd"),
         extensionstatusid: status,
+        approvednoofdays: status === extensionStatusId.approved ? approvedNumberDays : null,
         ...statusOptions,
       };
 
