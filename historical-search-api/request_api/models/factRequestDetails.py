@@ -167,7 +167,8 @@ class factRequestDetails(db.Model):
                             FROM \
                             public."ClosedRequestDetailsPost2018" WHERE '
 
-            filterbysearchcondition =[]        
+            filterbysearchcondition =[]
+            queryparams = {}
 
             if(params['search'] == 'requestdescription'):
                 for keyword in params['keywords']:
@@ -184,6 +185,16 @@ class factRequestDetails(db.Model):
             elif(params['search'] == 'oipc_number'):
                 for keyword in params['keywords']:
                     filterbysearchcondition.append("LOWER(oipcno) like LOWER('%{0}%')".format(keyword))
+            elif(params['search'] == 'businessName'):
+                for idx, keyword in enumerate(params['keywords']):
+                    keyword = keyword.strip()
+                    parameter_name = f'businessname_{idx}'
+                    filterbysearchcondition.append(
+                        f'EXISTS (SELECT 1 FROM public."dimRequesters" r '
+                        f'WHERE r.requesterid = public."ClosedRequestDetailsPost2018".requesterid '
+                        f'AND LOWER(r.company) LIKE LOWER(:{parameter_name}))'
+                    )
+                    queryparams[parameter_name] = f'%{keyword}%'
 
             requesttypecondition = []
             if len(params['requesttype'] + params['requestflags']) > 0:
@@ -237,7 +248,7 @@ class factRequestDetails(db.Model):
             else:
                 basequery+= ' LIMIT 100'
         
-            rs = db.session.execute(text(basequery))
+            rs = db.session.execute(text(basequery), queryparams)
             
             for row in rs:            
                 searchresults.append({"axisrequestid": row["visualrequestfilenumber"], "description": row["description"], "assignee": row["assignee"], "requeststatus": row["requeststatus"], "applicantname": row["applicantname"], "requesttype": row["requesttypename"],"receiveddate": row["receiveddate"],"oipcno": row["oipcno"]})

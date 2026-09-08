@@ -989,8 +989,10 @@ class FOIRawRequest(db.Model):
         return {
             'firstName': FOIRawRequest.requestrawdata['firstName'].astext,
             'lastName': FOIRawRequest.requestrawdata['lastName'].astext,
+            'businessName': FOIRawRequest.requestrawdata['businessName'].astext,
             'contactFirstName': FOIRawRequest.requestrawdata['contactInfo']['firstName'].astext,
             'contactLastName': FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext,
+            'contactBusinessName': FOIRawRequest.requestrawdata['contactInfo']['businessName'].astext,
             'requestType': FOIRawRequest.requestrawdata['requestType'].astext,
             'requestTypeRequestType': FOIRawRequest.requestrawdata['requestType']['requestType'].astext,
             'idNumber': cast(FOIRawRequest.requestid, String),
@@ -1354,6 +1356,8 @@ class FOIRawRequest(db.Model):
             return FOIRawRequest.__getfilterfordescription(params)
         elif(params['search'] == 'applicantname'):
             return FOIRawRequest.__getfilterforapplicantname(params)
+        elif(params['search'] == 'businessName'):
+            return FOIRawRequest.__getfilterforbusinessname(params)
         elif(params['search'] == 'assigneename'):
             return FOIRawRequest.__getfilterforassigneename(params)
         elif(params['search'] == 'idnumber' or params['search'] == 'axisrequest_number'):
@@ -1390,6 +1394,16 @@ class FOIRawRequest(db.Model):
         return or_(and_(*searchcondition1), and_(*searchcondition2), and_(*searchcondition3), and_(*searchcondition4))
     
     @classmethod        
+    def __getfilterforbusinessname(cls,params):
+        searchcondition1 = []
+        searchcondition2 = []
+        for keyword in params['keywords']:
+            keyword = keyword.strip()
+            searchcondition1.append(FOIRawRequest.findfield('businessName').ilike('%'+keyword+'%'))
+            searchcondition2.append(FOIRawRequest.findfield('contactBusinessName').ilike('%'+keyword+'%'))
+        return or_(and_(*searchcondition1), and_(*searchcondition2))
+
+    @classmethod
     def __getfilterforassigneename(cls,params):
         searchcondition1 = []
         searchcondition2 = []

@@ -732,6 +732,19 @@ const AdvancedSearch = ({ userDetail }) => {
                     }
                     label="OIPC Number"
                   />
+                  <FormControlLabel
+                    value={SearchFilter.ORGANIZATION}
+                    control={
+                      <Radio
+                        sx={{
+                          color: "#013366",
+                          "&.Mui-checked": { color: "#013366" },
+                          "& .MuiSvgIcon-root": { fontSize: 26 },
+                        }}
+                      />
+                    }
+                    label="Organization"
+                  />
                 </RadioGroup>
               </Grid>
 

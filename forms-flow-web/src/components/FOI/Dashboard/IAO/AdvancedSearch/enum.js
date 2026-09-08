@@ -6,7 +6,8 @@ const SearchFilter = Object.freeze({
   APPLICANT_NAME: "applicantname",
   ASSIGNEE_NAME: "assigneename",
   SUBJECT_CODE: "subjectcode",
-  OIPC_NUMBER: "oipc_number"
+  OIPC_NUMBER: "oipc_number",
+  ORGANIZATION: "businessName"
 });
 
 const DateRangeTypes = Object.freeze([
