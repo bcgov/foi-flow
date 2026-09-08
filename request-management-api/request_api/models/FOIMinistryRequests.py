@@ -880,6 +880,7 @@ class FOIMinistryRequest(db.Model):
         return {
             'firstName': FOIRequestApplicant.firstname,
             'lastName': FOIRequestApplicant.lastname,
+            'businessName': FOIRequestApplicant.businessname,
             'requestType': FOIRequest.requesttype,
             'idNumber': FOIMinistryRequest.filenumber,
             'axisRequestId': FOIMinistryRequest.axisrequestid,
