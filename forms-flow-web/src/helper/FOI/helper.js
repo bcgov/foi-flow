@@ -128,9 +128,8 @@ const addBusinessDays = (dateText, days) => {
 
 const addBusinessDaysExt = (dateText, days) => {
   const startDate = dayjs(dateText);
-  const endDate = startDate.businessDaysAdd(days);
   const startYear = dayjs(startDate).year();
-  const endYear = dayjs(endDate).year();
+  const endYear = dayjs(startDate).add(1, "year").year();
   const holidays = getHolidayList(startYear, endYear);
   const expandedHolidays = expandHolidays(holidays);
   let businessDays = 0;
@@ -142,7 +141,7 @@ const addBusinessDaysExt = (dateText, days) => {
         businessDays++;
     }
   }
-
+  
   return calcDate.format("YYYY-MM-DD");
 };
 
@@ -159,6 +158,10 @@ const expandHolidays = (holidays) => {
   return holidays.map(h => {
     const d = dayjs(h.date);
     if (d.day() === 6) {
+      const newDate = d.add(2, "day").format("YYYY-MM-DD");
+      return {...h, date: newDate};
+    }
+    if (d.day() === 0 && !isBusinessDay(d.subtract(1, 'day'), holidays)) {
       const newDate = d.add(2, "day").format("YYYY-MM-DD");
       return {...h, date: newDate};
     }
@@ -194,9 +197,8 @@ const removeBusinessDays = (dateText, days) => {
 
 const removeBusinessDaysExt = (dateText, days) => {
   const startDate = dayjs(dateText);
-  const endDate = startDate.businessDaysAdd(days);
   const startYear = dayjs(startDate).year();
-  const endYear = dayjs(endDate).year();
+  const endYear = dayjs(startDate).subtract(1, "year").year();
   const holidays = getHolidayList(startYear, endYear);
   const expandedHolidays = expandHolidays(holidays);
   let businessDays = 0;
