@@ -168,7 +168,7 @@ const AddExtensionModal = () => {
         selectedExtension.approvednoofdays || selectedExtension.extendedduedays;
       const applicableExtendedDueDate = new Date(currentDueDate).getTime() !==  new Date (selectedExtension?.extendedduedate).getTime() ? currentDueDate : selectedExtension.extendedduedate; 
       setPreExtendedDate(
-        removeBusinessDays(
+        removeBusinessDaysExt(
           formatDate(applicableExtendedDueDate),
           daysToSubtract
         )
