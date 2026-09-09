@@ -127,6 +127,10 @@
     },
     "axios": {
       "form-data": "^4.0.4"
+    },
+    "shell-quote": "^1.10.0",
+    "sockjs": {
+      "websocket-driver": "^0.7.5"
     }
   },
   "browserslist": [
