@@ -127,6 +127,9 @@
     },
     "axios": {
       "form-data": "^4.0.4"
+    },
+    "enzyme": {
+      "cheerio": "1.0.0-rc.12"
     }
   },
   "browserslist": [
