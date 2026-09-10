@@ -19,6 +19,7 @@ import {
   isValidMinistryCode,
   countOfMinistrySelected,
 } from "./utils";
+import { isProactiveDisclosureProgramArea } from "./proactiveDisclosureProgramAreas";
 
 const useStyles = makeStyles({
   headingError: {
@@ -69,7 +70,7 @@ const ProactiveDisclosureDescription = React.memo(
 
     // Filter once - use const
     const proactiveProgramAreaList = masterProgramAreas?.filter(
-      (value) => !["OCC", "TIC", "CLB", "CFD", "COR", "IIO", "LDB", "LSB", "MGC", "OBC"].includes(value?.iaocode)
+      isProactiveDisclosureProgramArea
     );
 
     const requestDescriptionHistoryList = useSelector(
