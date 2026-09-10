@@ -2,7 +2,7 @@
 # FROM python:3.8
 # test
 # Necessary to pull images from bcgov and not hit Dockerhub quotas.
-FROM python:3.10.8-bullseye
+FROM python:3.10.21-bookworm
 EXPOSE 9402
 RUN set -eux; apt-get update; apt-get install -y --no-install-recommends ca-certificates curl netbase wget ; rm -rf /var/lib/apt/lists/*
 
