@@ -20,7 +20,9 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import {
   formatDate,
   addBusinessDays,
+  addBusinessDaysExt,
   removeBusinessDays,
+  removeBusinessDaysExt,
   ConditionalComponent,
 } from "../../../../helper/FOI/helper";
 import clsx from "clsx";
@@ -164,9 +166,10 @@ const AddExtensionModal = () => {
 
       const daysToSubtract =
         selectedExtension.approvednoofdays || selectedExtension.extendedduedays;
+      const applicableExtendedDueDate = new Date(currentDueDate).getTime() !==  new Date (selectedExtension?.extendedduedate).getTime() ? currentDueDate : selectedExtension.extendedduedate; 
       setPreExtendedDate(
-        removeBusinessDays(
-          formatDate(selectedExtension.extendedduedate),
+        removeBusinessDaysExt(
+          formatDate(applicableExtendedDueDate),
           daysToSubtract
         )
       );
@@ -212,7 +215,7 @@ const AddExtensionModal = () => {
     if (!selectedExtension || !preExtendedDate) {
       return currentDueDate;
     }
-
+    
     return preExtendedDate;
   };
 
@@ -226,7 +229,7 @@ const AddExtensionModal = () => {
     }
 
     setApprovedNumberDays(days);
-    setExtendedDate(addBusinessDays(dueDate, days));
+    setExtendedDate(addBusinessDaysExt(dueDate, days));
   };
 
   const updateExtendedDate = (days) => {
@@ -237,7 +240,7 @@ const AddExtensionModal = () => {
 
     setNumberDays(days);
     setApprovedNumberDays(days);
-    setExtendedDate(addBusinessDays(dueDate, days));
+    setExtendedDate(addBusinessDaysExt(dueDate, days));
   };
 
   const handleClose = () => {
@@ -304,6 +307,7 @@ const AddExtensionModal = () => {
         extendedduedays: numberDays,
         extendedduedate: formatDate(extendedDate, "yyyy-MM-dd"),
         extensionstatusid: status,
+        approvednoofdays: status === extensionStatusId.approved ? approvedNumberDays : null,
         ...statusOptions,
       };
 
@@ -597,7 +601,7 @@ const AddExtensionModal = () => {
                   </Grid>
                 </ConditionalComponent>
                 <ConditionalComponent
-                  condition={status !== extensionStatusId.pending}
+                  condition={status !== extensionStatusId.pending && reason?.extensiontype !== "OIPC" && reason?.extensionreasonid !== 1}
                 >
                   <Grid item xs={12}>
                     <FileUpload
