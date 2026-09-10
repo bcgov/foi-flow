@@ -60,7 +60,7 @@ class requestservicebuilder(requestserviceconfigurator):
         foiministryrequest.duedate = requestschema.get("dueDate")
         foiministryrequest.linkedrequests = requestschema.get("linkedRequests")
         foiministryrequest.identityverified = requestschema.get("identityVerified")
-        foiministryrequest.originalldd = requestschema.get("originalDueDate")
+        foiministryrequest.originalldd = requestschema.get("originalDueDate", requestschema.get("dueDate", None))
         foiministryrequest.estimatedpagecount = requestschema.get("estimatedpagecount")
         foiministryrequest.estimatedtaggedpagecount = requestschema.get("estimatedtaggedpagecount")
         if requestschema.get("isoipcreview") is not None and requestschema.get("isoipcreview")  != "":
