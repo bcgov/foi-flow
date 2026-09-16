@@ -136,6 +136,7 @@ class ReclassifyFOIDocument(Resource):
             moveresult = documentservice().copyrequestdocumenttonewlocation(documentschema['category'], documentpath)
             # save new version of document with updated documentpath
             if moveresult['status'] == 'success':
+                 documentschema['documentpath'] = moveresult['documentpath']
                  result = documentservice().createrequestdocumentversion(requestid, documentid, documentschema, AuthHelper.getuserid(), requesttype)
                  return {'status': result.success, 'message':result.message,'id':result.identifier} , 200
             return {'status': False, 'message': "Something went wrong moving the document's location" }, 500
