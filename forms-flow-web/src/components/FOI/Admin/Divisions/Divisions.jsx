@@ -15,6 +15,8 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
+import VisibilityIcon from "@material-ui/icons/Visibility";
+import VisibilityOffIcon from "@material-ui/icons/VisibilityOff";
 import { toast } from "react-toastify";
 
 import {
@@ -22,6 +24,7 @@ import {
   createProgramAreaDivision,
   editProgramAreaDivision,
   disableProgramAreaDivision,
+  updateProgramAreaDivisionSelectable,
 } from "../../../../apiManager/services/FOI/foiAdminServices";
 import {fetchAllProgramAreasForAdmin} from "../../../../apiManager/services/FOI/foiMasterDataServices";
 import "./divisions.scss";
@@ -31,6 +34,7 @@ import {isFoiAdmin} from "../../../../helper/FOI/helper";
 
 const Divisions = ({userDetail}) => {
   const [searchResults, setSearchResults] = useState(null);
+  const [divisionRows, setDivisionRows] = useState([]);
   const [selectedDivision, setSelectedDivision] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCreateSectionModal, setShowCreateSectionModal] = useState(false);
@@ -44,6 +48,10 @@ const Divisions = ({userDetail}) => {
   let divisions = useSelector(
     (state) => state.foiRequests.foiProgramAreaDivisionList
   );
+
+  useEffect(() => {
+    setDivisionRows(divisions || []);
+  }, [divisions]);
 
   useEffect(async () => {
     if(isAdmin){
@@ -168,6 +176,62 @@ const Divisions = ({userDetail}) => {
     ]);
   };
 
+  const toggleDivisionSelectable = async (data) => {
+    const newValue = !data.isselectable;
+
+    await Promise.all([
+      dispatch(
+        updateProgramAreaDivisionSelectable(
+          data.divisionid,
+          newValue,
+          (err, res) => {
+            if (!err && res) {
+              const updateSelectableRow = (row) =>
+                row.divisionid === data.divisionid
+                  ? { ...row, isselectable: newValue }
+                  : row;
+
+              setDivisionRows((rows) =>
+                rows.map(updateSelectableRow)
+              );
+
+              setSearchResults((rows) =>
+                rows ? rows.map(updateSelectableRow) : rows
+              );
+
+              toast.success(
+                newValue
+                  ? "Division is now visible to ministry users."
+                  : "Division is now hidden from ministry users.",
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
+            } else {
+              toast.error(
+                "Unable to update division visibility. Please try again.",
+                {
+                  position: "top-right",
+                  autoClose: 3000,
+                  hideProgressBar: true,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                }
+              );
+            }
+          }
+        )
+      ),
+    ]);
+  };
   const openCreateDivisionModal = () => {
     setShowCreateModal(true);
   };
@@ -240,6 +304,13 @@ const Divisions = ({userDetail}) => {
       align: "center",
     },
     {
+      field: "isselectable",
+      headerName: "Visible?",
+      width: 100,
+      align: "center",
+      renderCell: (params) => <>{params.row.issection || params.row.type ? "-" : params.value ? "Yes" : "No"}</>,
+    },
+    {
       field: "sortorder",
       headerName: "Sort Order",
       width: 100,
@@ -250,7 +321,7 @@ const Divisions = ({userDetail}) => {
       field: "action",
       headerName: "Action",
       renderHeader: () => <></>,
-      width: 100,
+      width: 140,
       align: "right",
       sortable: false,
       renderCell: (params) => (
@@ -258,6 +329,24 @@ const Divisions = ({userDetail}) => {
           <IconButton onClick={() => openEditDivisionModal(params.row)}>
             <EditIcon />
           </IconButton>
+
+          {!params.row.issection && !params.row.type && (
+            <IconButton
+              onClick={() => toggleDivisionSelectable(params.row)}
+              title={
+                params.row.isselectable
+                  ? "Hide from ministry users"
+                  : "Show to ministry users"
+              }
+            >
+              {params.row.isselectable ? (
+                <VisibilityIcon />
+              ) : (
+                <VisibilityOffIcon />
+              )}
+            </IconButton>
+          )}
+
           <IconButton onClick={() => openDisableDivisionModal(params.row)}>
             <DeleteIcon />
           </IconButton>
@@ -299,7 +388,7 @@ const Divisions = ({userDetail}) => {
               // autocompleteOptions={divisions
               //   .map((division) => division.name)
               //   .filter((value, index, self) => self.indexOf(value) === index)}
-              items={divisions}
+              items={divisionRows}
               setSearchResults={setSearchResults}
             />
           </Grid>
@@ -328,7 +417,7 @@ const Divisions = ({userDetail}) => {
             autoHeight
             className="divisions-data-grid"
             getRowId={(row) => row.divisionid}
-            rows={searchResults ? searchResults : divisions}
+            rows={searchResults ? searchResults : divisionRows}
             columns={columns}
             rowHeight={30}
             headerHeight={50}
