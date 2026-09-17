@@ -80,6 +80,38 @@ export const editProgramAreaDivision = (data, divisionid, ...rest) => {
   };
 };
 
+export const updateProgramAreaDivisionSelectable = (
+  divisionid,
+  isselectable,
+  ...rest
+) => {
+  const done = fnDone(rest);
+  let apiUrl = replaceUrl(
+    API.FOI_PUT_PROGRAMAREADIVISION_SELECTABLE,
+    "<divisionid>",
+    divisionid
+  );
+
+  return (dispatch) => {
+    httpPUTRequest(
+      apiUrl,
+      { isselectable },
+      UserService.getToken()
+    )
+      .then((res) => {
+        if (res.data) {
+          done(null, res.data);
+        } else {
+          dispatch(serviceActionError(res));
+          throw new Error("Error updating division visibility");
+        }
+      })
+      .catch((error) => {
+        done(error);
+        catchError(error, dispatch);
+      });
+  };
+};
 export const disableProgramAreaDivision = (divisionid, ...rest) => {
   const done = fnDone(rest);
   let apiUrl = replaceUrl(

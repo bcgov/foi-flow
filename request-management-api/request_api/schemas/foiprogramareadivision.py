@@ -8,6 +8,7 @@ class FOIProgramAreaDivisionSchema(Schema):
     programareaid = fields.Int(data_key="programareaid")
     name = fields.Str(data_key="name")
     isactive = fields.Bool(data_key="isactive",allow_none=True)
+    isselectable = fields.Bool(data_key="isselectable", allow_none=False)
     sortorder = fields.Int(data_key="sortorder",allow_none=True)
     issection = fields.Bool(data_key="issection", allow_none=False)
     parentid = fields.Int(data_key="parentid", allow_none=True)

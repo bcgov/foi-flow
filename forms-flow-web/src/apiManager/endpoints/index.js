@@ -67,6 +67,7 @@ const API = {
   FOI_POST_PROGRAMAREADIVISION: `${FOI_BASE_API_URL}/api/foiadmin/division`,
   FOI_PUT_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/division/<divisionid>`,
   FOI_DELETE_PROGRAMAREADIVISIONS: `${FOI_BASE_API_URL}/api/foiadmin/division/<divisionid>/disable`,
+  FOI_PUT_PROGRAMAREADIVISION_SELECTABLE: `${FOI_BASE_API_URL}/api/foiadmin/division/<divisionid>/selectable`,
 
   FOI_POST_COMMENT_REQUESTHISTORY: `${FOI_BASE_API_URL}/api/foicomment/requesthistory`,
 
