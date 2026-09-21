@@ -23,7 +23,7 @@ intentionally left unimplemented for now.
 
 class commonworkflowservice:
 
-    n8nbaseurl = os.getenv('N8N_BASE_URL', 'http://localhost:5678')
+    n8nbaseurl = os.getenv('N8N_BASE_URL', '')
     n8nroutingwebhookpath = os.getenv('N8N_ROUTING_WEBHOOK_PATH', '/webhook/foi-request-routing')
     n8nwebhookauthheadername = os.getenv('N8N_WEBHOOK_AUTH_HEADER_NAME')
     n8nwebhookauthheadervalue = os.getenv('N8N_WEBHOOK_AUTH_HEADER_VALUE')
