@@ -25,64 +25,45 @@ __author__      = "sumathi.thirumani@aot-technologies.com"
 class workflowservice:
 
     def createinstance(self, definitionkey, message):
-        # Initial creation always goes by WF_DEFAULT_ENGINE - there is no wfengine
-        # on record yet for a brand-new request. Once Camunda creates the instance,
-        # stamp wfengine='camunda' so every later operation routes back to Camunda
-        # by record instead of re-consulting the (possibly since-changed) default.
-        # n8n stamps its own wfengine/wfmetadata from within its workflow, so that
-        # path is left alone here to avoid a duplicate/conflicting write.
-        enginename = resolve_engine_name(None)
-        engine = resolve_engine(None)
-        logging.info("workflowservice.createinstance: definitionkey=%s using engine=%s", definitionkey, type(engine).__name__)
+        """Camunda-only: n8n has no notion of a pre-created instance - its
+        requests reach the fixed routing webhook via the normal event calls, 
+        so there is nothing to do here when WF_DEFAULT_ENGINE is n8n."""
         messagejson = json.loads(message)
+        if resolve_engine_name() != WFEngine.camunda:
+            logging.info("workflowservice.createinstance: WF_DEFAULT_ENGINE is not camunda - skipping instance creation for definitionkey=%s", definitionkey)
+            return None
+        engine = resolve_engine()
+        logging.info("workflowservice.createinstance: definitionkey=%s using engine=%s", definitionkey, type(engine).__name__)
         response = engine.createinstance(definitionkey, messagejson)
         if response is None:
             logging.error("workflowservice.createinstance: %s returned no response for definitionkey=%s", type(engine).__name__, definitionkey)
             raise Exception("Unable to create instance for key"+ definitionkey)
         logging.info("workflowservice.createinstance: %s created instance for definitionkey=%s -> %s", type(engine).__name__, definitionkey, response)
-        if enginename == WFEngine.camunda:
-            FOIRawRequest.updateworkflowengine(messagejson["id"], WFEngine.camunda, None, "System")
         return response
 
     def postunopenedevent(self, id, wfinstanceid, requestsschema, status, ministries=None):
-        requesttype = "foirequest" if status == UnopenedEvent.open.value else "rawrequest"
-        wfengine = self.__getwfenginebyrequesttype(id, requesttype)
-        logging.info("workflowservice.postunopenedevent: id=%s wfinstanceid=%s status=%s requesttype=%s wfengine=%s", id, wfinstanceid, status, requesttype, wfengine)
-        if wfinstanceid in (None,"") and resolve_engine_name(wfengine) != WFEngine.n8n:
+        logging.info("workflowservice.postunopenedevent: id=%s wfinstanceid=%s status=%s", id, wfinstanceid, status)
+        if wfinstanceid in (None,"") and resolve_engine_name() != WFEngine.n8n:
             logging.error("WF INSTANCE IS INVALID")
             return
+        logging.info("workflowservice.postunopenedevent: requestsschema=%s", requestsschema)
         assignedgroup = requestsschema["assignedGroup"] if 'assignedGroup' in requestsschema  else None
         assignedto = requestsschema["assignedTo"] if 'assignedTo' in requestsschema  else None
 
-        engine = resolve_engine(wfengine)
-        instanceaddress = self.__instanceaddress(wfengine, wfinstanceid, self.__getwfmetadatabyrequesttype(id, requesttype))
+        engine = resolve_engine()
         if status == UnopenedEvent.open.value:
-            metadata = json.dumps({"id": id, "status": status, "ministries": ministries, "assignedGroup": assignedgroup, "assignedTo": assignedto})
+            rawrequestid = FOIRequest.getrawrequestidbyfoirequestid(id)
+            metadata = json.dumps({"id": id, "rawRequestId": rawrequestid, "status": status, "ministries": ministries, "assignedGroup": assignedgroup, "assignedTo": assignedto})
         else:
             metadata = json.dumps({"id": id, "status": status, "assignedGroup": assignedgroup, "assignedTo": assignedto})
         if status == UnopenedEvent.intakeinprogress.value:
             messagename = MessageType.intakereopen.value if self.__hasreopened(id, "rawrequest") == True else MessageType.intakeclaim.value
-            return engine.unopenedsave(instanceaddress, metadata, messagename)
+            return engine.unopenedsave(wfinstanceid, metadata, messagename)
         else:
-            return engine.unopenedcomplete(instanceaddress, metadata, MessageType.intakecomplete.value)
-
-    def __getwfenginebyrequesttype(self, id, requesttype):
-        """Common wfengine lookup: id is only meaningful together with
-        requesttype, since the same numeric id space is not shared between
-        tables - "rawrequest" ids are FOIRawRequests.requestid, while
-        "foirequest" ids are FOIRequests.foirequestid (the split/opened
-        request, which falls back to its raw request's wfengine when not
-        yet copied over - see FOIRequest.getwfengine)."""
-        if requesttype == "rawrequest":
-            return FOIRawRequest.getwfengine(id)
-        return FOIRequest.getwfengine(id)
-
-    def __getwfmetadatabyrequesttype(self, id, requesttype):
-        if requesttype == "rawrequest":
-            return FOIRawRequest.getwfmetadata(id)
-        return FOIRequest.getwfmetadata(id)
+            return engine.unopenedcomplete(wfinstanceid, metadata, MessageType.intakecomplete.value)
 
     def postopenedevent(self, id, wfinstanceid, requestsschema, data, newstatus, usertype, issync=False):
+        logging.info("workflowservice.postopenedevent: requestsschema=%s", requestsschema)
         assignedgroup = self.__getopenedassigneevalue(requestsschema, "assignedgroup",usertype)
         assignedto = self.__getopenedassigneevalue(requestsschema, "assignedto",usertype)
         axisrequestid = self.__getvaluefromschema(requestsschema,"axisRequestId")
@@ -96,15 +77,16 @@ class workflowservice:
                     activity = self.__getministryactivity(oldstatus,newstatus) if issync == False else Activity.complete.value
                     isprocessing = self.__isprocessing(id) if issync == False else False
                     messagename = self.__messagename(oldstatus, activity, usertype, isprocessing)
+                    rawrequestid = FOIRequest.getrawrequestidbyfoirequestid(ministry["foirequestid"])
                     metadata = json.dumps(
                         {"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] ,
                         "assignedGroup": assignedgroup, "assignedTo": assignedto,
                         "assignedministrygroup":ministry["assignedministrygroup"],
                         "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id),
                         "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "issync": issync,
-                        "isofflinepayment": FOIMinistryRequest.getofflinepaymentflag(id)})
-                    wfengine = FOIRequest.getwfengine(ministry["foirequestid"])
-                    engine = resolve_engine(wfengine)
+                        "isofflinepayment": FOIMinistryRequest.getofflinepaymentflag(id),
+                        "foiRequestId": ministry["foirequestid"], "rawRequestId": rawrequestid})
+                    engine = resolve_engine()
                     if issync == True:
                         _variables = engine.getinstancevariables(wfinstanceid)
                         if ministry["status"] == OpenedEvent.callforrecords.value and (("status" not in _variables) or (_variables not in (None, []) and "status" in _variables and _variables["status"]["value"] != OpenedEvent.callforrecords.value)):
@@ -113,14 +95,16 @@ class workflowservice:
                             return engine.reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)
                         else:
                             return engine.openedcomplete(wfinstanceid, filenumber, metadata, messagename)
-                    logging.info("workflowservice.postopenedevent: id=%s filenumber=%s wfinstanceid=%s status=%s activity=%s usertype=%s messagename=%s wfengine=%s", id, filenumber, wfinstanceid, newstatus, activity, usertype, messagename, wfengine)
+                    logging.info("workflowservice.postopenedevent: id=%s filenumber=%s wfinstanceid=%s status=%s activity=%s usertype=%s messagename=%s", id, filenumber, wfinstanceid, newstatus, activity, usertype, messagename)
                     logging.info("workflowservice.postopenedevent: foirequestid=%s", ministry["foirequestid"])
-                    instanceaddress = self.__instanceaddress(wfengine, wfinstanceid, FOIRequest.getwfmetadata(ministry["foirequestid"]))
-                    self.__postopenedevent(id, filenumber, metadata, messagename, instanceaddress, activity, wfengine)
+                    self.__postopenedevent(id, filenumber, metadata, messagename, wfinstanceid, activity)
 
     def postfeeevent(self, requestid, ministryrequestid, requestsschema, paymentstatus, nextstatename=None):
+        logging.info("workflowservice.postfeeevent: requestsschema=%s", requestsschema)
+        rawrequestid = FOIRequest.getrawrequestidbyfoirequestid(requestid)
         metadata = json.dumps({
             "id": requestsschema["idNumber"],
+            "rawRequestId": rawrequestid,
             "status": requestsschema["currentState"],
             "assignedGroup": requestsschema["assignedGroup"],
             "assignedTo": requestsschema["assignedTo"],
@@ -129,31 +113,24 @@ class workflowservice:
 			"foiRequestID" :requestid,
             "nextStateName": nextstatename
             })
-        wfengine = FOIRequest.getwfengine(requestid)
-        engine = resolve_engine(wfengine)
-        instanceaddress = self.__instanceaddress(wfengine, requestsschema["axisRequestId"], FOIRequest.getwfmetadata(requestid))
-        return engine.feeevent(instanceaddress, metadata, paymentstatus)
+        engine = resolve_engine()
+        return engine.feeevent(requestsschema["axisRequestId"], metadata, paymentstatus)
 
     def postcorrenspodenceevent(self, wfinstanceid, ministryid, requestsschema, applicantcorrespondenceid, templatename, attributes):
+        logging.info("workflowservice.postcorrenspodenceevent: requestsschema=%s", requestsschema)
         paymentexpirydate = self.__getvaluefromlist(attributes,"paymentExpiryDate")
         axisrequestid = self.__getvaluefromschema(requestsschema,"axisRequestId")
         filenumber = self.__getvaluefromschema(requestsschema,"idNumber")
         status = self.__getvaluefromschema(requestsschema,"currentState")
         metadata = json.dumps({"id": filenumber, "status": status , "ministryRequestID": ministryid, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "applicantcorrespondenceid": applicantcorrespondenceid, "templatename": templatename.replace(" ", "")})
-        wfengine = FOIRequest.getwfenginebyministryrequestid(ministryid)
-        engine = resolve_engine(wfengine)
-        instanceaddress = self.__instanceaddress(wfengine, wfinstanceid, FOIRequest.getwfmetadatabyministryrequestid(ministryid))
-        engine.correspondanceevent(instanceaddress, filenumber, metadata)
+        engine = resolve_engine()
+        engine.correspondanceevent(wfinstanceid, filenumber, metadata)
 
     def syncwfinstance(self, requesttype, requestid, isallactivity=False):
         # n8n's searchinstancebyvariable/getinstancevariables are not implemented yet
-        # (deferred), so sync is skipped only when the request resolves to n8n -
-        # via an explicit wfengine='n8n' on record, or via WF_DEFAULT_ENGINE when
-        # no wfengine is set yet. A wfengine of None must still fall back to
-        # WF_DEFAULT_ENGINE like every other routing decision in this file, so the
-        # gate checks the resolved engine name, not the raw DB value.
-        wfengine = self.__syncwfengine(requesttype, requestid)
-        if resolve_engine_name(wfengine) == WFEngine.n8n:
+        # (deferred), so sync is skipped whenever WF_DEFAULT_ENGINE is n8n - this is
+        # a single global switch, not a per-request decision.
+        if resolve_engine_name() == WFEngine.n8n:
             return None
         try:
             # Sync and get raw instance details from FOI DB
@@ -162,23 +139,9 @@ class workflowservice:
                 req_metadata = self.__sync_foi_request(requestid, raw_metadata)
                 # Check foi request instance creation - Reconcile by transition to Open
                 _all_activity_desc = FOIMinistryRequest.getactivitybyid(requestid)
-                self.__sync_state_transition(requestid, str(req_metadata.wfinstanceid), _all_activity_desc, isallactivity, wfengine)
+                self.__sync_state_transition(requestid, str(req_metadata.wfinstanceid), _all_activity_desc, isallactivity)
                 return req_metadata.wfinstanceid
             return raw_metadata.wfinstanceid
-        except Exception as ex:
-            logging.error(ex)
-        return None
-
-    def __syncwfengine(self, requesttype, requestid):
-        """The raw wfengine on record for this sync target (None if not yet
-        assigned) - syncwfinstance() resolves this through resolve_engine_name()
-        to decide whether to gate, and passes it through unresolved to
-        resolve_engine() for the actual engine calls."""
-        try:
-            if requesttype == "rawrequest":
-                return FOIRawRequest.getwfengine(int(requestid))
-            if requesttype == "ministryrequest":
-                return FOIRequest.getwfenginebyministryrequestid(int(requestid))
         except Exception as ex:
             logging.error(ex)
         return None
@@ -216,10 +179,9 @@ class workflowservice:
     def __get_wf_pid(self, requesttype, _raw_metadata, _req_metadata=None):
         if requesttype == "rawrequest":
             searchby = [{"name":"id" ,"operator":"eq","value": int(_raw_metadata.requestid)}]
-            return resolve_engine(getattr(_raw_metadata, "wfengine", None)).searchinstancebyvariable(ProcessDefinitionKey.rawrequest.value, searchby)
+            return resolve_engine().searchinstancebyvariable(ProcessDefinitionKey.rawrequest.value, searchby)
         elif requesttype == "ministryrequest":
-            wfengine = getattr(_req_metadata, "wfengine", None)
-            engine = resolve_engine(wfengine)
+            engine = resolve_engine()
             searchby = [{"name":"foiRequestID","operator":"eq","value": int(_req_metadata.foirequestid)},
                     {"name": "rawRequestPID","operator":"eq","value": str(_raw_metadata.wfinstanceid)}]
             wf_foirequest_pid = engine.searchinstancebyvariable(ProcessDefinitionKey.ministryrequest.value, searchby)
@@ -232,13 +194,13 @@ class workflowservice:
             logging.info("Unknown requestype %s", requesttype)
             return None
 
-    def __sync_state_transition(self, requestid, wfinstanceid, _all_activity_desc, isallactivity, wfengine=None):
+    def __sync_state_transition(self, requestid, wfinstanceid, _all_activity_desc, isallactivity):
         current = _all_activity_desc[0]
         previous = _all_activity_desc[1] if len(_all_activity_desc) > 1 else _all_activity_desc[0]
         _activity_itr_desc = _all_activity_desc
         if isallactivity == False:
             _activity_itr_desc.pop(0)
-        engine = resolve_engine(wfengine)
+        engine = resolve_engine()
         _variables = engine.getinstancevariables(wfinstanceid)
         # SP: Stuck in Open -> Move from Open to CFR
         if _variables not in (None, []) and "status" not in _variables:
@@ -282,16 +244,16 @@ class workflowservice:
             return UserType.ministry.value
         return UserType.iao.value
 
-    def __postopenedevent(self, id, filenumber, metadata, messagename, instanceaddress, activity, wfengine=None):
-        engine = resolve_engine(wfengine)
+    def __postopenedevent(self, id, filenumber, metadata, messagename, wfinstanceid, activity):
+        engine = resolve_engine()
         if activity == Activity.complete.value:
 
             if self.__hasreopened(id, "ministryrequest") == True:
-                engine.reopenevent(instanceaddress, metadata, MessageType.iaoreopen.value)
+                engine.reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)
             else:
-                engine.openedcomplete(instanceaddress, filenumber, metadata, messagename)
+                engine.openedcomplete(wfinstanceid, filenumber, metadata, messagename)
         else:
-            engine.unopenedsave(instanceaddress, metadata, messagename)
+            engine.unopenedsave(wfinstanceid, metadata, messagename)
 
 
     def __getopenedassigneevalue(self, requestsschema, property, usertype):
@@ -375,18 +337,6 @@ class workflowservice:
 
     def __getministryactivity(self, oldstatus, newstatus):
         return  Activity.complete.value if newstatus is not None and oldstatus != newstatus else Activity.save.value
-
-    def __instanceaddress(self, wfengine, wfinstanceid, wfmetadata):
-        """The value to pass as the "which running instance" argument to the
-        resolved engine: the Camunda wfinstanceid unchanged, or - for n8n -
-        the current resume path from wfmetadata (wfinstanceid stays unused
-        for n8n-owned requests, per the wfengine/wfmetadata separation).
-        Read-only: workflowservice never writes wfengine/wfmetadata - that is
-        owned by createinstance's response (bpmservice) or by the n8n
-        workflow itself (commonworkflowservice)."""
-        if resolve_engine_name(wfengine) == WFEngine.n8n:
-            return (wfmetadata or {}).get("resumePath")
-        return wfinstanceid
 
 
 class UserType(Enum):

@@ -195,15 +195,15 @@ class FOIRawRequestBPMProcess(Resource):
             try:
                 notes = request_json['notes'] if request_json.get('notes') is not None else 'Workflow Update'
                 requestid = int(_requestid)
-                if 'executionId' in request_json:
-                    # n8n payload (workflow/resume update or status update) - wfengine/
-                    # wfmetadata only, never written into the Camunda wfinstanceid column.
-                    executionid = request_json['executionId']
-                    resumepath = request_json.get('resumePath')
-                    result = rawrequestservice().updateworkflowmetadatawithstatus(executionid, resumepath, requestid, notes, AuthHelper.getuserid())
-                else:
+                if 'wfinstanceid' in request_json:
                     _wfinstanceid = request_json['wfinstanceid']
                     result = rawrequestservice().updateworkflowinstancewithstatus(_wfinstanceid,requestid,notes,AuthHelper.getuserid())
+                else:
+                    # n8n payload - no wfinstanceid (n8n requests are addressed via
+                    # the fixed routing webhook, not a stored instance id/address) -
+                    # just records the status/notes n8n reports for the request.
+                    status = request_json['status']
+                    result = rawrequestservice().updatestatuswithnotes(status, requestid, notes, AuthHelper.getuserid())
                 if result.identifier != -1 :
                     return {'status': result.success, 'message':result.message}, 200
                 else:
