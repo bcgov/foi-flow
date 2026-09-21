@@ -51,7 +51,7 @@ class requestservicecreate:
             openfoirequest.applicantcategoryid = requestserviceconfigurator().getvalueof("category",foirequestschema.get("category"))
         openfoirequest.personalAttributes = self._prearepersonalattributes(foirequestschema, userid)        
         openfoirequest.requestApplicants = self.__prepareapplicants(foirequestschema, userid)       
-        if foirequestid is not None:
+        if foirequestid is not None:         
            openfoirequest.foirequestid = foirequestid
         openfoirequest.wfinstanceid = wfinstanceid if wfinstanceid is not None else None
         openfoirequest.createdby = userid

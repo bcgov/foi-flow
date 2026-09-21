@@ -4,7 +4,7 @@ from .db import  db, ma
 from datetime import datetime
 from sqlalchemy.orm import relationship,backref
 from .default_method_result import DefaultMethodResult
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSON, UUID
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import text
 import logging
@@ -28,7 +28,7 @@ class FOIRequest(db.Model):
     updated_at = db.Column(db.DateTime, nullable=True)
     createdby = db.Column(db.String(120), unique=False, nullable=True)
     updatedby = db.Column(db.String(120), unique=False, nullable=True)
-    wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
+    wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)   
 
     #ForeignKey References
     
@@ -80,10 +80,10 @@ class FOIRequest(db.Model):
             setattr(currequest,'wfinstanceid',wfinstanceid)
             setattr(currequest,'updated_at',datetime.now().isoformat())
             setattr(currequest,'updatedby',userid)
-            db.session.commit()
+            db.session.commit()  
             return DefaultMethodResult(True,'Request updated',foirequestid)
         return DefaultMethodResult(True,'wfinstanceid is None',foirequestid)
-
+    
     @classmethod
     def updateStatus(cls, foirequestid, updatedministries, userid)->DefaultMethodResult:
         currequest = db.session.query(FOIRequest).filter_by(foirequestid=foirequestid).order_by(FOIRequest.version.desc()).first()
@@ -102,11 +102,11 @@ class FOIRequest(db.Model):
     def getworkflowinstance(cls,requestid)->DefaultMethodResult:
         request_schema = FOIRequestsSchema()
         try:
-            sql = """select fr3.wfinstanceid, fr3.foirequestid  from "FOIMinistryRequests" fr2, "FOIRequests" fr3
-                        where fr2.foirequest_id = fr3.foirequestid and fr2.foiministryrequestid=:requestid
+            sql = """select fr3.wfinstanceid, fr3.foirequestid  from "FOIMinistryRequests" fr2, "FOIRequests" fr3 
+                        where fr2.foirequest_id = fr3.foirequestid and fr2.foiministryrequestid=:requestid 
                         order by  fr3."version" desc limit 1"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
-            for row in rs:
+            for row in rs:                
                 request_schema.__dict__.update({"wfinstanceid":row["wfinstanceid"] , "foirequestid": row["foirequestid"]})
         except Exception as ex:
             logging.error(ex)
