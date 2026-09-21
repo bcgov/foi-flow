@@ -21,8 +21,5 @@ class requestserviceupdate(requestservicebuilder):
                         updatedministries.append({"filenumber" : ministry["filenumber"], "requeststatuslabel": status["statuslabel"]})
             return FOIRequest.updateStatus(foirequestid, updatedministries, userid)
 
-    def updateworkflowexecutioninfo(self, foirequestid, executionid, resumepath, userid):
-        return FOIRequest.updateWFExecutionInfo(foirequestid, executionid, resumepath, userid)
-
     def updateministryrequestduedate(self, ministryrequestid, duedate, userid):
         return FOIMinistryRequest().updateduedate(ministryrequestid, duedate, userid)
