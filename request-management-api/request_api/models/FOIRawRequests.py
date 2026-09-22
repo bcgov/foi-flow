@@ -632,11 +632,10 @@ class FOIRawRequest(db.Model):
             ],
             else_ = cast(FOIRawRequest.requestrawdata['proactiveDisclosureCategory'], String)).label('proactivedisclosurecategory')
 
-        selectedministries = case([
-                            (FOIRawRequest.status == StateName.unopened.value,
-                             FOIRawRequest.requestrawdata['ministry']['selectedMinistry'].astext),
-                           ],
-                           else_ = FOIRawRequest.requestrawdata['selectedMinistries'].astext).label('selectedMinistries')
+        selectedministries = func.coalesce(
+            FOIRawRequest.requestrawdata['selectedMinistries'].astext,
+            FOIRawRequest.requestrawdata['ministry']['selectedMinistry'].astext
+        ).label('selectedMinistries')
 
         onbehalf_applicant = aliased(FOIRequestApplicant)
 
