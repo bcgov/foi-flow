@@ -12,6 +12,7 @@ class ProgramAreaDivision(db.Model):
     programareaid = db.Column(db.Integer, db.ForeignKey('ProgramAreas.programareaid'))
     name = db.Column(db.String(500), unique=False, nullable=False)    
     isactive = db.Column(db.Boolean, unique=False, nullable=False)
+    isselectable = db.Column(db.Boolean, unique=False, nullable=False, default=True)
     sortorder = db.Column(db.Integer, unique=False, nullable=True)
     issection = db.Column(db.Boolean, unique=False, nullable=True)
     parentid = db.Column(db.Integer, unique=False, nullable=True)
@@ -36,8 +37,17 @@ class ProgramAreaDivision(db.Model):
 
     @classmethod
     def getprogramareadivisions(cls,programareaid):
-        division_schema = ProgramAreaDivisionSchema(many=True)        
-        query = db.session.query(ProgramAreaDivision).filter(ProgramAreaDivision.programareaid == programareaid, ProgramAreaDivision.isactive == True, ProgramAreaDivision.issection == False,or_(ProgramAreaDivision.specifictopersonalrequests == None,ProgramAreaDivision.specifictopersonalrequests == False))
+        division_schema = ProgramAreaDivisionSchema(many=True)
+        query = db.session.query(ProgramAreaDivision).filter(
+            ProgramAreaDivision.programareaid == programareaid,
+            ProgramAreaDivision.isactive == True,
+            ProgramAreaDivision.isselectable == True,
+            ProgramAreaDivision.issection == False,
+            or_(
+                ProgramAreaDivision.specifictopersonalrequests == None,
+                ProgramAreaDivision.specifictopersonalrequests == False
+            )
+        )
         return division_schema.dump(query)
 
     @classmethod
@@ -49,7 +59,17 @@ class ProgramAreaDivision(db.Model):
     @classmethod
     def getpersonalspecificprogramareadivisions(cls,programareaid):
         division_schema = ProgramAreaDivisionSchema(many=True)
-        query = db.session.query(ProgramAreaDivision).filter(ProgramAreaDivision.programareaid==programareaid,ProgramAreaDivision.isactive==True,ProgramAreaDivision.issection==False,ProgramAreaDivision.specifictopersonalrequests==True,or_(ProgramAreaDivision.type.is_(None), ProgramAreaDivision.type=="")).order_by(ProgramAreaDivision.name.asc())
+        query = db.session.query(ProgramAreaDivision).filter(
+            ProgramAreaDivision.programareaid == programareaid,
+            ProgramAreaDivision.isactive == True,
+            ProgramAreaDivision.isselectable == True,
+            ProgramAreaDivision.issection == False,
+            ProgramAreaDivision.specifictopersonalrequests == True,
+            or_(
+                ProgramAreaDivision.type.is_(None),
+                ProgramAreaDivision.type == ""
+            )
+        ).order_by(ProgramAreaDivision.name.asc())
         return division_schema.dump(query)
     
     @classmethod
@@ -107,8 +127,35 @@ class ProgramAreaDivision(db.Model):
             db.session.commit()
             return DefaultMethodResult(True,'Division disabled successfully',divisionid)
         else:
-            return DefaultMethodResult(True,'No Division found',divisionid)  
-    
+            return DefaultMethodResult(True,'No Division found',divisionid)
+
+    @classmethod
+    def updateselectable(cls, divisionid, isselectable, userid):
+        dbquery = db.session.query(ProgramAreaDivision)
+        division = dbquery.filter_by(divisionid=divisionid, isactive=True)
+
+        if division.count() > 0:
+            division.update(
+                {
+                    ProgramAreaDivision.isselectable: isselectable,
+                    ProgramAreaDivision.updatedby: userid,
+                    ProgramAreaDivision.updated_at: datetime2.now()
+                },
+                synchronize_session=False
+            )
+            db.session.commit()
+            return DefaultMethodResult(
+                True,
+                'Division visibility updated successfully',
+                divisionid
+            )
+        else:
+            return DefaultMethodResult(
+                False,
+                'No active Division found',
+                divisionid
+            )
+
     @classmethod
     def updateprogramareadivision(cls, divisionid, programareadivision, userid):   
         dbquery = db.session.query(ProgramAreaDivision)
@@ -141,4 +188,4 @@ class ProgramAreaDivision(db.Model):
 
 class ProgramAreaDivisionSchema(ma.Schema):
     class Meta:
-        fields = ('divisionid','programareaid','name','isactive','sortorder','issection','parentid','specifictopersonalrequests','type')
+        fields = ('divisionid','programareaid','name','isactive','isselectable','sortorder','issection','parentid','specifictopersonalrequests','type')

@@ -118,5 +118,61 @@ class DisableFOIProgramAreaDivision(Resource):
         except KeyError as error:
             return {'status': False, 'message': CUSTOM_KEYERROR_MESSAGE + str(error)}, 400      
         except BusinessException as exception:            
-            return {'status': exception.status_code, 'message':exception.message}, 500   
+            return {'status': exception.status_code, 'message':exception.message}, 500
+
+@cors_preflight('PUT,OPTIONS')
+@API.route('/foiadmin/division/<divisionid>/selectable')
+class UpdateFOIProgramAreaDivisionSelectable(Resource):
+    """Updates whether a division is selectable for new ministry work."""
+
+    @staticmethod
+    @TRACER.trace()
+    @auth.require
+    @cross_origin(origins=allowedorigins())
+    @auth.isfoiadmin()
+    def put(divisionid):
+        try:
+            requestjson = request.get_json() or {}
+
+            if 'isselectable' not in requestjson:
+                return {
+                    'status': False,
+                    'message': 'isselectable is required'
+                }, 400
+
+            if not isinstance(requestjson['isselectable'], bool):
+                return {
+                    'status': False,
+                    'message': 'isselectable must be a boolean'
+                }, 400
+
+            result = programareadivisionservice().updateselectable(
+                divisionid,
+                requestjson['isselectable'],
+                AuthHelper.getuserid()
+            )
+
+            if result.success != True:
+                return {
+                    'status': result.success,
+                    'message': result.message,
+                    'id': result.identifier
+                }, 400
+
+            return {
+                'status': result.success,
+                'message': result.message,
+                'id': result.identifier
+            }, 200
+
+        except KeyError as error:
+            return {
+                'status': False,
+                'message': CUSTOM_KEYERROR_MESSAGE + str(error)
+            }, 400
+        except BusinessException as exception:
+            return {
+                'status': exception.status_code,
+                'message': exception.message
+            }, 500
 
