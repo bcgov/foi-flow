@@ -13,7 +13,6 @@ def _n8n_env(monkeypatch):
     monkeypatch.setattr(commonworkflowservice, "n8nroutingwebhookpath", "/webhook/foi-request-routing")
     monkeypatch.setattr(commonworkflowservice, "n8nwebhookauthheadername", "X-N8N-Auth")
     monkeypatch.setattr(commonworkflowservice, "n8nwebhookauthheadervalue", "secret")
-    yield
 
 
 def _mock_response(ok=True, body=None):

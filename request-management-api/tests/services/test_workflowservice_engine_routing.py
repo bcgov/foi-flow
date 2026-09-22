@@ -16,7 +16,6 @@ from request_api.utils.enums import StateName
 @pytest.fixture(autouse=True)
 def _default_camunda(monkeypatch):
     monkeypatch.setenv("WF_DEFAULT_ENGINE", "camunda")
-    yield
 
 
 class TestCreateInstance:
@@ -46,8 +45,10 @@ class TestCreateInstance:
     @patch.object(bpmservice, "createinstance")
     def test_raises_when_engine_returns_none(self, mock_create):
         mock_create.return_value = None
-        with pytest.raises(Exception):
-            workflowservice().createinstance("foi-rawrequest", json.dumps({"id": 42}))
+        service = workflowservice()
+
+        with pytest.raises(Exception, match="Unable to create instance for key"):
+            service.createinstance("foi-rawrequest", json.dumps({"id": 42}))
 
 
 class TestPostUnopenedEvent:
