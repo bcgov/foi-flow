@@ -193,19 +193,25 @@ class FOIRawRequestBPMProcess(Resource):
     def put(_requestid=None):
             request_json = request.get_json()
             try:
-
-                _wfinstanceid = request_json['wfinstanceid']
                 notes = request_json['notes'] if request_json.get('notes') is not None else 'Workflow Update'
-                requestid = int(_requestid)                                                               
-                result = rawrequestservice().updateworkflowinstancewithstatus(_wfinstanceid,requestid,notes,AuthHelper.getuserid())
-                if result.identifier != -1 :                
+                requestid = int(_requestid)
+                if 'wfinstanceid' in request_json:
+                    _wfinstanceid = request_json['wfinstanceid']
+                    result = rawrequestservice().updateworkflowinstancewithstatus(_wfinstanceid,requestid,notes,AuthHelper.getuserid())
+                else:
+                    # n8n payload - no wfinstanceid (n8n requests are addressed via
+                    # the fixed routing webhook, not a stored instance id/address) -
+                    # just records the status/notes n8n reports for the request.
+                    status = request_json['status']
+                    result = rawrequestservice().updatestatuswithnotes(status, requestid, notes, AuthHelper.getuserid())
+                if result.identifier != -1 :
                     return {'status': result.success, 'message':result.message}, 200
                 else:
                     return {'status': result.success, 'message':result.message}, 404
             except KeyError:
                 return {'status': "Invalid PUT request", 'message':"Key Error on JSON input, please confirm requestid and wfinstanceid"}, 500
             except ValueError as valuexception:
-                return {'status': "BAD Request", 'message': str(valuexception)}, 500           
+                return {'status': "BAD Request", 'message': str(valuexception)}, 500
 
 @cors_preflight('GET,POST,OPTIONS')
 @API.route('/foirawrequests')

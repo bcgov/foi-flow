@@ -38,7 +38,7 @@ class FOIRawRequest(db.Model):
     requeststatuslabel = db.Column(db.String(50), unique=False, nullable=False)
     notes = db.Column(db.String(120), unique=False, nullable=True)
     wfinstanceid = db.Column(UUID(as_uuid=True), unique=False, nullable=True)
-    assignedgroup = db.Column(db.String(250), unique=False, nullable=True) 
+    assignedgroup = db.Column(db.String(250), unique=False, nullable=True)
     assignedto = db.Column(db.String(120), ForeignKey('FOIAssignees.username'), unique=False, nullable=True)    
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, nullable=True)
@@ -168,7 +168,7 @@ class FOIRawRequest(db.Model):
                     linkedrequests=linkedrequests,
                     isiaorestricted = request.isiaorestricted,
                     isconsultflag = isconsultflag
-                   
+
                 )
             )
             db.session.execute(insertstmt)               
@@ -255,7 +255,7 @@ class FOIRawRequest(db.Model):
                     axissyncdate=axissyncdate,
                     linkedrequests=linkedrequests,
                     isiaorestricted = request.isiaorestricted,
-                    requeststatuslabel = request.requeststatuslabel                    
+                    requeststatuslabel = request.requeststatuslabel
                 )
             )
             db.session.execute(insertstmt)               
@@ -283,9 +283,9 @@ class FOIRawRequest(db.Model):
     def getworkflowinstancebyministry(cls,requestid)->DefaultMethodResult:
         request_schema = FOIRawRequestSchema()
         try:
-            sql = """select fr.wfinstanceid,  fr.assignedto,  fr.assignedgroup, fr.requestid 
-                        from "FOIMinistryRequests" fr2, "FOIRequests" fr3, "FOIRawRequests" fr 
-                        where fr2.foirequest_id = fr3.foirequestid and fr3.foirawrequestid  = fr.requestid 
+            sql = """select fr.wfinstanceid,  fr.assignedto,  fr.assignedgroup, fr.requestid
+                        from "FOIMinistryRequests" fr2, "FOIRequests" fr3, "FOIRawRequests" fr
+                        where fr2.foirequest_id = fr3.foirequestid and fr3.foirawrequestid  = fr.requestid
                         and fr2.foiministryrequestid= :requestid order by fr."version" desc limit 1"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
@@ -321,9 +321,9 @@ class FOIRawRequest(db.Model):
         if(requestraqw.count() > 0) :            
             requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.updatedby:userid}, synchronize_session = False)
             db.session.commit()
-            return DefaultMethodResult(True,'Request updated',requestid)       
+            return DefaultMethodResult(True,'Request updated',requestid)
         else:
-            return DefaultMethodResult(False,'Requestid not exists',-1)        
+            return DefaultMethodResult(False,'Requestid not exists',-1)
 
     @classmethod
     def updateworkflowinstancewithstatus(cls,wfinstanceid,requestid,notes,userid)-> DefaultMethodResult:
@@ -338,9 +338,27 @@ class FOIRawRequest(db.Model):
                                 
             requestraqw.update({FOIRawRequest.wfinstanceid:wfinstanceid, FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:notes,FOIRawRequest.status:status,FOIRawRequest.updatedby:userid}, synchronize_session = False)
             db.session.commit()
-            return DefaultMethodResult(True,'Request updated',requestid)       
+            return DefaultMethodResult(True,'Request updated',requestid)
         else:
-            return DefaultMethodResult(False,'Requestid not exists',-1)    
+            return DefaultMethodResult(False,'Requestid not exists',-1)
+
+    @classmethod
+    def updatestatuswithnotes(cls,status,requestid,notes,userid)-> DefaultMethodResult:
+        """n8n counterpart to updateworkflowinstancewithstatus: n8n requests have
+        no wfinstanceid, so this just records the status/notes n8n reports for
+        the request, leaving wfinstanceid untouched."""
+        updatedat = datetime.now()
+        dbquery = db.session.query(FOIRawRequest)
+        _requestraqw = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
+        if _requestraqw is None:
+            return DefaultMethodResult(False,'Requestid not exists',-1)
+        requestraqw = dbquery.filter_by(requestid=requestid,version = _requestraqw.version)
+        if(requestraqw.count() > 0) :
+            requestraqw.update({FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:notes,FOIRawRequest.status:status,FOIRawRequest.updatedby:userid}, synchronize_session = False)
+            db.session.commit()
+            return DefaultMethodResult(True,'Request updated',requestid)
+        else:
+            return DefaultMethodResult(False,'Requestid not exists',-1)
 
     @classmethod
     def getrequests(cls):
