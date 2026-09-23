@@ -61,9 +61,10 @@ def test_historical_organization_search_uses_company_bind_parameter():
         # parameter and must not be interpolated into the SQL.
         assert "Kyle's Law Firm" not in query
 
-        assert queryparams == {
-            "businessname_0": "%Kyle's Law Firm%",
-        }
+        assert (
+            queryparams["businessname_0"]
+            == "%Kyle's Law Firm%"
+        )
 
         mock_db.session.close.assert_called_once()
 
@@ -87,6 +88,7 @@ def test_historical_organization_search_trims_keyword():
         args = mock_db.session.execute.call_args.args
         queryparams = args[1]
 
-        assert queryparams == {
-            "businessname_0": "%Kyle's Law Firm%",
-        }
+        assert (
+            queryparams["businessname_0"]
+            == "%Kyle's Law Firm%"
+        )

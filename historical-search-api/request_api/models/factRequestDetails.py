@@ -165,93 +165,173 @@ class factRequestDetails(db.Model):
                             ,ministry \
                             ,officeid \
                             FROM \
-                            public."ClosedRequestDetailsPost2018" WHERE '
+                            public."ClosedRequestDetailsPost2018"'
 
-            filterbysearchcondition =[]
+            conditions = []
             queryparams = {}
 
-            if(params['search'] == 'requestdescription'):
-                for keyword in params['keywords']:
-                    filterbysearchcondition.append("LOWER(description) like LOWER('%{0}%')".format(keyword))
-            elif(params['search'] == 'applicantname'):
-                for keyword in params['keywords']:
-                    filterbysearchcondition.append("LOWER(applicantname) like LOWER('%{0}%')".format(keyword))
-            elif(params['search'] == 'assigneename'):
-                for keyword in params['keywords']:
-                    filterbysearchcondition.append("LOWER(primaryusername) like LOWER('%{0}%')".format(keyword))
-            elif(params['search'] == 'idnumber' or params['search'] == 'axisrequest_number'):
-                for keyword in params['keywords']:
-                    filterbysearchcondition.append("LOWER(visualrequestfilenumber) like LOWER('%{0}%')".format(keyword))
-            elif(params['search'] == 'oipc_number'):
-                for keyword in params['keywords']:
-                    filterbysearchcondition.append("LOWER(oipcno) like LOWER('%{0}%')".format(keyword))
-            elif(params['search'] == 'businessName'):
-                for idx, keyword in enumerate(params['keywords']):
-                    keyword = keyword.strip()
+            search_type = params.get('search')
+
+            if search_type == 'requestdescription':
+                search_column = 'description'
+            elif search_type == 'applicantname':
+                search_column = 'applicantname'
+            elif search_type == 'assigneename':
+                search_column = 'primaryusername'
+            elif search_type in ('idnumber', 'axisrequest_number'):
+                search_column = 'visualrequestfilenumber'
+            elif search_type == 'oipc_number':
+                search_column = 'oipcno'
+            else:
+                search_column = None
+
+            if search_column is not None:
+                for idx, keyword in enumerate(params.get('keywords') or []):
+                    parameter_name = f'search_{idx}'
+                    conditions.append(
+                        f'LOWER({search_column}) LIKE LOWER(:{parameter_name})'
+                    )
+                    queryparams[parameter_name] = f'%{keyword}%'
+
+            elif search_type == 'businessName':
+                for idx, keyword in enumerate(params.get('keywords') or []):
                     parameter_name = f'businessname_{idx}'
-                    filterbysearchcondition.append(
+
+                    conditions.append(
                         f'EXISTS (SELECT 1 FROM public."dimRequesters" r '
                         f'WHERE r.requesterid = public."ClosedRequestDetailsPost2018".requesterid '
                         f'AND LOWER(r.company) LIKE LOWER(:{parameter_name}))'
                     )
-                    queryparams[parameter_name] = f'%{keyword}%'
 
-            requesttypecondition = []
-            if len(params['requesttype'] + params['requestflags']) > 0:
-                for requesttype in (params['requesttype'] + params['requestflags']):
-                    if (requesttype == 'oipc'): requesttype = 'review' 
-                    requesttypecondition.append("LOWER(requesttypename) like '%{0}%'".format(requesttype))
-                basequery+= (' (' +' OR '.join(requesttypecondition) + ')')
-                if (len(filterbysearchcondition) > 0):
-                    basequery+= ' AND '
+                    queryparams[parameter_name] = f'%{keyword.strip()}%'
 
-            conditioncount = len(filterbysearchcondition) 
+            requesttypeconditions = []
 
-            for idx,searchcondition in enumerate(filterbysearchcondition):                                
-                basequery+= ' {0} '.format(searchcondition)
-                
-                if(idx!=(conditioncount-1)):
-                    basequery+= ' AND '
+            for idx, requesttype in enumerate(
+                (params.get('requesttype') or []) +
+                (params.get('requestflags') or [])
+            ):
+                if requesttype == 'oipc':
+                    requesttype = 'review'
+
+                parameter_name = f'requesttype_{idx}'
+
+                requesttypeconditions.append(
+                    f'LOWER(requesttypename) LIKE LOWER(:{parameter_name})'
+                )
+                queryparams[parameter_name] = f'%{requesttype}%'
+
+            if requesttypeconditions:
+                conditions.append(
+                    '(' + ' OR '.join(requesttypeconditions) + ')'
+                )
 
             datefilter = params.get('daterangetype')
-            if (datefilter):
-                query = ''
-                if len(filterbysearchcondition + requesttypecondition) > 0:
-                   query += ' AND '
+
+            if datefilter == 'receivedDate':
+                date_column = 'receiveddate'
+            elif datefilter == 'duedate':
+                date_column = 'targetdate'
+            elif datefilter == 'closedate':
+                date_column = 'closeddate'
+            elif datefilter:
+                raise ValueError(
+                    'Unsupported historical search date range type'
+                )
+            else:
+                date_column = None
+
+            if date_column is not None:
                 if params.get('fromdate'):
-                    query += (''' {0} >= \'''' + params.get('fromdate') + '\' AND') 
+                    conditions.append(
+                        f'{date_column} >= :fromdate'
+                    )
+                    queryparams['fromdate'] = params.get('fromdate')
+
                 if params.get('todate'):
-                    query += (''' {0} <= \'''' + params.get('todate') + '\'') 
-                if (datefilter == 'receivedDate'):
-                    query = query.format('receiveddate')
-                if (datefilter == 'duedate'):
-                    query = query.format('targetdate')
-                if (datefilter == 'closedate'):
-                    query = query.format('closeddate')
-                basequery += query
-            
-            if(len(filterbysearchcondition + requesttypecondition) == 0 and not datefilter): # if no conditions have been set so far, then any other conditions do not apply to historical search, so return empty array
+                    conditions.append(
+                        f'{date_column} <= :todate'
+                    )
+                    queryparams['todate'] = params.get('todate')
+
+            if not conditions:
                 return {'results': [], 'count': 0}
 
-            if(isiaorestictedmanager == False):
-                basequery+= " AND requesttypename NOT LIKE '%Restricted%'"
+            if isiaorestictedmanager == False:
+                conditions.append(
+                    "requesttypename NOT LIKE '%Restricted%'"
+                )
 
-            if params['sortingitem'] == 'axisrequestid':
-                params['sortingitem'] = 'visualrequestfilenumber'
-            elif params['sortingitem'] == 'requesttype':
-                params['sortingitem'] = 'requesttype'
+            basequery += ' WHERE ' + ' AND '.join(conditions)
 
-            basequery+= ' ORDER BY {0} {1}'.format(params['sortingitem'],params['sortingorder'])
+            sortingitem = params.get('sortingitem')
 
-            if params['size'] is not None:
-                basequery+= ' LIMIT {0} OFFSET {1}'.format(params['size'], (params['page'] - 1) * params['size'] )
+            if sortingitem == 'applicantname':
+                sort_column = 'applicantname'
+            elif sortingitem == 'requesttype':
+                sort_column = 'requesttype'
+            elif sortingitem == 'axisrequestid':
+                sort_column = 'visualrequestfilenumber'
+            elif sortingitem == 'oipcno':
+                sort_column = 'oipcno'
+            elif sortingitem == 'assignee':
+                sort_column = 'assignee'
+            elif sortingitem == 'receiveddate':
+                sort_column = 'receiveddate'
             else:
-                basequery+= ' LIMIT 100'
-        
-            rs = db.session.execute(text(basequery), queryparams)
-            
-            for row in rs:            
-                searchresults.append({"axisrequestid": row["visualrequestfilenumber"], "description": row["description"], "assignee": row["assignee"], "requeststatus": row["requeststatus"], "applicantname": row["applicantname"], "requesttype": row["requesttypename"],"receiveddate": row["receiveddate"],"oipcno": row["oipcno"]})
+                raise ValueError(
+                    'Unsupported historical search sort field'
+                )
+
+            sortingorder = str(
+                params.get('sortingorder', '')
+            ).lower()
+
+            if sortingorder == 'asc':
+                sort_order = 'ASC'
+            elif sortingorder == 'desc':
+                sort_order = 'DESC'
+            else:
+                raise ValueError(
+                    'Unsupported historical search sort order'
+                )
+
+            basequery += f' ORDER BY {sort_column} {sort_order}'
+
+            if params.get('size') is not None:
+                size = int(params['size'])
+                page = int(params.get('page', 1))
+
+                if size < 1 or page < 1:
+                    raise ValueError(
+                        'Historical search page and size must be positive integers'
+                    )
+
+                queryparams['limit_value'] = size
+                queryparams['offset_value'] = (page - 1) * size
+
+                basequery += (
+                    ' LIMIT :limit_value OFFSET :offset_value'
+                )
+            else:
+                basequery += ' LIMIT 100'
+
+            rs = db.session.execute(
+                text(basequery),
+                queryparams
+            )
+
+            for row in rs:
+                searchresults.append({
+                    "axisrequestid": row["visualrequestfilenumber"],
+                    "description": row["description"],
+                    "assignee": row["assignee"],
+                    "requeststatus": row["requeststatus"],
+                    "applicantname": row["applicantname"],
+                    "requesttype": row["requesttypename"],
+                    "receiveddate": row["receiveddate"],
+                    "oipcno": row["oipcno"]
+                })
                 count = row["full_count"]
         except Exception as ex:
             logging.error(ex)
