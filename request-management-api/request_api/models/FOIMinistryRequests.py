@@ -880,6 +880,7 @@ class FOIMinistryRequest(db.Model):
         return {
             'firstName': FOIRequestApplicant.firstname,
             'lastName': FOIRequestApplicant.lastname,
+            'businessName': FOIRequestApplicant.businessname,
             'requestType': FOIRequest.requesttype,
             'idNumber': FOIMinistryRequest.filenumber,
             'axisRequestId': FOIMinistryRequest.axisrequestid,
@@ -2008,6 +2009,7 @@ class FOIMinistryRequest(db.Model):
             .outerjoin(ProactiveDisclosureCategory, ProactiveDisclosureCategory.proactivedisclosurecategoryid == latest_proactive.proactivedisclosurecategoryid)
             .outerjoin(iaoassignee, iaoassignee.username == FOIMinistryRequest.assignedto)
             .outerjoin(OpenInformationStatuses, OpenInformationStatuses.oistatusid == FOIMinistryRequest.oistatus_id)
+            .outerjoin(CloseReason, CloseReason.closereasonid == FOIMinistryRequest.closereasonid)
             .join(ProgramArea, ProgramArea.programareaid == FOIMinistryRequest.programareaid)
             .join(FOIRequestApplicantMapping,
                         and_(FOIRequestApplicantMapping.foirequest_id == FOIMinistryRequest.foirequest_id, FOIRequestApplicantMapping.foirequestversion_id == FOIMinistryRequest.foirequestversion_id, FOIRequestApplicantMapping.requestortypeid == RequestorType.applicant.value),
@@ -2054,11 +2056,16 @@ class FOIMinistryRequest(db.Model):
             )
         if not isadvancedsearch:
             basequery = basequery.filter(
-                    or_(
-                        FOIMinistryRequest.oistatus_id != OIStatusEnum.PUBLISHED.value,
-                        FOIMinistryRequest.oistatus_id.is_(None),               
-                    ),
-                )
+                or_(
+                    FOIMinistryRequest.oistatus_id != OIStatusEnum.PUBLISHED.value,
+                    FOIMinistryRequest.oistatus_id.is_(None),
+                ),
+                or_(
+                    FOIMinistryRequest.requeststatuslabel != StateName.closed.name,
+                    CloseReason.name != "Opened In Error",
+                    CloseReason.name.is_(None),
+                ),
+            )
         return basequery
 
 

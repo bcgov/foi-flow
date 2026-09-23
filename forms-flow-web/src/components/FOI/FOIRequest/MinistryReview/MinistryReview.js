@@ -50,7 +50,6 @@ import {
 import ApplicantDetails from "./ApplicantDetails";
 import ChildDetails from "./ChildDetails";
 import OnBehalfDetails from "./OnBehalfDetails";
-import AdditionalApplicantDetails from "./AdditionalApplicantDetails";
 import RequestDetails from "./RequestDetails";
 import RequestDescription from "./RequestDescription";
 import RequestHeader from "./RequestHeader";
@@ -900,9 +899,6 @@ const MinistryReview = React.memo(({ userDetail }) => {
                               linkedRequestsInfo={requestDetails?.linkedRequestsInfo}
                             />
                             <RequestDetails requestDetails={requestDetails} />
-                            <AdditionalApplicantDetails
-                              requestDetails={requestDetails}
-                            />
                             <ExtensionDetails
                               requestDetails={requestDetails}
                               requestState={requestState}

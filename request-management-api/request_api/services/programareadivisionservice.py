@@ -28,6 +28,14 @@ class programareadivisionservice:
         """
         return ProgramAreaDivision.updateprogramareadivision(divisionid, data,userid)
     
+    def updateselectable(self, divisionid, isselectable, userid):
+        """Controls whether a division can be selected for new ministry work."""
+        return ProgramAreaDivision.updateselectable(
+            divisionid,
+            isselectable,
+            userid
+        )
+
     def disableprogramareadivision(self, divisionid,userid):
         """ Disable a program area division
         """

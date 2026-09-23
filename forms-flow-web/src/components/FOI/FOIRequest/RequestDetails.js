@@ -280,7 +280,7 @@ const RequestDetails = React.memo(
                   required
                   error={receivedDateText === undefined || receivedDateText === ""}
                   fullWidth
-                  disabled={requestDetails.receivedMode?.toLowerCase() === FOI_COMPONENT_CONSTANTS.ONLINE_FORM.toLowerCase() || disableInput}
+                  disabled={isHistoricalRequest}
                 />
                 <TextField
                   id="originalDueDate"
