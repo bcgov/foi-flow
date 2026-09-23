@@ -95,6 +95,48 @@ describe('FOI RequestDetails component', () => {
         const tree = renderer.create(<Provider store={store}><RequestDetails requestDetails={localState.requestDetails} createSaveRequestObject={localState.createSaveRequestObject} handleRequestDetailsValue={localState.handleRequestDetailsValue} handleRequestDetailsInitialValue={localState.handleRequestDetailsInitialValue} /></Provider>).toJSON();  
         expect(tree).toMatchSnapshot();
     })
+      it('keeps Received Date editable for Online Form requests in Intake in Progress', () => {
+        store = mockStore(initialState)
+
+        const localState = {
+            createSaveRequestObject: jest.fn(),
+            handleRequestDetailsValue: jest.fn(),
+            handleRequestDetailsInitialValue: jest.fn(),
+            requestDetails: {
+                requestType: 'general',
+                receivedMode: 'Online Form',
+                deliveryMode: 'Secure File Transfer',
+                sourceOfSubmission: 'onlineform',
+                currentState: 'Intake in Progress',
+                requestProcessStart: '2021-09-23',
+                receivedDateUF: '2021-09-22 21:01:35.902089',
+                dueDate: '2021-10-22'
+            },
+            foiRequests: {
+                foiRequestTypeList: [],
+                foiReceivedModeList: [],
+                foiDeliveryModeList: []
+            }
+        }
+
+        useSelector.mockImplementation(callback => {
+            return callback(localState);
+        });
+
+        render(
+            <Provider store={store}>
+                <RequestDetails
+                    requestDetails={localState.requestDetails}
+                    createSaveRequestObject={localState.createSaveRequestObject}
+                    handleRequestDetailsValue={localState.handleRequestDetailsValue}
+                    handleRequestDetailsInitialValue={localState.handleRequestDetailsInitialValue}
+                    isHistoricalRequest={false}
+                />
+            </Provider>
+        );
+
+        expect(document.getElementById('receivedDate')).not.toBeDisabled();
+      });
   })
 
 
