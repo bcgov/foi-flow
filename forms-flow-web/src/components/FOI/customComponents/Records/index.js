@@ -1605,7 +1605,7 @@ export const RecordsLog = ({
       selectedRecords = [record]
     for (let record of selectedRecords) {
       record.trigger = "recordretry";
-      let retryServiceName = record.failed ? record.failed.split('.')[0] : "all";
+      let retryServiceName = record.failed ? record.failed.split('.')[0].toLowerCase() : "all";
       if (retryServiceName == 'ocr-queue')
         retryServiceName = 'ocr'
       console.log(retryServiceName);

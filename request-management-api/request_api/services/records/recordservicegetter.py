@@ -312,9 +312,9 @@ class recordservicegetter(recordservicebase):
         elif "compressionstatus" in computingresponse and computingresponse["compressionstatus"] == "error":
             return "compression. " + computingresponse["message"] if "message" in computingresponse and computingresponse["message"] is not None else "compression"
         elif "ocractivemqstatus" in computingresponse and computingresponse["ocractivemqstatus"] == "error":
-            return "ocr-queue. " + computingresponse["message"] if "message" in computingresponse and computingresponse["message"] is not None else "ocr-queue"
+            return "OCR"
         elif "azureocrjobstatus" in computingresponse and computingresponse["azureocrjobstatus"] == "error":
-            return "ocr. " + computingresponse["message"] if "message" in computingresponse and computingresponse["message"] is not None else "ocr"
+            return "OCR"
         return None
 
     def __getcomputingsummary(self, computingresponse):
