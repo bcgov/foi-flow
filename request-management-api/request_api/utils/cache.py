@@ -23,7 +23,7 @@ class Config(object):
     
     CACHE_REDIS_URL = os.getenv('CACHE_REDISURL')
     CACHE_DEFAULT_TIMEOUT = os.getenv('CACHE_TIMEOUT')
-    CACHE_KEY_PPREFIX = 'foi'
+    CACHE_KEY_PREFIX = 'foi_cache_'
          
     ## include code of function in hash
     CACHE_SOURCE_CHECK = True
@@ -52,10 +52,21 @@ def response_filter(resp):
 def clear_cache():
     try:
         if os.getenv('CACHE_ENABLED') == 'Y':
-            cache_client.flushall()
+            keys = []
+            for key in cache_client.scan_iter(
+                match=f'{Config.CACHE_KEY_PREFIX}*',
+                count=100
+            ):
+                keys.append(key)
+                if len(keys) >= 100:
+                    cache_client.delete(*keys)
+                    keys.clear()
+
+            if keys:
+                cache_client.delete(*keys)
         return True
-    except Exception as ex:    
-        logging.error(ex)        
+    except Exception:
+        logging.exception("Failed to clear application cache")
     return False
 
 
