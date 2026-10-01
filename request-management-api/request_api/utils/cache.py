@@ -23,7 +23,7 @@ class Config(object):
     
     CACHE_REDIS_URL = os.getenv('CACHE_REDISURL')
     CACHE_DEFAULT_TIMEOUT = os.getenv('CACHE_TIMEOUT')
-    CACHE_KEY_PREFIX = 'flask_cache_'
+    CACHE_KEY_PREFIX = 'foi_cache_'
          
     ## include code of function in hash
     CACHE_SOURCE_CHECK = True

@@ -89,13 +89,13 @@ class PublicationCompletedStreamConsumer:
             sleep_seconds=float(os.getenv("PUBLICATION_COMPLETED_CONSUMER_SLEEP_SECONDS", 1)),
         )
 
-    def ensure_groups(self):
+    def ensure_groups(self, start_id="0"):
         for stream_name in self.stream_names.values():
             try:
                 self.redis_client.xgroup_create(
                     name=stream_name,
                     groupname=self.group_name,
-                    id="0",
+                    id=start_id,
                     mkstream=True,
                 )
             except redis.exceptions.ResponseError as err:
@@ -137,13 +137,26 @@ class PublicationCompletedStreamConsumer:
         if not self.stream_names:
             return 0
 
-        messages = self.redis_client.xreadgroup(
-            groupname=self.group_name,
-            consumername=self.consumer_name,
-            streams={stream_name: ">" for stream_name in self.stream_names.values()},
-            count=self.count,
-            block=self.block_ms,
-        )
+        try:
+            messages = self.redis_client.xreadgroup(
+                groupname=self.group_name,
+                consumername=self.consumer_name,
+                streams={stream_name: ">" for stream_name in self.stream_names.values()},
+                count=self.count,
+                block=self.block_ms,
+            )
+        except redis.exceptions.ResponseError as err:
+            if not str(err).startswith("NOGROUP"):
+                raise
+            logging.warning(
+                "Publication completed consumer group %s missing; recreating missing groups "
+                "at stream end. Existing events will be skipped for recreated groups "
+                "and may need reconciliation: %s",
+                self.group_name,
+                err,
+            )
+            self.ensure_groups(start_id="$")
+            return 0
         processed = 0
         for stream_name, stream_messages in messages:
             for message_id, fields in stream_messages:

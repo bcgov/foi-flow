@@ -40,8 +40,9 @@ def redis_client(monkeypatch):
 def test_clear_cache_preserves_publication_streams_and_other_keys(redis_client):
     stream = {"messages": ["completed-event"], "groups": ["request-management-api"]}
     redis_client.entries.update({
-        "flask_cache_subjectcodes83e0459e": "cached subjects",
-        "flask_cache_view//api/foiflow/divisions/CAF221cc66d": "cached divisions",
+        "foi_cache_subjectcodes83e0459e": "cached subjects",
+        "foi_cache_view//api/foiflow/divisions/CAF221cc66d": "cached divisions",
+        "flask_cache_legacy": "legacy cache",
         "publication.publish.completed": stream,
         "publication.unpublish.completed": stream,
         "foirequest-dedupe:abc": "request hash",
@@ -50,6 +51,7 @@ def test_clear_cache_preserves_publication_streams_and_other_keys(redis_client):
     assert cache.clear_cache() is True
 
     assert redis_client.entries == {
+        "flask_cache_legacy": "legacy cache",
         "publication.publish.completed": stream,
         "publication.unpublish.completed": stream,
         "foirequest-dedupe:abc": "request hash",
@@ -58,7 +60,7 @@ def test_clear_cache_preserves_publication_streams_and_other_keys(redis_client):
 
 @pytest.mark.parametrize("key_count", [0, 1, 100, 205])
 def test_clear_cache_removes_all_matching_keys_in_bounded_batches(redis_client, key_count):
-    redis_client.entries.update({f"flask_cache_item{i}": "cached" for i in range(key_count)})
+    redis_client.entries.update({f"foi_cache_item{i}": "cached" for i in range(key_count)})
 
     assert cache.clear_cache() is True
 
@@ -78,7 +80,7 @@ def test_clear_cache_uses_configured_prefix(redis_client, monkeypatch):
 
 def test_clear_cache_does_not_access_redis_when_disabled(redis_client, monkeypatch):
     monkeypatch.setenv("CACHE_ENABLED", "N")
-    redis_client.entries["flask_cache_item"] = "cached"
+    redis_client.entries["foi_cache_item"] = "cached"
 
     def unexpected_scan(**kwargs):
         pytest.fail("Disabled caching must not scan Redis")
@@ -86,14 +88,14 @@ def test_clear_cache_does_not_access_redis_when_disabled(redis_client, monkeypat
     monkeypatch.setattr(redis_client, "scan_iter", unexpected_scan)
 
     assert cache.clear_cache() is True
-    assert redis_client.entries == {"flask_cache_item": "cached"}
+    assert redis_client.entries == {"foi_cache_item": "cached"}
 
 
 @pytest.mark.parametrize("operation", ["scan_iter", "delete"])
 def test_clear_cache_returns_false_and_logs_traceback_on_redis_failure(
     redis_client, monkeypatch, caplog, operation
 ):
-    redis_client.entries["flask_cache_item"] = "cached"
+    redis_client.entries["foi_cache_item"] = "cached"
 
     def fail(*args, **kwargs):
         raise redis.exceptions.ConnectionError("Redis unavailable")
