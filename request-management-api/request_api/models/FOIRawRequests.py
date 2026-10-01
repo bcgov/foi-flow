@@ -343,24 +343,6 @@ class FOIRawRequest(db.Model):
             return DefaultMethodResult(False,'Requestid not exists',-1)
 
     @classmethod
-    def updatestatuswithnotes(cls,status,requestid,notes,userid)-> DefaultMethodResult:
-        """n8n counterpart to updateworkflowinstancewithstatus: n8n requests have
-        no wfinstanceid, so this just records the status/notes n8n reports for
-        the request, leaving wfinstanceid untouched."""
-        updatedat = datetime.now()
-        dbquery = db.session.query(FOIRawRequest)
-        _requestraqw = dbquery.filter_by(requestid=requestid).order_by(FOIRawRequest.version.desc()).first()
-        if _requestraqw is None:
-            return DefaultMethodResult(False,'Requestid not exists',-1)
-        requestraqw = dbquery.filter_by(requestid=requestid,version = _requestraqw.version)
-        if(requestraqw.count() > 0) :
-            requestraqw.update({FOIRawRequest.updated_at:updatedat,FOIRawRequest.notes:notes,FOIRawRequest.status:status,FOIRawRequest.updatedby:userid}, synchronize_session = False)
-            db.session.commit()
-            return DefaultMethodResult(True,'Request updated',requestid)
-        else:
-            return DefaultMethodResult(False,'Requestid not exists',-1)
-
-    @classmethod
     def getrequests(cls):
         _session = db.session
         _archivedrequestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status.in_(['Archived'])).all()
