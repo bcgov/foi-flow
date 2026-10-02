@@ -1,4 +1,5 @@
 import json
+import uuid
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -100,6 +101,39 @@ def test_reopenevent_delegates_to_unopenedcomplete(mock_post):
     commonworkflowservice().reopenevent(None, json.dumps({}), MessageType.iaoreopen.value)
     body = json.loads(mock_post.call_args[1]["data"])
     assert body["event"] == MessageType.iaoreopen.value
+
+
+@patch(POST)
+def test_every_event_method_adds_a_uuid4_event_id(mock_post):
+    mock_post.return_value = _mock_response(True, {})
+    engine = commonworkflowservice()
+    engine.unopenedsave(None, json.dumps({}), MessageType.intakeclaim.value)
+    engine.unopenedcomplete(None, json.dumps({}), MessageType.intakecomplete.value)
+    engine.openedcomplete(None, "FILE-1", json.dumps({}), MessageType.iaocomplete.value)
+    engine.feeevent("AXIS-1", json.dumps({}), "PAID")
+    engine.correspondanceevent(None, "FILE-1", json.dumps({}))
+    engine.reopenevent(None, json.dumps({}), MessageType.iaoreopen.value)
+    eventIds = [json.loads(call[1]["data"])["eventId"] for call in mock_post.call_args_list]
+    assert len(eventIds) == 6
+    assert all(uuid.UUID(eventId).version == 4 for eventId in eventIds)
+    assert len(set(eventIds)) == 6
+
+
+@patch(POST)
+def test_eventId_is_kept_on_the_payload_queued_for_retry(mock_post, retry_queue):
+    mock_post.side_effect = requests.ConnectionError("refused")
+    assert _unopenedcomplete() is None
+    sent = json.loads(mock_post.call_args[1]["data"])
+    queued = retry_queue.enqueue.call_args[0][0]
+    assert queued["eventId"] == sent["eventId"]
+
+
+@patch(POST)
+def test_redelivery_of_a_queued_payload_resends_the_same_eventId(mock_post):
+    mock_post.return_value = _mock_response(True, {})
+    payload = {"event": MessageType.intakecomplete.value, "eventId": "11111111-1111-4111-8111-111111111111"}
+    commonworkflowservice().deliver(payload)
+    assert json.loads(mock_post.call_args[1]["data"])["eventId"] == payload["eventId"]
 
 
 @patch(POST)

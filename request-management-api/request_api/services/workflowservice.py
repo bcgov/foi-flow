@@ -111,7 +111,9 @@ class workflowservice:
             "assignedministrygroup" : requestsschema["assignedministrygroup"],
             "ministryRequestID" : ministryrequestid,
 			"foiRequestID" :requestid,
-            "nextStateName": nextstatename
+            "nextStateName": nextstatename,
+            "paymentExpiryDate": self.__getvaluefromfeedata(requestsschema, "paymentexpirydate"),
+            "paymenturl": self.__getvaluefromfeedata(requestsschema, "paymenturl")
             })
         engine = resolve_engine()
         return engine.feeevent(requestsschema["axisRequestId"], metadata, paymentstatus)
@@ -302,6 +304,10 @@ class workflowservice:
 
     def __getvaluefromschema(self,requestsschema, property):
         return requestsschema.get(property) if property in requestsschema  else None
+
+    def __getvaluefromfeedata(self, requestsschema, property):
+        feedata = (requestsschema.get("cfrfee") or {}).get("feedata") or {}
+        return self.__getvaluefromschema(feedata, property)
 
     def __getvaluefromlist(self,attributes, property):
         for attribute in attributes:

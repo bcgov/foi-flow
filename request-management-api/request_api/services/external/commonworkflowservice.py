@@ -2,6 +2,7 @@ import requests
 import os
 import json
 import logging
+import uuid
 
 from request_api.services.external.bpmservice import MessageType
 from request_api.services.external.n8nwebhookretryqueue import n8nwebhookretryqueue
@@ -17,6 +18,10 @@ All n8n requests are routed through a single fixed webhook
 identifying and routing the request from the payload (the "event" field
 plus whatever ids/metadata are already present in the payload), so there is
 no per-request instance id/address to store or construct on this side.
+
+Every event carries an "event_id" (uuid4) generated once in __post_event and
+stored in the payload, so a retry through the queue re-sends the same id and
+FOI Request Routing in n8n can skip an event whose earlier run completed.
 
 A webhook call that fails transiently (network error, timeout, HTTP 429 or
 5xx) is logged and queued in n8nwebhookretryqueue; N8NWebhookRetryScheduler
@@ -107,8 +112,9 @@ class commonworkflowservice:
         return n8ndeliveryresult(True, content=content if isinstance(content, dict) else None)
 
     def __post_event(self, messagetype, extra):
-        payload = {"event": messagetype}
+        payload = {"event": messagetype, "eventId": str(uuid.uuid4())}
         payload.update(extra)
+        logging.info("commonworkflowservice.__post_event: sending event=%s eventId=%s", messagetype, payload["eventId"])
         result = self.deliver(payload)
         if not result.delivered and result.retryable:
             self.__queueforretry(payload, result.error)
