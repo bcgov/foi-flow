@@ -163,6 +163,7 @@ class requestservicegetter:
                 requestdetails['cfrfee']['feedata']['depositpaid'] = '{:.2f}'.format(float(cfrfee['feedata']['amountpaid']) - paidamount)
                 requestdetails['cfrfee']['feedata']['paymenturl'] = payment['paymenturl']            
                 requestdetails['cfrfee']['feedata']['paymentdate'] = payment['created_at'][:10]
+                requestdetails['cfrfee']['feedata']['paymentexpirydate'] = payment['paymentexpirydate'][:10] if payment['paymentexpirydate'] is not None else None
         return requestdetails
 
     def getrawrequestidbyfoirequestid(self, foirequestid):
