@@ -193,7 +193,6 @@ class FOIRawRequestBPMProcess(Resource):
     def put(_requestid=None):
             request_json = request.get_json()
             try:
-
                 _wfinstanceid = request_json['wfinstanceid']
                 notes = request_json['notes'] if request_json.get('notes') is not None else 'Workflow Update'
                 requestid = int(_requestid)                                                               

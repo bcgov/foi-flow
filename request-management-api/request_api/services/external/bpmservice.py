@@ -58,12 +58,18 @@ class bpmservice(camundaservice):
             return None
         return None
 
-    def unopenedsave(self,processinstanceid, userid, messagetype, token=None):
+    def unopenedsave(self,processinstanceid, metadata, messagetype, token=None):
         if self.bpmengineresturl is not None:
+            # metadata is the complete event payload (a json.dumps(...) string, same as every
+            # other engine call) - Camunda's claim step only needs assignedGroup/assignedTo as
+            # individual process variables, so pull just those two out of it.
+            _metadata = json.loads(metadata) if metadata else {}
             messageschema = MessageSchema().dump({"processInstanceId": processinstanceid,
-                                              "messageName": messagetype, 
+                                              "messageName": messagetype,
                                               "processVariables":{
-                                                  "assignedTo": VariableSchema().dump({"type" : VariableType.String.value, "value": userid})
+                                                  "filenumber": VariableSchema().dump({"type" : VariableType.String.value, "value": _metadata.get("id")}),
+                                                  "assignedGroup": VariableSchema().dump({"type" : VariableType.String.value, "value": _metadata.get("assignedGroup")}),
+                                                  "assignedTo": VariableSchema().dump({"type" : VariableType.String.value, "value": _metadata.get("assignedTo")})
                                                   }
                                               })
             return self.__post_message(messagetype, messageschema, token)
