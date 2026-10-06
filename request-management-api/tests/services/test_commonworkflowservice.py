@@ -19,6 +19,7 @@ def _n8n_env(monkeypatch):
     monkeypatch.setenv("N8N_WEBHOOK_AUTH_HEADER_NAME", "X-N8N-Auth")
     monkeypatch.setenv("N8N_WEBHOOK_AUTH_HEADER_VALUE", "secret")
     monkeypatch.delenv("N8N_WEBHOOK_TIMEOUT_SECONDS", raising=False)
+    monkeypatch.delenv("N8N_WEBHOOK_RETRY_ENABLED", raising=False)
 
 
 @pytest.fixture
@@ -237,3 +238,34 @@ def test_gated_methods_raise_not_implemented():
         engine.searchinstancebyvariable("foi-request", [{"name": "id", "value": 7}])
     with pytest.raises(NotImplementedError):
         engine.searchprocessinstance("555")
+
+
+@patch(POST)
+def test_retryable_failure_is_dead_lettered_when_retries_are_disabled(mock_post, retry_queue, monkeypatch, caplog):
+    monkeypatch.setenv("N8N_WEBHOOK_RETRY_ENABLED", "false")
+    mock_post.return_value = _mock_response(False, status_code=503)
+    assert _unopenedcomplete() is None
+    retry_queue.enqueue.assert_not_called()
+    retry_queue.deadletterpayload.assert_called_once()
+    payload = retry_queue.deadletterpayload.call_args[0][0]
+    assert retry_queue.deadletterpayload.call_args[1] == {"attempts": 1, "error": "HTTP 503"}
+    assert "retries are disabled" in caplog.text
+    assert payload["eventId"] in caplog.text
+
+
+@patch(POST)
+def test_retryable_failure_is_queued_when_retries_are_enabled(mock_post, retry_queue, monkeypatch):
+    monkeypatch.setenv("N8N_WEBHOOK_RETRY_ENABLED", "true")
+    mock_post.return_value = _mock_response(False, status_code=503)
+    _unopenedcomplete()
+    retry_queue.enqueue.assert_called_once()
+    retry_queue.deadletterpayload.assert_not_called()
+
+
+@patch(POST)
+def test_dead_letter_failure_is_logged_not_raised_when_retries_are_disabled(mock_post, retry_queue, monkeypatch, caplog):
+    monkeypatch.setenv("N8N_WEBHOOK_RETRY_ENABLED", "false")
+    mock_post.side_effect = requests.ConnectionError("refused")
+    retry_queue.deadletterpayload.side_effect = Exception("redis down")
+    assert _unopenedcomplete() is None
+    assert "unable to queue n8n event" in caplog.text

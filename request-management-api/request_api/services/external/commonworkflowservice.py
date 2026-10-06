@@ -5,7 +5,7 @@ import logging
 import uuid
 
 from request_api.services.external.bpmservice import MessageType
-from request_api.services.external.n8nwebhookretryqueue import n8nwebhookretryqueue
+from request_api.services.external.n8nwebhookretryqueue import n8nwebhookretryqueue, retryenabled
 
 """
 n8n implementation of the workflow-engine interface consumed by
@@ -24,7 +24,8 @@ stored in the payload, so a retry through the queue re-sends the same id and
 FOI Request Routing in n8n can skip an event whose earlier run completed.
 
 A webhook call that fails transiently (network error, timeout, HTTP 429 or
-5xx) is logged and queued in n8nwebhookretryqueue; N8NWebhookRetryScheduler
+5xx) is logged and queued in n8nwebhookretryqueue (or written straight to its
+dead-letter list when N8N_WEBHOOK_RETRY_ENABLED is false); N8NWebhookRetryScheduler
 re-sends it later through deliver(). Non-retryable failures (missing
 N8N_BASE_URL, other 4xx) are only logged, since resending cannot fix them.
 
@@ -122,7 +123,12 @@ class commonworkflowservice:
 
     def __queueforretry(self, payload, error):
         try:
-            n8nwebhookretryqueue().enqueue(payload, attempts=1, error=error)
+            if retryenabled():
+                n8nwebhookretryqueue().enqueue(payload, attempts=1, error=error)
+            else:
+                logging.error("commonworkflowservice: n8n event not delivered and retries are disabled; event=%s eventId=%s error=%s",
+                              payload.get("event"), payload.get("eventId"), error)
+                n8nwebhookretryqueue().deadletterpayload(payload, attempts=1, error=error)
         except Exception as ex:
             logging.exception("commonworkflowservice: unable to queue n8n event=%s for retry; event is not delivered: %s", payload.get("event"), type(ex).__name__)
 

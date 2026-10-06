@@ -58,7 +58,17 @@ class N8NWebhookRetryScheduler:
             else:
                 entry.update({"attempts": attempts, "lasterror": result.error})
                 self.queue.deadletter(entry)
+        self.__logbacklog()
         return delivered
+
+    def __logbacklog(self):
+        try:
+            pending, failed = self.queue.backlog()
+        except Exception:
+            logging.exception("Unable to read n8n webhook retry backlog")
+            return
+        level = logging.INFO if (pending or failed) else logging.DEBUG
+        logging.log(level, "n8n webhook retry backlog; pending=%s failed=%s", pending, failed)
 
     def run_forever(self):
         while not self._stop_event.is_set():

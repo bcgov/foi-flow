@@ -3,8 +3,25 @@ import json
 import pytest
 
 from request_api.services.external.commonworkflowservice import n8ndeliveryresult
-from request_api.services.external.n8nwebhookretryqueue import n8nwebhookretryqueue
+from request_api.services.external.n8nwebhookretryqueue import n8nwebhookretryqueue, retryenabled
 from request_api.services.n8nwebhookretryscheduler import N8NWebhookRetryScheduler
+
+
+class FakePipeline:
+    """Queues commands and applies them together on execute(), like MULTI/EXEC."""
+
+    def __init__(self, client):
+        self.client = client
+        self.commands = []
+
+    def __getattr__(self, name):
+        def queue(*args, **kwargs):
+            self.commands.append((name, args, kwargs))
+            return self
+        return queue
+
+    def execute(self):
+        return [getattr(self.client, name)(*args, **kwargs) for name, args, kwargs in self.commands]
 
 
 class FakeRedisClient:
@@ -16,17 +33,36 @@ class FakeRedisClient:
 
     def zadd(self, name, mapping):
         self.zsets.setdefault(name, {}).update(mapping)
+        return len(mapping)
 
     def zrangebyscore(self, name, minimum, maximum, start=0, num=None):
-        members = sorted((score, member) for member, score in self.zsets.get(name, {}).items() if score <= maximum)
+        members = sorted((score, member) for member, score in self.zsets.get(name, {}).items() if score <= float(maximum))
         members = [member for _, member in members][start:]
         return members[:num] if num is not None else members
 
     def zrem(self, name, member):
         return 1 if self.zsets.get(name, {}).pop(member, None) is not None else 0
 
+    def zcard(self, name):
+        return len(self.zsets.get(name, {}))
+
     def rpush(self, name, value):
         self.lists.setdefault(name, []).append(value)
+        return len(self.lists[name])
+
+    def ltrim(self, name, start, end):
+        items = self.lists.get(name, [])
+        size = len(items)
+        first = start + size if start < 0 else start
+        last = end + size if end < 0 else end
+        self.lists[name] = items[max(first, 0):last + 1]
+        return True
+
+    def llen(self, name):
+        return len(self.lists.get(name, []))
+
+    def pipeline(self, transaction=True):
+        return FakePipeline(self)
 
 
 class FakeEngine:
@@ -42,7 +78,9 @@ class FakeEngine:
 @pytest.fixture(autouse=True)
 def _retry_env(monkeypatch):
     for name in ("N8N_WEBHOOK_RETRY_QUEUE", "N8N_WEBHOOK_RETRY_MAX_ATTEMPTS",
-                 "N8N_WEBHOOK_RETRY_BACKOFF_SECONDS", "N8N_WEBHOOK_RETRY_MAX_BACKOFF_SECONDS"):
+                 "N8N_WEBHOOK_RETRY_BACKOFF_SECONDS", "N8N_WEBHOOK_RETRY_MAX_BACKOFF_SECONDS",
+                 "N8N_WEBHOOK_RETRY_ENABLED", "N8N_WEBHOOK_DEADLETTER_MAX",
+                 "N8N_WEBHOOK_RETRY_LEASE_SECONDS", "N8N_WEBHOOK_TIMEOUT_SECONDS"):
         monkeypatch.delenv(name, raising=False)
 
 
@@ -154,3 +192,59 @@ def test_scheduler_from_env(monkeypatch, queue):
     scheduler = N8NWebhookRetryScheduler.from_env(queue=queue)
     assert scheduler.interval_seconds == 15
     assert scheduler.batch_size == 3
+
+
+@pytest.mark.parametrize("value, expected", [
+    (None, True), ("true", True), (" TRUE ", True),
+    ("false", False), ("False", False), ("0", False),
+])
+def test_retryenabled(monkeypatch, value, expected):
+    if value is None:
+        monkeypatch.delenv("N8N_WEBHOOK_RETRY_ENABLED", raising=False)
+    else:
+        monkeypatch.setenv("N8N_WEBHOOK_RETRY_ENABLED", value)
+    assert retryenabled() is expected
+
+
+def test_deadletter_list_is_capped_keeping_newest(redis_client, monkeypatch, caplog):
+    monkeypatch.setenv("N8N_WEBHOOK_DEADLETTER_MAX", "3")
+    queue = n8nwebhookretryqueue(redisclient=redis_client)
+    for index in range(5):
+        queue.deadletter({"id": str(index), "event": "e", "attempts": 5, "lasterror": "HTTP 500", "payload": PAYLOAD})
+    kept = [json.loads(entry)["id"] for entry in redis_client.lists[queue.deadlettername]]
+    assert kept == ["2", "3", "4"]
+    assert "dead-letter list is full" in caplog.text
+
+
+@pytest.mark.parametrize("value", ["0", "-5", "abc"])
+def test_invalid_deadletter_max_falls_back_to_default(redis_client, monkeypatch, value):
+    monkeypatch.setenv("N8N_WEBHOOK_DEADLETTER_MAX", value)
+    assert n8nwebhookretryqueue(redisclient=redis_client).deadlettermax == 1000
+
+
+def test_deadletter_with_member_removes_it_from_the_queue(queue, redis_client):
+    member = json.dumps({"id": "a", "payload": PAYLOAD})
+    redis_client.zadd(queue.queuename, {member: 0.0})
+    queue.deadletter({"id": "a", "payload": PAYLOAD}, member)
+    assert _pending(redis_client, queue) == {}
+    assert len(redis_client.lists[queue.deadlettername]) == 1
+
+
+def test_deadletterpayload_writes_straight_to_the_dead_letter_list(queue, redis_client):
+    queue.deadletterpayload(PAYLOAD, attempts=1, error="HTTP 503")
+    assert _pending(redis_client, queue) == {}
+    failed = json.loads(redis_client.lists[queue.deadlettername][0])
+    assert failed["payload"] == PAYLOAD and failed["attempts"] == 1 and failed["lasterror"] == "HTTP 503"
+
+
+def test_backlog_reports_pending_and_failed_sizes(queue, redis_client):
+    redis_client.zadd(queue.queuename, {json.dumps({"id": "a", "payload": PAYLOAD}): 999.0})
+    queue.deadletterpayload(PAYLOAD)
+    assert queue.backlog() == (1, 1)
+
+
+def test_scheduler_logs_backlog_when_not_empty(queue, redis_client, caplog):
+    caplog.set_level("INFO")
+    redis_client.zadd(queue.queuename, {json.dumps({"id": "later", "payload": PAYLOAD}): 9e18})
+    N8NWebhookRetryScheduler(queue=queue, engine_factory=lambda: FakeEngine()).run_once()
+    assert "n8n webhook retry backlog; pending=1 failed=0" in caplog.text
