@@ -112,8 +112,7 @@ import {
   isRequestRestricted,
   convertSTRToDate,
   getCommentTypeIdByName,
-  isMinistryLogin,
-  addBusinessDays
+  isMinistryLogin
 } from "../../../helper/FOI/helper";
 import DivisionalTracking from "./DivisionalTracking";
 import RedactionSummary from "./RedactionSummary";
