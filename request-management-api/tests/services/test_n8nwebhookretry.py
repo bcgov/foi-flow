@@ -136,7 +136,8 @@ def test_enqueue_dead_letters_when_attempts_are_exhausted(queue, redis_client, c
     assert queue.enqueue(PAYLOAD, attempts=5, error="HTTP 500", entryid="a") is False
     assert queue.queuename not in redis_client.zsets
     failed = [json.loads(entry) for entry in redis_client.lists[queue.deadlettername]]
-    assert failed[0]["id"] == "a" and failed[0]["lasterror"] == "HTTP 500"
+    assert failed[0]["id"] == "a"
+    assert failed[0]["lasterror"] == "HTTP 500"
     assert "needs operator action" in caplog.text
 
 
@@ -178,7 +179,8 @@ def test_scheduler_dead_letters_non_retryable_failure(queue, redis_client):
     N8NWebhookRetryScheduler(queue=queue, engine_factory=lambda: engine).run_once()
     assert _pending(redis_client, queue) == {}
     failed = json.loads(redis_client.lists[queue.deadlettername][0])
-    assert failed["lasterror"] == "HTTP 401" and failed["attempts"] == 2
+    assert failed["lasterror"] == "HTTP 401"
+    assert failed["attempts"] == 2
 
 
 def test_scheduler_from_env(monkeypatch, queue):
@@ -229,7 +231,9 @@ def test_deadletterpayload_writes_straight_to_the_dead_letter_list(queue, redis_
     queue.deadletterpayload(PAYLOAD, attempts=1, error="HTTP 503")
     assert _pending(redis_client, queue) == {}
     failed = json.loads(redis_client.lists[queue.deadlettername][0])
-    assert failed["payload"] == PAYLOAD and failed["attempts"] == 1 and failed["lasterror"] == "HTTP 503"
+    assert failed["payload"] == PAYLOAD
+    assert failed["attempts"] == 1
+    assert failed["lasterror"] == "HTTP 503"
 
 
 def test_backlog_reports_pending_and_failed_sizes(queue, redis_client):
@@ -282,7 +286,8 @@ def test_reschedule_replaces_the_leased_member_with_one_new_entry(queue, redis_c
     assert queue.reschedule(member, entry, 2, "HTTP 503") is True
     pending = _pending(redis_client, queue)
     assert list(pending) == ["a"]
-    assert pending["a"][0]["attempts"] == 2 and pending["a"][0]["lasterror"] == "HTTP 503"
+    assert pending["a"][0]["attempts"] == 2
+    assert pending["a"][0]["lasterror"] == "HTTP 503"
     assert pending["a"][1] == 1060.0
 
 
@@ -307,7 +312,8 @@ def test_corrupt_member_is_dead_lettered_and_others_still_claimed(queue, redis_c
     assert [entry["id"] for _, entry in claimed] == ["good"]
     assert "not-json{" not in redis_client.zsets[queue.queuename]
     failed = json.loads(redis_client.lists[queue.deadlettername][0])
-    assert failed["lasterror"] == "invalid JSON" and failed["raw"] == "not-json{"
+    assert failed["lasterror"] == "invalid JSON"
+    assert failed["raw"] == "not-json{"
 
 
 class RaisingEngine:
@@ -328,7 +334,8 @@ def test_scheduler_reschedules_entry_whose_delivery_raises_and_continues(queue, 
     assert N8NWebhookRetryScheduler(queue=queue, engine_factory=lambda: engine).run_once() == 1
     pending = _pending(redis_client, queue)
     assert list(pending) == ["boom"]
-    assert pending["boom"][0]["attempts"] == 2 and pending["boom"][0]["lasterror"] == "RuntimeError"
+    assert pending["boom"][0]["attempts"] == 2
+    assert pending["boom"][0]["lasterror"] == "RuntimeError"
 
 
 def test_entry_stays_leased_when_ack_fails_after_delivery(queue, redis_client, monkeypatch):
@@ -364,7 +371,8 @@ def test_non_object_member_is_dead_lettered_and_others_still_claimed(queue, redi
     assert [entry["id"] for _, entry in claimed] == ["good"]
     assert member not in redis_client.zsets[queue.queuename]
     failed = json.loads(redis_client.lists[queue.deadlettername][0])
-    assert failed["lasterror"] == "invalid entry" and failed["raw"] == member
+    assert failed["lasterror"] == "invalid entry"
+    assert failed["raw"] == member
 
 
 def test_scheduler_dead_letters_entry_with_non_numeric_attempts_and_continues(queue, redis_client):
@@ -375,4 +383,5 @@ def test_scheduler_dead_letters_entry_with_non_numeric_attempts_and_continues(qu
     assert N8NWebhookRetryScheduler(queue=queue, engine_factory=lambda: engine).run_once() == 1
     assert _pending(redis_client, queue) == {}
     failed = json.loads(redis_client.lists[queue.deadlettername][0])
-    assert failed["id"] == "bad" and failed["lasterror"] == "invalid attempts"
+    assert failed["id"] == "bad"
+    assert failed["lasterror"] == "invalid attempts"
