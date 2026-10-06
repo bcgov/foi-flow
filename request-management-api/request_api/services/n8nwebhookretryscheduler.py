@@ -60,7 +60,11 @@ class N8NWebhookRetryScheduler:
         delivered = 0
         engine = self.engine_factory()
         for member, entry in self.queue.claimdue(self.batch_size):
-            attempts = entry.get("attempts", 0) + 1
+            try:
+                attempts = int(entry.get("attempts") or 0) + 1
+            except (TypeError, ValueError):
+                self.queue.deadletter(dict(entry, lasterror="invalid attempts"), member)
+                continue
             try:
                 result = engine.deliver(entry["payload"])
             except Exception as err:

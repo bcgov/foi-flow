@@ -354,3 +354,25 @@ def test_check_lease_is_quiet_when_lease_is_long_enough(queue, caplog):
 def test_scheduler_from_env_reads_webhook_timeout(monkeypatch, queue):
     monkeypatch.setenv("N8N_WEBHOOK_TIMEOUT_SECONDS", "4")
     assert N8NWebhookRetryScheduler.from_env(queue=queue).webhook_timeout_seconds == 4.0
+
+
+@pytest.mark.parametrize("member", ["123", "[]", "null"])
+def test_non_object_member_is_dead_lettered_and_others_still_claimed(queue, redis_client, member):
+    good = json.dumps({"id": "good", "payload": PAYLOAD})
+    redis_client.zadd(queue.queuename, {member: 0.0, good: 1.0})
+    claimed = queue.claimdue(now=100.0)
+    assert [entry["id"] for _, entry in claimed] == ["good"]
+    assert member not in redis_client.zsets[queue.queuename]
+    failed = json.loads(redis_client.lists[queue.deadlettername][0])
+    assert failed["lasterror"] == "invalid entry" and failed["raw"] == member
+
+
+def test_scheduler_dead_letters_entry_with_non_numeric_attempts_and_continues(queue, redis_client):
+    bad = json.dumps({"id": "bad", "event": PAYLOAD["event"], "attempts": "x", "payload": PAYLOAD})
+    redis_client.zadd(queue.queuename, {bad: 0.0})
+    _due_entry(redis_client, queue, attempts=1, entryid="ok")
+    engine = FakeEngine(n8ndeliveryresult(True, content={}))
+    assert N8NWebhookRetryScheduler(queue=queue, engine_factory=lambda: engine).run_once() == 1
+    assert _pending(redis_client, queue) == {}
+    failed = json.loads(redis_client.lists[queue.deadlettername][0])
+    assert failed["id"] == "bad" and failed["lasterror"] == "invalid attempts"

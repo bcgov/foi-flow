@@ -126,10 +126,18 @@ class n8nwebhookretryqueue:
         claimed = []
         for member in members:
             try:
-                claimed.append((member, json.loads(member)))
+                entry = json.loads(member)
             except ValueError:
-                self.deadletter({"id": None, "event": None, "attempts": None, "lasterror": "invalid JSON", "raw": member}, member)
+                self.__deadletterraw(member, "invalid JSON")
+                continue
+            if isinstance(entry, dict):
+                claimed.append((member, entry))
+            else:
+                self.__deadletterraw(member, "invalid entry")
         return claimed
+
+    def __deadletterraw(self, member, error):
+        self.deadletter({"id": None, "event": None, "attempts": None, "lasterror": error, "raw": member}, member)
 
     def ack(self, member):
         """Removes a leased entry after it was delivered."""
