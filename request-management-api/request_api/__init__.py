@@ -82,6 +82,9 @@ def set_secure_headers(response):
 def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     """Return a configured Flask App using the Factory method."""   
     app.config.from_object(config.CONFIGURATION[run_mode])
+    # Fail fast on a mistyped WF_DEFAULT_ENGINE instead of misrouting requests at runtime.
+    from request_api.services.workflowengine import resolve_engine_name  # pylint: disable=import-outside-toplevel
+    app.logger.info("Workflow engine: %s", resolve_engine_name())
 
     from request_api.resources import API_BLUEPRINT #, DEFAULT_API_BLUEPRINT #, OPS_BLUEPRINT  # pylint: disable=import-outside-toplevel
 

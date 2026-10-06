@@ -256,3 +256,39 @@ class TestPostOpenedEventIncludesRequestIds:
         )
         mock_openedcomplete.assert_not_called()
         self._assert_metadata_has_ids(mock_reopenevent, metadata_index=1)
+
+
+class TestEngineNameNormalisation:
+    """Every call site must agree on the engine, even when WF_DEFAULT_ENGINE
+    has odd casing or whitespace (e.g. a trailing newline from a configmap)."""
+
+    @patch.object(bpmservice, "createinstance")
+    def test_createinstance_runs_for_normalised_camunda(self, mock_create, monkeypatch):
+        monkeypatch.setenv("WF_DEFAULT_ENGINE", " Camunda ")
+        mock_create.return_value = "camunda-instance-id"
+
+        assert workflowservice().createinstance("foi-rawrequest", json.dumps({"id": 42})) == "camunda-instance-id"
+        mock_create.assert_called_once()
+
+    @patch.object(bpmservice, "createinstance")
+    def test_createinstance_skips_for_normalised_n8n(self, mock_create, monkeypatch):
+        monkeypatch.setenv("WF_DEFAULT_ENGINE", "N8N")
+
+        assert workflowservice().createinstance("foi-rawrequest", json.dumps({"id": 42})) is None
+        mock_create.assert_not_called()
+
+    @patch.object(commonworkflowservice, "unopenedcomplete")
+    def test_postunopenedevent_without_wfinstanceid_posts_to_n8n_for_normalised_n8n(self, mock_call, monkeypatch):
+        monkeypatch.setenv("WF_DEFAULT_ENGINE", "N8N")
+        mock_call.return_value = MagicMock()
+
+        workflowservice().postunopenedevent(4745, None, {"assignedGroup": "g", "assignedTo": "u"}, "Closed", [])
+
+        mock_call.assert_called_once()
+
+    @patch.object(FOIRawRequest, "getworkflowinstancebyraw")
+    def test_syncwfinstance_skips_for_normalised_n8n(self, mock_getwf, monkeypatch):
+        monkeypatch.setenv("WF_DEFAULT_ENGINE", "n8n\n")
+
+        assert workflowservice().syncwfinstance("rawrequest", 1) is None
+        mock_getwf.assert_not_called()
