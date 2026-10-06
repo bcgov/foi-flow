@@ -64,6 +64,17 @@ class FakeRedisClient:
     def pipeline(self, transaction=True):
         return FakePipeline(self)
 
+    def register_script(self, script):
+        """Python stand-in for the Lua claim script: lease due members by
+        pushing their score to ARGV[3] and return them."""
+        def claim(keys, args):
+            name, now, limit, leaseuntil = keys[0], float(args[0]), int(args[1]), float(args[2])
+            due = self.zrangebyscore(name, "-inf", now, start=0, num=limit)
+            for member in due:
+                self.zsets[name][member] = leaseuntil
+            return due
+        return claim
+
 
 class FakeEngine:
     def __init__(self, *results):
@@ -127,22 +138,6 @@ def test_enqueue_dead_letters_when_attempts_are_exhausted(queue, redis_client, c
     failed = [json.loads(entry) for entry in redis_client.lists[queue.deadlettername]]
     assert failed[0]["id"] == "a" and failed[0]["lasterror"] == "HTTP 500"
     assert "needs operator action" in caplog.text
-
-
-def test_claimdue_returns_only_due_entries_and_removes_them(queue, redis_client):
-    redis_client.zadd(queue.queuename, {json.dumps({"id": "due", "payload": PAYLOAD}): 50.0,
-                                        json.dumps({"id": "later", "payload": PAYLOAD}): 500.0})
-    claimed = queue.claimdue(limit=10, now=100.0)
-    assert [entry["id"] for entry in claimed] == ["due"]
-    assert list(_pending(redis_client, queue)) == ["later"]
-    assert queue.claimdue(limit=10, now=100.0) == []
-
-
-def test_claimdue_skips_entries_already_claimed_by_another_worker(queue, redis_client, monkeypatch):
-    member = json.dumps({"id": "a", "payload": PAYLOAD})
-    redis_client.zadd(queue.queuename, {member: 0.0})
-    monkeypatch.setattr(redis_client, "zrem", lambda name, value: 0)
-    assert queue.claimdue(now=100.0) == []
 
 
 def _due_entry(redis_client, queue, attempts=1, entryid="a"):
@@ -248,3 +243,114 @@ def test_scheduler_logs_backlog_when_not_empty(queue, redis_client, caplog):
     redis_client.zadd(queue.queuename, {json.dumps({"id": "later", "payload": PAYLOAD}): 9e18})
     N8NWebhookRetryScheduler(queue=queue, engine_factory=lambda: FakeEngine()).run_once()
     assert "n8n webhook retry backlog; pending=1 failed=0" in caplog.text
+
+
+def test_claimdue_leases_due_entries_instead_of_removing_them(queue, redis_client):
+    due = json.dumps({"id": "due", "payload": PAYLOAD})
+    redis_client.zadd(queue.queuename, {due: 50.0, json.dumps({"id": "later", "payload": PAYLOAD}): 500.0})
+    claimed = queue.claimdue(limit=10, now=100.0)
+    assert [(member, entry["id"]) for member, entry in claimed] == [(due, "due")]
+    assert redis_client.zsets[queue.queuename][due] == 100.0 + queue.leaseseconds
+
+
+def test_second_claim_before_lease_ends_gets_nothing(queue, redis_client):
+    redis_client.zadd(queue.queuename, {json.dumps({"id": "a", "payload": PAYLOAD}): 0.0})
+    assert len(queue.claimdue(now=100.0)) == 1
+    assert queue.claimdue(now=100.0 + queue.leaseseconds - 1) == []
+
+
+def test_unacked_entry_becomes_due_again_after_lease(queue, redis_client):
+    """Simulates a pod dying between claim and ack: nothing is lost."""
+    original = {"id": "a", "attempts": 2, "payload": dict(PAYLOAD, eventId="e-1")}
+    redis_client.zadd(queue.queuename, {json.dumps(original): 0.0})
+    queue.claimdue(now=100.0)
+    (member, entry), = queue.claimdue(now=100.0 + queue.leaseseconds + 1)
+    assert entry == original
+
+
+def test_ack_removes_the_leased_member(queue, redis_client):
+    redis_client.zadd(queue.queuename, {json.dumps({"id": "a", "payload": PAYLOAD}): 0.0})
+    (member, _), = queue.claimdue(now=100.0)
+    queue.ack(member)
+    assert _pending(redis_client, queue) == {}
+
+
+def test_reschedule_replaces_the_leased_member_with_one_new_entry(queue, redis_client, monkeypatch):
+    monkeypatch.setattr("request_api.services.external.n8nwebhookretryqueue.time.time", lambda: 1000.0)
+    redis_client.zadd(queue.queuename, {json.dumps({"id": "a", "attempts": 1, "payload": PAYLOAD}): 0.0})
+    (member, entry), = queue.claimdue(now=100.0)
+    assert queue.reschedule(member, entry, 2, "HTTP 503") is True
+    pending = _pending(redis_client, queue)
+    assert list(pending) == ["a"]
+    assert pending["a"][0]["attempts"] == 2 and pending["a"][0]["lasterror"] == "HTTP 503"
+    assert pending["a"][1] == 1060.0
+
+
+def test_reschedule_dead_letters_at_max_attempts(queue, redis_client):
+    redis_client.zadd(queue.queuename, {json.dumps({"id": "a", "attempts": 4, "payload": PAYLOAD}): 0.0})
+    (member, entry), = queue.claimdue(now=100.0)
+    assert queue.reschedule(member, entry, 5, "HTTP 500") is False
+    assert _pending(redis_client, queue) == {}
+    assert json.loads(redis_client.lists[queue.deadlettername][0])["attempts"] == 5
+
+
+@pytest.mark.parametrize("value", ["0", "-1", "abc"])
+def test_invalid_lease_seconds_falls_back_to_default(redis_client, monkeypatch, value):
+    monkeypatch.setenv("N8N_WEBHOOK_RETRY_LEASE_SECONDS", value)
+    assert n8nwebhookretryqueue(redisclient=redis_client).leaseseconds == 300
+
+
+def test_corrupt_member_is_dead_lettered_and_others_still_claimed(queue, redis_client):
+    good = json.dumps({"id": "good", "payload": PAYLOAD})
+    redis_client.zadd(queue.queuename, {"not-json{": 0.0, good: 1.0})
+    claimed = queue.claimdue(now=100.0)
+    assert [entry["id"] for _, entry in claimed] == ["good"]
+    assert "not-json{" not in redis_client.zsets[queue.queuename]
+    failed = json.loads(redis_client.lists[queue.deadlettername][0])
+    assert failed["lasterror"] == "invalid JSON" and failed["raw"] == "not-json{"
+
+
+class RaisingEngine:
+    def __init__(self, *results):
+        self.results = list(results)
+
+    def deliver(self, payload):
+        result = self.results.pop(0)
+        if isinstance(result, Exception):
+            raise result
+        return result
+
+
+def test_scheduler_reschedules_entry_whose_delivery_raises_and_continues(queue, redis_client):
+    _due_entry(redis_client, queue, attempts=1, entryid="boom")
+    _due_entry(redis_client, queue, attempts=1, entryid="ok")
+    engine = RaisingEngine(RuntimeError("bug"), n8ndeliveryresult(True, content={}))
+    assert N8NWebhookRetryScheduler(queue=queue, engine_factory=lambda: engine).run_once() == 1
+    pending = _pending(redis_client, queue)
+    assert list(pending) == ["boom"]
+    assert pending["boom"][0]["attempts"] == 2 and pending["boom"][0]["lasterror"] == "RuntimeError"
+
+
+def test_entry_stays_leased_when_ack_fails_after_delivery(queue, redis_client, monkeypatch):
+    _due_entry(redis_client, queue, attempts=1)
+    monkeypatch.setattr(queue, "ack", lambda member: (_ for _ in ()).throw(ConnectionError("redis down")))
+    engine = FakeEngine(n8ndeliveryresult(True, content={}))
+    with pytest.raises(ConnectionError):
+        N8NWebhookRetryScheduler(queue=queue, engine_factory=lambda: engine).run_once()
+    assert list(_pending(redis_client, queue)) == ["a"]
+
+
+def test_check_lease_warns_when_lease_is_shorter_than_a_batch(queue, caplog, monkeypatch):
+    monkeypatch.setattr(queue, "leaseseconds", 50)
+    N8NWebhookRetryScheduler(queue=queue, batch_size=10, webhook_timeout_seconds=10).check_lease()
+    assert "lease is not longer than a worst-case batch" in caplog.text
+
+
+def test_check_lease_is_quiet_when_lease_is_long_enough(queue, caplog):
+    N8NWebhookRetryScheduler(queue=queue, batch_size=10, webhook_timeout_seconds=10).check_lease()
+    assert "lease is not longer" not in caplog.text
+
+
+def test_scheduler_from_env_reads_webhook_timeout(monkeypatch, queue):
+    monkeypatch.setenv("N8N_WEBHOOK_TIMEOUT_SECONDS", "4")
+    assert N8NWebhookRetryScheduler.from_env(queue=queue).webhook_timeout_seconds == 4.0

@@ -11,9 +11,12 @@ Delayed retry queue for n8n webhook events that could not be delivered
 (network error, timeout, HTTP 429 or 5xx).
 
 Pending entries live in a Redis sorted set (N8N_WEBHOOK_RETRY_QUEUE) scored
-by the time of their next attempt. Entries that exhaust
-N8N_WEBHOOK_RETRY_MAX_ATTEMPTS, fail with a non-retryable error, or fail
-while N8N_WEBHOOK_RETRY_ENABLED is false move to the "<queue>:failed" list,
+by the time of their next attempt. claimdue() leases due entries for
+N8N_WEBHOOK_RETRY_LEASE_SECONDS instead of removing them, so an entry claimed
+by a worker that dies is retried once the lease expires. Delivery is therefore
+at-least-once; n8n must skip an eventId it has already completed. Entries
+that exhaust N8N_WEBHOOK_RETRY_MAX_ATTEMPTS, fail with a non-retryable error,
+or fail while N8N_WEBHOOK_RETRY_ENABLED is false move to the "<queue>:failed" list,
 which keeps only the newest N8N_WEBHOOK_DEADLETTER_MAX entries.
 
 Uses the EVENT_QUEUE_* Redis connection already configured for this API.
@@ -27,6 +30,16 @@ Operator notes (default queue name shown):
                          redis-cli LREM foi-n8n-webhook-retry:failed 1 '<original entry json>'
   Clear the list:        redis-cli DEL foi-n8n-webhook-retry:failed
 """
+
+# Atomically finds up to ARGV[2] members due by ARGV[1] and leases them by
+# pushing their score to ARGV[3], so no other worker sees them as due until
+# the lease expires. Members stay in the zset until ack/reschedule/deadletter.
+CLAIM_SCRIPT = """
+local due = redis.call('ZRANGEBYSCORE', KEYS[1], '-inf', ARGV[1], 'LIMIT', 0, ARGV[2])
+for _, m in ipairs(due) do redis.call('ZADD', KEYS[1], 'XX', ARGV[3], m) end
+return due
+"""
+
 
 def retryenabled():
     """Single source of truth for N8N_WEBHOOK_RETRY_ENABLED (unset means enabled)."""
@@ -52,6 +65,7 @@ class n8nwebhookretryqueue:
         self.backoffseconds = int(os.getenv("N8N_WEBHOOK_RETRY_BACKOFF_SECONDS") or 30)
         self.maxbackoffseconds = int(os.getenv("N8N_WEBHOOK_RETRY_MAX_BACKOFF_SECONDS") or 3600)
         self.deadlettermax = positiveint("N8N_WEBHOOK_DEADLETTER_MAX", 1000)
+        self.leaseseconds = positiveint("N8N_WEBHOOK_RETRY_LEASE_SECONDS", 300)
         self.redis = redisclient or redis.Redis(
             host=os.getenv("EVENT_QUEUE_HOST") or "localhost",
             port=int(os.getenv("EVENT_QUEUE_PORT") or 6379),
@@ -60,6 +74,7 @@ class n8nwebhookretryqueue:
             decode_responses=True,
             socket_connect_timeout=5,
         )
+        self._claimscript = self.redis.register_script(CLAIM_SCRIPT)
 
     def enqueue(self, payload, attempts=1, error=None, entryid=None):
         """Schedules the next attempt for an event that has already been tried
@@ -102,13 +117,38 @@ class n8nwebhookretryqueue:
                 "attempts": attempts, "lasterror": error, "payload": payload}
 
     def claimdue(self, limit=10, now=None):
-        """Removes and returns up to `limit` entries whose next attempt is due."""
+        """Leases up to `limit` due entries and returns them as (member, entry)
+        pairs. A leased entry stays in Redis: finish it with ack, reschedule or
+        deadletter; if the worker dies first it becomes due again when the
+        lease expires (at-least-once delivery)."""
         now = time.time() if now is None else now
+        members = self._claimscript(keys=[self.queuename], args=[now, limit, now + self.leaseseconds])
         claimed = []
-        for member in self.redis.zrangebyscore(self.queuename, "-inf", now, start=0, num=limit):
-            if self.redis.zrem(self.queuename, member):
-                claimed.append(json.loads(member))
+        for member in members:
+            try:
+                claimed.append((member, json.loads(member)))
+            except ValueError:
+                self.deadletter({"id": None, "event": None, "attempts": None, "lasterror": "invalid JSON", "raw": member}, member)
         return claimed
+
+    def ack(self, member):
+        """Removes a leased entry after it was delivered."""
+        self.redis.zrem(self.queuename, member)
+
+    def reschedule(self, member, entry, attempts, error):
+        """Replaces a leased entry with its next attempt. Returns False when the
+        entry was dead-lettered because it reached N8N_WEBHOOK_RETRY_MAX_ATTEMPTS."""
+        entry = dict(entry, attempts=attempts, lasterror=error)
+        if attempts >= self.maxattempts:
+            self.deadletter(entry, member)
+            return False
+        pipe = self.redis.pipeline(transaction=True)
+        pipe.zrem(self.queuename, member)
+        pipe.zadd(self.queuename, {json.dumps(entry): time.time() + self.__backoff(attempts)})
+        pipe.execute()
+        logging.warning("n8nwebhookretryqueue: queued n8n event for retry; id=%s event=%s attempts=%s error=%s",
+                        entry.get("id"), entry.get("event"), attempts, error)
+        return True
 
     def __backoff(self, attempts):
         return min(self.backoffseconds * (2 ** (attempts - 1)), self.maxbackoffseconds)
