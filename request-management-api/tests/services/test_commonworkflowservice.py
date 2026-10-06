@@ -269,3 +269,66 @@ def test_dead_letter_failure_is_logged_not_raised_when_retries_are_disabled(mock
     retry_queue.deadletterpayload.side_effect = Exception("redis down")
     assert _unopenedcomplete() is None
     assert "unable to queue n8n event" in caplog.text
+
+
+from datetime import datetime, timedelta, timezone
+
+DATETIME = "request_api.services.external.commonworkflowservice.datetime"
+
+
+class _Clock:
+    """Stand-in for datetime that returns successive UTC instants from now()."""
+    def __init__(self):
+        self.current = datetime(2026, 10, 6, 17, 0, 0, tzinfo=timezone.utc)
+
+    def now(self, tz=None):
+        self.current += timedelta(microseconds=1)
+        return self.current
+
+
+@patch(POST)
+def test_every_event_carries_utc_iso_occurredAt(mock_post):
+    mock_post.return_value = _mock_response(True, {})
+    _unopenedcomplete()
+    occurred = json.loads(mock_post.call_args[1]["data"])["occurredAt"]
+    parsed = datetime.fromisoformat(occurred)
+    assert parsed.utcoffset() == timedelta(0)
+    assert "." in occurred
+
+
+@patch(POST)
+def test_two_events_get_increasing_occurredAt(mock_post):
+    mock_post.return_value = _mock_response(True, {})
+    with patch(DATETIME, _Clock()):
+        _unopenedcomplete()
+        _unopenedcomplete()
+    first, second = [json.loads(call[1]["data"])["occurredAt"] for call in mock_post.call_args_list]
+    assert first < second
+
+
+@patch(POST)
+def test_occurredAt_is_kept_on_the_payload_queued_for_retry(mock_post, retry_queue):
+    mock_post.side_effect = requests.ConnectionError("refused")
+    _unopenedcomplete()
+    sent = json.loads(mock_post.call_args[1]["data"])
+    queued = retry_queue.enqueue.call_args[0][0]
+    assert queued["occurredAt"] == sent["occurredAt"]
+    assert queued["eventId"] == sent["eventId"]
+
+
+@patch(POST)
+def test_occurredAt_is_kept_on_the_dead_lettered_payload(mock_post, retry_queue, monkeypatch):
+    monkeypatch.setenv("N8N_WEBHOOK_RETRY_ENABLED", "false")
+    mock_post.return_value = _mock_response(False, status_code=503)
+    _unopenedcomplete()
+    sent = json.loads(mock_post.call_args[1]["data"])
+    assert retry_queue.deadletterpayload.call_args[0][0]["occurredAt"] == sent["occurredAt"]
+
+
+@patch(POST)
+def test_redelivery_resends_the_original_occurredAt(mock_post):
+    mock_post.return_value = _mock_response(True, {})
+    payload = {"event": MessageType.intakecomplete.value, "eventId": "11111111-1111-4111-8111-111111111111",
+               "occurredAt": "2026-10-06T17:00:00.000001+00:00"}
+    commonworkflowservice().deliver(payload)
+    assert json.loads(mock_post.call_args[1]["data"])["occurredAt"] == payload["occurredAt"]
