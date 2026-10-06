@@ -1,6 +1,6 @@
 import FOI_COMPONENT_CONSTANTS from "../../../constants/FOI/foiComponentConstants";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
-import { formatDate, isProcessingTeam, isFlexTeam, addBusinessDays, calculateDaysRemaining } from "../../../helper/FOI/helper";
+import { formatDate, isProcessingTeam, isFlexTeam, addBusinessDaysExpanded, calculateDaysRemaining } from "../../../helper/FOI/helper";
 import { extensionStatusId, KCProcessingTeams } from "../../../constants/FOI/enum";
 import MANDATORY_FOI_REQUEST_FIELDS from '../../../constants/FOI/mandatoryFOIRequestFields';
 import AXIS_SYNC_DISPLAY_FIELDS from '../../../constants/FOI/axisSyncDisplayFields';
@@ -328,7 +328,7 @@ export const createRequestDetailsObjectFunc = (
     case FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE:
       requestObject.requestProcessStart = value;
       requestObject.dueDate = value2;
-      if ("originalDueDate" in requestObject) requestObject.originalDueDate = addBusinessDays(formatDate(value, "yyyy MMM, dd"), 30);
+      if ("originalDueDate" in requestObject) requestObject.originalDueDate = addBusinessDaysExpanded(formatDate(value, "yyyy MMM, dd"), 30);
       break;
     case FOI_COMPONENT_CONSTANTS.PROGRAM_AREA_LIST:
       requestObject.selectedMinistries = [];

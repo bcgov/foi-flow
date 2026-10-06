@@ -1,11 +1,11 @@
 import {
-  addBusinessDaysExt,
+  addBusinessDaysExpanded,
   removeBusinessDaysExt,
 } from "./helper";
 
 describe("FOI LDD business-day calculations", () => {
 
-  describe("addBusinessDaysExt", () => {
+  describe("addBusinessDaysExpanded", () => {
     test.each([
       ["2026-08-27", 1, "2026-08-28"],
       ["2026-08-28", 1, "2026-08-31"],
@@ -18,7 +18,7 @@ describe("FOI LDD business-day calculations", () => {
     ])(
       "%s + %i business days = %s",
       (start, days, expected) => {
-        expect(addBusinessDaysExt(start, days)).toBe(expected);
+        expect(addBusinessDaysExpanded(start, days)).toBe(expected);
       }
     );
   });
@@ -52,7 +52,7 @@ describe("business-day invariants", () => {
   ])(
     "add then remove returns original date: %s / %i business days",
     (start, days) => {
-      const added = addBusinessDaysExt(start, days);
+      const added = addBusinessDaysExpanded(start, days);
       const result = removeBusinessDaysExt(added, days);
 
       expect(result).toBe(start);

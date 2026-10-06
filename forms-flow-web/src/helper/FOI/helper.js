@@ -126,7 +126,7 @@ const addBusinessDays = (dateText, days) => {
   return reconcilePublicHoliDays(startDate, endDate).format("YYYY-MM-DD");
 };
 
-const addBusinessDaysExt = (dateText, days) => {
+const addBusinessDaysExpanded = (dateText, days) => {
   const startDate = dayjs(dateText);
   const startYear = dayjs(startDate).year();
   const endYear = dayjs(startDate).add(1, "year").year();
@@ -801,6 +801,6 @@ export {
   addBusinessDaysToDate,
   getIAOTagList,
   isNotMinistryGroup,
-  addBusinessDaysExt,
+  addBusinessDaysExpanded,
   removeBusinessDaysExt,
 };
