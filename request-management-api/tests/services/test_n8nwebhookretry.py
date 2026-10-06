@@ -340,10 +340,15 @@ def test_scheduler_reschedules_entry_whose_delivery_raises_and_continues(queue, 
 
 def test_entry_stays_leased_when_ack_fails_after_delivery(queue, redis_client, monkeypatch):
     _due_entry(redis_client, queue, attempts=1)
-    monkeypatch.setattr(queue, "ack", lambda member: (_ for _ in ()).throw(ConnectionError("redis down")))
+
+    def failingack(member):
+        raise ConnectionError("redis down")
+
+    monkeypatch.setattr(queue, "ack", failingack)
     engine = FakeEngine(n8ndeliveryresult(True, content={}))
+    scheduler = N8NWebhookRetryScheduler(queue=queue, engine_factory=lambda: engine)
     with pytest.raises(ConnectionError):
-        N8NWebhookRetryScheduler(queue=queue, engine_factory=lambda: engine).run_once()
+        scheduler.run_once()
     assert list(_pending(redis_client, queue)) == ["a"]
 
 
