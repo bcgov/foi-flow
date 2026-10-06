@@ -3,9 +3,10 @@ import os
 import json
 import logging
 import uuid
+from datetime import datetime, timezone
 
 from request_api.services.external.bpmservice import MessageType
-from request_api.services.external.n8nwebhookretryqueue import n8nwebhookretryqueue
+from request_api.services.external.n8nwebhookretryqueue import n8nwebhookretryqueue, retryenabled
 
 """
 n8n implementation of the workflow-engine interface consumed by
@@ -19,12 +20,19 @@ identifying and routing the request from the payload (the "event" field
 plus whatever ids/metadata are already present in the payload), so there is
 no per-request instance id/address to store or construct on this side.
 
-Every event carries an "event_id" (uuid4) generated once in __post_event and
-stored in the payload, so a retry through the queue re-sends the same id and
-FOI Request Routing in n8n can skip an event whose earlier run completed.
+Every event carries two fields set once in __post_event and never changed,
+so a retry through the queue re-sends them exactly as first built:
+  - "eventId" (uuid4): FOI Request Routing in n8n skips an eventId whose
+    earlier run completed (required - retry delivery is at-least-once).
+  - "occurredAt" (ISO-8601 UTC, microseconds): when the API emitted the
+    event. n8n keeps the last occurredAt applied per request and skips an
+    older *state* event (claim/complete/reopen) that arrives late after a
+    retry; *action* events (managepayment, iaocorrenspodence) are always
+    processed.
 
 A webhook call that fails transiently (network error, timeout, HTTP 429 or
-5xx) is logged and queued in n8nwebhookretryqueue; N8NWebhookRetryScheduler
+5xx) is logged and queued in n8nwebhookretryqueue (or written straight to its
+dead-letter list when N8N_WEBHOOK_RETRY_ENABLED is false); N8NWebhookRetryScheduler
 re-sends it later through deliver(). Non-retryable failures (missing
 N8N_BASE_URL, other 4xx) are only logged, since resending cannot fix them.
 
@@ -112,7 +120,8 @@ class commonworkflowservice:
         return n8ndeliveryresult(True, content=content if isinstance(content, dict) else None)
 
     def __post_event(self, messagetype, extra):
-        payload = {"event": messagetype, "eventId": str(uuid.uuid4())}
+        payload = {"event": messagetype, "eventId": str(uuid.uuid4()),
+                   "occurredAt": datetime.now(timezone.utc).isoformat(timespec="microseconds")}
         payload.update(extra)
         logging.info("commonworkflowservice.__post_event: sending event=%s eventId=%s", messagetype, payload["eventId"])
         result = self.deliver(payload)
@@ -122,7 +131,12 @@ class commonworkflowservice:
 
     def __queueforretry(self, payload, error):
         try:
-            n8nwebhookretryqueue().enqueue(payload, attempts=1, error=error)
+            if retryenabled():
+                n8nwebhookretryqueue().enqueue(payload, attempts=1, error=error)
+            else:
+                logging.error("commonworkflowservice: n8n event not delivered and retries are disabled; event=%s eventId=%s error=%s",
+                              payload.get("event"), payload.get("eventId"), error)
+                n8nwebhookretryqueue().deadletterpayload(payload, attempts=1, error=error)
         except Exception as ex:
             logging.exception("commonworkflowservice: unable to queue n8n event=%s for retry; event is not delivered: %s", payload.get("event"), type(ex).__name__)
 

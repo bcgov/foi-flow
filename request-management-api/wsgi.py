@@ -18,6 +18,7 @@ from request_api.utils.redissubscriber import RedisSubscriberService
 from request_api.services.publication_events.completed_stream_consumer import PublicationCompletedStreamConsumer
 from request_api.services.publication_events.scheduler import PublicationPrePublishingScheduler
 from request_api.services.n8nwebhookretryscheduler import N8NWebhookRetryScheduler
+from request_api.services.external.n8nwebhookretryqueue import retryenabled
 import logging
 
 @socketio.on('connect')
@@ -91,7 +92,7 @@ if __name__ == "__main__":
         except Exception as exception:
             logging.error("Unable to start publication pre-publishing scheduler: %s", exception)
 
-    if (os.getenv("N8N_WEBHOOK_RETRY_ENABLED") or "true").lower() == "true":
+    if retryenabled():
         try:
             n8n_webhook_retry_scheduler = N8NWebhookRetryScheduler.from_env()
             n8n_webhook_retry_scheduler.start()
