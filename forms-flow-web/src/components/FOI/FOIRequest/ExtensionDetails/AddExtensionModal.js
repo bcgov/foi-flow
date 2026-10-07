@@ -19,10 +19,9 @@ import FormControl from "@material-ui/core/FormControl";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import {
   formatDate,
-  addBusinessDays,
-  addBusinessDaysExt,
+  addBusinessDaysExpanded,
   removeBusinessDays,
-  removeBusinessDaysExt,
+  removeBusinessDaysExpanded,
   ConditionalComponent,
 } from "../../../../helper/FOI/helper";
 import clsx from "clsx";
@@ -168,7 +167,7 @@ const AddExtensionModal = () => {
         selectedExtension.approvednoofdays || selectedExtension.extendedduedays;
       const applicableExtendedDueDate = new Date(currentDueDate).getTime() !==  new Date (selectedExtension?.extendedduedate).getTime() ? currentDueDate : selectedExtension.extendedduedate; 
       setPreExtendedDate(
-        removeBusinessDaysExt(
+        removeBusinessDaysExpanded(
           formatDate(applicableExtendedDueDate),
           daysToSubtract
         )
@@ -229,7 +228,7 @@ const AddExtensionModal = () => {
     }
 
     setApprovedNumberDays(days);
-    setExtendedDate(addBusinessDaysExt(dueDate, days));
+    setExtendedDate(addBusinessDaysExpanded(dueDate, days));
   };
 
   const updateExtendedDate = (days) => {
@@ -240,7 +239,7 @@ const AddExtensionModal = () => {
 
     setNumberDays(days);
     setApprovedNumberDays(days);
-    setExtendedDate(addBusinessDaysExt(dueDate, days));
+    setExtendedDate(addBusinessDaysExpanded(dueDate, days));
   };
 
   const handleClose = () => {
