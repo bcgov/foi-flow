@@ -21,7 +21,7 @@ import {
   formatDate,
   addBusinessDaysExpanded,
   removeBusinessDays,
-  removeBusinessDaysExt,
+  removeBusinessDaysExpanded,
   ConditionalComponent,
 } from "../../../../helper/FOI/helper";
 import clsx from "clsx";
@@ -167,7 +167,7 @@ const AddExtensionModal = () => {
         selectedExtension.approvednoofdays || selectedExtension.extendedduedays;
       const applicableExtendedDueDate = new Date(currentDueDate).getTime() !==  new Date (selectedExtension?.extendedduedate).getTime() ? currentDueDate : selectedExtension.extendedduedate; 
       setPreExtendedDate(
-        removeBusinessDaysExt(
+        removeBusinessDaysExpanded(
           formatDate(applicableExtendedDueDate),
           daysToSubtract
         )

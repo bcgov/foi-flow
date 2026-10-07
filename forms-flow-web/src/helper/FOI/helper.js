@@ -110,8 +110,8 @@ const getPublicHoliDays = (startDate, endDate) => {
 };
 const reconcilePublicHoliDays = (startDate, endDate) => {
   let publicHoliDays = getPublicHoliDays(startDate, endDate);
-  startDate = endDate;
   endDate = endDate.businessDaysAdd(publicHoliDays);
+  startDate = endDate;
   if (publicHoliDays !== 0) {
     return reconcilePublicHoliDays(startDate, endDate);
   }
@@ -195,7 +195,7 @@ const removeBusinessDays = (dateText, days) => {
   );
 };
 
-const removeBusinessDaysExt = (dateText, days) => {
+const removeBusinessDaysExpanded = (dateText, days) => {
   const startDate = dayjs(dateText);
   const startYear = dayjs(startDate).year();
   const endYear = dayjs(startDate).subtract(1, "year").year();
@@ -802,5 +802,5 @@ export {
   getIAOTagList,
   isNotMinistryGroup,
   addBusinessDaysExpanded,
-  removeBusinessDaysExt,
+  removeBusinessDaysExpanded,
 };
