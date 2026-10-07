@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import { formatDate, addBusinessDays, businessDay } from "../../../helper/FOI/helper";
+import { formatDate, addBusinessDays, addBusinessDaysExpanded, businessDay } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { shouldDisableFieldForMinistryRequests, findRequestState } from "./utils"
@@ -175,7 +175,7 @@ const RequestDetails = React.memo(
 
     //due date calculation
     const dueDateCalculation = (dateText) => {
-      return dateText? addBusinessDays(dateText, 30) : "";
+      return dateText? addBusinessDaysExpanded(dateText, 30) : "";
     }
 
     const [dueDateText, setDueDate] = React.useState(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, getProcessStartDateForLocalState()));
@@ -213,7 +213,7 @@ const RequestDetails = React.memo(
       // Add extensions to dueDate when start date changed
       if (requestExtensions) {
         const extDays = requestExtensions.reduce((acc, ext) => acc + (ext.extensionstatus === "Approved" ? parseInt(ext.extendedduedays) : 0), 0);
-        dueDate = addBusinessDays(dueDate, extDays)
+        dueDate = addBusinessDaysExpanded(dueDate, extDays)
       }
       setDueDate(dueDate);
       //event bubble up - for required feild validation
