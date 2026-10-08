@@ -48,7 +48,8 @@ def test_run_once_hands_the_engines_deliver_to_the_service_with_the_batch_size(s
     dispatcher, engine = _dispatcher(service)
     assert dispatcher.run_once() == 2
     deliver, batchsize = service.dispatched[0]
-    assert deliver == engine.deliver and batchsize == 7
+    assert deliver == engine.deliver
+    assert batchsize == 7
 
 
 def test_sweep_runs_on_the_first_pass_then_only_when_its_interval_has_elapsed(service):
@@ -77,7 +78,8 @@ def test_run_once_works_inside_the_app_context(service):
     app.app_context = context
     dispatcher, _ = _dispatcher(service, app=app)
     dispatcher.run_once()
-    assert entered == ["in", "out"] and len(service.dispatched) == 1
+    assert entered == ["in", "out"]
+    assert len(service.dispatched) == 1
 
 
 def test_run_forever_survives_an_error_and_keeps_polling(service, caplog):
