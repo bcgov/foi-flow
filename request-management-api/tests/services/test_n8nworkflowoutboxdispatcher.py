@@ -3,7 +3,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from request_api.services.n8nworkflowoutboxdispatcher import N8NWorkflowOutboxDispatcher
+from request_api.services.external.n8nworkflowoutboxdispatcher import N8NWorkflowOutboxDispatcher, dispatcherenabled
 
 
 class FakeService:
@@ -112,3 +112,16 @@ def test_from_env_defaults(monkeypatch):
         monkeypatch.delenv(name, raising=False)
     dispatcher = N8NWorkflowOutboxDispatcher.from_env()
     assert (dispatcher.interval_seconds, dispatcher.batch_size, dispatcher.sweep_interval_seconds, dispatcher.no_outcome_minutes) == (5, 10, 300, 30)
+
+
+
+@pytest.mark.parametrize("raw,expected", [
+    (None, True), ("", True), ("true", True), ("TRUE", True), (" true\n", True),
+    ("false", False), ("False", False), ("0", False), ("no", False),
+])
+def test_dispatcherenabled(monkeypatch, raw, expected):
+    if raw is None:
+        monkeypatch.delenv("N8N_OUTBOX_DISPATCHER_ENABLED", raising=False)
+    else:
+        monkeypatch.setenv("N8N_OUTBOX_DISPATCHER_ENABLED", raw)
+    assert dispatcherenabled() is expected
