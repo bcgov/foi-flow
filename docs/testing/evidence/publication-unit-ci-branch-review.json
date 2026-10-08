@@ -1,0 +1,207 @@
+{
+  "checked_at_utc": "2026-10-08T04:25:51.6682828Z",
+  "repository": "bcgov/foi-flow",
+  "method": "Public read-only GitHub REST. No credentials, dispatch, changes, workflow execution, or deployment calls.",
+  "branches": [
+    {
+      "name": "main",
+      "sha": "871a3e549adc36e48c11d1dcdf0c7fea86503c33",
+      "workflows": [
+        {
+          "path": ".github/workflows/ci-build-images.yaml",
+          "exists": true,
+          "blob_sha": "98fd5688f1782763bcca1dd5114cc08db2e2a46f",
+          "public_source_url": "https://github.com/bcgov/foi-flow/blob/871a3e549adc36e48c11d1dcdf0c7fea86503c33/.github/workflows/ci-build-images.yaml",
+          "parsed_findings": {
+            "events": [
+              "pull_request",
+              "workflow_dispatch"
+            ],
+            "pull_request_types": [
+              "opened",
+              "synchronize",
+              "ready_for_review"
+            ],
+            "pull_request_base_branches": [
+              "dev",
+              "main"
+            ],
+            "pull_request_paths": [],
+            "application_test_commands": [],
+            "purpose": "Image build and publish; no application unit-test step",
+            "test_step_comment_only": false
+          }
+        },
+        {
+          "path": ".github/workflows/publication-service-ci.yaml",
+          "exists": true,
+          "blob_sha": "2c85fa3d316a5b3c65014bc685a08bf42a8c3497",
+          "public_source_url": "https://github.com/bcgov/foi-flow/blob/871a3e549adc36e48c11d1dcdf0c7fea86503c33/.github/workflows/publication-service-ci.yaml",
+          "parsed_findings": {
+            "events": [
+              "pull_request",
+              "workflow_dispatch"
+            ],
+            "pull_request_types": [
+              "opened",
+              "synchronize",
+              "ready_for_review"
+            ],
+            "pull_request_base_branches": [
+              "dev",
+              "main"
+            ],
+            "pull_request_paths": [
+              "publication-service/**"
+            ],
+            "application_test_commands": [],
+            "purpose": "Image build and publish; no application unit-test step",
+            "test_step_comment_only": true
+          }
+        },
+        {
+          "path": ".github/workflows/publication-service-unit-tests.yml",
+          "exists": false
+        }
+      ],
+      "publication-service/go.mod": {
+        "blob_sha": "eadf1abd52206353a1192c51989fa605a6fc7ac4",
+        "public_source_url": "https://github.com/bcgov/foi-flow/blob/871a3e549adc36e48c11d1dcdf0c7fea86503c33/publication-service/go.mod"
+      },
+      "publication-service/go.sum": {
+        "blob_sha": "20f6b2fed86e9d7a1b147066188a49f0cc72f9f6",
+        "public_source_url": "https://github.com/bcgov/foi-flow/blob/871a3e549adc36e48c11d1dcdf0c7fea86503c33/publication-service/go.sum"
+      },
+      "publication_service_tree": "dadc640bd11f3de223e3b38d93814414727dabc3"
+    },
+    {
+      "name": "dev",
+      "sha": "d333c30e96964257612cd49832d5a6d92a5dfd45",
+      "workflows": [
+        {
+          "path": ".github/workflows/ci-build-images.yaml",
+          "exists": true,
+          "blob_sha": "3e15966c083f0e1f1ce84e64e4c254f7b8de8344",
+          "public_source_url": "https://github.com/bcgov/foi-flow/blob/d333c30e96964257612cd49832d5a6d92a5dfd45/.github/workflows/ci-build-images.yaml",
+          "parsed_findings": {
+            "events": [
+              "pull_request",
+              "workflow_dispatch"
+            ],
+            "pull_request_types": [
+              "opened",
+              "synchronize",
+              "ready_for_review"
+            ],
+            "pull_request_base_branches": [
+              "dev",
+              "master"
+            ],
+            "pull_request_paths": [],
+            "application_test_commands": [],
+            "purpose": "Image build and publish; no application unit-test step",
+            "test_step_comment_only": false
+          }
+        },
+        {
+          "path": ".github/workflows/publication-service-ci.yaml",
+          "exists": false
+        },
+        {
+          "path": ".github/workflows/publication-service-unit-tests.yml",
+          "exists": false
+        }
+      ],
+      "publication-service/go.mod": {
+        "blob_sha": "eadf1abd52206353a1192c51989fa605a6fc7ac4",
+        "public_source_url": "https://github.com/bcgov/foi-flow/blob/d333c30e96964257612cd49832d5a6d92a5dfd45/publication-service/go.mod"
+      },
+      "publication-service/go.sum": {
+        "blob_sha": "20f6b2fed86e9d7a1b147066188a49f0cc72f9f6",
+        "public_source_url": "https://github.com/bcgov/foi-flow/blob/d333c30e96964257612cd49832d5a6d92a5dfd45/publication-service/go.sum"
+      },
+      "publication_service_tree": "88edc6df065ee41b074aebea573365b759de83a0"
+    }
+  ],
+  "actions": [
+    {
+      "repository": "actions/checkout",
+      "tag": "v7.0.1",
+      "object_type": "commit",
+      "commit_sha": "3d3c42e5aac5ba805825da76410c181273ba90b1",
+      "source_url": "https://api.github.com/repos/actions/checkout/git/refs/tags/v7.0.1"
+    },
+    {
+      "repository": "actions/setup-go",
+      "tag": "v7.0.0",
+      "object_type": "commit",
+      "commit_sha": "b7ad1dad31e06c5925ef5d2fc7ad053ef454303e",
+      "source_url": "https://api.github.com/repos/actions/setup-go/git/refs/tags/v7.0.0"
+    },
+    {
+      "repository": "actions/upload-artifact",
+      "tag": "v7.0.2",
+      "object_type": "commit",
+      "commit_sha": "cf430e030ddbb5b0abf93d22962f4752f3646cd9",
+      "source_url": "https://api.github.com/repos/actions/upload-artifact/git/refs/tags/v7.0.2"
+    }
+  ],
+  "actionlint": {
+    "version": "v1.7.12",
+    "release_url": "https://github.com/rhysd/actionlint/releases/tag/v1.7.12",
+    "assets": [
+      {
+        "name": "actionlint_1.7.12_checksums.txt",
+        "browser_download_url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_checksums.txt",
+        "digest": "sha256:433028cf0ba3c42163ea1a668dedce30fcdbe84fe912b1a5e288c006eab8a4f5"
+      },
+      {
+        "name": "actionlint_1.7.12_linux_amd64.tar.gz",
+        "browser_download_url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz",
+        "digest": "sha256:8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
+      },
+      {
+        "name": "actionlint_1.7.12_windows_amd64.zip",
+        "browser_download_url": "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_windows_amd64.zip",
+        "digest": "sha256:6e7241b51e6817ea6a047693d8e6fed13b31819c9a0dd6c5a726e1592d22f6e9"
+      }
+    ],
+    "installation_documentation": "https://github.com/rhysd/actionlint/blob/main/docs/install.md"
+  },
+  "findings": [
+    "main dynamic image builder targets dev/main; dev dynamic image builder targets dev/master. Both respond to opened, synchronize, ready_for_review pull_request activities and workflow_dispatch; neither invokes application tests.",
+    "main has publication-service-ci.yaml with publication-service/** filter and dev/main PR targets. dev lacks this service-specific image workflow.",
+    "Proposed standalone test workflow is absent remotely on both reviewed SHAs. It must be delivered to both maintained branch histories; declaring branches does not copy a workflow between branches.",
+    "No deployment or delivery workflows, branch protections, workflow registrations, or settings were changed or invoked. Existing dependency manifests are identical between branches; comparing hashes does not claim test execution on dev."
+  ],
+  "publication_branch_file_differences": [
+    {
+      "path": "publication-service/Dockerfile",
+      "main_blob": "56b1d37c3b1f398b58e2daffd8d89182e51e19cf",
+      "dev_blob": "8c4b677dfd16dcd652fe9c17195560bb5c7639b9"
+    }
+  ],
+  "local_workflow_validation": [
+    {
+      "tool": "actionlint",
+      "version": "1.7.12",
+      "download_sha256": "6e7241b51e6817ea6a047693d8e6fed13b31819c9a0dd6c5a726e1592d22f6e9",
+      "command": ".audit-work/publication-unit-ci/tools/actionlint-1.7.12/actionlint.exe -color .github/workflows/publication-service-unit-tests.yml",
+      "exit_code": 1,
+      "environment": "Windows host; workflow statically validated only; GitHub-hosted actions not executed",
+      "workflow_sha256": "263bd5cf2654a8a28a5c9d8801c500ee19d89597463d803d7bac14170b1a1a5c",
+      "diagnostic": "Line 26: context runner is not allowed in jobs.publication-unit.env; available contexts are github, inputs, matrix, needs, secrets, strategy, vars."
+    },
+    {
+      "tool": "actionlint",
+      "version": "1.7.12",
+      "download_sha256": "6e7241b51e6817ea6a047693d8e6fed13b31819c9a0dd6c5a726e1592d22f6e9",
+      "command": ".audit-work/publication-unit-ci/tools/actionlint-1.7.12/actionlint.exe -color .github/workflows/publication-service-unit-tests.yml",
+      "exit_code": 0,
+      "environment": "Windows host; statically validated only; GitHub-hosted actions not executed; external ShellCheck and Pyflakes not installed",
+      "workflow_sha256": "bf8ec7925213cf5e7fe8db1bfebab2f7a7e06b38deb7de14c0e410f92f961702",
+      "change_since_first_validation": "REPORT_DIR uses github.workspace rather than runner.temp at job env scope.",
+      "diagnostic": "No diagnostics. Workflow syntax and recognized action/expression fields passed static actionlint validation."
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+name: Publication Service Unit Tests
+
+on:
+  pull_request:
+    branches: [main, dev]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+  workflow_dispatch:
+
+# No registry, cluster, deployment, PR-comment or application credentials.
+permissions:
+  contents: read
+
+concurrency:
+  group: publication-unit-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publication-unit:
+    name: Publication unit tests (Go 1.25.0)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      GOENV: 'off'
+      GOTOOLCHAIN: local
+      GOFLAGS: -mod=readonly
+      REPORT_DIR: ${{ github.workspace }}/test-reports/publication-unit
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - name: Check out the tested revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go 1.25.0
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.25.0'
+          check-latest: false
+          cache: true
+          cache-dependency-path: publication-service/go.sum
+
+      - name: Validate the report failure guards
+        run: python3 -m unittest discover -s .github/scripts/tests -p test_publication_unit_report.py -v
+
+      - name: Run the normal unit suite and capture coverage
+        run: bash .github/scripts/publication-unit-tests.sh "$REPORT_DIR"
+
+      - name: Validate results and publish the job summary
+        if: always()
+        run: >-
+          python3 .github/scripts/publication_unit_report.py
+          --report-dir "$REPORT_DIR"
+          --github-summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test and scoped coverage reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: publication-unit-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ env.REPORT_DIR }}/
+          if-no-files-found: error
+          retention-days: 14

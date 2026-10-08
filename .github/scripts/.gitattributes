@@ -1,0 +1,2 @@
+# Bash runners also execute inside Linux containers from Windows checkouts.
+*.sh text eol=lf

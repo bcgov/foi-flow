@@ -1,0 +1,582 @@
+{
+  "recorded_at_utc": "2026-10-08T04:37:44.410931+00:00",
+  "application_commit_sha": "871a3e549adc36e48c11d1dcdf0c7fea86503c33",
+  "implementation_state": "New uncommitted workflow/helpers; hashes below identify the locally validated implementation. Existing publication-service tracked files unchanged.",
+  "implementation_sha256": {
+    ".github/workflows/publication-service-unit-tests.yml": "bf8ec7925213cf5e7fe8db1bfebab2f7a7e06b38deb7de14c0e410f92f961702",
+    ".github/scripts/publication-unit-tests.sh": "8a72af93451bc0fc92b52320bdd0f2e5929057ee8649249e71604dec6afd13e6",
+    ".github/scripts/publication_unit_report.py": "676dd04b7744c2c8c5f9795dd01d2dbd04d15eb329f5358a04f3c8d7d23248d2",
+    ".github/scripts/tests/test_publication_unit_report.py": "889cf57ccca24a68f1dad165d788431f91d84614d3ad0f5fd041de4303260ab5",
+    ".github/scripts/.gitattributes": "c035c081d03f1c33fbc116d128dbc606e06b2c8dd69e323a2a64986c51a1f135"
+  },
+  "runtime": {
+    "container_image": "golang:1.25.0",
+    "image_digest": "sha256:5502b0e56fca23feba76dbc5387ba59c593c02ccc2f0f7355871ea9a0852cebe",
+    "go_version": "go1.25.0",
+    "platform": "linux/amd64",
+    "network": "none during both Go test commands",
+    "source_mount": "read-only",
+    "dependencies": "Warm module/build caches; -count=1 disables test-result caching",
+    "reporter_python": "3.12.14 on Windows host"
+  },
+  "runs": {
+    "before": {
+      "status": "pass",
+      "errors": [],
+      "metadata": {
+        "commit_sha": "871a3e549adc36e48c11d1dcdf0c7fea86503c33",
+        "pr_head_sha": "",
+        "event_name": "local",
+        "go_version": "go1.25.0",
+        "goos": "linux",
+        "goarch": "amd64",
+        "command": "go test -count=1 -timeout=5m -json -coverprofile=REPORT_DIRECTORY/coverage.out ./...",
+        "started_at": "2026-10-08T04:26:05Z",
+        "duration_seconds": 22.0,
+        "test_exit_code": 0,
+        "coverage_text_exit_code": 0,
+        "coverage_html_exit_code": 0,
+        "metadata_provenance": "Assembled after execution from saved timestamps, exit-code.txt and runtime.txt. Coverage text/HTML were generated afterward from the saved profile; both commands exited 0."
+      },
+      "scope": "publication-service ./..., default build tags (integration excluded), package-local statement coverage; not repository-wide coverage",
+      "top_level_tests": {
+        "started": 179,
+        "passed": 179,
+        "failed": 0,
+        "skipped": 0,
+        "executed": 179
+      },
+      "subtests": {
+        "started": 51,
+        "passed": 51,
+        "failed": 0,
+        "skipped": 0,
+        "executed": 51
+      },
+      "packages": {
+        "started": 22,
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0,
+        "executed": 22
+      },
+      "coverage": {
+        "covered_statements": 920,
+        "total_statements": 1762,
+        "percent": 52.2134
+      },
+      "failures": [],
+      "package_results": [
+        {
+          "package": "publication-service/cmd/api",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 1.661
+        },
+        {
+          "package": "publication-service/internal/app",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.12
+        },
+        {
+          "package": "publication-service/internal/config",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.225
+        },
+        {
+          "package": "publication-service/internal/events",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.13
+        },
+        {
+          "package": "publication-service/internal/htmlindex",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.044
+        },
+        {
+          "package": "publication-service/internal/http/handlers",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.22
+        },
+        {
+          "package": "publication-service/internal/http/server",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.282
+        },
+        {
+          "package": "publication-service/internal/messaging",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.289
+        },
+        {
+          "package": "publication-service/internal/messaging/redisstream",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 2.943
+        },
+        {
+          "package": "publication-service/internal/observability",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.038
+        },
+        {
+          "package": "publication-service/internal/publication/publish",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.364
+        },
+        {
+          "package": "publication-service/internal/publication/sitemapping",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.033
+        },
+        {
+          "package": "publication-service/internal/publication/unpublish",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.069
+        },
+        {
+          "package": "publication-service/internal/publish",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 1.343
+        },
+        {
+          "package": "publication-service/internal/publishcompletion",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.042
+        },
+        {
+          "package": "publication-service/internal/publishnow",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.04
+        },
+        {
+          "package": "publication-service/internal/sitemapping",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.029
+        },
+        {
+          "package": "publication-service/internal/storage/postgres",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.021
+        },
+        {
+          "package": "publication-service/internal/storage/s3",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.047
+        },
+        {
+          "package": "publication-service/internal/unpublish",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.019
+        },
+        {
+          "package": "publication-service/internal/unpublishnow",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 1.51
+        },
+        {
+          "package": "publication-service/internal/workflowresult",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 1.506
+        }
+      ],
+      "packages_executing_tests": 17,
+      "raw_report_directory": ".audit-work/publication-unit-ci/before",
+      "artifacts": {
+        "coverage.html": {
+          "bytes": 259005,
+          "sha256": "c03006efabe5d15919fee8b64667e1316cde6678573af13ab9b07826874ff5a7"
+        },
+        "coverage.out": {
+          "bytes": 83663,
+          "sha256": "e364225b399c03ba31c04463140c72a66a757fe2fd000fc2fb50f857277a9c19"
+        },
+        "coverage.txt": {
+          "bytes": 16913,
+          "sha256": "b667fef1d65407a55411dab8d014bf5acb8d41ed8acaaf4f19e80de894974ebb"
+        },
+        "exit-code.txt": {
+          "bytes": 2,
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        },
+        "finished-at.txt": {
+          "bytes": 21,
+          "sha256": "a5c66940b286801c1b391eb451dce5c9858488b5c5d0e20cd0f0a4169efd133a"
+        },
+        "run.json": {
+          "bytes": 648,
+          "sha256": "09f078f668335a842d256331849847c97c484fb600208c9dcc3e88766951cf77"
+        },
+        "runtime.txt": {
+          "bytes": 32,
+          "sha256": "facbf2c278fea28b0b30dfdb6e466964bdda5bddde8cd336cbb5548076879de3"
+        },
+        "started-at.txt": {
+          "bytes": 21,
+          "sha256": "72b08569df51bb751d385e8164027fb44cad8cbc183ab3115319319e9c5a29ae"
+        },
+        "stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summary.json": {
+          "bytes": 54369,
+          "sha256": "a0e35d551b70c05655d46be83e56486014422d674c450a191f828c8ff8ed3e6d"
+        },
+        "summary.md": {
+          "bytes": 1155,
+          "sha256": "a2f1193bd5def577c4911a9fd4f0483fe8bc932f26cc79c56cf874b44527b8e7"
+        },
+        "tests.jsonl": {
+          "bytes": 218450,
+          "sha256": "62bdb1e979837c998888be7d83d78792cb1906134d1d92bb0cb247f3c571fd1b"
+        }
+      }
+    },
+    "after": {
+      "status": "pass",
+      "errors": [],
+      "metadata": {
+        "commit_sha": "871a3e549adc36e48c11d1dcdf0c7fea86503c33",
+        "pr_head_sha": "",
+        "event_name": "local",
+        "go_version": "go1.25.0",
+        "goos": "linux",
+        "goarch": "amd64",
+        "command": "go test -count=1 -timeout=5m -json -coverprofile=REPORT_DIRECTORY/coverage.out ./...",
+        "started_at": "2026-10-08T04:32:05Z",
+        "duration_seconds": 30,
+        "test_exit_code": 0,
+        "coverage_text_exit_code": 0,
+        "coverage_html_exit_code": 0
+      },
+      "scope": "publication-service ./..., default build tags (integration excluded), package-local statement coverage; not repository-wide coverage",
+      "top_level_tests": {
+        "started": 179,
+        "passed": 179,
+        "failed": 0,
+        "skipped": 0,
+        "executed": 179
+      },
+      "subtests": {
+        "started": 51,
+        "passed": 51,
+        "failed": 0,
+        "skipped": 0,
+        "executed": 51
+      },
+      "packages": {
+        "started": 22,
+        "passed": 22,
+        "failed": 0,
+        "skipped": 0,
+        "executed": 22
+      },
+      "coverage": {
+        "covered_statements": 920,
+        "total_statements": 1762,
+        "percent": 52.2134
+      },
+      "failures": [],
+      "package_results": [
+        {
+          "package": "publication-service/cmd/api",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 1.15
+        },
+        {
+          "package": "publication-service/internal/app",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.124
+        },
+        {
+          "package": "publication-service/internal/config",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.2
+        },
+        {
+          "package": "publication-service/internal/events",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.13
+        },
+        {
+          "package": "publication-service/internal/htmlindex",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.025
+        },
+        {
+          "package": "publication-service/internal/http/handlers",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.209
+        },
+        {
+          "package": "publication-service/internal/http/server",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.319
+        },
+        {
+          "package": "publication-service/internal/messaging",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.308
+        },
+        {
+          "package": "publication-service/internal/messaging/redisstream",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 2.479
+        },
+        {
+          "package": "publication-service/internal/observability",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.032
+        },
+        {
+          "package": "publication-service/internal/publication/publish",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.456
+        },
+        {
+          "package": "publication-service/internal/publication/sitemapping",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.122
+        },
+        {
+          "package": "publication-service/internal/publication/unpublish",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.03
+        },
+        {
+          "package": "publication-service/internal/publish",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 1.666
+        },
+        {
+          "package": "publication-service/internal/publishcompletion",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.015
+        },
+        {
+          "package": "publication-service/internal/publishnow",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.039
+        },
+        {
+          "package": "publication-service/internal/sitemapping",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.03
+        },
+        {
+          "package": "publication-service/internal/storage/postgres",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.019
+        },
+        {
+          "package": "publication-service/internal/storage/s3",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.087
+        },
+        {
+          "package": "publication-service/internal/unpublish",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 0.031
+        },
+        {
+          "package": "publication-service/internal/unpublishnow",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 1.748
+        },
+        {
+          "package": "publication-service/internal/workflowresult",
+          "name": "",
+          "started": true,
+          "status": "pass",
+          "duration_seconds": 1.742
+        }
+      ],
+      "packages_executing_tests": 17,
+      "raw_report_directory": ".audit-work/publication-unit-ci/after",
+      "artifacts": {
+        "coverage-html-stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "coverage-text-stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "coverage.html": {
+          "bytes": 259005,
+          "sha256": "c03006efabe5d15919fee8b64667e1316cde6678573af13ab9b07826874ff5a7"
+        },
+        "coverage.out": {
+          "bytes": 83663,
+          "sha256": "aeaffd13759da92a4510a3802f0dc7d77fe188ea3e7cead7012837a8043b3243"
+        },
+        "coverage.txt": {
+          "bytes": 16913,
+          "sha256": "b667fef1d65407a55411dab8d014bf5acb8d41ed8acaaf4f19e80de894974ebb"
+        },
+        "run.json": {
+          "bytes": 431,
+          "sha256": "f960797935f1fa792a73729a9307e5caa4b7731d50f4d131a2dfb4cad01264b5"
+        },
+        "stderr.log": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "summary.json": {
+          "bytes": 54160,
+          "sha256": "6ce2664793f3da8868e0a7d55388f43f709c8358549d10499283a0773c748df7"
+        },
+        "summary.md": {
+          "bytes": 1152,
+          "sha256": "50465dd0a052e0fa14f3337bcf4e452f05b7fb1aab2f5c4377f2186c2caa4026"
+        },
+        "tests.jsonl": {
+          "bytes": 218456,
+          "sha256": "f8104dec0fad2ee2bf16dffacea824c0c152164c72949520b5773810a0d08cef"
+        }
+      }
+    }
+  },
+  "reporter_tests": {
+    "command": "& 'C:\\Users\\User\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe' -B -m unittest discover -s .github/scripts/tests -p test_publication_unit_report.py -v",
+    "exit_code": 0,
+    "passed": 13,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "duration_seconds": 0.381,
+    "fixtures": "Synthetic only"
+  },
+  "runner_validation": {
+    "bash_syntax": {
+      "command": "bash -n /workspace/.github/scripts/publication-unit-tests.sh",
+      "exit_code": 0
+    },
+    "runner": {
+      "command": "bash .github/scripts/publication-unit-tests.sh /reports",
+      "exit_code": 0
+    },
+    "reporter_cli": {
+      "command": "python -B .github/scripts/publication_unit_report.py --report-dir .audit-work/publication-unit-ci/after --github-summary .audit-work/publication-unit-ci/job-summary.md",
+      "exit_code": 0
+    },
+    "before_coverage_rendering": {
+      "commands": [
+        "go tool cover -func=/reports/coverage.out > /reports/coverage.txt",
+        "go tool cover -html=/reports/coverage.out -o /reports/coverage.html"
+      ],
+      "combined_exit_code": 0,
+      "timing": "After test execution; no test rerun"
+    },
+    "line_endings": {
+      "command": "git check-attr text eol -- .github/scripts/publication-unit-tests.sh",
+      "exit_code": 0,
+      "result": "text: set; eol: lf"
+    }
+  },
+  "workflow_syntax_evidence": "../publication-unit-ci-branch-review.json",
+  "exact_container_commands": "../../PUBLICATION_UNIT_CI.md",
+  "hosted_execution": {
+    "performed": false,
+    "reason": "Local validation only; no workflow pushed or dispatched and no remote changes authorized as part of this implementation."
+  },
+  "known_limits": [
+    "No tagged integration, race, deployment, production-service or browser test execution.",
+    "No cold dependency install; actual GitHub actions/cache/artifact/event behavior remains unverified.",
+    "Matching main/dev source blobs do not claim a separate dev checkout execution.",
+    "Package-local default-tag statement coverage; no coverage threshold."
+  ],
+  "final_review": {
+    "source_whitespace_and_local_links": "pass",
+    "json_evidence_parse": "pass",
+    "recorded_implementation_hashes": "match",
+    "sample_matches_actual_local_summary": true,
+    "git_diff_check_exit_code": 0,
+    "publication_source_and_existing_delivery_workflow_diff": "empty"
+  }
+}
