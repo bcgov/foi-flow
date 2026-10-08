@@ -126,21 +126,24 @@ def test_outbox_row_commits_together_with_the_callers_pending_change(service):
     db.session.add(RequestChange(note="status changed"))
     service.enqueue(_payload(1))
     db.session.rollback()  # nothing left to roll back: both were committed together
-    assert RequestChange.query.count() == 1 and FOIWorkflowEventOutbox.query.count() == 1
+    assert RequestChange.query.count() == 1
+    assert FOIWorkflowEventOutbox.query.count() == 1
 
 
 def test_rolling_back_the_callers_change_also_drops_the_outbox_row(service):
     db.session.add(RequestChange(note="status changed"))
     service.enqueue(_payload(1), commit=False)
     db.session.rollback()
-    assert RequestChange.query.count() == 0 and FOIWorkflowEventOutbox.query.count() == 0
+    assert RequestChange.query.count() == 0
+    assert FOIWorkflowEventOutbox.query.count() == 0
 
 
 def test_failed_insert_does_not_roll_back_the_callers_pending_change(service):
     service.enqueue(_payload(1))
     db.session.add(RequestChange(note="kept"))
+    duplicate = _payload(1)  # same event_id
     with pytest.raises(IntegrityError):
-        service.enqueue(_payload(1), commit=False)  # duplicate event_id
+        service.enqueue(duplicate, commit=False)
     db.session.commit()
     assert RequestChange.query.count() == 1
 
@@ -154,7 +157,8 @@ def test_dispatch_delivers_pending_rows_and_marks_them_delivered(service):
     row = _row(1)
     assert sent == [_payload(1)]
     assert (row.status, row.attempts) == ("DELIVERED", 1)
-    assert row.deliveredat is not None and row.lasterror is None
+    assert row.deliveredat is not None
+    assert row.lasterror is None
 
 
 def test_rows_not_yet_due_and_non_pending_rows_are_not_delivered(service):
@@ -241,7 +245,8 @@ def test_committed_event_survives_a_crash_before_any_delivery_and_is_sent_by_a_n
     db.session.remove()
     sent = []
     _dispatch(workflowoutboxservice(), lambda payload: sent.append(payload) or OK)   # fresh dispatcher after restart
-    assert sent == [_payload(1)] and _row(1).status == "DELIVERED"
+    assert sent == [_payload(1)]
+    assert _row(1).status == "DELIVERED"
 
 
 def test_crash_after_claim_leaves_a_lease_then_the_row_is_retried(service):
@@ -259,7 +264,8 @@ def test_crash_after_claim_leaves_a_lease_then_the_row_is_retried(service):
     _dispatch(service, lambda payload: sent.append(payload) or OK, now=NOW + timedelta(seconds=5))
     assert sent == []                                   # still leased: no double send
     _dispatch(service, lambda payload: sent.append(payload) or OK, now=NOW + timedelta(seconds=31))
-    assert sent == [_payload(1)] and _row(1).status == "DELIVERED"
+    assert sent == [_payload(1)]
+    assert _row(1).status == "DELIVERED"
 
 
 def test_row_claimed_the_maximum_times_without_a_result_goes_dead_without_sending(service, monkeypatch):
@@ -268,7 +274,8 @@ def test_row_claimed_the_maximum_times_without_a_result_goes_dead_without_sendin
     _seed(svc, 1, attempts=2, nextattemptat=NOW - timedelta(seconds=1))
     sent = []
     _dispatch(svc, lambda payload: sent.append(payload) or OK)
-    assert sent == [] and _row(1).status == "DEAD"
+    assert sent == []
+    assert _row(1).status == "DEAD"
 
 
 # --- two dispatchers --------------------------------------------------------------------------------
@@ -355,7 +362,8 @@ def test_sweeper_flags_delivered_rows_with_no_outcome_after_the_threshold(servic
     _seed(service, 3, status="COMPLETED", deliveredat=NOW - timedelta(hours=5))
     flagged = service.sweepnooutcome(30, now=NOW)
     assert flagged == [_payload(1)["event_id"]]
-    assert _row(1).status == "FAILED" and _row(1).lasterror.startswith("NO_OUTCOME")
+    assert _row(1).status == "FAILED"
+    assert _row(1).lasterror.startswith("NO_OUTCOME")
     assert (_row(2).status, _row(3).status) == ("DELIVERED", "COMPLETED")
 
 
@@ -459,7 +467,8 @@ def test_skip_locked_two_dispatchers_never_claim_the_same_row():
         b = threading.Thread(target=claimer, args=("b", holding))
         a.start(); b.start()
         b.join(10); release.set(); a.join(10)
-        assert len(claimed["a"]) == 10 and len(claimed["b"]) == 10
+        assert len(claimed["a"]) == 10
+        assert len(claimed["b"]) == 10
         assert not set(claimed["a"]) & set(claimed["b"])
     finally:
         seed.rollback()

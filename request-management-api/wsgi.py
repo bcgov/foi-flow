@@ -97,7 +97,7 @@ if __name__ == "__main__":
             n8n_outbox_dispatcher = N8NWorkflowOutboxDispatcher.from_env(app=APP)
             n8n_outbox_dispatcher.start()
         except Exception as exception:
-            logging.error("Unable to start n8n workflow outbox dispatcher: %s", exception)
+            logging.exception("Unable to start n8n workflow outbox dispatcher: %s", exception)
 
     socketio.run(
         APP,

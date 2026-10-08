@@ -46,9 +46,10 @@ class TestCreateInstance:
     def test_raises_when_engine_returns_none(self, mock_create):
         mock_create.return_value = None
         service = workflowservice()
+        payload = json.dumps({"id": 42})
 
         with pytest.raises(Exception, match="Unable to create instance for key"):
-            service.createinstance("foi-rawrequest", json.dumps({"id": 42}))
+            service.createinstance("foi-rawrequest", payload)
 
 
 class TestPostUnopenedEvent:
@@ -281,6 +282,8 @@ class TestNormalizedEngineConsistency:
 
     def test_invalid_engine_raises_instead_of_mixed_path(self, monkeypatch):
         monkeypatch.setenv("WF_DEFAULT_ENGINE", "foo")
+        service = workflowservice()
+        payload = json.dumps({"id": 42})
         with pytest.raises(ValueError):
-            workflowservice().createinstance("foi-rawrequest", json.dumps({"id": 42}))
+            service.createinstance("foi-rawrequest", payload)
 
