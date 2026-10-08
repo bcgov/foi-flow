@@ -1,0 +1,146 @@
+name: Publication Unit Negative Probes (Temporary)
+
+# Disposable validation PR only. Never include this intentionally failing
+# workflow in the final implementation PR or merge it into a maintained branch.
+on:
+  pull_request:
+    branches: [ci/publication-unit-tests]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publication-probes-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  negative-probe:
+    name: Expected failure (${{ matrix.scenario }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        scenario: [failing-test, missing-report, zero-tests]
+    env:
+      GOENV: 'off'
+      GOTOOLCHAIN: local
+      GOFLAGS: -mod=readonly
+      SCENARIO: ${{ matrix.scenario }}
+      WORKFLOW_SHA: ${{ github.sha }}
+      PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+      REPORT_DIR: ${{ github.workspace }}/test-reports/publication-probe-${{ matrix.scenario }}
+      PROBE_CONTEXT: ${{ github.workspace }}/publication-probe-context.json
+    steps:
+      - name: Check out the tested revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Go 1.25.0
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.25.0'
+          check-latest: false
+          cache: true
+          cache-dependency-path: publication-service/go.sum
+
+      - name: Validate the unchanged report failure guards
+        run: python3 -m unittest discover -s .github/scripts/tests -p test_publication_unit_report.py -v
+
+      - name: Prepare an isolated negative probe and its provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$SCENARIO" in
+            failing-test)
+              mkdir publication-service/ci_negative_probe
+              printf '%s\n' 'package ci_negative_probe' 'import "testing"' \
+                'func TestDeliberateCIProbeFailure(t *testing.T) { t.Fatal("Synthetic CI validation failure; existing tests are unchanged") }' \
+                > publication-service/ci_negative_probe/probe_test.go
+              ;;
+            missing-report)
+              # This scenario runs the normal application suite unchanged.
+              ;;
+            zero-tests)
+              fixture="$RUNNER_TEMP/publication-zero-fixture"
+              mkdir -p "$fixture/.github/scripts" "$fixture/publication-service"
+              cp .github/scripts/publication-unit-tests.sh "$fixture/.github/scripts/"
+              cmp .github/scripts/publication-unit-tests.sh "$fixture/.github/scripts/publication-unit-tests.sh"
+              printf '%s\n' 'module example.invalid/publication-zero-fixture' '' 'go 1.25.0' \
+                > "$fixture/publication-service/go.mod"
+              printf '%s\n' 'package fixture' 'func SyntheticValue() int { return 1 }' \
+                > "$fixture/publication-service/fixture.go"
+              git init --initial-branch=probe "$fixture"
+              git -C "$fixture" add .github/scripts/publication-unit-tests.sh publication-service/go.mod publication-service/fixture.go
+              git -C "$fixture" -c user.name='CI synthetic fixture' \
+                -c user.email='ci-fixture@example.invalid' -c commit.gpgsign=false \
+                commit -m 'Synthetic zero-test fixture; not application source'
+              ;;
+            *)
+              echo 'Unknown probe scenario' >&2
+              exit 1
+              ;;
+          esac
+          python3 - <<'PY'
+          import json, os, pathlib, subprocess
+          scenario = os.environ["SCENARIO"]
+          fixture = pathlib.Path(os.environ["RUNNER_TEMP"]) / "publication-zero-fixture"
+          fixture_sha = subprocess.check_output(["git", "-C", str(fixture), "rev-parse", "HEAD"], text=True).strip() if scenario == "zero-tests" else None
+          context = {
+              "intentional_negative_probe": True,
+              "scenario": scenario,
+              "workflow_sha": os.environ["WORKFLOW_SHA"],
+              "pr_head_sha": os.environ.get("PR_HEAD_SHA", ""),
+              "fixture_sha": fixture_sha,
+              "application_source_tested": scenario != "zero-tests",
+              "runtime_added_test": "publication-service/ci_negative_probe/probe_test.go" if scenario == "failing-test" else None,
+              "expected_outcome": "failure",
+              "note": "Disposable runner-only fixture or report mutation; never a passing application result.",
+          }
+          pathlib.Path(os.environ["PROBE_CONTEXT"]).write_text(json.dumps(context, indent=2) + "\n", encoding="utf-8")
+          PY
+
+      - name: Run the unchanged Bash runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "$SCENARIO" == zero-tests ]]; then
+            fixture="$RUNNER_TEMP/publication-zero-fixture"
+            # The synthetic fixture has its own honest Git identity. Preserve
+            # the actual workflow/PR identities separately in probe-context.json.
+            export GITHUB_SHA="$(git -C "$fixture" rev-parse HEAD)"
+            export GITHUB_EVENT_NAME=synthetic_zero_test_fixture
+            export PR_HEAD_SHA=
+            bash "$fixture/.github/scripts/publication-unit-tests.sh" "$REPORT_DIR"
+          else
+            bash .github/scripts/publication-unit-tests.sh "$REPORT_DIR"
+          fi
+
+      - name: Remove one generated report for the missing-report probe
+        if: success() && matrix.scenario == 'missing-report'
+        run: rm -- "$REPORT_DIR/coverage.html"
+
+      - name: Preserve probe provenance
+        if: always()
+        run: |
+          mkdir -p "$REPORT_DIR"
+          cp "$PROBE_CONTEXT" "$REPORT_DIR/probe-context.json"
+
+      - name: Validate results with the unchanged reporter
+        if: always()
+        run: |
+          printf '## Intentional negative probe: %s\n\nThis disposable job must fail. See probe-context.json for fixture and workflow identities.\n\n' "$SCENARIO" >> "$GITHUB_STEP_SUMMARY"
+          python3 .github/scripts/publication_unit_report.py \
+            --report-dir "$REPORT_DIR" \
+            --github-summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload intentional-failure evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: publication-probe-${{ matrix.scenario }}-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ env.REPORT_DIR }}/
+          if-no-files-found: error
+          retention-days: 14
