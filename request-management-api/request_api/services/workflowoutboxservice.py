@@ -88,7 +88,7 @@ class workflowoutboxservice:
         if status == row.status and not self.__issweepersfailure(row):
             db.session.rollback()
             return AckResult.unchanged, row
-        if not self.__canacknowledge(row, status):
+        if not self.__canacknowledge(row):
             db.session.rollback()
             logging.warning("workflowoutboxservice: rejected acknowledgement event_id=%s %s -> %s", eventid, row.status, status)
             return AckResult.conflict, row
@@ -199,7 +199,7 @@ class workflowoutboxservice:
         db.session.commit()
         return result.delivered
 
-    def __canacknowledge(self, row, status):
+    def __canacknowledge(self, row):
         if row.status in (OutboxStatus.pending.value, OutboxStatus.delivered.value):
             return True
         return self.__issweepersfailure(row)
