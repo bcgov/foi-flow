@@ -9,6 +9,11 @@ from request_api.services.external.commonworkflowservice import commonworkflowse
 from request_api.services.workflowoutboxservice import workflowoutboxservice
 
 
+def dispatcherenabled():
+    """Single source of truth for N8N_OUTBOX_DISPATCHER_ENABLED (unset means enabled)."""
+    return (os.getenv("N8N_OUTBOX_DISPATCHER_ENABLED") or "true").strip().lower() == "true"
+
+
 class N8NWorkflowOutboxDispatcher:
     """Every interval: delivers due PENDING rows; every sweep interval: flags DELIVERED rows
     that never reported an outcome. Safe to run in several pods/workers at once (the claim
