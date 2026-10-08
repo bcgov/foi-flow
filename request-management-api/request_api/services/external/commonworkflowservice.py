@@ -5,7 +5,7 @@ import logging
 import uuid
 
 from request_api.services.external.bpmservice import MessageType
-from request_api.services.external.n8nwebhookretryqueue import n8nwebhookretryqueue
+from request_api.services.workflowoutboxservice import workflowoutboxservice
 
 """
 n8n implementation of the workflow-engine interface consumed by
@@ -20,13 +20,18 @@ plus whatever ids/metadata are already present in the payload), so there is
 no per-request instance id/address to store or construct on this side.
 
 Every event carries an "event_id" (uuid4) generated once in __post_event and
-stored in the payload, so a retry through the queue re-sends the same id and
+stored in the payload, so every re-delivery re-sends the same id and
 FOI Request Routing in n8n can skip an event whose earlier run completed.
 
-A webhook call that fails transiently (network error, timeout, HTTP 429 or
-5xx) is logged and queued in n8nwebhookretryqueue; N8NWebhookRetryScheduler
-re-sends it later through deliver(). Non-retryable failures (missing
-N8N_BASE_URL, other 4xx) are only logged, since resending cannot fix them.
+Events are not posted from the request thread. __post_event stores them in the
+FOIWorkflowEventOutbox table (workflowoutboxservice.enqueue) and
+N8NWorkflowOutboxDispatcher delivers them through deliver(), with backoff and a
+DEAD state; DEAD and FAILED events can be replayed through the /foiworkflow/events
+endpoints.
+
+deliver() makes one POST and reports whether it was delivered and whether a failure
+is worth retrying (network error, timeout, HTTP 429 or 5xx). A missing
+N8N_BASE_URL or another 4xx is not retryable.
 
 getinstancevariables / searchinstancebyvariable / searchprocessinstance are
 intentionally left unimplemented for now.
@@ -89,7 +94,7 @@ class commonworkflowservice:
 
     def deliver(self, payload):
         """POSTs one event payload to the n8n routing webhook, exactly once.
-        Used for the first attempt and by N8NWebhookRetryScheduler for retries."""
+        Called by N8NWorkflowOutboxDispatcher for every attempt."""
         event = payload.get("event")
         if not self.n8nbaseurl:
             logging.error("commonworkflowservice.deliver: N8N_BASE_URL is not configured; event=%s not sent", event)
@@ -112,19 +117,13 @@ class commonworkflowservice:
         return n8ndeliveryresult(True, content=content if isinstance(content, dict) else None)
 
     def __post_event(self, messagetype, extra):
-        payload = {"event": messagetype, "eventId": str(uuid.uuid4())}
+        payload = {"event": messagetype, "event_id": str(uuid.uuid4())}
         payload.update(extra)
-        logging.info("commonworkflowservice.__post_event: sending event=%s eventId=%s", messagetype, payload["eventId"])
-        result = self.deliver(payload)
-        if not result.delivered and result.retryable:
-            self.__queueforretry(payload, result.error)
-        return result.content if result.delivered else None
-
-    def __queueforretry(self, payload, error):
         try:
-            n8nwebhookretryqueue().enqueue(payload, attempts=1, error=error)
+            workflowoutboxservice().enqueue(payload)
         except Exception as ex:
-            logging.exception("commonworkflowservice: unable to queue n8n event=%s for retry; event is not delivered: %s", payload.get("event"), type(ex).__name__)
+            logging.exception("commonworkflowservice: unable to save n8n event=%s event_id=%s to the outbox; it will not reach n8n: %s", messagetype, payload["event_id"], type(ex).__name__)
+        return None
 
     def __getheaders(self):
         headers = {"Content-Type": "application/json"}
