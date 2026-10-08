@@ -46,7 +46,6 @@ class workflowservice:
         if wfinstanceid in (None,"") and not isn8n():
             logging.error("WF INSTANCE IS INVALID")
             return
-        logging.info("workflowservice.postunopenedevent: requestsschema=%s", requestsschema)
         assignedgroup = requestsschema["assignedGroup"] if 'assignedGroup' in requestsschema  else None
         assignedto = requestsschema["assignedTo"] if 'assignedTo' in requestsschema  else None
 
@@ -79,7 +78,6 @@ class workflowservice:
         return FOIRequest.getwfmetadata(id)
 
     def postopenedevent(self, id, wfinstanceid, requestsschema, data, newstatus, usertype, issync=False):
-        logging.info("workflowservice.postopenedevent: requestsschema=%s", requestsschema)
         assignedgroup = self.__getopenedassigneevalue(requestsschema, "assignedgroup",usertype)
         assignedto = self.__getopenedassigneevalue(requestsschema, "assignedto",usertype)
         axisrequestid = self.__getvaluefromschema(requestsschema,"axisRequestId")

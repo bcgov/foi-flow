@@ -99,7 +99,7 @@ class commonworkflowservice:
         if not self.n8nbaseurl:
             logging.error("commonworkflowservice.deliver: N8N_BASE_URL is not configured; event=%s not sent", event)
             return n8ndeliveryresult(False, retryable=False, error="N8N_BASE_URL is not configured")
-        url = self.n8nbaseurl + self.n8nroutingwebhookpath
+        url = self.n8nbaseurl.rstrip('/') + '/' + self.n8nroutingwebhookpath.strip().lstrip('/')
         try:
             response = requests.post(url, data=json.dumps(payload), headers=self.__getheaders(), timeout=self.n8nwebhooktimeout)
         except requests.RequestException as ex:
