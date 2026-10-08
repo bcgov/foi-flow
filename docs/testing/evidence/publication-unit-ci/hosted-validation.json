@@ -1,0 +1,244 @@
+{
+  "implementation_pr": "https://github.com/bcgov/foi-flow/pull/6393",
+  "implementation_commit": "956af16e929435acdec1dfce2ccb883314a81952",
+  "tracked_dependency_blobs": {
+    ".github/scripts/.gitattributes": "150d84db0b6e90bc10686a04ca5a72b11d843e1f",
+    ".github/scripts/publication-unit-tests.sh": "6dea9373369e52c500365e01c3bfa2d98584610b",
+    ".github/scripts/publication_unit_report.py": "5a82fa6250f43f5f6e59cb034e29b49d0a67498f",
+    ".github/scripts/tests/test_publication_unit_report.py": "2d5290f823e52b8962d99a34e5aca8f05509a114",
+    ".github/workflows/publication-service-unit-tests.yml": "0c6acd16dfbbc1ca941b4beb706c67029ebfe9d9",
+    "publication-service/go.mod": "eadf1abd52206353a1192c51989fa605a6fc7ac4",
+    "publication-service/go.sum": "20f6b2fed86e9d7a1b147066188a49f0cc72f9f6"
+  },
+  "baseline": {
+    "run": {
+      "conclusion": "success",
+      "createdAt": "2026-10-08T05:09:59Z",
+      "headSha": "956af16e929435acdec1dfce2ccb883314a81952",
+      "jobs": [
+        {
+          "completedAt": "2026-10-08T05:11:04Z",
+          "conclusion": "success",
+          "databaseId": 113159862080,
+          "name": "Publication unit tests (Go 1.25.0)",
+          "startedAt": "2026-10-08T05:10:02Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-08T05:10:04Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-08T05:10:03Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-08T05:10:07Z",
+              "conclusion": "success",
+              "name": "Check out the tested revision",
+              "number": 2,
+              "startedAt": "2026-10-08T05:10:04Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-08T05:10:16Z",
+              "conclusion": "success",
+              "name": "Set up Go 1.25.0",
+              "number": 3,
+              "startedAt": "2026-10-08T05:10:07Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-08T05:10:16Z",
+              "conclusion": "success",
+              "name": "Validate the report failure guards",
+              "number": 4,
+              "startedAt": "2026-10-08T05:10:16Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-08T05:10:55Z",
+              "conclusion": "success",
+              "name": "Run the normal unit suite and capture coverage",
+              "number": 5,
+              "startedAt": "2026-10-08T05:10:16Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-08T05:10:55Z",
+              "conclusion": "success",
+              "name": "Validate results and publish the job summary",
+              "number": 6,
+              "startedAt": "2026-10-08T05:10:55Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-08T05:10:57Z",
+              "conclusion": "success",
+              "name": "Upload test and scoped coverage reports",
+              "number": 7,
+              "startedAt": "2026-10-08T05:10:55Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-08T05:11:02Z",
+              "conclusion": "success",
+              "name": "Post Set up Go 1.25.0",
+              "number": 13,
+              "startedAt": "2026-10-08T05:10:57Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-08T05:11:02Z",
+              "conclusion": "success",
+              "name": "Post Check out the tested revision",
+              "number": 14,
+              "startedAt": "2026-10-08T05:11:02Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-08T05:11:02Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 15,
+              "startedAt": "2026-10-08T05:11:02Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/bcgov/foi-flow/actions/runs/37731003835/job/113159862080"
+        }
+      ],
+      "status": "completed",
+      "updatedAt": "2026-10-08T05:11:05Z",
+      "url": "https://github.com/bcgov/foi-flow/actions/runs/37731003835"
+    },
+    "artifact_api": {
+      "total_count": 1,
+      "artifacts": [
+        {
+          "id": 11530095225,
+          "node_id": "MDg6QXJ0aWZhY3QxMTUzMDA5NTIyNQ==",
+          "name": "publication-unit-3ec6b7d99f3443a710956b90cc2a1ddd24e5e17e-1",
+          "size_in_bytes": 78641,
+          "url": "https://api.github.com/repos/bcgov/foi-flow/actions/artifacts/11530095225",
+          "archive_download_url": "https://api.github.com/repos/bcgov/foi-flow/actions/artifacts/11530095225/zip",
+          "expired": false,
+          "digest": "sha256:d5b51cae09e97dd38feaac3339852e0c6d67421f9610b1208f71c57dbbe5c17c",
+          "created_at": "2026-10-08T05:10:57Z",
+          "updated_at": "2026-10-08T05:10:57Z",
+          "expires_at": "2026-10-22T05:10:55Z",
+          "workflow_run": {
+            "id": 37731003835,
+            "repository_id": 358004325,
+            "head_repository_id": 358004325,
+            "head_branch": "ci/publication-unit-tests",
+            "head_sha": "956af16e929435acdec1dfce2ccb883314a81952"
+          }
+        }
+      ]
+    },
+    "metadata": {
+      "commit_sha": "3ec6b7d99f3443a710956b90cc2a1ddd24e5e17e",
+      "pr_head_sha": "956af16e929435acdec1dfce2ccb883314a81952",
+      "event_name": "pull_request",
+      "go_version": "go1.25.0",
+      "goos": "linux",
+      "goarch": "amd64",
+      "command": "go test -count=1 -timeout=5m -json -coverprofile=REPORT_DIRECTORY/coverage.out ./...",
+      "started_at": "2026-10-08T05:10:16Z",
+      "duration_seconds": 39,
+      "test_exit_code": 0,
+      "coverage_text_exit_code": 0,
+      "coverage_html_exit_code": 0
+    },
+    "top_level_tests": {
+      "started": 179,
+      "passed": 179,
+      "failed": 0,
+      "skipped": 0,
+      "executed": 179
+    },
+    "subtests": {
+      "started": 51,
+      "passed": 51,
+      "failed": 0,
+      "skipped": 0,
+      "executed": 51
+    },
+    "packages": {
+      "started": 22,
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "executed": 22
+    },
+    "packages_executing_tests": 17,
+    "coverage": {
+      "covered_statements": 920,
+      "total_statements": 1762,
+      "percent": 52.2134
+    },
+    "failures": [],
+    "summary_validation_errors": [],
+    "artifact_files": {
+      "coverage-html-stderr.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "coverage-text-stderr.log": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "coverage.html": {
+        "bytes": 253604,
+        "sha256": "9d25cedde1130af06cfacf14b9d4f964dfe6e1aa71acca9d5c98779d28c35ccf"
+      },
+      "coverage.out": {
+        "bytes": 83663,
+        "sha256": "3121e6f5d4fb5484d03ee4a387c895b7144a6f960ca18c1ee872ff4c5e87e843"
+      },
+      "coverage.txt": {
+        "bytes": 16913,
+        "sha256": "b667fef1d65407a55411dab8d014bf5acb8d41ed8acaaf4f19e80de894974ebb"
+      },
+      "run.json": {
+        "bytes": 478,
+        "sha256": "fb2bdaab6647817f41cf243710ba9a65fdbad949e3801e565b69f806560e3943"
+      },
+      "stderr.log": {
+        "bytes": 2734,
+        "sha256": "0d38d645708b30bca38d857254faaffbef3b51a827227a8afa6804019bec1208"
+      },
+      "summary.json": {
+        "bytes": 52399,
+        "sha256": "a55009df3dcfee95fd59302b0963aac1aee1b22fe965239840688116db05aae4"
+      },
+      "summary.md": {
+        "bytes": 1153,
+        "sha256": "246377b03ab0524c71ffe256cca859e20922ae9f73e02dd9448d3194c2424930"
+      },
+      "tests.jsonl": {
+        "bytes": 218454,
+        "sha256": "1a2d4f4fa7a684202904f677c34d33f1fd6c3ddfff5605681785458046ba1283"
+      }
+    },
+    "cold_cache": {
+      "observed": true,
+      "setup_log": "Cache is not found",
+      "downloads_in_stderr": true,
+      "cache_saved_after_success": true
+    },
+    "job_summary": "Hosted write step succeeded; Markdown downloaded; authenticated UI rendering not inspected"
+  },
+  "negative_probes": {
+    "pr": "https://github.com/bcgov/foi-flow/pull/6394",
+    "state": "pending"
+  },
+  "cancellation": {
+    "state": "pending"
+  },
+  "limitations": [
+    "No separate dev or fork run yet.",
+    "No branch protection or deployment settings modified."
+  ]
+}
