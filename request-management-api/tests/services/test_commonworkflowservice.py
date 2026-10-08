@@ -114,6 +114,21 @@ def test_outbox_failure_is_logged_not_raised(outbox, caplog):
 
 # --- deliver(): one POST, used by the dispatcher -----------------------------------------------
 
+@pytest.mark.parametrize("base,path", [
+    ("https://n8n.example.com/", "/webhook/foi-request-routing"),
+    ("https://n8n.example.com", "webhook/foi-request-routing"),
+    ("https://n8n.example.com/", "webhook/foi-request-routing"),
+    ("https://n8n.example.com///", " //webhook/foi-request-routing "),
+])
+@patch(POST)
+def test_deliver_url_has_single_slash_between_base_and_path(mock_post, monkeypatch, base, path):
+    monkeypatch.setenv("N8N_BASE_URL", base)
+    monkeypatch.setenv("N8N_ROUTING_WEBHOOK_PATH", path)
+    mock_post.return_value = _mock_response(True, {})
+    commonworkflowservice().deliver(PAYLOAD)
+    assert mock_post.call_args[0][0] == "https://n8n.example.com/webhook/foi-request-routing"
+
+
 @patch(POST)
 def test_deliver_posts_to_fixed_routing_webhook_with_auth_header(mock_post):
     mock_post.return_value = _mock_response(True, {})
