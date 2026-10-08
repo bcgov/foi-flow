@@ -17,19 +17,36 @@ class WFEngine:
 
 
 def resolve_engine_name():
-    """Returns the engine name ('camunda' | 'n8n') from WF_DEFAULT_ENGINE."""
-    raw_default = os.getenv("WF_DEFAULT_ENGINE")
-    default_engine = raw_default if raw_default not in (None, "") else WFEngine.camunda
-    logging.info(
-        "workflowengine.resolve_engine_name: WF_DEFAULT_ENGINE env var=%r -> resolved=%r",
-        raw_default, default_engine
-    )
-    return default_engine
+    """Returns the normalized engine name ('camunda' | 'n8n') from WF_DEFAULT_ENGINE.
+
+    Whitespace and case are ignored; unset/blank falls back to Camunda. Any other
+    value raises ValueError so a typo can never silently route events nowhere.
+    Every call site must go through this (or isn8n/iscamunda) rather than reading
+    the env var itself."""
+    raw = os.getenv("WF_DEFAULT_ENGINE")
+    name = (raw or "").strip().lower() or WFEngine.camunda
+    if name not in (WFEngine.camunda, WFEngine.n8n):
+        raise ValueError(
+            "WF_DEFAULT_ENGINE=%r is not supported; use '%s' or '%s'" % (raw, WFEngine.camunda, WFEngine.n8n)
+        )
+    return name
+
+
+def isn8n():
+    return resolve_engine_name() == WFEngine.n8n
+
+
+def iscamunda():
+    return resolve_engine_name() == WFEngine.camunda
+
+
+def validate_engine_config():
+    """Startup check: fails fast on an invalid WF_DEFAULT_ENGINE and logs the active engine once."""
+    name = resolve_engine_name()
+    logging.info("workflowengine: active workflow engine=%s (WF_DEFAULT_ENGINE=%r)", name, os.getenv("WF_DEFAULT_ENGINE"))
+    return name
 
 
 def resolve_engine():
     """Returns the workflow-engine service instance for the current WF_DEFAULT_ENGINE."""
-    enginename = resolve_engine_name()
-    engine = commonworkflowservice() if enginename == WFEngine.n8n else bpmservice()
-    logging.info("workflowengine.resolve_engine: routing to %s (%s)", enginename, type(engine).__name__)
-    return engine
+    return commonworkflowservice() if isn8n() else bpmservice()
