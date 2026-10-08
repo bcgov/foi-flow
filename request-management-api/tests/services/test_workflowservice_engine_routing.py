@@ -256,3 +256,31 @@ class TestPostOpenedEventIncludesRequestIds:
         )
         mock_openedcomplete.assert_not_called()
         self._assert_metadata_has_ids(mock_reopenevent, metadata_index=1)
+
+
+
+class TestNormalizedEngineConsistency:
+    """A messy-but-valid WF_DEFAULT_ENGINE (e.g. 'N8N') must route every
+    call site to n8n the same way."""
+
+    @pytest.mark.parametrize("raw", ["N8N", " n8n ", "n8n\n"])
+    @patch.object(FOIRequest, "getrawrequestidbyfoirequestid", return_value=1)
+    @patch.object(commonworkflowservice, "unopenedcomplete")
+    @patch.object(bpmservice, "createinstance")
+    def test_all_call_sites_agree_on_n8n(self, mock_create, mock_n8n_call, mock_getrawid, monkeypatch, raw):
+        monkeypatch.setenv("WF_DEFAULT_ENGINE", raw)
+        service = workflowservice()
+
+        assert service.createinstance("foi-rawrequest", json.dumps({"id": 42})) is None
+        mock_create.assert_not_called()
+
+        service.postunopenedevent(42, None, {}, "Open")
+        mock_n8n_call.assert_called_once()
+
+        assert service.syncwfinstance("rawrequest", 42) is None
+
+    def test_invalid_engine_raises_instead_of_mixed_path(self, monkeypatch):
+        monkeypatch.setenv("WF_DEFAULT_ENGINE", "foo")
+        with pytest.raises(ValueError):
+            workflowservice().createinstance("foi-rawrequest", json.dumps({"id": 42}))
+

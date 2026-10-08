@@ -14,7 +14,7 @@ from request_api.utils.enums import StateName
 import logging
 from request_api.schemas.external.bpmschema import VariableSchema
 from request_api.services.external.camundaservice import VariableType
-from request_api.services.workflowengine import resolve_engine, resolve_engine_name, WFEngine
+from request_api.services.workflowengine import resolve_engine, isn8n, iscamunda
 """
 This class is reserved for workflow services integration.
 Supported operations: claim
@@ -29,7 +29,7 @@ class workflowservice:
         requests reach the fixed routing webhook via the normal event calls, 
         so there is nothing to do here when WF_DEFAULT_ENGINE is n8n."""
         messagejson = json.loads(message)
-        if resolve_engine_name() != WFEngine.camunda:
+        if not iscamunda():
             logging.info("workflowservice.createinstance: WF_DEFAULT_ENGINE is not camunda - skipping instance creation for definitionkey=%s", definitionkey)
             return None
         engine = resolve_engine()
@@ -43,7 +43,7 @@ class workflowservice:
 
     def postunopenedevent(self, id, wfinstanceid, requestsschema, status, ministries=None):
         logging.info("workflowservice.postunopenedevent: id=%s wfinstanceid=%s status=%s", id, wfinstanceid, status)
-        if wfinstanceid in (None,"") and resolve_engine_name() != WFEngine.n8n:
+        if wfinstanceid in (None,"") and not isn8n():
             logging.error("WF INSTANCE IS INVALID")
             return
         logging.info("workflowservice.postunopenedevent: requestsschema=%s", requestsschema)
@@ -132,7 +132,7 @@ class workflowservice:
         # n8n's searchinstancebyvariable/getinstancevariables are not implemented yet
         # (deferred), so sync is skipped whenever WF_DEFAULT_ENGINE is n8n - this is
         # a single global switch, not a per-request decision.
-        if resolve_engine_name() == WFEngine.n8n:
+        if isn8n():
             return None
         try:
             # Sync and get raw instance details from FOI DB

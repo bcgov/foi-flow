@@ -17,8 +17,8 @@ from flask import current_app
 from request_api.utils.redissubscriber import RedisSubscriberService
 from request_api.services.publication_events.completed_stream_consumer import PublicationCompletedStreamConsumer
 from request_api.services.publication_events.scheduler import PublicationPrePublishingScheduler
-from request_api.services.n8nworkflowoutboxdispatcher import N8NWorkflowOutboxDispatcher
-from request_api.services.workflowengine import resolve_engine_name, WFEngine
+from request_api.services.external.n8nworkflowoutboxdispatcher import N8NWorkflowOutboxDispatcher, dispatcherenabled
+from request_api.services.workflowengine import isn8n
 import logging
 
 @socketio.on('connect')
@@ -92,7 +92,7 @@ if __name__ == "__main__":
         except Exception as exception:
             logging.error("Unable to start publication pre-publishing scheduler: %s", exception)
 
-    if resolve_engine_name() == WFEngine.n8n and (os.getenv("N8N_OUTBOX_DISPATCHER_ENABLED") or "true").lower() == "true":
+    if isn8n() and dispatcherenabled():
         try:
             n8n_outbox_dispatcher = N8NWorkflowOutboxDispatcher.from_env(app=APP)
             n8n_outbox_dispatcher.start()
