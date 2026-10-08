@@ -127,7 +127,7 @@ def test_acknowledgement_requires_a_uuid_event_id(client, monkeypatch):
 
 @pytest.mark.parametrize("result,code", [(AckResult.unchanged, 200), (AckResult.notfound, 404), (AckResult.conflict, 409)])
 def test_acknowledgement_maps_the_service_result_to_a_status_code(client, monkeypatch, result, code):
-    FakeOutbox.ack_result = (result, SimpleNamespace(eventid=EVENT_ID, status="DEAD") if result != AckResult.notfound else None)
+    monkeypatch.setattr(FakeOutbox, "ack_result", (result, SimpleNamespace(eventid=EVENT_ID, status="DEAD") if result != AckResult.notfound else None))
     headers = _as(monkeypatch, N8N)
     assert client.put("/api/foiworkflow/events/" + EVENT_ID, headers=headers, json={"status": "COMPLETED"}).status_code == code
 
@@ -137,7 +137,8 @@ def test_acknowledgement_maps_the_service_result_to_a_status_code(client, monkey
 def test_admin_lists_dead_and_failed_by_default(client, monkeypatch):
     headers = _as(monkeypatch, ADMIN)
     response = client.get("/api/foiworkflow/events", headers=headers)
-    assert response.status_code == 200 and response.get_json()["events"] == [{"eventid": EVENT_ID}]
+    assert response.status_code == 200
+    assert response.get_json()["events"] == [{"eventid": EVENT_ID}]
     assert FakeOutbox.calls == [("list", ["DEAD", "FAILED"], 100, 0)]
 
 
@@ -158,14 +159,14 @@ def test_admin_replays_one_event_with_its_existing_event_id(client, monkeypatch)
 
 @pytest.mark.parametrize("result,code", [(AckResult.notfound, 404), (AckResult.conflict, 409)])
 def test_replay_maps_not_found_and_not_replayable(client, monkeypatch, result, code):
-    FakeOutbox.replay_results = {EVENT_ID: (result, SimpleNamespace(eventid=EVENT_ID, status="COMPLETED") if result == AckResult.conflict else None)}
+    monkeypatch.setattr(FakeOutbox, "replay_results", {EVENT_ID: (result, SimpleNamespace(eventid=EVENT_ID, status="COMPLETED") if result == AckResult.conflict else None)})
     headers = _as(monkeypatch, ADMIN)
     assert client.post("/api/foiworkflow/events/%s/replay" % EVENT_ID, headers=headers).status_code == code
 
 
 def test_bulk_replay_reports_each_event(client, monkeypatch):
     other = str(uuid.uuid4())
-    FakeOutbox.replay_results = {other: (AckResult.conflict, SimpleNamespace(eventid=other, status="COMPLETED"))}
+    monkeypatch.setattr(FakeOutbox, "replay_results", {other: (AckResult.conflict, SimpleNamespace(eventid=other, status="COMPLETED"))})
     headers = _as(monkeypatch, ADMIN)
     response = client.post("/api/foiworkflow/events/replay", headers=headers, json={"eventids": [EVENT_ID, other]})
     assert response.status_code == 200

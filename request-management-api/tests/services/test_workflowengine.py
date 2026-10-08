@@ -54,7 +54,8 @@ def test_resolve_engine_name_rejects_unsupported_value(monkeypatch, raw):
     with pytest.raises(ValueError) as excinfo:
         resolve_engine_name()
     assert repr(raw) in str(excinfo.value)
-    assert "camunda" in str(excinfo.value) and "n8n" in str(excinfo.value)
+    assert "camunda" in str(excinfo.value)
+    assert "n8n" in str(excinfo.value)
 
 
 def test_resolve_engine_fails_for_unsupported_value(monkeypatch):
