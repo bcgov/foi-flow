@@ -3,6 +3,7 @@ import { Redirect, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import "semantic-ui-css/semantic.min.css";
 import UserService from "../../services/UserService";
+import { fetchUserPreferences } from "../../apiManager/services/FOI/foiUserPreferenceServices";
 import { setUserAuth } from "../../actions/bpmActions";
 import Loading from "../../containers/Loading";
 import FOIHeader from "./Header";
@@ -33,7 +34,14 @@ const FOIAuthenticateRouting = React.memo((props) => {
     // console.log('authenticate')
     if(props.store){
       UserService.initKeycloak(props.store, (_err, res) => {
-        dispatch(setUserAuth(res.authenticated));
+        if (_err) {
+          dispatch(setUserAuth(false));
+          return;
+        }
+
+        props.store.dispatch(fetchUserPreferences()).then(() => {
+          dispatch(setUserAuth(res.authenticated));
+        });
       });
     }
   },[props.store, dispatch]);
