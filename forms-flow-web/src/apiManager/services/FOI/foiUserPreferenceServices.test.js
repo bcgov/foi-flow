@@ -277,4 +277,96 @@ describe("foiUserPreferenceServices", () => {
 
     warning.mockRestore();
   });
+
+  test("serializes rapid changes and persists the most recent selection", async () => {
+    let finishFirstRequest;
+
+    const firstResponse = new Promise((resolve) => {
+      finishFirstRequest = resolve;
+    });
+
+    httpPUTRequest
+      .mockImplementationOnce(() => firstResponse)
+      .mockImplementation((_url, document) => Promise.resolve({ data: document }));
+
+    let state = {
+      userPreferences: {
+        schemaVersion: 1,
+        preferences: {
+          exampleSetting: "preserved",
+          dashboard: { queue: { pageSize: 100 } }
+        },
+        isLoaded: true,
+        loadError: false
+      }
+    };
+
+    const dispatch = jest.fn((action) => {
+      if (action.type === USER_PREFERENCES_SET) {
+        state = {
+          ...state,
+          userPreferences: { ...state.userPreferences, ...action.payload }
+        };
+      }
+    });
+
+    const getState = () => state;
+
+    const first = saveDashboardQueuePageSize(20)(dispatch, getState);
+    // The save queue chains a catch and a then before calling PUT.
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(httpPUTRequest).toHaveBeenCalledTimes(1);
+
+    const second = saveDashboardQueuePageSize(50)(dispatch, getState);
+    const third = saveDashboardQueuePageSize(10)(dispatch, getState);
+
+    expect(httpPUTRequest).toHaveBeenCalledTimes(1);
+
+    finishFirstRequest({ data: httpPUTRequest.mock.calls[0][1] });
+    await Promise.all([first, second, third]);
+
+    const savedSizes = httpPUTRequest.mock.calls.map(
+      ([, document]) => document.preferences.dashboard.queue.pageSize
+    );
+
+    expect(savedSizes).toEqual([20, 50, 10]);
+    expect(state.userPreferences.preferences.dashboard.queue.pageSize).toBe(10);
+    expect(state.userPreferences.preferences.exampleSetting).toBe("preserved");
+  });
+
+
+  test("continues the save queue after an earlier PUT fails", async () => {
+    const warning = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+    try {
+      httpPUTRequest
+        .mockRejectedValueOnce(new Error("network failure"))
+        .mockImplementation((_url, document) => Promise.resolve({ data: document }));
+
+      const preferences = {
+        schemaVersion: 1,
+        preferences: { dashboard: { queue: { pageSize: 100 } } },
+        isLoaded: true,
+        loadError: false
+      };
+
+      const dispatch = jest.fn();
+      const getState = () => ({ userPreferences: preferences });
+
+      const first = saveDashboardQueuePageSize(20)(dispatch, getState);
+      const second = saveDashboardQueuePageSize(50)(dispatch, getState);
+
+      const [firstResult, secondResult] = await Promise.all([first, second]);
+
+      expect(firstResult).toBeNull();
+      expect(secondResult.preferences.dashboard.queue.pageSize).toBe(50);
+      expect(httpPUTRequest).toHaveBeenCalledTimes(2);
+    } finally {
+      warning.mockRestore();
+    }
+  });
+
 });

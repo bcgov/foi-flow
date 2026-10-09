@@ -141,3 +141,39 @@ def test_preferences_cannot_be_saved_without_authenticated_user():
                 "preferences": {}
             }
         )
+
+
+def test_atomic_upsert_uses_postgresql_conflict_handling():
+    from sqlalchemy.dialects import postgresql
+
+    from request_api.models.FOIUserPreferences import FOIUserPreference
+
+    statement = FOIUserPreference._build_upsert_statement(
+        "test.user@idir",
+        {"dashboard": {"queue": {"pageSize": 50}}},
+        1
+    )
+
+    sql = str(statement.compile(dialect=postgresql.dialect()))
+
+    assert 'INSERT INTO "FOIUserPreferences"' in sql
+    assert 'ON CONFLICT (userid) DO UPDATE' in sql
+    assert 'preferences = excluded.preferences' in sql
+    assert 'schema_version = excluded.schema_version' in sql
+
+
+def test_atomic_upsert_executes_before_reading_saved_row():
+    from request_api.models.FOIUserPreferences import FOIUserPreference
+    from request_api.models.db import db
+
+    saved_preference = Mock()
+
+    with patch.object(db.session, "execute") as execute, \
+         patch.object(db.session, "commit") as commit, \
+         patch.object(FOIUserPreference, "getbyuserid", return_value=saved_preference) as lookup:
+        result = FOIUserPreference.upsert("test.user@idir", {"test": True}, 1)
+
+    assert result is saved_preference
+    execute.assert_called_once()
+    commit.assert_called_once()
+    lookup.assert_called_once_with("test.user@idir")

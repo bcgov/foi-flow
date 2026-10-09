@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB, insert as pg_insert
 
 from .db import db
 
@@ -57,25 +57,36 @@ class FOIUserPreference(db.Model):
         )
 
     @classmethod
+    def _build_upsert_statement(cls, userid, preferences, schema_version):
+        # A single PostgreSQL statement avoids a race when two sessions
+        # create a user's first preference document concurrently.
+        now = datetime.now()
+        insert_statement = pg_insert(cls.__table__).values(
+            userid=userid,
+            preferences=preferences,
+            schema_version=schema_version,
+            created_at=now
+        )
+
+        return insert_statement.on_conflict_do_update(
+            index_elements=[cls.__table__.c.userid],
+            set_={
+                "preferences": insert_statement.excluded.preferences,
+                "schema_version": insert_statement.excluded.schema_version,
+                "updated_at": now
+            }
+        )
+
+    @classmethod
     def upsert(cls, userid, preferences, schema_version):
         try:
-            preference = cls.getbyuserid(userid)
-
-            if preference is None:
-                preference = cls(
-                    userid=userid,
-                    preferences=preferences,
-                    schema_version=schema_version
-                )
-                db.session.add(preference)
-            else:
-                preference.preferences = preferences
-                preference.schema_version = schema_version
-                preference.updated_at = datetime.now()
-
+            statement = cls._build_upsert_statement(
+                userid, preferences, schema_version
+            )
+            db.session.execute(statement)
             db.session.commit()
 
-            return preference
+            return cls.getbyuserid(userid)
 
         except Exception:
             db.session.rollback()

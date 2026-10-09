@@ -1,7 +1,7 @@
 """create FOI user preferences
 
 Revision ID: 7d9c2e4f1a6b
-Revises: 5a7ce876a293
+Revises: a4e9c7d2f1b6
 Create Date: 2026-09-02
 
 """

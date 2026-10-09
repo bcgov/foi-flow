@@ -143,47 +143,61 @@ export const fetchUserPreferences = () => {
 };
 
 
+// One in-flight PUT per Redux store: later changes must not be saved
+// or applied out of order. Use dispatch as the per-store identity.
+const pendingPageSizeSaves = new WeakMap();
+
+
 export const saveDashboardQueuePageSize = (pageSize) => {
   return (dispatch, getState) => {
-    const state = getState();
-    const currentPreferences = state.userPreferences;
+    const previousSave =
+      pendingPageSizeSaves.get(dispatch) || Promise.resolve();
 
-    if (
-      !currentPreferences?.isLoaded ||
-      currentPreferences?.loadError
-    ) {
-      console.warn(
-        "User preferences are not available; page size was not persisted."
-      );
+    // Read the current document when this save reaches the front of
+    // the queue so other preference fields from prior saves survive.
+    const save = previousSave.catch(() => null).then(() => {
+      const currentPreferences = getState().userPreferences;
 
-      return Promise.resolve(null);
-    }
-
-    const document =
-      buildQueuePageSizePreferenceDocument(
-        currentPreferences,
-        pageSize
-      );
-
-    return httpPUTRequest(
-      API.FOI_USER_PREFERENCES,
-      document
-    )
-      .then((res) => {
-        const savedDocument =
-          normalizeUserPreferenceDocument(res.data);
-
-        dispatch(setUserPreferences(savedDocument));
-
-        return savedDocument;
-      })
-      .catch((error) => {
+      if (
+        !currentPreferences?.isLoaded ||
+        currentPreferences?.loadError
+      ) {
         console.warn(
-          "Unable to save dashboard queue page size.",
-          error
+          "User preferences are not available; page size was not persisted."
         );
 
         return null;
-      });
+      }
+
+      const document =
+        buildQueuePageSizePreferenceDocument(
+          currentPreferences,
+          pageSize
+        );
+
+      return httpPUTRequest(
+        API.FOI_USER_PREFERENCES,
+        document
+      )
+        .then((res) => {
+          const savedDocument =
+            normalizeUserPreferenceDocument(res.data);
+
+          dispatch(setUserPreferences(savedDocument));
+
+          return savedDocument;
+        })
+        .catch((error) => {
+          console.warn(
+            "Unable to save dashboard queue page size.",
+            error
+          );
+
+          return null;
+        });
+    });
+
+    pendingPageSizeSaves.set(dispatch, save);
+    return save;
   };
 };
