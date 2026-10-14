@@ -11,6 +11,7 @@ COPY ["MCS.FOI.Integration.API/MCS.FOI.Integration.API.csproj", "MCS.FOI.Integra
 COPY ["MCS.FOI.Integration.Application/MCS.FOI.Integration.Application.csproj", "MCS.FOI.Integration.Application/"]
 COPY ["MCS.FOI.Integration.Core/MCS.FOI.Integration.Core.csproj", "MCS.FOI.Integration.Core/"]
 COPY ["MCS.FOI.Integration.Infrastructure/MCS.FOI.Integration.Infrastructure.csproj", "MCS.FOI.Integration.Infrastructure/"]
+COPY ["MCS.FOI.Integration.Tests/MCS.FOI.Integration.Tests.csproj", "MCS.FOI.Integration.Tests/"]
 RUN dotnet restore "MCS.FOI.Integration.sln"
 
 # Copy the remaining files and build the application.
