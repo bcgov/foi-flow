@@ -19,7 +19,11 @@ namespace MCS.FOI.Integration.Infrastructure.Repositories.RedisRepository
 
         public async Task UpdateCacheTemplateAsync(IEnumerable<TemplateDto>? templates)
         {
-            if (!_redisDbContext.IsConnected || !templates.Any()) return;
+            if (!_redisDbContext.IsConnected)
+                throw new InvalidOperationException("Redis is disconnected; template cache cannot be refreshed.");
+
+            if (templates == null || !templates.Any())
+                throw new InvalidOperationException("No templates were provided for cache refresh.");
 
             var batch = _redisDbContext.Redis.CreateBatch();
             var tasks = templates.Select(template =>
@@ -29,7 +33,10 @@ namespace MCS.FOI.Integration.Infrastructure.Repositories.RedisRepository
             }).ToList();
 
             batch.Execute();
-            await Task.WhenAll(tasks);
+            var results = await Task.WhenAll(tasks);
+
+            if (results.Any(success => !success))
+                throw new InvalidOperationException("Redis failed to write one or more template cache entries.");
         }
 
         public async Task<TemplateDto?> GetTemplateCacheAsync(string fileName)
