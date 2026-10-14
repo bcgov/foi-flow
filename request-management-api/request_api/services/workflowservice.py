@@ -41,7 +41,7 @@ class workflowservice:
             return bpmservice().unopenedsave(wfinstanceid, assignedto, messagename)                 
         else:
             if status == UnopenedEvent.open.value:
-                metadata = json.dumps({"id": id, "status": status, "ministries": ministries, "assignedGroup": assignedgroup, "assignedTo": assignedto})
+                metadata = json.dumps({"id": id, "status": status, "ministries": self.__format_ministries(ministries), "assignedGroup": assignedgroup, "assignedTo": assignedto})
             else:            
                 metadata = json.dumps({"id": id, "status": status, "assignedGroup": assignedgroup, "assignedTo": assignedto})
             return bpmservice().unopenedcomplete(wfinstanceid, metadata, MessageType.intakecomplete.value) 
@@ -322,6 +322,19 @@ class workflowservice:
     
     def __getministryactivity(self, oldstatus, newstatus):
         return  Activity.complete.value if newstatus is not None and oldstatus != newstatus else Activity.save.value
+
+    # The data needs to be less than 4000 characters for Camunda
+    # This strips irrelevant data to keep text below limit when all ministries selected
+    def __format_ministries(self, ministries):
+        if ministries is None or type(ministries) is not list:
+            return ministries
+        formatted_ministries = []
+        for ministry in ministries:
+            formatted_ministries.append({
+                "filenumber": ministry.get("filenumber"),
+                "assignedgroup": ministry.get("assignedgroup"),
+            })
+        return formatted_ministries
 
 
 class UserType(Enum):
