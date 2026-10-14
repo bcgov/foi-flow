@@ -1,4 +1,4 @@
-﻿//using Template = MCS.FOI.Integration.Core.Entities.Template;
+//using Template = MCS.FOI.Integration.Core.Entities.Template;
 
 namespace MCS.FOI.Integration.Application.Commands.UpdateRedisTemplate
 {
@@ -20,25 +20,34 @@ namespace MCS.FOI.Integration.Application.Commands.UpdateRedisTemplate
 
         public async Task<bool> Handle(UpdateTemplateCacheCommand command, CancellationToken cancellationToken)
         {
-            try
-            {
-                var templates = await GetTemplatesAsync();
+            var templates = (await GetTemplatesAsync()).ToList();
 
-                var fetchTasks = templates.Select(async template =>
+            if (templates.Count == 0)
+                throw new InvalidOperationException("No active templates found for refresh.");
+
+            var fetchTasks = templates.Select(async template =>
+            {
+                var documentFiles = await _s3StorageService.FetchTemplatesAsync(
+                    template.FileName,
+                    command.Token,
+                    template.DocumentPath,
+                    cancellationToken);
+
+                var encodedContent = documentFiles?.FirstOrDefault()?.Text;
+
+                if (string.IsNullOrWhiteSpace(encodedContent))
                 {
-                    var documentFiles = await _s3StorageService.FetchTemplatesAsync(template.FileName, command.Token, template.DocumentPath, cancellationToken);
-                    template.EncodedContent = documentFiles?.FirstOrDefault()?.Text ?? string.Empty;
-                });
+                    throw new InvalidOperationException(
+                        $"S3 returned no content for template '{template.FileName}'.");
+                }
 
-                await Task.WhenAll(fetchTasks);
+                template.EncodedContent = encodedContent;
+            });
 
-                await _templateDataService.UpdateTemplates(templates);
-                await _templateCacheService.UpdateCacheTemplateAsync(templates);
-            }
-            catch (Exception ex)
-            {
-                new InternalServerException($"Error saving changes: {ex.Message}");
-            }
+            await Task.WhenAll(fetchTasks);
+
+            await _templateDataService.UpdateTemplates(templates);
+            await _templateCacheService.UpdateCacheTemplateAsync(templates);
 
             return true;
         }

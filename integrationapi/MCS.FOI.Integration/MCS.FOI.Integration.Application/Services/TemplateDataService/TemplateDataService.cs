@@ -23,7 +23,7 @@
 
         public async Task UpdateTemplates(IEnumerable<TemplateDto> templates)
         {
-            const string updateQuery = @"UPDATE public.""Template"" SET ""EncodedContent"" = @EncodedContent WHERE ""Id"" = @Id";
+            const string updateQuery = @"UPDATE public.""Template"" SET encodedcontent = @EncodedContent WHERE templateid = @TemplateId";
             await _repository.UpdateAsync(updateQuery, templates);
         }
 
