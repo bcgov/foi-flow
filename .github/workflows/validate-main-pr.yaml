@@ -1,0 +1,80 @@
+name: Validate Main Pull Request
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+
+permissions:
+  pull-requests: write
+
+jobs:
+
+  validate-release-label:
+
+    name: Validate Release Label
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Validate Release Label
+        id: validate
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          PR_BODY=$(gh api \
+            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} \
+            --jq '.body')
+
+
+          RELEASE_LABEL=$(echo "$PR_BODY" \
+            | sed -n 's/^Release Label:[[:space:]]*//p' \
+            | head -1)
+
+
+          if [ -z "$RELEASE_LABEL" ]; then
+            echo "comment<<EOF" >> "$GITHUB_OUTPUT"
+            echo "❌ Release Label is missing." >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_OUTPUT"
+            echo "Add a Release Label to the PR description before merging to \`main\`." >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_OUTPUT"
+            echo "Example: \`Release Label: 1.2.0-rc1\`" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+
+            exit 1
+          fi
+
+
+          if ! [[ "$RELEASE_LABEL" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?(-.+)?$ ]]; then
+            echo "comment<<EOF" >> "$GITHUB_OUTPUT"
+            echo "❌ Invalid Release Label: \`$RELEASE_LABEL\`" >> "$GITHUB_OUTPUT"
+            echo "" >> "$GITHUB_OUTPUT"
+            echo "Expected format: \`<major>.<minor>[.<patch>][-<suffix>]\`" >> "$GITHUB_OUTPUT"
+            echo "Examples: \`25.99.99\`, \`1.2-test\`, \`1.2.0-rc1\`" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+
+            exit 1
+          fi
+
+
+          echo "comment<<EOF" >> "$GITHUB_OUTPUT"
+          echo "✅ Release Label verified: \`$RELEASE_LABEL\`" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+
+      - name: Comment Release Label Validation
+        if: always()
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
+        with:
+          message: |
+            ${{ steps.validate.outputs.comment }}
+          comment_tag: release-label-validation
