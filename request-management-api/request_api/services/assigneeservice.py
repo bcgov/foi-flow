@@ -18,8 +18,20 @@ class assigneeservice:
                return KeycloakAdminService().getgroupsandmembers(OperatingTeam.getalloperatingteams()) 
         else:
             if requesttype.lower() == 'proactive disclosure':
-               teams = [OperatingTeam.getteam('OI Team'), OperatingTeam.getteam('Intake Team')]
-               return KeycloakAdminService().getgroupsandmembers(teams) 
+                teams = [
+                    team for team in OperatingTeam.getalloperatingteams()
+                    if team['type'] == 'iao' or team['name'] == 'OI Team'
+                ]
+
+                groups = KeycloakAdminService().getgroupsandmembers(teams)
+
+                return sorted(
+                    groups,
+                    key=lambda group: (
+                        group['name'] != 'OI Team',
+                        group['name'].casefold()
+                    )
+                )
             filteredgroups = self.__getgroups(requesttype, status, bcgovcode)
             if filteredgroups is not None:
                 return KeycloakAdminService().getgroupsandmembers(filteredgroups)

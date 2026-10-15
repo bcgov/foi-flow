@@ -18,6 +18,7 @@ export const getMenuItems = ({
 }) => {
 
   const requestType = requestDetails?.requestType
+  const isProactiveDisclosure = requestType?.toLowerCase() === 'proactive disclosure'
   const bcgovcode = requestDetails?.bcgovcode
   let mcfSelected = false //need this for intakeinprogress because requestDetails.bcgovcode is not set until open state
   requestDetails?.selectedMinistries?.forEach((ministry) => {
@@ -29,7 +30,14 @@ export const getMenuItems = ({
   const listIndustryTeamFirst = !isMinistry && INDUSTRY_TEAM_MINISTRIES.includes(bcgovcode);
   const listResourceTeamFirst = !isMinistry && RESOURCE_TEAM_MINISTRIES.includes(bcgovcode);
   const listChildrenAndFamilyTeamFirst = !isMinistry && requestType === 'personal' && mcfSelected;
-  if (listCommunityAndHealthTeamFirst) {
+  if (isProactiveDisclosure) {
+    assignedToList = [...(assignedToList || [])].sort((a, b) => {
+      const aPriority = a.name === 'OI Team' ? 0 : 1;
+      const bPriority = b.name === 'OI Team' ? 0 : 1;
+
+      return aPriority - bPriority || a.name.localeCompare(b.name);
+    });
+  } else if (listCommunityAndHealthTeamFirst) {
     assignedToList.sort((a, b) => a.name == "Community and Health Team" ? -1 : 0)
   } else if (listJusticeTeamFirst) {
     assignedToList.sort((a, b) => a.name == "Justice Team" ? -1 : 0)
@@ -60,7 +68,11 @@ export const getMenuItems = ({
     return menuItems;
   }
   else {
-    assignedToList = assignedToList.filter(assignedTo => assignedTo.type === 'iao');
+    assignedToList = assignedToList.filter(
+      assignedTo =>
+        assignedTo.type === 'iao' ||
+        (isProactiveDisclosure && assignedTo.name === 'OI Team')
+    );
   }
   assignedToList?.forEach((group) => {
     const groupItem = (
