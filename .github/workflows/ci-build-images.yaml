@@ -78,12 +78,12 @@ jobs:
 
             if [ "$REQUESTED_SERVICE" = "all" ]; then
 
-              BUILD_MATRIX=$(yq -o=json '.services | {include: .}' "$CONFIG_FILE")
+              BUILD_MATRIX=$(yq -o=json '.services | {"include": .}' "$CONFIG_FILE")
 
             else
 
               BUILD_MATRIX=$(yq -o=json \
-                ".services | map(select(.name == \"$REQUESTED_SERVICE\")) | {include: .}" \
+                ".services | map(select(.name == \"$REQUESTED_SERVICE\")) | {\"include\": .}" \
                 "$CONFIG_FILE")
 
             fi
