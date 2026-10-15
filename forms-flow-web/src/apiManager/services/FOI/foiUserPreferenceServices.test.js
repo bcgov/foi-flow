@@ -18,7 +18,7 @@ import {
   normalizeUserPreferenceDocument,
   buildQueuePageSizePreferenceDocument,
   fetchUserPreferences,
-  saveDashboardQueuePageSize
+  saveRequestQueuePageSize
 } from "./foiUserPreferenceServices";
 
 
@@ -62,7 +62,7 @@ describe("foiUserPreferenceServices", () => {
       });
 
     expect(
-      document.preferences.dashboard.queue.pageSize
+      document.preferences.requestQueue.pageSize
     ).toBe(100);
   });
 
@@ -74,10 +74,8 @@ describe("foiUserPreferenceServices", () => {
           schemaVersion: 1,
           preferences: {
             exampleSetting: true,
-            dashboard: {
-              queue: {
-                pageSize: 100
-              }
+            requestQueue: {
+              pageSize: 100
             }
           }
         },
@@ -87,8 +85,24 @@ describe("foiUserPreferenceServices", () => {
     expect(document.preferences.exampleSetting).toBe(true);
 
     expect(
-      document.preferences.dashboard.queue.pageSize
+      document.preferences.requestQueue.pageSize
     ).toBe(50);
+  });
+
+
+  test("preserves requestQueue fields without adding dashboard hierarchy", () => {
+    const document = normalizeUserPreferenceDocument({
+      schemaVersion: 1,
+      preferences: {
+        appearance: { compactMode: true },
+        requestQueue: { pageSize: 25, favoriteColumns: ["requestId"] }
+      }
+    });
+
+    expect(document.preferences.requestQueue.pageSize).toBe(25);
+    expect(document.preferences.requestQueue.favoriteColumns).toEqual(["requestId"]);
+    expect(document.preferences.appearance.compactMode).toBe(true);
+    expect(document.preferences).not.toHaveProperty("dashboard");
   });
 
 
@@ -97,10 +111,8 @@ describe("foiUserPreferenceServices", () => {
       data: {
         schemaVersion: 1,
         preferences: {
-          dashboard: {
-            queue: {
-              pageSize: 50
-            }
+          requestQueue: {
+            pageSize: 50
           }
         }
       }
@@ -160,7 +172,7 @@ describe("foiUserPreferenceServices", () => {
       );
 
     expect(
-      result.preferences.dashboard.queue.pageSize
+      result.preferences.requestQueue.pageSize
     ).toBe(100);
 
     expect(dispatch).toHaveBeenCalledWith({
@@ -176,10 +188,8 @@ describe("foiUserPreferenceServices", () => {
       schemaVersion: 1,
       preferences: {
         exampleSetting: "preserved",
-        dashboard: {
-          queue: {
-            pageSize: 100
-          }
+        requestQueue: {
+          pageSize: 100
         }
       },
       isLoaded: true,
@@ -196,7 +206,7 @@ describe("foiUserPreferenceServices", () => {
     const dispatch = jest.fn();
 
     const saved =
-      await saveDashboardQueuePageSize(50)(
+      await saveRequestQueuePageSize(50)(
         dispatch,
         () => ({
           userPreferences: currentPreferences
@@ -214,7 +224,7 @@ describe("foiUserPreferenceServices", () => {
       httpPUTRequest.mock.calls[0][1];
 
     expect(
-      sentDocument.preferences.dashboard.queue.pageSize
+      sentDocument.preferences.requestQueue.pageSize
     ).toBe(50);
 
     expect(
@@ -222,7 +232,7 @@ describe("foiUserPreferenceServices", () => {
     ).toBe("preserved");
 
     expect(
-      saved.preferences.dashboard.queue.pageSize
+      saved.preferences.requestQueue.pageSize
     ).toBe(50);
 
     expect(dispatch).toHaveBeenCalledWith(
@@ -239,7 +249,7 @@ describe("foiUserPreferenceServices", () => {
       .mockImplementation(() => {});
 
     const result =
-      await saveDashboardQueuePageSize(50)(
+      await saveRequestQueuePageSize(50)(
         jest.fn(),
         () => ({
           userPreferences: {
@@ -262,7 +272,7 @@ describe("foiUserPreferenceServices", () => {
       .mockImplementation(() => {});
 
     const result =
-      await saveDashboardQueuePageSize(50)(
+      await saveRequestQueuePageSize(50)(
         jest.fn(),
         () => ({
           userPreferences: {
@@ -294,7 +304,7 @@ describe("foiUserPreferenceServices", () => {
         schemaVersion: 1,
         preferences: {
           exampleSetting: "preserved",
-          dashboard: { queue: { pageSize: 100 } }
+          requestQueue: { pageSize: 100 }
         },
         isLoaded: true,
         loadError: false
@@ -312,7 +322,7 @@ describe("foiUserPreferenceServices", () => {
 
     const getState = () => state;
 
-    const first = saveDashboardQueuePageSize(20)(dispatch, getState);
+    const first = saveRequestQueuePageSize(20)(dispatch, getState);
     // The save queue chains a catch and a then before calling PUT.
     await Promise.resolve();
     await Promise.resolve();
@@ -320,8 +330,8 @@ describe("foiUserPreferenceServices", () => {
 
     expect(httpPUTRequest).toHaveBeenCalledTimes(1);
 
-    const second = saveDashboardQueuePageSize(50)(dispatch, getState);
-    const third = saveDashboardQueuePageSize(10)(dispatch, getState);
+    const second = saveRequestQueuePageSize(50)(dispatch, getState);
+    const third = saveRequestQueuePageSize(10)(dispatch, getState);
 
     expect(httpPUTRequest).toHaveBeenCalledTimes(1);
 
@@ -329,11 +339,11 @@ describe("foiUserPreferenceServices", () => {
     await Promise.all([first, second, third]);
 
     const savedSizes = httpPUTRequest.mock.calls.map(
-      ([, document]) => document.preferences.dashboard.queue.pageSize
+      ([, document]) => document.preferences.requestQueue.pageSize
     );
 
     expect(savedSizes).toEqual([20, 50, 10]);
-    expect(state.userPreferences.preferences.dashboard.queue.pageSize).toBe(10);
+    expect(state.userPreferences.preferences.requestQueue.pageSize).toBe(10);
     expect(state.userPreferences.preferences.exampleSetting).toBe("preserved");
   });
 
@@ -348,7 +358,7 @@ describe("foiUserPreferenceServices", () => {
 
       const preferences = {
         schemaVersion: 1,
-        preferences: { dashboard: { queue: { pageSize: 100 } } },
+        preferences: { requestQueue: { pageSize: 100 } },
         isLoaded: true,
         loadError: false
       };
@@ -356,13 +366,13 @@ describe("foiUserPreferenceServices", () => {
       const dispatch = jest.fn();
       const getState = () => ({ userPreferences: preferences });
 
-      const first = saveDashboardQueuePageSize(20)(dispatch, getState);
-      const second = saveDashboardQueuePageSize(50)(dispatch, getState);
+      const first = saveRequestQueuePageSize(20)(dispatch, getState);
+      const second = saveRequestQueuePageSize(50)(dispatch, getState);
 
       const [firstResult, secondResult] = await Promise.all([first, second]);
 
       expect(firstResult).toBeNull();
-      expect(secondResult.preferences.dashboard.queue.pageSize).toBe(50);
+      expect(secondResult.preferences.requestQueue.pageSize).toBe(50);
       expect(httpPUTRequest).toHaveBeenCalledTimes(2);
     } finally {
       warning.mockRestore();

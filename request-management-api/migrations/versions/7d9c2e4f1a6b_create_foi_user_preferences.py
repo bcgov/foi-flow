@@ -21,12 +21,6 @@ def upgrade():
     op.create_table(
         "FOIUserPreferences",
         sa.Column(
-            "userpreferenceid",
-            sa.Integer(),
-            autoincrement=True,
-            nullable=False
-        ),
-        sa.Column(
             "userid",
             sa.String(length=255),
             nullable=False
@@ -54,11 +48,7 @@ def upgrade():
             sa.DateTime(),
             nullable=True
         ),
-        sa.PrimaryKeyConstraint("userpreferenceid"),
-        sa.UniqueConstraint(
-            "userid",
-            name="uq_foi_user_preferences_userid"
-        )
+        sa.PrimaryKeyConstraint("userid")
     )
 
 def downgrade():

@@ -16,7 +16,7 @@ import {
 
 import {
   USER_PREFERENCE_SCHEMA_VERSION,
-  DEFAULT_DASHBOARD_QUEUE_PAGE_SIZE,
+  DEFAULT_REQUEST_QUEUE_PAGE_SIZE,
   DEFAULT_USER_PREFERENCE_DOCUMENT
 } from "../../../constants/FOI/userPreferences";
 
@@ -31,7 +31,7 @@ const normalizePageSize = (pageSize) => {
     return numericPageSize;
   }
 
-  return DEFAULT_DASHBOARD_QUEUE_PAGE_SIZE;
+  return DEFAULT_REQUEST_QUEUE_PAGE_SIZE;
 };
 
 
@@ -43,28 +43,20 @@ export const normalizeUserPreferenceDocument = (document = {}) => {
       ? document.preferences
       : {};
 
-  const sourceDashboard =
-    sourcePreferences.dashboard &&
-    typeof sourcePreferences.dashboard === "object"
-      ? sourcePreferences.dashboard
-      : {};
-
-  const sourceQueue =
-    sourceDashboard.queue &&
-    typeof sourceDashboard.queue === "object"
-      ? sourceDashboard.queue
+  const sourceRequestQueue =
+    sourcePreferences.requestQueue &&
+    typeof sourcePreferences.requestQueue === "object" &&
+    !Array.isArray(sourcePreferences.requestQueue)
+      ? sourcePreferences.requestQueue
       : {};
 
   return {
     schemaVersion: USER_PREFERENCE_SCHEMA_VERSION,
     preferences: {
       ...sourcePreferences,
-      dashboard: {
-        ...sourceDashboard,
-        queue: {
-          ...sourceQueue,
-          pageSize: normalizePageSize(sourceQueue.pageSize)
-        }
+      requestQueue: {
+        ...sourceRequestQueue,
+        pageSize: normalizePageSize(sourceRequestQueue.pageSize)
       }
     }
   };
@@ -82,12 +74,9 @@ export const buildQueuePageSizePreferenceDocument = (
     schemaVersion: USER_PREFERENCE_SCHEMA_VERSION,
     preferences: {
       ...normalized.preferences,
-      dashboard: {
-        ...normalized.preferences.dashboard,
-        queue: {
-          ...normalized.preferences.dashboard.queue,
-          pageSize: normalizePageSize(pageSize)
-        }
+      requestQueue: {
+        ...normalized.preferences.requestQueue,
+        pageSize: normalizePageSize(pageSize)
       }
     }
   };
@@ -112,7 +101,7 @@ export const fetchUserPreferences = () => {
         const currentRowsState =
           currentQueueParams.rowsState || {
             page: 0,
-            pageSize: DEFAULT_DASHBOARD_QUEUE_PAGE_SIZE
+            pageSize: DEFAULT_REQUEST_QUEUE_PAGE_SIZE
           };
 
         dispatch(
@@ -122,7 +111,7 @@ export const fetchUserPreferences = () => {
               ...currentRowsState,
               page: 0,
               pageSize:
-                document.preferences.dashboard.queue.pageSize
+                document.preferences.requestQueue.pageSize
             }
           })
         );
@@ -148,7 +137,7 @@ export const fetchUserPreferences = () => {
 const pendingPageSizeSaves = new WeakMap();
 
 
-export const saveDashboardQueuePageSize = (pageSize) => {
+export const saveRequestQueuePageSize = (pageSize) => {
   return (dispatch, getState) => {
     const previousSave =
       pendingPageSizeSaves.get(dispatch) || Promise.resolve();
@@ -189,7 +178,7 @@ export const saveDashboardQueuePageSize = (pageSize) => {
         })
         .catch((error) => {
           console.warn(
-            "Unable to save dashboard queue page size.",
+            "Unable to save request queue page size.",
             error
           );
 

@@ -10,17 +10,11 @@ class FOIUserPreference(db.Model):
 
     __tablename__ = "FOIUserPreferences"
 
-    userpreferenceid = db.Column(
-        db.Integer,
-        primary_key=True,
-        autoincrement=True
-    )
-
     # Deliberately uses the normalized authenticated user id returned by
     # AuthHelper.getuserid() rather than depending on the FOIUsers sync table.
     userid = db.Column(
         db.String(255),
-        unique=True,
+        primary_key=True,
         nullable=False
     )
 

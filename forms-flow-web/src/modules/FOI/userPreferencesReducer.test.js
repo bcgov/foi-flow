@@ -7,11 +7,11 @@ import {
 
 
 describe("userPreferencesReducer", () => {
-  test("uses dashboard queue page size 100 by default", () => {
+  test("uses request queue page size 100 by default", () => {
     const state = userPreferences(undefined, {});
 
     expect(
-      state.preferences.dashboard.queue.pageSize
+      state.preferences.requestQueue.pageSize
     ).toBe(100);
 
     expect(state.isLoaded).toBe(false);
@@ -25,17 +25,15 @@ describe("userPreferencesReducer", () => {
       setUserPreferences({
         schemaVersion: 1,
         preferences: {
-          dashboard: {
-            queue: {
-              pageSize: 50
-            }
+          requestQueue: {
+            pageSize: 50
           }
         }
       })
     );
 
     expect(
-      state.preferences.dashboard.queue.pageSize
+      state.preferences.requestQueue.pageSize
     ).toBe(50);
 
     expect(state.isLoaded).toBe(true);
@@ -50,7 +48,7 @@ describe("userPreferencesReducer", () => {
     );
 
     expect(
-      state.preferences.dashboard.queue.pageSize
+      state.preferences.requestQueue.pageSize
     ).toBe(100);
 
     expect(state.isLoaded).toBe(true);

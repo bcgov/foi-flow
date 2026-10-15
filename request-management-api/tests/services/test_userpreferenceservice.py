@@ -30,10 +30,8 @@ def test_get_preferences_returns_saved_document():
     preference.asdict.return_value = {
         "schemaVersion": 1,
         "preferences": {
-            "dashboard": {
-                "queue": {
-                    "pageSize": 50
-                }
+            "requestQueue": {
+                "pageSize": 50
             }
         }
     }
@@ -48,7 +46,7 @@ def test_get_preferences_returns_saved_document():
         )
 
     assert (
-        result["preferences"]["dashboard"]["queue"]["pageSize"]
+        result["preferences"]["requestQueue"]["pageSize"]
         == 50
     )
 
@@ -59,10 +57,8 @@ def test_save_preferences_uses_authenticated_user_id():
     saved_preference.asdict.return_value = {
         "schemaVersion": 1,
         "preferences": {
-            "dashboard": {
-                "queue": {
-                    "pageSize": 100
-                }
+            "requestQueue": {
+                "pageSize": 100
             }
         }
     }
@@ -70,10 +66,8 @@ def test_save_preferences_uses_authenticated_user_id():
     payload = {
         "schemaVersion": 1,
         "preferences": {
-            "dashboard": {
-                "queue": {
-                    "pageSize": 100
-                }
+            "requestQueue": {
+                "pageSize": 100
             }
         }
     }
@@ -95,7 +89,7 @@ def test_save_preferences_uses_authenticated_user_id():
     )
 
     assert (
-        result["preferences"]["dashboard"]["queue"]["pageSize"]
+        result["preferences"]["requestQueue"]["pageSize"]
         == 100
     )
 
@@ -150,7 +144,7 @@ def test_atomic_upsert_uses_postgresql_conflict_handling():
 
     statement = FOIUserPreference._build_upsert_statement(
         "test.user@idir",
-        {"dashboard": {"queue": {"pageSize": 50}}},
+        {"requestQueue": {"pageSize": 50}},
         1
     )
 
@@ -177,3 +171,11 @@ def test_atomic_upsert_executes_before_reading_saved_row():
     execute.assert_called_once()
     commit.assert_called_once()
     lookup.assert_called_once_with("test.user@idir")
+
+
+def test_userid_is_the_only_primary_key():
+    from request_api.models.FOIUserPreferences import FOIUserPreference
+
+    table = FOIUserPreference.__table__
+    assert list(table.primary_key.columns.keys()) == ["userid"]
+    assert "userpreferenceid" not in table.columns
