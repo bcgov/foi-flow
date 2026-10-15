@@ -14,6 +14,7 @@ from request_api.utils.enums import StateName
 import logging
 from request_api.schemas.external.bpmschema import VariableSchema
 from request_api.services.external.camundaservice import VariableType 
+from pprint import pformat
 """
 This class is reserved for workflow services integration.
 Supported operations: claim
@@ -40,7 +41,7 @@ class workflowservice:
             return bpmservice().unopenedsave(wfinstanceid, assignedto, messagename)                 
         else:
             if status == UnopenedEvent.open.value:
-                metadata = json.dumps({"id": id, "status": status, "ministries": ministries, "assignedGroup": assignedgroup, "assignedTo": assignedto})
+                metadata = json.dumps({"id": id, "status": status, "ministries": self.__format_ministries(ministries), "assignedGroup": assignedgroup, "assignedTo": assignedto})
             else:            
                 metadata = json.dumps({"id": id, "status": status, "assignedGroup": assignedgroup, "assignedTo": assignedto})
             return bpmservice().unopenedcomplete(wfinstanceid, metadata, MessageType.intakecomplete.value) 
@@ -49,6 +50,18 @@ class workflowservice:
         assignedgroup = self.__getopenedassigneevalue(requestsschema, "assignedgroup",usertype) 
         assignedto = self.__getopenedassigneevalue(requestsschema, "assignedto",usertype)        
         axisrequestid = self.__getvaluefromschema(requestsschema,"axisRequestId")
+        print('******postopenedevent******')
+        print('data: ', pformat(data))
+        print('issync: ', pformat(issync))
+        print('usertype: ', pformat(usertype))
+        print('assignedgroup: ', pformat(assignedgroup))
+        print('assignedto: ', pformat(assignedto))
+        print('axisrequestid: ', pformat(axisrequestid))
+        print('newstatus: ', pformat(newstatus))
+        print('id: ', pformat(id))
+        print('wfinstanceid: ', pformat(wfinstanceid))
+        print('requestsschema: ', pformat(requestsschema))
+        print('ministries: ', pformat(data.get("ministries")))
         if data.get("ministries") is not None:
             for ministry in data.get("ministries"): 
                 filenumber =  ministry["filenumber"] 
@@ -209,6 +222,15 @@ class workflowservice:
         return UserType.iao.value
 
     def __postopenedevent(self, id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity):
+        print('******__postopenedevent******')
+        print('id: ', pformat(id))
+        print('filenumber: ', pformat(filenumber))
+        print('metadata: ', pformat(metadata))
+        print('messagename: ', pformat(messagename))
+        print('assignedgroup: ', pformat(assignedgroup))
+        print('assignedto: ', pformat(assignedto))
+        print('wfinstanceid: ', pformat(wfinstanceid))
+        print('activity: ', pformat(activity))
         if activity == Activity.complete.value:
 
             if self.__hasreopened(id, "ministryrequest") == True:
@@ -300,6 +322,19 @@ class workflowservice:
     
     def __getministryactivity(self, oldstatus, newstatus):
         return  Activity.complete.value if newstatus is not None and oldstatus != newstatus else Activity.save.value
+
+    # The data needs to be less than 4000 characters for Camunda
+    # This strips irrelevant data to keep text below limit when all ministries selected
+    def __format_ministries(self, ministries):
+        if ministries is None or isinstance(ministries, list):
+            return ministries
+        formatted_ministries = []
+        for ministry in ministries:
+            formatted_ministries.append({
+                "filenumber": ministry.get("filenumber"),
+                "assignedgroup": ministry.get("assignedgroup"),
+            })
+        return formatted_ministries
 
 
 class UserType(Enum):
