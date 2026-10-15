@@ -326,7 +326,7 @@ class workflowservice:
     # The data needs to be less than 4000 characters for Camunda
     # This strips irrelevant data to keep text below limit when all ministries selected
     def __format_ministries(self, ministries):
-        if ministries is None or isinstance(ministries, list):
+        if ministries is None or not isinstance(ministries, list):
             return ministries
         formatted_ministries = []
         for ministry in ministries:
