@@ -51,11 +51,17 @@ jobs:
           fetch-depth: 0
 
 
-      - name: Install yq
+      - name: Install build dependencies
         run: |
           sudo wget -qO /usr/local/bin/yq \
             https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
+
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+          yq --version
+          jq --version
 
 
       - name: Generate service build matrix
@@ -64,7 +70,6 @@ jobs:
         run: |
 
           CONFIG_FILE=".github/configuration/service-catalog.yaml"
-
 
           #
           # Manual execution:
@@ -78,16 +83,15 @@ jobs:
 
             if [ "$REQUESTED_SERVICE" = "all" ]; then
 
-              BUILD_MATRIX=$(yq -o=json '.services | {include: .}' "$CONFIG_FILE")
+              BUILD_MATRIX=$(yq -o=json '.services | {"include": .}' "$CONFIG_FILE")
 
             else
 
               BUILD_MATRIX=$(yq -o=json \
-                ".services | map(select(.name == \"$REQUESTED_SERVICE\")) | {include: .}" \
+                ".services | map(select(.name == \"$REQUESTED_SERVICE\")) | {\"include\": .}" \
                 "$CONFIG_FILE")
 
             fi
-
 
           #
           # Pull request execution:
@@ -95,53 +99,60 @@ jobs:
           #
           else
 
-            CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+
+            echo "Base SHA: $BASE_SHA"
+            echo "Head SHA: $HEAD_SHA"
+
+            CHANGED_FILES=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA")
 
             echo "Changed files:"
-            echo "$CHANGED_FILES"
+            printf '%s\n' "$CHANGED_FILES"
 
-
-            BUILD_MATRIX='{"include":['
-            FIRST_ENTRY=true
-
+            BUILD_MATRIX='{"include":[]}'
 
             SERVICE_COUNT=$(yq '.services | length' "$CONFIG_FILE")
-
 
             for ((index=0; index<SERVICE_COUNT; index++))
             do
 
-              SERVICE_NAME=$(yq ".services[$index].name" "$CONFIG_FILE")
-              SERVICE_PATH=$(yq ".services[$index].path" "$CONFIG_FILE")
-              IMAGE_NAME=$(yq ".services[$index].image" "$CONFIG_FILE")
+              SERVICE_NAME=$(yq -r ".services[$index].name" "$CONFIG_FILE")
+              SERVICE_PATH=$(yq -r ".services[$index].path" "$CONFIG_FILE")
+              IMAGE_NAME=$(yq -r ".services[$index].image" "$CONFIG_FILE")
 
+              echo "Checking service: $SERVICE_NAME"
+              echo "  Path: $SERVICE_PATH"
 
-              # Add service to build list if code changes exist under its directory
-              if echo "$CHANGED_FILES" | grep -q "^${SERVICE_PATH}/"; then
+              while IFS= read -r changed_file
+              do
 
+                if [[ "$changed_file" == "$SERVICE_PATH/"* ]]; then
 
-                if [ "$FIRST_ENTRY" = false ]; then
-                  BUILD_MATRIX+=","
+                  echo "  MATCH: $changed_file"
+
+                  BUILD_MATRIX=$(echo "$BUILD_MATRIX" | jq \
+                    --arg name "$SERVICE_NAME" \
+                    --arg path "$SERVICE_PATH" \
+                    --arg image "$IMAGE_NAME" \
+                    '.include += [{
+                      name: $name,
+                      path: $path,
+                      image: $image
+                    }]')
+
+                  break
+
                 fi
 
-
-                BUILD_MATRIX+="{\"name\":\"${SERVICE_NAME}\",\"path\":\"${SERVICE_PATH}\",\"image\":\"${IMAGE_NAME}\"}"
-
-                FIRST_ENTRY=false
-
-              fi
+              done <<< "$CHANGED_FILES"
 
             done
 
-
-            BUILD_MATRIX+=']}'
-
           fi
-
 
           echo "Build matrix:"
           echo "$BUILD_MATRIX" | jq .
-
 
           echo "matrix=$(echo "$BUILD_MATRIX" | jq -c .)" >> "$GITHUB_OUTPUT"
 
@@ -213,12 +224,9 @@ jobs:
           do
             echo "Registry login attempt ${attempt}/${MAX_RETRIES}"
 
-            printf '%s\n' "$PASSWORD" | docker login "$REGISTRY" --username "$USERNAME" --password-stdin
-            EXIT_CODE=$?
-
-            if [ $EXIT_CODE -eq 0 ]; then
-              echo "Registry login successful"
-              exit 0
+            if printf '%s\n' "$PASSWORD" | docker login "$REGISTRY" --username "$USERNAME" --password-stdin; then
+                echo "Registry login successful"
+                exit 0
             fi
 
             if [ "$attempt" -lt "$MAX_RETRIES" ]; then
@@ -307,3 +315,4 @@ jobs:
             ✅ Container images built successfully.
 
             **Image tag:** `${{ env.IMAGE_TAG }}`
+  
