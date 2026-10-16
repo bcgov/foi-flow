@@ -14,7 +14,6 @@ from request_api.utils.enums import StateName
 import logging
 from request_api.schemas.external.bpmschema import VariableSchema
 from request_api.services.external.camundaservice import VariableType 
-from pprint import pformat
 """
 This class is reserved for workflow services integration.
 Supported operations: claim
@@ -50,18 +49,6 @@ class workflowservice:
         assignedgroup = self.__getopenedassigneevalue(requestsschema, "assignedgroup",usertype) 
         assignedto = self.__getopenedassigneevalue(requestsschema, "assignedto",usertype)        
         axisrequestid = self.__getvaluefromschema(requestsschema,"axisRequestId")
-        print('******postopenedevent******')
-        print('data: ', pformat(data))
-        print('issync: ', pformat(issync))
-        print('usertype: ', pformat(usertype))
-        print('assignedgroup: ', pformat(assignedgroup))
-        print('assignedto: ', pformat(assignedto))
-        print('axisrequestid: ', pformat(axisrequestid))
-        print('newstatus: ', pformat(newstatus))
-        print('id: ', pformat(id))
-        print('wfinstanceid: ', pformat(wfinstanceid))
-        print('requestsschema: ', pformat(requestsschema))
-        print('ministries: ', pformat(data.get("ministries")))
         if data.get("ministries") is not None:
             for ministry in data.get("ministries"): 
                 filenumber =  ministry["filenumber"] 
@@ -222,15 +209,6 @@ class workflowservice:
         return UserType.iao.value
 
     def __postopenedevent(self, id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity):
-        print('******__postopenedevent******')
-        print('id: ', pformat(id))
-        print('filenumber: ', pformat(filenumber))
-        print('metadata: ', pformat(metadata))
-        print('messagename: ', pformat(messagename))
-        print('assignedgroup: ', pformat(assignedgroup))
-        print('assignedto: ', pformat(assignedto))
-        print('wfinstanceid: ', pformat(wfinstanceid))
-        print('activity: ', pformat(activity))
         if activity == Activity.complete.value:
 
             if self.__hasreopened(id, "ministryrequest") == True:
