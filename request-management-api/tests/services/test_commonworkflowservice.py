@@ -1,5 +1,7 @@
 import json
+import re
 import uuid
+from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -104,6 +106,48 @@ def test_every_event_method_adds_a_unique_uuid4_event_id(outbox):
     assert len(event_ids) == 6
     assert all(uuid.UUID(event_id).version == 4 for event_id in event_ids)
     assert len(set(event_ids)) == 6
+
+
+OCCURRED_AT_FORMAT = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}\+00:00$")
+
+
+def _send_every_kind_of_event(engine):
+    engine.unopenedsave(None, json.dumps({}), MessageType.intakeclaim.value)
+    engine.unopenedcomplete(None, json.dumps({}), MessageType.intakecomplete.value)
+    engine.openedcomplete(None, "FILE-1", json.dumps({}), MessageType.iaocomplete.value)
+    engine.feeevent("AXIS-1", json.dumps({}), "PAID")
+    engine.correspondanceevent(None, "FILE-1", json.dumps({}))
+    engine.reopenevent(None, json.dumps({}), MessageType.iaoreopen.value)
+
+
+def test_every_event_method_adds_a_utc_occurred_at_in_a_fixed_width_sortable_format(outbox):
+    _send_every_kind_of_event(commonworkflowservice())
+    payloads = _enqueued(outbox)
+    assert len(payloads) == 6
+    for payload in payloads:
+        assert OCCURRED_AT_FORMAT.match(payload["occurred_at"]), payload["occurred_at"]
+        assert datetime.fromisoformat(payload["occurred_at"]).utcoffset().total_seconds() == 0
+
+
+def test_occurred_at_does_not_go_backwards_from_one_event_to_the_next(outbox):
+    _send_every_kind_of_event(commonworkflowservice())
+    stamps = [payload["occurred_at"] for payload in _enqueued(outbox)]
+    assert stamps == sorted(stamps)
+
+
+def test_occurred_at_is_the_time_the_event_was_produced(outbox):
+    before = datetime.now(timezone.utc)
+    _unopenedcomplete()
+    after = datetime.now(timezone.utc)
+    stamp = datetime.fromisoformat(_enqueued(outbox)[0]["occurred_at"])
+    assert before <= stamp <= after
+
+
+def test_occurred_at_and_event_id_are_set_by_the_service_not_by_the_caller_data(outbox):
+    commonworkflowservice().feeevent("AXIS-1", json.dumps({"occurred_at": "1999"}), "PAID")
+    payload = _enqueued(outbox)[0]
+    assert payload["occurred_at"] != "1999"
+    assert OCCURRED_AT_FORMAT.match(payload["occurred_at"])
 
 
 def test_outbox_failure_is_logged_not_raised(outbox, caplog):
