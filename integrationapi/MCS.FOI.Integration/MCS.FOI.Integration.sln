@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.Integration.Infrast
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.Integration.Core", "MCS.FOI.Integration.Core\MCS.FOI.Integration.Core.csproj", "{4D48EC55-8D99-47FB-AC59-34B02F196B9A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCS.FOI.Integration.Tests", "MCS.FOI.Integration.Tests\MCS.FOI.Integration.Tests.csproj", "{D55D68CD-6972-4C37-B41F-191B75289AAB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{4D48EC55-8D99-47FB-AC59-34B02F196B9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D48EC55-8D99-47FB-AC59-34B02F196B9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D48EC55-8D99-47FB-AC59-34B02F196B9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D55D68CD-6972-4C37-B41F-191B75289AAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D55D68CD-6972-4C37-B41F-191B75289AAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D55D68CD-6972-4C37-B41F-191B75289AAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D55D68CD-6972-4C37-B41F-191B75289AAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
