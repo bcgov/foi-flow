@@ -2,7 +2,6 @@ import requests
 import os
 import json
 from enum import Enum
-from pprint import pformat
 
 from request_api.schemas.external.bpmschema import MessageSchema, VariableSchema, VariableMessageSchema 
 from request_api.services.external.camundaservice import camundaservice, VariableType 
@@ -112,10 +111,6 @@ class bpmservice(camundaservice):
                                               "processVariables":{
                                                   "foiRequestMetaData": VariableSchema().dump({"data" : VariableType.String.value, "value": data})}
                                               })
-            print('******openedcomplete******')
-            print('self.bpmengineresturl: ', pformat(self.bpmengineresturl))
-            print('messageschema: ', pformat(messageschema))
-            print('messagetype: ', pformat(messagetype))
             return self.__post_message(messagetype, messageschema, token)
         else:
             return    
@@ -152,12 +147,6 @@ class bpmservice(camundaservice):
         return self.unopenedcomplete(processinstanceid, data, messagetype, token)
 
     def __post_message(self, messagetype, messageschema, token=None):
-        print('******__post_message******')
-        print('messagetype: ', pformat(messagetype))
-        print('messageschema: ', pformat(messageschema))
-        print('token present: ', pformat(token is not None))
-        print('URL: ', pformat(self._getUrl_(messagetype)))
-        print('data: ', pformat(json.dumps(messageschema)))
         return requests.post(self._getUrl_(messagetype), data=json.dumps(messageschema), headers = self._getHeaders_(token))
 
     def _getUrl_(self, messagetype, definitionkey=None):
