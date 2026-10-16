@@ -13,6 +13,7 @@
 # limitations under the License.
 """Bring in the common JWT Manager."""
 import logging
+import os
 from functools import wraps
 from http import HTTPStatus
 
@@ -148,6 +149,22 @@ class Auth:
             return wrapper
         return decorated
 
+
+    @classmethod
+    def isworkflowserviceaccount(cls):
+        """Allows only the n8n service account: the token's azp/clientId claim must equal
+        N8N_SERVICE_ACCOUNT_CLIENT_ID. Fails closed when that variable is not set.
+        Use in conjunction with require."""
+        def decorated(f):
+            @wraps(f)
+            def wrapper(*args, **kwargs):
+                expected = os.getenv("N8N_SERVICE_ACCOUNT_CLIENT_ID")
+                claims = getattr(g, "jwt_oidc_token_info", None) or {}
+                if expected and expected in (claims.get("azp"), claims.get("clientId")):
+                    return f(*args, **kwargs)
+                return "Unauthorized" , 401
+            return wrapper
+        return decorated
 
     @classmethod
     def isiao(cls,func):

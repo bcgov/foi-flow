@@ -86,6 +86,9 @@ def create_app(run_mode=os.getenv('FLASK_ENV', 'development')):
     from request_api.resources import API_BLUEPRINT #, DEFAULT_API_BLUEPRINT #, OPS_BLUEPRINT  # pylint: disable=import-outside-toplevel
 
     app.logger.info("Creating request API app: environment=%s", run_mode)
+
+    from request_api.services.workflowengine import validate_engine_config  # pylint: disable=import-outside-toplevel
+    validate_engine_config()  # fail fast on an invalid WF_DEFAULT_ENGINE
     
     CORS(app, supports_credentials=True)
     db.init_app(app)
