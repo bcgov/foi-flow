@@ -86,7 +86,8 @@ def service(app):
 
 
 def _payload(n=1, event="foi-iao-complete"):
-    return {"event": event, "event_id": "00000000-0000-4000-8000-%012d" % n, "foiRequestMetaData": "{}"}
+    return {"event": event, "event_id": "00000000-0000-4000-8000-%012d" % n, "occurred_at": "2040-01-01T12:00:%02d.123456+00:00" % n,
+            "foiRequestMetaData": "{}"}
 
 
 def _row(n=1):
@@ -398,6 +399,26 @@ def test_replay_queues_dead_and_failed_events_again_with_the_same_event_id(servi
     _dispatch(service, lambda payload: sent.append(payload) or OK)
     assert [p["event_id"] for p in sent] == [_payload(1)["event_id"]]
     assert _row(1).status == "DELIVERED"
+
+
+# --- ordering: occurred_at is part of the stored payload and never changes ---------------------------
+
+def test_occurred_at_is_the_same_on_the_first_send_and_on_every_retry(service):
+    service.enqueue(_payload(1))
+    sent = []
+    for attempt in range(3):
+        _dispatch(service, lambda payload: sent.append(dict(payload)) or RETRYABLE, now=NOW + timedelta(hours=attempt + 1))
+    assert len(sent) == 3
+    assert {p["occurred_at"] for p in sent} == {_payload(1)["occurred_at"]}
+    assert {p["event_id"] for p in sent} == {_payload(1)["event_id"]}
+
+
+def test_occurred_at_is_unchanged_when_a_dead_event_is_replayed_later(service):
+    _seed(service, 1, status="DEAD", attempts=5, lasterror="boom")
+    service.replay(_payload(1)["event_id"], now=NOW)
+    sent = []
+    _dispatch(service, lambda payload: sent.append(dict(payload)) or OK, now=NOW + timedelta(days=3))
+    assert [p["occurred_at"] for p in sent] == [_payload(1)["occurred_at"]]
 
 
 @pytest.mark.parametrize("status", ["PENDING", "DELIVERED", "COMPLETED"])

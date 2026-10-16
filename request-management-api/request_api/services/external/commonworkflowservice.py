@@ -3,6 +3,7 @@ import os
 import json
 import logging
 import uuid
+from datetime import datetime, timezone
 
 from request_api.services.external.bpmservice import MessageType
 from request_api.services.workflowoutboxservice import workflowoutboxservice
@@ -22,6 +23,13 @@ no per-request instance id/address to store or construct on this side.
 Every event carries an "event_id" (uuid4) generated once in __post_event and
 stored in the payload, so every re-delivery re-sends the same id and
 FOI Request Routing in n8n can skip an event whose earlier run completed.
+
+Every event also carries "occurred_at" (UTC ISO-8601 with microseconds, fixed width so
+the strings sort in time order), stamped once at the same place. The outbox stores the
+payload, so every retry and replay re-sends the original value. FOI Request Routing keeps
+the newest occurred_at it has applied per request and skips an older *state* event
+(intake / IAO / ministry claim, complete and reopen) as stale; action events
+(foi-manage-payment, foi-iao-correnspodence) are always processed.
 
 Events are not posted from the request thread. __post_event stores them in the
 FOIWorkflowEventOutbox table (workflowoutboxservice.enqueue) and
@@ -117,7 +125,8 @@ class commonworkflowservice:
         return n8ndeliveryresult(True, content=content if isinstance(content, dict) else None)
 
     def __post_event(self, messagetype, extra):
-        payload = {"event": messagetype, "event_id": str(uuid.uuid4())}
+        payload = {"event": messagetype, "event_id": str(uuid.uuid4()),
+                   "occurred_at": datetime.now(timezone.utc).isoformat(timespec="microseconds")}
         payload.update(extra)
         try:
             workflowoutboxservice().enqueue(payload)
