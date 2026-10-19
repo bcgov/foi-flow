@@ -44,20 +44,39 @@
             if (items == null || !items.Any())
                 throw new ArgumentException("Items collection cannot be null or empty.", nameof(items));
 
-            using var transaction = _dbConnection.BeginTransaction();
+            var openedHere = _dbConnection.State != System.Data.ConnectionState.Open;
+
+            if (openedHere)
+            {
+                if (_dbConnection is System.Data.Common.DbConnection dbConnection)
+                    await dbConnection.OpenAsync();
+                else
+                    _dbConnection.Open();
+            }
+
             try
             {
-                foreach (var item in items)
-                {
-                    await _dbConnection.ExecuteAsync(updateQuery, item, transaction);
-                }
+                using var transaction = _dbConnection.BeginTransaction();
 
-                transaction.Commit();
+                try
+                {
+                    foreach (var item in items)
+                    {
+                        await _dbConnection.ExecuteAsync(updateQuery, item, transaction);
+                    }
+
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                    throw;
+                }
             }
-            catch
+            finally
             {
-                transaction.Rollback();
-                throw;
+                if (openedHere)
+                    _dbConnection.Close();
             }
         }
     }
