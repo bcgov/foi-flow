@@ -44,7 +44,7 @@
             if (items == null || !items.Any())
                 throw new ArgumentException("Items collection cannot be null or empty.", nameof(items));
 
-            var openedHere = _dbConnection.State != System.Data.ConnectionState.Open;
+            var openedHere = _dbConnection.State == System.Data.ConnectionState.Closed;
 
             if (openedHere)
             {
