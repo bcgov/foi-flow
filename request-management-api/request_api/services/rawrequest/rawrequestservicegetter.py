@@ -144,6 +144,7 @@ class rawrequestservicegetter:
                                'isiaorestricted': request['isiaorestricted'] if request['isiaorestricted'] is not None else False,
                                'sourceOfSubmission': request['sourceofsubmission'],
                                'requestType': requesttype,
+                               'identityVerified': requestrawdata.get('identityVerified'),
                                'firstName': contactinfo['firstName'],
                                'middleName': requestrawdata['contactInfo']['middleName'],
                                'lastName': contactinfo['lastName'],
