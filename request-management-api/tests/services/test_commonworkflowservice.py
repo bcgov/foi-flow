@@ -279,3 +279,48 @@ def test_gated_methods_raise_not_implemented():
         engine.searchinstancebyvariable("foi-request", [{"name": "id", "value": 7}])
     with pytest.raises(NotImplementedError):
         engine.searchprocessinstance("555")
+
+
+# --- enqueue failure: retried, recorded as DEAD for every event -----------------
+
+ACTION_CALLS = {
+    MessageType.iaocomplete.value: lambda e: e.openedcomplete(None, "FILE-1", json.dumps({}), MessageType.iaocomplete.value),
+    MessageType.iaocorrenspodence.value: lambda e: e.correspondanceevent(None, "FILE-1", json.dumps({})),
+    MessageType.managepayment.value: lambda e: e.feeevent("AXIS-1", json.dumps({}), "PAID"),
+}
+AUDIT_CALLS = {
+    MessageType.intakeclaim.value: lambda e: e.unopenedsave(None, json.dumps({}), MessageType.intakeclaim.value),
+    MessageType.intakecomplete.value: lambda e: e.unopenedcomplete(None, json.dumps({}), MessageType.intakecomplete.value),
+    MessageType.iaoreopen.value: lambda e: e.reopenevent(None, json.dumps({}), MessageType.iaoreopen.value),
+}
+
+ALL_CALLS = {**ACTION_CALLS, **AUDIT_CALLS}
+
+
+def test_a_transient_enqueue_failure_is_retried_and_creates_no_dead_row(outbox):
+    outbox.enqueue.side_effect = [Exception("blip"), None]
+    assert _unopenedcomplete() is None
+    assert outbox.enqueue.call_count == 2
+    outbox.recordenqueuefailure.assert_not_called()
+    # every retry sends the same payload, so the event_id stays unique
+    assert len({call[0][0]["event_id"] for call in outbox.enqueue.call_args_list}) == 1
+
+
+@pytest.mark.parametrize("event,call", ALL_CALLS.items())
+def test_a_persistent_enqueue_failure_is_recorded_as_dead_and_does_not_raise_for_any_event(outbox, caplog, event, call):
+    outbox.enqueue.side_effect = Exception("db down")
+    outbox.recordenqueuefailure.return_value = True
+    assert call(commonworkflowservice()) is None
+    assert outbox.enqueue.call_count == 3
+    payload, error = outbox.recordenqueuefailure.call_args[0]
+    assert payload["event"] == event and error == "Exception"
+    assert payload["event_id"] in caplog.text
+    assert "was NOT queued" in caplog.text
+
+
+def test_a_database_outage_is_logged_without_the_payload_and_does_not_raise(outbox, caplog):
+    outbox.enqueue.side_effect = Exception("db down")
+    outbox.recordenqueuefailure.side_effect = Exception("db down")
+    assert ALL_CALLS[MessageType.managepayment.value](commonworkflowservice()) is None
+    assert "recorded as DEAD=False" in caplog.text
+    assert "foiRequestMetaData" not in caplog.text
