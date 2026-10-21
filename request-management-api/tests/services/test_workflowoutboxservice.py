@@ -149,6 +149,35 @@ def test_failed_insert_does_not_roll_back_the_callers_pending_change(service):
     assert RequestChange.query.count() == 1
 
 
+def test_recordenqueuefailure_writes_a_dead_row_with_the_payload_and_it_can_be_replayed(service):
+    assert service.recordenqueuefailure(_payload(1), "OperationalError") is True
+    row = _row(1)
+    assert (row.status, row.payload, row.eventname) == ("DEAD", _payload(1), "foi-iao-complete")
+    assert row.lasterror.startswith("ENQUEUE_FAILED")
+    result, replayed = service.replay(_payload(1)["event_id"])
+    assert result == AckResult.updated and replayed.status == "PENDING"
+
+
+def test_recordenqueuefailure_falls_back_to_a_row_without_the_payload_body(service, monkeypatch):
+    unserializable = dict(_payload(1), foiRequestMetaData=object())
+    assert service.recordenqueuefailure(unserializable, "TypeError") is True
+    row = _row(1)
+    assert row.status == "DEAD" and "foiRequestMetaData" not in row.payload
+    assert row.lasterror.endswith("(payload not stored)")
+
+
+def test_recordenqueuefailure_returns_false_when_nothing_can_be_written(service):
+    service.enqueue(_payload(1))
+    assert service.recordenqueuefailure(_payload(1), "IntegrityError") is False  # event_id already stored
+
+
+def test_recoversession_keeps_a_healthy_session_and_resets_a_broken_one(service):
+    db.session.add(RequestChange(note="kept"))
+    service.recoversession()
+    db.session.commit()
+    assert RequestChange.query.count() == 1
+
+
 # --- dispatcher ------------------------------------------------------------------------------
 
 def test_dispatch_delivers_pending_rows_and_marks_them_delivered(service):
