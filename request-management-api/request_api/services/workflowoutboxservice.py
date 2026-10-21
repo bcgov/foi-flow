@@ -3,6 +3,8 @@ import os
 import random
 from datetime import datetime, timedelta, timezone
 
+from sqlalchemy.orm import Session
+
 from request_api.models.db import db
 from request_api.models.FOIWorkflowEventOutbox import FOIWorkflowEventOutbox, OutboxStatus
 
@@ -24,11 +26,15 @@ acknowledge()    n8n reports the outcome. PENDING/DELIVERED -> COMPLETED/FAILED.
                  outcome. Repeating the same acknowledgement is a no-op.
 sweepnooutcome() DELIVERED rows with no outcome after a threshold become FAILED/NO_OUTCOME.
 replay()         DEAD/FAILED -> PENDING, same event_id (FOI Request Routing dedupes on it).
+recordenqueuefailure()
+                 last resort when enqueue() keeps failing: writes a DEAD row (lasterror starts
+                 with ENQUEUE_FAILED) in a separate session so the event can be found and replayed.
 
 Retry settings come from N8N_WEBHOOK_RETRY_MAX_ATTEMPTS, _BACKOFF_SECONDS and _MAX_BACKOFF_SECONDS.
 """
 
 NO_OUTCOME_PREFIX = "NO_OUTCOME"
+ENQUEUE_FAILED_PREFIX = "ENQUEUE_FAILED"
 MAXERRORLENGTH = 2000
 
 
@@ -59,6 +65,39 @@ class workflowoutboxservice:
         if commit:
             db.session.commit()
         return row
+
+    @staticmethod
+    def recoversession():
+        """Rolls the caller's session back only if a failed commit left it unusable, so a
+        retry of enqueue() can run. A healthy session (failed insert rolled back to its
+        savepoint) keeps the caller's pending changes."""
+        if not db.session.is_active:
+            db.session.rollback()
+
+    def recordenqueuefailure(self, payload, error):
+        """Writes a DEAD row for an event that could not be enqueued, in its own session so a
+        broken caller session cannot block it. Falls back to a row without the payload body if
+        the full payload cannot be stored. Returns True if a row was written; False if the
+        database is unreachable (the caller must then rely on its log line)."""
+        message = self.__truncate("%s: %s" % (ENQUEUE_FAILED_PREFIX, error))
+        minimal = {key: payload.get(key) for key in ("event", "event_id", "occurred_at")}
+        for stored, note in ((payload, message), (minimal, self.__truncate(message + " (payload not stored)"))):
+            session = Session(bind=db.engine)
+            try:
+                now = self.__now()
+                session.add(FOIWorkflowEventOutbox(
+                    eventid=payload["event_id"], eventname=payload.get("event") or "unknown", payload=stored,
+                    status=OutboxStatus.dead.value, attempts=0, nextattemptat=now, lasterror=note,
+                    created_at=now, updated_at=now,
+                ))
+                session.commit()
+                return True
+            except Exception as ex:
+                session.rollback()
+                logging.error("workflowoutboxservice: unable to record the enqueue failure for event_id=%s (payload stored=%s): %s", payload.get("event_id"), stored is payload, type(ex).__name__)
+            finally:
+                session.close()
+        return False
 
     def dispatch_due(self, deliver, batchsize=10, now=None):
         """Claims due rows and delivers each once through deliver(payload) -> n8ndeliveryresult.
