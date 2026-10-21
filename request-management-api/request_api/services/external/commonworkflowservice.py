@@ -37,6 +37,11 @@ N8NWorkflowOutboxDispatcher delivers them through deliver(), with backoff and a
 DEAD state; DEAD and FAILED events can be replayed through the /foiworkflow/events
 endpoints.
 
+If the outbox write fails, __post_event retries it (ENQUEUE_ATTEMPTS), then records a DEAD row
+(lasterror starts with ENQUEUE_FAILED, payload stored whole) in a separate session and logs at ERROR
+with the event_id (never the payload). Every event is treated the same: the caller is not given an
+error, the DEAD row and the log are the signal, and the row can be replayed.
+
 deliver() makes one POST and reports whether it was delivered and whether a failure
 is worth retrying (network error, timeout, HTTP 429 or 5xx). A missing
 N8N_BASE_URL or another 4xx is not retryable.
@@ -44,6 +49,9 @@ N8N_BASE_URL or another 4xx is not retryable.
 getinstancevariables / searchinstancebyvariable / searchprocessinstance are
 intentionally left unimplemented for now.
 """
+
+ENQUEUE_ATTEMPTS = 3
+
 
 class n8ndeliveryresult:
     """Outcome of one webhook call: delivered, whether a failure is worth
@@ -128,10 +136,22 @@ class commonworkflowservice:
         payload = {"event": messagetype, "event_id": str(uuid.uuid4()),
                    "occurred_at": datetime.now(timezone.utc).isoformat(timespec="microseconds")}
         payload.update(extra)
+        outbox = workflowoutboxservice()
+        error = None
+        for attempt in range(1, ENQUEUE_ATTEMPTS + 1):
+            try:
+                outbox.enqueue(payload)
+                return None
+            except Exception as ex:
+                error = type(ex).__name__
+                logging.error("commonworkflowservice: unable to save n8n event=%s event_id=%s to the outbox (attempt %s of %s): %s", messagetype, payload["event_id"], attempt, ENQUEUE_ATTEMPTS, error)
+                outbox.recoversession()
         try:
-            workflowoutboxservice().enqueue(payload)
+            recorded = outbox.recordenqueuefailure(payload, error)
         except Exception as ex:
-            logging.exception("commonworkflowservice: unable to save n8n event=%s event_id=%s to the outbox; it will not reach n8n: %s", messagetype, payload["event_id"], type(ex).__name__)
+            recorded = False
+            logging.error("commonworkflowservice: unable to record the enqueue failure for event_id=%s: %s", payload["event_id"], type(ex).__name__)
+        logging.error("commonworkflowservice: n8n event=%s event_id=%s was NOT queued; recorded as DEAD=%s", messagetype, payload["event_id"], recorded)
         return None
 
     def __getheaders(self):
