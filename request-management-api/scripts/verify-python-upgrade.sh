@@ -2,12 +2,12 @@
 set -euo pipefail
 service_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 phase=${1:-candidate}
-if [ "$#" -gt 0 ]; then shift; fi
+if [[ "$#" -gt 0 ]]; then shift; fi
 case "$phase" in baseline|candidate) ;; *) echo 'Usage: verify-python-upgrade.sh [baseline|candidate]' >&2; exit 2 ;; esac
 export UPGRADE_EVIDENCE_DIR=${UPGRADE_EVIDENCE_DIR:-/tmp/request-api-python-upgrade/$phase}
 export UPGRADE_APP_IMAGE="foi-request-api-upgrade:$phase"
 mkdir -p "$UPGRADE_EVIDENCE_DIR"
-if [ "$phase" = baseline ]; then
+if [[ "$phase" = baseline ]]; then
     # Never overwrite the pre-upgrade image with the modified working tree.
     docker image inspect --format '{{.Id}}' "$UPGRADE_APP_IMAGE" > "$UPGRADE_EVIDENCE_DIR/image-id.txt"
     docker run --rm --network none --entrypoint python "$UPGRADE_APP_IMAGE" --version
@@ -26,7 +26,7 @@ trap cleanup EXIT
 docker build -f "${UPGRADE_DOCKERFILE:-$service_dir/Dockerfile}" -t "$UPGRADE_APP_IMAGE" "$service_dir" 2>&1 | tee "$UPGRADE_EVIDENCE_DIR/build.log"
 "${compose[@]}" build checks
 "${compose[@]}" up -d --wait --wait-timeout 90 postgres redis storage
-if [ "$phase" = candidate ]; then
+if [[ "$phase" = candidate ]]; then
     bash "$service_dir/scripts/check-migration-parity.sh" "foi-python-upgrade-$phase" "$UPGRADE_EVIDENCE_DIR"
 fi
 "${compose[@]}" run --rm checks "$@" 2>&1 | tee "$UPGRADE_EVIDENCE_DIR/checks.log"

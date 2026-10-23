@@ -49,7 +49,7 @@ class Tracer:
                 'trace_id_header': 'registries-trace-id',
             },
         )
-        self.tracer = config.initialize_tracer() or opentracing.tracer
+        self.backend = config.initialize_tracer() or opentracing.tracer
         Tracer.__instance = self
 
     def trace(self, *attributes):
@@ -57,14 +57,14 @@ class Tracer:
         def decorate(handler):
             @wraps(handler)
             def traced(*args, **kwargs):
-                headers = {key.lower(): value for key, value in request.headers}
+                headers = {key.lower(): value for key, value in request.headers.items()}
                 try:
-                    parent = self.tracer.extract(opentracing.Format.HTTP_HEADERS, headers)
+                    parent = self.backend.extract(opentracing.Format.HTTP_HEADERS, headers)
                 except (opentracing.InvalidCarrierException,
                         opentracing.SpanContextCorruptedException):
                     parent = None
 
-                with self.tracer.start_active_span(
+                with self.backend.start_active_span(
                     request.endpoint or handler.__name__, child_of=parent,
                 ) as scope:
                     span = scope.span
