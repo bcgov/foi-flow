@@ -108,8 +108,10 @@ def test_real_storage_upload_can_be_read_back_with_same_bytes(session, external_
         's3', endpoint_url='https://storage:8333', region_name='us-east-1',
         aws_access_key_id='upgrade-test-only', aws_secret_access_key='upgrade-test-only',
         verify=os.environ.get('REQUESTS_CA_BUNDLE', True),
-        config=Config(s3={'addressing_style': 'path'}, connect_timeout=2, read_timeout=2,
-                      retries={'max_attempts': 0}),
+        # Shared CI runners can take longer than two seconds to complete TLS.
+        # Bound SDK retries while retaining certificate and roundtrip validation.
+        config=Config(s3={'addressing_style': 'path'}, connect_timeout=10, read_timeout=30,
+                      retries={'mode': 'standard', 'total_max_attempts': 3}),
     )
     bucket = 'upgrade-roundtrip-' + uuid.uuid4().hex
     client.create_bucket(Bucket=bucket)
