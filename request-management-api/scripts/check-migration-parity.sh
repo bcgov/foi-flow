@@ -13,11 +13,12 @@ if ! docker image inspect "$baseline_image" >/dev/null 2>&1; then
 fi
 "${compose[@]}" exec -T postgres createdb -U postgres foi_upgrade_test_baseline
 run_migration() {
+    local migration_image=$1
     docker run --rm --network "${project}_verification" \
         --env-file "$service_dir/tests/upgrade.env" \
         -e DATABASE_TEST_URL=postgresql://postgres:upgrade-test-only@postgres:5432/foi_upgrade_test_baseline \
         -e DATABASE_TEST_NAME=foi_upgrade_test_baseline \
-        --entrypoint python "$1" manage.py db upgrade
+        --entrypoint python "$migration_image" manage.py db upgrade
 }
 dump_schema() {
     "${compose[@]}" exec -T postgres pg_dump -U postgres -d foi_upgrade_test_baseline --schema-only --no-owner --no-privileges |
