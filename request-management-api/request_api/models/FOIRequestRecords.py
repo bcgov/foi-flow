@@ -154,29 +154,29 @@ class FOIRequestRecord(db.Model):
                 originalfile = ""
                 originalfilename = ""
 
-                if row["replacementof"] is not None:
-                    originalrecord = FOIRequestRecord.getrecordbyid(row["replacementof"])
+                if row._mapping["replacementof"] is not None:
+                    originalrecord = FOIRequestRecord.getrecordbyid(row._mapping["replacementof"])
                     if originalrecord:
                         originalfile = originalrecord.get("s3uripath", "")
                         originalfilename = originalrecord.get("filename", "")
 
                 records.append({
-                    "recordid": row["recordid"],
-                    "filename": row["filename"],
-                    "s3uripath": row["s3uripath"],
-                    "attributes": row["attributes"],
-                    "batchid": row["batchid"],
-                    "createdby": row["createdby"],
-                    "created_at": row["created_at"],
-                    "replacementof": row["replacementof"],
+                    "recordid": row._mapping["recordid"],
+                    "filename": row._mapping["filename"],
+                    "s3uripath": row._mapping["s3uripath"],
+                    "attributes": row._mapping["attributes"],
+                    "batchid": row._mapping["batchid"],
+                    "createdby": row._mapping["createdby"],
+                    "created_at": row._mapping["created_at"],
+                    "replacementof": row._mapping["replacementof"],
                     # replacement file
                     "originalfile": originalfile,
                     "originalfilename": originalfilename,
                     # group fields
-                    "groupdocumentsetid": row["group_document_set_id"],
-                    "groupministryrequestid": row["group_ministry_request_id"],
-                    "groupisactive": row["group_is_active"],
-                    "groupname": row["group_name"]
+                    "groupdocumentsetid": row._mapping["group_document_set_id"],
+                    "groupministryrequestid": row._mapping["group_ministry_request_id"],
+                    "groupisactive": row._mapping["group_is_active"],
+                    "groupname": row._mapping["group_name"]
                 })
 
         except Exception as ex:
@@ -227,7 +227,7 @@ class FOIRequestRecord(db.Model):
             """
             result = db.session.execute(text(sql))
             for row in result:
-                records.append({"recordid": row["recordid"], "foirequestid": row["foirequestid"], "ministryrequestid": row["ministryrequestid"], "filename": row["filename"], "attributes": row["attributes"], "isactive": row["isactive"], "replacementof": row["replacementof"]})
+                records.append({"recordid": row._mapping["recordid"], "foirequestid": row._mapping["foirequestid"], "ministryrequestid": row._mapping["ministryrequestid"], "filename": row._mapping["filename"], "attributes": row._mapping["attributes"], "isactive": row._mapping["isactive"], "replacementof": row._mapping["replacementof"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -260,7 +260,7 @@ class FOIRequestRecord(db.Model):
                         where ministryrequestid = :ministryrequestid and isactive = true  """
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
-                batchcount = row["batch_count"]
+                batchcount = row._mapping["batch_count"]
         except Exception as ex:
             logging.error(ex)
             raise ex

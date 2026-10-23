@@ -97,7 +97,7 @@ class FOIRequestNotificationUser(db.Model):
             rs = db.session.execute(text(sql), {'notificationuserid': notificationuserid})
         
             for row in rs:
-                notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+                notifications.append({"notificationid": row._mapping["notificationid"], "count" : row._mapping["relcount"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -113,7 +113,7 @@ class FOIRequestNotificationUser(db.Model):
                     where notificationid in (select notificationid from "FOIRequestNotificationUsers" frnu  where userid = :userid) group by notificationid """
             rs = db.session.execute(text(sql), {'userid': userid})
             for row in rs:
-                notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+                notifications.append({"notificationid": row._mapping["notificationid"], "count" : row._mapping["relcount"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -129,7 +129,7 @@ class FOIRequestNotificationUser(db.Model):
                     where notificationid in (select notificationid from "FOIRequestNotificationUsers" frnu  where userid = :userid and notificationusertypelabel = :notificationusertypelabel) group by notificationid """
             rs = db.session.execute(text(sql), {'userid': userid, 'notificationusertypelabel':notificationusertypelabel})
             for row in rs:
-                notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+                notifications.append({"notificationid": row._mapping["notificationid"], "count" : row._mapping["relcount"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -144,7 +144,7 @@ class FOIRequestNotificationUser(db.Model):
             sql = """select notificationid from "FOIRequestNotificationUsers" where userid = :userid and notificationid = ANY(:notificationids) """
             rs = db.session.execute(text(sql), {'userid': userid, 'notificationids': notificationids})
             for row in rs:
-                ids.append(row["notificationid"])
+                ids.append(row._mapping["notificationid"])
         except Exception as ex:
             logging.error(ex)
             raise ex

@@ -44,6 +44,7 @@ class FOIRequestTeam(db.Model):
             rs = db.session.execute(text(sql), {'requesttype': requesttype, 'status': status,'bcgovcode':bcgovcode})
         
             for row in rs:
+                row = row._mapping
                 teams.append({"name":row["name"], "type":row["type"]})
         except Exception as ex:
             logging.error(ex)
@@ -64,6 +65,7 @@ class FOIRequestTeam(db.Model):
                     and ft.requeststatuslabel = :requeststatuslabel"""
             rs = db.session.execute(text(sql), {'requesttype': requesttype, 'requeststatuslabel': StateName.feeestimate.name})
             for row in rs:
+                row = row._mapping
                 teams.append({"team":row["team"], "ministry":row["ministry"], "bcgovcode":row["bcgovcode"], "iaocode":row["iaocode"]})
         except Exception as ex:
             logging.error(ex)
@@ -85,6 +87,7 @@ class FOIRequestTeam(db.Model):
                     and (lower(pa.bcgovcode) = :bcgovcode or ft.programareaid  is null) order by requestteamid desc limit 1"""
             rs = db.session.execute(text(sql), {'bcgovcode':bcgovcode.lower()})
             for row in rs:
+                row = row._mapping
                 defaultteam = row["name"]
         except Exception as ex:
             logging.error(ex)

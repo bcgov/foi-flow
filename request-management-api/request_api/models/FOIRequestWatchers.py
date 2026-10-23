@@ -47,8 +47,8 @@ class FOIRequestWatcher(db.Model):
             sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedbygroup like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
             for row in rs:
-                if row["isactive"] == True:
-                    watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
+                if row._mapping["isactive"] == True:
+                    watchers.append({"watchedby": row._mapping["watchedby"], "watchedbygroup": row._mapping["watchedbygroup"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -63,8 +63,8 @@ class FOIRequestWatcher(db.Model):
             sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedbygroup not like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
             for row in rs:
-                if row["isactive"] == True:
-                    watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
+                if row._mapping["isactive"] == True:
+                    watchers.append({"watchedby": row._mapping["watchedby"], "watchedbygroup": row._mapping["watchedbygroup"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -79,7 +79,7 @@ class FOIRequestWatcher(db.Model):
             sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedby=:watchedby  and watchedbygroup not like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid,'watchedby':userid})        
             for row in rs:
-                if row["isactive"] == True:
+                if row._mapping["isactive"] == True:
                     _iswatcher = True
         except Exception as ex:
             logging.error(ex)
@@ -95,7 +95,7 @@ class FOIRequestWatcher(db.Model):
             sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRequestWatchers" where ministryrequestid=:ministryrequestid and watchedby=:watchedby  and watchedbygroup like \'%Ministry Team\' order by watchedby, watchedbygroup, created_at desc'
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid,'watchedby':userid})        
             for row in rs:
-                if row["isactive"] == True:
+                if row._mapping["isactive"] == True:
                     _iswatcher = True
         except Exception as ex:
             logging.error(ex)

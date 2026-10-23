@@ -74,9 +74,9 @@ class FOIRequestNotification(db.Model):
                   ) as notf order by created_at desc"""
             rs = db.session.execute(text(sql), {'userid': userid, 'days': days})
             for row in rs:
-                dt = maya.parse(row["created_at"]).datetime(to_timezone='America/Vancouver', naive=False)
+                dt = maya.parse(row._mapping["created_at"]).datetime(to_timezone='America/Vancouver', naive=False)
                 _createddate = dt
-                notifications.append({"idnumber": row["idnumber"], "axisnumber": row["axisnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": _createddate.strftime('%Y %b %d | %I:%M %p').upper(), "createdby": row["createdby"], "requesttype":row["requesttype"], "requestid":row["requestid"],"foirequestid":row["foirequestid"]})
+                notifications.append({"idnumber": row._mapping["idnumber"], "axisnumber": row._mapping["axisnumber"], "notificationid": row._mapping["notificationid"], "notification": row._mapping["notification"], "notificationtype": row._mapping["notificationtype"],  "notificationusertype": row._mapping["notificationusertype"], "created_at": _createddate.strftime('%Y %b %d | %I:%M %p').upper(), "createdby": row._mapping["createdby"], "requesttype":row._mapping["requesttype"], "requestid":row._mapping["requestid"],"foirequestid":row._mapping["foirequestid"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -100,9 +100,9 @@ class FOIRequestNotification(db.Model):
             # notificationtypelabel = ','.join(str(e) for e in notificationtypelabel)
             rs = db.session.execute(text(sql), {'commentid': commentid, 'notificationtypelabel': notificationtypelabel})
             for row in rs:
-                dt = maya.parse(row["created_at"]).datetime(to_timezone='America/Vancouver', naive=False)
+                dt = maya.parse(row._mapping["created_at"]).datetime(to_timezone='America/Vancouver', naive=False)
                 _createddate = dt
-                notifications.append({"userid": row["userid"],"idnumber": row["idnumber"], "axisnumber": row["axisnumber"], "notificationid": row["notificationid"], "notificationuserid": row["notificationuserid"], "notification": row["notification"], "notificationtype": row["notificationtype"],  "notificationusertype": row["notificationusertype"], "created_at": _createddate.strftime('%Y %b %d | %I:%M %p').upper(), "createdby": row["createdby"], "requesttype":row["requesttype"], "requestid":row["requestid"],"foirequestid":row["foirequestid"]})
+                notifications.append({"userid": row._mapping["userid"],"idnumber": row._mapping["idnumber"], "axisnumber": row._mapping["axisnumber"], "notificationid": row._mapping["notificationid"], "notificationuserid": row._mapping["notificationuserid"], "notification": row._mapping["notification"], "notificationtype": row._mapping["notificationtype"],  "notificationusertype": row._mapping["notificationusertype"], "created_at": _createddate.strftime('%Y %b %d | %I:%M %p').upper(), "createdby": row._mapping["createdby"], "requesttype":row._mapping["requesttype"], "requestid":row._mapping["requestid"],"foirequestid":row._mapping["foirequestid"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -117,7 +117,7 @@ class FOIRequestNotification(db.Model):
             sql = sql = """select idnumber, axisnumber, notificationid, notification , notificationtypelabel from "FOIRequestNotifications" where isdeleted = false and notification->>'extensionid' = :extensionid """
             rs = db.session.execute(text(sql), {'extensionid': str(extensionid)})
             for row in rs:
-                notifications.append({"idnumber": row["idnumber"], "axisnumber": row["axisnumber"], "notificationid": row["notificationid"], "notification": row["notification"], "notificationtypelabel": row["notificationtypelabel"]})
+                notifications.append({"idnumber": row._mapping["idnumber"], "axisnumber": row._mapping["axisnumber"], "notificationid": row._mapping["notificationid"], "notification": row._mapping["notification"], "notificationtypelabel": row._mapping["notificationtypelabel"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -143,7 +143,7 @@ class FOIRequestNotification(db.Model):
             sql = """select notificationid from "FOIRequestNotifications" where idnumber = :idnumber and notificationtypelabel = ANY(:notificationtypelabels) and isdeleted = false """
             rs = db.session.execute(text(sql), {'idnumber': idnumber, 'notificationtypelabels': notificationtypelabels})
             for row in rs:
-                notificationids.append(row["notificationid"])
+                notificationids.append(row._mapping["notificationid"])
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -158,7 +158,7 @@ class FOIRequestNotification(db.Model):
             sql = """select notificationid from "FOIRequestNotifications" where idnumber = :idnumber and isdeleted = false """
             rs = db.session.execute(text(sql), {'idnumber': idnumber})
             for row in rs:
-                notificationids.append(row["notificationid"])
+                notificationids.append(row._mapping["notificationid"])
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -172,7 +172,7 @@ class FOIRequestNotification(db.Model):
         rs = db.session.execute(text(sql), {'notificationtypelabel': notificationtypelabel})
         notificationids = []
         for row in rs:
-            notificationids.append(row["notificationid"])
+            notificationids.append(row._mapping["notificationid"])
         return notificationids
     
     @classmethod
@@ -181,7 +181,7 @@ class FOIRequestNotification(db.Model):
         rs = db.session.execute(text(sql), {'requestid': ministryid})
         notificationids = []
         for row in rs:
-            notificationids.append(row["notificationid"])
+            notificationids.append(row._mapping["notificationid"])
         return notificationids
 
 class FOIRequestNotificationSchema(ma.Schema):

@@ -102,8 +102,8 @@ class FOIRequestExtension(db.Model):
             sql = 'SELECT * FROM (SELECT DISTINCT ON (foirequestextensionid) foirequestextensionid, fre.extensionreasonid, er.reason, er.extensiontype, fre.extensionstatusid, es.name, extendedduedays, extendedduedate, decisiondate, approvednoofdays, fre.isactive, created_at , createdby, fre.version FROM "FOIRequestExtensions" fre INNER JOIN "ExtensionReasons" er ON fre.extensionreasonid = er.extensionreasonid INNER JOIN "ExtensionStatuses" es ON fre.extensionstatusid = es.extensionstatusid where foiministryrequest_id =:ministryrequestid and foiministryrequestversion_id = :ministryrequestversion ORDER BY foirequestextensionid, version DESC) AS list ORDER BY extensionstatusid ASC, created_at DESC'
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion})
             for row in rs:
-                if row["isactive"] == True:
-                    extensions.append(dict(row))
+                if row._mapping["isactive"] == True:
+                    extensions.append(dict(row._mapping))
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -131,7 +131,7 @@ class FOIRequestExtension(db.Model):
                         ) AS list """
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
-                extensioncount = row["extensions_count"]
+                extensioncount = row._mapping["extensions_count"]
         except Exception as ex:
             logging.error(ex)
             raise ex

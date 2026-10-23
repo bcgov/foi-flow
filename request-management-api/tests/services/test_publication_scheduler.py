@@ -1,6 +1,7 @@
 from datetime import datetime, time
 from unittest.mock import patch
 import importlib
+from types import SimpleNamespace
 
 import request_api.models.FOIOpenInformationRequests as openinfo_module
 pd_module = importlib.import_module('request_api.models.FOIProactiveDisclosureRequests')
@@ -19,7 +20,7 @@ class FakeSession:
 
     def execute(self, statement, params=None):
         self.statements.append((str(statement), params))
-        return self.rows
+        return [SimpleNamespace(_mapping=row) for row in self.rows]
 
     def close(self):
         self.closed = True

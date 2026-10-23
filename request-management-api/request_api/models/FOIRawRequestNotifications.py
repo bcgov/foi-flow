@@ -76,7 +76,7 @@ class FOIRawRequestNotification(db.Model):
             sql = """select notificationid from "FOIRawRequestNotifications" where idnumber = :idnumber and notificationtypelabel= :notificationtypelabel """
             rs = db.session.execute(text(sql), {'idnumber': idnumber, 'notificationtypelabel': notificationtypelabel})
             for row in rs:
-                notificationids.append(row["notificationid"])
+                notificationids.append(row._mapping["notificationid"])
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -91,7 +91,7 @@ class FOIRawRequestNotification(db.Model):
             sql = """select notificationid from "FOIRawRequestNotifications" where idnumber = :idnumber """
             rs = db.session.execute(text(sql), {'idnumber': idnumber})
             for row in rs:
-                notificationids.append(row["notificationid"])
+                notificationids.append(row._mapping["notificationid"])
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -106,7 +106,7 @@ class FOIRawRequestNotification(db.Model):
             sql = """select notificationid from "FOIRawRequestNotifications" where notificationtypelabel= :notificationtypelabel and isdeleted = false """
             rs = db.session.execute(text(sql), {'notificationtypelabel': notificationtypelabel})
             for row in rs:
-                notificationids.append(row["notificationid"])
+                notificationids.append(row._mapping["notificationid"])
         except Exception as ex:
             logging.error(ex)
             raise ex
