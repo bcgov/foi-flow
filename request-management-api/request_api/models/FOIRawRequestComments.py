@@ -210,7 +210,7 @@ class FOIRawRequestComment(db.Model):
                 ) cmt where commenttypeid not in (2,3)"""
             rs = db.session.execute(text(sql), {'commentid': commentid})
             for row in rs:
-                users.append({"commentid": row["commentid"], "createdby": row["createdby"], "taggedusers": row["taggedusers"]})
+                users.append({"commentid": row._mapping["commentid"], "createdby": row._mapping["createdby"], "taggedusers": row._mapping["taggedusers"]})
         except Exception as ex:
             logging.error(ex)
             raise ex

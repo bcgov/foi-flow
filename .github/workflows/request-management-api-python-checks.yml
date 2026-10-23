@@ -1,0 +1,28 @@
+name: Request Management API Python checks
+
+on:
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - request-management-api/**
+      - .github/workflows/request-management-api-python-checks.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - name: Verify the Python 3.13 image and focused regressions
+        run: bash request-management-api/scripts/verify-python-upgrade.sh candidate @tests/python-upgrade-focused.txt
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: request-api-python-compatibility
+          path: /tmp/request-api-python-upgrade/candidate
+          retention-days: 14

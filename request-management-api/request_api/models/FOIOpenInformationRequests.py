@@ -295,18 +295,18 @@ class FOIOpenInformationRequests(db.Model):
             FOIOpenInformationRequests.isactive == True
         ]
 
-        recordspagecount = case ([
+        recordspagecount = case (*[
             (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
             ],
             else_= literal("0").label("recordspagecount")
         )
 
         oistatusname = case(
-            [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
+            *[(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
             else_=OpenInformationStatuses.name
         ).label('oiStatusName')
 
-        assignedToFormatted = case([
+        assignedToFormatted = case(*[
                 (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
                 func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
                 (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
@@ -503,7 +503,7 @@ class FOIOpenInformationRequests(db.Model):
     def findfield(cls, field):
 
         defaultsorting = case(
-                [(FOIMinistryRequest.oistatus_id == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
+                *[(FOIMinistryRequest.oistatus_id == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
                 else_=1
             )
 
@@ -522,7 +522,7 @@ class FOIOpenInformationRequests(db.Model):
         elif field == 'publicationStatus':
             return cast(
                 case(
-                    [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
+                    *[(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
                     else_=OpenInformationStatuses.name
                 ),
                 String
@@ -572,7 +572,7 @@ class FOIOpenInformationRequests(db.Model):
     def findsortfield(cls, field):
 
         defaultsorting = case(
-                [(literal_column('oistatus_id') == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
+                *[(literal_column('oistatus_id') == OIStatusEnum.EXEMPTION_REQUEST.value, 0)],
                 else_=1
             )
 
@@ -761,7 +761,7 @@ class FOIOpenInformationRequests(db.Model):
             """
             
             result = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid})
-            data = [dict(row) for row in result]
+            data = [dict(row._mapping) for row in result]
             return data
         except Exception as exception:
             logging.error(f"Error fetching FOIOpenInfo request details: {exception}")
@@ -844,7 +844,7 @@ class FOIOpenInformationRequests(db.Model):
                     'publication_cutoff': publication_cutoff,
                 },
             )
-            return [dict(row) for row in result]
+            return [dict(row._mapping) for row in result]
         except Exception as exception:
             logging.error(f"Error fetching FOIOpenInfo pre-publishing records: {exception}")
             return []
@@ -877,7 +877,7 @@ class FOIOpenInformationRequests(db.Model):
             
             result = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid})
             # Convert the result rows into a list of dictionaries for easy JSON serialization
-            data = [dict(row) for row in result]
+            data = [dict(row._mapping) for row in result]
             return data
         except Exception as exception:
             logging.error(f"Error fetching FOIOpenInfo request details: {exception}")
@@ -954,7 +954,7 @@ class FOIOpenInformationRequests(db.Model):
             """
 
             result = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid})
-            data = [dict(row) for row in result]
+            data = [dict(row._mapping) for row in result]
             return data[0] if data else None
 
         except Exception as exception:
@@ -989,7 +989,7 @@ class FOIOpenInformationRequests(db.Model):
             
             result = db.session.execute(text(sql), {'foiministryrequestid': foiministryrequestid})
             # Convert the result rows into a list of dictionaries for easy JSON serialization
-            data = [dict(row) for row in result]
+            data = [dict(row._mapping) for row in result]
             return data
         except Exception as exception:
             logging.error(f"Error fetching FOIOpenInfo request details: {exception}")

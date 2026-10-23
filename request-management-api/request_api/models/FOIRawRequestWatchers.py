@@ -47,8 +47,8 @@ class FOIRawRequestWatcher(db.Model):
             sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRawRequestWatchers" where requestid=:requestid order by watchedby, watchedbygroup, created_at desc'
             rs = db.session.execute(text(sql), {'requestid': requestid})        
             for row in rs:
-                if row["isactive"] == True:
-                    watchers.append({"watchedby": row["watchedby"], "watchedbygroup": row["watchedbygroup"]})
+                if row._mapping["isactive"] == True:
+                    watchers.append({"watchedby": row._mapping["watchedby"], "watchedbygroup": row._mapping["watchedbygroup"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -63,7 +63,7 @@ class FOIRawRequestWatcher(db.Model):
             sql = 'select distinct on (watchedby, watchedbygroup) watchedby, watchedbygroup, isactive from "FOIRawRequestWatchers" where requestid=:requestid and watchedby=:watchedby  order by watchedby, watchedbygroup, created_at desc'
             rs = db.session.execute(text(sql), {'requestid': requestid,'watchedby':userid})        
             for row in rs:
-                if row["isactive"] == True:
+                if row._mapping["isactive"] == True:
                     _iswatcher = True
         except Exception as ex:
             logging.error(ex)

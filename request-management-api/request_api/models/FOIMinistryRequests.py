@@ -157,7 +157,7 @@ class FOIMinistryRequest(db.Model):
                     order by version desc limit 2;"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
-                assignments.append({"assignedto": row["assignedto"], "assignedministryperson": row["assignedministryperson"], "version": row["version"]})
+                assignments.append({"assignedto": row._mapping["assignedto"], "assignedministryperson": row._mapping["assignedministryperson"], "version": row._mapping["version"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -308,7 +308,7 @@ class FOIMinistryRequest(db.Model):
             
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'requeststatuslabel': StateName.closed.name})        
             for row in rs:
-                summary.append({"requeststatusid": row["requeststatusid"], "requeststatuslabel": row["requeststatuslabel"], "created_at": row["created_at"], "foirequest_id": row["foirequest_id"]})                
+                summary.append({"requeststatusid": row._mapping["requeststatusid"], "requeststatuslabel": row._mapping["requeststatuslabel"], "created_at": row._mapping["created_at"], "foirequest_id": row._mapping["foirequest_id"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -334,9 +334,9 @@ class FOIMinistryRequest(db.Model):
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})  
             _tmp_state = None       
             for row in rs:
-                if row["status"] != _tmp_state:
-                    transitions.append({"status": row["status"], "version": row["version"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f')})
-                    _tmp_state = row["status"]
+                if row._mapping["status"] != _tmp_state:
+                    transitions.append({"status": row._mapping["status"], "version": row._mapping["version"], "created_at": row._mapping["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f')})
+                    _tmp_state = row._mapping["status"]
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -353,9 +353,9 @@ class FOIMinistryRequest(db.Model):
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})  
             _tmp_state = None       
             for row in rs:
-                if row["status"] != _tmp_state:
-                    transitions.append({"status": row["status"], "version": row["version"], "created_at": row["created_at"]})
-                    _tmp_state = row["status"]
+                if row._mapping["status"] != _tmp_state:
+                    transitions.append({"status": row._mapping["status"], "version": row._mapping["version"], "created_at": row._mapping["created_at"]})
+                    _tmp_state = row._mapping["status"]
             desc_transitions = transitions[::-1]
             index = 0
             onhold_occurance = 0
@@ -383,7 +383,7 @@ class FOIMinistryRequest(db.Model):
             where foiministryrequestid=:ministryrequestid  order by version desc limit  2"""
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
-                requeststates.append(row["status"])
+                requeststates.append(row._mapping["status"])
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -399,7 +399,7 @@ class FOIMinistryRequest(db.Model):
             where foiministryrequestid=:ministryrequestid  order by version desc""" 
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})        
             for row in rs:
-                requeststates.append(row["status"])
+                requeststates.append(row._mapping["status"])
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -482,25 +482,25 @@ class FOIMinistryRequest(db.Model):
             
                 filtercondition.append(or_(*onekeywordfiltercondition))
 
-        intakesorting = case([
+        intakesorting = case(*[
                             (and_(FOIMinistryRequest.assignedto == None, FOIMinistryRequest.assignedgroup == 'Intake Team'), # Unassigned requests first
                              literal(None)),
                            ],
                            else_ = FOIRequest.receiveddate).label('intakeSorting')
 
-        defaultsorting = case([
+        defaultsorting = case(*[
                             (FOIMinistryRequest.assignedto == None, # Unassigned requests first
                              literal(None)),
                            ],
                            else_ = FOIMinistryRequest.duedate).label('defaultSorting')
 
-        ministrysorting = case([
+        ministrysorting = case(*[
                             (FOIMinistryRequest.assignedministryperson == None, # Unassigned requests first
                              literal(None)),
                            ],
                            else_ = FOIMinistryRequest.duedate).label('ministrySorting')
 
-        assignedtoformatted = case([
+        assignedtoformatted = case(*[
                             (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
                              func.concat(iaoassignee.lastname, ', ', iaoassignee.firstname)),
                             (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.is_(None)),
@@ -510,7 +510,7 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = FOIMinistryRequest.assignedgroup).label('assignedToFormatted')
 
-        ministryassignedtoformatted = case([
+        ministryassignedtoformatted = case(*[
                             (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.isnot(None)),
                              func.concat(ministryassignee.lastname, ', ', ministryassignee.firstname)),
                             (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.is_(None)),
@@ -520,35 +520,35 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
         
-        duedate = case([
+        duedate = case(*[
                             (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
                            else_ = func.nullif(cast(FOIMinistryRequest.duedate, String), '')).label('duedate')
         
-        cfrduedate = case([
+        cfrduedate = case(*[
                             (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
                            else_ = func.nullif(cast(FOIMinistryRequest.cfrduedate, String),'')).label('cfrduedate')
 
-        axispagecount = case ([
+        axispagecount = case (*[
             (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
             ],
             else_= literal("0").label("axispagecount")
         )
-        axislanpagecount = case ([
+        axislanpagecount = case (*[
             (FOIMinistryRequest.axislanpagecount.isnot(None), FOIMinistryRequest.axislanpagecount)
             ],
             else_= literal("0").label("axislanpagecount")
         )
-        recordspagecount = case ([
+        recordspagecount = case (*[
             (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
             ],
             else_= literal("0").label("recordspagecount")
         )
 
-        requestpagecount = case([
+        requestpagecount = case(*[
                 (and_(axispagecount.isnot(None), recordspagecount.isnot(None), cast(axispagecount, Integer) > cast(recordspagecount, Integer)),
                     axispagecount),
                 (and_(recordspagecount.isnot(None)),
@@ -558,7 +558,7 @@ class FOIMinistryRequest(db.Model):
                 ],
                 else_= literal("0"))
 
-        onbehalfformatted = case([
+        onbehalfformatted = case(*[
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
                              func.concat(onbehalf_applicant.lastname, ', ', onbehalf_applicant.firstname)),
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.is_(None)),
@@ -568,7 +568,7 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = None).label('onBehalfFormatted')
         
-        extensions = case([
+        extensions = case(*[
                             (subquery_extension_count.c.extensions.is_(None),
                              0),
                            ],
@@ -852,22 +852,22 @@ class FOIMinistryRequest(db.Model):
         #add more fields here if need sort/filter/search more columns
         from .FOIOpenInformationRequests import FOIOpenInformationRequests
         foiopeninfo=aliased(FOIOpenInformationRequests)
-        axispagecount = case ([
+        axispagecount = case (*[
             (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
             ],
             else_= literal("0").label("axispagecount")
         )
-        axislanpagecount = case ([
+        axislanpagecount = case (*[
             (FOIMinistryRequest.axislanpagecount.isnot(None), FOIMinistryRequest.axislanpagecount)
             ],
             else_= literal("0").label("axislanpagecount")
         )
-        recordspagecount = case ([
+        recordspagecount = case (*[
             (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
             ],
             else_= literal("0").label("recordspagecount")
         )
-        requestpagecount = case([
+        requestpagecount = case(*[
                 (and_(axispagecount.isnot(None), recordspagecount.isnot(None), cast(axispagecount, Integer) > cast(recordspagecount, Integer)),
                     axispagecount),
                 (and_(recordspagecount.isnot(None)),
@@ -976,7 +976,7 @@ class FOIMinistryRequest(db.Model):
                     order by filenumber , version desc;""" 
             rs = db.session.execute(text(sql), {'requeststatuslabel': StateName.callforrecords.name})           
             for row in rs:
-                upcomingduerecords.append({"filenumber": row["filenumber"], "cfrduedate": row["cfrduedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
+                upcomingduerecords.append({"filenumber": row._mapping["filenumber"], "cfrduedate": row._mapping["cfrduedate"],"foiministryrequestid": row._mapping["foiministryrequestid"], "version": row._mapping["version"], "foirequest_id": row._mapping["foirequest_id"], "created_at": row._mapping["created_at"], "createdby": row._mapping["createdby"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -995,7 +995,7 @@ class FOIMinistryRequest(db.Model):
             requeststatuslabel =  tuple([StateName.closed.name,StateName.redirect.name,StateName.unopened.name,StateName.intakeinprogress.name,StateName.onhold.name,StateName.archived.name, StateName.onholdother.name])
             rs = db.session.execute(text(sql), {'requeststatuslabel': requeststatuslabel})
             for row in rs:
-                upcomingduerecords.append({"filenumber": row["filenumber"], "duedate": row["duedate"],"foiministryrequestid": row["foiministryrequestid"], "version": row["version"], "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"]})
+                upcomingduerecords.append({"filenumber": row._mapping["filenumber"], "duedate": row._mapping["duedate"],"foiministryrequestid": row._mapping["foiministryrequestid"], "version": row._mapping["version"], "foirequest_id": row._mapping["foirequest_id"], "created_at": row._mapping["created_at"], "createdby": row._mapping["createdby"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -1024,13 +1024,13 @@ class FOIMinistryRequest(db.Model):
             rs = db.session.execute(text(sql), {'requeststatuslabel': requeststatuslabel})
             for row in rs:
                 upcomingduerecords.append({
-                    "filenumber": row["filenumber"],
-                    "publicationdate": row["publicationdate"],
-                    "foiministryrequestid": row["foiministryrequestid"],
-                    "version": row["version"],
-                    "foirequest_id": row["foirequest_id"],
-                    "created_at": row["created_at"],
-                    "createdby": row["createdby"]
+                    "filenumber": row._mapping["filenumber"],
+                    "publicationdate": row._mapping["publicationdate"],
+                    "foiministryrequestid": row._mapping["foiministryrequestid"],
+                    "version": row._mapping["version"],
+                    "foirequest_id": row._mapping["foirequest_id"],
+                    "created_at": row._mapping["created_at"],
+                    "createdby": row._mapping["createdby"]
                 })
         except Exception as ex:
             logging.error(ex)
@@ -1058,12 +1058,12 @@ class FOIMinistryRequest(db.Model):
             rs = db.session.execute(text(sql), {'requeststatuslabel': requeststatuslabel})
                   
             for row in rs:
-                upcomingduerecords.append({"axisrequestid": row["axisrequestid"], "filenumber": row["filenumber"], 
-                                            "foiministryrequestid": row["foiministryrequestid"], "version": row["foiministryrequestversion"], 
-                                            "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"],
-                                            "divisionid": row["divisionid"],"divisionname": row["divisionname"],
-                                            "stageid": row["stageid"], "stagename": row["stagename"], 
-                                            "duedate": row["duedate"]})
+                upcomingduerecords.append({"axisrequestid": row._mapping["axisrequestid"], "filenumber": row._mapping["filenumber"],
+                                            "foiministryrequestid": row._mapping["foiministryrequestid"], "version": row._mapping["foiministryrequestversion"],
+                                            "foirequest_id": row._mapping["foirequest_id"], "created_at": row._mapping["created_at"], "createdby": row._mapping["createdby"],
+                                            "divisionid": row._mapping["divisionid"],"divisionname": row._mapping["divisionname"],
+                                            "stageid": row._mapping["stageid"], "stagename": row._mapping["stagename"],
+                                            "duedate": row._mapping["duedate"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -1090,10 +1090,10 @@ class FOIMinistryRequest(db.Model):
                         order by frd.foiministryrequest_id , frd.foiministryrequestversion_id desc;""" 
             rs = db.session.execute(text(sql))        
             for row in rs:
-                upcomingduerecords.append({"axisrequestid": row["axisrequestid"], "filenumber": row["filenumber"], 
-                                            "foiministryrequestid": row["foiministryrequestid"], "version": row["foiministryrequestversion"], 
-                                            "foirequest_id": row["foirequest_id"], "created_at": row["created_at"], "createdby": row["createdby"],
-                                            "orderno": row["orderno"],"duedate": row["duedate"]})
+                upcomingduerecords.append({"axisrequestid": row._mapping["axisrequestid"], "filenumber": row._mapping["filenumber"],
+                                            "foiministryrequestid": row._mapping["foiministryrequestid"], "version": row._mapping["foiministryrequestversion"],
+                                            "foirequest_id": row._mapping["foirequest_id"], "created_at": row._mapping["created_at"], "createdby": row._mapping["createdby"],
+                                            "orderno": row._mapping["orderno"],"duedate": row._mapping["duedate"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -1129,9 +1129,9 @@ class FOIMinistryRequest(db.Model):
                         where frt.foirawrequestid=:rawrequestid; """ 
             rs = db.session.execute(text(sql), {'rawrequestid': rawrequestid})           
             for row in rs:
-                ministries.append({"filenumber": row["filenumber"], "axisrequestid": row["axisrequestid"], "name": row["name"], "requestid": row["foirequest_id"],"ministryrequestid": row["foiministryrequestid"],
-                                    "assignedministrygroup": row["assignedministrygroup"], "assignedministryperson": row["assignedministryperson"], "assignedgroup": row["assignedgroup"], "assignedto": row["assignedto"],
-                                    "id": row["foiministryrequestid"], "foirequestid": row["foirequest_id"], "status": row["status"]})
+                ministries.append({"filenumber": row._mapping["filenumber"], "axisrequestid": row._mapping["axisrequestid"], "name": row._mapping["name"], "requestid": row._mapping["foirequest_id"],"ministryrequestid": row._mapping["foiministryrequestid"],
+                                    "assignedministrygroup": row._mapping["assignedministrygroup"], "assignedministryperson": row._mapping["assignedministryperson"], "assignedgroup": row._mapping["assignedgroup"], "assignedto": row._mapping["assignedto"],
+                                    "id": row._mapping["foiministryrequestid"], "foirequestid": row._mapping["foirequest_id"], "status": row._mapping["status"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -1151,12 +1151,12 @@ class FOIMinistryRequest(db.Model):
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})   
             _tmp_state = None        
             for row in rs:
-                if row["status"] != _tmp_state:
-                    ministries.append({"id": row["foiministryrequestid"], "foirequestid": row["foirequest_id"], "axisrequestid": row["axisrequestid"], "filenumber": row["filenumber"], "status": row["status"], 
-                                    "assignedministrygroup": row["assignedministrygroup"], "assignedministryperson": row["assignedministryperson"], 
-                                    "assignedgroup": row["assignedgroup"], "assignedto": row["assignedto"], "version": row["version"] 
+                if row._mapping["status"] != _tmp_state:
+                    ministries.append({"id": row._mapping["foiministryrequestid"], "foirequestid": row._mapping["foirequest_id"], "axisrequestid": row._mapping["axisrequestid"], "filenumber": row._mapping["filenumber"], "status": row._mapping["status"],
+                                    "assignedministrygroup": row._mapping["assignedministrygroup"], "assignedministryperson": row._mapping["assignedministryperson"],
+                                    "assignedgroup": row._mapping["assignedgroup"], "assignedto": row._mapping["assignedto"], "version": row._mapping["version"]
                                      })
-                    _tmp_state = row["status"] 
+                    _tmp_state = row._mapping["status"]
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -1174,7 +1174,7 @@ class FOIMinistryRequest(db.Model):
                         order by  foiministryrequestid , version desc, axisrequestid"""
             rs = db.session.execute(text(sql), {'requeststatuslabel': StateName.closed.name})
             for row in rs:
-                axisids.append(row["axisrequestid"])
+                axisids.append(row._mapping["axisrequestid"])
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -1226,25 +1226,25 @@ class FOIMinistryRequest(db.Model):
         latest_proactive = aliased(FOIProactiveDisclosureRequests)
 
 
-        intakesorting = case([
+        intakesorting = case(*[
                             (FOIMinistryRequest.assignedto == None, # Unassigned requests first
                              literal(None)),
                            ],
                            else_ = FOIRequest.receiveddate).label('intakeSorting')
 
-        defaultsorting = case([
+        defaultsorting = case(*[
                             (FOIMinistryRequest.assignedto == None, # Unassigned requests first
                              literal(None)),
                            ],
                            else_ = FOIMinistryRequest.duedate).label('defaultSorting')
 
-        ministrysorting = case([
+        ministrysorting = case(*[
                             (FOIMinistryRequest.assignedministryperson == None, # Unassigned requests first
                              literal(None)),
                            ],
                            else_ = FOIMinistryRequest.duedate).label('ministrySorting')
 
-        assignedtoformatted = case([
+        assignedtoformatted = case(*[
                             (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.isnot(None)),
                              func.concat(iaoassignee.lastname, ', ', iaoassignee.firstname)),
                             (and_(iaoassignee.lastname.isnot(None), iaoassignee.firstname.is_(None)),
@@ -1254,7 +1254,7 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = FOIMinistryRequest.assignedgroup).label('assignedToFormatted')
 
-        ministryassignedtoformatted = case([
+        ministryassignedtoformatted = case(*[
                             (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.isnot(None)),
                              func.concat(ministryassignee.lastname, ', ', ministryassignee.firstname)),
                             (and_(ministryassignee.lastname.isnot(None), ministryassignee.firstname.is_(None)),
@@ -1264,34 +1264,34 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = FOIMinistryRequest.assignedministrygroup).label('ministryAssignedToFormatted')
         
-        duedate = case([
+        duedate = case(*[
                             (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
                            else_ = func.nullif(cast(FOIMinistryRequest.duedate, String), '')).label('duedate')
         
-        cfrduedate = case([
+        cfrduedate = case(*[
                             (or_(FOIMinistryRequest.requeststatuslabel == StateName.onhold.name, FOIMinistryRequest.requeststatuslabel == StateName.onholdother.name),  # On Hold
                              literal(None)),
                            ],
                            else_ = func.nullif(cast(FOIMinistryRequest.cfrduedate, String), '')).label('cfrduedate')
 
-        axispagecount = case ([
+        axispagecount = case (*[
             (FOIMinistryRequest.axispagecount.isnot(None), FOIMinistryRequest.axispagecount)
             ],
             else_= literal("0").label("axispagecount")
         )
-        axislanpagecount = case ([
+        axislanpagecount = case (*[
             (FOIMinistryRequest.axislanpagecount.isnot(None), FOIMinistryRequest.axislanpagecount)
             ],
             else_= literal("0").label("axislanpagecount")
         )
-        recordspagecount = case ([
+        recordspagecount = case (*[
             (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
             ],
             else_= literal("0").label("recordspagecount")
         )
-        requestpagecount = case([
+        requestpagecount = case(*[
                 (and_(axispagecount.isnot(None), recordspagecount.isnot(None), cast(axispagecount, Integer) > cast(recordspagecount, Integer)),
                     axispagecount),
                 (and_(recordspagecount.isnot(None)),
@@ -1301,7 +1301,7 @@ class FOIMinistryRequest(db.Model):
                 ],
                 else_= literal("0"))
 
-        onbehalfformatted = case([
+        onbehalfformatted = case(*[
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
                              func.concat(onbehalf_applicant.lastname, ', ', onbehalf_applicant.firstname)),
                             (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.is_(None)),
@@ -1311,7 +1311,7 @@ class FOIMinistryRequest(db.Model):
                            ],
                            else_ = None).label('onBehalfFormatted')
         
-        extensions = case([
+        extensions = case(*[
                             (subquery_extension_count.c.extensions.is_(None),
                              0),
                            ],
@@ -1378,7 +1378,7 @@ class FOIMinistryRequest(db.Model):
             latest_proactive.reportperiod.label('reportperiod')
         ]
         if is_oi_team:
-            oiAssignedToFormatted = case([
+            oiAssignedToFormatted = case(*[
                 (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
                 func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
                 (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
@@ -1390,7 +1390,7 @@ class FOIMinistryRequest(db.Model):
             ],
             else_ = foiopeninfo.oiassignedto).label('oiAssignedTo')
             publicationStatus = case(
-                [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
+                *[(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
                 else_=OpenInformationStatuses.name
             ).label('publicationStatus')
 
@@ -1747,7 +1747,7 @@ class FOIMinistryRequest(db.Model):
             order by fr.created_at ;"""
             rs = db.session.execute(text(sql), {'programarea': programarea, 'requesttype': requesttype})
             for row in rs:
-                requestdetails.append({"axisrequestid":row["axisrequestid"], "axispagecount": row["axispagecount"],  "axislanpagecount": row["axislanpagecount"], "foiministryrequestid":row["foiministryrequestid"], "version":row["version"]})
+                requestdetails.append({"axisrequestid":row._mapping["axisrequestid"], "axispagecount": row._mapping["axispagecount"],  "axislanpagecount": row._mapping["axislanpagecount"], "foiministryrequestid":row._mapping["foiministryrequestid"], "version":row._mapping["version"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -1780,14 +1780,14 @@ class FOIMinistryRequest(db.Model):
                     order by fmr.version desc limit 1;"""
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
-                requestdetails["assignedTo"] = row["assignedto"]
-                requestdetails["assignedToFirstName"] = row["firstname"]
-                requestdetails["assignedToLastName"] = row["lastname"]
-                requestdetails["bcgovcode"] = row["bcgovcode"]
-                requestdetails["version"] = row["version"]
-                requestdetails["programareaid"] = row["programareaid"]
-                requestdetails["requesttype"] = row["requesttype"]
-                requestdetails["isoipcreview"] = row["isoipcreview"]
+                requestdetails["assignedTo"] = row._mapping["assignedto"]
+                requestdetails["assignedToFirstName"] = row._mapping["firstname"]
+                requestdetails["assignedToLastName"] = row._mapping["lastname"]
+                requestdetails["bcgovcode"] = row._mapping["bcgovcode"]
+                requestdetails["version"] = row._mapping["version"]
+                requestdetails["programareaid"] = row._mapping["programareaid"]
+                requestdetails["requesttype"] = row._mapping["requesttype"]
+                requestdetails["isoipcreview"] = row._mapping["isoipcreview"]
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -1802,7 +1802,7 @@ class FOIMinistryRequest(db.Model):
              foiministryrequestid = :ministryrequestid and isofflinepayment = true limit 1;"""
             rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
             for row in rs:
-                if row["isofflinepayment"] == True:
+                if row._mapping["isofflinepayment"] == True:
                     return True
             return False
         except Exception as ex:
@@ -1859,29 +1859,29 @@ class FOIMinistryRequest(db.Model):
             rows = result.fetchall()            
             for row in rows:
                 requestdetail={}
-                requestdetail["ministryrequestid"]=row["foiministryrequestid"]
-                requestdetail["id"]=row["foirequest_id"]
-                requestdetail["requeststatus"]=row["requeststatuslabel"]
-                requestdetail["requestnumber"]=row["axisrequestid"]
-                requestdetail["lastname"]=row["lastname"]
-                requestdetail["firstname"]=row["firstname"]
-                requestdetail["closedate"]=row["closedate"]
-                requestdetail["axispagecount"]=row["axispagecount"]
-                requestdetail["recordspagecount"]=row["recordspagecount"]
-                if row["axispagecount"] is not None and row["recordspagecount"] is not None and int(row["axispagecount"]) > int(row["recordspagecount"]):
-                    requestdetail["requestpagecount"] = row["axispagecount"]
-                elif row["recordspagecount"] is not None:
-                    requestdetail["requestpagecount"] = row["recordspagecount"]
-                elif row["axispagecount"] is not None:
-                    requestdetail["requestpagecount"] = row["axispagecount"]
+                requestdetail["ministryrequestid"]=row._mapping["foiministryrequestid"]
+                requestdetail["id"]=row._mapping["foirequest_id"]
+                requestdetail["requeststatus"]=row._mapping["requeststatuslabel"]
+                requestdetail["requestnumber"]=row._mapping["axisrequestid"]
+                requestdetail["lastname"]=row._mapping["lastname"]
+                requestdetail["firstname"]=row._mapping["firstname"]
+                requestdetail["closedate"]=row._mapping["closedate"]
+                requestdetail["axispagecount"]=row._mapping["axispagecount"]
+                requestdetail["recordspagecount"]=row._mapping["recordspagecount"]
+                if row._mapping["axispagecount"] is not None and row._mapping["recordspagecount"] is not None and int(row._mapping["axispagecount"]) > int(row._mapping["recordspagecount"]):
+                    requestdetail["requestpagecount"] = row._mapping["axispagecount"]
+                elif row._mapping["recordspagecount"] is not None:
+                    requestdetail["requestpagecount"] = row._mapping["recordspagecount"]
+                elif row._mapping["axispagecount"] is not None:
+                    requestdetail["requestpagecount"] = row._mapping["axispagecount"]
                 else:
                     requestdetail["requestpagecount"] = "0"
-                requestdetail["axislanpagecount"]=row["axislanpagecount"]
-                requestdetail["estimatedpagecount"]=row["estimatedpagecount"]
-                requestdetail["estimatedtaggedpagecount"]=row["estimatedtaggedpagecount"]
-                requestdetail["description"]=row["description"]
-                requestdetail["requestType"]=row["requesttype"]
-                requestdetail["bcgovcode"]=row["programareacode"]
+                requestdetail["axislanpagecount"]=row._mapping["axislanpagecount"]
+                requestdetail["estimatedpagecount"]=row._mapping["estimatedpagecount"]
+                requestdetail["estimatedtaggedpagecount"]=row._mapping["estimatedtaggedpagecount"]
+                requestdetail["description"]=row._mapping["description"]
+                requestdetail["requestType"]=row._mapping["requesttype"]
+                requestdetail["bcgovcode"]=row._mapping["programareacode"]
                 requestdetails.append(requestdetail)
 
         except Exception as ex:
@@ -1920,19 +1920,19 @@ class FOIMinistryRequest(db.Model):
         
         latest_proactive = aliased(FOIProactiveDisclosureRequests)
 
-        recordspagecount = case ([
+        recordspagecount = case (*[
             (FOIMinistryRequest.recordspagecount.isnot(None), FOIMinistryRequest.recordspagecount)
             ],
             else_= literal("0").label("recordspagecount")
         )
 
         oistatusname = case(
-            [(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
+            *[(FOIMinistryRequest.oistatus_id.is_(None), literal('unopened'))],
             else_=OpenInformationStatuses.name
         ).label('oiStatusName')
 
         assignedtoformatted = case(
-            [
+            *[
                 (
                     and_(
                         iaoassignee.lastname.isnot(None),

@@ -16,9 +16,10 @@
 """
 import logging
 
-from flask import url_for
-from flask_migrate import Migrate, MigrateCommand
-from flask_script import Manager  # class for handling a set of commands
+import click
+from flask.cli import FlaskGroup
+from flask_migrate import Migrate
+from flask_migrate.cli import db as db_commands
 
 # models included so that migrate can build the database migrations
 from request_api import models  # pylint: disable=unused-import
@@ -33,29 +34,24 @@ logger = logging.getLogger(__name__)
 
 APP = create_app()
 MIGRATE = Migrate(APP, db)
-MANAGER = Manager(APP)
+MANAGER = FlaskGroup(create_app=lambda: APP)
 
-MANAGER.add_command('db', MigrateCommand)
+MANAGER.add_command(db_commands, 'db')
 
 
-@MANAGER.command
+@MANAGER.command('list_routes')
 def list_routes():
     output = []
     for rule in APP.url_map.iter_rules():
 
-        options = {}
-        for arg in rule.arguments:
-            options[arg] = "[{0}]".format(arg)
-
         methods = ','.join(rule.methods)
-        url = url_for(rule.endpoint, **options)
-        line = ("{:50s} {:20s} {}".format(rule.endpoint, methods, url))
+        line = ("{:50s} {:20s} {}".format(rule.endpoint, methods, rule.rule))
         output.append(line)
 
     for line in sorted(output):
-        logger.info("%s", line)
+        click.echo(line)
 
 
 if __name__ == '__main__':
     logging.log(logging.INFO, 'Running the Manager')
-    MANAGER.run()
+    MANAGER()

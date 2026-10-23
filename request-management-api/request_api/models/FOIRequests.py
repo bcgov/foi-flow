@@ -107,7 +107,7 @@ class FOIRequest(db.Model):
                         order by  fr3."version" desc limit 1"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:                
-                request_schema.__dict__.update({"wfinstanceid":row["wfinstanceid"] , "foirequestid": row["foirequestid"]})
+                request_schema.__dict__.update({"wfinstanceid":row._mapping["wfinstanceid"] , "foirequestid": row._mapping["foirequestid"]})
         except Exception as ex:
             logging.error(ex)
         finally:
@@ -122,7 +122,7 @@ class FOIRequest(db.Model):
             rs = db.session.execute(text(sql), {'requestid': requestid})
             rawrequestid = None
             for row in rs:
-                rawrequestid = row["foirawrequestid"]
+                rawrequestid = row._mapping["foirawrequestid"]
         except Exception as ex:
             logging.error(ex)
         finally:

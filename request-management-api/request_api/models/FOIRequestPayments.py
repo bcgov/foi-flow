@@ -71,7 +71,7 @@ class FOIRequestPayment(db.Model):
             
             rs = db.session.execute(text(sql), {'foirequestid': foirequestid, 'ministryrequestid' : ministryrequestid, 'today' : _psttoday})
             for row in rs:
-                return ({"paymentid": row["paymentid"], "paymenturl": row["paymenturl"]})
+                return ({"paymentid": row._mapping["paymentid"], "paymenturl": row._mapping["paymenturl"]})
         except Exception as ex:
             logging.error(ex)
             raise ex

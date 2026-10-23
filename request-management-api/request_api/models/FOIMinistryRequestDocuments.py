@@ -41,8 +41,8 @@ class FOIMinistryRequestDocument(db.Model):
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion})
         documents = []
         for row in rs:
-            if row["isactive"] == True:
-                documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"], "version": row["version"]})
+            if row._mapping["isactive"] == True:
+                documents.append({"foiministrydocumentid": row._mapping["foiministrydocumentid"], "filename": row._mapping["filename"], "documentpath": row._mapping["documentpath"], "category": row._mapping["category"], "created_at": row._mapping["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row._mapping["createdby"], "version": row._mapping["version"]})
         return documents
     
     @classmethod
@@ -81,8 +81,8 @@ class FOIMinistryRequestDocument(db.Model):
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid})
         documents = []
         for row in rs:
-            if row["isactive"] == True:
-                documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"], "version": row["version"]})
+            if row._mapping["isactive"] == True:
+                documents.append({"foiministrydocumentid": row._mapping["foiministrydocumentid"], "filename": row._mapping["filename"], "documentpath": row._mapping["documentpath"], "category": row._mapping["category"], "created_at": row._mapping["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row._mapping["createdby"], "version": row._mapping["version"]})
         return documents
 
     @classmethod
@@ -91,8 +91,8 @@ class FOIMinistryRequestDocument(db.Model):
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion, 'category': category})
         documents = []
         for row in rs:
-            if row["isactive"] == True:
-                documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+            if row._mapping["isactive"] == True:
+                documents.append({"foiministrydocumentid": row._mapping["foiministrydocumentid"], "filename": row._mapping["filename"], "documentpath": row._mapping["documentpath"], "category": row._mapping["category"], "created_at": row._mapping["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row._mapping["createdby"]})
         return documents 
     @classmethod
     def getdocument(cls,foiministrydocumentid):   
@@ -135,8 +135,8 @@ class FOIMinistryRequestDocument(db.Model):
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'ministryrequestversion':ministryrequestversion, 'category': category})
         documents = []
         for row in rs:
-            if row["isactive"] == True:
-                documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+            if row._mapping["isactive"] == True:
+                documents.append({"foiministrydocumentid": row._mapping["foiministrydocumentid"], "filename": row._mapping["filename"], "documentpath": row._mapping["documentpath"], "category": row._mapping["category"], "created_at": row._mapping["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row._mapping["createdby"]})
         return documents 
 
     def getlatestreceiptdocumentforemail(cls, ministryrequestid, category):
@@ -145,8 +145,8 @@ class FOIMinistryRequestDocument(db.Model):
         rs = db.session.execute(text(sql), {'ministryrequestid': ministryrequestid, 'category': category})
         documents = []
         for row in rs:
-            if row["isactive"] == True:
-                documents.append({"foiministrydocumentid": row["foiministrydocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+            if row._mapping["isactive"] == True:
+                documents.append({"foiministrydocumentid": row._mapping["foiministrydocumentid"], "filename": row._mapping["filename"], "documentpath": row._mapping["documentpath"], "category": row._mapping["category"], "created_at": row._mapping["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row._mapping["createdby"]})
         return documents  
 
     @classmethod
