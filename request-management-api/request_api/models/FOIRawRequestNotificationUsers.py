@@ -73,7 +73,7 @@ class FOIRawRequestNotificationUser(db.Model):
                         where notificationid in (select notificationid from "FOIRawRequestNotificationUsers" frnu  where notificationuserid  = :notificationuserid) group by notificationid """
             rs = db.session.execute(text(sql), {'notificationuserid': notificationuserid})
             for row in rs:
-                notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+                notifications.append({"notificationid": row._mapping["notificationid"], "count" : row._mapping["relcount"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -89,7 +89,7 @@ class FOIRawRequestNotificationUser(db.Model):
                         where notificationid in (select notificationid from "FOIRawRequestNotificationUsers" frnu  where userid = :userid) group by notificationid """
             rs = db.session.execute(text(sql), {'userid': userid})
             for row in rs:
-                notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+                notifications.append({"notificationid": row._mapping["notificationid"], "count" : row._mapping["relcount"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -105,7 +105,7 @@ class FOIRawRequestNotificationUser(db.Model):
                         where notificationid in (select notificationid from "FOIRawRequestNotificationUsers" frnu  where userid = :userid and notificationusertypelabel = :notificationusertypelabel) group by notificationid """
             rs = db.session.execute(text(sql), {'userid': userid, 'notificationusertypelabel': notificationusertypelabel})
             for row in rs:
-                notifications.append({"notificationid": row["notificationid"], "count" : row["relcount"]})
+                notifications.append({"notificationid": row._mapping["notificationid"], "count" : row._mapping["relcount"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -127,7 +127,7 @@ class FOIRawRequestNotificationUser(db.Model):
             sql = """select notificationid from "FOIRawRequestNotificationUsers" where userid = :userid and notificationid = ANY(:notificationids) """
             rs = db.session.execute(text(sql), {'userid': userid, 'notificationids': notificationids})
             for row in rs:
-                ids.append(row["notificationid"])
+                ids.append(row._mapping["notificationid"])
         except Exception as ex:
             logging.error(ex)
             raise ex

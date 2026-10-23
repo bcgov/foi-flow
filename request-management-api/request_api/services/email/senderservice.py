@@ -1,5 +1,4 @@
 
-from audioop import reverse
 from os import stat
 import os
 import smtplib

@@ -18,7 +18,7 @@ class OperatingTeam(db.Model):
             sql = """select name, type from "OperatingTeams" ot where ot.isactive = true"""
             rs = db.session.execute(text(sql))
             for row in rs:
-                teams.append({"name":row["name"], "type":row["type"]})
+                teams.append({"name":row._mapping["name"], "type":row._mapping["type"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -33,7 +33,7 @@ class OperatingTeam(db.Model):
                     where replace(lower(name),' ','') = replace(lower(:team),' ','')"""
             rs = db.session.execute(text(sql), {'team': team})
             for row in rs:
-                return {'type': row["type"], 'name': row['name']}
+                return {'type': row._mapping["type"], 'name': row._mapping['name']}
         except Exception as ex:
             logging.error(ex)
             raise ex

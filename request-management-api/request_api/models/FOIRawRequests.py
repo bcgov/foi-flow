@@ -271,7 +271,7 @@ class FOIRawRequest(db.Model):
             sql = """select wfinstanceid, assignedto, assignedgroup, requestid  from "FOIRawRequests" fr where requestid = :requestid order by "version" desc limit 1;"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
-                request_schema.__dict__.update({"requestid": row["requestid"],"assignedto": row["assignedto"], "assignedgroup": row["assignedgroup"], "wfinstanceid": row["wfinstanceid"]})
+                request_schema.__dict__.update({"requestid": row._mapping["requestid"],"assignedto": row._mapping["assignedto"], "assignedgroup": row._mapping["assignedgroup"], "wfinstanceid": row._mapping["wfinstanceid"]})
         except Exception as ex:
             logging.error(ex)
         finally:
@@ -289,7 +289,7 @@ class FOIRawRequest(db.Model):
                         and fr2.foiministryrequestid= :requestid order by fr."version" desc limit 1"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
-                request_schema.__dict__.update({"requestid": row["requestid"], "assignedto": row["assignedto"], "assignedgroup": row["assignedgroup"], "wfinstanceid": row["wfinstanceid"]})
+                request_schema.__dict__.update({"requestid": row._mapping["requestid"], "assignedto": row._mapping["assignedto"], "assignedgroup": row._mapping["assignedgroup"], "wfinstanceid": row._mapping["wfinstanceid"]})
         except Exception as ex:
             logging.error(ex)
         finally:
@@ -345,8 +345,8 @@ class FOIRawRequest(db.Model):
     @classmethod
     def getrequests(cls):
         _session = db.session
-        _archivedrequestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status.in_(['Archived'])).all()
-        _requestids = _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.requestid.notin_(_archivedrequestids)).all()
+        _archivedrequestids = [row[0] for row in _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.status.in_(['Archived'])).all()]
+        _requestids = [row[0] for row in _session.query(distinct(FOIRawRequest.requestid)).filter(FOIRawRequest.requestid.notin_(_archivedrequestids)).all()]
         requests = []
         for _requestid in _requestids:
            request = _session.query(FOIRawRequest).filter(FOIRawRequest.requestid == _requestid).order_by(FOIRawRequest.version.desc()).first()           
@@ -377,7 +377,7 @@ class FOIRawRequest(db.Model):
                         where requestid = :requestid order by version ) as sq;"""
             rs = db.session.execute(text(sql), {'requestid': requestid, 'requeststatus': StateName.unopened.value})
             for row in rs:
-                requests.append(dict(row))
+                requests.append(dict(row._mapping))
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -449,7 +449,7 @@ class FOIRawRequest(db.Model):
                         order by version desc limit 2;"""
             rs = db.session.execute(text(sql), {'requestid': requestid})            
             for row in rs:
-                assignments.append({"assignedto": row["assignedto"], "status": row["status"], "version": row["version"]})
+                assignments.append({"assignedto": row._mapping["assignedto"], "status": row._mapping["status"], "version": row._mapping["version"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -505,9 +505,9 @@ class FOIRawRequest(db.Model):
             rs = db.session.execute(text(sql), {'requestid': requestid})  
             _tmp_state = None       
             for row in rs:
-                if row["status"] != _tmp_state:
-                    transitions.append({"status": row["status"], "version": row["version"]})
-                    _tmp_state = row["status"]
+                if row._mapping["status"] != _tmp_state:
+                    transitions.append({"status": row._mapping["status"], "version": row._mapping["version"]})
+                    _tmp_state = row._mapping["status"]
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -536,53 +536,53 @@ class FOIRawRequest(db.Model):
             subquery_maxversion.c.max_version == FOIRawRequest.version,
         ]
         
-        requesttype = case([
+        requesttype = case(*[
                             (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['requestType']['requestType'].astext.isnot(None)),
                              FOIRawRequest.requestrawdata['requestType']['requestType'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['requestType'].astext).label('requestType')
-        firstname = case([
+        firstname = case(*[
                             (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['contactInfo']['firstName'].astext.isnot(None)),
                              FOIRawRequest.requestrawdata['contactInfo']['firstName'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['firstName'].astext).label('firstName')
-        lastname = case([
+        lastname = case(*[
                             (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext.isnot(None)),
                              FOIRawRequest.requestrawdata['contactInfo']['lastName'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['lastName'].astext).label('lastName')
-        description = case([
+        description = case(*[
                             (FOIRawRequest.status == StateName.unopened.value,
                              FOIRawRequest.requestrawdata['descriptionTimeframe']['description'].astext),
                            ],
                            else_ = FOIRawRequest.requestrawdata['description'].astext).label('description')
-        recordsearchfromdate = case([
+        recordsearchfromdate = case(*[
                             (FOIRawRequest.status == StateName.unopened.value,
                              FOIRawRequest.requestrawdata['descriptionTimeframe']['fromDate'].astext),
                            ],
                            else_ = func.nullif(FOIRawRequest.requestrawdata['fromDate'].astext, '')).label('recordsearchfromdate')
-        recordsearchtodate = case([
+        recordsearchtodate = case(*[
                             (FOIRawRequest.status == StateName.unopened.value,
                              FOIRawRequest.requestrawdata['descriptionTimeframe']['toDate'].astext),
                            ],
                            else_ = func.nullif(FOIRawRequest.requestrawdata['toDate'].astext, '')).label('recordsearchtodate')
-        duedate = case([
+        duedate = case(*[
                             (FOIRawRequest.status == StateName.unopened.value,
                              literal(None)),
                            ],
                            else_ = func.nullif(FOIRawRequest.requestrawdata['dueDate'].astext, '')).label('duedate')
-        receiveddate = case([
+        receiveddate = case(*[
                             (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['receivedDate'].is_(None)),
                              func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD')),
                            ],
                            else_ = func.nullif(FOIRawRequest.requestrawdata['receivedDate'].astext, '')).label('receivedDate')
-        receiveddateuf = case([
+        receiveddateuf = case(*[
                             (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['receivedDateUF'].is_(None)),
                              func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD HH:MM:SS')),
                            ],
                            else_ = func.nullif(FOIRawRequest.requestrawdata['receivedDateUF'].astext, '')).label('receivedDateUF')
 
-        assignedtoformatted = case([
+        assignedtoformatted = case(*[
                             (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
                              func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
                             (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
@@ -594,7 +594,7 @@ class FOIRawRequest(db.Model):
                            ],
                            else_ = FOIRawRequest.assignedgroup).label('assignedToFormatted')
 
-        axisrequestid = case([
+        axisrequestid = case(*[
             (FOIRawRequest.axisrequestid.is_(None),
             'U-00' + cast(FOIRawRequest.requestid, String)),
             #FOIMOD-4172 - update here
@@ -602,31 +602,31 @@ class FOIRawRequest(db.Model):
             ],
             else_ = cast(FOIRawRequest.axisrequestid, String)).label('axisRequestId')
 
-        requestpagecount = case([
+        requestpagecount = case(*[
             (FOIRawRequest.requestrawdata['axispagecount'].is_(None),
             '0'),
             ],
             else_ = cast(FOIRawRequest.requestrawdata['axispagecount'], String))
 
-        intakesorting = case([
+        intakesorting = case(*[
                             (FOIRawRequest.assignedto == None, # Unassigned requests first
                              literal(None)),
                            ],
                            else_ = cast(func.nullif(FOIRawRequest.requestrawdata['receivedDateUF'].astext, ''),TIMESTAMP)).label('intakeSorting')
 
-        isiaorestricted = case([
+        isiaorestricted = case(*[
                             (FOIRawRequest.isiaorestricted.is_(None),
                              False),
                            ],
                            else_ = FOIRawRequest.isiaorestricted).label('isiaorestricted')
 
-        subjectcode = case([
+        subjectcode = case(*[
             (FOIRawRequest.requestrawdata['subjectCode'].is_(None),
             literal(None)),
             ],
             else_ = cast(FOIRawRequest.requestrawdata['subjectCode'], String)).label('subjectcode')
         
-        proactivedisclosurecategory = case([
+        proactivedisclosurecategory = case(*[
             (FOIRawRequest.requestrawdata['proactiveDisclosureCategory'].is_(None),
             literal(None)),
             ],
@@ -639,19 +639,19 @@ class FOIRawRequest(db.Model):
 
         onbehalf_applicant = aliased(FOIRequestApplicant)
 
-        onbehalf_firstname = case([
+        onbehalf_firstname = case(*[
                             (FOIRawRequest.requestrawdata['foiRequestOnBehalfOfApplicantID'].is_(None),
                              literal(None)),
                            ],
                            else_ = onbehalf_applicant.firstname).label('onBehalfFirstName')
 
-        onbehalf_lastname = case([
+        onbehalf_lastname = case(*[
                             (FOIRawRequest.requestrawdata['foiRequestOnBehalfOfApplicantID'].is_(None),
                              literal(None)),
                            ],
                            else_ = onbehalf_applicant.lastname).label('onBehalfLastName')
 
-        onbehalfformatted = case([
+        onbehalfformatted = case(*[
                                     (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.isnot(None)),
                                      func.concat(onbehalf_applicant.lastname, ', ', onbehalf_applicant.firstname)),
                                     (and_(onbehalf_applicant.lastname.isnot(None), onbehalf_applicant.firstname.is_(None)),
@@ -849,7 +849,7 @@ class FOIRawRequest(db.Model):
             subquery_maxversion.c.max_version == FOIRawRequest.version,
         ]
 
-        assignedtoformatted = case([
+        assignedtoformatted = case(*[
                             (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.isnot(None)),
                              func.concat(FOIAssignee.lastname, ', ', FOIAssignee.firstname)),
                             (and_(FOIAssignee.lastname.isnot(None), FOIAssignee.firstname.is_(None)),
@@ -861,7 +861,7 @@ class FOIRawRequest(db.Model):
                            ],
                            else_ = FOIRawRequest.assignedto).label('assignedToFormatted')
 
-        axisrequestid_raw = case([
+        axisrequestid_raw = case(*[
             (FOIRawRequest.axisrequestid.is_(None),
             'U-00' + cast(FOIRawRequest.requestid, String)),
             ],
@@ -869,7 +869,7 @@ class FOIRawRequest(db.Model):
 
         axisrequestid = axisrequestid_raw.label('axisRequestId')
 
-        isiaorestricted = case([
+        isiaorestricted = case(*[
                             (FOIRawRequest.isiaorestricted.is_(None),
                              False),
                            ],
@@ -877,7 +877,7 @@ class FOIRawRequest(db.Model):
 
         receiveddate = cast(func.nullif(FOIRawRequest.requestrawdata['receivedDateUF'].astext, ''), db.DateTime).label('receivedDate')
 
-        proactivedisclosurecategory = case([
+        proactivedisclosurecategory = case(*[
             (FOIRawRequest.requestrawdata['proactiveDisclosureCategory'].is_(None),
             literal(None)),
             ],
@@ -1465,10 +1465,10 @@ class FOIRawRequest(db.Model):
                     order by version desc limit 1;"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
-                requestdetails["assignedTo"] = row['assignedto']
-                requestdetails["assignedToFirstName"] = row["assignedtofirstname"]
-                requestdetails["assignedToLastName"] = row["assignedtolastname"]
-                requestdetails["bcgovcode"] = row["bcgovcode"]
+                requestdetails["assignedTo"] = row._mapping['assignedto']
+                requestdetails["assignedToFirstName"] = row._mapping["assignedtofirstname"]
+                requestdetails["assignedToLastName"] = row._mapping["assignedtolastname"]
+                requestdetails["bcgovcode"] = row._mapping["bcgovcode"]
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -1487,7 +1487,7 @@ class FOIRawRequest(db.Model):
             WHERE foireqs.status = :requeststatus;"""
             rs = db.session.execute(text(sql), {'requeststatus': StateName.section5pending.value})
             for row in rs:
-                section5pendings.append({"requestid": row["requestid"], "version": row["version"], "statusname": row["status"], "created_at": row["created_at"], "axisrequestid": ["axisrequestid"]})
+                section5pendings.append({"requestid": row._mapping["requestid"], "version": row._mapping["version"], "statusname": row._mapping["status"], "created_at": row._mapping["created_at"], "axisrequestid": ["axisrequestid"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -1519,12 +1519,12 @@ class FOIRawRequest(db.Model):
             rs = db.session.execute(text(sql), {'startdate': startdate, 'enddate': enddate})
             for row in rs:
                 requests.append({
-                    "requestid": row["requestid"],
-                    "created_at": row["created_at"],
-                    "requestrawdata": row["requestrawdata"],
-                    "paymentstatus": row["status"],
-                    "fee": row["fee"],
-                    "txnno": row["txnno"]
+                    "requestid": row._mapping["requestid"],
+                    "created_at": row._mapping["created_at"],
+                    "requestrawdata": row._mapping["requestrawdata"],
+                    "paymentstatus": row._mapping["status"],
+                    "fee": row._mapping["fee"],
+                    "txnno": row._mapping["txnno"]
                 })
         except Exception as ex:
             logging.error(ex)
@@ -1561,7 +1561,7 @@ class FOIRawRequest(db.Model):
                 'receiveddate': request['requestrawdata']['receivedDateUF'][0:10],
             })
             for row in rs:
-                requests.append({"requestid": row["requestid"], "created_at": row["created_at"], "requestrawdata": row["requestrawdata"]})
+                requests.append({"requestid": row._mapping["requestid"], "created_at": row._mapping["created_at"], "requestrawdata": row._mapping["requestrawdata"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -1629,10 +1629,10 @@ class FOIRawRequest(db.Model):
             results = db.session.execute(text(sql), params)
             result_list=[]
             for row in results:
-                requeststatus = StateName[row["requeststatuslabel"]].value
-                govcode = row["iaocode"] if row["iaocode"] is not None else row["requestrawdata"]["selectedMinistries"][0]["code"]
-                result_list.append({"rawrequestid": row["requestid"],  "axisrequestid": row["axisrequestid"], "foiministryrequestid": row["foiministryrequestid"],
-                                           "foirequestid": row["foirequest_id"] ,"requeststatus": requeststatus, "govcode": govcode})
+                requeststatus = StateName[row._mapping["requeststatuslabel"]].value
+                govcode = row._mapping["iaocode"] if row._mapping["iaocode"] is not None else row._mapping["requestrawdata"]["selectedMinistries"][0]["code"]
+                result_list.append({"rawrequestid": row._mapping["requestid"],  "axisrequestid": row._mapping["axisrequestid"], "foiministryrequestid": row._mapping["foiministryrequestid"],
+                                           "foirequestid": row._mapping["foirequest_id"] ,"requeststatus": requeststatus, "govcode": govcode})
             return result_list
         except Exception as ex:
             logging.error(f"Error fetching linked request IDs: {ex}")
@@ -1667,10 +1667,10 @@ class FOIRawRequest(db.Model):
             params = {"axis_ids": tuple(axis_ids)}
             rs = db.session.execute(text(sql), params)
             for row in rs:
-                requeststatus = StateName[row["requeststatuslabel"]].value
-                govcode = row["iaocode"] if row["iaocode"] is not None else row["requestrawdata"]["selectedMinistries"][0]["code"]
-                linkedrequestsinfo.append({"rawrequestid": row["requestid"],  "axisrequestid": row["axisrequestid"], "foiministryrequestid": row["foiministryrequestid"],
-                                           "foirequestid": row["foirequest_id"] ,"requeststatus": requeststatus, "govcode": govcode})
+                requeststatus = StateName[row._mapping["requeststatuslabel"]].value
+                govcode = row._mapping["iaocode"] if row._mapping["iaocode"] is not None else row._mapping["requestrawdata"]["selectedMinistries"][0]["code"]
+                linkedrequestsinfo.append({"rawrequestid": row._mapping["requestid"],  "axisrequestid": row._mapping["axisrequestid"], "foiministryrequestid": row._mapping["foiministryrequestid"],
+                                           "foirequestid": row._mapping["foirequest_id"] ,"requeststatus": requeststatus, "govcode": govcode})
         except Exception as ex:
             logging.error(ex)
             raise ex
