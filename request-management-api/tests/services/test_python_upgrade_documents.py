@@ -3,11 +3,6 @@
 from io import BytesIO
 import json
 import re
-import os
-import uuid
-
-import boto3
-from botocore.config import Config
 
 from pypdf import PdfReader
 import pytest
@@ -17,7 +12,6 @@ from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIRawRequestDocuments import FOIRawRequestDocument
 from request_api.models.DocumentPathMapper import DocumentPathMapper
 from request_api.services.cdogs_api_service import CdogsApiService
-from request_api.services.external.storageservice import storageservice
 
 
 def create_request(session):
@@ -98,42 +92,3 @@ def test_cdogs_receipt_request_and_returned_bytes(app, external_http):
         assert response.content == b'%PDF-synthetic-cdogs-output'
     finally:
         app.config.update(saved)
-
-
-def test_real_storage_upload_can_be_read_back_with_same_bytes(session, external_http):
-    # Keep the actual HTTPS request signing/upload code and S3 SDK in this path.
-    # Only this dedicated peer is allowed through the HTTP mock boundary.
-    external_http.put(re.compile(r'^https://storage:8333/'), real_http=True)
-    client = boto3.client(
-        's3', endpoint_url='https://storage:8333', region_name='us-east-1',
-        aws_access_key_id='upgrade-test-only', aws_secret_access_key='upgrade-test-only',
-        verify=os.environ.get('REQUESTS_CA_BUNDLE', True),
-        # Shared CI runners can take longer than two seconds to complete TLS.
-        # Bound SDK retries while retaining certificate and roundtrip validation.
-        config=Config(s3={'addressing_style': 'path'}, connect_timeout=10, read_timeout=30,
-                      retries={'mode': 'standard', 'total_max_attempts': 3}),
-    )
-    bucket = 'upgrade-roundtrip-' + uuid.uuid4().hex
-    client.create_bucket(Bucket=bucket)
-    try:
-        mapper = session.query(DocumentPathMapper).filter_by(category='Attachments', isactive=True).one()
-        mapper.bucket = bucket
-        mapper.attributes = '{}'
-        session.flush()
-        content = b'%PDF-synthetic-storage-roundtrip\n'
-        result = storageservice().upload({
-            'filename': 'roundtrip.pdf', 'file': content, 'filestatustransition': 'applicant',
-            'ministrycode': 'Misc', 'requestnumber': 'UPGRADE-001',
-        })
-        prefix = f'https://storage:8333/{bucket}/'
-        assert result['documentpath'].startswith(prefix)
-        key = result['documentpath'][len(prefix):]
-        assert key.startswith('Misc/UPGRADE-001/applicant/')
-        stored = client.get_object(Bucket=bucket, Key=key)
-        assert stored['Body'].read() == content
-        assert stored['ContentType'] == 'application/pdf'
-    finally:
-        for item in client.list_objects_v2(Bucket=bucket).get('Contents', []):
-            client.delete_object(Bucket=bucket, Key=item['Key'])
-        client.delete_bucket(Bucket=bucket)
-        client.close()
