@@ -6,10 +6,6 @@ alembic==1.20.1 \
 aniso8601==9.0.1 \
     --hash=sha256:1d2b7ef82963909e93c4f24ce48d4de9e66009a21bf1c1e1c85bdd0812fe412f \
     --hash=sha256:72e3117667eedf66951bb2d93f4296a56b94b078a8a95905a052611fb3f1b973
-asyncio-nats-client==0.11.4 \
-    --hash=sha256:ede58bda6560cf4206059799597be9be7ba28a479c4d118cf00bda6e4471bf2e
-asyncio-nats-streaming==0.4.0 \
-    --hash=sha256:1fecb125917b438028e6eb753cdc1689dd1c7c86df8a9808534d9fc1711b0aa6
 attrs==26.1.0 \
     --hash=sha256:c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309 \
     --hash=sha256:d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c985eff32
