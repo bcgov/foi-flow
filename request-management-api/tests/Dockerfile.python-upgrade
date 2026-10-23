@@ -1,5 +1,9 @@
 ARG APP_IMAGE=foi-request-api-upgrade:candidate
 FROM ${APP_IMAGE}
 COPY requirements-test.txt /tmp/requirements-test.txt
-RUN python -m pip install --no-cache-dir --require-hashes -r /tmp/requirements-test.txt
+RUN python -m pip install \
+    --no-cache-dir \
+    --require-hashes \
+    --only-binary=:all: \
+    -r /tmp/requirements-test.txt
 ENV PYTHONPATH=/verification-source

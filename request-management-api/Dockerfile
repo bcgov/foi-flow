@@ -2,9 +2,22 @@
 # FROM python:3.8
 # rebuild for DEV
 # Necessary to pull images from bcgov and not hit Dockerhub quotas.
-FROM python:3.13.17-bookworm@sha256:a3799099b64fd333f262768c7a64733f6e4edb7bc569813710a100214bdcf278
+FROM python:3.13.17-bookworm
 EXPOSE 6402
-RUN set -eux; apt-get update; apt-get install -y --no-install-recommends ca-certificates curl netbase wget libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 fonts-dejavu-core libexpat1 libexpat1-dev; rm -rf /var/lib/apt/lists/*
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        fonts-dejavu-core \
+        libexpat1 \
+        libexpat1-dev \
+        libharfbuzz-subset0 \
+        libpango-1.0-0 \
+        libpangoft2-1.0-0 \
+        netbase \
+        wget; \
+    rm -rf /var/lib/apt/lists/*
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
