@@ -1,7 +1,7 @@
 import {
   formatDate,
   addBusinessDays,
-  businessDay,
+  getBusinessDateWithCutoff,
   calculateDaysRemaining,
 } from "../../../helper/FOI/helper";
 import { StateEnum } from "../../../constants/FOI/statusEnum";
@@ -34,21 +34,7 @@ export const getAssigneeValue = (row) => {
 };
 
 export const getReceivedDate = (params) => {
-  let receivedDateString = params.row.receivedDateUF;
-  const dateString = receivedDateString
-    ? receivedDateString.substring(0, 10)
-    : "";
-  receivedDateString = receivedDateString ? new Date(receivedDateString) : "";
-
-  if (
-    receivedDateString !== "" &&
-    (receivedDateString.getHours() > 16 ||
-      (receivedDateString.getHours() === 16 &&
-        receivedDateString.getMinutes() > 30) ||
-      !businessDay(dateString))
-  ) {
-    receivedDateString = addBusinessDays(receivedDateString, 1);
-  }
+  const receivedDateString = getBusinessDateWithCutoff(params.row.receivedDateUF);
   return formatDate(receivedDateString, "MMM dd yyyy").toUpperCase();
 };
 
@@ -70,20 +56,7 @@ export const getOIApplicantCategory = (params) => {
 };
 
 export const getClosedDate = (params) => {
-  let closedDateString = params.row.closedate;
-  const dateString = closedDateString
-    ? closedDateString.substring(0, 10)
-    : "";
-  closedDateString = closedDateString ? new Date(closedDateString) : "";
-  if (
-    closedDateString !== "" &&
-    (closedDateString.getHours() > 16 ||
-      (closedDateString.getHours() === 16 &&
-        closedDateString.getMinutes() > 30) ||
-      !businessDay(dateString))
-  ) {
-    closedDateString = addBusinessDays(closedDateString, 1);
-  }
+  const closedDateString = getBusinessDateWithCutoff(params.row.closedate);
   return formatDate(closedDateString, "MMM dd yyyy").toUpperCase();
 };
 

@@ -571,14 +571,17 @@ class FOIRawRequest(db.Model):
                              literal(None)),
                            ],
                            else_ = func.nullif(FOIRawRequest.requestrawdata['dueDate'].astext, '')).label('duedate')
+        # Match the existing UTC created_at reader contract before returning BC
+        # wall time. Saved receipt values already represent business dates/times.
+        created_at_pacific = func.timezone('America/Vancouver', func.timezone('UTC', FOIRawRequest.created_at))
         receiveddate = case(*[
                             (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['receivedDate'].is_(None)),
-                             func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD')),
+                             func.to_char(created_at_pacific, 'YYYY-MM-DD')),
                            ],
                            else_ = func.nullif(FOIRawRequest.requestrawdata['receivedDate'].astext, '')).label('receivedDate')
         receiveddateuf = case(*[
                             (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['receivedDateUF'].is_(None)),
-                             func.to_char(FOIRawRequest.created_at, 'YYYY-mm-DD HH:MM:SS')),
+                             func.to_char(created_at_pacific, 'YYYY-MM-DD HH24:MI:SS')),
                            ],
                            else_ = func.nullif(FOIRawRequest.requestrawdata['receivedDateUF'].astext, '')).label('receivedDateUF')
 
@@ -1259,16 +1262,18 @@ class FOIRawRequest(db.Model):
     @classmethod
     def getfilterfordate(cls, params):
         filterconditionfordate = []
+        # Use the same BC date as the dashboard fallback for UTC created_at.
+        created_at_pacific = func.timezone('America/Vancouver', func.timezone('UTC', FOIRawRequest.created_at))
         if(params['daterangetype'] == 'closedate'):
             #no rawrequest returned for this case
             filterconditionfordate.append(FOIRawRequest.requestid < 0)
         else:
             if(params['fromdate'] is not None):
                 if(params['daterangetype'] == 'receivedDate'):
-                    #online form submission has no receivedDate in json - using created_at
+                    # Online submissions without a saved date use the BC creation day.
                     filterconditionfordate.append(
                         or_(
-                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), FOIRawRequest.created_at.cast(Date) >= parser.parse(params['fromdate'])),
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), created_at_pacific.cast(Date) >= parser.parse(params['fromdate'])),
                             and_(FOIRawRequest.requestrawdata['receivedDate'].isnot(None), FOIRawRequest.findfield(params['daterangetype']).cast(Date) >= parser.parse(params['fromdate'])),
                         )
                     )
@@ -1277,10 +1282,10 @@ class FOIRawRequest(db.Model):
 
             if(params['todate'] is not None):
                 if(params['daterangetype'] == 'receivedDate'):
-                    #online form submission has no receivedDate in json - using created_at
+                    # Online submissions without a saved date use the BC creation day.
                     filterconditionfordate.append(
                         or_(
-                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), FOIRawRequest.created_at.cast(Date) <= parser.parse(params['todate'])),
+                            and_(FOIRawRequest.requestrawdata['receivedDate'].is_(None), created_at_pacific.cast(Date) <= parser.parse(params['todate'])),
                             and_(FOIRawRequest.requestrawdata['receivedDate'].isnot(None), FOIRawRequest.findfield(params['daterangetype']).cast(Date) <= parser.parse(params['todate'])),
                         )
                     )
