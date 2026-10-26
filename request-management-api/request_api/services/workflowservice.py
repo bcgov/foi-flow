@@ -49,33 +49,17 @@ class workflowservice:
         assignedgroup = requestsschema["assignedGroup"] if 'assignedGroup' in requestsschema  else None
         assignedto = requestsschema["assignedTo"] if 'assignedTo' in requestsschema  else None
 
-        engine = resolve_engine(wfengine)
-        instanceaddress = self.__instanceaddress(wfengine, wfinstanceid, self.__getwfmetadatabyrequesttype(id, requesttype))
+        engine = resolve_engine()
+        if status == UnopenedEvent.open.value:
+            rawrequestid = FOIRequest.getrawrequestidbyfoirequestid(id)
+            metadata = json.dumps({"id": id, "rawRequestId": rawrequestid, "status": status, "ministries": self.__format_ministries(ministries), "assignedGroup": assignedgroup, "assignedTo": assignedto})
+        else:
+            metadata = json.dumps({"id": id, "status": status, "assignedGroup": assignedgroup, "assignedTo": assignedto})
         if status == UnopenedEvent.intakeinprogress.value:
             messagename = MessageType.intakereopen.value if self.__hasreopened(id, "rawrequest") == True else MessageType.intakeclaim.value
             return engine.unopenedsave(wfinstanceid, metadata, messagename)
         else:
-            if status == UnopenedEvent.open.value:
-                 metadata = json.dumps({"id": id, "status": status, "ministries": self.__format_ministries(ministries), "assignedGroup": assignedgroup, "assignedTo": assignedto})
-            else:
-                metadata = json.dumps({"id": id, "status": status, "assignedGroup": assignedgroup, "assignedTo": assignedto})
-            return engine.unopenedcomplete(instanceaddress, metadata, MessageType.intakecomplete.value)
-
-    def __getwfenginebyrequesttype(self, id, requesttype):
-        """Common wfengine lookup: id is only meaningful together with
-        requesttype, since the same numeric id space is not shared between
-        tables - "rawrequest" ids are FOIRawRequests.requestid, while
-        "foirequest" ids are FOIRequests.foirequestid (the split/opened
-        request, which falls back to its raw request's wfengine when not
-        yet copied over - see FOIRequest.getwfengine)."""
-        if requesttype == "rawrequest":
-            return FOIRawRequest.getwfengine(id)
-        return FOIRequest.getwfengine(id)
-
-    def __getwfmetadatabyrequesttype(self, id, requesttype):
-        if requesttype == "rawrequest":
-            return FOIRawRequest.getwfmetadata(id)
-        return FOIRequest.getwfmetadata(id)
+            return engine.unopenedcomplete(wfinstanceid, metadata, MessageType.intakecomplete.value)
 
     def postopenedevent(self, id, wfinstanceid, requestsschema, data, newstatus, usertype, issync=False):
         assignedgroup = self.__getopenedassigneevalue(requestsschema, "assignedgroup",usertype)
@@ -357,7 +341,7 @@ class workflowservice:
 
     def __getministryactivity(self, oldstatus, newstatus):
         return  Activity.complete.value if newstatus is not None and oldstatus != newstatus else Activity.save.value
-
+    
     # The data needs to be less than 4000 characters for Camunda
     # This strips irrelevant data to keep text below limit when all ministries selected
     def __format_ministries(self, ministries):
@@ -366,21 +350,12 @@ class workflowservice:
         formatted_ministries = []
         for ministry in ministries:
             formatted_ministries.append({
+                "id": ministry.get("id"),
+                "foirequestid": ministry.get("foirequestid"),
                 "filenumber": ministry.get("filenumber"),
                 "assignedgroup": ministry.get("assignedgroup"),
             })
         return formatted_ministries
-    def __instanceaddress(self, wfengine, wfinstanceid, wfmetadata):
-        """The value to pass as the "which running instance" argument to the
-        resolved engine: the Camunda wfinstanceid unchanged, or - for n8n -
-        the current resume path from wfmetadata (wfinstanceid stays unused
-        for n8n-owned requests, per the wfengine/wfmetadata separation).
-        Read-only: workflowservice never writes wfengine/wfmetadata - that is
-        owned by createinstance's response (bpmservice) or by the n8n
-        workflow itself (commonworkflowservice)."""
-        if resolve_engine_name(wfengine) == WFEngine.n8n:
-            return (wfmetadata or {}).get("resumePath")
-        return wfinstanceid
 
 
 class UserType(Enum):
