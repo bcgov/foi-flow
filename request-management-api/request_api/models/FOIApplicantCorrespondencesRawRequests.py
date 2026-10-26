@@ -64,15 +64,15 @@ class FOIApplicantCorrespondenceRawRequest(db.Model):
                     order by applicantcorrespondenceid desc, version desc""" 
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
-                if row["isdeleted"] == False:
-                    correspondences.append({"applicantcorrespondenceid": row["applicantcorrespondenceid"], "templateid": row["templateid"],
-                                            "correspondencemessagejson": row["correspondencemessagejson"], "version": row["version"], 
-                                            "created_at": row["created_at"], "createdby": row["createdby"], 
-                                            "sentcorrespondencemessage": row["sentcorrespondencemessage"], "parentapplicantcorrespondenceid": row["parentapplicantcorrespondenceid"],
-                                            "sent_at": row["sent_at"], "sentby": row["sentby"],
-                                            "isdraft": row["isdraft"], "isresponse": row["isresponse"], "response_at": row["response_at"], "israwrequest": row["israwrequest"],
-                                            "templatename": row["templatename"], "templatetype": row["templatetype"], "emailsubject": row["emailsubject"], "correspondencesubject": row["correspondencesubject"],
-                                            "is_sent_successfully": row["is_sent_successfully"], "sent_from_email": row["sent_from_email"]})
+                if row._mapping["isdeleted"] == False:
+                    correspondences.append({"applicantcorrespondenceid": row._mapping["applicantcorrespondenceid"], "templateid": row._mapping["templateid"],
+                                            "correspondencemessagejson": row._mapping["correspondencemessagejson"], "version": row._mapping["version"],
+                                            "created_at": row._mapping["created_at"], "createdby": row._mapping["createdby"],
+                                            "sentcorrespondencemessage": row._mapping["sentcorrespondencemessage"], "parentapplicantcorrespondenceid": row._mapping["parentapplicantcorrespondenceid"],
+                                            "sent_at": row._mapping["sent_at"], "sentby": row._mapping["sentby"],
+                                            "isdraft": row._mapping["isdraft"], "isresponse": row._mapping["isresponse"], "response_at": row._mapping["response_at"], "israwrequest": row._mapping["israwrequest"],
+                                            "templatename": row._mapping["templatename"], "templatetype": row._mapping["templatetype"], "emailsubject": row._mapping["emailsubject"], "correspondencesubject": row._mapping["correspondencesubject"],
+                                            "is_sent_successfully": row._mapping["is_sent_successfully"], "sent_from_email": row._mapping["sent_from_email"]})
         except Exception as ex:
             logging.error(ex)
             raise ex

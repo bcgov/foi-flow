@@ -352,7 +352,7 @@ class FOIProactiveDisclosureRequests(db.Model):
                     'publication_cutoff': publication_cutoff,
                 },
             )
-            return [dict(row) for row in result]
+            return [dict(row._mapping) for row in result]
         except Exception as exception:
             logging.error(f"Error fetching Proactive Disclosure pre-publishing records: {exception}")
             return []

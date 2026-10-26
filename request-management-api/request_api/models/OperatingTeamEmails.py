@@ -28,7 +28,7 @@ class OperatingTeamEmail(db.Model):
             """
             rs = db.session.execute(text(sql))
             for row in rs:
-                emails.append({"email":row["email_address"], "name":row["name"]})
+                emails.append({"email":row._mapping["email_address"], "name":row._mapping["name"]})
         except Exception as ex:
             logging.error(ex)
             raise ex
@@ -49,7 +49,7 @@ class OperatingTeamEmail(db.Model):
             """
             rs = db.session.execute(text(sql), {'operatingteamname': operatingteamname})
             for row in rs:
-                email = row["email_address"]
+                email = row._mapping["email_address"]
         except Exception as ex:
             logging.error(ex)
             raise ex

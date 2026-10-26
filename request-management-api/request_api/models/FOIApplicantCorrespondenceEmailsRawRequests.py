@@ -43,8 +43,8 @@ class FOIApplicantCorrespondenceEmailRawRequest(db.Model):
                         where fc.foirawrequest_id = :requestid;""" 
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
-                correspondence_emails.append({"correspondence_to": row["correspondence_to"], "iscarboncopy": row["iscarboncopy"], "applicantcorrespondence_id": row["applicantcorrespondence_id"],
-                                            "applicantcorrespondence_version": row["applicantcorrespondence_version"]})
+                correspondence_emails.append({"correspondence_to": row._mapping["correspondence_to"], "iscarboncopy": row._mapping["iscarboncopy"], "applicantcorrespondence_id": row._mapping["applicantcorrespondence_id"],
+                                            "applicantcorrespondence_version": row._mapping["applicantcorrespondence_version"]})
         except Exception as ex:
             logging.error(ex)
             raise ex

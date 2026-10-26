@@ -28,13 +28,13 @@ class OIPCReviewTypesReasons(db.Model):
         reviewtypereasons = []
         for row in rs:
             reviewtypereasons.append({
-                "reviewtypeid": row["reviewtypeid"], 
-                "reasonid": row["reasonid"],
-                "reason_name": row["reason_name"],
-                "type_name": row["type_name"],
-                "reviewtypereason_isactive": row["reviewtypereason_isactive"],
-                "reviewtype_isactive": row["reviewtype_isactive"],
-                "reason_isactive": row["reason_isactive"],
+                "reviewtypeid": row._mapping["reviewtypeid"],
+                "reasonid": row._mapping["reasonid"],
+                "reason_name": row._mapping["reason_name"],
+                "type_name": row._mapping["type_name"],
+                "reviewtypereason_isactive": row._mapping["reviewtypereason_isactive"],
+                "reviewtype_isactive": row._mapping["reviewtype_isactive"],
+                "reason_isactive": row._mapping["reason_isactive"],
                 })
         return reviewtypereasons
 
