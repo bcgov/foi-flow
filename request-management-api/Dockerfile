@@ -2,7 +2,7 @@
 # FROM python:3.8
 # rebuild for DEV
 # Necessary to pull images from bcgov and not hit Dockerhub quotas.
-FROM python:3.13.17-bookworm
+FROM python:3.13.17-trixie
 EXPOSE 6402
 RUN set -eux; \
     apt-get update; \
