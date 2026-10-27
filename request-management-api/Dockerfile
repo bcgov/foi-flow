@@ -1,4 +1,5 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
+#test
 # FROM python:3.8
 # rebuild for DEV
 # Necessary to pull images from bcgov and not hit Dockerhub quotas.
