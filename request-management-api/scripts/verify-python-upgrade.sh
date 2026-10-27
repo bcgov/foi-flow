@@ -26,6 +26,7 @@ trap cleanup EXIT
 docker build -f "${UPGRADE_DOCKERFILE:-$service_dir/Dockerfile}" -t "$UPGRADE_APP_IMAGE" "$service_dir" 2>&1 | tee "$UPGRADE_EVIDENCE_DIR/build.log"
 "${compose[@]}" build checks
 "${compose[@]}" up -d --wait --wait-timeout 90 postgres redis storage
+bash "$service_dir/scripts/prepare-test-schema.sh" "foi-python-upgrade-$phase"
 if [[ "$phase" = candidate ]]; then
     bash "$service_dir/scripts/check-migration-parity.sh" "foi-python-upgrade-$phase" "$UPGRADE_EVIDENCE_DIR"
 fi
