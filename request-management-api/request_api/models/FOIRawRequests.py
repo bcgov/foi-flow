@@ -571,14 +571,22 @@ class FOIRawRequest(db.Model):
                              literal(None)),
                            ],
                            else_ = func.nullif(FOIRawRequest.requestrawdata['dueDate'].astext, '')).label('duedate')
+        # created_at is UTC-naive. Preserve historical Vancouver rules,
+        # but bypass outdated PostgreSQL tzdata after the 2026 fall cutoff.
+        # PDT is a fixed UTC-7 PostgreSQL timezone abbreviation.
+        created_at_vancouver = case(*[
+            (FOIRawRequest.created_at >= datetime(2026, 11, 1, 9, 0, 0),
+             func.timezone('PDT', func.timezone('UTC', FOIRawRequest.created_at))),
+        ], else_=func.timezone(
+            'America/Vancouver', func.timezone('UTC', FOIRawRequest.created_at)))
         receiveddate = case(*[
                             (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['receivedDate'].is_(None)),
-                             func.to_char(FOIRawRequest.created_at, 'YYYY-MM-DD')),
+                             func.to_char(created_at_vancouver, 'YYYY-MM-DD')),
                            ],
                            else_ = func.nullif(FOIRawRequest.requestrawdata['receivedDate'].astext, '')).label('receivedDate')
         receiveddateuf = case(*[
                             (and_(FOIRawRequest.status == StateName.unopened.value, FOIRawRequest.requestrawdata['receivedDateUF'].is_(None)),
-                             func.to_char(FOIRawRequest.created_at, 'YYYY-MM-DD HH24:MI:SS')),
+                             func.to_char(created_at_vancouver, 'YYYY-MM-DD HH24:MI:SS')),
                            ],
                            else_ = func.nullif(FOIRawRequest.requestrawdata['receivedDateUF'].astext, '')).label('receivedDateUF')
 

@@ -51,6 +51,8 @@ describe.each([
     // Offset-less API values are already Vancouver wall time; date-only
     // business fields must not be reinterpreted as UTC instants.
     ["2026-11-02 16:29:00.000000", "NOV 02 2026"],
+    ["2022-08-03 15:07:37", "AUG 03 2022"],
+    ["2022-08-03 22:07:37", "AUG 04 2022"],
     ["2026-11-02 16:30:59.000000", "NOV 02 2026"],
     ["2026-11-02 16:31:00.000000", "NOV 03 2026"],
     ["2026-11-02", "NOV 02 2026"],
