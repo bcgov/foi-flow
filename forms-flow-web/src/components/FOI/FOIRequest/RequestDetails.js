@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import Input from '@material-ui/core/Input';
-import { formatDate, addBusinessDays, addBusinessDaysExpanded, businessDay } from "../../../helper/FOI/helper";
+import { formatDate, addBusinessDaysExpanded, getBusinessDateWithCutoff } from "../../../helper/FOI/helper";
 import FOI_COMPONENT_CONSTANTS from '../../../constants/FOI/foiComponentConstants';
 import { StateEnum } from '../../../constants/FOI/statusEnum';
 import { shouldDisableFieldForMinistryRequests, findRequestState } from "./utils"
@@ -99,14 +99,6 @@ const RequestDetails = React.memo(
     const receivedMode = useSelector(state=> state.foiRequests.foiReceivedModeList);
     const deliveryMode = useSelector(state=> state.foiRequests.foiDeliveryModeList);
     const [openModal, setModal] = useState(false);
-    const calculateReceivedDate = (receivedDateString) => {
-      const dateString = receivedDateString ? receivedDateString.substring(0,10): "";
-      receivedDateString = receivedDateString ? new Date(receivedDateString): "";
-      if (receivedDateString !== "" && ((receivedDateString.getHours() > 16 || (receivedDateString.getHours() === 16 && receivedDateString.getMinutes() > 30)) || !businessDay(dateString))) {
-          receivedDateString = addBusinessDays(receivedDateString, 1);
-      }
-      return formatDate(receivedDateString);
-    }
 
     //updates the default values from the request details
     React.useEffect(() => {
@@ -120,7 +112,7 @@ const RequestDetails = React.memo(
       setDueDate(validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.DUE_DATE, getProcessStartDateForLocalState()));
 
       let receivedDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF);
-      receivedDate = calculateReceivedDate(receivedDate);
+      receivedDate = getBusinessDateWithCutoff(receivedDate);
       const startDate = validateFields(requestDetails, FOI_COMPONENT_CONSTANTS.REQUEST_START_DATE, receivedDate);
       const requestDetailsObject = {
         requestType: initialRequestType,
@@ -155,7 +147,7 @@ const RequestDetails = React.memo(
         requestDetails,
         FOI_COMPONENT_CONSTANTS.RECEIVED_DATE_UF
       );
-      receivedDate = calculateReceivedDate(receivedDate);
+      receivedDate = getBusinessDateWithCutoff(receivedDate);
       receivedDate = receivedDate ? formatDate(receivedDate) : "";
       return receivedDate;
     }
@@ -200,7 +192,7 @@ const RequestDetails = React.memo(
     });
     //handling the received date change
     const handleReceivedDateChange = (e) => {
-      const receivedDate = calculateReceivedDate(e.target.value);
+      const receivedDate = getBusinessDateWithCutoff(e.target.value);
       setReceivedDate(receivedDate);
       //event bubble up - for required feild validation
       handleRequestDetailsValue(receivedDate, FOI_COMPONENT_CONSTANTS.RECEIVED_DATE);
