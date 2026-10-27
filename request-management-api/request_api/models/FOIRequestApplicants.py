@@ -1251,7 +1251,7 @@ class ApplicantProfileBaseSchema(ma.Schema): # For profiles with data solely fro
     employeenumber = fields.String(attribute="employee_number")
     correctionnumber = fields.String(attribute="correction_number")
     section43_info = fields.String(attribute="section43_info")
-    requestHistory = fields.Dict(attribute="request_history")
+    requestHistory = fields.Raw(attribute="request_history")
     applicantcategory = fields.String(attribute="category")
     dob = fields.Date(format="%Y-%m-%d")
 
