@@ -139,7 +139,7 @@ const getBusinessDateWithCutoff = (value) => {
     (date.hour() === 16 && date.minute() > 30) ||
     !businessDay(dateText)
   ) {
-    return addBusinessDays(dateText, 1);
+    return addBusinessDays(date.format("YYYY-MM-DDTHH:mm:ss"), 1);
   }
   return dateText;
 };
