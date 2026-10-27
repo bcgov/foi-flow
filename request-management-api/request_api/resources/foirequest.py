@@ -20,6 +20,7 @@ from flask_expects_json import expects_json
 from flask_cors import cross_origin
 from request_api.auth import auth, AuthHelper
 from request_api.services.eventservice import eventservice
+from request_api.models.db import db
 from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships,str_to_bool,canrestictdata,canrestictdata_ministry
 from request_api.exceptions import BusinessException
@@ -44,6 +45,15 @@ logger = logging.getLogger(__name__)
 
 API = Namespace('FOIRequests', description='Endpoints for FOI request management')
 TRACER = Tracer.get_instance()
+
+
+def _posteventsafely(*args):
+    """Run event creation inline; a failure must not skip the workflow post after the version commit."""
+    try:
+        eventservice().posteventsync(*args)
+    except Exception:
+        logger.exception("FOI event creation failed for request %s", args[0])
+        db.session.rollback()
 EXCEPTION_MESSAGE_NOTFOUND_REQUEST='Record not found'
 CUSTOM_KEYERROR_MESSAGE = "Key error has occured: "
 
@@ -158,7 +168,7 @@ class FOIRequestsById(Resource):
                 foirequestschema = FOIRequestWrapperSchema().load(request_json)  
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid())
             if result.success == True:                             
-                eventservice().posteventsync(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember())
+                _posteventsafely(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(),AuthHelper.isministrymember())
                 if IAOTeamWithKeycloackGroup.oi.value in AuthHelper.getusergroups():
                     eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, AuthHelper.getuserid(),AuthHelper.getusername())
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
@@ -200,7 +210,7 @@ class FOIRequestsByIdAndType(Resource):
                 ministryrequestschema = FOIRequestMinistrySchema().load(request_json)
             result = requestservice().saveministryrequestversion(ministryrequestschema, foirequestid, foiministryrequestid,AuthHelper.getuserid(), usertype)
             if result.success == True:
-                eventservice().posteventsync(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(), AuthHelper.isministrymember(),assigneename)
+                _posteventsafely(foiministryrequestid,"ministryrequest",AuthHelper.getuserid(),AuthHelper.getusername(), AuthHelper.isministrymember(),assigneename)
                 metadata = json.dumps({"id": result.identifier, "ministries": result.args[0]})
                 requestservice().posteventtoworkflow(foiministryrequestid, ministryrequestschema, json.loads(metadata),usertype)
                 return {'status': result.success, 'message':result.message,'id':result.identifier, 'ministryRequests': result.args[0]} , 200
@@ -370,7 +380,7 @@ class FOIRequestUpdateBySection(Resource):
                 foirequestschema = FOIRequestWrapperSchema().load(foirequest)
             result = requestservice().saverequestversion(foirequestschema, foirequestid, foiministryrequestid, userid)
             if result.success == True:
-                eventservice().posteventsync(foiministryrequestid,"ministryrequest",userid,username,is_ministry_member)
+                _posteventsafely(foiministryrequestid,"ministryrequest",userid,username,is_ministry_member)
                 if (section == 'oistatusid'):
                     eventservice().postopeninfostateevent(foirequestid, foiministryrequestid, userid,username)
                     if(request_json['oistatusid'] == OIStatusEnum.EXEMPTION_REQUEST.value):
