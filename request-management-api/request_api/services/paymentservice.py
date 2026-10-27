@@ -1,3 +1,4 @@
+from request_api.utils.requestversion import require_request_version
 
 from os import stat
 from re import VERBOSE
@@ -28,7 +29,7 @@ class paymentservice:
     
     def createpayment(self, requestid, ministryrequestid, data, createdby='System'):
         payment = FOIRequestPayment()
-        ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
+        ministryversion = require_request_version(FOIMinistryRequest.getversionforrequest(ministryrequestid))
         payment.foirequestid = requestid
         payment.ministryrequestid = ministryrequestid
         payment.ministryrequestversion = ministryversion
@@ -61,7 +62,7 @@ class paymentservice:
 
     def __createpaymentinstance(self, request_id, ministry_request_id):
         _payment = FOIRequestPayment.getpayment(request_id, ministry_request_id)
-        ministryversion = FOIMinistryRequest.getversionforrequest(ministry_request_id)
+        ministryversion = require_request_version(FOIMinistryRequest.getversionforrequest(ministry_request_id))
         payment = FOIRequestPayment()
         payment.foirequestid = request_id
         payment.ministryrequestid = ministry_request_id

@@ -1,3 +1,4 @@
+from request_api.utils.requestversion import require_request_version
 
 from os import stat
 from re import VERBOSE
@@ -65,7 +66,7 @@ class cfrfeeservice:
             cfrfee.updatedby = None
         cfrfee.version = _version   
         cfrfee.ministryrequestid = ministryrequestid
-        cfrfee.ministryrequestversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
+        cfrfee.ministryrequestversion = require_request_version(FOIMinistryRequest.getversionforrequest(ministryrequestid))
         if "status" in data and data['status'] not in (None,''):
             cfrfee.cfrfeestatusid = cfrfeestatusservice().getcfrfeestatusidbyname(data['status'])
         if "reason" in data and data['reason'] not in (None,''):

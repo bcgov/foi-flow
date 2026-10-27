@@ -1,3 +1,4 @@
+from request_api.utils.requestversion import require_request_version
 from request_api.models.FOICorrespondenceEmails import FOICorrespondenceEmail
 from request_api.models.FOICorrespondenceEmailsRawRequests import FOICorrespondenceEmailRawRequest
 from request_api.models.FOIApplicantCorrespondenceEmailsRawRequests import FOIApplicantCorrespondenceEmailRawRequest
@@ -17,7 +18,7 @@ class correspondenceemailservice:
             correspondenceemail = FOICorrespondenceEmailRawRequest()
             correspondenceemail.email = data['email']
             correspondenceemail.foirawrequest_id = rawrequestid
-            correspondenceemail.foirawrequestversion_id =FOIRawRequest.getversionforrequest(requestid=rawrequestid)
+            correspondenceemail.foirawrequestversion_id = require_request_version(FOIRawRequest.getversionforrequest(requestid=rawrequestid))
             correspondenceemail.createdby = userid
             correspondenceemail.created_at = datetime.now()
             return FOICorrespondenceEmailRawRequest.savecorrespondenceemail(correspondenceemail)
@@ -25,7 +26,7 @@ class correspondenceemailservice:
             correspondenceemail = FOICorrespondenceEmail()
             correspondenceemail.email = data['email']
             correspondenceemail.foiministryrequest_id = ministryrequestid
-            correspondenceemail.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid)
+            correspondenceemail.foiministryrequestversion_id = require_request_version(FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid))
             correspondenceemail.createdby = userid
             correspondenceemail.created_at = datetime.now()
             return FOICorrespondenceEmail.savecorrespondenceemail(correspondenceemail)

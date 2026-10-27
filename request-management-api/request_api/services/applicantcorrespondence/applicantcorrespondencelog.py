@@ -1,3 +1,4 @@
+from request_api.utils.requestversion import require_request_version
 from request_api.models.ApplicationCorrespondenceTemplates import ApplicationCorrespondenceTemplate
 from request_api.models.FOIApplicantCorrespondences import FOIApplicantCorrespondence
 from request_api.models.FOIApplicantCorrespondenceAttachments import FOIApplicantCorrespondenceAttachment
@@ -81,7 +82,7 @@ class applicantcorrespondenceservice:
         applicantcorrespondence.templateid =  data['templateid'] if 'templateid' in data else None
         applicantcorrespondence.isresponse = False if 'templateid' in data else True
         applicantcorrespondence.foiministryrequest_id = ministryrequestid
-        applicantcorrespondence.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid)
+        applicantcorrespondence.foiministryrequestversion_id = require_request_version(FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid))
         applicantcorrespondence.isdraft = isdraft
         if userid == 'system':
             applicantcorrespondence.sentcorrespondencemessage = data['correspondencemessagejson']
@@ -111,7 +112,7 @@ class applicantcorrespondenceservice:
         else:
             applicantcorrespondence.version=1
         applicantcorrespondence.foirawrequest_id = requestid
-        applicantcorrespondence.foirawrequestversion_id =FOIRawRequest.getversionforrequest(requestid=requestid)
+        applicantcorrespondence.foirawrequestversion_id = require_request_version(FOIRawRequest.getversionforrequest(requestid=requestid))
 
         applicantcorrespondence.templateid =  data['templateid'] if 'templateid' in data else None
         applicantcorrespondence.isresponse = False if 'templateid' in data else True
@@ -148,7 +149,7 @@ class applicantcorrespondenceservice:
         updt_correspondence = FOIApplicantCorrespondence()
         updt_correspondence.__dict__.update(correspondence)
         updt_correspondence.version = correspondence['version']+1
-        updt_correspondence.foiministryrequestversion_id =FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid)
+        updt_correspondence.foiministryrequestversion_id = require_request_version(FOIMinistryRequest.getversionforrequest(ministryrequestid=ministryrequestid))
         updt_correspondence.created_at = datetime.now()
         updt_correspondence.createdby = userid
         if 'emails' in data and len(data["emails"]) > 0:
@@ -189,7 +190,7 @@ class applicantcorrespondenceservice:
         updt_correspondence = FOIApplicantCorrespondenceRawRequest()
         updt_correspondence.__dict__.update(correspondence)
         updt_correspondence.version = correspondence['version']+1
-        updt_correspondence.foirawrequestversion_id =FOIRawRequest.getversionforrequest(requestid=rawrequestid)
+        updt_correspondence.foirawrequestversion_id = require_request_version(FOIRawRequest.getversionforrequest(requestid=rawrequestid))
         updt_correspondence.created_at = datetime.now()
         updt_correspondence.createdby = userid
         # This is for sent correspondences

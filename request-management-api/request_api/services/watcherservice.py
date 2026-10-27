@@ -1,3 +1,4 @@
+from request_api.utils.requestversion import require_request_version
 
 from os import stat
 from re import VERBOSE
@@ -13,7 +14,7 @@ class watcherservice:
     def createrawrequestwatcher(self, data, userid, usergroups):
         """Creates a watcher for a user with groups passed in for an unopened request.
         """
-        version = FOIRawRequest.getversionforrequest(data["requestid"])
+        version = require_request_version(FOIRawRequest.getversionforrequest(data["requestid"]))
         if 'watchedbygroup' in data:
             return FOIRawRequestWatcher.savewatcher(data, version, userid)
         else:
@@ -35,7 +36,7 @@ class watcherservice:
     def createministryrequestwatcher(self, data, userid, usergroups):
         """Creates a watcher for a user with groups passed in for an opened request.
         """
-        version = FOIMinistryRequest.getversionforrequest(data["ministryrequestid"])
+        version = require_request_version(FOIMinistryRequest.getversionforrequest(data["ministryrequestid"]))
         if 'watchedbygroup' in data:
             return FOIRequestWatcher.savewatcher(data, version, userid) 
         else:

@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: foi_upgrade_test
+      POSTGRES_PASSWORD: upgrade-test-only
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U postgres -d foi_upgrade_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    networks: [verification]
+  redis:
+    image: redis:7.0-alpine
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    networks: [verification]
+  storage:
+    image: chrislusf/seaweedfs:4.46
+    command: server -s3 -s3.port=8334 -s3.port.https=8333 -s3.cert.file=/test-tls/storage.crt -s3.key.file=/test-tls/storage.key -ip=storage -volume.max=1
+    volumes:
+      - ${UPGRADE_TLS_DIR:-/tmp/request-api-python-upgrade/tls/candidate}:/test-tls:ro
+    networks: [verification]
+  checks:
+    image: foi-request-api-upgrade-checks
+    build:
+      context: ..
+      dockerfile: tests/Dockerfile.python-upgrade
+      args:
+        APP_IMAGE: ${UPGRADE_APP_IMAGE:-foi-request-api-upgrade:candidate}
+    env_file: upgrade.env
+    volumes:
+      - ${UPGRADE_SOURCE_DIR:-..}:/verification-source:ro
+      - ${UPGRADE_EVIDENCE_DIR:-/tmp/request-api-python-upgrade}:/evidence
+      - ${UPGRADE_TLS_DIR:-/tmp/request-api-python-upgrade/tls/candidate}:/test-tls:ro
+    working_dir: /verification-source
+    entrypoint: ["python", "scripts/run_upgrade_checks.py"]
+    command: ["tests", "--continue-on-collection-errors"]
+    networks: [verification]
+networks:
+  verification:
+    internal: true

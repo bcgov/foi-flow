@@ -2,7 +2,6 @@ from threading import Thread
 import eventlet
 #Monkey patch to allow for async actions (aka multiple workers)
 eventlet.monkey_patch()
-from distutils.log import debug
 
 
 import os
@@ -21,6 +20,8 @@ import logging
 
 @socketio.on('connect')
 def connect(message):
+    if not isinstance(message, dict):
+        raise ConnectionRefusedError('unauthorized!')
     userid = __getauthenticateduserid(message)
     if userid is not None:
         current_app.logger.info('socket connection established for user: ' + userid + ' | sid: ' + request.sid)

@@ -124,7 +124,7 @@ class FOIApplicantCorrespondenceAttachmentRawRequest(db.Model):
                         applicantcorrespondence_version DESC;"""
             rs = db.session.execute(text(sql), {'requestid': requestid})
             for row in rs:
-                attachments.append({"applicantcorrespondenceid": row["applicantcorrespondenceid"], "applicantcorrespondence_version": row["applicantcorrespondence_version"],"applicantcorrespondenceattachmentid": row["applicantcorrespondenceattachmentid"], "attachmentfilename": row["attachmentfilename"], "attachmentdocumenturipath": row["attachmentdocumenturipath"], "version": row["version"]})
+                attachments.append({"applicantcorrespondenceid": row._mapping["applicantcorrespondenceid"], "applicantcorrespondence_version": row._mapping["applicantcorrespondence_version"],"applicantcorrespondenceattachmentid": row._mapping["applicantcorrespondenceattachmentid"], "attachmentfilename": row._mapping["attachmentfilename"], "attachmentdocumenturipath": row._mapping["attachmentdocumenturipath"], "version": row._mapping["version"]})
         except Exception as ex:
             logging.error(ex)
             raise ex

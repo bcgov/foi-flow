@@ -1,3 +1,4 @@
+from request_api.utils.requestversion import require_request_version
 
 from os import path,getenv
 
@@ -338,7 +339,7 @@ class recordservice(recordservicebase):
 
     def replace(self, _requestid, ministryrequestid, recordid, recordschema, userid):
         _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
-        _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
+        _ministryversion = require_request_version(FOIMinistryRequest.getversionforrequest(ministryrequestid))
         recordlist = []
         records = recordschema.get("records")
         for _record in records:
@@ -491,7 +492,7 @@ class recordservice(recordservicebase):
         """
 
         # 1. Retrieve necessary metadata
-        _ministryversion = FOIMinistryRequest.getversionforrequest(ministryrequestid)
+        _ministryversion = require_request_version(FOIMinistryRequest.getversionforrequest(ministryrequestid))
         _ministryrequest = FOIMinistryRequest.getrequestbyministryrequestid(ministryrequestid)
         foirequestid = _ministryrequest.get('foirequest_id')
 

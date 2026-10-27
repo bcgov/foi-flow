@@ -55,8 +55,8 @@ class FOIRawRequestDocument(db.Model):
             rs = db.session.execute(text(sql), {'requestid': requestid, 'requestversion': requestversion})
         
             for row in rs:
-                if row["isactive"] == True:
-                    documents.append({"foidocumentid": row["foidocumentid"], "filename": row["filename"], "documentpath": row["documentpath"], "category": row["category"], "created_at": row["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row["createdby"]})
+                if row._mapping["isactive"] == True:
+                    documents.append({"foidocumentid": row._mapping["foidocumentid"], "filename": row._mapping["filename"], "documentpath": row._mapping["documentpath"], "category": row._mapping["category"], "created_at": row._mapping["created_at"].strftime('%Y-%m-%d %H:%M:%S.%f'), "createdby": row._mapping["createdby"]})
         except Exception as ex:
             logging.error(ex)
             raise ex

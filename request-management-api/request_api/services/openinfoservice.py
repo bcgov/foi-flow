@@ -1,3 +1,4 @@
+from request_api.utils.requestversion import require_request_version
 from request_api.models.OpenInfoPublicationStauses import OpenInfoPublicationStatuses
 from request_api.models.OpenInformationExemptions import OpenInformationExemptions
 from request_api.models.OpenInformationStatuses import OpenInformationStatuses
@@ -43,20 +44,20 @@ class openinfoservice:
                     "oiexemption_id": 5,
                 } 
             foiopeninforequest = FOIOpenInfoSchema().load(default_foiopeninforequest)
-            version = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
+            version = require_request_version(FOIMinistryRequest().getversionforrequest(foiministryrequestid))
             foiopeninforequest['foiministryrequestversion_id'] = version
             foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
             result = FOIOpenInformationRequests().createopeninfo(foiopeninforequest, userid)
             return result
 
     def updateopeninforequest(self, foiopeninforequest, userid, foiministryrequestid, assigneedetails):
+        foiministryrequestversion = require_request_version(FOIMinistryRequest().getversionforrequest(foiministryrequestid))
         is_new_assignment = False
         if 'oiassignedto' in foiopeninforequest:
             current_request = self.getcurrentfoiopeninforequest(foiministryrequestid)
             is_new_assignment = current_request and current_request.get('oiassignedto') is None and foiopeninforequest['oiassignedto'] is not None
             is_assignment_changed = current_request and current_request.get('oiassignedto') != foiopeninforequest['oiassignedto']
             self.updateopeninfoassignee(foiopeninforequest['oiassignedto'], assigneedetails)
-        foiministryrequestversion = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
         foiopeninforequest['foiministryrequestversion_id'] = foiministryrequestversion
         foiopeninforequest['foiministryrequest_id'] = foiministryrequestid
         result = FOIOpenInformationRequests().saveopeninfo(foiopeninforequest, userid)

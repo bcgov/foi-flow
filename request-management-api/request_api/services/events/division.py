@@ -1,3 +1,4 @@
+from request_api.utils.requestversion import require_request_version
 
 from os import stat
 from re import VERBOSE
@@ -20,9 +21,9 @@ class divisionevent:
     def createdivisionevent(self, requestid, requesttype, userid):
         if requesttype != "ministryrequest":
             return DefaultMethodResult(True,'No division required',requestid)
-        version = FOIMinistryRequest.getversionforrequest(requestid)
+        version = require_request_version(FOIMinistryRequest.getversionforrequest(requestid))
         curdivisions = FOIMinistryRequestDivision.getdivisions(requestid, version)
-        prevdivisions = FOIMinistryRequestDivision.getdivisions(requestid, version[0]-1)
+        prevdivisions = FOIMinistryRequestDivision.getdivisions(requestid, version-1)
         divisionsummary = self.__maintained(curdivisions, prevdivisions) + self.__deleted(curdivisions, prevdivisions)
         if divisionsummary is None or (divisionsummary and len(divisionsummary) <1):
             return  DefaultMethodResult(True,'No change',requestid)

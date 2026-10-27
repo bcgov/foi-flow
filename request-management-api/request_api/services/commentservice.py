@@ -1,3 +1,4 @@
+from request_api.utils.requestversion import require_request_version
 
 from os import stat
 from re import VERBOSE
@@ -28,22 +29,22 @@ class commentservice:
     """
     
     def createministryrequestcomment(self, data, userid, type=1):
-        version = FOIMinistryRequest.getversionforrequest(data["ministryrequestid"])
+        version = require_request_version(FOIMinistryRequest.getversionforrequest(data["ministryrequestid"]))
         return FOIRequestComment.savecomment(type, data, version, userid) 
 
     def createrawrequestcomment(self, data, userid, type=1):
-        version = FOIRawRequest.getversionforrequest(data["requestid"])    
+        version = require_request_version(FOIRawRequest.getversionforrequest(data["requestid"]))
         return FOIRawRequestComment.savecomment(type, data, version, userid) 
     
     def createcomments(self, data, userid, type=2):
         return FOIRequestComment.savecomment(type, data, data['version'], userid) 
     
     def createRequestHistorycomments(self, data, userid, type=2):
-        version = FOIMinistryRequest.getversionforrequest(data["requestid"])
+        version = require_request_version(FOIRawRequest.getversionforrequest(data["requestid"]))
         return FOIRawRequestComment.savecomment(type, data, version, userid) 
     
     def createMinistryRequestHistorycomments(self, data, userid, type=2):
-        version = FOIMinistryRequest.getversionforrequest(data["ministryrequestid"])
+        version = require_request_version(FOIMinistryRequest.getversionforrequest(data["ministryrequestid"]))
         return FOIRequestComment.savecomment(type, data, version, userid) 
   
     def disableministryrequestcomment(self, commentid, userid):
