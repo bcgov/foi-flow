@@ -40,7 +40,7 @@ class commentservice:
         return FOIRequestComment.savecomment(type, data, data['version'], userid) 
     
     def createRequestHistorycomments(self, data, userid, type=2):
-        version = require_request_version(FOIMinistryRequest.getversionforrequest(data["requestid"]))
+        version = require_request_version(FOIRawRequest.getversionforrequest(data["requestid"]))
         return FOIRawRequestComment.savecomment(type, data, version, userid) 
     
     def createMinistryRequestHistorycomments(self, data, userid, type=2):
