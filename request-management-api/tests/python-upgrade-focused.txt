@@ -17,3 +17,6 @@ tests/services/test_rawrequest_identity_verification.py
 tests/services/test_recordservicegetter_ocr.py
 --deselect=tests/services/test_publication_scheduler.py::test_getopeninforecordsforprepublishing_filters_publishable_rows
 --deselect=tests/services/test_publication_scheduler.py::test_getpdrecordsforprepublishing_filters_publishable_rows
+tests/models/test_applicant_history_serialization.py
+tests/services/test_request_version_compatibility.py
+tests/restapi/test_applicant_history_contracts.py

@@ -1,3 +1,4 @@
+from request_api.utils.requestversion import require_request_version
 from request_api.models.FOIProactiveDisclosureRequests import FOIProactiveDisclosureRequests
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.auth import AuthHelper
@@ -11,7 +12,7 @@ class proactivedisclosureservice:
        return FOIProactiveDisclosureRequests().getcurrentfoiproactiverequest(foiministryrequestid)
     
     def updateproactivedisclosure(self, foiproactiverequest, userid, foiministryrequestid):
-        foiministryrequestversion = FOIMinistryRequest().getversionforrequest(foiministryrequestid)
+        foiministryrequestversion = require_request_version(FOIMinistryRequest().getversionforrequest(foiministryrequestid))
         proactive_disclosure_data = {
             "foiministryrequest_id": foiministryrequestid,
             "foiministryrequestversion_id": foiministryrequestversion

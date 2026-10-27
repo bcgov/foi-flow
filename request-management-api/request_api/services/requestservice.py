@@ -1,3 +1,4 @@
+from request_api.utils.requestversion import require_request_version
 
 from request_api.services.documentservice import documentservice
 from request_api.services.workflowservice import workflowservice
@@ -338,17 +339,22 @@ class requestservice:
 
     # intake in progress to open: create a restricted request record for each selected ministries
     def createrestrictedrequests(self, ministries, type, isrestricted, userid):
-        for ministry in ministries:
-            version = FOIMinistryRequest.getversionforrequest(ministry["id"])
+        ministry_versions = [
+            (ministry["id"], require_request_version(
+                FOIMinistryRequest.getversionforrequest(ministry["id"])
+            ))
+            for ministry in ministries
+        ]
+        for ministry_id, version in ministry_versions:
             FOIRestrictedMinistryRequest.disablerestrictedrequests(
-                ministry["id"], type, userid
+                ministry_id, type, userid
             )
             FOIRestrictedMinistryRequest.saverestrictedrequest(
-                ministry["id"], type, isrestricted, version, userid
+                ministry_id, type, isrestricted, version, userid
             )
 
     def saverestrictedrequest(self, ministryrequestid, type, isrestricted, userid):
-        version = FOIMinistryRequest.getversionforrequest(ministryrequestid)
+        version = require_request_version(FOIMinistryRequest.getversionforrequest(ministryrequestid))
         FOIRestrictedMinistryRequest.disablerestrictedrequests(
             ministryrequestid, type, userid
         )
