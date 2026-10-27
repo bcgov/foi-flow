@@ -181,7 +181,8 @@ def test_comment_save_boundaries(monkeypatch, version_row, method, missing):
     from request_api.models.FOIRequestComments import FOIRequestComment
     from request_api.models.FOIRawRequestComments import FOIRawRequestComment
     from request_api.services.commentservice import commentservice
-    expected_lookup = FOIRawRequest if method == 'createrawrequestcomment' else FOIMinistryRequest
+    expected_lookup = FOIRawRequest if method in (
+        'createrawrequestcomment', 'createRequestHistorycomments') else FOIMinistryRequest
     other_lookup = FOIMinistryRequest if expected_lookup is FOIRawRequest else FOIRawRequest
     monkeypatch.setattr(expected_lookup, 'getversionforrequest', lambda *a: None if missing else version_row)
     monkeypatch.setattr(other_lookup, 'getversionforrequest', lambda *a: pytest.fail('Changed lookup choice'))
@@ -334,6 +335,32 @@ def raw_request(session):
     result = FOIRawRequest.saverawrequest({'requestType': 'general', 'description': 'Synthetic'},
         'online', False, 'tester', None, False, None, None, [])
     return result.identifier
+
+
+@pytest.mark.parametrize('matching_ministry', [False, True])
+def test_raw_history_comment_uses_raw_version(session, raw_request, matching_ministry):
+    from datetime import datetime
+    from request_api.models.FOIRawRequestComments import FOIRawRequestComment
+    from request_api.services.commentservice import commentservice
+
+    assert FOIMinistryRequest.getversionforrequest(raw_request) is None
+    if matching_ministry:
+        session.add(FOIMinistryRequest(
+            foiministryrequestid=raw_request, version=7, filenumber='TEST-HISTORY',
+            description='Unrelated ministry request', duedate=datetime(2026, 12, 1),
+            requeststatuslabel='Open', isconsultflag=False))
+        session.flush()
+
+    result = commentservice().createRequestHistorycomments(
+        {'requestid': raw_request, 'comment': 'Synthetic history export'}, 'tester')
+
+    assert result.success
+    session.expire_all()
+    comment = session.query(FOIRawRequestComment).filter_by(commentid=result.identifier).one()
+    assert comment.requestid == raw_request
+    assert comment.version == 1
+    assert comment.commenttypeid == 2
+    assert comment.comment == 'Synthetic history export'
 
 
 def test_payment_cfr_comment_watcher_postgres_saves(session, ministry, raw_request):
