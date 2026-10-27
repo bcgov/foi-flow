@@ -1,5 +1,5 @@
--- FOIMOD-5453: literal-only validation of the raw receipt projection/filter
--- contract in request_api/models/FOIRawRequests.py. No application rows are read.
+-- FOIMOD-5453: synthetic PostgreSQL timezone-data readiness check.
+-- No request rows are read; this does not test the current MOD receivedDate fallback.
 -- Run with psql -X -w -v ON_ERROR_STOP=1 -P pager=off -f - against each target
 \set ON_ERROR_STOP on
 BEGIN TRANSACTION READ ONLY;
