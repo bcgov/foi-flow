@@ -54,6 +54,18 @@ def upgrade():
         ON "FOIWorkflowEventOutbox" (outboxid DESC) WHERE status IN ('DEAD', 'FAILED');
     """)
 
+    # wfengine supports rollback: existing rows are populated with 'camunda' via the
+    # server_default, which is then removed so new rows must set it explicitly
+    for table in ('FOIRawRequests', 'FOIRequests'):
+        op.add_column(
+            table,
+            sa.Column('wfengine', sa.String(length=10), nullable=True, server_default='camunda')
+        )
+        op.alter_column(table, 'wfengine', server_default=None)
+
 
 def downgrade():
+    for table in ('FOIRequests', 'FOIRawRequests'):
+        op.drop_column(table, 'wfengine')
+
     op.execute('DROP TABLE IF EXISTS "FOIWorkflowEventOutbox";')
