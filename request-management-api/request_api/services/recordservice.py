@@ -588,7 +588,7 @@ class recordservice(recordservicebase):
         return dbresponse
     
     # this is for inflight request pagecount calculation option 1
-    async def updatepagecount(self, ministryrequestid, userid):
+    def updatepagecount(self, ministryrequestid, userid):
         streamobj = {
             'ministryrequestid': ministryrequestid
         }
@@ -602,7 +602,7 @@ class recordservice(recordservicebase):
         return DefaultMethodResult(True,'Pushed to PageCountCalculator stream', job.get("id"), ministryrequestid)
     
     # this is for inflight request pagecount calculation option 2
-    async def calculatepagecount(self, requestid, ministryrequestid, userid):
+    def calculatepagecount(self, requestid, ministryrequestid, userid):
         uploadedrecords = FOIRequestRecord.fetch(requestid, ministryrequestid)
         if len(uploadedrecords) > 0:
           records, err = recordservicegetter().getdatafromdocreviewer(uploadedrecords, ministryrequestid)

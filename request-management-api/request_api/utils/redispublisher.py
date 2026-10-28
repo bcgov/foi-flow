@@ -31,7 +31,7 @@ class RedisPublisherService:
     def publish_request(self, message):
         self._publish(self.request_channel, message)
 
-    async def publishrequest(self, message):
+    def publishrequest(self, message):
         self.publish_request(message)
 
     def publish_comment(self, message):

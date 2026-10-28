@@ -19,7 +19,7 @@ from flask import request, send_file, Response
 from flask_cors import cross_origin
 from flask_restx import Namespace, Resource
 import json
-import asyncio
+from request_api.utils.backgroundtask import runinbackground
 
 from request_api.services import FeeService
 from request_api.services.cfrfeeservice import cfrfeeservice
@@ -105,11 +105,10 @@ class Payment(Resource):
                 cfrfeeservice().updatepaymentmethod(ministry_request_id, paymenteventtype)
                 # automated state transition and due date calculation
                 requestservice().postpaymentstatetransition(request_id, ministry_request_id, nextstatename, parsed_args.get('trnDate'))
-                event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(eventservice().postpaymentevent(ministry_request_id, paymenteventtype), event_loop)
+                runinbackground(eventservice().postpaymentevent, ministry_request_id, paymenteventtype)
                 requestservice().postfeeeventtoworkflow(request_id, ministry_request_id, "PAID", nextstatename)
                 
-                asyncio.run_coroutine_threadsafe(eventservice().postevent(ministry_request_id,"ministryrequest","System","System", False), event_loop)
+                runinbackground(eventservice().postevent, ministry_request_id,"ministryrequest","System","System", False)
             return response, 201
         except BusinessException as e:
             return {'status': e.code, 'message': e.message}, e.status_code
