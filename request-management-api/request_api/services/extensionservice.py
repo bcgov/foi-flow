@@ -10,7 +10,6 @@ from request_api.services.extensionreasonservice import extensionreasonservice
 from request_api.services.eventservice import eventservice
 from request_api.services.events.extension import ExtensionType
 from datetime import datetime
-import asyncio
 import json
 import base64
 from request_api.exceptions import BusinessException, Error

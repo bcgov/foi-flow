@@ -15,7 +15,6 @@ import os
 from flask import current_app
 from dateutil.parser import parse
 from request_api import socketio
-import asyncio
 from request_api.utils.redispublisher import RedisPublisherService
 class commentevent:
     """ FOI Event management service
