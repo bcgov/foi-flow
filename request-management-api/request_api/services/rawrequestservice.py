@@ -6,7 +6,7 @@ from flask.signals import request_started
 from sqlalchemy.sql.expression import false
 from request_api.models.FOIRawRequests import FOIRawRequest
 import json
-import asyncio
+from request_api.utils.backgroundtask import runinbackground
 from request_api.utils.redispublisher import RedisPublisherService
 from request_api.services.workflowservice import workflowservice
 from request_api.services.documentservice import documentservice
@@ -90,8 +90,7 @@ class rawrequestservice:
                 workflowservice().createinstance(redispubservice.foirequestqueueredischannel, json_data)
             except Exception as ex:
                 logging.error(ex)
-                event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(redispubservice.publishrequest(json_data), event_loop)
+                runinbackground(redispubservice.publishrequest, json_data)
         return result
 
     @staticmethod

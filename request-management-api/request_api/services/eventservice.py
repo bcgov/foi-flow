@@ -31,7 +31,7 @@ class eventservice:
 
     """
     
-    async def postevent(self, requestid, requesttype, userid, username, isministryuser,assigneename=''):
+    def postevent(self, requestid, requesttype, userid, username, isministryuser,assigneename=''):
         self.posteventsync(requestid, requesttype, userid, username, isministryuser,assigneename)
     
     def posteventsync(self, requestid, requesttype, userid, username, isministryuser,assigneename=''):
@@ -80,7 +80,7 @@ class eventservice:
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
        
-    async def postcommentevent(self, commentid, requesttype, userid, isdelete=False, existingtaggedusers=False):
+    def postcommentevent(self, commentid, requesttype, userid, isdelete=False, existingtaggedusers=False):
         try:
             commentresponse = commentevent().createcommentevent(commentid, requesttype, userid, isdelete, existingtaggedusers)
             if commentresponse.success == False :
@@ -102,10 +102,10 @@ class eventservice:
             self.__logbusinessexception(exception)
 
 
-    async def posteventforsanctioncfrfeeform(self, ministryrequestid, userid, username):
+    def posteventforsanctioncfrfeeform(self, ministryrequestid, userid, username):
         self.__posteventforsanctioncfrfeeform(ministryrequestid, userid, username)
     
-    async def posteventforcfrfeeform(self, ministryrequestid, userid, username):
+    def posteventforcfrfeeform(self, ministryrequestid, userid, username):
         try:
             feewaivercommentresponse, refundcommentresponse= cfrfeeformevent().createeventforupdatedamounts(ministryrequestid, userid, username)                
             if feewaivercommentresponse.success == False or refundcommentresponse.success == False: 
@@ -113,7 +113,7 @@ class eventservice:
         except BusinessException as exception:            
             self.__logbusinessexception(exception)
 
-    async def postpaymentevent(self, requestid, paymenteventtype = PaymentEventType.paid.value):
+    def postpaymentevent(self, requestid, paymenteventtype = PaymentEventType.paid.value):
         try:
             paymeneteventresponse = paymentevent().createpaymentevent(requestid, paymenteventtype)
             if paymeneteventresponse.success == False:

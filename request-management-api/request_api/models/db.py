@@ -17,12 +17,15 @@ These will get initialized by the application using the models
 """
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
+from greenlet import getcurrent
 
 
 # by convention in the Flask community these are lower case,
 # whereas pylint wants them upper case
 ma = Marshmallow()  # pylint: disable=invalid-name
-db = SQLAlchemy()  # pylint: disable=invalid-name
+# One session per greenlet (the Flask-SQLAlchemy 2.x default): sessions scoped by app context
+# let two eventlet greenlets share a psycopg2 connection, which deadlocks the process.
+db = SQLAlchemy(session_options={"scopefunc": getcurrent})  # pylint: disable=invalid-name
 
 
 #make_versioned(user_cls=None, plugins=[activity_plugin])

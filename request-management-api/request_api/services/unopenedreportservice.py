@@ -21,7 +21,7 @@ class unopenedreportservice:
     reportemail = getenv('UNOPENED_REPORT_EMAIL_RECIPIENT')
 
 
-    async def generateunopenedreport(self):
+    def generateunopenedreport(self):
         logging.info("begin unopened report generation")
         startdate = date.today() - timedelta(days=int(self.dayscutoff))
         enddate = date.today() -  timedelta(days=int(self.waitdays))
