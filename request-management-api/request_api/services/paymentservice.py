@@ -12,7 +12,6 @@ from request_api.utils.enums import PaymentEventType, StateName
 import json
 from dateutil.parser import parse
 from datetime import datetime
-import asyncio
 
 from dateutil import parser
 from dateutil import tz

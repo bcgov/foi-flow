@@ -27,7 +27,7 @@ from request_api.schemas.foirecord import  FOIRequestBulkCreateRecordSchema, FOI
 from marshmallow import INCLUDE
 import json
 from flask_cors import cross_origin
-import asyncio
+from request_api.utils.backgroundtask import runinbackground
 import traceback
 import logging
 
@@ -312,8 +312,7 @@ class UpdateRequestsPageCount(Resource):
             requestjson = request.get_json()
             ministryrequestid = requestjson['ministryrequestid']  if requestjson.get("ministryrequestid") != None else None
             if ministryrequestid:
-                event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(recordservice().updatepagecount(ministryrequestid, AuthHelper.getuserid()), event_loop)
+                runinbackground(recordservice().updatepagecount, ministryrequestid, AuthHelper.getuserid())
                 return {'status': True, 'message': 'async updatepagecount function called'} , 200
             else:
                 return {'status': True, 'message':'ministryrequestid is none'} , 200
@@ -343,8 +342,7 @@ class UpdateRequestsPageCountOption2(Resource):
                 ministryrequestid,
             )
             if ministryrequestid:
-                event_loop = asyncio.get_running_loop()
-                asyncio.run_coroutine_threadsafe(recordservice().calculatepagecount(requestid, ministryrequestid, AuthHelper.getuserid()), event_loop)
+                runinbackground(recordservice().calculatepagecount, requestid, ministryrequestid, AuthHelper.getuserid())
                 return {'status': True, 'message': 'async calculatepagecount function called'} , 200
             else:
                 return {'status': True, 'message':'ministryrequestid is none'} , 200
