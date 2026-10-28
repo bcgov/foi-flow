@@ -127,6 +127,7 @@ class FOIWorkflowEventReplay(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.isfoiadmin()
     def post(eventid):
         eventid = _validuuid(eventid)
         if eventid is None:
@@ -145,6 +146,7 @@ class FOIWorkflowEventsReplay(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.isfoiadmin()
     def post():
         eventids = (request.get_json(silent=True) or {}).get('eventids')
         if not isinstance(eventids, list) or not eventids or len(eventids) > 500 or any(_validuuid(item) is None for item in eventids):
