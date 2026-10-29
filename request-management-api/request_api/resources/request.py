@@ -249,7 +249,7 @@ def _skiptoworkday(datetimevalue, extradiff=0):
     """skip weekend, holiday, weekdays (after 16:30)"""
     receiveddate = datetime.strptime(datetimevalue, LONG_DATE_FORMAT) if isinstance(datetimevalue, str) else datetimevalue
 
-    ca_holidays = _getholidays()
+    ca_holidays = _getholidays(receiveddate.year)
     diff = 0
     if receiveddate.isoweekday() in [6, 7]: #weekend - add 1 day
         diff += 1
@@ -269,20 +269,21 @@ def _skiptoworkday(datetimevalue, extradiff=0):
     receiveddate = receiveddate.replace(hour=0, minute=0, second=0, microsecond=0) #reset time
     return _skiptoworkday(receiveddate, extradiff)
 
-def _getholidays():        
+def _getholidays(year):
+    """Use the received date's calendar, including a skip into the next year."""
     ca_holidays = []
-    for date, name in sorted(holidays.CA(prov='BC', years=datetime.today().year).items()):
+    for date, name in sorted(holidays.CA(prov='BC', years=year).items()):
         ca_holidays.append(date.strftime(SHORT_DATE_FORMAT))
     if 'FOI_ADDITIONAL_HOLIDAYS' in os.environ and os.getenv('FOI_ADDITIONAL_HOLIDAYS') != '':
         _addldays = os.getenv('FOI_ADDITIONAL_HOLIDAYS')
         for _addlday in _addldays.split(","):
-            ca_holidays.append(_addlday.strip().replace('XXXX',str(datetime.today().year)))
+            ca_holidays.append(_addlday.strip().replace('XXXX',str(year)))
 
     if 'FOI_INVALID_HOLIDAYS' in os.environ and os.getenv('FOI_INVALID_HOLIDAYS') != '': #remove dec 24, dec 27 from holidays
         _invaliddays = os.getenv('FOI_INVALID_HOLIDAYS')
         for _invalidday in _invaliddays.split(","):
             if _invalidday in ca_holidays:
-                ca_holidays.remove(_invalidday.strip().replace('XXXX',str(datetime.today().year)))
+                ca_holidays.remove(_invalidday.strip().replace('XXXX',str(year)))
     
     return ca_holidays
 

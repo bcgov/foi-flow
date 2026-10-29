@@ -7,6 +7,7 @@ import { SESSION_SECURITY_KEY, SESSION_LIFETIME } from "../../constants/constant
 import { toast } from "react-toastify";
 import { KCProcessingTeams, KCScanningTeam } from "../../constants/FOI/enum";
 import _ from 'lodash';
+import { parseBusinessDateTime } from './businessDate';
 
 let isBetween = require("dayjs/plugin/isBetween");
 let utc = require("dayjs/plugin/utc");
@@ -124,6 +125,23 @@ const addBusinessDays = (dateText, days) => {
   let startDate = dayjs(dateText);
   let endDate = startDate.businessDaysAdd(days);
   return reconcilePublicHoliDays(startDate, endDate).format("YYYY-MM-DD");
+};
+
+// Preserve the existing receipt/closure cutoff policy, evaluated in B.C. time.
+// Advance the calendar date, not a browser-local representation of the instant.
+const getBusinessDateWithCutoff = (value) => {
+  const date = parseBusinessDateTime(value);
+  if (!date) return "";
+
+  const dateText = date.format("YYYY-MM-DD");
+  if (
+    date.hour() > 16 ||
+    (date.hour() === 16 && date.minute() > 30) ||
+    !businessDay(dateText)
+  ) {
+    return addBusinessDays(date.format("YYYY-MM-DDTHH:mm:ss"), 1);
+  }
+  return dateText;
 };
 
 const addBusinessDaysExpanded = (dateText, days) => {
@@ -252,12 +270,14 @@ const calculateDaysRemaining = (endDate, startDate) => {
   }
 };
 const calculateBusinessDaysBetween = (date1, date2) => {
-  // Parse dates as simple date strings without timezone conversion
-  const startDate = new Date(date1);
-  const endDate = new Date(date2);
-  // Reset time to avoid timezone issues
-  startDate.setHours(0, 0, 0, 0);
-  endDate.setHours(0, 0, 0, 0);
+  const from = parseBusinessDateTime(date1);
+  const to = parseBusinessDateTime(date2);
+  if (!from || !to) return 0;
+
+  // UTC dates are used only for calendar arithmetic. A YYYY-MM-DD value must
+  // keep its calendar day even when the user's browser is in another zone.
+  const startDate = new Date(`${from.format("YYYY-MM-DD")}T00:00:00Z`);
+  const endDate = new Date(`${to.format("YYYY-MM-DD")}T00:00:00Z`);
   if (startDate.getTime() === endDate.getTime()) return 0;
   
   // Determine direction and set up iteration
@@ -266,9 +286,10 @@ const calculateBusinessDaysBetween = (date1, date2) => {
   const targetDate = new Date(isForward ? endDate : startDate);
   let businessDays = 0;
   while (currentDate < targetDate) {
-    currentDate.setDate(currentDate.getDate() + 1);
-    const isHoliday = hd.isHoliday(currentDate);
-    const isWeekend = currentDate.getDay() === 6 || currentDate.getDay() === 0;
+    currentDate.setUTCDate(currentDate.getUTCDate() + 1);
+    const dateText = currentDate.toISOString().substring(0, 10);
+    const isHoliday = hd.isHoliday(parseBusinessDateTime(dateText).toDate());
+    const isWeekend = currentDate.getUTCDay() === 6 || currentDate.getUTCDay() === 0;
     if (!isHoliday && !isWeekend) {
       businessDays++;
     }
@@ -759,6 +780,7 @@ export {
   formatDate,
   businessDay,
   addBusinessDays,
+  getBusinessDateWithCutoff,
   calculateDaysRemaining,
   isMinistryCoordinator,
   isMinistryLogin,
