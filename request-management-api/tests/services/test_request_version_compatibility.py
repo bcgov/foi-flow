@@ -625,6 +625,32 @@ def test_lookup_contracts_and_unchanged_scalar_extractors(session, ministry, raw
     assert subjectcodeservice()._subjectcodeservice__getministryversionforrequest(requestid) == 3
 
 
+def test_extension_event_reads_saved_extension_version_as_scalar(session, ministry, monkeypatch):
+    from request_api.models.FOIRequestExtensions import FOIRequestExtension
+    from request_api.models.default_method_result import DefaultMethodResult
+    from request_api.services.events.extension import extensionevent
+
+    extension = FOIRequestExtension(
+        version=1, foiministryrequest_id=ministry.foiministryrequestid,
+        foiministryrequestversion_id=3, extensionreasonid=1,
+        extensionstatusid=1, extendedduedays=10, createdby='tester',
+    )
+    session.add(extension)
+    session.commit()
+    event = extensionevent()
+    monkeypatch.setattr(event, '_extensionevent__maintained', lambda *args: None)
+    monkeypatch.setattr(event, 'createnotification',
+                        lambda *args: DefaultMethodResult(True, 'No notification'))
+
+    result = event.createextensionevent(
+        ministry.foiministryrequestid, extension.foirequestextensionid,
+        'tester', 'Tester', 'add',
+    )
+
+    assert result.success is True
+    assert result.identifier == extension.foirequestextensionid
+
+
 def test_request_builder_keeps_row_extraction(session, ministry, monkeypatch):
     from request_api.services.foirequest.requestservicebuilder import requestservicebuilder
     from request_api.services.foirequest.requestserviceministrybuilder import requestserviceministrybuilder
