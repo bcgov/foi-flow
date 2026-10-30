@@ -147,7 +147,7 @@ class FOIRequestExtension(db.Model):
 
     @classmethod
     def getversionforextension(cls,extensionid):   
-        return db.session.query(FOIRequestExtension.version).filter_by(foirequestextensionid=extensionid).order_by(FOIRequestExtension.version.desc()).first() 
+        return db.session.query(FOIRequestExtension.version).filter_by(foirequestextensionid=extensionid).order_by(FOIRequestExtension.version.desc()).scalar()
     
     @classmethod
     def getextensionforversion(cls, foirequestextensionid, version):   
@@ -193,4 +193,3 @@ class FOIRequestExtension(db.Model):
 class FOIRequestExtensionSchema(ma.Schema):
     class Meta:
         fields = ('foirequestextensionid', 'extensionreasonid', 'extensionstatusid', 'foiministryrequest_id', 'foiministryrequestversion_id', 'extendedduedays', 'extendedduedate', 'decisiondate', 'approvednoofdays', 'version', 'isactive')
-    
