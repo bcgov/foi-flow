@@ -147,7 +147,7 @@ class FOIRequestExtension(db.Model):
 
     @classmethod
     def getversionforextension(cls,extensionid):   
-        return db.session.query(FOIRequestExtension.version).filter_by(foirequestextensionid=extensionid).order_by(FOIRequestExtension.version.desc()).scalar()
+        return db.session.query(FOIRequestExtension.version).filter_by(foirequestextensionid=extensionid).order_by(FOIRequestExtension.version.desc()).limit(1).scalar()
     
     @classmethod
     def getextensionforversion(cls, foirequestextensionid, version):   
