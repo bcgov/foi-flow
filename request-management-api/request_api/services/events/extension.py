@@ -24,7 +24,7 @@ class extensionevent:
     def createextensionevent(self, ministryrequestid, extensionid, userid, username, event):        
         version = FOIRequestExtension.getversionforextension(extensionid)       
         curextension = FOIRequestExtension().getextensionforversion(extensionid, version)
-        prevextension = FOIRequestExtension().getextensionforversion(extensionid, version[0]-1)
+        prevextension = FOIRequestExtension().getextensionforversion(extensionid, version-1)
         extensionsummaryforcomment = self.__maintained(curextension, prevextension, event)
         message = ""
         try:
