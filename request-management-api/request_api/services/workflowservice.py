@@ -122,7 +122,9 @@ class workflowservice:
         axisrequestid = self.__getvaluefromschema(requestsschema,"axisRequestId")
         filenumber = self.__getvaluefromschema(requestsschema,"idNumber")
         status = self.__getvaluefromschema(requestsschema,"currentState")
-        metadata = json.dumps({"id": filenumber, "status": status , "ministryRequestID": ministryid, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "applicantcorrespondenceid": applicantcorrespondenceid, "templatename": templatename.replace(" ", "")})
+        foirequestid = FOIMinistryRequest.getrequest(ministryid)["foirequest_id"]
+        rawrequestid = FOIRequest.getrawrequestidbyfoirequestid(foirequestid)
+        metadata = json.dumps({"id": filenumber, "status": status , "ministryRequestID": ministryid, "foiRequestId": foirequestid, "rawRequestId": rawrequestid, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "applicantcorrespondenceid": applicantcorrespondenceid, "templatename": templatename.replace(" ", "")})
         engine = resolve_engine()
         engine.correspondanceevent(wfinstanceid, filenumber, metadata)
 
