@@ -7,7 +7,7 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 from request_api.models.FOIRawRequests import FOIRawRequest
 from request_api.models.FOIRequests import FOIRequest
 from request_api.services.external.bpmservice import bpmservice
-from request_api.services.external.commonworkflowservice import commonworkflowservice
+from request_api.services.external.n8nworkflowservice import n8nworkflowservice
 from request_api.services.paymentservice import paymentservice
 from request_api.services.workflowservice import workflowservice
 from request_api.utils.enums import StateName
@@ -23,7 +23,7 @@ class TestCreateInstance:
     creation is routed by WF_DEFAULT_ENGINE. n8n has no createinstance concept
     at all (a single fixed webhook handles every event), so when the default
     engine is n8n, createinstance must be a no-op rather than calling into
-    commonworkflowservice (which no longer implements createinstance)."""
+    n8nworkflowservice (which no longer implements createinstance)."""
 
     @patch.object(bpmservice, "createinstance")
     def test_new_request_routes_to_camunda_by_default(self, mock_create, monkeypatch):
@@ -68,7 +68,7 @@ class TestPostUnopenedEvent:
         assert mock_call.call_args[0][0] == "camunda-wfid-123"
 
     @patch.object(FOIRequest, "getrawrequestidbyfoirequestid")
-    @patch.object(commonworkflowservice, "unopenedcomplete")
+    @patch.object(n8nworkflowservice, "unopenedcomplete")
     def test_n8n_request_with_no_wfinstanceid_calls_engine_with_none(self, mock_call, mock_getrawid, monkeypatch):
         monkeypatch.setenv("WF_DEFAULT_ENGINE", "n8n")
         mock_getrawid.return_value = 9001
@@ -82,7 +82,7 @@ class TestPostUnopenedEvent:
         assert workflowservice().postunopenedevent(1, None, {}, "Open", []) is None
         assert workflowservice().postunopenedevent(1, "", {}, "Open", []) is None
 
-    @patch.object(commonworkflowservice, "unopenedcomplete")
+    @patch.object(n8nworkflowservice, "unopenedcomplete")
     def test_rawrequest_status_without_wfinstanceid_routes_to_n8n_default(self, mock_call, monkeypatch):
         monkeypatch.setenv("WF_DEFAULT_ENGINE", "n8n")
         mock_call.return_value = MagicMock()
@@ -100,7 +100,7 @@ class TestUnopenedSaveReceivesCompleteMetadata:
     reduced/engine-specific shape for it."""
 
     @patch.object(workflowservice, "_workflowservice__hasreopened")
-    @patch.object(commonworkflowservice, "unopenedsave")
+    @patch.object(n8nworkflowservice, "unopenedsave")
     def test_postunopenedevent_passes_complete_metadata_for_intake_in_progress(self, mock_call, mock_hasreopened, monkeypatch):
         monkeypatch.setenv("WF_DEFAULT_ENGINE", "n8n")
         mock_call.return_value = MagicMock()
@@ -115,7 +115,7 @@ class TestUnopenedSaveReceivesCompleteMetadata:
         assert posted_metadata["assignedGroup"] == "Intake Team"
         assert posted_metadata["assignedTo"] == "jdoe"
 
-    @patch.object(commonworkflowservice, "unopenedsave")
+    @patch.object(n8nworkflowservice, "unopenedsave")
     def test_postopenedevent_save_activity_passes_complete_metadata(self, mock_call, monkeypatch):
         # __postopenedevent is the private helper postopenedevent() delegates to for
         # the actual engine call - exercise it directly to isolate the fix (the
@@ -133,7 +133,7 @@ class TestUnopenedSaveReceivesCompleteMetadata:
 
 class TestSyncWfInstanceEngineGate:
     """syncwfinstance() is deferred for n8n: getinstancevariables/searchinstancebyvariable
-    aren't implemented for commonworkflowservice yet, so sync is skipped whenever
+    aren't implemented for n8nworkflowservice yet, so sync is skipped whenever
     WF_DEFAULT_ENGINE is n8n - a single global switch, not a per-request decision."""
 
     @patch.object(FOIRawRequest, "getworkflowinstancebyraw")
@@ -212,7 +212,7 @@ class TestPostOpenedEventIncludesRequestIds:
         mock_offlineflag.return_value = False
         if wfinstanceid is None:
             monkeypatch.setenv("WF_DEFAULT_ENGINE", "n8n")
-        engine_cls = bpmservice if wfinstanceid else commonworkflowservice
+        engine_cls = bpmservice if wfinstanceid else n8nworkflowservice
 
         with patch.object(engine_cls, "getinstancevariables", return_value=instance_variables), \
              patch.object(engine_cls, "openedcomplete", return_value=None) as mock_openedcomplete, \
@@ -266,7 +266,7 @@ class TestNormalizedEngineConsistency:
 
     @pytest.mark.parametrize("raw", ["N8N", " n8n ", "n8n\n"])
     @patch.object(FOIRequest, "getrawrequestidbyfoirequestid", return_value=1)
-    @patch.object(commonworkflowservice, "unopenedcomplete")
+    @patch.object(n8nworkflowservice, "unopenedcomplete")
     @patch.object(bpmservice, "createinstance")
     def test_all_call_sites_agree_on_n8n(self, mock_create, mock_n8n_call, mock_getrawid, monkeypatch, raw):
         monkeypatch.setenv("WF_DEFAULT_ENGINE", raw)

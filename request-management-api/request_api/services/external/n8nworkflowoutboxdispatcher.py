@@ -5,7 +5,7 @@ import os
 import threading
 import time
 
-from request_api.services.external.commonworkflowservice import commonworkflowservice
+from request_api.services.external.n8nworkflowservice import n8nworkflowservice
 from request_api.services.workflowoutboxservice import workflowoutboxservice
 
 
@@ -23,7 +23,7 @@ class N8NWorkflowOutboxDispatcher:
                  sweep_interval_seconds=300, no_outcome_minutes=30, stop_event=None, clock=time.monotonic):
         self.app = app
         self.service_factory = service_factory or workflowoutboxservice
-        self.engine_factory = engine_factory or commonworkflowservice
+        self.engine_factory = engine_factory or n8nworkflowservice
         self.interval_seconds = interval_seconds
         self.batch_size = batch_size
         self.sweep_interval_seconds = sweep_interval_seconds

@@ -1,12 +1,12 @@
 > Architecture note · request-management-api
 
-# Camunda → Common Workflow (n8n): engine integration
+# Camunda → n8n: engine integration
 
 Current status of the n8n workflow-engine integration, what actually shipped, and a condensed record of the earlier per-request design that was evaluated and superseded before implementation.
 
 - **For:** request-management-api / workflow integration
 - **Date:** 2026-08-10 (original design) · updated 2026-09-21 (shipped implementation, CCP-5801)
-- **Scope:** bpmservice.py, workflowservice.py, workflowengine.py, commonworkflowservice.py, request.py, rawrequestservice.py
+- **Scope:** bpmservice.py, workflowservice.py, workflowengine.py, n8nworkflowservice.py, request.py, rawrequestservice.py
 
 ## Status: implemented (CCP-5258, CCP-5801)
 
@@ -14,15 +14,15 @@ n8n is wired in as an alternate workflow engine behind `bpmservice`'s existing m
 
 ## 01 — How engine selection works
 
-`workflowengine.py` exposes `resolve_engine()` / `resolve_engine_name()`, which read one env var — `WF_DEFAULT_ENGINE` (`camunda` | `n8n`, defaults to `camunda`) — and return either `bpmservice()` or `commonworkflowservice()`.
+`workflowengine.py` exposes `resolve_engine()` / `resolve_engine_name()`, which read one env var — `WF_DEFAULT_ENGINE` (`camunda` | `n8n`, defaults to `camunda`) — and return either `bpmservice()` or `n8nworkflowservice()`.
 
 Every call site in `workflowservice.py` that used to instantiate `bpmservice()` directly (`createinstance`, `postunopenedevent`, `postopenedevent`, `postfeeevent`, `postcorrenspodenceevent`, and the internal `__sync_*` / `__get_wf_pid` helpers) now goes through this resolver instead. The state-machine logic, message-name computation, and activity derivation in `workflowservice.py` never had to change — only the leaf calls did.
 
 There is **no `wfengine` column** on `FOIRequests`/`FOIRawRequests`, and no per-request routing decision — every call is routed by whatever `WF_DEFAULT_ENGINE` is set to at the moment it's made. (An earlier design proposed per-row routing; see §05 for why it wasn't built.)
 
-## 02 — commonworkflowservice.py: single fixed webhook
+## 02 — n8nworkflowservice.py: single fixed webhook
 
-`commonworkflowservice.py` implements the same method surface as `bpmservice.py` (`unopenedsave`, `unopenedcomplete`, `openedcomplete`, `feeevent`, `correspondanceevent`, `reopenevent`), so `resolve_engine()` can hand back either engine interchangeably and `workflowservice.py` never has to know which one it's talking to.
+`n8nworkflowservice.py` implements the same method surface as `bpmservice.py` (`unopenedsave`, `unopenedcomplete`, `openedcomplete`, `feeevent`, `correspondanceevent`, `reopenevent`), so `resolve_engine()` can hand back either engine interchangeably and `workflowservice.py` never has to know which one it's talking to.
 
 Every event is POSTed to **one fixed n8n webhook**: `N8N_BASE_URL` + `N8N_ROUTING_WEBHOOK_PATH`, with an `"event"` field naming the message type (e.g. `intakeclaim`, `iaocomplete`, `managepayment`) plus whatever ids/metadata are already in the payload (`foiRequestMetaData`, `rawRequestId`, `foiRequestId`, etc.). n8n is responsible for identifying and routing the request from that payload — request-management-api does not construct or store a per-request instance id/address for n8n.
 
@@ -54,7 +54,7 @@ The original proposal for this migration (2026-08-10) was designed, partially im
   - *Option 1 — parallel run (recommended default).* Old requests finish on Camunda untouched; only brand-new requests pick up `WF_DEFAULT_ENGINE`. Lowest risk / smallest blast radius, but Camunda has to stay up (licensing, patching, infra) until the last in-flight request closes — potentially months for a long-running FOI request.
   - *Option 2 — migrate in-flight requests.* A `migratewfinstance()` reconciliation step (extending `syncwfinstance`'s existing pattern) would bootstrap an n8n execution mid-workflow, seed it from derived FOI Postgres state, and flip `wfengine` to `'n8n'` only once the n8n side was confirmed created. Lets you set a hard Camunda shutdown date, at the cost of needing correct "resume from step N" logic for every request shape on day one.
   - Recommendation at the time was to run Option 1 as default while building Option 2's mechanism in reserve, for selective use on stuck/long-tail requests rather than a bulk cutover.
-- **Risk areas identified for the per-row design:** in-progress Camunda requests being treated as n8n before their Camunda instance finished; Common Workflow's Data Table drifting from FOI Postgres; duplicate execution on retried events (mitigation: search-before-create, mirroring `bpmservice.searchinstancebyvariable`); the flip-to-`'n8n'` happening before bootstrap was confirmed; and rollback (never terminate the Camunda instance during migration — leave it idle so rollback is just flipping the column back).
+- **Risk areas identified for the per-row design:** in-progress Camunda requests being treated as n8n before their Camunda instance finished; n8n's Data Table drifting from FOI Postgres; duplicate execution on retried events (mitigation: search-before-create, mirroring `bpmservice.searchinstancebyvariable`); the flip-to-`'n8n'` happening before bootstrap was confirmed; and rollback (never terminate the Camunda instance during migration — leave it idle so rollback is just flipping the column back).
 - **Why it wasn't built:** the shipped scope (CCP-5801) only needed *new* requests to be routable to n8n; migrating in-flight Camunda instances wasn't in scope. The column/resolver machinery and its migration file were removed rather than shipped unused. If per-request/in-flight migration becomes a real requirement, Option 2's shape above (and the risk/mitigation list it came with) is the starting point.
 
 ## 06 — Cutover path (current)

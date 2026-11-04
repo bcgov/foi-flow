@@ -2,7 +2,7 @@ import pytest
 
 from request_api.services.workflowengine import resolve_engine, resolve_engine_name, validate_engine_config, isn8n, iscamunda, WFEngine
 from request_api.services.external.bpmservice import bpmservice
-from request_api.services.external.commonworkflowservice import commonworkflowservice
+from request_api.services.external.n8nworkflowservice import n8nworkflowservice
 
 
 def test_resolve_engine_name_uses_configured_default(monkeypatch):
@@ -26,9 +26,9 @@ def test_resolve_engine_returns_bpmservice_for_camunda_default(monkeypatch):
     assert isinstance(resolve_engine(), bpmservice)
 
 
-def test_resolve_engine_returns_commonworkflowservice_for_n8n_default(monkeypatch):
+def test_resolve_engine_returns_n8nworkflowservice_for_n8n_default(monkeypatch):
     monkeypatch.setenv("WF_DEFAULT_ENGINE", "n8n")
-    assert isinstance(resolve_engine(), commonworkflowservice)
+    assert isinstance(resolve_engine(), n8nworkflowservice)
 
 
 def test_resolve_engine_defaults_to_camunda_when_unconfigured(monkeypatch):

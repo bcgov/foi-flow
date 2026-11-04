@@ -8,10 +8,10 @@ import pytest
 import requests
 
 from request_api.services.external.bpmservice import MessageType
-from request_api.services.external.commonworkflowservice import commonworkflowservice
+from request_api.services.external.n8nworkflowservice import n8nworkflowservice
 
-POST = "request_api.services.external.commonworkflowservice.requests.post"
-OUTBOX = "request_api.services.external.commonworkflowservice.workflowoutboxservice"
+POST = "request_api.services.external.n8nworkflowservice.requests.post"
+OUTBOX = "request_api.services.external.n8nworkflowservice.workflowoutboxservice"
 
 PAYLOAD = {"event": MessageType.intakecomplete.value, "event_id": "11111111-1111-4111-8111-111111111111"}
 
@@ -40,7 +40,7 @@ def _mock_response(ok=True, body=None, status_code=None):
 
 
 def _unopenedcomplete():
-    return commonworkflowservice().unopenedcomplete(None, json.dumps({"id": 1}), MessageType.intakecomplete.value)
+    return n8nworkflowservice().unopenedcomplete(None, json.dumps({"id": 1}), MessageType.intakecomplete.value)
 
 
 def _enqueued(outbox):
@@ -64,38 +64,38 @@ def test_unopenedsave_nests_complete_metadata_under_foireuestmetadata(outbox):
     every other engine call receives (a json.dumps(...) string), nested under
     foiRequestMetaData exactly like every other event method."""
     metadata = json.dumps({"id": 42, "status": "Intake in Progress", "assignedGroup": "Intake Team", "assignedTo": "jdoe"})
-    commonworkflowservice().unopenedsave(None, metadata, MessageType.intakeclaim.value)
+    n8nworkflowservice().unopenedsave(None, metadata, MessageType.intakeclaim.value)
     payload = _enqueued(outbox)[0]
     assert payload["event"] == MessageType.intakeclaim.value
     assert payload["foiRequestMetaData"] == metadata
 
 
 def test_openedcomplete_includes_filenumber(outbox):
-    commonworkflowservice().openedcomplete(None, "FILE-1", json.dumps({}), MessageType.iaocomplete.value)
+    n8nworkflowservice().openedcomplete(None, "FILE-1", json.dumps({}), MessageType.iaocomplete.value)
     payload = _enqueued(outbox)[0]
     assert payload["id"] == "FILE-1"
     assert payload["event"] == MessageType.iaocomplete.value
 
 
 def test_feeevent_uses_managepayment_event(outbox):
-    commonworkflowservice().feeevent("AXIS-1", json.dumps({}), "PAID")
+    n8nworkflowservice().feeevent("AXIS-1", json.dumps({}), "PAID")
     payload = _enqueued(outbox)[0]
     assert payload["event"] == MessageType.managepayment.value
     assert payload["paymentstatus"] == "PAID"
 
 
 def test_correspondanceevent_uses_correspondence_event(outbox):
-    commonworkflowservice().correspondanceevent(None, "FILE-1", json.dumps({}))
+    n8nworkflowservice().correspondanceevent(None, "FILE-1", json.dumps({}))
     assert _enqueued(outbox)[0]["event"] == MessageType.iaocorrenspodence.value
 
 
 def test_reopenevent_delegates_to_unopenedcomplete(outbox):
-    commonworkflowservice().reopenevent(None, json.dumps({}), MessageType.iaoreopen.value)
+    n8nworkflowservice().reopenevent(None, json.dumps({}), MessageType.iaoreopen.value)
     assert _enqueued(outbox)[0]["event"] == MessageType.iaoreopen.value
 
 
 def test_every_event_method_adds_a_unique_uuid4_event_id(outbox):
-    engine = commonworkflowservice()
+    engine = n8nworkflowservice()
     engine.unopenedsave(None, json.dumps({}), MessageType.intakeclaim.value)
     engine.unopenedcomplete(None, json.dumps({}), MessageType.intakecomplete.value)
     engine.openedcomplete(None, "FILE-1", json.dumps({}), MessageType.iaocomplete.value)
@@ -121,7 +121,7 @@ def _send_every_kind_of_event(engine):
 
 
 def test_every_event_method_adds_a_utc_occurred_at_in_a_fixed_width_sortable_format(outbox):
-    _send_every_kind_of_event(commonworkflowservice())
+    _send_every_kind_of_event(n8nworkflowservice())
     payloads = _enqueued(outbox)
     assert len(payloads) == 6
     for payload in payloads:
@@ -130,7 +130,7 @@ def test_every_event_method_adds_a_utc_occurred_at_in_a_fixed_width_sortable_for
 
 
 def test_occurred_at_does_not_go_backwards_from_one_event_to_the_next(outbox):
-    _send_every_kind_of_event(commonworkflowservice())
+    _send_every_kind_of_event(n8nworkflowservice())
     stamps = [payload["occurred_at"] for payload in _enqueued(outbox)]
     assert stamps == sorted(stamps)
 
@@ -144,7 +144,7 @@ def test_occurred_at_is_the_time_the_event_was_produced(outbox):
 
 
 def test_occurred_at_and_event_id_are_set_by_the_service_not_by_the_caller_data(outbox):
-    commonworkflowservice().feeevent("AXIS-1", json.dumps({"occurred_at": "1999"}), "PAID")
+    n8nworkflowservice().feeevent("AXIS-1", json.dumps({"occurred_at": "1999"}), "PAID")
     payload = _enqueued(outbox)[0]
     assert payload["occurred_at"] != "1999"
     assert OCCURRED_AT_FORMAT.match(payload["occurred_at"])
@@ -169,14 +169,14 @@ def test_deliver_url_has_single_slash_between_base_and_path(mock_post, monkeypat
     monkeypatch.setenv("N8N_BASE_URL", base)
     monkeypatch.setenv("N8N_ROUTING_WEBHOOK_PATH", path)
     mock_post.return_value = _mock_response(True, {})
-    commonworkflowservice().deliver(PAYLOAD)
+    n8nworkflowservice().deliver(PAYLOAD)
     assert mock_post.call_args[0][0] == "https://n8n.example.com/webhook/foi-request-routing"
 
 
 @patch(POST)
 def test_deliver_posts_to_fixed_routing_webhook_with_auth_header(mock_post):
     mock_post.return_value = _mock_response(True, {})
-    result = commonworkflowservice().deliver(PAYLOAD)
+    result = n8nworkflowservice().deliver(PAYLOAD)
     assert result.delivered is True
     assert mock_post.call_args[0][0] == "https://n8n.example.com/webhook/foi-request-routing"
     assert mock_post.call_args[1]["headers"]["X-N8N-Auth"] == "secret"
@@ -186,8 +186,8 @@ def test_deliver_posts_to_fixed_routing_webhook_with_auth_header(mock_post):
 @patch(POST)
 def test_redelivery_of_a_stored_payload_resends_the_same_event_id(mock_post):
     mock_post.return_value = _mock_response(True, {})
-    commonworkflowservice().deliver(PAYLOAD)
-    commonworkflowservice().deliver(PAYLOAD)
+    n8nworkflowservice().deliver(PAYLOAD)
+    n8nworkflowservice().deliver(PAYLOAD)
     sent = [json.loads(call[1]["data"])["event_id"] for call in mock_post.call_args_list]
     assert sent == [PAYLOAD["event_id"]] * 2
 
@@ -195,7 +195,7 @@ def test_redelivery_of_a_stored_payload_resends_the_same_event_id(mock_post):
 @patch(POST)
 def test_deliver_uses_default_timeout(mock_post):
     mock_post.return_value = _mock_response(True, {})
-    commonworkflowservice().deliver(PAYLOAD)
+    n8nworkflowservice().deliver(PAYLOAD)
     assert mock_post.call_args[1]["timeout"] == 10
 
 
@@ -203,7 +203,7 @@ def test_deliver_uses_default_timeout(mock_post):
 def test_deliver_uses_configured_timeout(mock_post, monkeypatch):
     monkeypatch.setenv("N8N_WEBHOOK_TIMEOUT_SECONDS", "3")
     mock_post.return_value = _mock_response(True, {})
-    commonworkflowservice().deliver(PAYLOAD)
+    n8nworkflowservice().deliver(PAYLOAD)
     assert mock_post.call_args[1]["timeout"] == 3
 
 
@@ -211,7 +211,7 @@ def test_deliver_uses_configured_timeout(mock_post, monkeypatch):
 def test_empty_routing_path_falls_back_to_default(mock_post, monkeypatch):
     monkeypatch.setenv("N8N_ROUTING_WEBHOOK_PATH", "")
     mock_post.return_value = _mock_response(True, {})
-    commonworkflowservice().deliver(PAYLOAD)
+    n8nworkflowservice().deliver(PAYLOAD)
     assert mock_post.call_args[0][0] == "https://n8n.example.com/webhook/foi-request-routing"
 
 
@@ -222,7 +222,7 @@ def test_missing_base_url_is_logged_not_sent_and_not_retryable(mock_post, monkey
         monkeypatch.delenv("N8N_BASE_URL", raising=False)
     else:
         monkeypatch.setenv("N8N_BASE_URL", base_url)
-    result = commonworkflowservice().deliver(PAYLOAD)
+    result = n8nworkflowservice().deliver(PAYLOAD)
     assert (result.delivered, result.retryable) == (False, False)
     mock_post.assert_not_called()
     assert "N8N_BASE_URL is not configured" in caplog.text
@@ -232,7 +232,7 @@ def test_missing_base_url_is_logged_not_sent_and_not_retryable(mock_post, monkey
 @patch(POST)
 def test_network_failure_is_retryable(mock_post, error):
     mock_post.side_effect = error
-    result = commonworkflowservice().deliver(PAYLOAD)
+    result = n8nworkflowservice().deliver(PAYLOAD)
     assert (result.delivered, result.retryable, result.error) == (False, True, type(error).__name__)
 
 
@@ -240,7 +240,7 @@ def test_network_failure_is_retryable(mock_post, error):
 @patch(POST)
 def test_retryable_http_status(mock_post, status_code):
     mock_post.return_value = _mock_response(False, status_code=status_code)
-    result = commonworkflowservice().deliver(PAYLOAD)
+    result = n8nworkflowservice().deliver(PAYLOAD)
     assert (result.delivered, result.retryable, result.error) == (False, True, "HTTP %s" % status_code)
 
 
@@ -248,7 +248,7 @@ def test_retryable_http_status(mock_post, status_code):
 @patch(POST)
 def test_non_retryable_http_status(mock_post, status_code):
     mock_post.return_value = _mock_response(False, status_code=status_code)
-    result = commonworkflowservice().deliver(PAYLOAD)
+    result = n8nworkflowservice().deliver(PAYLOAD)
     assert (result.delivered, result.retryable) == (False, False)
 
 
@@ -257,7 +257,7 @@ def test_success_with_non_json_body_is_delivered(mock_post):
     response = _mock_response(True)
     response.content = b"Workflow was started"
     mock_post.return_value = response
-    result = commonworkflowservice().deliver(PAYLOAD)
+    result = n8nworkflowservice().deliver(PAYLOAD)
     assert result.delivered is True
     assert result.content is None
 
@@ -266,13 +266,13 @@ def test_success_with_non_json_body_is_delivered(mock_post):
 def test_logs_do_not_contain_payload_or_response_body(mock_post, caplog):
     caplog.set_level("INFO")
     mock_post.return_value = _mock_response(True, {"secret": "response-body"})
-    commonworkflowservice().deliver({**PAYLOAD, "foiRequestMetaData": json.dumps({"assignedTo": "jdoe@example.com"})})
+    n8nworkflowservice().deliver({**PAYLOAD, "foiRequestMetaData": json.dumps({"assignedTo": "jdoe@example.com"})})
     assert "jdoe@example.com" not in caplog.text
     assert "response-body" not in caplog.text
 
 
 def test_gated_methods_raise_not_implemented():
-    engine = commonworkflowservice()
+    engine = n8nworkflowservice()
     with pytest.raises(NotImplementedError):
         engine.getinstancevariables({"foiRequestId": 7})
     with pytest.raises(NotImplementedError):
@@ -310,7 +310,7 @@ def test_a_transient_enqueue_failure_is_retried_and_creates_no_dead_row(outbox):
 def test_a_persistent_enqueue_failure_is_recorded_as_dead_and_does_not_raise_for_any_event(outbox, caplog, event, call):
     outbox.enqueue.side_effect = Exception("db down")
     outbox.recordenqueuefailure.return_value = True
-    assert call(commonworkflowservice()) is None
+    assert call(n8nworkflowservice()) is None
     assert outbox.enqueue.call_count == 3
     payload, error = outbox.recordenqueuefailure.call_args[0]
     assert payload["event"] == event
@@ -322,6 +322,6 @@ def test_a_persistent_enqueue_failure_is_recorded_as_dead_and_does_not_raise_for
 def test_a_database_outage_is_logged_without_the_payload_and_does_not_raise(outbox, caplog):
     outbox.enqueue.side_effect = Exception("db down")
     outbox.recordenqueuefailure.side_effect = Exception("db down")
-    assert ALL_CALLS[MessageType.managepayment.value](commonworkflowservice()) is None
+    assert ALL_CALLS[MessageType.managepayment.value](n8nworkflowservice()) is None
     assert "recorded as DEAD=False" in caplog.text
     assert "foiRequestMetaData" not in caplog.text

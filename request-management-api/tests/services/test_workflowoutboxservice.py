@@ -12,7 +12,7 @@ from sqlalchemy.exc import IntegrityError
 import request_api.models as _models
 from request_api.models.db import db
 from request_api.models.FOIWorkflowEventOutbox import FOIWorkflowEventOutbox, OutboxStatus
-from request_api.services.external.commonworkflowservice import n8ndeliveryresult
+from request_api.services.external.n8nworkflowservice import n8ndeliveryresult
 from request_api.services.workflowoutboxservice import AckResult, workflowoutboxservice
 
 """
