@@ -66,11 +66,25 @@ The repository comparison used GitOps revision
 rendered successfully. Production uses `request-management-api-002`; dev/test
 use `request-management-api`.
 
-Live Argo CD Application sources, values-file ordering, ownership, health/sync
-status, and production promotion still require DevOps verification before merge:
-the OpenShift session available during cleanup returned `Unauthorized`. Retained
-prerequisite resources also need their provisioning owners confirmed. Removing
-these repository files does not delete cluster resources or change GitOps values.
+Subsequent read-only cluster checks on 2026-11-04 confirmed the three application
+Deployments are available in dev, test, and prod. Their Deployments, Services,
+Routes, and the two migrated CronJobs carry the corresponding `foi-flow-dev`,
+`foi-flow-test`, or `foi-flow-prod` Argo CD tracking annotations. Both CronJobs
+reported successful completions that day. No DeploymentConfigs remain in these
+three namespaces, and the three retired application BuildConfigs are absent from
+`d7abee-tools`.
+
+The retained BPM and backup BuildConfigs still exist. The S3 backup build uses
+`openshift/templates/backup/copy-to-s3` as its build context. The checked prerequisite
+ConfigMaps and Secrets exist in each environment, and `app-data-pvc`,
+`foi-bkup-shared-pvc`, and `backup-verification` are `Bound`.
+
+Argo CD Application sources, values-file ordering, Application health/sync status,
+production promotion, and prerequisite provisioning owners still require DevOps
+verification before merge. Cluster-wide Application listing is forbidden for the
+available account; resource tracking annotations do not establish Application
+sync status. Removing these repository files does not delete cluster resources or
+change GitOps values. No Secret values were retrieved during verification.
 
 The deleted jobs have the following chart counterparts in all three environments:
 
