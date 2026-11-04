@@ -244,6 +244,7 @@ const API = {
   FOI_UNPUBLISH_PROACTIVE_DISCLOSURE: `${FOI_BASE_API_URL}/api/foiopeninfo/ministryrequest/<foiministryrequestid>/pdunpublish`,
 
   FOI_PUBLISHNOW_OPEN_INFORMATION: `${FOI_BASE_API_URL}/api/foiopeninfo/ministryrequest/<foiministryrequestid>/publishnow`,
+  FOI_USER_PREFERENCES: `${FOI_BASE_API_URL}/api/foiuser/preferences`,
   FOI_UNPUBLISH_OPEN_INFORMATION: `${FOI_BASE_API_URL}/api/foiopeninfo/ministryrequest/<foiministryrequestid>/unpublish`
 };
 export default API;
