@@ -85,6 +85,15 @@ class FOIApplicantCorrespondence(db.Model):
         correspondence_schema = FOIApplicantCorrespondenceSchema()
         query = db.session.query(FOIApplicantCorrespondence).filter(FOIApplicantCorrespondence.applicantcorrespondenceid == applicantcorrespondenceid).order_by(FOIApplicantCorrespondence.version.desc()).first()
         return correspondence_schema.dump(query)
+
+    @classmethod
+    def getapplicantcorrespondencebyidforrequest(cls, applicantcorrespondenceid, ministryrequestid):
+        """Latest version of the correspondence, only if every version belongs to this ministry request."""
+        owners = {row[0] for row in db.session.query(FOIApplicantCorrespondence.foiministryrequest_id).filter(
+            FOIApplicantCorrespondence.applicantcorrespondenceid == applicantcorrespondenceid).distinct()}
+        if owners != {int(ministryrequestid)}:
+            return {}
+        return cls.getapplicantcorrespondencebyid(applicantcorrespondenceid)
     
     @classmethod
     def getlatestapplicantcorrespondence(cls,ministryrequestid):
@@ -111,16 +120,24 @@ class FOIApplicantCorrespondence(db.Model):
                         attachment.createdby = newapplicantcorrepondencelog.createdby
                         attachment.version = 1
                         correspondenceattachments.append(attachment)
-
-            # Update existing attachments
-            existingattachments = FOIApplicantCorrespondenceAttachment().getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(newapplicantcorrepondencelog.applicantcorrespondenceid)
-            for _existingattachment in existingattachments:
-                attachment = FOIApplicantCorrespondenceAttachment()
-                attachment.__dict__.update(_existingattachment)
-                attachment.version = _existingattachment['version'] + 1
-                attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
-                attachment.applicantcorrespondence_version = newapplicantcorrepondencelog.version
-                correspondenceattachments.append(attachment)
+            
+            # Carry forward only the existing attachments the user kept, taken from the
+            # previous version of this same correspondence. attachments=None means the
+            # caller (edit flow) versions the attachments itself.
+            if attachments is not None and newapplicantcorrepondencelog.version > 1:
+                keptids = {a['applicantcorrespondenceattachmentid'] for a in attachments
+                           if 'applicantcorrespondenceattachmentid' in a}
+                previousattachments = FOIApplicantCorrespondenceAttachment.getattachmentsbycorrespondenceversion(
+                    newapplicantcorrepondencelog.applicantcorrespondenceid, newapplicantcorrepondencelog.version - 1)
+                for _existingattachment in previousattachments:
+                    if _existingattachment['applicantcorrespondenceattachmentid'] not in keptids:
+                        continue
+                    attachment = FOIApplicantCorrespondenceAttachment()
+                    attachment.__dict__.update(_existingattachment)
+                    attachment.version = _existingattachment['version'] + 1
+                    attachment.applicantcorrespondenceid = newapplicantcorrepondencelog.applicantcorrespondenceid
+                    attachment.applicantcorrespondence_version = newapplicantcorrepondencelog.version
+                    correspondenceattachments.append(attachment)
             if (len(correspondenceattachments) > 0):
                 FOIApplicantCorrespondenceAttachment().saveapplicantcorrespondenceattachments(newapplicantcorrepondencelog.foiministryrequest_id, correspondenceattachments)
 

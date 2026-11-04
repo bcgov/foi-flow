@@ -162,6 +162,15 @@ class FOIApplicantCorrespondenceAttachment(db.Model):
         finally:
             db.session.close()
         return attachments
+    
+    @classmethod
+    def getattachmentsbycorrespondenceversion(cls, applicantcorrespondenceid, applicantcorrespondenceversion):
+        correspondenceattachment_schema = FOIApplicantCorrespondenceAttachmentSchema(many=True)
+        query = db.session.query(FOIApplicantCorrespondenceAttachment).filter(
+            FOIApplicantCorrespondenceAttachment.applicantcorrespondenceid == applicantcorrespondenceid,
+            FOIApplicantCorrespondenceAttachment.applicantcorrespondence_version == applicantcorrespondenceversion
+        ).order_by(FOIApplicantCorrespondenceAttachment.applicantcorrespondenceattachmentid.asc()).all()
+        return correspondenceattachment_schema.dump(query)
 
 class FOIApplicantCorrespondenceAttachmentSchema(ma.Schema):
     class Meta:

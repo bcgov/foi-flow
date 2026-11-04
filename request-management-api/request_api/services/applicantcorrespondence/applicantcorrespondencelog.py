@@ -15,6 +15,8 @@ from sqlalchemy.sql.expression import null
 import maya
 import json
 import html
+import logging
+from request_api.models.default_method_result import DefaultMethodResult
 from datetime import datetime
 class applicantcorrespondenceservice:
 
@@ -74,7 +76,10 @@ class applicantcorrespondenceservice:
     def saveapplicantcorrespondencelog(self, requestid, ministryrequestid, data, userid, isdraft=False):
         applicantcorrespondence = FOIApplicantCorrespondence()
         if "correspondenceid" in data and data['correspondenceid'] is not None:
-            correspondence = FOIApplicantCorrespondence.getapplicantcorrespondencebyid(data['correspondenceid'])
+            correspondence = FOIApplicantCorrespondence.getapplicantcorrespondencebyidforrequest(data['correspondenceid'], ministryrequestid)
+            if not correspondence:
+                logging.error("Correspondence %s does not belong to ministry request %s", data['correspondenceid'], ministryrequestid)
+                return DefaultMethodResult(False, 'Correspondence does not belong to this request', data['correspondenceid'])
             applicantcorrespondence.applicantcorrespondenceid = data['correspondenceid']
             applicantcorrespondence.version = correspondence['version']+1
         else:
@@ -106,7 +111,10 @@ class applicantcorrespondenceservice:
     def saveapplicantcorrespondencelogforrawrequest(self, requestid, data, userid, isdraft=False):
         applicantcorrespondence = FOIApplicantCorrespondenceRawRequest()
         if "correspondenceid" in data and data['correspondenceid'] is not None:
-            correspondence = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencebyid(data['correspondenceid'])
+            correspondence = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencebyidforrequest(data['correspondenceid'], requestid)
+            if not correspondence:
+                logging.error("Correspondence %s does not belong to request %s", data['correspondenceid'], requestid)
+                return DefaultMethodResult(False, 'Correspondence does not belong to this request', data['correspondenceid'])
             applicantcorrespondence.applicantcorrespondenceid = data['correspondenceid']
             applicantcorrespondence.version = correspondence['version']+1
         else:
@@ -138,7 +146,10 @@ class applicantcorrespondenceservice:
         return FOIApplicantCorrespondenceRawRequest.saveapplicantcorrespondence(applicantcorrespondence,data['attachments'], emails, ccemails)
     
     def editapplicantcorrespondencelogforministry(self, ministryrequestid, data, userid):
-        correspondence = FOIApplicantCorrespondence.getapplicantcorrespondencebyid(data['correspondenceid'])
+        correspondence = FOIApplicantCorrespondence.getapplicantcorrespondencebyidforrequest(data['correspondenceid'], ministryrequestid)
+        if not correspondence:
+            logging.error("Correspondence %s does not belong to ministry request %s", data['correspondenceid'], ministryrequestid)
+            return DefaultMethodResult(False, 'Correspondence does not belong to this request', data['correspondenceid'])
         oldcorrespondenceid = correspondence['applicantcorrespondenceid']
         oldcorrespondenceversion = correspondence['version']
         if 'sentcorrespondencemessage' in correspondence and correspondence['sentcorrespondencemessage'] is not None:
@@ -179,7 +190,10 @@ class applicantcorrespondenceservice:
         return response
     
     def editapplicantcorrespondencelogforrawrequest(self, rawrequestid, data, userid):
-        correspondence = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencebyid(data['correspondenceid'])
+        correspondence = FOIApplicantCorrespondenceRawRequest.getapplicantcorrespondencebyidforrequest(data['correspondenceid'], rawrequestid)
+        if not correspondence:
+            logging.error("Correspondence %s does not belong to request %s", data['correspondenceid'], rawrequestid)
+            return DefaultMethodResult(False, 'Correspondence does not belong to this request', data['correspondenceid'])
         oldcorrespondenceid = correspondence['applicantcorrespondenceid']
         oldcorrespondenceversion = correspondence['version']
         if 'sentcorrespondencemessage' in correspondence and correspondence['sentcorrespondencemessage'] is not None:
@@ -258,7 +272,7 @@ class applicantcorrespondenceservice:
     
     def __updateattachmentsversionministryrequest(self, ministryrequestid, data, oldcorrespondenceid, oldcorrespondenceversion, userid):
         # Check for attachments
-        attachments = FOIApplicantCorrespondenceAttachment.getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(oldcorrespondenceid)
+        attachments = FOIApplicantCorrespondenceAttachment.getattachmentsbycorrespondenceversion(oldcorrespondenceid, oldcorrespondenceversion)
         updated_attachments = []
         if (attachments is not None and len(attachments) > 0):
             for _attachment in attachments:
@@ -279,7 +293,7 @@ class applicantcorrespondenceservice:
 
     def __updateattachmentsversionrawrequest(self, rawrequestid, data, oldcorrespondenceid, oldcorrespondenceversion, userid):
         # Check for attachments
-        attachments = FOIApplicantCorrespondenceAttachmentRawRequest.getapplicantcorrespondenceattachmentsbyapplicantcorrespondenceid(oldcorrespondenceid)
+        attachments = FOIApplicantCorrespondenceAttachmentRawRequest.getattachmentsbycorrespondenceversion(oldcorrespondenceid, oldcorrespondenceversion)
         updated_attachments = []
         if (attachments is not None and len(attachments) > 0):
             for _attachment in attachments:
