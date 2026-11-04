@@ -16,6 +16,9 @@ payment as ``ACTIVE`` would make the n8n expiry job notify the applicant a secon
 separately and only written, as ``EXPIRED``, when ``include_expired`` is set.
 """
 
+import csv
+import hashlib
+import io
 import json
 import logging
 import os
@@ -58,8 +61,25 @@ OPEN_STATUSES = ('ACTIVE', 'PENDING')
 TERMINAL_STATUSES = ('PAID', 'CANCELLED', 'EXPIRED')
 
 
+CSV_COLUMNS = ('process_instance_id', 'ministry_request_id', 'foi_request_id', 'file_number', 'suspended',
+               'outcome', 'reason', 'detail', 'expiry_state', 'expires_at', 'sla_row_id')
+PLAN_HASH = re.compile(r'^[0-9a-f]{16}$')
+
+
 class BackfillSourceError(Exception):
     """A source (Camunda, FOI database, n8n) failed. The run is aborted instead of guessing."""
+
+
+class PlanChangedError(Exception):
+    """The rows an apply would write differ from the plan the operator reviewed. Nothing was written.
+
+    ``report`` is the dry-run report of the new plan, so it can be reviewed and confirmed in turn.
+    """
+
+    def __init__(self, expected, report):
+        super().__init__('The plan changed since it was reviewed: expected %s, now %s'
+                         % (expected, report['run']['plan_hash']))
+        self.expected, self.report = expected, report
 
 
 def _clean(value):
@@ -376,9 +396,10 @@ class PaymentSlaBackfill:
     """Classifies every Camunda fee instance, plans the missing SLA rows and (optionally) writes them."""
 
     def __init__(self, camunda, foi, store, apply=False, include_expired=False, ministry_request_ids=None,
-                 run_id=None, operator=None, clock=None):
+                 run_id=None, operator=None, clock=None, confirm_plan=None):
         self.camunda, self.foi, self.store = camunda, foi, store
         self.apply = apply
+        self.confirm_plan = confirm_plan  # plan hash from a reviewed dry run; checked before anything is written
         self.include_expired = include_expired
         self.only = set(ministry_request_ids or [])
         self.run_id = run_id or uuid.uuid4().hex[:12]
@@ -406,14 +427,33 @@ class PaymentSlaBackfill:
         self._check_expiry(pending)
         pending = [r for r in pending if not r['outcome']]
         self._plan(pending)
+        plan_hash = self._plan_hash(records)
+        if self.apply and self.confirm_plan is not None and _clean(self.confirm_plan).lower() != plan_hash:
+            self.apply = False  # nothing is written; the report shows the new plan as a dry run
+            raise PlanChangedError(_clean(self.confirm_plan), self._finish(records, len(instances), started, plan_hash))
         for record in records:
             if record['outcome'] == CREATE and self.apply:
                 self._write(record)
-        report = self._report(records, len(instances), started)
+        return self._finish(records, len(instances), started, plan_hash)
+
+    def _finish(self, records, examined, started, plan_hash):
+        report = self._report(records, examined, started, plan_hash)
         for record in records:  # internal fields never leave this object
             for key in [k for k in record if k.startswith('_')]:
                 del record[key]
         return report
+
+    @staticmethod
+    def _plan_hash(records):
+        """A fingerprint of the rows this run would write, so an apply can be tied to the plan that was reviewed.
+
+        It covers the instance, request, Form.io ids, status and deadline of each planned row, not the run id,
+        timestamps or comments, so the same plan gives the same hash on every run.
+        """
+        planned = sorted((r['_row']['ministry_request_id'], r['process_instance_id'], r['_row']['form_id'],
+                          r['_row']['submission_id'], r['_row']['sla_status'], r['_row']['payment_expiry_date'],
+                          r['_row']['expires_at']) for r in records if r['outcome'] == CREATE)
+        return hashlib.sha256(json.dumps(planned).encode('utf-8')).hexdigest()[:16]
 
     # -- classification ---------------------------------------------------------------------------------------
 
@@ -643,7 +683,7 @@ class PaymentSlaBackfill:
 
     # -- reporting --------------------------------------------------------------------------------------------
 
-    def _report(self, records, examined, started):
+    def _report(self, records, examined, started, plan_hash):
         by_outcome, by_reason = {}, {}
         for record in records:
             by_outcome[record['outcome']] = by_outcome.get(record['outcome'], 0) + 1
@@ -692,7 +732,7 @@ class PaymentSlaBackfill:
         review = [r for r in records if r['outcome'] in MANUAL_REVIEW]
         return {
             'run': {'id': self.run_id, 'mode': 'apply' if written else 'dry-run',
-                    'include_expired': self.include_expired, 'operator': self.operator,
+                    'include_expired': self.include_expired, 'operator': self.operator, 'plan_hash': plan_hash,
                     'started_at': started.isoformat(), 'finished_at': self.clock().isoformat()},
             'summary': summary,
             'by_outcome_and_reason': dict(sorted(by_reason.items())),
@@ -708,11 +748,22 @@ class PaymentSlaBackfill:
         return out
 
 
+def report_csv_text(report, bom=True):
+    """The per-record results as CSV text. The BOM makes Excel read it as UTF-8."""
+    out = io.StringIO()
+    writer = csv.DictWriter(out, fieldnames=CSV_COLUMNS, extrasaction='ignore', lineterminator='\r\n')
+    writer.writeheader()
+    writer.writerows(report['records'])
+    return ('﻿' if bom else '') + out.getvalue()
+
+
 def format_summary(report):
     """Plain text for the console. Counts and references only; record detail is in the report file."""
     run, summary = report['run'], report['summary']
     lines = ['Payment SLA backfill  run=%s  mode=%s  include_expired=%s' % (run['id'], run['mode'].upper(),
                                                                              run['include_expired'])]
+    lines.append('Plan hash: %s%s' % (run['plan_hash'], '  (review the report, then --apply --confirm-plan %s)'
+                                       % run['plan_hash'] if run['mode'] == 'dry-run' else ''))
     lines += ['  %-72s %s' % (key, value) for key, value in summary.items()]
     lines.append('Outcome / reason')
     lines += ['  %-72s %s' % (key, value) for key, value in report['by_outcome_and_reason'].items()]
