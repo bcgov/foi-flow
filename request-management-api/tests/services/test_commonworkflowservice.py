@@ -313,7 +313,8 @@ def test_a_persistent_enqueue_failure_is_recorded_as_dead_and_does_not_raise_for
     assert call(commonworkflowservice()) is None
     assert outbox.enqueue.call_count == 3
     payload, error = outbox.recordenqueuefailure.call_args[0]
-    assert payload["event"] == event and error == "Exception"
+    assert payload["event"] == event
+    assert error == "Exception"
     assert payload["event_id"] in caplog.text
     assert "was NOT queued" in caplog.text
 
