@@ -27,14 +27,14 @@ import uuid
 from datetime import datetime, timezone
 from urllib.parse import quote, urlencode
 
-import pytz
+from zoneinfo import ZoneInfo
 import requests
 
 FEE_PROCESS_KEY = 'foi-fee-processing'
 PAYMENT_WAIT_ACTIVITY = 'Gateway_1771ld6'  # event based gateway: waits for foi-manage-payment or the daily timer
 SLA_TYPE = 'payment-expiry'
 SLA_TABLE_NAME = 'foi-payment-sla'
-VANCOUVER = pytz.timezone('America/Vancouver')
+VANCOUVER = ZoneInfo('America/Vancouver')
 
 # Only these Camunda variables are requested. The instances also hold credentials and tokens.
 CAMUNDA_VARIABLES = (
@@ -123,7 +123,7 @@ def compute_expires_at(expiry_date):
     if len(raw) <= 10:
         parsed = parsed.replace(hour=23, minute=59, second=59, microsecond=999000)
     if parsed.tzinfo is None:
-        parsed = VANCOUVER.localize(parsed)  # after the end-of-day replace, so a DST change day stays right
+        parsed = parsed.replace(tzinfo=VANCOUVER)  # after the end-of-day replace, so a DST change day stays right
     utc = parsed.astimezone(timezone.utc)
     return utc.strftime('%Y-%m-%dT%H:%M:%S.') + '%03dZ' % (utc.microsecond // 1000)
 
@@ -156,7 +156,11 @@ def payment_expiry_reached(payment_expiry_date, expires_at, now):
     like JavaScript ``new Date()`` (a date-only value is midnight UTC) and ``expires_at`` is only the fallback.
     """
     raw = _clean(payment_expiry_date) or _clean(expires_at)
-    expiry = _parse_utc(raw if len(raw) > 10 else raw + 'T00:00:00+00:00') if raw else None
+    expiry = None
+    if raw:
+        if len(raw) <= 10:
+            raw += 'T00:00:00+00:00'
+        expiry = _parse_utc(raw)
     return expiry is not None and (now - expiry).total_seconds() > -86400
 
 
@@ -516,7 +520,10 @@ class PaymentSlaBackfill:
                 continue
             match = [p for p in active if (p['form_id'], p['submission_id']) == record['_ids']]
             record['_payment'] = match[0] if match else None
-        # an unmatched instance is stale when a sibling instance for the same request does match
+        self._mark_unmatched(records)
+
+    def _mark_unmatched(self, records):
+        """An unmatched instance is stale when a sibling instance for the same request does match."""
         matched_requests = {r['ministry_request_id'] for r in records if not r['outcome'] and r['_payment']}
         for record in records:
             if record['outcome'] or record['_payment']:
@@ -669,8 +676,8 @@ class PaymentSlaBackfill:
                 self._mark(record, SLA_CONFLICT, 'concurrent_run_created_a_row_first',
                            'own row %s removed; kept row %s' % (inserted['id'], clash['id']))
         except Exception as exc:  # pylint: disable=broad-except
-            logging.error('payment SLA backfill: write failed for instance %s: %s',
-                          record['process_instance_id'], type(exc).__name__)
+            logging.exception('payment SLA backfill: write failed for instance %s: %s',
+                              record['process_instance_id'], type(exc).__name__)
             self._mark(record, ERROR, 'write_failed', '%s: %s' % (type(exc).__name__, exc))
 
     def _clash(self, row, inserted):

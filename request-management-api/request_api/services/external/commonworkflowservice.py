@@ -144,13 +144,13 @@ class commonworkflowservice:
                 return None
             except Exception as ex:
                 error = type(ex).__name__
-                logging.error("commonworkflowservice: unable to save n8n event=%s event_id=%s to the outbox (attempt %s of %s): %s", messagetype, payload["event_id"], attempt, ENQUEUE_ATTEMPTS, error)
+                logging.exception("commonworkflowservice: unable to save n8n event=%s event_id=%s to the outbox (attempt %s of %s): %s", messagetype, payload["event_id"], attempt, ENQUEUE_ATTEMPTS, error)
                 outbox.recoversession()
         try:
             recorded = outbox.recordenqueuefailure(payload, error)
         except Exception as ex:
             recorded = False
-            logging.error("commonworkflowservice: unable to record the enqueue failure for event_id=%s: %s", payload["event_id"], type(ex).__name__)
+            logging.exception("commonworkflowservice: unable to record the enqueue failure for event_id=%s: %s", payload["event_id"], type(ex).__name__)
         logging.error("commonworkflowservice: n8n event=%s event_id=%s was NOT queued; recorded as DEAD=%s", messagetype, payload["event_id"], recorded)
         return None
 

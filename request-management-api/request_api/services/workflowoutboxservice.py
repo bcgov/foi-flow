@@ -94,7 +94,7 @@ class workflowoutboxservice:
                 return True
             except Exception as ex:
                 session.rollback()
-                logging.error("workflowoutboxservice: unable to record the enqueue failure for event_id=%s (payload stored=%s): %s", payload.get("event_id"), stored is payload, type(ex).__name__)
+                logging.exception("workflowoutboxservice: unable to record the enqueue failure for event_id=%s (payload stored=%s): %s", payload.get("event_id"), stored is payload, type(ex).__name__)
             finally:
                 session.close()
         return False
