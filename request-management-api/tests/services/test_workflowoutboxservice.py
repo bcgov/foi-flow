@@ -155,14 +155,16 @@ def test_recordenqueuefailure_writes_a_dead_row_with_the_payload_and_it_can_be_r
     assert (row.status, row.payload, row.eventname) == ("DEAD", _payload(1), "foi-iao-complete")
     assert row.lasterror.startswith("ENQUEUE_FAILED")
     result, replayed = service.replay(_payload(1)["event_id"])
-    assert result == AckResult.updated and replayed.status == "PENDING"
+    assert result == AckResult.updated
+    assert replayed.status == "PENDING"
 
 
 def test_recordenqueuefailure_falls_back_to_a_row_without_the_payload_body(service, monkeypatch):
     unserializable = dict(_payload(1), foiRequestMetaData=object())
     assert service.recordenqueuefailure(unserializable, "TypeError") is True
     row = _row(1)
-    assert row.status == "DEAD" and "foiRequestMetaData" not in row.payload
+    assert row.status == "DEAD"
+    assert "foiRequestMetaData" not in row.payload
     assert row.lasterror.endswith("(payload not stored)")
 
 
