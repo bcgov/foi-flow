@@ -4,8 +4,10 @@ import logging
 from logging.config import fileConfig
 
 from flask import current_app
+from sqlalchemy import text
 
 from alembic import context
+from alembic.util import CommandError
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -15,6 +17,9 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 logger = logging.getLogger('alembic.env')
+
+# Shared by every online runner for this service, regardless of database role.
+MIGRATION_LOCK_KEY = 0x464F494D494752
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -73,15 +78,49 @@ def run_migrations_online():
     connectable = current_app.extensions['migrate'].db.engine
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata,
-            process_revision_directives=process_revision_directives,
-            **current_app.extensions['migrate'].configure_args
-        )
+        completed = False
+        try:
+            locked = connection.execute(
+                text('SELECT pg_try_advisory_lock(:key)'),
+                {'key': MIGRATION_LOCK_KEY},
+            ).scalar_one()
+            # End SQLAlchemy's implicit transaction before Alembic starts its own.
+            # The session advisory lock survives commits between revisions.
+            connection.commit()
+            if not locked:
+                raise CommandError(
+                    'Another database migration is running; retry after it completes.'
+                )
 
-        with context.begin_transaction():
-            context.run_migrations()
+            logger.info('Database migration lock acquired; starting online migration run.')
+            context.configure(
+                connection=connection,
+                target_metadata=target_metadata,
+                process_revision_directives=process_revision_directives,
+                **current_app.extensions['migrate'].configure_args
+            )
+
+            with context.begin_transaction():
+                context.run_migrations()
+            completed = True
+        finally:
+            if not completed:
+                # Close the physical session to release its lock even after a
+                # failed transaction or disconnect, without masking the failure.
+                connection.invalidate()
+            else:
+                try:
+                    unlocked = connection.execute(
+                        text('SELECT pg_advisory_unlock(:key)'),
+                        {'key': MIGRATION_LOCK_KEY},
+                    ).scalar_one()
+                    connection.commit()
+                    if not unlocked:
+                        raise CommandError('Database migration lock was lost during execution.')
+                except BaseException:
+                    connection.invalidate()
+                    raise
+                logger.info('Online migration run completed; database migration lock released.')
 
 
 if context.is_offline_mode():

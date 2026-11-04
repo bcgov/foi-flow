@@ -36,5 +36,5 @@ COPY ./ /app
 #RUN useradd appuser && chown -R appuser /app
 #USER appuser
 
-RUN chmod u+x /app/entrypoint.sh
+RUN chmod a+x /app/entrypoint.sh
 ENTRYPOINT ["/bin/sh", "/app/entrypoint.sh"]
