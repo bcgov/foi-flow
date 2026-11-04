@@ -3,6 +3,12 @@
 The legacy application deployment flow using the OpenShift templates in this
 directory is discontinued for services migrated to **Argo CD**.
 
+Following the deprecation of OpenShift DeploymentConfigs, the Request Management
+API, notification manager, and template API now use Kubernetes Deployments managed
+through Argo CD. Their container images are built directly from Dockerfiles in
+GitHub Actions runners, replacing image builds through BuildConfigs on the Silver
+cluster.
+
 Maintain deployment configuration for those services in the
 [tenant-gitops-d7abee repository](https://github.com/bcgov-c/tenant-gitops-d7abee/tree/main/foi-flow),
 using its Helm chart and environment values. Argo CD reconciles that configuration
@@ -74,7 +80,11 @@ reported successful completions that day. No DeploymentConfigs remain in these
 three namespaces, and the three retired application BuildConfigs are absent from
 `d7abee-tools`.
 
-The retained BPM and backup BuildConfigs still exist. The S3 backup build uses
+The retained BPM and backup BuildConfigs still exist. The BPM/Camunda configuration
+is expected to be retired once the migration to the internally managed n8n
+instance is complete and the remaining Camunda dependencies have been removed.
+Backup configuration remains subject to its own replacement and ownership review.
+The S3 backup build uses
 `openshift/templates/backup/copy-to-s3` as its build context. The checked prerequisite
 ConfigMaps and Secrets exist in each environment, and `app-data-pvc`,
 `foi-bkup-shared-pvc`, and `backup-verification` are `Bound`.
