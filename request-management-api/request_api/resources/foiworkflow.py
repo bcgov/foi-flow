@@ -14,7 +14,7 @@
 """API endpoints for managing a FOI Requests resource."""
 
 
-from flask import g, request
+from flask import g, request, Response
 from flask_restx import Namespace, Resource, cors
 from flask_expects_json import expects_json
 from request_api.auth import auth
@@ -24,6 +24,8 @@ from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.workflowservice import workflowservice
 from request_api.services.workflowoutboxservice import workflowoutboxservice, AckResult
+from request_api.services import paymentslabackfillapi as backfillapi
+from request_api.services.paymentslabackfillservice import report_csv_text
 from request_api.models.FOIWorkflowEventOutbox import OutboxStatus
 import json
 import uuid
@@ -157,3 +159,70 @@ class FOIWorkflowEventsReplay(Resource):
             result, _ = workflowoutboxservice().replay(_validuuid(eventid))
             results[eventid] = result
         return {'status': True, 'results': results}, 200
+
+
+def _backfillresponse(payload, status):
+    # the report holds Form.io ids, which make up the payment links
+    return _nostore(Response(json.dumps(payload), status=status, mimetype='application/json'))
+
+
+def _nostore(response):
+    response.headers['Cache-Control'] = 'no-store'
+    return response
+
+
+def _runpaymentslabackfill(apply):
+    """One-time Camunda to n8n payment SLA backfill. Only while PAYMENT_SLA_BACKFILL_ENABLED=true."""
+    if not backfillapi.enabled():
+        return _backfillresponse({'status': False, 'message': 'The payment SLA backfill is not enabled'}, 404)
+    options, error = backfillapi.parse_options(request.get_json(silent=True), apply)
+    if error:
+        return _backfillresponse({'status': False, 'message': error}, 400)
+    operator, mode = str(AuthHelper.getuserid()), 'APPLY' if apply else 'dry run'
+    logging.info("payment SLA backfill %s requested by %s: include_expired=%s ministry_request_ids=%s",
+                 mode, operator, options['include_expired'], options['ministry_request_ids'])
+    status, payload, report = backfillapi.execute(options, apply, operator)
+    logging.info("payment SLA backfill %s by %s finished with HTTP %s plan_hash=%s",
+                 mode, operator, status, (report or {}).get('run', {}).get('plan_hash'))
+    if status == 200 and request.args.get('format', 'json').lower() == 'csv':
+        response = Response(report_csv_text(report).encode('utf-8'), mimetype='text/csv')
+        response.headers['Content-Disposition'] = 'attachment; filename=payment_sla_backfill_%s_%s.csv' % (
+            report['run']['mode'], report['run']['id'])
+        response.headers['X-Plan-Hash'] = report['run']['plan_hash']
+        return _nostore(response)
+    return _backfillresponse(payload, status)
+
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiworkflow/payment-sla-backfill/dry-run')
+class FOIPaymentSlaBackfillDryRun(Resource):
+    """Reports what the backfill would write and returns its plan hash. Writes nothing.
+
+    Body: {"include_expired": false, "ministry_request_ids": []}. ?format=csv downloads the per-record results for
+    review in Excel; the plan hash is then in the X-Plan-Hash header.
+    """
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isfoiadmin()
+    def post():
+        return _runpaymentslabackfill(apply=False)
+
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiworkflow/payment-sla-backfill/apply')
+class FOIPaymentSlaBackfillApply(Resource):
+    """Writes the rows of a reviewed dry run. Body: the dry-run body plus its "plan_hash".
+
+    Answers 409 and writes nothing when the plan changed since that dry run.
+    """
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isfoiadmin()
+    def post():
+        return _runpaymentslabackfill(apply=True)
