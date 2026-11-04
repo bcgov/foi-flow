@@ -64,7 +64,7 @@ class n8ndeliveryresult:
         self.error = error
 
 
-class commonworkflowservice:
+class n8nworkflowservice:
 
     def __init__(self):
         self.n8nbaseurl = (os.getenv('N8N_BASE_URL') or '').strip()
@@ -75,17 +75,17 @@ class commonworkflowservice:
 
     def getinstancevariables(self, instanceid, token=None):
         raise NotImplementedError(
-            "commonworkflowservice.getinstancevariables is deferred pending n8n integration."
+            "n8nworkflowservice.getinstancevariables is deferred pending n8n integration."
         )
 
     def searchinstancebyvariable(self, definitionkey, searchby, token=None):
         raise NotImplementedError(
-            "commonworkflowservice.searchinstancebyvariable is deferred pending n8n integration."
+            "n8nworkflowservice.searchinstancebyvariable is deferred pending n8n integration."
         )
 
     def searchprocessinstance(self, pid, token=None):
         raise NotImplementedError(
-            "commonworkflowservice.searchprocessinstance is deferred pending n8n integration."
+            "n8nworkflowservice.searchprocessinstance is deferred pending n8n integration."
         )
 
     def unopenedsave(self, processinstanceid, metadata, messagetype, token=None):
@@ -113,19 +113,19 @@ class commonworkflowservice:
         Called by N8NWorkflowOutboxDispatcher for every attempt."""
         event = payload.get("event")
         if not self.n8nbaseurl:
-            logging.error("commonworkflowservice.deliver: N8N_BASE_URL is not configured; event=%s not sent", event)
+            logging.error("n8nworkflowservice.deliver: N8N_BASE_URL is not configured; event=%s not sent", event)
             return n8ndeliveryresult(False, retryable=False, error="N8N_BASE_URL is not configured")
         url = self.n8nbaseurl.rstrip('/') + '/' + self.n8nroutingwebhookpath.strip().lstrip('/')
         try:
             response = requests.post(url, data=json.dumps(payload), headers=self.__getheaders(), timeout=self.n8nwebhooktimeout)
         except requests.RequestException as ex:
-            logging.exception("commonworkflowservice.deliver: n8n webhook call failed; event=%s error=%s", event, type(ex).__name__)
+            logging.exception("n8nworkflowservice.deliver: n8n webhook call failed; event=%s error=%s", event, type(ex).__name__)
             return n8ndeliveryresult(False, retryable=True, error=type(ex).__name__)
         if not response.ok:
             retryable = response.status_code == 429 or response.status_code >= 500
-            logging.error("commonworkflowservice.deliver: n8n webhook returned an error; event=%s status=%s retryable=%s", event, response.status_code, retryable)
+            logging.error("n8nworkflowservice.deliver: n8n webhook returned an error; event=%s status=%s retryable=%s", event, response.status_code, retryable)
             return n8ndeliveryresult(False, retryable=retryable, error="HTTP %s" % response.status_code)
-        logging.info("commonworkflowservice.deliver: n8n webhook accepted event=%s status=%s", event, response.status_code)
+        logging.info("n8nworkflowservice.deliver: n8n webhook accepted event=%s status=%s", event, response.status_code)
         try:
             content = json.loads(response.content) if response.content else {}
         except ValueError:
@@ -144,14 +144,14 @@ class commonworkflowservice:
                 return None
             except Exception as ex:
                 error = type(ex).__name__
-                logging.exception("commonworkflowservice: unable to save n8n event=%s event_id=%s to the outbox (attempt %s of %s): %s", messagetype, payload["event_id"], attempt, ENQUEUE_ATTEMPTS, error)
+                logging.exception("n8nworkflowservice: unable to save n8n event=%s event_id=%s to the outbox (attempt %s of %s): %s", messagetype, payload["event_id"], attempt, ENQUEUE_ATTEMPTS, error)
                 outbox.recoversession()
         try:
             recorded = outbox.recordenqueuefailure(payload, error)
         except Exception as ex:
             recorded = False
-            logging.exception("commonworkflowservice: unable to record the enqueue failure for event_id=%s: %s", payload["event_id"], type(ex).__name__)
-        logging.error("commonworkflowservice: n8n event=%s event_id=%s was NOT queued; recorded as DEAD=%s", messagetype, payload["event_id"], recorded)
+            logging.exception("n8nworkflowservice: unable to record the enqueue failure for event_id=%s: %s", payload["event_id"], type(ex).__name__)
+        logging.error("n8nworkflowservice: n8n event=%s event_id=%s was NOT queued; recorded as DEAD=%s", messagetype, payload["event_id"], recorded)
         return None
 
     def __getheaders(self):

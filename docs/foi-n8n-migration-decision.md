@@ -101,8 +101,8 @@ Decided: full migration to n8n, and Camunda is decommissioned (D1). Only request
 
 #### Phase A — this PR
 
-- **commonworkflowservice:** timeout and error handling (comment 3). *Done.*
-- **commonworkflowservice:** add an `event_id` (uuid4) to every payload. *To do.*
+- **n8nworkflowservice:** timeout and error handling (comment 3). *Done.*
+- **n8nworkflowservice:** add an `event_id` (uuid4) to every payload. *To do.*
 - **FOI Request Routing:** respond immediately. *Done.*
 - **FOI Request Routing:** record the `event_id` with the run id in `foi-process-audit`. Skip an `event_id` whose earlier run **completed**; let failed or unfinished ones run again. Add the `event_id` column in FOI - Initialize Data Tables. *To do.*
 - **n8n error workflow:** record failed runs and send an alert, because the API can't see them (see below). *To do.*
@@ -114,7 +114,7 @@ Also in this PR: a Redis retry queue re-sends events that failed to reach n8n. I
 #### Phase B — this PR
 
 - An outbound event table in Postgres (`FOIWorkflowEventOutbox`): event id, payload, status, attempts, next retry time.
-- **commonworkflowservice** inserts a row instead of posting, in the same transaction as the request change.
+- **n8nworkflowservice** inserts a row instead of posting, in the same transaction as the request change.
 - A dispatcher thread started in `wsgi.py`, like the publication consumer. It claims rows, sends them, and retries with backoff until a dead-letter state.
 - n8n reports each run's outcome back to the outbox row, plus a sweeper for runs with no outcome (see below).
 - A way to view and replay dead-lettered, failed and "no outcome" events.

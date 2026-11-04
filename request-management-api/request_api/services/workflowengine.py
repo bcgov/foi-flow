@@ -2,7 +2,7 @@ import os
 import logging
 
 from request_api.services.external.bpmservice import bpmservice
-from request_api.services.external.commonworkflowservice import commonworkflowservice
+from request_api.services.external.n8nworkflowservice import n8nworkflowservice
 
 """
 Resolves which workflow-engine backend (Camunda or n8n) is currently active,
@@ -49,4 +49,4 @@ def validate_engine_config():
 
 def resolve_engine():
     """Returns the workflow-engine service instance for the current WF_DEFAULT_ENGINE."""
-    return commonworkflowservice() if isn8n() else bpmservice()
+    return n8nworkflowservice() if isn8n() else bpmservice()
