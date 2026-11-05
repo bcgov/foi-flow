@@ -101,12 +101,13 @@ class FOIWorkflowEventOutcome(Resource):
 @cors_preflight('GET,OPTIONS')
 @API.route('/foiworkflow/events')
 class FOIWorkflowEvents(Resource):
-    """Lists outbox events; DEAD and FAILED (including NO_OUTCOME) by default. Payloads are not returned."""
+    """Lists outbox events; DEAD and FAILED (including NO_OUTCOME) by default. Payloads are not returned. FOI admins only."""
 
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.isfoiadmin()
     def get():
         valid = [status.value for status in OutboxStatus]
         statuses = [item.strip().upper() for item in request.args.get('status', 'DEAD,FAILED').split(',') if item.strip()]

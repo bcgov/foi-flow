@@ -65,7 +65,7 @@ class bpmservice(camundaservice):
             # individual process variables, so pull just those two out of it.
             _metadata = json.loads(metadata) if metadata else {}
             messageschema = MessageSchema().dump({"processInstanceId": processinstanceid,
-                                              "messageName": messagetype,
+                                              "messageName": messagetype, 
                                               "processVariables":{
                                                   "filenumber": VariableSchema().dump({"type" : VariableType.String.value, "value": _metadata.get("id")}),
                                                   "assignedGroup": VariableSchema().dump({"type" : VariableType.String.value, "value": _metadata.get("assignedGroup")}),
