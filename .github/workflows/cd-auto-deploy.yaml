@@ -25,128 +25,203 @@ jobs:
   # - services affected by this PR
   # - release label (main only)
   prepare-deployment:
+      if: github.event.pull_request.merged == true
+      permissions:
+        contents: read
+        pull-requests: read
+      runs-on: ubuntu-latest
+      outputs:
+        environment: ${{ steps.generate.outputs.environment }}
+        matrix: ${{ steps.generate.outputs.matrix }}
+        release_label: ${{ steps.generate.outputs.release_label }}
+        run_migrations: ${{ steps.generate.outputs.run_migrations }}
+  
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v6
+  
+        - name: Install yq
+          run: |
+            sudo wget -qO /usr/local/bin/yq \
+              https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+            sudo chmod +x /usr/local/bin/yq
+  
+        - name: Generate Deployment Configuration
+          id: generate
+          shell: bash
+          env:
+            PR_BODY: ${{ github.event.pull_request.body }}
+            GH_TOKEN: ${{ github.token }}
+  
+          run: |
+            if [[ "${{ github.event.pull_request.base.ref }}" == "dev" ]]; then
+              TARGET_ENVIRONMENT="dev"
+            else
+              TARGET_ENVIRONMENT="test"
+            fi
+  
+            RELEASE_LABEL=""
+            if [[ "$TARGET_ENVIRONMENT" == "test" ]]; then
+              RELEASE_LABEL=$(grep '^Release Label:' <<< "$PR_BODY" \
+                | cut -d':' -f2- \
+                | xargs)
+  
+              if [[ -z "$RELEASE_LABEL" ]]; then
+                echo "::error::Release label is required for main deployments."
+                exit 1
+              fi
+            fi
+  
+            echo "release_label=${RELEASE_LABEL}" >> "$GITHUB_OUTPUT"
+  
+            CHANGED_FILES=$(gh api \
+              repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
+              --paginate \
+              --jq '.[].filename')
+  
+            MATRIX='{"include":['
+            FIRST=true
+            RUN_MIGRATIONS=false
+  
+            COUNT=$(yq '.services | length' .github/configuration/service-catalog.yaml)
+  
+            for ((i=0;i<COUNT;i++))
+            do
+              NAME=$(yq ".services[$i].name" .github/configuration/service-catalog.yaml)
+              PATH_VALUE=$(yq ".services[$i].path" .github/configuration/service-catalog.yaml)
+              IMAGE=$(yq ".services[$i].image" .github/configuration/service-catalog.yaml)
+              KIND=$(yq ".services[$i].kind // \"deployment\"" .github/configuration/service-catalog.yaml)
+              LARGEFILES=$(yq ".services[$i].largefiles // false" .github/configuration/service-catalog.yaml)
+  
+              if echo "$CHANGED_FILES" | grep -q "^${PATH_VALUE}/"; then
+                if [[ "$NAME" == "request-management-api" ]]; then
+                  RUN_MIGRATIONS=true
+                fi
+  
+                if [[ "$FIRST" == false ]]; then
+                  MATRIX="${MATRIX},"
+                fi
+  
+                MATRIX="${MATRIX}{\"name\":\"${NAME}\",\"path\":\"${PATH_VALUE}\",\"image\":\"${IMAGE}\",\"kind\":\"${KIND}\"}"
+                FIRST=false
+  
+                if [[ "$LARGEFILES" == "true" ]]; then
+                  MATRIX="${MATRIX},"
+                  MATRIX="${MATRIX}{\"name\":\"${NAME}-largefiles\",\"path\":\"${PATH_VALUE}\",\"image\":\"${IMAGE}\",\"kind\":\"${KIND}\"}"
+                fi
+              fi
+            done
+  
+            MATRIX="${MATRIX}]}"
+  
+            echo "environment=${TARGET_ENVIRONMENT}" >> "$GITHUB_OUTPUT"
+            echo "matrix=$(echo "$MATRIX" | jq -c .)" >> "$GITHUB_OUTPUT"
+            echo "run_migrations=${RUN_MIGRATIONS}" >> "$GITHUB_OUTPUT"
 
-    if: github.event.pull_request.merged == true
-
-    permissions:
-      contents: read
-      pull-requests: read
-
+  # ---------------------------------------------------------------------------
+  # Runs database migrations IFF request-management-api is being deployed.
+  # ---------------------------------------------------------------------------
+  run-api-migrations:
+    name: Run API Migrations
+    needs: prepare-deployment
+    if: needs.prepare-deployment.outputs.run_migrations == 'true'
     runs-on: ubuntu-latest
-
-    outputs:
-      environment: ${{ steps.generate.outputs.environment }}
-      matrix: ${{ steps.generate.outputs.matrix }}
-      release_label: ${{ steps.generate.outputs.release_label }}
-
-
     steps:
-
-      - name: Checkout
-        uses: actions/checkout@v6
-
-
-      - name: Install yq
-        run: |
-          sudo wget -qO /usr/local/bin/yq \
-            https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
-          sudo chmod +x /usr/local/bin/yq
-
-
-      - name: Generate Deployment Configuration
-        id: generate
+      - name: Setup SSH
         shell: bash
         env:
-          PR_BODY: ${{ github.event.pull_request.body }}
-          GH_TOKEN: ${{ github.token }} 
-
+          MANIFEST_REPO_DEPLOY_KEY: ${{ secrets.MANIFEST_REPO_DEPLOY_KEY }}
         run: |
+          mkdir -p ~/.ssh
+          echo "${MANIFEST_REPO_DEPLOY_KEY}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
-          # Map Git branch to deployment environment.
-          # dev branch deploys automatically to dev.
-          # main branch deploys to test.
-          if [[ "${{ github.event.pull_request.base.ref }}" == "dev" ]]; then
-            TARGET_ENVIRONMENT="dev"
-          else
-            TARGET_ENVIRONMENT="test"
-          fi
+      - name: Update CronJob in GitOps Manifests
+        shell: bash
+        run: |
+          git clone git@github.com:bcgov-c/tenant-gitops-d7abee.git
+          cd tenant-gitops-d7abee
 
+          VALUES_FILE="foi-flow/values-${{ needs.prepare-deployment.outputs.environment }}.yaml"
+          CRONJOB_NAME="request-management-api-migrations"
 
-          # Release label is required only for main -> test deployments.
-          RELEASE_LABEL=""
+          echo "Updating CronJob ${CRONJOB_NAME} with tag ${{ env.IMAGE_TAG }}"
 
-          if [[ "$TARGET_ENVIRONMENT" == "test" ]]; then
+          # Update the CronJob container image tag in the GitOps values file
+          yq e \
+            ".cronJobs.${CRONJOB_NAME}.image.tag = \"${{ env.IMAGE_TAG }}\"" \
+            -i "$VALUES_FILE"
 
-            RELEASE_LABEL=$(grep '^Release Label:' <<< "$PR_BODY" \
-              | cut -d':' -f2- \
-              | xargs)
+          git config user.email "adam.kroon@gov.bc.ca"
+          git config user.name "adamkroonbcgov"
 
-            if [[ -z "$RELEASE_LABEL" ]]; then
-              echo "::error::Release label is required for main deployments."
-              exit 1
+          git add "$VALUES_FILE"
+          git commit -m "Update ${CRONJOB_NAME} to tag ${{ env.IMAGE_TAG }} [skip ci]" || exit 0
+
+          RETRY_DELAYS=(15 30 60 120 240)
+          for attempt in $(seq 1 5); do
+            if git push origin main; then
+              break
             fi
-
-          fi
-
-
-          echo "release_label=${RELEASE_LABEL}" >> "$GITHUB_OUTPUT"
-
-
-          # Get files changed in the merged PR.
-          # Used to determine which services need deployment.
-          CHANGED_FILES=$(gh api \
-            repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
-            --paginate \
-            --jq '.[].filename')
-
-
-          # Build deployment matrix from service catalog.
-          # Only services with changed files will be deployed.
-          MATRIX='{"include":['
-          FIRST=true
-
-          COUNT=$(yq '.services | length' .github/configuration/service-catalog.yaml)
-
-
-          for ((i=0;i<COUNT;i++))
-          do
-
-            NAME=$(yq ".services[$i].name" .github/configuration/service-catalog.yaml)
-            PATH_VALUE=$(yq ".services[$i].path" .github/configuration/service-catalog.yaml)
-            IMAGE=$(yq ".services[$i].image" .github/configuration/service-catalog.yaml)
-            KIND=$(yq ".services[$i].kind // \"deployment\"" .github/configuration/service-catalog.yaml)
-
-            # Some services also deploy a companion "-largefiles" deployment
-            # using the same container image.
-            LARGEFILES=$(yq ".services[$i].largefiles // false" \
-              .github/configuration/service-catalog.yaml)
-
-
-            if echo "$CHANGED_FILES" | grep -q "^${PATH_VALUE}/"; then
-
-              if [[ "$FIRST" == false ]]; then
-                MATRIX="${MATRIX},"
-              fi
-
-              # Primary deployment.
-              MATRIX="${MATRIX}{\"name\":\"${NAME}\",\"path\":\"${PATH_VALUE}\",\"image\":\"${IMAGE}\",\"kind\":\"${KIND}\"}"
-              FIRST=false
-
-              # Companion largefiles deployment.
-              if [[ "$LARGEFILES" == "true" ]]; then
-                MATRIX="${MATRIX},"
-                MATRIX="${MATRIX}{\"name\":\"${NAME}-largefiles\",\"path\":\"${PATH_VALUE}\",\"image\":\"${IMAGE}\",\"kind\":\"${KIND}\"}"
-              fi
-
-            fi
-
+            sleep "${RETRY_DELAYS[$((attempt-1))]}"
+            git pull --rebase origin main || exit 1
           done
 
-          MATRIX="${MATRIX}]}"
+      - name: Install OC CLI
+        uses: redhat-actions/oc-installer@35b60c3f9757ae4301521556e1b75ff6f59f8d7c
+        with:
+          oc_version: '4.6'
 
+      - name: Login to OpenShift
+        run: |
+          oc login \
+            --server="${{ secrets.OPENSHIFT4_LOGIN_REGISTRY }}" \
+            --token="${{ secrets.OPENSHIFT4_SA_TOKEN }}"
 
-          echo "environment=${TARGET_ENVIRONMENT}" >> "$GITHUB_OUTPUT"
-          echo "matrix=$(echo "$MATRIX" | jq -c .)" >> "$GITHUB_OUTPUT"
+      - name: Trigger Migration Job and Wait
+        shell: bash
+        run: |
+          NAMESPACE="d7abee-${{ needs.prepare-deployment.outputs.environment }}"
+          CRONJOB="request-management-api-migrations"
+          JOB_NAME="migration-pr-${{ env.IMAGE_TAG }}-$(date +%s)"
+          EXPECTED_TAG="${{ env.IMAGE_TAG }}"
+
+          oc project "${NAMESPACE}"
+
+          echo "Waiting for ArgoCD to sync the CronJob image tag in OpenShift..."
+          for i in {1..30}; do
+            CURRENT_TAG=$(oc get cronjob "${CRONJOB}" \
+              -o jsonpath='{.spec.jobTemplate.spec.template.spec.containers[0].image}' 2>/dev/null \
+              | awk -F':' '{print $NF}')
+
+            if [[ "${CURRENT_TAG}" == "${EXPECTED_TAG}" ]]; then
+              echo "CronJob manifest updated to tag ${EXPECTED_TAG}."
+              break
+            fi
+
+            if [[ "$i" -eq 30 ]]; then
+              echo "::error::Timed out waiting for CronJob ${CRONJOB} to reflect image tag ${EXPECTED_TAG}."
+              exit 1
+            fi
+            sleep 10
+          done
+
+          echo "Spawning ad-hoc Job ${JOB_NAME} from CronJob ${CRONJOB}..."
+          oc create job --from="cronjob/${CRONJOB}" "${JOB_NAME}"
+
+          echo "Waiting for job/${JOB_NAME} to complete..."
+          # Wait up to 10 minutes (600s) for job completion
+          if ! oc wait --for=condition=complete "job/${JOB_NAME}" --timeout=600s; then
+            echo "::error::Migration job ${JOB_NAME} failed or timed out!"
+            echo "--- Pod Logs ---"
+            oc logs "job/${JOB_NAME}" --all-containers=true || true
+            echo "--- Job Description ---"
+            oc describe "job/${JOB_NAME}"
+            exit 1
+          fi
+
+          echo "✅ Migration job/${JOB_NAME} completed successfully."
 
 
 
