@@ -4,7 +4,7 @@ import json
 from enum import Enum
 from request_api.exceptions import BusinessException, Error
 from request_api.utils.redispublisher import RedisPublisherService
-from request_api.services.external.bpmservice import MessageType, bpmservice, ProcessDefinitionKey
+from request_api.services.external.bpmservice import MessageType, ProcessDefinitionKey
 from request_api.services.cfrfeeservice import cfrfeeservice
 from request_api.services.paymentservice import paymentservice
 from request_api.models.FOIRawRequests import FOIRawRequest
@@ -14,6 +14,7 @@ from request_api.utils.enums import StateName
 import logging
 from request_api.schemas.external.bpmschema import VariableSchema
 from request_api.services.external.camundaservice import VariableType 
+from request_api.services.workflowengine import resolve_engine, isn8n, iscamunda
 """
 This class is reserved for workflow services integration.
 Supported operations: claim
@@ -24,26 +25,41 @@ __author__      = "sumathi.thirumani@aot-technologies.com"
 class workflowservice:
 
     def createinstance(self, definitionkey, message):
-        response = bpmservice().createinstance(definitionkey, json.loads(message))
+        """Camunda-only: n8n has no notion of a pre-created instance - its
+        requests reach the fixed routing webhook via the normal event calls, 
+        so there is nothing to do here when WF_DEFAULT_ENGINE is n8n."""
+        messagejson = json.loads(message)
+        if not iscamunda():
+            logging.info("workflowservice.createinstance: WF_DEFAULT_ENGINE is not camunda - skipping instance creation for definitionkey=%s", definitionkey)
+            return None
+        engine = resolve_engine()
+        logging.info("workflowservice.createinstance: definitionkey=%s using engine=%s", definitionkey, type(engine).__name__)
+        response = engine.createinstance(definitionkey, messagejson)
         if response is None:
+            logging.error("workflowservice.createinstance: %s returned no response for definitionkey=%s", type(engine).__name__, definitionkey)
             raise Exception("Unable to create instance for key"+ definitionkey)
+        logging.info("workflowservice.createinstance: %s created instance for definitionkey=%s -> %s", type(engine).__name__, definitionkey, response)
         return response
 
     def postunopenedevent(self, id, wfinstanceid, requestsschema, status, ministries=None):        
-        if wfinstanceid in (None,""):
+        logging.info("workflowservice.postunopenedevent: id=%s wfinstanceid=%s status=%s", id, wfinstanceid, status)
+        if wfinstanceid in (None,"") and not isn8n():
             logging.error("WF INSTANCE IS INVALID")
             return
         assignedgroup = requestsschema["assignedGroup"] if 'assignedGroup' in requestsschema  else None
         assignedto = requestsschema["assignedTo"] if 'assignedTo' in requestsschema  else None
+
+        engine = resolve_engine()
+        if status == UnopenedEvent.open.value:
+            rawrequestid = FOIRequest.getrawrequestidbyfoirequestid(id)
+            metadata = json.dumps({"id": id, "rawRequestId": rawrequestid, "status": status, "ministries": self.__format_ministries(ministries), "assignedGroup": assignedgroup, "assignedTo": assignedto})
+        else:
+            metadata = json.dumps({"id": id, "status": status, "assignedGroup": assignedgroup, "assignedTo": assignedto})
         if status == UnopenedEvent.intakeinprogress.value:
             messagename = MessageType.intakereopen.value if self.__hasreopened(id, "rawrequest") == True else MessageType.intakeclaim.value
-            return bpmservice().unopenedsave(wfinstanceid, assignedto, messagename)                 
+            return engine.unopenedsave(wfinstanceid, metadata, messagename)
         else:
-            if status == UnopenedEvent.open.value:
-                metadata = json.dumps({"id": id, "status": status, "ministries": self.__format_ministries(ministries), "assignedGroup": assignedgroup, "assignedTo": assignedto})
-            else:            
-                metadata = json.dumps({"id": id, "status": status, "assignedGroup": assignedgroup, "assignedTo": assignedto})
-            return bpmservice().unopenedcomplete(wfinstanceid, metadata, MessageType.intakecomplete.value) 
+            return engine.unopenedcomplete(wfinstanceid, metadata, MessageType.intakecomplete.value)
 
     def postopenedevent(self, id, wfinstanceid, requestsschema, data, newstatus, usertype, issync=False):
         assignedgroup = self.__getopenedassigneevalue(requestsschema, "assignedgroup",usertype) 
@@ -59,45 +75,65 @@ class workflowservice:
                     activity = self.__getministryactivity(oldstatus,newstatus) if issync == False else Activity.complete.value
                     isprocessing = self.__isprocessing(id) if issync == False else False  
                     messagename = self.__messagename(oldstatus, activity, usertype, isprocessing)
+                    rawrequestid = FOIRequest.getrawrequestidbyfoirequestid(ministry["foirequestid"])
                     metadata = json.dumps(
                         {"id": filenumber, "previousstatus":previousstatus, "status": ministry["status"] , 
                         "assignedGroup": assignedgroup, "assignedTo": assignedto, 
                         "assignedministrygroup":ministry["assignedministrygroup"], 
                         "ministryRequestID": id, "isPaymentActive": self.__ispaymentactive(ministry["foirequestid"], id), 
                         "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "issync": issync,
-                        "isofflinepayment": FOIMinistryRequest.getofflinepaymentflag(id)})
+                        "isofflinepayment": FOIMinistryRequest.getofflinepaymentflag(id),
+                        "foiRequestId": ministry["foirequestid"], "rawRequestId": rawrequestid})
+                    engine = resolve_engine()
                     if issync == True:                        
-                        _variables = bpmservice().getinstancevariables(wfinstanceid)    
+                        _variables = engine.getinstancevariables(wfinstanceid)
                         if ministry["status"] == OpenedEvent.callforrecords.value and (("status" not in _variables) or (_variables not in (None, []) and "status" in _variables and _variables["status"]["value"] != OpenedEvent.callforrecords.value)):
                             messagename = MessageType.iaoopencomplete.value
                         elif  _variables not in (None, []) and ("status" in _variables and _variables["status"]["value"] == StateName.closed.value):
-                            return bpmservice().reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)                     
+                            return engine.reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)
                         else:
-                            return bpmservice().openedcomplete(wfinstanceid, filenumber, metadata, messagename)       
-                    self.__postopenedevent(id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity)
+                            return engine.openedcomplete(wfinstanceid, filenumber, metadata, messagename)
+                    logging.info("workflowservice.postopenedevent: id=%s filenumber=%s wfinstanceid=%s status=%s activity=%s usertype=%s messagename=%s", id, filenumber, wfinstanceid, newstatus, activity, usertype, messagename)
+                    logging.info("workflowservice.postopenedevent: foirequestid=%s", ministry["foirequestid"])
+                    self.__postopenedevent(id, filenumber, metadata, messagename, wfinstanceid, activity)
 
     def postfeeevent(self, requestid, ministryrequestid, requestsschema, paymentstatus, nextstatename=None):
+        logging.info("workflowservice.postfeeevent: requestid=%s ministryrequestid=%s paymentstatus=%s", requestid, ministryrequestid, paymentstatus)
+        rawrequestid = FOIRequest.getrawrequestidbyfoirequestid(requestid)
         metadata = json.dumps({
             "id": requestsschema["idNumber"], 
+            "rawRequestId": rawrequestid,
             "status": requestsschema["currentState"], 
             "assignedGroup": requestsschema["assignedGroup"], 
             "assignedTo": requestsschema["assignedTo"],
             "assignedministrygroup" : requestsschema["assignedministrygroup"],
             "ministryRequestID" : ministryrequestid,
 			"foiRequestID" :requestid,
-            "nextStateName": nextstatename
+            "nextStateName": nextstatename,
+            "paymentExpiryDate": self.__getvaluefromfeedata(requestsschema, "paymentexpirydate"),
+            "paymenturl": self.__getvaluefromfeedata(requestsschema, "paymenturl")
             })
-        return bpmservice().feeevent(requestsschema["axisRequestId"], metadata, paymentstatus)    
+        engine = resolve_engine()
+        return engine.feeevent(requestsschema["axisRequestId"], metadata, paymentstatus)
     
     def postcorrenspodenceevent(self, wfinstanceid, ministryid, requestsschema, applicantcorrespondenceid, templatename, attributes):
+        logging.info("workflowservice.postcorrenspodenceevent: ministryid=%s applicantcorrespondenceid=%s templatename=%s", ministryid, applicantcorrespondenceid, templatename)
         paymentexpirydate = self.__getvaluefromlist(attributes,"paymentExpiryDate")
         axisrequestid = self.__getvaluefromschema(requestsschema,"axisRequestId")
         filenumber = self.__getvaluefromschema(requestsschema,"idNumber")
         status = self.__getvaluefromschema(requestsschema,"currentState")
-        metadata = json.dumps({"id": filenumber, "status": status , "ministryRequestID": ministryid, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "applicantcorrespondenceid": applicantcorrespondenceid, "templatename": templatename.replace(" ", "")})
-        bpmservice().correspondanceevent(wfinstanceid, filenumber, metadata)
+        foirequestid = FOIMinistryRequest.getrequest(ministryid)["foirequest_id"]
+        rawrequestid = FOIRequest.getrawrequestidbyfoirequestid(foirequestid)
+        metadata = json.dumps({"id": filenumber, "status": status , "ministryRequestID": ministryid, "foiRequestId": foirequestid, "rawRequestId": rawrequestid, "paymentExpiryDate": paymentexpirydate, "axisRequestId": axisrequestid, "applicantcorrespondenceid": applicantcorrespondenceid, "templatename": templatename.replace(" ", "")})
+        engine = resolve_engine()
+        engine.correspondanceevent(wfinstanceid, filenumber, metadata)
 
     def syncwfinstance(self, requesttype, requestid, isallactivity=False):      
+        # n8n's searchinstancebyvariable/getinstancevariables are not implemented yet
+        # (deferred), so sync is skipped whenever WF_DEFAULT_ENGINE is n8n - this is
+        # a single global switch, not a per-request decision.
+        if isn8n():
+            return None
         try:
             # Sync and get raw instance details from FOI DB
             raw_metadata = self.__sync_raw_request(requesttype, requestid)
@@ -145,15 +181,16 @@ class workflowservice:
     def __get_wf_pid(self, requesttype, _raw_metadata, _req_metadata=None):
         if requesttype == "rawrequest":
             searchby = [{"name":"id" ,"operator":"eq","value": int(_raw_metadata.requestid)}]
-            return bpmservice().searchinstancebyvariable(ProcessDefinitionKey.rawrequest.value, searchby)  
+            return resolve_engine().searchinstancebyvariable(ProcessDefinitionKey.rawrequest.value, searchby)
         elif requesttype == "ministryrequest":
+            engine = resolve_engine()
             searchby = [{"name":"foiRequestID","operator":"eq","value": int(_req_metadata.foirequestid)},
                     {"name": "rawRequestPID","operator":"eq","value": str(_raw_metadata.wfinstanceid)}]
-            wf_foirequest_pid = bpmservice().searchinstancebyvariable(ProcessDefinitionKey.ministryrequest.value, searchby)
+            wf_foirequest_pid = engine.searchinstancebyvariable(ProcessDefinitionKey.ministryrequest.value, searchby)
             if wf_foirequest_pid in (None, ""):
                 searchby = [{"name":"foiRequestID","operator":"eq","value": str(_req_metadata.foirequestid)},
                     {"name": "rawRequestPID","operator":"eq","value": str(_raw_metadata.wfinstanceid)}]
-                wf_foirequest_pid = bpmservice().searchinstancebyvariable(ProcessDefinitionKey.ministryrequest.value, searchby) 
+                wf_foirequest_pid = engine.searchinstancebyvariable(ProcessDefinitionKey.ministryrequest.value, searchby)
             return wf_foirequest_pid   
         else:
             logging.info("Unknown requestype %s", requesttype)
@@ -165,7 +202,8 @@ class workflowservice:
         _activity_itr_desc = _all_activity_desc
         if isallactivity == False:
             _activity_itr_desc.pop(0)
-        _variables = bpmservice().getinstancevariables(wfinstanceid)  
+        engine = resolve_engine()
+        _variables = engine.getinstancevariables(wfinstanceid)
         # SP: Stuck in Open -> Move from Open to CFR
         if _variables not in (None, []) and "status" not in _variables:
             for entry in _activity_itr_desc:
@@ -173,7 +211,7 @@ class workflowservice:
                     self.__sync_complete_event(requestid, wfinstanceid, entry)
                     break
         # Sync action
-        _variables = bpmservice().getinstancevariables(wfinstanceid)
+        _variables = engine.getinstancevariables(wfinstanceid)
         oldstatus = self.__getministrystatus(current["filenumber"], current["version"])             
         activity = Activity.save.value if isallactivity == True else self.__getministryactivity(oldstatus,current["status"])
         if _variables not in (None, []) and "status" in _variables:
@@ -208,15 +246,16 @@ class workflowservice:
             return UserType.ministry.value
         return UserType.iao.value
 
-    def __postopenedevent(self, id, filenumber, metadata, messagename, assignedgroup, assignedto, wfinstanceid, activity):
+    def __postopenedevent(self, id, filenumber, metadata, messagename, wfinstanceid, activity):
+        engine = resolve_engine()
         if activity == Activity.complete.value:
 
             if self.__hasreopened(id, "ministryrequest") == True:
-                bpmservice().reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)
+                engine.reopenevent(wfinstanceid, metadata, MessageType.iaoreopen.value)
             else:
-                bpmservice().openedcomplete(wfinstanceid, filenumber, metadata, messagename)   
+                engine.openedcomplete(wfinstanceid, filenumber, metadata, messagename)
         else:
-            bpmservice().unopenedsave(filenumber, assignedgroup, assignedto, messagename)
+            engine.unopenedsave(wfinstanceid, metadata, messagename)
          
     
     def __getopenedassigneevalue(self, requestsschema, property, usertype):
@@ -266,6 +305,10 @@ class workflowservice:
     def __getvaluefromschema(self,requestsschema, property):
         return requestsschema.get(property) if property in requestsschema  else None 
 
+    def __getvaluefromfeedata(self, requestsschema, property):
+        feedata = (requestsschema.get("cfrfee") or {}).get("feedata") or {}
+        return self.__getvaluefromschema(feedata, property)
+
     def __getvaluefromlist(self,attributes, property):
         for attribute in attributes:
             if property in attribute:
@@ -309,6 +352,8 @@ class workflowservice:
         formatted_ministries = []
         for ministry in ministries:
             formatted_ministries.append({
+                "id": ministry.get("id"),
+                "foirequestid": ministry.get("foirequestid"),
                 "filenumber": ministry.get("filenumber"),
                 "assignedgroup": ministry.get("assignedgroup"),
             })
