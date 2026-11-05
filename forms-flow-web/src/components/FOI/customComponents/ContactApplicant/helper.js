@@ -1,6 +1,6 @@
 export const getCorrespondenceSubject = (correspondence, templateList, requestNumber) => {
     if (correspondence?.correspondencesubject) return correspondence.correspondencesubject
-    if (!correspondence?.sentby && correspondence?.templatename) return templateList.find((obj)=> obj.fileName == correspondence.templatename)?.templateName
+    if (!correspondence?.sentby && correspondence?.templatename) return templateList?.find((obj)=> obj.fileName == correspondence.templatename)?.templateName ?? correspondence.templatename
     if (correspondence.category === "response") return correspondence.correspondencesubject?.trim() ? correspondence.correspondencesubject : "Applicant Response";
     if ((correspondence?.sentby == "System Generated Email" || correspondence?.sentby == "system") && 
       (correspondence?.text.includes("as you have additional options outside of paying the fee") || 
