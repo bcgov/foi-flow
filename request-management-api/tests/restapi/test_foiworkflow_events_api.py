@@ -132,7 +132,15 @@ def test_acknowledgement_maps_the_service_result_to_a_status_code(client, monkey
     assert client.put("/api/foiworkflow/events/" + EVENT_ID, headers=headers, json={"status": "COMPLETED"}).status_code == code
 
 
-# --- list / replay: any authenticated user --------------------------------------------------------
+# --- list / replay: FOI admins only ---------------------------------------------------------------
+
+@pytest.mark.parametrize("claims", [USER, N8N])
+@pytest.mark.parametrize("method,url,body", ENDPOINTS[1:])
+def test_list_and_replay_reject_non_admins(client, monkeypatch, claims, method, url, body):
+    headers = _as(monkeypatch, claims)
+    assert getattr(client, method)(url, headers=headers, json=body).status_code == 401
+    assert FakeOutbox.calls == []
+
 
 def test_admin_lists_dead_and_failed_by_default(client, monkeypatch):
     headers = _as(monkeypatch, ADMIN)
