@@ -30,6 +30,8 @@ jobs:
         contents: read
         pull-requests: read
       runs-on: ubuntu-latest
+      env:
+      
       outputs:
         environment: ${{ steps.generate.outputs.environment }}
         matrix: ${{ steps.generate.outputs.matrix }}
@@ -131,6 +133,8 @@ jobs:
         shell: bash
         env:
           MANIFEST_REPO_DEPLOY_KEY: ${{ secrets.MANIFEST_REPO_DEPLOY_KEY }}
+          OPENSHIFT4_LOGIN_REGISTRY: ${{ secrets.OPENSHIFT4_LOGIN_REGISTRY }}
+          OPENSHIFT4_SA_TOKEN: ${{ secrets.OPENSHIFT4_SA_TOKEN }}
         run: |
           mkdir -p ~/.ssh
           echo "${MANIFEST_REPO_DEPLOY_KEY}" > ~/.ssh/id_rsa
@@ -176,8 +180,8 @@ jobs:
       - name: Login to OpenShift
         run: |
           oc login \
-            --server="${{ secrets.OPENSHIFT4_LOGIN_REGISTRY }}" \
-            --token="${{ secrets.OPENSHIFT4_SA_TOKEN }}"
+            --server="$OPENSHIFT4_LOGIN_REGISTRY" \
+            --token="$OPENSHIFT4_SA_TOKEN"
 
       - name: Trigger Migration Job and Wait
         shell: bash
@@ -355,7 +359,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.prepare-deployment.outputs.matrix) }}
-
+    env:
+      OPENSHIFT4_LOGIN_REGISTRY: ${{ secrets.OPENSHIFT4_LOGIN_REGISTRY }}
+      OPENSHIFT4_SA_TOKEN: ${{ secrets.OPENSHIFT4_SA_TOKEN }}
 
     runs-on: ubuntu-latest
 
@@ -371,8 +377,8 @@ jobs:
       - name: Login to OpenShift
         run: |
           oc login \
-            --server="${{ secrets.OPENSHIFT4_LOGIN_REGISTRY }}" \
-            --token="${{ secrets.OPENSHIFT4_SA_TOKEN }}"
+            --server="$OPENSHIFT4_LOGIN_REGISTRY" \
+            --token="$OPENSHIFT4_SA_TOKEN"
 
 
       - name: Verify Deployment
