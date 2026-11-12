@@ -1,12 +1,14 @@
 import logging
 import os
 import random
+import re
 from datetime import datetime, timedelta, timezone
 
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from request_api.models.db import db
-from request_api.models.FOIWorkflowEventOutbox import FOIWorkflowEventOutbox, OutboxStatus
+from request_api.models.FOIWorkflowEventOutbox import FOIWorkflowEventOutbox, OrderScope, OutboxStatus
 
 """
 Transactional outbox for workflow events destined for n8n.
@@ -29,13 +31,26 @@ replay()         DEAD/FAILED -> PENDING, same event_id (FOI Request Routing dedu
 recordenqueuefailure()
                  last resort when enqueue() keeps failing: writes a DEAD row (lasterror starts
                  with ENQUEUE_FAILED) in a separate session so the event can be found and replayed.
+claim()          called by n8n FOI Request Routing before it processes an event. In ONE transaction
+                 it answers proceed / duplicate / in_progress / stale: duplicate = the event already
+                 COMPLETED; in_progress = another execution holds a live claim (lease); stale = an
+                 older state event than one already allowed to run for the request (the newest
+                 stateoccurredat on the outbox rows of that request is the ordering watermark).
+                 This replaces the idempotency, ordering and execution lookups n8n used to do against
+                 the foi-process-audit Data Table. acknowledge() and replay() release the claim.
+findbyexecution()
+                 maps a failed n8n execution id to its event (the claim recorded it), for the error handler.
+scrubpayloads() / purgecompleted()
+                 retention: remove the personal data from old COMPLETED payloads, then delete old rows.
 
 Retry settings come from N8N_WEBHOOK_RETRY_MAX_ATTEMPTS, _BACKOFF_SECONDS and _MAX_BACKOFF_SECONDS.
+The claim lease comes from N8N_OUTBOX_CLAIM_LEASE_MINUTES (default N8N_OUTBOX_NO_OUTCOME_MINUTES, 30).
 """
 
 NO_OUTCOME_PREFIX = "NO_OUTCOME"
 ENQUEUE_FAILED_PREFIX = "ENQUEUE_FAILED"
 MAXERRORLENGTH = 2000
+OCCURRED_AT_FORMAT = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}\+00:00$")
 
 
 class AckResult:
@@ -45,6 +60,20 @@ class AckResult:
     conflict = "conflict"
 
 
+class ClaimDecision:
+    proceed = "proceed"
+    duplicate = "duplicate"
+    inprogress = "in_progress"
+    stale = "stale"
+
+
+class EventKind:
+    """state events change the request and are order-checked; action events are always processed."""
+    state = "state"
+    action = "action"
+    all = (state, action)
+
+
 class workflowoutboxservice:
 
     def __init__(self):
@@ -52,6 +81,7 @@ class workflowoutboxservice:
         self.backoffseconds = int(os.getenv("N8N_WEBHOOK_RETRY_BACKOFF_SECONDS") or 30)
         self.maxbackoffseconds = int(os.getenv("N8N_WEBHOOK_RETRY_MAX_BACKOFF_SECONDS") or 3600)
         self.deliverytimeout = float(os.getenv("N8N_WEBHOOK_TIMEOUT_SECONDS") or 10)
+        self.claimleaseminutes = int(os.getenv("N8N_OUTBOX_CLAIM_LEASE_MINUTES") or os.getenv("N8N_OUTBOX_NO_OUTCOME_MINUTES") or 30)
 
     def enqueue(self, payload, commit=True):
         """Stores the event as PENDING. A failure to insert raises after rolling back
@@ -135,6 +165,7 @@ class workflowoutboxservice:
         row.lasterror = self.__truncate(error) if status == OutboxStatus.failed.value else None
         row.n8nexecutionid = executionid or row.n8nexecutionid
         row.completedat = now if status == OutboxStatus.completed.value else None
+        row.claimedat = None  # the run is over, a replay must not be blocked by its lease
         row.updated_at = now
         db.session.commit()
         logging.info("workflowoutboxservice: event_id=%s acknowledged as %s", eventid, status)
@@ -171,10 +202,126 @@ class workflowoutboxservice:
         row.nextattemptat = now
         row.replaycount = (row.replaycount or 0) + 1
         row.completedat = None
+        row.claimedat = None
         row.updated_at = now
         db.session.commit()
         logging.info("workflowoutboxservice: event_id=%s replayed from %s (replaycount=%s)", eventid, previous, row.replaycount)
         return AckResult.updated, row
+
+    def claim(self, eventid, executionid, kind=EventKind.action, scope=None, scopekey=None, occurredat=None,
+              requestids=None, now=None):
+        """Decides, in one transaction, whether the n8n execution `executionid` may process the event.
+        Returns a ClaimDecision. Raises ValueError for input the caller got wrong.
+
+        kind=state with scope/scopekey/occurredat is order-checked: it is stale when another event of the
+        same request, with a newer occurred_at, was already allowed to run (an equal timestamp runs, so a
+        replay of the same event works). The ordering state is the `stateoccurredat` of the outbox rows
+        themselves: a ministry event records its raw request id too, so a late intake event for that raw
+        request becomes stale. Claims for one request are serialised (Postgres advisory lock) so two events
+        cannot pass the check together. An event without an outbox row (sent by hand) is still
+        order-checked but not claimed."""
+        if kind not in EventKind.all:
+            raise ValueError("kind must be one of %s" % ", ".join(EventKind.all))
+        moment = self.__orderingmoment(kind, scope, scopekey, occurredat)
+        now = self.__naive(now or self.__now())
+        try:
+            row = FOIWorkflowEventOutbox.getbyeventid(eventid, lock=True)
+            decision = self.__existingclaimdecision(row, executionid, now)
+            if decision is None:
+                requestids = self.__claimrequestids(requestids, scope, scopekey, moment)
+                if moment is not None and self.__isstale(eventid, scope, scopekey, moment, requestids):
+                    decision = ClaimDecision.stale
+            if decision is not None:
+                db.session.rollback()
+                return decision
+            if row is not None:
+                self.__recordclaim(row, executionid, requestids, moment, now)
+            db.session.commit()
+            return ClaimDecision.proceed
+        except Exception:
+            db.session.rollback()
+            raise
+
+    def __orderingmoment(self, kind, scope, scopekey, occurredat):
+        """The parsed occurred_at when the event is order-checked, else None. Raises ValueError for a bad scope or timestamp."""
+        if kind != EventKind.state or not (occurredat and scope and scopekey):
+            return None
+        if scope not in OrderScope.all:
+            raise ValueError("scope must be one of %s" % ", ".join(OrderScope.all))
+        return self.__parsemoment(occurredat)
+
+    def __existingclaimdecision(self, row, executionid, now):
+        """duplicate or in_progress when the event's outbox row says so, else None (no row, or free to run)."""
+        if row is None:
+            return None
+        if row.status == OutboxStatus.completed.value:
+            return ClaimDecision.duplicate
+        if self.__claimislive(row, executionid, now):
+            return ClaimDecision.inprogress
+        return None
+
+    @staticmethod
+    def __claimrequestids(requestids, scope, scopekey, moment):
+        """A copy of the request ids; for an order-checked event its own scope key is always one of them."""
+        requestids = dict(requestids or {})
+        if moment is not None:
+            requestids["rawrequestid" if scope == OrderScope.rawrequest else "ministryrequestid"] = scopekey
+        return requestids
+
+    def __isstale(self, eventid, scope, scopekey, moment, requestids):
+        """True when another event of the same request with a newer occurred_at was already allowed to run.
+        Takes the per-request advisory lock first, so the check and the recording of this claim are atomic."""
+        self.__lockrequests(requestids)
+        newest = FOIWorkflowEventOutbox.neweststateoccurredat(scope, str(scopekey), eventid)
+        return newest is not None and newest > moment
+
+    def __recordclaim(self, row, executionid, requestids, moment, now):
+        row.claimedat = now
+        row.n8nexecutionid = str(executionid)[:100] if executionid else row.n8nexecutionid
+        self.__recordrequestids(row, requestids)
+        if moment is not None:
+            row.stateoccurredat = moment
+        row.updated_at = now
+
+    def findbyexecution(self, executionid):
+        """The event an n8n execution claimed, as a dict, or None. Never returns the payload."""
+        row = FOIWorkflowEventOutbox.getbyexecutionid(str(executionid))
+        if row is None:
+            return None
+        return {"event_id": row.eventid, "event": row.eventname, "raw_request_id": row.rawrequestid,
+                "foi_request_id": row.foirequestid, "ministry_request_id": row.ministryrequestid,
+                "status": row.requeststatus, "outbox_status": row.status}
+
+    def scrubpayloads(self, days, batchsize=1000, now=None):
+        """Removes the event (personal data) from COMPLETED rows completed more than `days` days ago,
+        keeping eventid, name, status and timestamps. Returns the number of rows scrubbed."""
+        now = self.__naive(now or self.__now())
+        try:
+            rows = FOIWorkflowEventOutbox.getscrubbable(now - timedelta(days=days), batchsize)
+            for row in rows:
+                row.payload = {"event_id": row.eventid, "event": row.eventname, "scrubbed": True}
+                row.payloadscrubbedat = now
+                row.updated_at = now
+            db.session.commit()
+            return len(rows)
+        except Exception:
+            db.session.rollback()
+            raise
+
+    def purgecompleted(self, days, batchsize=1000, now=None):
+        """Deletes COMPLETED rows completed more than `days` days ago. The duplicate check and the ordering
+        check read these rows, so `days` must be far longer than an event can still be redelivered or
+        replayed (DEAD and FAILED rows, the ones that can be replayed, are never deleted).
+        Returns the number of rows deleted."""
+        now = self.__naive(now or self.__now())
+        cutoff = now - timedelta(days=days)
+        try:
+            deleted = FOIWorkflowEventOutbox.deletecompletedbefore(cutoff, batchsize)
+            db.session.commit()
+            return deleted
+        except Exception:
+            db.session.rollback()
+            raise
 
     def listevents(self, statuses=None, limit=100, offset=0):
         statuses = statuses or [OutboxStatus.dead.value, OutboxStatus.failed.value]
@@ -191,6 +338,8 @@ class workflowoutboxservice:
             "n8nexecutionid": row.n8nexecutionid, "replaycount": row.replaycount,
             "deliveredat": iso(row.deliveredat), "completedat": iso(row.completedat),
             "created_at": iso(row.created_at), "updated_at": iso(row.updated_at),
+            "claimedat": iso(row.claimedat), "rawrequestid": row.rawrequestid,
+            "foirequestid": row.foirequestid, "ministryrequestid": row.ministryrequestid,
         }
 
     def __claim(self, batchsize, now):
@@ -215,6 +364,47 @@ class workflowoutboxservice:
             db.session.rollback()
             raise
         return claimed
+
+    def __claimislive(self, row, executionid, now):
+        """Another execution claimed the event less than a lease ago. The same execution may claim again."""
+        if row.claimedat is None or (row.n8nexecutionid or "") == (str(executionid) if executionid else ""):
+            return False
+        return row.claimedat > now - timedelta(minutes=self.claimleaseminutes)
+
+    @staticmethod
+    def __lockrequests(requestids):
+        """Serialises the claims of one request: a transaction-scoped Postgres advisory lock on the raw and
+        the ministry request id (always in that order, so two claims cannot deadlock). The lock is released
+        at commit or rollback; the next claim then sees the previous one's stateoccurredat. Other databases
+        (the SQLite of the unit tests) have a single writer and need no lock."""
+        if db.session.get_bind().dialect.name != "postgresql":
+            return
+        for label, key in (("raw", requestids.get("rawrequestid")), ("ministry", requestids.get("ministryrequestid"))):
+            if key not in (None, ""):
+                db.session.execute(text("SELECT pg_advisory_xact_lock(hashtext(:key))"), {"key": "foiworkflow:%s:%s" % (label, key)})
+
+    @staticmethod
+    def __parsemoment(occurredat):
+        if not isinstance(occurredat, str) or not OCCURRED_AT_FORMAT.match(occurredat):
+            raise ValueError("occurred_at must be a UTC ISO-8601 timestamp with microseconds")
+        return datetime.strptime(occurredat[:-6], "%Y-%m-%dT%H:%M:%S.%f")
+
+    @staticmethod
+    def __recordrequestids(row, requestids):
+        def text(key, length):
+            value = requestids.get(key)
+            return str(value)[:length] if value not in (None, "") else None
+        row.rawrequestid = text("rawrequestid", 50) or row.rawrequestid
+        row.foirequestid = text("foirequestid", 50) or row.foirequestid
+        row.ministryrequestid = text("ministryrequestid", 50) or row.ministryrequestid
+        row.requeststatus = text("status", 100) or row.requeststatus
+
+    @staticmethod
+    def __naive(moment):
+        """The columns hold naive UTC."""
+        if moment.tzinfo is not None:
+            return moment.astimezone(timezone.utc).replace(tzinfo=None)
+        return moment
 
     def __recorddelivery(self, eventid, attempts, result):
         now = self.__now()
