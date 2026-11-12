@@ -23,7 +23,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins
 from request_api.exceptions import BusinessException, Error
 from request_api.services.workflowservice import workflowservice
-from request_api.services.workflowoutboxservice import workflowoutboxservice, AckResult
+from request_api.services.workflowoutboxservice import workflowoutboxservice, AckResult, EventKind
 from request_api.services import paymentslabackfillapi as backfillapi
 from request_api.services.paymentslabackfillservice import report_csv_text
 from request_api.models.FOIWorkflowEventOutbox import OutboxStatus
@@ -96,6 +96,52 @@ class FOIWorkflowEventOutcome(Resource):
             return _outboxresponse(result, row, conflict="Event cannot move from %s to %s" % (row.status if row else None, status))
         except BusinessException as exception:
             return {'status': exception.status_code, 'message': exception.message}, 500
+
+
+@cors_preflight('POST,OPTIONS')
+@API.route('/foiworkflow/events/<eventid>/claim')
+class FOIWorkflowEventClaim(Resource):
+    """n8n asks whether it may process an event. Answers proceed, duplicate, in_progress or stale."""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isworkflowserviceaccount()
+    def post(eventid):
+        eventid = _validuuid(eventid)
+        body = request.get_json(silent=True) or {}
+        executionid = body.get('executionid')
+        also = body.get('also_advance') or []
+        if eventid is None or executionid in (None, '') or not isinstance(also, list) \
+                or not all(isinstance(item, dict) for item in also):
+            return {'status': False, 'message': 'A valid event id and executionid are required'}, 400
+        try:
+            decision = workflowoutboxservice().claim(
+                eventid, str(executionid), kind=body.get('kind') or EventKind.action,
+                scope=body.get('scope'), scopekey=body.get('scopekey'), occurredat=body.get('occurred_at'),
+                requestids=body.get('requestids') if isinstance(body.get('requestids'), dict) else {})
+            logging.info("workflow event claim event_id=%s execution=%s decision=%s", eventid, executionid, decision)
+            return {'status': True, 'decision': decision}, 200
+        except ValueError as err:
+            return {'status': False, 'message': str(err)}, 400
+
+
+@cors_preflight('GET,OPTIONS')
+@API.route('/foiworkflow/executions/<executionid>/event')
+class FOIWorkflowExecutionEvent(Resource):
+    """The event an n8n execution claimed (found: false when it failed before claiming). No payload."""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isworkflowserviceaccount()
+    def get(executionid):
+        found = workflowoutboxservice().findbyexecution(executionid)
+        if found is None:
+            return {'status': True, 'found': False}, 200
+        return dict(found, status=True, found=True), 200
 
 
 @cors_preflight('GET,OPTIONS')
