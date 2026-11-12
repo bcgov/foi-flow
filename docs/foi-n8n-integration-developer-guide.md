@@ -7,7 +7,7 @@ Three stores are involved. Learn these three and you can troubleshoot most workf
 | Store | Where it lives | One line description |
 |---|---|---|
 | `FOIWorkflowEventOutbox` | Postgres (FOI requests DB) | The API's "to send" list. One row per event sent to n8n, with its delivery status. |
-| `foi-process-audit` | n8n Data Table | n8n's diary. Rows such as `event-received` and `event-completed` say what n8n did with each event. |
+| `foi-process-audit` | n8n Data Table | n8n's diary: one slim row per processing step, plus a row when an event is skipped. Write-only: nothing in the event flow reads it, so it can be purged. |
 | `foi-payment-sla` | n8n Data Table | One row per online fee payment that is waiting for the applicant. Drives payment expiry. |
 
 The two n8n tables are not in Postgres. Open them in n8n under **Data tables** and filter by column.
@@ -32,16 +32,19 @@ sequenceDiagram
     DS->>N8: POST webhook
     N8-->>DS: 202 accepted
     DS->>OB: mark DELIVERED
-    N8->>AU: write event-received
+    N8->>API: POST /foiworkflow/events/{event_id}/claim
+    API->>OB: lock row, check duplicate, order and lease
+    API-->>N8: proceed (or duplicate, stale, in_progress)
     Note over N8: sub-workflow does the real work
-    N8->>AU: write event-completed
+    N8->>AU: write step rows (slim)
     N8->>API: PUT /foiworkflow/events/{event_id}
     API->>OB: mark COMPLETED
 ```
 
 Things to remember:
 
-- **`event_id`** is a uuid created once per event. It is the same in the outbox, the audit table, the error table and the API logs. Always start a search with it.
+- **`event_id`** is a uuid created once per event (n8n rejects an event without it). It is the same in the outbox, the audit table, the error table and the API logs. Always start a search with it.
+- **The claim** is what makes processing safe to repeat. Before it does any work, FOI Request Routing asks the API (`POST /foiworkflow/events/{event_id}/claim`) and gets one of four answers: `proceed`, `duplicate` (the event already COMPLETED), `stale` (a newer state event was already applied for the request) or `in_progress` (another n8n execution holds the claim). The answer comes from Postgres (the outbox rows only; there is no separate ordering table), inside one transaction, with claims for one request serialised by an advisory lock, so two executions can never both proceed.
 - The `202` from n8n only means "received". The real result arrives later in the PUT callback. That is why the outbox has both `DELIVERED` and `COMPLETED`.
 - If something ends badly, an admin **replays** the event. The same payload is sent again with the same `event_id`.
 
@@ -60,7 +63,10 @@ Things to remember:
 | `attempts` | How many times the dispatcher tried to send it. Reset to 0 on replay. |
 | `nextattemptat` | When it is due next (UTC). |
 | `lasterror` | Why it is not healthy. See the table below. |
-| `n8nexecutionid` | The n8n execution that handled it (reported by the callback). |
+| `n8nexecutionid` | The n8n execution that handled it (recorded by the claim, confirmed by the callback). The Error Handler uses it to map a failed run to its event. |
+| `claimedat` | When an n8n execution claimed the event. While the claim is younger than `N8N_OUTBOX_CLAIM_LEASE_MINUTES`, another execution is told `in_progress`. Cleared by the callback and by a replay. |
+| `rawrequestid`, `foirequestid`, `ministryrequestid`, `requeststatus` | The request the event is about, recorded by the claim. Indexed: use them to find the events of one request instead of searching the payload. |
+| `payloadscrubbedat` | Set when the retention job removed the personal data from `payload`. |
 | `replaycount` | How many times it was replayed. |
 | `deliveredat`, `completedat`, `created_at`, `updated_at` | Timestamps (UTC). |
 
@@ -108,45 +114,43 @@ Retries use exponential backoff (30 s, 60 s, 120 s, ... with some randomness). W
 | `HTTP 429`, `HTTP 5xx`, or an exception name such as `ReadTimeout`, `ConnectionError` | n8n is busy or down. Retried, goes `DEAD` once attempts run out. |
 | `N8N_BASE_URL is not configured` | Missing environment variable. Goes `DEAD`. |
 | `Retries exhausted` | The row was picked up the maximum number of times without a result being saved (for example the pod kept restarting). |
-| `NO_OUTCOME` | n8n accepted the event but never reported back within `N8N_OUTBOX_NO_OUTCOME_MINUTES`. The run may have succeeded or crashed: check the audit table. |
+| `NO_OUTCOME` | n8n accepted the event but never reported back within `N8N_OUTBOX_NO_OUTCOME_MINUTES`. The run may have succeeded or crashed: check `claimedat` and `n8nexecutionid` on the outbox row, and the step rows in the audit table. |
 | `ENQUEUE_FAILED` | The API could not even save the event (3 tries), so it wrote this `DEAD` row as a last resort. |
 | `<workflow> > <node>: <message>` | n8n reported the run failed. The text names the failing workflow and node. |
 
 ---
 
-## 3. `foi-process-audit` (`event-received` and `event-completed`)
+## 3. `foi-process-audit`
 
-The entry workflow **FOI Request Routing** writes a row here at each step of handling an event.
+A write-only diary of what n8n did. **Nothing in the event flow reads it** (the duplicate check, the ordering check and the failed-execution lookup all use the API, see section 1), so it can be purged on a schedule (workflow **FOI Audit Retention**, created inactive).
 
-| `process_type` | Meaning |
-|---|---|
-| `event-received` | The event was valid, new and in order. Processing is starting. |
-| `event-completed` | The sub-workflow finished and every branch ended without error. |
-| `event-duplicate` | An `event-completed` row for this `event_id` already existed, so the run was skipped. |
-| `event-stale-skipped` | An older state event arrived after a newer one for the same request, so it was skipped. |
-| `other` | Invalid payload (answered with 400) or an event type with no processing. |
-| `raw-request-process`, `ministry-request-process`, `fee-process`, ... | Step rows written by the sub-workflows. |
+| `process_type` | Written by | Meaning |
+|---|---|---|
+| `raw-request-process`, `foi-request-process`, `ministry-request-process`, `ministry-request`, `fee-process` | The sub-workflows | One row per processing step (a sentence in `comments`). The payload is **not** copied into the row; read it from the outbox by `event_id` while it is retained |
+| `event-duplicate` | Routing | The claim answered `duplicate`: an earlier run already completed this event, nothing was applied again |
+| `event-stale-skipped` | Routing | The claim answered `stale`: a newer state event for the same request was already applied |
+| `event-in-progress` | Routing | The claim answered `in_progress`: another execution holds the claim and reports the outcome |
+| `other` | Routing | Invalid payload (answered with 400) or an event type with no processing. Keeps the raw body, because such an event may have no outbox row |
 
 Useful columns: `event_id`, `event`, `process_type`, `execution_id`, `raw_request_id`, `foi_request_id`, `ministry_request_id`, `status`, `comments`, `occurred_at`.
 
-A healthy event looks like this (sub-workflow rows run as their own executions, so their `execution_id` differs; match rows by `event_id`):
+A healthy event now looks like this (the sub-workflow row runs as its own execution, so its `execution_id` differs; match rows by `event_id`):
 
 ```
 process_type              event                  event_id      execution_id
-event-received            foi-ministry-complete  8846f942-...  2035
 ministry-request-process  foi-ministry-complete  8846f942-...  2036
-event-completed           foi-ministry-complete  8846f942-...  2035
 ```
 
-### Why these two rows matter
+There are no `event-received` / `event-completed` rows any more. Their jobs moved:
 
-They are not just logs. n8n reads them to make decisions.
+| Job | Used to be | Now |
+|---|---|---|
+| Do not run twice | n8n looked for an `event-completed` row | The claim answers `duplicate` when the outbox row is COMPLETED |
+| Do not run twice at the same time | Not handled | The claim answers `in_progress` while another execution holds a live claim (`claimedat`) |
+| Do not go back in time | n8n compared with the newest `event-received.occurred_at` | The claim compares with the newest `stateoccurredat` on the outbox rows of the same request, atomically (a ministry event also records its raw request id, so it counts for the raw request too) |
+| Find the failure | The Error Handler read the `event-received` row by `execution_id` | The Error Handler calls `GET /foiworkflow/executions/{id}/event`; the claim recorded the execution on the outbox row |
 
-| Row | What n8n uses it for |
-|---|---|
-| `event-completed` | **Do not run twice.** Before processing, n8n looks for an `event-completed` row with the same `event_id`. If it exists, the event is skipped and acknowledged. This makes retries and replays safe. A failed run has no such row, so it runs again. |
-| `event-received` | **Do not go back in time.** Its `occurred_at` is the newest event applied for that request. If an older state event shows up later, it is skipped as stale. (Payment and correspondence events are never skipped.) |
-| `event-received` | **Find the failure.** When a run fails, the **FOI Error Handler** workflow looks up this row by `execution_id` to learn the `event_id`, then reports `FAILED` to the API. |
+Audit inserts never block a run: if one fails, processing continues (the audit row is lost, the event is not).
 
 ---
 
@@ -213,7 +217,7 @@ A one-time Camunda-to-n8n backfill (admin endpoints in the API, enabled by `PAYM
 
 | Symptom | What to check |
 |---|---|
-| Applicant paid but the request is still On Hold | 1) Outbox: is the `foi-manage-payment` event `COMPLETED`? 2) Audit table: does the `event_id` have `event-completed`? 3) SLA row: is it `PAID`? |
+| Applicant paid but the request is still On Hold | 1) Outbox: is the `foi-manage-payment` event `COMPLETED`? 2) Audit table: does the `event_id` have a `fee-process` step row? 3) SLA row: is it `PAID`? |
 | Applicant got no expiry email | Is the row `ACTIVE`? Does it have a `payment_expiry_date` or `expires_at`? Is **FOI Payment Expiry SLA Job** active, and did its 1 PM execution succeed? |
 | Row stuck in `PENDING` | Payment setup failed part way. `comments` and `started_execution_id` point to the execution. Re-running the start is safe. |
 | Two open rows for one request | `comments` will say "Other non-terminal rows found". Fee Processing uses the newest `ACTIVE` row. |
@@ -223,15 +227,16 @@ A one-time Camunda-to-n8n backfill (admin endpoints in the API, enabled by `PAYM
 
 ## 5. Reading the outbox and the audit table together
 
-| Outbox status | Audit rows for the same `event_id` | What it means |
+| Outbox status | What the outbox row and audit table show | What it means |
 |---|---|---|
-| `PENDING` or `DEAD`, retries shown | none | n8n never got the event. Read `lasterror`, check n8n is up and the API config. |
-| `DELIVERED` | `event-received` only | n8n is still working on it, or crashed. |
-| `DELIVERED` | `event-received` + `event-completed` | Work is done but the callback did not arrive. Check the n8n callback and `N8N_SERVICE_ACCOUNT_CLIENT_ID`. Replay is safe: n8n skips it as a duplicate and acknowledges it. |
-| `FAILED` | `event-received`, no `event-completed` | The run failed. Open the execution (`n8nexecutionid`) and the `foi-execution-errors` table, fix, replay. |
-| `FAILED` (`NO_OUTCOME`) | none | The run was lost or failed before `event-received` was written. Replay. |
-| `COMPLETED` | `event-received` + `event-completed` | Healthy. |
-| `COMPLETED` | `event-duplicate` or `event-stale-skipped` | n8n skipped it on purpose and acknowledged it. |
+| `PENDING` or `DEAD`, retries shown | no `claimedat`, no audit rows | n8n never got the event. Read `lasterror`, check n8n is up and the API config. |
+| `DELIVERED`, no `claimedat` | none | n8n accepted the webhook but has not claimed it yet (or the run died before the claim). Wait, or see `NO_OUTCOME` |
+| `DELIVERED`, `claimedat` set | step rows may appear | n8n is working on it. After `N8N_OUTBOX_NO_OUTCOME_MINUTES` the sweeper flags it |
+| `DELIVERED`, step rows for every step | all steps present | Work is done but the callback did not arrive. Check the n8n callback and `N8N_SERVICE_ACCOUNT_CLIENT_ID`. Replay is safe once the sweeper flags it: the claim lease has expired and the replay runs again, or answers `duplicate` if the callback arrived meanwhile |
+| `FAILED` | `n8nexecutionid` of the failed run | The run failed. Open the execution and the `foi-execution-errors` table, fix, replay. |
+| `FAILED` (`NO_OUTCOME`) | no `claimedat` or an expired one | The run was lost or failed before the claim. Replay. |
+| `COMPLETED` | step rows | Healthy. |
+| `COMPLETED` | `event-duplicate` or `event-stale-skipped` row | n8n skipped it on purpose and acknowledged it. |
 
 ---
 
@@ -241,10 +246,12 @@ Base path `/api/foiworkflow`. Payloads are never returned.
 
 | Endpoint | Who can call | Purpose |
 |---|---|---|
-| `GET /events?status=DEAD,FAILED&limit=100&offset=0` | any signed-in user | List outbox rows (newest first, `limit` max 500). Any status can be listed. |
+| `GET /events?status=DEAD,FAILED&limit=100&offset=0` | **FOI Admin** | List outbox rows (newest first, `limit` max 500). Any status can be listed. |
 | `POST /events/{event_id}/replay` | **FOI Admin** | Queue one `DEAD` or `FAILED` event again. |
 | `POST /events/replay` with `{"eventids": ["...", "..."]}` | **FOI Admin** | Replay 1 to 500 events. |
-| `PUT /events/{event_id}` | **n8n service account only** | n8n's callback with `COMPLETED` or `FAILED`. Humans do not call this. |
+| `PUT /events/{event_id}` | **n8n service account only** | n8n's callback with `COMPLETED` or `FAILED`; releases the claim. Humans do not call this. |
+| `POST /events/{event_id}/claim` | **n8n service account only** | n8n asks whether it may process the event: `{decision: proceed \| duplicate \| in_progress \| stale}`. Body: `executionid`, `kind` (`state` or `action`), `scope`, `scopekey`, `occurred_at`, `requestids`. `400` for bad input |
+| `GET /executions/{execution_id}/event` | **n8n service account only** | The event a failed execution claimed (`found: false` if it failed before claiming). Never returns the payload |
 
 ```bash
 # what needs attention?
@@ -268,8 +275,8 @@ curl -s -X POST -H "Authorization: Bearer $ADMIN" -H "Content-Type: application/
 
 What a replay does: the row returns to `PENDING`, `attempts` goes to 0, `replaycount` goes up by one, and the dispatcher sends the **original payload** again within a few seconds. Expect these outcomes:
 
-- The earlier n8n run had actually finished: n8n records `event-duplicate` and acknowledges. Nothing is applied twice.
-- A newer event for the same request was applied meanwhile: n8n records `event-stale-skipped`. This is intended. If the old change is still needed, redo the action in the app to create a new event.
+- The earlier n8n run had actually finished (the outbox row is COMPLETED): the claim answers `duplicate`, n8n records `event-duplicate` and acknowledges. Nothing is applied twice.
+- A newer event for the same request was applied meanwhile: the claim answers `stale` and n8n records `event-stale-skipped`. This is intended. If the old change is still needed, redo the action in the app to create a new event.
 - A row with `ENQUEUE_FAILED ... (payload not stored)` has no request data to send. Redo the user action instead.
 
 ---
@@ -287,7 +294,10 @@ What a replay does: the row returns to `PENDING`, `attempts` goes to 0, `replayc
 | `N8N_OUTBOX_DISPATCHER_ENABLED` | true | Switch the dispatcher and sweeper off for one pod. Running on several pods is safe. |
 | `N8N_OUTBOX_DISPATCH_INTERVAL_SECONDS`, `N8N_OUTBOX_BATCH_SIZE` | 5, 10 | How often to check and how many rows per pass. |
 | `N8N_OUTBOX_SWEEP_INTERVAL_SECONDS`, `N8N_OUTBOX_NO_OUTCOME_MINUTES` | 300, 30 | How often to sweep, and how long to wait for n8n's outcome. Keep the minutes above the longest normal run. |
-| `N8N_SERVICE_ACCOUNT_CLIENT_ID` | empty | Keycloak client allowed to call the callback. If empty, every callback is rejected and every event would end up `NO_OUTCOME`. |
+| `N8N_OUTBOX_CLAIM_LEASE_MINUTES` | `N8N_OUTBOX_NO_OUTCOME_MINUTES` (30) | How long a claim by one n8n execution blocks another execution of the same event (`in_progress`). Keep it at or above the longest normal run. |
+| `N8N_OUTBOX_SCRUB_AFTER_DAYS`, `N8N_OUTBOX_PURGE_AFTER_DAYS` | 0 (never) | Retention of COMPLETED rows, run by the dispatcher thread: scrub removes the payload (personal data) and keeps the row; purge deletes the row. The duplicate check and the ordering check read COMPLETED rows, so keep the purge period far longer than an event can still be redelivered or replayed (DEAD and FAILED rows, the replayable ones, are never touched). Set them only after the FOI records owners decide the periods |
+| `N8N_OUTBOX_RETENTION_INTERVAL_SECONDS`, `N8N_OUTBOX_RETENTION_BATCH_SIZE` | 3600, 1000 | How often the retention job runs and how many rows per batch |
+| `N8N_SERVICE_ACCOUNT_CLIENT_ID` | empty | Keycloak client allowed to call the callback, the claim and the execution lookup. If empty, every callback is rejected and every event would end up `NO_OUTCOME`. |
 
 **Optional, only for the one-time payment backfill, and only if you run it through the API endpoints** (not needed for normal operation):
 
@@ -336,7 +346,8 @@ Payloads can contain personal information. Query them only when needed and do no
 
 ### In n8n
 
-- **Data tables > `foi-process-audit`**: filter by `event_id` for the full trail, or by `raw_request_id`, `foi_request_id` or `ministry_request_id` for a whole request.
+- **Data tables > `foi-process-audit`**: filter by `event_id` for the step rows, or by `raw_request_id`, `foi_request_id` or `ministry_request_id` for a whole request. The rows older than the retention period are purged.
+- **Events of one request in the API database** (indexed, set by the claim): `SELECT eventid, eventname, status, lasterror FROM "FOIWorkflowEventOutbox" WHERE ministryrequestid = '5265' ORDER BY outboxid;` (same for `rawrequestid`, `foirequestid`).
 - **Data tables > `foi-execution-errors`**: the failed workflow, node and error message for an event.
 - **Data tables > `foi-payment-sla`**: filter by `ministry_request_id`.
 - **Executions**: open the id from `n8nexecutionid` or from an audit row.
@@ -351,7 +362,7 @@ Payloads can contain personal information. Query them only when needed and do no
 | `DEAD`, `N8N_BASE_URL is not configured` | Missing variable | Set it, restart the API, replay. |
 | `DEAD`, `ENQUEUE_FAILED` | Database problem when the event was created | Search the API log for the `event_id`. Replay if the payload was stored, otherwise redo the action. |
 | `FAILED`, message `<workflow> > <node>: ...` | The n8n run failed | Open the execution, fix, replay. |
-| `FAILED`, `NO_OUTCOME` | n8n accepted but never called back | Check the audit table (see section 5). |
+| `FAILED`, `NO_OUTCOME` | n8n accepted but never called back | Check `claimedat`, `n8nexecutionid` and the step rows (see section 5). |
 | Replayed event shows `COMPLETED` but nothing changed | n8n skipped it as duplicate or stale | Read `comments` on the audit row. This is by design. |
 | Every callback returns 401 | `N8N_SERVICE_ACCOUNT_CLIENT_ID` is empty or does not match the token's `azp` claim | Fix the variable. |
 | Healthy events get `NO_OUTCOME` | `N8N_OUTBOX_NO_OUTCOME_MINUTES` is shorter than real run times | Raise it. |
@@ -360,13 +371,13 @@ Payloads can contain personal information. Query them only when needed and do no
 
 ## 9. Rules for maintainers
 
-- `event_id` and `occurred_at` are set once, when the event is created, and stored in the payload. Never regenerate them on retry or replay: duplicate and ordering checks depend on them.
-- Never delete `event-completed` rows (a replay would run the whole workflow again). Keep `event-received` rows too (they are the ordering marks).
+- `event_id` and `occurred_at` are set once, when the event is created, and stored in the payload. Never regenerate them on retry or replay: the duplicate and ordering checks depend on them.
+- Never make a workflow decision from `foi-process-audit`. It is a diary that gets purged. Anything n8n needs to decide goes through the claim or the outbox.
 - Never delete `foi-payment-sla` rows. A late payment needs the old row.
-- Change outbox rows through the service or the replay endpoints, not by hand. If you must reset a row by hand, set `status='PENDING'`, `attempts=0`, `nextattemptat=(now() at time zone 'utc')` and add 1 to `replaycount`, which is exactly what a replay does.
-- The `foi-process-audit` table must have the `event_id` and `occurred_at` columns. Without them `Audit: Event Received` fails and every event fails.
-- A new event type needs a branch in the `Route Event` node of FOI Request Routing. If it changes request state, also add it to the `Check Event Order` node, otherwise it is treated as an action event and is never skipped as stale.
+- Change outbox rows through the service or the replay endpoints, not by hand. If you must reset a row by hand, set `status='PENDING'`, `attempts=0`, `claimedat=NULL`, `nextattemptat=(now() at time zone 'utc')` and add 1 to `replaycount`, which is exactly what a replay does.
+- A new event type needs a branch in the `Route Event` node of FOI Request Routing. If it changes request state, also add it to the lists in the `Build Claim Request` node, otherwise it is treated as an action event and is never skipped as stale.
 - A new outbox status needs: the `OutboxStatus` enum, a migration for the table's check constraint, the rules in `acknowledge()` and `replay()`, and an update to this guide.
+- A new audit insert node in a sub-workflow must not copy the payload into `metadata` and must continue on error.
 - Log `event_id`, never the payload.
 - The dispatcher is started from `wsgi.py` inside the API process. There is no separate worker.
 
@@ -377,11 +388,11 @@ Payloads can contain personal information. Query them only when needed and do no
 | Area | File |
 |---|---|
 | Table model, statuses, queries | `request-management-api/request_api/models/FOIWorkflowEventOutbox.py` |
-| Table migration | `request-management-api/migrations/versions/1b34e2d861aa_create_FOIWorkflowEventOutbox_Table.py` |
-| Outbox logic: save, pick up, acknowledge, sweep, replay | `request-management-api/request_api/services/workflowoutboxservice.py` |
+| Table migrations | `request-management-api/migrations/versions/1b34e2d861aa_create_FOIWorkflowEventOutbox_Table.py`, `c01e2a8c31f2_outbox_claim_watermark_retention.py` |
+| Outbox logic: save, pick up, claim, acknowledge, sweep, replay, retention | `request-management-api/request_api/services/workflowoutboxservice.py` |
 | Creating events and posting them to n8n | `request-management-api/request_api/services/external/n8nworkflowservice.py` |
-| Background dispatcher and sweeper | `request-management-api/request_api/services/external/n8nworkflowoutboxdispatcher.py` |
+| Background dispatcher, sweeper and retention | `request-management-api/request_api/services/external/n8nworkflowoutboxdispatcher.py` |
 | Endpoints | `request-management-api/request_api/resources/foiworkflow.py` |
-| Tests | `request-management-api/tests/services/test_workflowoutboxservice.py`, `test_n8nworkflowoutboxdispatcher.py` |
+| Tests | `request-management-api/tests/services/test_workflowoutboxservice.py`, `test_workflowoutboxclaim.py`, `test_n8nworkflowoutboxdispatcher.py`, `test_n8nworkflowoutboxretention.py` |
 
-n8n workflows involved: **FOI Request Routing** (entry point, writes the audit rows, dedupe and ordering, sends the callback), **FOI Error Handler** (reports failures to the API and sends alerts), **FOI Fee Processing**, **FOI IAO Complete Process** and **FOI Payment Expiry SLA Job** (payment lifecycle).
+n8n workflows involved: **FOI Request Routing** (entry point, claim, routing, acknowledgement), **FOI Backend API Manager** (the `foi-event-claim`, `foi-event-ack` and `foi-event-by-execution` categories), **FOI Error Handler** (reports failures to the API and sends alerts), **FOI Audit Retention** (purges old audit and error rows), **FOI Fee Processing**, **FOI IAO Complete Process** and **FOI Payment Expiry SLA Job** (payment lifecycle).

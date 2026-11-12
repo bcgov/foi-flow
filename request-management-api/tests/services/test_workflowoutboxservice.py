@@ -50,7 +50,7 @@ def _bind_sqlite_savepoints(engine):
 
     @event.listens_for(engine, "begin")
     def _begin(conn):
-        conn.execute("BEGIN")
+        conn.exec_driver_sql("BEGIN")
 
 
 @pytest.fixture(autouse=True)
