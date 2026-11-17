@@ -166,10 +166,11 @@ class FOIFlowApplicantCorrespondenceDraft(Resource):
                 rawrequestid = requestid
             else:
                 rawrequestid = requestservice().getrawrequestidbyfoirequestid(requestid)
-            if ministryrequestid != 'None' or "israwrequest" in correspondenceschemaobj and correspondenceschemaobj["israwrequest"] == False:
-                result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(rawrequestid, ministryrequestid, correspondenceschemaobj, AuthHelper.getuserid(), True)
-            elif ministryrequestid == 'None' or "israwrequest" in correspondenceschemaobj and correspondenceschemaobj["israwrequest"] == True:
+            israwrequest = correspondenceschemaobj.get("israwrequest") is True
+            if ministryrequestid == 'None' or israwrequest:
                 result = applicantcorrespondenceservice().saveapplicantcorrespondencelogforrawrequest(rawrequestid, correspondenceschemaobj, AuthHelper.getuserid(), True)
+            else:
+                result = applicantcorrespondenceservice().saveapplicantcorrespondencelog(rawrequestid, ministryrequestid, correspondenceschemaobj, AuthHelper.getuserid(), True)
             if result.success == True:
                return {'status': result.success, 'message':result.message,'id':result.identifier} , 200      
         except BusinessException:
