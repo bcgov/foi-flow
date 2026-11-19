@@ -4,6 +4,7 @@ import ast
 import request_api
 from request_api.models.OperatingTeams import OperatingTeam
 from request_api.exceptions import BusinessException, Error
+from request_api.utils.ministrygroupaccess import grantinggroups
 import redis
 import logging
 
@@ -84,7 +85,28 @@ class KeycloakAdminService:
         allowedgroups = self.getgroups(allowedgroups)
         for group in allowedgroups:
             group["members"] = self.getgroupmembersbyid(group["id"])
-        return allowedgroups  
+        return self.addgrantedmembers(allowedgroups)
+
+    def addgrantedmembers(self, groups):
+        """Add the members of groups granted access to each group (see ministrygroupaccess)."""
+        allgroups = None
+        for group in groups:
+            sources = grantinggroups(group["name"])
+            if not sources:
+                continue
+            if allgroups is None:
+                allgroups = self.getallgroups()
+            members = list(group.get("members") or [])
+            usernames = {member["username"] for member in members}
+            for source in allgroups:
+                if source["name"] not in sources:
+                    continue
+                for member in self.getgroupmembersbyid(source["id"]):
+                    if member["username"] not in usernames:
+                        usernames.add(member["username"])
+                        members.append(member)
+            group["members"] = sorted(members, key=lambda k: str(k['lastname']))
+        return groups
     
 
     # INPUT: groupid (string) - intake group id from the keyclock request
@@ -199,7 +221,7 @@ class KeycloakAdminService:
         allowedgroups = self.getgroup(groupname, type)
         for group in allowedgroups:
             group["members"] = self.getgroupmembersbyid(group["id"])
-        return allowedgroups
+        return self.addgrantedmembers(allowedgroups)
 
         
 
