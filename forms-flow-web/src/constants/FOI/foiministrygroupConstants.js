@@ -47,6 +47,7 @@ const MINISTRYGROUPS = {
     INF : "INF Ministry Team",
     MCM : "MCM Ministry Team",
     ECS : "ECS Ministry Team",
+    FAKE : "FAKE Ministry Team", // synthetic ministry for local reorganization testing
 
   };
 
