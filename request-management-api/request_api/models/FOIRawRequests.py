@@ -468,7 +468,7 @@ class FOIRawRequest(db.Model):
 					order by r.updated_at asc
                     '''
             rs = db.session.execute(text(sql), {'requeststaus': StateName.appfeeowing.value})
-            appfeeowingrequests = rs
+            appfeeowingrequests = [dict(row._mapping) for row in rs]
         except Exception as ex:
             logging.error(ex)
             raise ex
