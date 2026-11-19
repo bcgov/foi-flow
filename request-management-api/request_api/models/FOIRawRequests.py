@@ -1323,13 +1323,17 @@ class FOIRawRequest(db.Model):
         requesttypecondition = []
         for type in params['requesttype']:
             if type == 'proactivedisclosure':
-                requesttypecondition.append(FOIRawRequest.findfield('requestType') == 'proactive disclosure')
-                requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == 'proactive disclosure')
-                requesttypecondition.append(FOIRawRequest.findfield('requestType') == 'proactivedisclosure')
-                requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == 'proactivedisclosure')
+                requesttypecondition.extend([
+                    FOIRawRequest.findfield('requestType') == 'proactive disclosure',
+                    FOIRawRequest.findfield('requestTypeRequestType') == 'proactive disclosure',
+                    FOIRawRequest.findfield('requestType') == 'proactivedisclosure',
+                    FOIRawRequest.findfield('requestTypeRequestType') == 'proactivedisclosure',
+                ])
             else:
-                requesttypecondition.append(FOIRawRequest.findfield('requestType') == type)
-                requesttypecondition.append(FOIRawRequest.findfield('requestTypeRequestType') == type)
+                requesttypecondition.extend([
+                    FOIRawRequest.findfield('requestType') == type,
+                    FOIRawRequest.findfield('requestTypeRequestType') == type,
+                ])
         return requesttypecondition
 
     @classmethod
