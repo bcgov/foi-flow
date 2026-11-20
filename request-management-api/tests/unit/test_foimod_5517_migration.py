@@ -1,12 +1,12 @@
-"""FOIMOD-5515 migration: values, renames and bucket naming (no database)."""
+"""FOIMOD-5517 migration: values, renames and bucket naming (no database)."""
 
 import importlib.util
 from pathlib import Path
 
 import pytest
 
-_PATH = Path(__file__).resolve().parents[2] / "migrations/versions/a0134b09838d_FOIMOD_5515_ministry_reorganization.py"
-_spec = importlib.util.spec_from_file_location("foimod_5515_migration", _PATH)
+_PATH = Path(__file__).resolve().parents[2] / "migrations/versions/a0134b09838d_FOIMOD_5517_ministry_reorganization.py"
+_spec = importlib.util.spec_from_file_location("foimod_5517_migration", _PATH)
 migration = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(migration)
 
@@ -40,3 +40,12 @@ def test_renames_are_name_only_for_the_approved_ministries():
     for old_name, new_name in migration.RENAMES.values():
         assert old_name != new_name
         assert new_name.startswith("Ministry of ")
+
+
+def test_new_ministry_names_match_the_public_form():
+    # Same spelling as bcgov/foi-requests data.json, with Flow's "Ministry of" prefix.
+    assert {r["new"]: r["name"] for r in migration.REPLACEMENTS} == {
+        "EMP": "Ministry of Energy, Mines and Petroleum Resources",
+        "LHS": "Ministry of Local Government, Housing, Sport and Culture",
+        "EDT": "Ministry of Economic Development and Tourism",
+    }
