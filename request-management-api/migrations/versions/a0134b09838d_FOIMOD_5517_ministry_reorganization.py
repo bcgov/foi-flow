@@ -1,4 +1,4 @@
-"""FOIMOD-5515: ministry reorganization. EMP replaces ECS, LHS replaces HSG, EDT replaces JED, and seven
+"""FOIMOD-5517: ministry reorganization. EMP replaces ECS, LHS replaces HSG, EDT replaces JED, and seven
 ministries are renamed.
 
 Revision ID: a0134b09838d
@@ -41,11 +41,11 @@ depends_on = None
 
 logger = logging.getLogger(f'alembic.{revision}')
 
-CREATED_BY = 'FOIMOD-5515'
+CREATED_BY = 'system'
 CATALOGUE_TYPE = 'BC GOV Ministry'
 
 REPLACEMENTS = (
-    {'old': 'ECS', 'new': 'EMP', 'name': 'Ministry of Energy, Mines, and Petroleum Resources'},
+    {'old': 'ECS', 'new': 'EMP', 'name': 'Ministry of Energy, Mines and Petroleum Resources'},
     {'old': 'HSG', 'new': 'LHS', 'name': 'Ministry of Local Government, Housing, Sport and Culture'},
     {'old': 'JED', 'new': 'EDT', 'name': 'Ministry of Economic Development and Tourism'},
 )

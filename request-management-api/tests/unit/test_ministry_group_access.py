@@ -108,7 +108,7 @@ def test_groups_without_grants_are_not_changed():
 
 
 @pytest.mark.parametrize("old,new", [("ECS", "EMP"), ("HSG", "LHS"), ("JED", "EDT")])
-def test_foimod_5515_old_ministry_staff_get_the_new_ministry(old, new):
+def test_foimod_5517_old_ministry_staff_get_the_new_ministry(old, new):
     old_group, new_group = f"{old} Ministry Team", f"{new} Ministry Team"
     assert new_group in MINISTRY_GROUP_ACCESS_GRANTS[old_group]
     assert withgrantedgroups([old_group]) == [old_group, new_group]

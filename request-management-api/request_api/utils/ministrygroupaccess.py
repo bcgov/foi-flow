@@ -11,7 +11,7 @@ data changes are needed.
 """
 
 MINISTRY_GROUP_ACCESS_GRANTS = {
-    # FOIMOD-5515: EMP replaces ECS, LHS replaces HSG and EDT replaces JED. The old ministries'
+    # FOIMOD-5517: EMP replaces ECS, LHS replaces HSG and EDT replaces JED. The old ministries'
     # staff work on the new ministries' requests without being copied into the new groups.
     "ECS Ministry Team": ("EMP Ministry Team",),
     "HSG Ministry Team": ("LHS Ministry Team",),
