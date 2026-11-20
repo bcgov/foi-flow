@@ -85,6 +85,6 @@ process.env.COMMUNITY_AND_HEALTH_MINISTRIES || ["HTH", "MSD", "PSE", "CAS", "OBC
 export const JUSTICE_TEAM_MINISTRIES = (window._env_ && window._env_.REACT_APP_JUSTICE_TEAM_MINISTRIES) ||
 process.env.JUSTICE_TEAM_MINISTRIES || ["AG", "PSSG", "COR", "IIO", "OCC", "CLB", "GCP", "FIN", "TRAN", "TIC"]; 
 export const INDUSTRY_TEAM_MINISTRIES = (window._env_ && window._env_.REACT_APP_ECONOMY_TEAM_MINISTRIES) ||
-process.env.INDUSTRY_TEAM_MINISTRIES || ["OOP", "LDB", "PSA", "JED", "TACS", "LBR", "HSG", "CITZ", "AGR"];
+process.env.INDUSTRY_TEAM_MINISTRIES || ["OOP", "LDB", "PSA", "JED", "TACS", "LBR", "HSG", "LHS", "CITZ", "AGR"];
 export const RESOURCE_TEAM_MINISTRIES = (window._env_ && window._env_.REACT_APP_ECONOMY_TEAM_MINISTRIES) ||
-process.env.RESOURCE_TEAM_MINISTRIES || ["MCM", "WLR", "FOR", "ECS", "ENV", "EAO", "EMC", "DAS", "IRR"];
+process.env.RESOURCE_TEAM_MINISTRIES || ["MCM", "WLR", "FOR", "ECS", "EMP", "ENV", "EAO", "EMC", "DAS", "IRR"];
