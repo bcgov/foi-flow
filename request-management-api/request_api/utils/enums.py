@@ -80,6 +80,8 @@ class MinistryTeamWithKeycloackGroup(Enum):
     INF = "INF Ministry Team"
     MCM = "MCM Ministry Team"
     ECS = "ECS Ministry Team"
+    EMP = "EMP Ministry Team"
+    LHS = "LHS Ministry Team"
     FAKE = "FAKE Ministry Team"  # synthetic ministry for local reorganization testing
 
     @staticmethod
