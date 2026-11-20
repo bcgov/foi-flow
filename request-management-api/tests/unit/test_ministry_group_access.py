@@ -107,7 +107,7 @@ def test_groups_without_grants_are_not_changed():
     assert result[0]["members"] == [_member("a@idir", "Adams")]
 
 
-@pytest.mark.parametrize("old,new", [("ECS", "EMP"), ("HSG", "LHS")])
+@pytest.mark.parametrize("old,new", [("ECS", "EMP"), ("HSG", "LHS"), ("JED", "EDT")])
 def test_foimod_5515_old_ministry_staff_get_the_new_ministry(old, new):
     old_group, new_group = f"{old} Ministry Team", f"{new} Ministry Team"
     assert new_group in MINISTRY_GROUP_ACCESS_GRANTS[old_group]

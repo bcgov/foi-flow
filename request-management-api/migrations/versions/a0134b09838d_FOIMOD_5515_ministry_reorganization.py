@@ -1,10 +1,14 @@
-"""FOIMOD-5515: EMP replaces ECS and LHS replaces HSG.
+"""FOIMOD-5515: ministry reorganization. EMP replaces ECS, LHS replaces HSG, EDT replaces JED, and seven
+ministries are renamed.
 
 Revision ID: a0134b09838d
 Revises: a4e9c7d2f1b6
 Create Date: 2026-11-20
 
-For each replacement, this revision:
+Renames (RENAMES) change only ProgramAreas.name. The upgrade refuses if a ministry's current name is neither the
+expected old name nor the new one, so the downgrade can restore the old names exactly.
+
+For each replacement (REPLACEMENTS), this revision:
   * creates the new ministry in ProgramAreas (bcgovcode = iaocode = new code);
   * creates its operating team "<NEW> Ministry Team";
   * copies the old ministry's active divisions;
@@ -43,7 +47,19 @@ CATALOGUE_TYPE = 'BC GOV Ministry'
 REPLACEMENTS = (
     {'old': 'ECS', 'new': 'EMP', 'name': 'Ministry of Energy, Mines, and Petroleum Resources'},
     {'old': 'HSG', 'new': 'LHS', 'name': 'Ministry of Local Government, Housing, Sport and Culture'},
+    {'old': 'JED', 'new': 'EDT', 'name': 'Ministry of Economic Development and Tourism'},
 )
+
+# Name-only renames: bcgovcode -> (current name, new name).
+RENAMES = {
+    'AGR': ('Ministry of Agriculture and Food', 'Ministry of Agriculture'),
+    'CITZ': ('Ministry of Citizens’ Services', "Ministry of Citizens' Services and Technology"),
+    'ENV': ('Ministry of Environment and Parks', 'Ministry of Environment'),
+    'PSE': ('Ministry of Post-Secondary Education and Future Skills', 'Ministry of Post-Secondary Education and Labour'),
+    'MSD': ('Ministry of Social Development and Poverty Reduction', 'Ministry of Social Development'),
+    'TRAN': ('Ministry of Transportation and Transit', 'Ministry of Transportation and Infrastructure'),
+    'WLR': ('Ministry of Water, Land and Resource Stewardship', 'Ministry of Waters, Land and Natural Resource Operations'),
+}
 
 
 def _fail(message):
@@ -174,8 +190,20 @@ def _replace(conn, r):
                 revision, new, len(divisions), routed, new_bucket, old)
 
 
+def _rename(conn):
+    for code, (old_name, new_name) in RENAMES.items():
+        current = _scalar(conn, 'SELECT name FROM public."ProgramAreas" WHERE bcgovcode = :c', c=code)
+        if current is None:
+            _fail(f'ministry {code} does not exist')
+        if current not in (old_name, new_name):
+            _fail(f'ministry {code} is named {current!r}, expected {old_name!r}')
+    for code, (old_name, new_name) in RENAMES.items():
+        conn.execute(sa.text('UPDATE public."ProgramAreas" SET name = :n WHERE bcgovcode = :c'), {'n': new_name, 'c': code})
+
+
 def upgrade():
     conn = op.get_bind()
+    _rename(conn)
     for replacement in REPLACEMENTS:
         _replace(conn, replacement)
 
@@ -211,3 +239,6 @@ def downgrade():
                                 WHERE category = 'Records' AND bucket ILIKE lower(:code) || '-%' AND createdby = :createdby'''),
                      {'code': new, 'createdby': CREATED_BY})
         conn.execute(sa.text('UPDATE public."ProgramAreas" SET isactive = TRUE WHERE bcgovcode = :c'), {'c': old})
+    for code, (old_name, new_name) in RENAMES.items():
+        conn.execute(sa.text('UPDATE public."ProgramAreas" SET name = :old WHERE bcgovcode = :c AND name = :new'),
+                     {'old': old_name, 'new': new_name, 'c': code})
