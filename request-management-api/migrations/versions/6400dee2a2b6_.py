@@ -17,8 +17,8 @@ branch_labels = None
 depends_on = None
 
 ENVIRONMENT = os.getenv('OSS_S3_ENVIRONMENT') or 'dev'
-access = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID') or '<fake-access-key>'
-secret = os.getenv('OSS_S3_FORMS_SECRET_ACCESS_KEY') or '<fake-secret-key>'
+access = os.getenv('OSS_S3_FORMS_ACCESS_KEY_ID') or ""
+secret = os.getenv('OSS_S3_FORMS_SECRET_ACCESS_KEY') or ""
 s3accesskeyjson = f'{{"s3accesskey": "{access}", "s3secretkey": "{secret}"}}'
 
 NEW_MINISTRIES = [
