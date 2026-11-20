@@ -1,4 +1,4 @@
-"""empty message
+"""Govt BC Organization Changes Nov 20, 2026 (Provincial Elections)
 
 Revision ID: 6400dee2a2b6
 Revises: a4e9c7d2f1b6
