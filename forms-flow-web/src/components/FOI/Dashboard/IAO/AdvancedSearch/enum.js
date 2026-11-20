@@ -25,6 +25,7 @@ const MappedMinistries = Object.freeze({
   'LHS': ['LHS', 'HSG', 'MUNI'],
   'CAS': ['BRD', 'CAS'],
   'JED': ['JED', 'JERI'],
+  'EDT': ['EDT', 'JED', 'JERI'],
   'HTH': ['MMHA', 'HTH'],
 })
 
