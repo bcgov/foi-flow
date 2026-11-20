@@ -15,22 +15,22 @@ from request_api.utils.ministrygroupaccess import (
     withgrantedgroups,
 )
 
-EDU = "EDU Ministry Team"
-FAKE = "FAKE Ministry Team"
+OLD = "ECS Ministry Team"
+NEW = "EMP Ministry Team"
 HTH = "HTH Ministry Team"
-GRANTS = {EDU: (FAKE,)}
+GRANTS = {OLD: (NEW,)}
 
 
 def test_source_group_members_get_the_granted_group():
-    assert withgrantedgroups([EDU], GRANTS) == [EDU, FAKE]
+    assert withgrantedgroups([OLD], GRANTS) == [OLD, NEW]
 
 
 def test_grant_is_one_way():
-    assert withgrantedgroups([FAKE], GRANTS) == [FAKE]
+    assert withgrantedgroups([NEW], GRANTS) == [NEW]
 
 
 def test_member_of_both_groups_has_no_duplicates():
-    assert withgrantedgroups([EDU, FAKE], GRANTS) == [EDU, FAKE]
+    assert withgrantedgroups([OLD, NEW], GRANTS) == [OLD, NEW]
 
 
 def test_other_groups_are_unchanged():
@@ -38,8 +38,8 @@ def test_other_groups_are_unchanged():
 
 
 def test_granting_groups_lists_the_sources():
-    assert grantinggroups(FAKE, GRANTS) == [EDU]
-    assert grantinggroups(EDU, GRANTS) == []
+    assert grantinggroups(NEW, GRANTS) == [OLD]
+    assert grantinggroups(OLD, GRANTS) == []
 
 
 def test_configured_grants_use_known_ministry_groups():
@@ -66,17 +66,17 @@ def as_user():
 
 
 @patch.dict(MINISTRY_GROUP_ACCESS_GRANTS, GRANTS, clear=True)
-def test_edu_only_user_is_treated_as_fake_member(as_user):
-    with as_user(["/" + EDU]):
+def test_old_ministry_user_is_treated_as_new_ministry_member(as_user):
+    with as_user(["/" + OLD]):
         assert AuthHelper.getusertype() == "ministry"
-        assert sorted(AuthHelper.getministrygroups()) == [EDU, FAKE]
+        assert sorted(AuthHelper.getministrygroups()) == [OLD, NEW]
 
 
 @patch.dict(MINISTRY_GROUP_ACCESS_GRANTS, GRANTS, clear=True)
-def test_fake_only_user_does_not_get_edu(as_user):
-    with as_user(["/" + FAKE]):
+def test_new_ministry_user_does_not_get_old_ministry(as_user):
+    with as_user(["/" + NEW]):
         assert AuthHelper.getusertype() == "ministry"
-        assert AuthHelper.getministrygroups() == [FAKE]
+        assert AuthHelper.getministrygroups() == [NEW]
 
 
 def _member(username, lastname):
@@ -86,21 +86,21 @@ def _member(username, lastname):
 @patch.dict(MINISTRY_GROUP_ACCESS_GRANTS, GRANTS, clear=True)
 def test_granted_group_members_include_source_group_members():
     service = KeycloakAdminService()
-    allgroups = [{"id": "edu-id", "name": EDU}, {"id": "fake-id", "name": FAKE}]
-    edu_members = [_member("a@idir", "Adams"), _member("shared@idir", "Shared")]
-    groups = [{"id": "fake-id", "name": FAKE, "members": [_member("shared@idir", "Shared"), _member("z@idir", "Zed")]}]
+    allgroups = [{"id": "old-id", "name": OLD}, {"id": "new-id", "name": NEW}]
+    old_members = [_member("a@idir", "Adams"), _member("shared@idir", "Shared")]
+    groups = [{"id": "new-id", "name": NEW, "members": [_member("shared@idir", "Shared"), _member("z@idir", "Zed")]}]
     with patch.object(KeycloakAdminService, "getallgroups", return_value=allgroups), patch.object(
-        KeycloakAdminService, "getgroupmembersbyid", return_value=edu_members
+        KeycloakAdminService, "getgroupmembersbyid", return_value=old_members
     ) as members_by_id:
         result = service.addgrantedmembers(groups)
-    members_by_id.assert_called_once_with("edu-id")
+    members_by_id.assert_called_once_with("old-id")
     assert [m["username"] for m in result[0]["members"]] == ["a@idir", "shared@idir", "z@idir"]
 
 
 @patch.dict(MINISTRY_GROUP_ACCESS_GRANTS, GRANTS, clear=True)
 def test_groups_without_grants_are_not_changed():
     service = KeycloakAdminService()
-    groups = [{"id": "edu-id", "name": EDU, "members": [_member("a@idir", "Adams")]}]
+    groups = [{"id": "old-id", "name": OLD, "members": [_member("a@idir", "Adams")]}]
     with patch.object(KeycloakAdminService, "getallgroups") as allgroups:
         result = service.addgrantedmembers(groups)
     allgroups.assert_not_called()
