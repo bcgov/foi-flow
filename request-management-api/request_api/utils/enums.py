@@ -83,7 +83,6 @@ class MinistryTeamWithKeycloackGroup(Enum):
     ECS = "ECS Ministry Team"
     EMP = "EMP Ministry Team"
     LHS = "LHS Ministry Team"
-    FAKE = "FAKE Ministry Team"  # synthetic ministry for local reorganization testing
 
     @staticmethod
     def list():
