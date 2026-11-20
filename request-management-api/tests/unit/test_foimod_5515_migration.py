@@ -1,18 +1,18 @@
-"""FOIMOD-5515 migration: values and bucket naming (no database)."""
+"""FOIMOD-5515 migration: values, renames and bucket naming (no database)."""
 
 import importlib.util
 from pathlib import Path
 
 import pytest
 
-_PATH = Path(__file__).resolve().parents[2] / "migrations/versions/a0134b09838d_FOIMOD_5515_emp_lhs_ministries.py"
+_PATH = Path(__file__).resolve().parents[2] / "migrations/versions/a0134b09838d_FOIMOD_5515_ministry_reorganization.py"
 _spec = importlib.util.spec_from_file_location("foimod_5515_migration", _PATH)
 migration = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(migration)
 
 
 def test_replacements():
-    assert [(r["old"], r["new"]) for r in migration.REPLACEMENTS] == [("ECS", "EMP"), ("HSG", "LHS")]
+    assert [(r["old"], r["new"]) for r in migration.REPLACEMENTS] == [("ECS", "EMP"), ("HSG", "LHS"), ("JED", "EDT")]
 
 
 @pytest.mark.parametrize("old,new,bucket,expected", [
@@ -31,3 +31,12 @@ def test_unexpected_bucket_name_is_refused():
 
 def test_follows_the_current_head():
     assert migration.down_revision == "a4e9c7d2f1b6"
+
+
+def test_renames_are_name_only_for_the_approved_ministries():
+    assert set(migration.RENAMES) == {"AGR", "CITZ", "ENV", "PSE", "MSD", "TRAN", "WLR"}
+    replaced = {r["old"] for r in migration.REPLACEMENTS}
+    assert not replaced & set(migration.RENAMES)
+    for old_name, new_name in migration.RENAMES.values():
+        assert old_name != new_name
+        assert new_name.startswith("Ministry of ")

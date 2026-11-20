@@ -26,9 +26,11 @@ def test_group_list_has_no_duplicates():
 def test_foimod_5515_new_ministries_have_their_own_groups():
     assert MinistryTeamWithKeycloackGroup["EMP"].value == "EMP Ministry Team"
     assert MinistryTeamWithKeycloackGroup["LHS"].value == "LHS Ministry Team"
+    assert MinistryTeamWithKeycloackGroup["EDT"].value == "EDT Ministry Team"
 
 
 def test_foimod_5515_replaced_ministries_keep_their_groups():
     # Their existing requests still use these groups.
     assert MinistryTeamWithKeycloackGroup["ECS"].value == "ECS Ministry Team"
     assert MinistryTeamWithKeycloackGroup["HSG"].value == "HSG Ministry Team"
+    assert MinistryTeamWithKeycloackGroup["JED"].value == "JED Ministry Team"
