@@ -19,8 +19,10 @@ const DateRangeTypes = Object.freeze([
 const MappedMinistries = Object.freeze({
   'ECC': ['ECC', 'EDU'],
   'ECS': ['ECS', 'EMLI'],
+  'EMP': ['EMP', 'ECS', 'EMLI'],
   'PSE': ['PSE', 'AEST'],
   'HSG': ['HSG', 'MUNI'],
+  'LHS': ['LHS', 'HSG', 'MUNI'],
   'CAS': ['BRD', 'CAS'],
   'JED': ['JED', 'JERI'],
   'HTH': ['MMHA', 'HTH'],
