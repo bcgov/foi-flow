@@ -21,6 +21,7 @@ from flask_jwt_oidc import JwtManager
 # from jose import jwt as josejwt
 from jose import JWTError, jwt as josejwt
 from request_api.utils.enums import MinistryTeamWithKeycloackGroup, ProcessingTeamWithKeycloackGroup, IAOTeamWithKeycloackGroup
+from request_api.utils.ministrygroupaccess import withgrantedgroups
 from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 
 logger = logging.getLogger(__name__)
@@ -245,9 +246,9 @@ class AuthHelper:
         unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
         usergroups = unverified_claims['groups']
         usergroups = [usergroup.replace('/','',1) if usergroup.startswith('/') else usergroup for usergroup in usergroups]
-        return usergroups
+        return withgrantedgroups(usergroups)
 
-    @classmethod        
+    @classmethod
     def getuserroles(cls):
         token = request.headers.get("Authorization", None)
         unverified_claims = josejwt.get_unverified_claims(token.partition("Bearer")[2].strip())
