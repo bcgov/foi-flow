@@ -16,8 +16,6 @@ MINISTRY_GROUP_ACCESS_GRANTS = {
     "ECS Ministry Team": ("EMP Ministry Team",),
     "HSG Ministry Team": ("LHS Ministry Team",),
     "JED Ministry Team": ("EDT Ministry Team",),
-    # Local reorganization testing only: remove before merging to main.
-    "EDU Ministry Team": ("FAKE Ministry Team",),
 }
 
 

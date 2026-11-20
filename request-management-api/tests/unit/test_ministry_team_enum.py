@@ -4,13 +4,10 @@ from request_api.utils.enums import MinistryTeamWithKeycloackGroup
 from request_api.utils.util import getrequiredmemberships
 
 
-def test_fake_ministry_maps_to_its_own_group():
-    assert MinistryTeamWithKeycloackGroup["FAKE"].value == "FAKE Ministry Team"
-    assert "FAKE Ministry Team" in MinistryTeamWithKeycloackGroup.list()
-
-
-def test_fake_ministry_group_is_a_required_membership():
-    assert "FAKE Ministry Team" in getrequiredmemberships().split(",")
+def test_new_ministry_groups_are_required_memberships():
+    memberships = getrequiredmemberships().split(",")
+    for group in ("EMP Ministry Team", "LHS Ministry Team", "EDT Ministry Team"):
+        assert group in memberships
 
 
 def test_canonical_groups_follow_naming_convention():
