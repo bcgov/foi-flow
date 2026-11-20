@@ -40,3 +40,12 @@ def test_renames_are_name_only_for_the_approved_ministries():
     for old_name, new_name in migration.RENAMES.values():
         assert old_name != new_name
         assert new_name.startswith("Ministry of ")
+
+
+def test_new_ministry_names_match_the_public_form():
+    # Same spelling as bcgov/foi-requests data.json, with Flow's "Ministry of" prefix.
+    assert {r["new"]: r["name"] for r in migration.REPLACEMENTS} == {
+        "EMP": "Ministry of Energy, Mines and Petroleum Resources",
+        "LHS": "Ministry of Local Government, Housing, Sport and Culture",
+        "EDT": "Ministry of Economic Development and Tourism",
+    }
