@@ -13,8 +13,10 @@ For each replacement (REPLACEMENTS), this revision:
   * creates its operating team "<NEW> Ministry Team";
   * copies the old ministry's active divisions;
   * copies the old ministry's FOIRequestTeams routing, with the old ministry team swapped for the new one;
-  * adds an active Records DocumentPathMapper row for "<new>-<env>-e", reusing the old Records row's
-    attributes (same storage account). The environment suffix comes from the old bucket name;
+  * adds an active Records DocumentPathMapper row for "<new>-<env>-e". It copies the old Records row's
+    attributes with s3accesskey and s3secretkey emptied: the new bucket gets its own storage user, whose keys
+    are filled in through the credential process before release. Until then, access to the bucket fails rather
+    than silently using the old ministry's user. The environment suffix comes from the old bucket name;
   * deactivates the old ministry (isactive = false). Its team, divisions, routing and bucket stay, so its
     existing requests keep working.
 
@@ -43,6 +45,12 @@ logger = logging.getLogger(f'alembic.{revision}')
 
 CREATED_BY = 'system'
 CATALOGUE_TYPE = 'BC GOV Ministry'
+
+# The new bucket's attributes: the old row's, with its storage user's keys emptied. The new bucket has its own
+# user, whose keys are filled in through the credential process.
+EMPTY_CREDENTIALS_SQL = (
+    "(attributes::jsonb || jsonb_build_object('s3accesskey', '', 's3secretkey', ''))::text"
+)
 
 REPLACEMENTS = (
     {'old': 'ECS', 'new': 'EMP', 'name': 'Ministry of Energy, Mines and Petroleum Resources'},
@@ -179,10 +187,11 @@ def _replace(conn, r):
 
     conn.execute(sa.text('''
         INSERT INTO public."DocumentPathMapper" (category, bucket, attributes, isactive, createdby, created_at)
-        SELECT 'Records', :bucket, attributes, TRUE, :createdby, now()
+        SELECT 'Records', :bucket, ''' + EMPTY_CREDENTIALS_SQL + ''', TRUE, :createdby, now()
           FROM public."DocumentPathMapper" WHERE documentpathid = :id'''),
         {'bucket': new_bucket, 'createdby': CREATED_BY, 'id': old_row.documentpathid},
     )
+    logger.warning('%s: %s has no storage keys yet; fill them through the credential process', revision, new_bucket)
 
     conn.execute(sa.text('UPDATE public."ProgramAreas" SET isactive = FALSE WHERE programareaid = :p'),
                  {'p': old_programareaid})
