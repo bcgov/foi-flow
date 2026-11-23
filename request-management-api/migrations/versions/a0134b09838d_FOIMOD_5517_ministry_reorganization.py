@@ -5,8 +5,8 @@ Revision ID: a0134b09838d
 Revises: a4e9c7d2f1b6
 Create Date: 2026-11-20
 
-Renames (RENAMES) change only ProgramAreas.name. The upgrade refuses if a ministry's current name is neither the
-expected old name nor the new one, so the downgrade can restore the old names exactly.
+Renames (RENAMES) change only ProgramAreas.name. The upgrade refuses unless every ministry still has its expected
+old name, so the downgrade can restore the old names exactly.
 
 For each replacement (REPLACEMENTS), this revision:
   * creates the new ministry in ProgramAreas (bcgovcode = iaocode = new code);
@@ -195,7 +195,7 @@ def _rename(conn):
         current = _scalar(conn, 'SELECT name FROM public."ProgramAreas" WHERE bcgovcode = :c', c=code)
         if current is None:
             _fail(f'ministry {code} does not exist')
-        if current not in (old_name, new_name):
+        if current != old_name:
             _fail(f'ministry {code} is named {current!r}, expected {old_name!r}')
     for code, (old_name, new_name) in RENAMES.items():
         conn.execute(sa.text('UPDATE public."ProgramAreas" SET name = :n WHERE bcgovcode = :c'), {'n': new_name, 'c': code})
