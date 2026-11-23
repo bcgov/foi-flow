@@ -49,3 +49,43 @@ def test_new_ministry_names_match_the_public_form():
         "LHS": "Ministry of Local Government, Housing, Sport and Culture",
         "EDT": "Ministry of Economic Development and Tourism",
     }
+
+
+class _FakeConn:
+    """Answers the rename check's name lookups and records the updates."""
+
+    def __init__(self, names):
+        self.names = names
+        self.updates = []
+
+    def execute(self, statement, params):
+        conn = self
+
+        class _Result:
+            def scalar(self):
+                return conn.names.get(params["c"])
+
+        if str(statement).lstrip().startswith("UPDATE"):
+            self.updates.append(params)
+        return _Result()
+
+
+def _current_names():
+    return {code: old_name for code, (old_name, _) in migration.RENAMES.items()}
+
+
+def test_rename_applies_new_names_when_all_ministries_have_their_old_names():
+    conn = _FakeConn(_current_names())
+    migration._rename(conn)
+    assert {u["c"]: u["n"] for u in conn.updates} == {
+        code: new_name for code, (_, new_name) in migration.RENAMES.items()
+    }
+
+
+def test_rename_refuses_a_ministry_that_already_has_its_new_name():
+    names = _current_names()
+    names["AGR"] = migration.RENAMES["AGR"][1]
+    conn = _FakeConn(names)
+    with pytest.raises(RuntimeError, match="ministry AGR is named"):
+        migration._rename(conn)
+    assert conn.updates == []
