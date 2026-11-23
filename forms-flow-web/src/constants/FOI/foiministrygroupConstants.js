@@ -23,6 +23,7 @@ const MINISTRYGROUPS = {
     IRR : "IRR Ministry Team",
     JERI : "JERI Ministry Team",
     JED : "JED Ministry Team",
+    EDT : "EDT Ministry Team",
     LBR : "LBR Ministry Team",
     LDB : "LDB Ministry Team",
     LWR : "LWR Ministry Team",
@@ -47,6 +48,8 @@ const MINISTRYGROUPS = {
     INF : "INF Ministry Team",
     MCM : "MCM Ministry Team",
     ECS : "ECS Ministry Team",
+    EMP : "EMP Ministry Team",
+    LHS : "LHS Ministry Team",
 
   };
 
