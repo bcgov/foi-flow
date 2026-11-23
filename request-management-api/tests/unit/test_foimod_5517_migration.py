@@ -89,3 +89,10 @@ def test_rename_refuses_a_ministry_that_already_has_its_new_name():
     with pytest.raises(RuntimeError, match="ministry AGR is named"):
         migration._rename(conn)
     assert conn.updates == []
+
+
+def test_new_bucket_does_not_reuse_the_old_ministrys_storage_keys():
+    # The new bucket gets its own storage user; its keys are filled in through the credential process.
+    sql = migration.EMPTY_CREDENTIALS_SQL
+    assert "jsonb_build_object('s3accesskey', '', 's3secretkey', '')" in sql
+    assert sql.startswith("(attributes::jsonb ||")
