@@ -25,6 +25,7 @@ from request_api.tracer import Tracer
 from request_api.utils.util import  cors_preflight, allowedorigins, getrequiredmemberships,str_to_bool,canrestictdata,canrestictdata_ministry
 from request_api.exceptions import BusinessException
 from request_api.services.requestservice import requestservice
+from request_api.services.workflowengine import iscamunda
 from request_api.services.rawrequestservice import rawrequestservice
 from request_api.services.eventservice import eventservice
 from request_api.schemas.foirequestwrapper import  FOIRequestWrapperSchema, EditableFOIRequestWrapperSchema, FOIRequestMinistrySchema, FOIRequestStatusSchema, FOIPDRequestWrapperSchema
@@ -263,18 +264,23 @@ class FOIRequestUpdateById(Resource):
 @cors_preflight('GET,OPTIONS')
 @API.route('/foirequests/<int:foirequestid>/ministryrequest/<int:foiministryrequestid>/payonline')
 class FOIRequestDetailsByMinistryId(Resource):
-    """Retrieve foi request for opened request"""
-    
+    """Payment details the workflow engine (Camunda or n8n) needs to set up an online payment.
+
+    Returns only idNumber, axisRequestId, currentState, hasEmail, isofflinepayment and cfrfee.feedata.balanceDue,
+    not the full request record (FOIMOD-5523). The applicant's email address is added only when this deployment's
+    engine is Camunda (WF_DEFAULT_ENGINE), because the Camunda BPMN reads it; n8n is never sent the address. Restricted to the workflow engines' clients (see auth.isworkflowclient)."""
+
     @staticmethod
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
+    @auth.isworkflowclient()
     def get(foirequestid, foiministryrequestid):
         try :
-            jsondata = {}
-            statuscode = 200            
-            jsondata = requestservice().getrequestdetails(foirequestid, foiministryrequestid)            
-            return jsondata , statuscode 
+            jsondata = requestservice().getpaymentdetails(foirequestid, foiministryrequestid, includeemail=iscamunda())
+            if jsondata is None:
+                return {'status': False, 'message': EXCEPTION_MESSAGE_NOTFOUND_REQUEST}, 404
+            return jsondata , 200
         except ValueError:
             return {'status': 500, 'message':"Invalid Request Id"}, 500
         except KeyError as error:

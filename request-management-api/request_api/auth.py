@@ -27,6 +27,11 @@ from request_api.models.FOIMinistryRequests import FOIMinistryRequest
 
 logger = logging.getLogger(__name__)
 
+# Camunda logs in to the API as the Keycloak client forms-flow-bpm (KEYCLOAK_CLIENTID of the forms-flow-bpm
+# deployment). It is not taken from BPM_CLIENT_ID, which is the API's own outgoing login to Camunda. Remove it once
+# Camunda is decommissioned (not just scaled to zero: scaling it back up is the rollback).
+DEFAULT_WORKFLOW_CLIENT_IDS = "forms-flow-bpm"
+
 jwt = (
     JwtManager()
 )  # pylint: disable=invalid-name; lower case name as used by convention in most Flask apps
@@ -168,6 +173,32 @@ class Auth:
         return decorated
 
     @classmethod
+    def isworkflowclient(cls):
+        """Allows only the workflow engines' Keycloak clients (FOIMOD-5523): the token's azp/clientId claim must be
+        N8N_SERVICE_ACCOUNT_CLIENT_ID or one of the comma-separated WORKFLOW_CLIENT_IDS (default: Camunda's client).
+
+        WORKFLOW_CLIENT_ACCESS_MODE controls the rollout so the Camunda integration cannot break by surprise:
+          - "log" (default): every caller is let through; callers that would be refused are logged by client id.
+          - "enforce": callers that are not in the list get 403. Fails closed when the list is empty.
+        Only the client id is logged, never the token or user details. Use in conjunction with require."""
+        def decorated(f):
+            @wraps(f)
+            def wrapper(*args, **kwargs):
+                claims = getattr(g, "jwt_oidc_token_info", None) or {}
+                clientid = claims.get("azp") or claims.get("clientId")
+                allowed = AuthHelper.getworkflowclientids()
+                if clientid in allowed:
+                    return f(*args, **kwargs)
+                mode = (os.getenv("WORKFLOW_CLIENT_ACCESS_MODE") or "log").strip().lower()
+                if mode == "enforce":
+                    logger.warning("isworkflowclient: refused client=%s path=%s", clientid, request.path)
+                    return "Forbidden", HTTPStatus.FORBIDDEN
+                logger.warning("isworkflowclient: log-only mode, would refuse client=%s path=%s", clientid, request.path)
+                return f(*args, **kwargs)
+            return wrapper
+        return decorated
+
+    @classmethod
     def isiao(cls,func):
         @wraps(func)
         def decorated(*args, **kwargs):           
@@ -185,6 +216,18 @@ auth = (
 
 
 class AuthHelper:
+
+    @classmethod
+    def getworkflowclientids(cls):
+        """Keycloak client ids of the workflow engines: N8N_SERVICE_ACCOUNT_CLIENT_ID plus WORKFLOW_CLIENT_IDS.
+
+        WORKFLOW_CLIENT_IDS defaults to Camunda's client (DEFAULT_WORKFLOW_CLIENT_IDS) when it is not set, so no
+        environment change is needed while Camunda runs. Set it to override, or to an empty value to allow only n8n."""
+        configured = os.getenv("WORKFLOW_CLIENT_IDS")
+        if configured is None:
+            configured = DEFAULT_WORKFLOW_CLIENT_IDS
+        ids = configured.split(",") + [os.getenv("N8N_SERVICE_ACCOUNT_CLIENT_ID") or ""]
+        return {clientid.strip() for clientid in ids if clientid.strip()}
 
     @classmethod
     def getwsuserid(cls, token):
