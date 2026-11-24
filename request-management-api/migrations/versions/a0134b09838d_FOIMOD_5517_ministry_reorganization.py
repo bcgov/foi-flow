@@ -63,7 +63,7 @@ RENAMES = {
     'AGR': ('Ministry of Agriculture and Food', 'Ministry of Agriculture'),
     'CITZ': ('Ministry of Citizens’ Services', "Ministry of Citizens' Services and Technology"),
     'ENV': ('Ministry of Environment and Parks', 'Ministry of Environment'),
-    'PSE': ('Ministry of Post-Secondary Education and Future Skills', 'Ministry of Post-Secondary Education and Labour'),
+    'PSE': ('Ministry of Post-Secondary and Future Skills', 'Ministry of Post-Secondary Education and Labour'),
     'MSD': ('Ministry of Social Development and Poverty Reduction', 'Ministry of Social Development'),
     'TRAN': ('Ministry of Transportation and Transit', 'Ministry of Transportation and Infrastructure'),
     'WLR': ('Ministry of Water, Land and Resource Stewardship', 'Ministry of Waters, Land and Natural Resource Operations'),

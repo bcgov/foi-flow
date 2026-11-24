@@ -5,6 +5,8 @@ Revises: bbee01df3e8d
 Create Date: 2023-01-05 16:56:14.273444
 
 """
+import os
+
 from alembic import op
 import sqlalchemy as sa
 
@@ -63,6 +65,11 @@ def upgrade():
         name, description, type, isactive)
         VALUES ('ECS Ministry Team', 'ECS Ministry Team', 'ministry', true);commit;
     ''')
+    # Records bucket for ECS: c1c980e4b969 created Records rows only for ministries that existed then,
+    # and fa3bece1d1bd has already added the encrypted-bucket '-e' suffix.
+    op.execute('''INSERT INTO public."DocumentPathMapper"(category, bucket, isactive, createdby)
+        SELECT 'Records', lower(bcgovcode) || '-' || ''' + "'" + os.getenv('OSS_S3_ENVIRONMENT') + "'" + ''' || '-e', true, 'System'
+          FROM public."ProgramAreas" WHERE iaocode = 'ECS';''')
 
     # add MCM and ECS to Resource and Justice Team
     op.execute('''INSERT INTO public."FOIRequestTeams"(	requesttype, requeststatusid, teamid, programareaid, isactive, requeststatuslabel)
@@ -198,6 +205,8 @@ def upgrade():
 
 
 def downgrade():
+    op.execute('''DELETE FROM public."DocumentPathMapper" WHERE category = 'Records'
+        AND bucket ILIKE 'ecs-%' AND createdby = 'System';''')
     op.execute('''
         delete from public."FOIRequestTeams" where 
         programareaid in (select programareaid from public."ProgramAreas" where iaocode in ('MCM', 'ECS', 'INF'));commit;
