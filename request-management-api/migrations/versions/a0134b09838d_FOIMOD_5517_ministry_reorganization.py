@@ -193,11 +193,6 @@ def _replace(conn, r):
     )
     logger.warning('%s: %s has no storage keys yet; fill them through the credential process', revision, new_bucket)
 
-    conn.execute(sa.text('UPDATE public."ProgramAreas" SET isactive = FALSE WHERE programareaid = :p'),
-                 {'p': old_programareaid})
-    logger.info('%s: %s created (%d divisions, %d routing rows, bucket %s); %s deactivated',
-                revision, new, len(divisions), routed, new_bucket, old)
-
 
 def _rename(conn):
     for code, (old_name, new_name) in RENAMES.items():
@@ -247,7 +242,6 @@ def downgrade():
         conn.execute(sa.text('''DELETE FROM public."DocumentPathMapper"
                                 WHERE category = 'Records' AND bucket ILIKE lower(:code) || '-%' AND createdby = :createdby'''),
                      {'code': new, 'createdby': CREATED_BY})
-        conn.execute(sa.text('UPDATE public."ProgramAreas" SET isactive = TRUE WHERE bcgovcode = :c'), {'c': old})
     for code, (old_name, new_name) in RENAMES.items():
         conn.execute(sa.text('UPDATE public."ProgramAreas" SET name = :old WHERE bcgovcode = :c AND name = :new'),
                      {'old': old_name, 'new': new_name, 'c': code})
