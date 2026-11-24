@@ -20,3 +20,4 @@ tests/services/test_recordservicegetter_ocr.py
 tests/models/test_applicant_history_serialization.py
 tests/services/test_request_version_compatibility.py
 tests/restapi/test_applicant_history_contracts.py
+tests/test_migration_sources.py
