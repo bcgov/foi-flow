@@ -15,7 +15,7 @@ except OSError:
     # its native libraries are missing on some dev machines; it is not used by these tests
     sys.modules["weasyprint"] = MagicMock()
 
-from request_api import create_app  # noqa: E402
+from tests.restapi.flask_app import shared_test_client  # noqa: E402
 from request_api.auth import jwt as jwt_manager  # noqa: E402
 from request_api.services.workflowoutboxservice import AckResult  # noqa: E402
 import request_api.resources.foiworkflow as foiworkflow  # noqa: E402
@@ -49,7 +49,7 @@ class FakeOutbox:
 
 @pytest.fixture(scope="module")
 def client():
-    return create_app().test_client()
+    return shared_test_client()
 
 
 @pytest.fixture(autouse=True)
