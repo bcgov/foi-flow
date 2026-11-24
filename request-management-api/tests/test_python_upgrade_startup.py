@@ -48,6 +48,21 @@ def test_application_imports_and_serves_ops(setup):
     assert result.returncode == 0, result.stdout + result.stderr
 
 
+def test_wsgi_monkey_patch_greens_all_rlocks():
+    script = (
+        "import threading; from wsgi import APP; "
+        "lock_del = getattr(threading, '_DeleteDummyThreadOnDel', None); "
+        "assert lock_del is None or "
+        "lock_del.__del__.__defaults__[0] is threading._active_limbo_lock"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", script], cwd=SERVICE_DIR,
+        env=synthetic_environment(), capture_output=True, text=True, timeout=30,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "were not greened" not in result.stdout + result.stderr
+
+
 @pytest.mark.parametrize("arguments,expected", [
     (["db", "heads"], "head"),
     (["db", "--help"], "upgrade"),

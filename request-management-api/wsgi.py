@@ -1,7 +1,18 @@
-from threading import Thread
+import threading
 import eventlet
+
+# Python 3.13 binds threading._active_limbo_lock as a default argument of
+# _DeleteDummyThreadOnDel.__del__, where eventlet cannot green it. Detach it
+# before patching and rebind it to the greened lock afterwards.
+_dummy_thread_del = getattr(getattr(threading, "_DeleteDummyThreadOnDel", None), "__del__", None)
+if _dummy_thread_del is not None and _dummy_thread_del.__defaults__:
+    _dummy_thread_del.__defaults__ = (None,) + _dummy_thread_del.__defaults__[1:]
+
 #Monkey patch to allow for async actions (aka multiple workers)
 eventlet.monkey_patch()
+
+if _dummy_thread_del is not None and _dummy_thread_del.__defaults__:
+    _dummy_thread_del.__defaults__ = (threading._active_limbo_lock,) + _dummy_thread_del.__defaults__[1:]
 
 
 import os
