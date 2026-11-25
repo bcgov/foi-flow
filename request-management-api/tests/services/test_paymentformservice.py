@@ -120,6 +120,18 @@ def test_create_request_not_found_is_404():
     assert FakeFormio.created == []
 
 
+@pytest.mark.parametrize("exc", [KeyError("x"), TypeError("x")])
+def test_create_unknown_ministry_request_is_404(monkeypatch, exc):
+    def boom(self, *args, **kwargs):
+        raise exc
+    monkeypatch.setattr(FakeRequestService, "getpaymentdetails", boom)
+    with pytest.raises(PaymentFormError) as err:
+        _create()
+    assert err.value.status_code == 404
+    assert err.value.message == "Request not found"
+    assert FakeFormio.created == []
+
+
 def test_create_without_approved_fee_is_400():
     FakeRequestService.details = {k: v for k, v in DETAILS.items() if k != "cfrfee"}
     with pytest.raises(PaymentFormError) as err:

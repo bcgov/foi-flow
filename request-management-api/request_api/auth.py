@@ -172,13 +172,14 @@ class Auth:
         return decorated
 
     @classmethod
-    def isworkflowclient(cls):
+    def isworkflowclient(cls, enforce=False):
         """Allows only the workflow engines' Keycloak clients (FOIMOD-5523): the token's azp/clientId claim must be
         N8N_SERVICE_ACCOUNT_CLIENT_ID or one of the comma-separated WORKFLOW_CLIENT_IDS (default: Camunda's client).
 
         WORKFLOW_CLIENT_ACCESS_MODE controls the rollout so the Camunda integration cannot break by surprise:
           - "log" (default): every caller is let through; callers that would be refused are logged by client id.
           - "enforce": callers that are not in the list get 403. Fails closed when the list is empty.
+        enforce=True (FOIMOD-5525 routes): callers not in the list always get 403, whatever the mode.
         Only the client id is logged, never the token or user details. Use in conjunction with require."""
         def decorated(f):
             @wraps(f)
@@ -189,7 +190,7 @@ class Auth:
                 if clientid in allowed:
                     return f(*args, **kwargs)
                 mode = (os.getenv("WORKFLOW_CLIENT_ACCESS_MODE") or "log").strip().lower()
-                if mode == "enforce":
+                if enforce or mode == "enforce":
                     logger.warning("isworkflowclient: refused client=%s path=%s", clientid, request.path)
                     return "Forbidden", HTTPStatus.FORBIDDEN
                 logger.warning("isworkflowclient: log-only mode, would refuse client=%s path=%s", clientid, request.path)

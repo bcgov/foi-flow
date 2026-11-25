@@ -29,7 +29,11 @@ class paymentformservice:
         weburl = (os.getenv(webkey) or "").strip().rstrip("/")
         if not weburl:
             raise FormioNotConfigured(webkey)
-        details = requestservice().getpaymentdetails(requestid, ministryrequestid, includeemail=False)
+        try:
+            details = requestservice().getpaymentdetails(requestid, ministryrequestid, includeemail=False)
+        except (KeyError, TypeError):
+            # an unknown ministry request is dumped as {} / None upstream
+            raise PaymentFormError(404, "Request not found") from None
         if details is None:
             raise PaymentFormError(404, "Request not found")
         try:

@@ -126,7 +126,7 @@ class FOIPaymentFormSubmission(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    @auth.isworkflowclient()
+    @auth.isworkflowclient(enforce=True)
     def post(requestid, ministryrequestid):
         formtype = None
         try:
@@ -144,7 +144,7 @@ class FOIPaymentFormSubmission(Resource):
     @TRACER.trace()
     @cross_origin(origins=allowedorigins())
     @auth.require
-    @auth.isworkflowclient()
+    @auth.isworkflowclient(enforce=True)
     def patch(requestid, ministryrequestid):
         paymentstatus = None
         try:

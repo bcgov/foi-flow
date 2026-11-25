@@ -35,7 +35,7 @@ class PaymentFormSubmissionUpdateSchema(Schema):
     class Meta:  # pylint: disable=too-few-public-methods
         unknown = EXCLUDE
 
-    formId = fields.Str(required=True, validate=validate.Regexp(r"^[0-9a-f]{24}$"))
-    submissionId = fields.Str(required=True, validate=validate.Regexp(r"^[0-9a-f]{24}$"))
+    formId = fields.Str(required=True, validate=validate.Regexp(r"^[0-9a-f]{24}\Z"))
+    submissionId = fields.Str(required=True, validate=validate.Regexp(r"^[0-9a-f]{24}\Z"))
     paymentStatus = fields.Str(required=True, validate=validate.OneOf(["PAID", "CANCELLED"]))
-    status = fields.Str(allow_none=True, load_default=None)
+    status = fields.Str(allow_none=True, load_default=None, validate=validate.Length(max=100))
