@@ -258,3 +258,40 @@ def test_patchsubmission_sends_json_patch_with_string_values(requests_mock):
         {"op": "replace", "path": "/data/status", "value": "Records Review"},
         {"op": "replace", "path": "/data/n", "value": "5"},
     ]
+
+
+@pytest.mark.parametrize(
+    "call, method, path",
+    [
+        (lambda s: s.getformid("payfeeonline"), "get", "/payfeeonline"),
+        (lambda s: s.createsubmission(FID, {"x": 1}), "post", f"/form/{FID}/submission"),
+        (lambda s: s.getsubmission(FID, SID), "get", f"/form/{FID}/submission/{SID}"),
+    ],
+)
+def test_non_json_2xx_raises_formio_error(requests_mock, call, method, path):
+    _login(requests_mock)
+    getattr(requests_mock, method)(URL + path, text="SECRET-BODY")
+    with pytest.raises(FormioError) as exc:
+        call(formioservice())
+    assert str(exc.value) == "Form.io returned an unexpected response"
+    assert "SECRET-BODY" not in str(exc.value)
+
+
+def test_getformid_missing_id_raises_and_does_not_cache(requests_mock):
+    _login(requests_mock)
+    get = requests_mock.get(URL + "/payfeeonline", [{"json": {"other": "SECRET-BODY"}}, {"json": {"_id": FID}}])
+    svc = formioservice()
+    with pytest.raises(FormioError) as exc:
+        svc.getformid("payfeeonline")
+    assert "SECRET-BODY" not in str(exc.value)
+    assert svc.getformid("payfeeonline") == FID
+    assert get.call_count == 2
+
+
+@pytest.mark.parametrize("body", [{"form": FID}, {"_id": SID}, {}, ["SECRET-BODY"]])
+def test_createsubmission_missing_keys_raises(requests_mock, body):
+    _login(requests_mock)
+    requests_mock.post(f"{URL}/form/{FID}/submission", json=body)
+    with pytest.raises(FormioError) as exc:
+        formioservice().createsubmission(FID, {"x": 1})
+    assert str(exc.value) == "Form.io returned an unexpected response"
