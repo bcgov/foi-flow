@@ -83,6 +83,7 @@ def test_create_builds_n8n_parity_body(formtype, formname):
         (
             FORM_IDS[formname],
             {
+                "foiRequestID": "1",
                 "ministryRequestID": "9001",
                 "balanceDue": 45.0,
                 "axisRequestId": "EXM-2026-000123",
