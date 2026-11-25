@@ -151,7 +151,7 @@ class FOIPaymentFormSubmission(Resource):
             body = PaymentFormSubmissionUpdateSchema().load(request.get_json(silent=True) or {})
             paymentstatus = body['paymentStatus']
             result = paymentformservice().updatepaymentformsubmission(
-                requestid, ministryrequestid, body['formId'], body['submissionId'], paymentstatus, body['status'])
+                ministryrequestid, body['formId'], body['submissionId'], paymentstatus, body['status'])
             response = result, 200
         except (ValidationError, PaymentFormError, FormioNotConfigured, FormioError) as exception:
             response = _formsubmissionerror(exception)

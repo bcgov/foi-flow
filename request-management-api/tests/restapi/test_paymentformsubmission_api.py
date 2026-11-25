@@ -43,10 +43,9 @@ class FakePaymentFormService:
             raise FakePaymentFormService.error
         return {"formId": FID, "submissionId": SID, "paymentUrl": "https://example.test/public/form/x"}
 
-    def updatepaymentformsubmission(self, requestid, ministryrequestid, formid, submissionid, paymentstatus,
-                                    status=None):
+    def updatepaymentformsubmission(self, ministryrequestid, formid, submissionid, paymentstatus, status=None):
         FakePaymentFormService.calls.append(
-            ("update", requestid, ministryrequestid, formid, submissionid, paymentstatus, status))
+            ("update", ministryrequestid, formid, submissionid, paymentstatus, status))
         if FakePaymentFormService.error:
             raise FakePaymentFormService.error
         return {"formId": formid, "submissionId": submissionid}
@@ -103,14 +102,14 @@ def test_patch_returns_200(client, monkeypatch):
     response = client.patch(URL, json=_patch_body(), headers=_as(monkeypatch, N8N))
     assert response.status_code == 200
     assert response.get_json() == {"formId": FID, "submissionId": SID}
-    assert FakePaymentFormService.calls == [("update", 8001, 9001, FID, SID, "PAID", None)]
+    assert FakePaymentFormService.calls == [("update", 9001, FID, SID, "PAID", None)]
 
 
 def test_patch_passes_status_through(client, monkeypatch):
     response = client.patch(URL, json=_patch_body(paymentStatus="CANCELLED", status="On Hold"),
                             headers=_as(monkeypatch, N8N))
     assert response.status_code == 200
-    assert FakePaymentFormService.calls == [("update", 8001, 9001, FID, SID, "CANCELLED", "On Hold")]
+    assert FakePaymentFormService.calls == [("update", 9001, FID, SID, "CANCELLED", "On Hold")]
 
 
 @pytest.mark.parametrize("field", ["formId", "submissionId"])
@@ -135,12 +134,13 @@ def test_patch_rejects_expired_status(client, monkeypatch):
     (FormioError("boom"), 502, "Payment form service unavailable"),
 ])
 def test_errors_map_to_status(client, monkeypatch, method, body, exc, code, message):
-    FakePaymentFormService.error = exc
+    monkeypatch.setattr(FakePaymentFormService, "error", exc)
     response = getattr(client, method)(URL, json=body, headers=_as(monkeypatch, N8N))
     assert response.status_code == code
     assert response.get_json() == {"status": False, "message": message}
     text = response.get_data(as_text=True)
-    assert "boom" not in text and "FORMIO_URL" not in text
+    assert "boom" not in text
+    assert "FORMIO_URL" not in text
 
 
 def test_patch_rejects_overlong_status(client, monkeypatch):

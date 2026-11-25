@@ -55,14 +55,14 @@ class FakeFormio:
 @pytest.fixture(autouse=True)
 def _fakes(monkeypatch):
     monkeypatch.setenv("FORMSFLOW_WEB_URL", "https://pay.test")
-    FakeRequestService.details = dict(DETAILS)
-    FakeRequestService.calls = []
-    FakeFormio.stored = {"ministryRequestID": "9001"}
-    FakeFormio.getsubmission_error = None
-    FakeFormio.created = []
-    FakeFormio.getformid_calls = []
-    FakeFormio.getsubmission_calls = []
-    FakeFormio.patches = []
+    monkeypatch.setattr(FakeRequestService, "details", dict(DETAILS))
+    monkeypatch.setattr(FakeRequestService, "calls", [])
+    monkeypatch.setattr(FakeFormio, "stored", {"ministryRequestID": "9001"})
+    monkeypatch.setattr(FakeFormio, "getsubmission_error", None)
+    monkeypatch.setattr(FakeFormio, "created", [])
+    monkeypatch.setattr(FakeFormio, "getformid_calls", [])
+    monkeypatch.setattr(FakeFormio, "getsubmission_calls", [])
+    monkeypatch.setattr(FakeFormio, "patches", [])
     monkeypatch.setattr(module, "requestservice", FakeRequestService)
     monkeypatch.setattr(module, "formioservice", FakeFormio)
 
@@ -112,8 +112,8 @@ def test_create_unknown_form_type_is_400():
     assert FakeFormio.created == []
 
 
-def test_create_request_not_found_is_404():
-    FakeRequestService.details = None
+def test_create_request_not_found_is_404(monkeypatch):
+    monkeypatch.setattr(FakeRequestService, "details", None)
     with pytest.raises(PaymentFormError) as err:
         _create()
     assert err.value.status_code == 404
@@ -132,8 +132,8 @@ def test_create_unknown_ministry_request_is_404(monkeypatch, exc):
     assert FakeFormio.created == []
 
 
-def test_create_without_approved_fee_is_400():
-    FakeRequestService.details = {k: v for k, v in DETAILS.items() if k != "cfrfee"}
+def test_create_without_approved_fee_is_400(monkeypatch):
+    monkeypatch.setattr(FakeRequestService, "details", {k: v for k, v in DETAILS.items() if k != "cfrfee"})
     with pytest.raises(PaymentFormError) as err:
         _create()
     assert err.value.status_code == 400
@@ -141,8 +141,8 @@ def test_create_without_approved_fee_is_400():
 
 
 @pytest.mark.parametrize("balance", ["0.00", "-1.00"])
-def test_create_with_no_balance_due_is_400(balance):
-    FakeRequestService.details = {**DETAILS, "cfrfee": {"feedata": {"balanceDue": balance}}}
+def test_create_with_no_balance_due_is_400(monkeypatch, balance):
+    monkeypatch.setattr(FakeRequestService, "details", {**DETAILS, "cfrfee": {"feedata": {"balanceDue": balance}}})
     with pytest.raises(PaymentFormError) as err:
         _create()
     assert err.value.status_code == 400
@@ -165,7 +165,7 @@ def test_create_without_formsflow_web_url_raises_not_configured(monkeypatch, val
 
 def _update(paymentstatus="PAID", status="Records Review", formid=FID, submissionid=SID, ministryrequestid=9001):
     return paymentformservice().updatepaymentformsubmission(
-        1, ministryrequestid, formid, submissionid, paymentstatus, status
+        ministryrequestid, formid, submissionid, paymentstatus, status
     )
 
 
@@ -189,30 +189,30 @@ def test_update_rejects_form_that_is_not_a_payment_form():
 
 
 @pytest.mark.parametrize("stored", [9001, "9001"])
-def test_update_matches_numeric_and_string_ministry_request_id(stored):
-    FakeFormio.stored = {"ministryRequestID": stored}
+def test_update_matches_numeric_and_string_ministry_request_id(monkeypatch, stored):
+    monkeypatch.setattr(FakeFormio, "stored", {"ministryRequestID": stored})
     _update()
     assert len(FakeFormio.patches) == 1
 
 
-def test_update_other_requests_submission_is_404():
-    FakeFormio.stored = {"ministryRequestID": "9002"}
+def test_update_other_requests_submission_is_404(monkeypatch):
+    monkeypatch.setattr(FakeFormio, "stored", {"ministryRequestID": "9002"})
     with pytest.raises(PaymentFormError) as err:
         _update()
     assert err.value.status_code == 404
     assert FakeFormio.patches == []
 
 
-def test_update_missing_submission_is_404():
-    FakeFormio.getsubmission_error = FormioNotFound("Form.io returned 404")
+def test_update_missing_submission_is_404(monkeypatch):
+    monkeypatch.setattr(FakeFormio, "getsubmission_error", FormioNotFound("Form.io returned 404"))
     with pytest.raises(PaymentFormError) as err:
         _update()
     assert err.value.status_code == 404
     assert FakeFormio.patches == []
 
 
-def test_update_other_formio_errors_propagate():
-    FakeFormio.getsubmission_error = FormioError("Form.io unreachable")
+def test_update_other_formio_errors_propagate(monkeypatch):
+    monkeypatch.setattr(FakeFormio, "getsubmission_error", FormioError("Form.io unreachable"))
     with pytest.raises(FormioError):
         _update()
 
