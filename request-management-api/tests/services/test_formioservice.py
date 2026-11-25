@@ -1,0 +1,304 @@
+"""FOIMOD-5525: Form.io client (limited-user login, token cache, error mapping). All data is made up."""
+import importlib.util
+import sys
+import threading
+
+import pytest
+import requests
+from jose import jwt
+
+from request_api.services.external import formioservice as formioservice_module
+from request_api.services.external.formioservice import (
+    FormioError,
+    FormioNotConfigured,
+    FormioNotFound,
+    formioservice,
+    reset_cache,
+)
+
+URL = "https://formio.test"
+EMAIL = "limited@example.test"
+PASSWORD = "p4ssw0rd-made-up"
+NOW = 1_000_000.0
+
+
+def _token(exp=None, marker="a"):
+    claims = {"m": marker}
+    if exp is not None:
+        claims["exp"] = exp
+    return jwt.encode(claims, "k", algorithm="HS256")
+
+
+@pytest.fixture(autouse=True)
+def _settings(monkeypatch):
+    monkeypatch.setenv("FORMIO_URL", URL)
+    monkeypatch.setenv("FORMIO_PAYMENT_USER_EMAIL", EMAIL)
+    monkeypatch.setenv("FORMIO_PAYMENT_USER_PASSWORD", PASSWORD)
+    monkeypatch.setattr(formioservice_module, "_now", lambda: NOW)
+    reset_cache()
+    yield
+    reset_cache()
+
+
+def _login(requests_mock, token=None):
+    token = token or _token(NOW + 3600)
+    return requests_mock.post(URL + "/user/login", headers={"x-jwt-token": token}, json={}), token
+
+
+@pytest.mark.parametrize("name", ["FORMIO_URL", "FORMIO_PAYMENT_USER_EMAIL", "FORMIO_PAYMENT_USER_PASSWORD"])
+@pytest.mark.parametrize("blank", [None, ""])
+def test_missing_settings_raise_not_configured(monkeypatch, name, blank):
+    if blank is None:
+        monkeypatch.delenv(name)
+    else:
+        monkeypatch.setenv(name, blank)
+    svc = formioservice()
+    with pytest.raises(FormioNotConfigured) as exc:
+        svc._request("GET", "/payfeeonline")
+    assert name in str(exc.value)
+    assert PASSWORD not in str(exc.value)
+
+
+def test_login_posts_credentials_and_uses_jwt_header(requests_mock):
+    login, token = _login(requests_mock)
+    get = requests_mock.get(URL + "/payfeeonline", json={})
+    resp = formioservice()._request("GET", "/payfeeonline")
+    assert resp.status_code == 200
+    assert login.last_request.json() == {"data": {"email": EMAIL, "password": PASSWORD}}
+    assert get.last_request.headers["x-jwt-token"] == token
+
+
+def test_token_reused_for_15_minutes(requests_mock, monkeypatch):
+    login, _ = _login(requests_mock, _token(NOW + 60))
+    requests_mock.get(URL + "/payfeeonline", json={})
+    svc = formioservice()
+    svc._request("GET", "/payfeeonline")
+    svc._request("GET", "/payfeeonline")
+    assert login.call_count == 1
+    monkeypatch.setattr(formioservice_module, "_now", lambda: NOW + 899)
+    svc._request("GET", "/payfeeonline")
+    assert login.call_count == 1
+    monkeypatch.setattr(formioservice_module, "_now", lambda: NOW + 900)
+    svc._request("GET", "/payfeeonline")
+    assert login.call_count == 2
+
+
+def test_token_claims_are_not_read(requests_mock):
+    _login(requests_mock, "not-a-jwt")
+    get = requests_mock.get(URL + "/payfeeonline", json={})
+    formioservice()._request("GET", "/payfeeonline")
+    assert get.last_request.headers["x-jwt-token"] == "not-a-jwt"
+
+
+def test_login_without_token_header_raises(requests_mock):
+    requests_mock.post(URL + "/user/login", json={})
+    svc = formioservice()
+    with pytest.raises(FormioError):
+        svc._request("GET", "/payfeeonline")
+
+
+@pytest.mark.parametrize("status", [440, 401])
+def test_relogins_once_on_expired_session(requests_mock, status):
+    login, _ = _login(requests_mock)
+    get = requests_mock.get(URL + "/payfeeonline", [{"status_code": status}, {"status_code": 200}])
+    assert formioservice()._request("GET", "/payfeeonline").status_code == 200
+    assert login.call_count == 2
+    assert get.call_count == 2
+
+
+@pytest.mark.parametrize("status", [440, 401])
+def test_gives_up_after_one_relogin(requests_mock, status):
+    login, _ = _login(requests_mock)
+    get = requests_mock.get(URL + "/payfeeonline", [{"status_code": status}, {"status_code": status}])
+    svc = formioservice()
+    with pytest.raises(FormioError):
+        svc._request("GET", "/payfeeonline")
+    assert login.call_count == 2
+    assert get.call_count == 2
+
+
+def test_concurrent_first_calls_log_in_once(requests_mock):
+    login, _ = _login(requests_mock)
+    requests_mock.get(URL + "/payfeeonline", json={})
+    barrier = threading.Barrier(5)
+    results, errors = [], []
+
+    def work():
+        try:
+            barrier.wait()
+            results.append(formioservice()._request("GET", "/payfeeonline").status_code)
+        except Exception as e:  # pragma: no cover
+            errors.append(e)
+
+    threads = [threading.Thread(target=work) for _ in range(5)]
+    [t.start() for t in threads]
+    [t.join() for t in threads]
+    assert not errors
+    assert results == [200] * 5
+    assert login.call_count == 1
+
+
+def test_errors_hide_response_body_and_secrets(requests_mock, caplog):
+    _, token = _login(requests_mock)
+    requests_mock.get(URL + "/boom", status_code=500, text="SECRET-BODY")
+    requests_mock.get(URL + "/slow", exc=requests.exceptions.ConnectTimeout(f"{PASSWORD} {token}"))
+    svc = formioservice()
+    with caplog.at_level("DEBUG"):
+        with pytest.raises(FormioError) as e1:
+            svc._request("GET", "/boom")
+        with pytest.raises(FormioError) as e2:
+            svc._request("GET", "/slow")
+    assert str(e1.value) == "Form.io GET returned 500"
+    assert str(e2.value) == "Form.io unreachable"
+    for text in (str(e1.value), str(e2.value), caplog.text):
+        assert "SECRET-BODY" not in text
+        assert PASSWORD not in text
+        assert token not in text
+
+
+def test_login_failure_hides_secrets(requests_mock):
+    requests_mock.post(URL + "/user/login", status_code=401, text="SECRET-BODY")
+    svc = formioservice()
+    with pytest.raises(FormioError) as exc:
+        svc._request("GET", "/payfeeonline")
+    assert "SECRET-BODY" not in str(exc.value)
+    assert PASSWORD not in str(exc.value)
+
+
+def test_404_raises_formio_not_found(requests_mock):
+    _login(requests_mock)
+    requests_mock.get(URL + "/nope", status_code=404)
+    svc = formioservice()
+    with pytest.raises(FormioNotFound):
+        svc._request("GET", "/nope")
+    assert issubclass(FormioNotFound, FormioError)
+
+
+def test_request_uses_timeout(requests_mock):
+    _login(requests_mock)
+    get = requests_mock.get(URL + "/payfeeonline", json={})
+    formioservice()._request("GET", "/payfeeonline")
+    assert get.last_request.timeout == (10, 10)
+
+
+def test_import_does_no_network(requests_mock):
+    # Load a throwaway copy: reloading the real module would rebind its exception classes and lock.
+    spec = importlib.util.spec_from_file_location("formioservice_import_check", formioservice_module.__file__)
+    module = importlib.util.module_from_spec(spec)
+    before = sys.modules[formioservice_module.__name__]
+    spec.loader.exec_module(module)
+    assert requests_mock.call_count == 0
+    assert module.FormioError is not FormioError
+    assert sys.modules[formioservice_module.__name__] is before
+    assert formioservice_module.FormioError is FormioError
+
+
+FID = "a" * 24
+SID = "b" * 24
+
+
+def test_getformid_reads_id_and_caches_for_an_hour(requests_mock, monkeypatch):
+    _login(requests_mock)
+    get = requests_mock.get(URL + "/payfeeonline", json={"_id": FID})
+    svc = formioservice()
+    assert svc.getformid("payfeeonline") == FID
+    assert svc.getformid("payfeeonline") == FID
+    assert get.call_count == 1
+    monkeypatch.setattr(formioservice_module, "_now", lambda: NOW + 3599)
+    svc.getformid("payfeeonline")
+    assert get.call_count == 1
+    monkeypatch.setattr(formioservice_module, "_now", lambda: NOW + 3601)
+    svc.getformid("payfeeonline")
+    assert get.call_count == 2
+
+
+def test_getformid_caches_per_form_name(requests_mock):
+    _login(requests_mock)
+    requests_mock.get(URL + "/payfeeonline", json={"_id": FID})
+    requests_mock.get(URL + "/payoutstandingform", json={"_id": "c" * 24})
+    svc = formioservice()
+    assert svc.getformid("payfeeonline") == FID
+    assert svc.getformid("payoutstandingform") == "c" * 24
+
+
+def test_reset_cache_clears_form_ids(requests_mock):
+    _login(requests_mock)
+    get = requests_mock.get(URL + "/payfeeonline", json={"_id": FID})
+    formioservice().getformid("payfeeonline")
+    reset_cache()
+    formioservice().getformid("payfeeonline")
+    assert get.call_count == 2
+
+
+def test_createsubmission_posts_data_and_returns_ids(requests_mock):
+    _login(requests_mock)
+    post = requests_mock.post(f"{URL}/form/{FID}/submission", json={"_id": SID, "form": FID, "data": {"x": 1}})
+    result = formioservice().createsubmission(FID, {"x": 1})
+    assert post.last_request.json() == {"data": {"x": 1}}
+    assert result == {"formId": FID, "submissionId": SID}
+
+
+def test_getsubmission_returns_raw_json(requests_mock):
+    _login(requests_mock)
+    body = {"_id": SID, "form": FID, "data": {"ministryRequestID": 7}}
+    requests_mock.get(f"{URL}/form/{FID}/submission/{SID}", json=body)
+    assert formioservice().getsubmission(FID, SID) == body
+
+
+def test_getsubmission_404_raises_not_found(requests_mock):
+    _login(requests_mock)
+    requests_mock.get(f"{URL}/form/{FID}/submission/{SID}", status_code=404)
+    svc = formioservice()
+    with pytest.raises(FormioNotFound):
+        svc.getsubmission(FID, SID)
+
+
+def test_patchsubmission_sends_json_patch_with_string_values(requests_mock):
+    _login(requests_mock)
+    patch = requests_mock.patch(f"{URL}/form/{FID}/submission/{SID}", json={})
+    result = formioservice().patchsubmission(FID, SID, {"paymentstatus": "PAID", "status": "Records Review", "n": 5})
+    assert result is None
+    assert patch.last_request.json() == [
+        {"op": "replace", "path": "/data/paymentstatus", "value": "PAID"},
+        {"op": "replace", "path": "/data/status", "value": "Records Review"},
+        {"op": "replace", "path": "/data/n", "value": "5"},
+    ]
+
+
+@pytest.mark.parametrize(
+    "call, method, path",
+    [
+        (lambda s: s.getformid("payfeeonline"), "get", "/payfeeonline"),
+        (lambda s: s.createsubmission(FID, {"x": 1}), "post", f"/form/{FID}/submission"),
+        (lambda s: s.getsubmission(FID, SID), "get", f"/form/{FID}/submission/{SID}"),
+    ],
+)
+def test_non_json_2xx_raises_formio_error(requests_mock, call, method, path):
+    _login(requests_mock)
+    getattr(requests_mock, method)(URL + path, text="SECRET-BODY")
+    svc = formioservice()
+    with pytest.raises(FormioError) as exc:
+        call(svc)
+    assert str(exc.value) == "Form.io returned an unexpected response"
+    assert "SECRET-BODY" not in str(exc.value)
+
+
+def test_getformid_missing_id_raises_and_does_not_cache(requests_mock):
+    _login(requests_mock)
+    get = requests_mock.get(URL + "/payfeeonline", [{"json": {"other": "SECRET-BODY"}}, {"json": {"_id": FID}}])
+    svc = formioservice()
+    with pytest.raises(FormioError) as exc:
+        svc.getformid("payfeeonline")
+    assert "SECRET-BODY" not in str(exc.value)
+    assert svc.getformid("payfeeonline") == FID
+    assert get.call_count == 2
+
+
+@pytest.mark.parametrize("body", [{"form": FID}, {"_id": SID}, {}, ["SECRET-BODY"]])
+def test_createsubmission_missing_keys_raises(requests_mock, body):
+    _login(requests_mock)
+    requests_mock.post(f"{URL}/form/{FID}/submission", json=body)
+    svc = formioservice()
+    with pytest.raises(FormioError) as exc:
+        svc.createsubmission(FID, {"x": 1})
+    assert str(exc.value) == "Form.io returned an unexpected response"
