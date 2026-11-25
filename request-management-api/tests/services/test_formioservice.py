@@ -1,5 +1,6 @@
 """FOIMOD-5525: Form.io client (limited-user login, token cache, error mapping). All data is made up."""
-import importlib
+import importlib.util
+import sys
 import threading
 
 import pytest
@@ -177,5 +178,12 @@ def test_request_uses_timeout(requests_mock):
 
 
 def test_import_does_no_network(requests_mock):
-    importlib.reload(formioservice_module)
+    # Load a throwaway copy: reloading the real module would rebind its exception classes and lock.
+    spec = importlib.util.spec_from_file_location("formioservice_import_check", formioservice_module.__file__)
+    module = importlib.util.module_from_spec(spec)
+    before = sys.modules[formioservice_module.__name__]
+    spec.loader.exec_module(module)
     assert requests_mock.call_count == 0
+    assert module.FormioError is not FormioError
+    assert sys.modules[formioservice_module.__name__] is before
+    assert formioservice_module.FormioError is FormioError
