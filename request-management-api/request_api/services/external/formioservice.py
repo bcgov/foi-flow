@@ -4,7 +4,6 @@ import threading
 import time
 
 import requests
-from jose import jwt
 
 """
 Low-level client for the Form.io API, logging in as a limited Form.io user (FOIMOD-5525).
@@ -15,8 +14,9 @@ and submission data are never logged and never put in exception messages.
 logger = logging.getLogger(__name__)
 
 TIMEOUT = (10, 10)
-_REFRESH_MARGIN = 60
-_DEFAULT_TOKEN_TTL = 300
+# The token is not decoded (RMA cannot verify Form.io's signature). It is reused for a fixed
+# time, shorter than Form.io's token lifetime; an earlier expiry is handled by one re-login.
+_TOKEN_TTL = 900
 _FORM_ID_TTL = 3600
 _EXPIRED_SESSION_STATUSES = (401, 440)
 
@@ -77,19 +77,15 @@ class formioservice:
         token = response.headers.get("x-jwt-token")
         if not token:
             raise FormioError("Form.io login returned no token")
-        try:
-            exp = float(jwt.get_unverified_claims(token)["exp"])
-        except Exception:
-            exp = _now() + _DEFAULT_TOKEN_TTL
         _TOKEN["value"] = token
-        _TOKEN["exp"] = exp
+        _TOKEN["exp"] = _now() + _TOKEN_TTL
         return token
 
     def _gettoken(self, stale=None):
         """Return a valid token, logging in if needed. `stale` is a token the server just refused."""
         with _LOCK:
             token = _TOKEN["value"]
-            if token is None or token == stale or _now() >= _TOKEN["exp"] - _REFRESH_MARGIN:
+            if token is None or token == stale or _now() >= _TOKEN["exp"]:
                 token = self._login()
             return token
 
