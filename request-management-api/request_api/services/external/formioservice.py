@@ -115,23 +115,35 @@ class formioservice:
             raise FormioError(f"Form.io {method} returned {response.status_code}")
         return response
 
+    def _json(self, response, *required):
+        """Parse a JSON object response; anything else becomes a FormioError without the body."""
+        try:
+            body = response.json()
+            if not isinstance(body, dict) or any(key not in body for key in required):
+                raise ValueError
+        except ValueError:
+            raise FormioError("Form.io returned an unexpected response") from None
+        return body
+
     def getformid(self, formname):
         """Return the Form.io id of a form by its path name, cached for an hour."""
         with _LOCK:
             cached = _FORM_IDS.get(formname)
             if cached and _now() - cached[1] < _FORM_ID_TTL:
                 return cached[0]
-        formid = self._request("GET", f"/{formname}").json()["_id"]
+        formid = self._json(self._request("GET", f"/{formname}"), "_id")["_id"]
         with _LOCK:
             _FORM_IDS[formname] = (formid, _now())
         return formid
 
     def createsubmission(self, formid, data):
-        response = self._request("POST", f"/form/{formid}/submission", json={"data": data}).json()
+        response = self._json(
+            self._request("POST", f"/form/{formid}/submission", json={"data": data}), "_id", "form"
+        )
         return {"formId": response["form"], "submissionId": response["_id"]}
 
     def getsubmission(self, formid, submissionid):
-        return self._request("GET", f"/form/{formid}/submission/{submissionid}").json()
+        return self._json(self._request("GET", f"/form/{formid}/submission/{submissionid}"))
 
     def patchsubmission(self, formid, submissionid, fields):
         operations = [{"op": "replace", "path": f"/data/{k}", "value": str(v)} for k, v in fields.items()]
