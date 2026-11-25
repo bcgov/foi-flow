@@ -300,7 +300,7 @@ What a replay does: the row returns to `PENDING`, `attempts` goes to 0, `replayc
 | `N8N_SERVICE_ACCOUNT_CLIENT_ID` | empty | Keycloak client allowed to call the callback, the claim and the execution lookup. If empty, every callback is rejected and every event would end up `NO_OUTCOME`. |
 | `WORKFLOW_CLIENT_IDS` | `forms-flow-bpm` (when unset) | Keycloak clients, comma-separated, allowed to read payment details from `GET .../payonline` together with `N8N_SERVICE_ACCOUNT_CLIENT_ID`. The default is Camunda's client (the `KEYCLOAK_CLIENTID` of the Camunda deployment), so no environment change is needed. Set it only to override; an empty value allows n8n only. Remove the default when Camunda is decommissioned, not just scaled to zero. `BPM_CLIENT_ID` is not used: it is the API's outgoing login to Camunda. |
 | `WORKFLOW_CLIENT_ACCESS_MODE` | `log` | `log`: every caller may read `payonline`, and each caller that is not a workflow client is logged by client id. `enforce`: those callers get 403, and everyone is refused if no client id is set. Switch to `enforce` only after the logs show the only callers are the workflow engines (FOIMOD-5523). `log` is a temporary rollout step, not a permanent setting. |
-| `FORMIO_URL`, `FORMIO_PAYMENT_USER_EMAIL`, `FORMIO_PAYMENT_USER_PASSWORD`, `FORMSFLOW_WEB_URL` | empty | Payment form submission (FOIMOD-5525, see "Payment form submission" below). The email and password are a limited Form.io user, never root. When any is blank the two `formsubmission` endpoints return 503; the rest of the API is unaffected. |
+| `FORMIO_URL`, `FORMIO_PAYMENT_USER_EMAIL`, `FORMIO_PAYMENT_USER_PASSWORD`, `FORMSFLOW_WEB_URL` | empty | Payment form submission (FOIMOD-5525, see "Payment form submission" below). The email and password are a limited Form.io user, never root. When a required one is blank the `formsubmission` endpoints return 503 (update does not need `FORMSFLOW_WEB_URL`); the rest of the API is unaffected. |
 
 **Optional, only for the one-time payment backfill, and only if you run it through the API endpoints** (not needed for normal operation):
 
@@ -313,14 +313,16 @@ What a replay does: the row returns to `PENDING`, `attempts` goes to 0, `replayc
 
 n8n no longer talks to Form.io. The API creates and updates the payment form submission, so **n8n holds no Form.io credential**. The API logs in to Form.io as a limited user (`FORMIO_PAYMENT_USER_EMAIL` / `FORMIO_PAYMENT_USER_PASSWORD`, never root) and only for these two endpoints.
 
-Both endpoints are workflow-only (`auth.require` plus the workflow-client check from FOIMOD-5523: `N8N_SERVICE_ACCOUNT_CLIENT_ID`, `WORKFLOW_CLIENT_IDS`, `WORKFLOW_CLIENT_ACCESS_MODE`).
+Both endpoints are workflow-only (`auth.require` plus the workflow-client check from FOIMOD-5523: only the clients in `N8N_SERVICE_ACCOUNT_CLIENT_ID` and `WORKFLOW_CLIENT_IDS` are allowed). Enforcement is always on for these two routes: `WORKFLOW_CLIENT_ACCESS_MODE` does not apply, and any other client gets `403`.
 
 | Call | Body | Success |
 |---|---|---|
 | `POST /api/foipayment/{requestid}/ministryrequest/{ministryrequestid}/formsubmission` | `{"formType": "payonline" \| "payoutstanding"}` | `201` `{"formId", "submissionId", "paymentUrl"}` |
 | `PATCH` the same path | `{"formId", "submissionId", "paymentStatus": "PAID" \| "CANCELLED", "status"?}` | `200` `{"formId", "submissionId"}` |
 
-Errors: `400` invalid body, malformed ids or no balance due; `404` request, ministry request or submission not found; `502` Form.io unavailable or refused after one re-login; `503` the four settings are not all set.
+Errors: `400` invalid body, malformed ids or no balance due; `404` request, ministry request or submission not found; `502` Form.io unavailable or refused after one re-login; `503` a required setting is missing (create needs all four settings; update needs the three Form.io settings, not `FORMSFLOW_WEB_URL`).
+
+Retries: do **not** auto-retry the create call. It is not idempotent (each call makes a new submission), so n8n must reuse the stored ids when an event is replayed. The update call is safe to retry.
 
 n8n calls them through the "FOI Backend API Manager" workflow with these categories (inputs: `category`, `foiRequestId`, `ministryRequestId`, `reqPayload`):
 

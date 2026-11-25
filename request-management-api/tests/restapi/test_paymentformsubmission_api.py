@@ -114,7 +114,7 @@ def test_patch_passes_status_through(client, monkeypatch):
 
 
 @pytest.mark.parametrize("field", ["formId", "submissionId"])
-@pytest.mark.parametrize("bad", ["", "undefined", "../x", "A" * 24, "a" * 23])
+@pytest.mark.parametrize("bad", ["", "undefined", "../x", "A" * 24, "a" * 23, "b" * 24 + "\n", "a" * 24 + "\n"])
 def test_patch_rejects_malformed_ids(client, monkeypatch, field, bad):
     response = client.patch(URL, json=_patch_body(**{field: bad}), headers=_as(monkeypatch, N8N))
     assert response.status_code == 400
@@ -143,12 +143,26 @@ def test_errors_map_to_status(client, monkeypatch, method, body, exc, code, mess
     assert "boom" not in text and "FORMIO_URL" not in text
 
 
-@pytest.mark.parametrize("mode,code", [(None, 201), ("enforce", 403)])
-def test_staff_token_follows_workflow_client_mode(client, monkeypatch, mode, code):
+def test_patch_rejects_overlong_status(client, monkeypatch):
+    response = client.patch(URL, json=_patch_body(status="x" * 101), headers=_as(monkeypatch, N8N))
+    assert response.status_code == 400
+    assert FakePaymentFormService.calls == []
+
+
+@pytest.mark.parametrize("mode", [None, "log", "enforce"])
+@pytest.mark.parametrize("method,body", [("post", {"formType": "payonline"}), ("patch", _patch_body())])
+def test_staff_token_is_always_refused(client, monkeypatch, mode, method, body):
     if mode:
         monkeypatch.setenv("WORKFLOW_CLIENT_ACCESS_MODE", mode)
-    response = client.post(URL, json={"formType": "payonline"}, headers=_as(monkeypatch, STAFF))
-    assert response.status_code == code
+    response = getattr(client, method)(URL, json=body, headers=_as(monkeypatch, STAFF))
+    assert response.status_code == 403
+    assert FakePaymentFormService.calls == []
+
+
+@pytest.mark.parametrize("claims", [N8N, CAMUNDA])
+def test_workflow_clients_are_allowed(client, monkeypatch, claims):
+    response = client.post(URL, json={"formType": "payonline"}, headers=_as(monkeypatch, claims))
+    assert response.status_code == 201
 
 
 def test_existing_payment_routes_unchanged_without_formio_settings(client, monkeypatch):
