@@ -187,3 +187,74 @@ def test_import_does_no_network(requests_mock):
     assert module.FormioError is not FormioError
     assert sys.modules[formioservice_module.__name__] is before
     assert formioservice_module.FormioError is FormioError
+
+
+FID = "a" * 24
+SID = "b" * 24
+
+
+def test_getformid_reads_id_and_caches_for_an_hour(requests_mock, monkeypatch):
+    _login(requests_mock)
+    get = requests_mock.get(URL + "/payfeeonline", json={"_id": FID})
+    svc = formioservice()
+    assert svc.getformid("payfeeonline") == FID
+    assert svc.getformid("payfeeonline") == FID
+    assert get.call_count == 1
+    monkeypatch.setattr(formioservice_module, "_now", lambda: NOW + 3599)
+    svc.getformid("payfeeonline")
+    assert get.call_count == 1
+    monkeypatch.setattr(formioservice_module, "_now", lambda: NOW + 3601)
+    svc.getformid("payfeeonline")
+    assert get.call_count == 2
+
+
+def test_getformid_caches_per_form_name(requests_mock):
+    _login(requests_mock)
+    requests_mock.get(URL + "/payfeeonline", json={"_id": FID})
+    requests_mock.get(URL + "/payoutstandingform", json={"_id": "c" * 24})
+    svc = formioservice()
+    assert svc.getformid("payfeeonline") == FID
+    assert svc.getformid("payoutstandingform") == "c" * 24
+
+
+def test_reset_cache_clears_form_ids(requests_mock):
+    _login(requests_mock)
+    get = requests_mock.get(URL + "/payfeeonline", json={"_id": FID})
+    formioservice().getformid("payfeeonline")
+    reset_cache()
+    formioservice().getformid("payfeeonline")
+    assert get.call_count == 2
+
+
+def test_createsubmission_posts_data_and_returns_ids(requests_mock):
+    _login(requests_mock)
+    post = requests_mock.post(f"{URL}/form/{FID}/submission", json={"_id": SID, "form": FID, "data": {"x": 1}})
+    result = formioservice().createsubmission(FID, {"x": 1})
+    assert post.last_request.json() == {"data": {"x": 1}}
+    assert result == {"formId": FID, "submissionId": SID}
+
+
+def test_getsubmission_returns_raw_json(requests_mock):
+    _login(requests_mock)
+    body = {"_id": SID, "form": FID, "data": {"ministryRequestID": 7}}
+    requests_mock.get(f"{URL}/form/{FID}/submission/{SID}", json=body)
+    assert formioservice().getsubmission(FID, SID) == body
+
+
+def test_getsubmission_404_raises_not_found(requests_mock):
+    _login(requests_mock)
+    requests_mock.get(f"{URL}/form/{FID}/submission/{SID}", status_code=404)
+    with pytest.raises(FormioNotFound):
+        formioservice().getsubmission(FID, SID)
+
+
+def test_patchsubmission_sends_json_patch_with_string_values(requests_mock):
+    _login(requests_mock)
+    patch = requests_mock.patch(f"{URL}/form/{FID}/submission/{SID}", json={})
+    result = formioservice().patchsubmission(FID, SID, {"paymentstatus": "PAID", "status": "Records Review", "n": 5})
+    assert result is None
+    assert patch.last_request.json() == [
+        {"op": "replace", "path": "/data/paymentstatus", "value": "PAID"},
+        {"op": "replace", "path": "/data/status", "value": "Records Review"},
+        {"op": "replace", "path": "/data/n", "value": "5"},
+    ]

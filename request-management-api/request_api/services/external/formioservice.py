@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 TIMEOUT = (10, 10)
 _REFRESH_MARGIN = 60
 _DEFAULT_TOKEN_TTL = 300
+_FORM_ID_TTL = 3600
 _EXPIRED_SESSION_STATUSES = (401, 440)
 
 _TOKEN = {"value": None, "exp": 0.0}
@@ -113,3 +114,25 @@ class formioservice:
         if response.status_code >= 400:
             raise FormioError(f"Form.io {method} returned {response.status_code}")
         return response
+
+    def getformid(self, formname):
+        """Return the Form.io id of a form by its path name, cached for an hour."""
+        with _LOCK:
+            cached = _FORM_IDS.get(formname)
+            if cached and _now() - cached[1] < _FORM_ID_TTL:
+                return cached[0]
+        formid = self._request("GET", f"/{formname}").json()["_id"]
+        with _LOCK:
+            _FORM_IDS[formname] = (formid, _now())
+        return formid
+
+    def createsubmission(self, formid, data):
+        response = self._request("POST", f"/form/{formid}/submission", json={"data": data}).json()
+        return {"formId": response["form"], "submissionId": response["_id"]}
+
+    def getsubmission(self, formid, submissionid):
+        return self._request("GET", f"/form/{formid}/submission/{submissionid}").json()
+
+    def patchsubmission(self, formid, submissionid, fields):
+        operations = [{"op": "replace", "path": f"/data/{k}", "value": str(v)} for k, v in fields.items()]
+        self._request("PATCH", f"/form/{formid}/submission/{submissionid}", json=operations)
