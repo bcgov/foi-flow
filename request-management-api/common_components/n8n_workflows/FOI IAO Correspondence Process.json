@@ -1,0 +1,554 @@
+{
+  "name": "FOI IAO Correspondence Process",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "0fb3b47a-2665-40a2-94dd-04046c209390",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        304
+      ],
+      "notes": "Handles foi-iao-correnspodence (existing event spelling preserved)."
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const input = $input.first().json || {};\n  const event = input.event;\n  const eventId = input.eventId;\n  const occurredAt = input.occurredAt;\n\n  if (!event || typeof event !== 'string') {\n    throw new Error('Required field \"body.event\" is missing or invalid.');\n  }\n\n  // The COMPLETE original event payload - never reduced to the normalised fields.\n  let metadata = input.metadata;\n  if (typeof metadata === 'string') {\n    try {\n      metadata = JSON.parse(metadata);\n    } catch (e) {\n      metadata = null;\n    }\n  }  \n  const executionId = $execution.id;\n\n  // foiRequestMetaData arrives as an object (intake events) or as a JSON string (IAO / ministry events).\n  let foiRequestMetaData = metadata.foiRequestMetaData;\n  if (typeof foiRequestMetaData === 'string') {\n    try {\n      foiRequestMetaData = JSON.parse(foiRequestMetaData);\n    } catch (e) {\n      foiRequestMetaData = null;\n    }\n  }\n  let metadataString = \"\";\n  if (!metadata || typeof metadata === 'string') {   \n      metadataString = metadata;    \n  } else if (!metadata || typeof metadata === 'object') {\n      metadataString = JSON.stringify(metadata);\n  }\n  \n    return {\n      json: {\n        event,\n        eventId,\n        occurredAt,\n        rawRequestId: input.rawRequestId,\n        foiRequestId: input.foiRequestId,\n        ministryRequestId: input.ministryRequestId,\n        status: foiRequestMetaData?.status,\n        metadata: metadataString,\n        executionId,\n      },\n    };\n\n} catch (error) {\n   const input = $input.first().json || {};\n  return {\n    json: {\n      event: '',\n      eventId: (input && typeof input === 'object' && typeof input.eventId === 'string') ? input.eventId : null,\n      receivedEvent: (input && typeof input === 'object' && typeof input.event === 'string') ? input.event : null,\n      error: true,\n      errorMessage: error.message,\n      metadata: input.metadata ?? null,\n      executionId: $execution.id,\n    },\n  };\n}"
+      },
+      "id": "05853e07-7174-46db-a4e8-6592e591d1eb",
+      "name": "Set Event Variables",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "23145402-7af5-469b-8557-566b67780393",
+              "leftValue": "={{ $json.status }}",
+              "operator": {
+                "operation": "equals",
+                "type": "string"
+              },
+              "rightValue": "Closed"
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          }
+        },
+        "options": {}
+      },
+      "id": "14675cfb-d2d4-4304-b01f-7b01727c16d2",
+      "name": "IAO Correspondence: Closed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Builds the fixed-field input for FOI Fee Processing (feeAction = initiate): every field the Start node of that workflow accepts.\ntry {\n  const parseJson = (value) => {\n    if (value && typeof value === 'object') return value;\n    if (typeof value === 'string' && value.trim()) {\n      try { return JSON.parse(value); } catch (e) {\n        try { return JSON.parse(value.replace(/'/g, '\"')); } catch (e2) { return {}; }\n      }\n    }\n    return {};\n  };\n  \n  const input = $('Set Event Variables').first().json || {};\n  const eventId = input.eventId;\n  const occurredAt = input.occurredAt;\n  const metadata = parseJson(input.metadata);\n  const foiRequestMetaData = parseJson(metadata?.foiRequestMetaData);\n    \n  return [{\n    json: {\n      event: 'foi-fee-payment',\n      eventId,\n      occurredAt,\n      feeAction: 'initiate',\n      triggeredBy: input.event,\n      category: 'foi-fee-payment',\n      serviceKey: 'correspondence',\n      paymentStatus: 'NOT PAID',\n      isSync: false,\n      isOfflinePayment: false,\n      isPaymentActive: false,\n      rawRequestId: String(input.rawRequestId ?? ''),\n      foiRequestId: String(input.foiRequestId ?? ''),\n      ministryRequestId: String(input.ministryRequestId ?? ''),\n      fileNumber: foiRequestMetaData?.id,\n      paymentExpiryDate: foiRequestMetaData?.paymentExpiryDate,\n      previousStatus: '',\n      status: input.status ?? foiRequestMetaData?.status ?? '',\n      applicantCorrespondenceId: foiRequestMetaData?.applicantcorrespondenceid ?? '',\n      templateName: foiRequestMetaData?.templatename ?? '',\n      executionId: input.executionId,\n      metadata: input.metadata\n    }\n  }];\n  \n} catch (error) {\n  const input = $('Set Event Variables').first().json || {};\n    return {\n      json: {\n        event: '',\n        receivedEvent: (input && typeof input === 'object' && typeof input.event === 'string') ? input.event : null,\n        error: true,\n        errorMessage: error.message,\n        metadata: input.metadata ?? null,\n        executionId: $execution.id,\n      },\n    };\n}"
+      },
+      "id": "8a5fa21b-f5e4-4f59-8f16-594c9c8b673e",
+      "name": "Init servicekey",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "FWq4KLVI9kGZCRmx",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/FWq4KLVI9kGZCRmx",
+          "cachedResultName": "FOI Fee Processing"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "event": "={{ $json.event }}",
+            "eventId": "={{ $json.eventId }}",
+            "occurredAt": "={{ $json.occurredAt }}",
+            "feeAction": "={{ $json.feeAction }}",
+            "triggeredBy": "={{ $json.triggeredBy }}",
+            "category": "={{ $json.category }}",
+            "paymentStatus": "={{ $json.paymentStatus }}",
+            "serviceKey": "={{ $json.serviceKey }}",
+            "templateName": "={{ $json.templateName }}",
+            "applicantCorrespondenceId": "={{ $json.applicantCorrespondenceId }}",
+            "rawRequestId": "={{ $json.rawRequestId }}",
+            "foiRequestId": "={{ $json.foiRequestId }}",
+            "ministryRequestId": "={{ $json.ministryRequestId }}",
+            "fileNumber": "={{ $json.fileNumber }}",
+            "status": "={{ $json.status }}",
+            "previousStatus": "={{ $json.previousStatus }}",
+            "assignedTo": "={{ $json.assignedTo }}",
+            "assignedGroup": "={{ $json.assignedGroup }}",
+            "isPaymentActive": "={{ $json.isPaymentActive }}",
+            "isSync": "={{ $json.isSync }}",
+            "isOfflinePayment": "={{ $json.isOfflinePayment }}",
+            "paymentExpiryDate": "={{ $json.paymentExpiryDate }}",
+            "metadata": "={{ $json.metadata }}",
+            "executionId": "={{ $json.executionId }}",
+            "paymentSlaId": "={{ $json.paymentSlaId }}",
+            "paymentUrl": "={{ $json.paymentUrl }}",
+            "slaPaymentExpiryDate": "={{ $json.slaPaymentExpiryDate }}",
+            "saveDataPayload": "={{ $json.saveDataPayload }}",
+            "feeflow": "={{ $json.feeflow }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventId",
+              "displayName": "eventId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "occurredAt",
+              "displayName": "occurredAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "feeAction",
+              "displayName": "feeAction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "triggeredBy",
+              "displayName": "triggeredBy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "paymentStatus",
+              "displayName": "paymentStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "serviceKey",
+              "displayName": "serviceKey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "templateName",
+              "displayName": "templateName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "applicantCorrespondenceId",
+              "displayName": "applicantCorrespondenceId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rawRequestId",
+              "displayName": "rawRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "foiRequestId",
+              "displayName": "foiRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ministryRequestId",
+              "displayName": "ministryRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fileNumber",
+              "displayName": "fileNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "previousStatus",
+              "displayName": "previousStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "assignedTo",
+              "displayName": "assignedTo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "assignedGroup",
+              "displayName": "assignedGroup",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "isPaymentActive",
+              "displayName": "isPaymentActive",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isSync",
+              "displayName": "isSync",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isOfflinePayment",
+              "displayName": "isOfflinePayment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentExpiryDate",
+              "displayName": "paymentExpiryDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "executionId",
+              "displayName": "executionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentSlaId",
+              "displayName": "paymentSlaId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentUrl",
+              "displayName": "paymentUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "slaPaymentExpiryDate",
+              "displayName": "slaPaymentExpiryDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "saveDataPayload",
+              "displayName": "saveDataPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "feeflow",
+              "displayName": "feeflow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "30589649-104f-432b-b60d-b2c4883d8b66",
+      "name": "IAO Correspondence: Trigger Fee Payment",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "retryOnFail": false,
+      "position": [
+        1152,
+        416
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "d479aab4-b5c5-4238-899f-46c0363c691d",
+      "name": "End (Fee Payment Started)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        416
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "7d58f954-d40e-451c-94f5-2e830d37e479",
+      "name": "End (Closed)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        864,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI IAO Correspondence Process\n\n**Purpose:**\nHandles IAO applicant-correspondence events that may need a fee payment from the applicant.\n\n**Trigger/Entry:**\nSub-workflow called by FOI IAO Process for `foi-iao-correnspodence` (the existing event spelling).\n\n**Processing:**\nReads the event payload into standard fields. If the request status is Closed, it stops with no action. Otherwise it builds a fee-payment request: event foi-fee-payment, feeAction initiate, serviceKey correspondence, payment status NOT PAID, and the payment expiry date from the payload.\n\n**Integration/Outcome:**\nStarts FOI Fee Processing without waiting for it (fire-and-forget). That workflow creates the online payment and notifies the applicant.",
+        "height": 520,
+        "width": 620,
+        "color": 4
+      },
+      "id": "48cc826d-8188-4a2c-91cf-77959092fba3",
+      "name": "Developer Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        -192
+      ]
+    }
+  ],
+  "pinData": {
+    "Start": [
+      {
+        "json": {
+          "event": "foi-iao-correnspodence",
+          "eventId": "24e76717-f5c6-400d-a6b8-e004e8fbc102",
+          "occurredAt": "2026-11-16T16:55:46.452440+00:00",
+          "rawRequestId": 48049,
+          "foiRequestId": 22680,
+          "ministryRequestId": "22943",
+          "status": "On Hold",
+          "metadata": "{\"id\":\"CTZ-2026-048049\",\"event\":\"foi-iao-correnspodence\",\"event_id\":\"24e76717-f5c6-400d-a6b8-e004e8fbc102\",\"occurred_at\":\"2026-11-16T16:55:46.452440+00:00\",\"foiRequestMetaData\":\"{\\\"id\\\": \\\"CTZ-2026-048049\\\", \\\"status\\\": \\\"On Hold\\\", \\\"ministryRequestID\\\": \\\"22943\\\", \\\"foiRequestId\\\": 22680, \\\"rawRequestId\\\": 48049, \\\"paymentExpiryDate\\\": \\\"2026-11-17\\\", \\\"axisRequestId\\\": \\\"CTZ-2026-048049\\\", \\\"applicantcorrespondenceid\\\": 3681, \\\"templatename\\\": \\\"PAYONLINE\\\"}\"}",
+          "executionId": "209"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "IAO Correspondence: Closed?": {
+      "main": [
+        [
+          {
+            "node": "End (Closed)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "Init servicekey",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "IAO Correspondence: Trigger Fee Payment": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "End (Fee Payment Started)",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Init servicekey": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "IAO Correspondence: Trigger Fee Payment",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Set Event Variables": {
+      "main": [
+        [
+          {
+            "node": "IAO Correspondence: Closed?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Set Event Variables",
+            "type": "main"
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "7cecd58a-5c0c-481f-b3d7-2e64f2ffe763",
+  "meta": {
+    "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
+  },
+  "nodeGroups": [],
+  "id": "DZDGg30hiXeWJidp",
+  "tags": []
+}

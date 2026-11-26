@@ -1,0 +1,676 @@
+{
+  "name": "FOI - Initialize Data Tables",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "table",
+        "options": {}
+      },
+      "id": "c6b52678-3283-4582-8605-bc34f90c8db7",
+      "name": "List Existing Data Tables",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const REQUIRED_TABLES = ['foi-process-audit', 'foi-payment-sla', 'foi-execution-errors'];\nconst existingNames = $input.all().map(item => String(item.json.name || '').trim().toLowerCase());\n\nreturn [{\n  json: {\n    auditTableExists: existingNames.includes('foi-process-audit'),\n    slaTableExists: existingNames.includes('foi-payment-sla'),\n    errorsTableExists: existingNames.includes('foi-execution-errors'),\n    existingTableNames: existingNames\n  }\n}];"
+      },
+      "id": "1824e3ef-1b27-4ded-88a5-2b8b1ce15f68",
+      "name": "Compute Table Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1t",
+              "name": "table",
+              "type": "string",
+              "value": "={{$json.name}}"
+            },
+            {
+              "id": "c2t",
+              "name": "action",
+              "type": "string",
+              "value": "created"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e5a8c419-9209-4834-8e94-0aad1abd61ee",
+      "name": "Tag As Created",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const tables = $input.all().map(item => item.json);\nreturn [{\n  json: {\n    status: 'completed',\n    ranAt: new Date().toISOString(),\n    tables\n  }\n}];"
+      },
+      "id": "7426b8f7-1118-481f-85a5-ce778b469dd9",
+      "name": "Build Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c1",
+              "leftValue": "={{$json.auditTableExists}}",
+              "operator": {
+                "operation": "equals",
+                "type": "boolean"
+              },
+              "rightValue": false
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "6088a4b0-4929-4225-9e0c-e03fd7d121b3",
+      "name": "Audit Table Missing?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1120,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c2",
+              "leftValue": "={{$json.slaTableExists}}",
+              "operator": {
+                "operation": "equals",
+                "type": "boolean"
+              },
+              "rightValue": false
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "48319cdb-6f4d-4cb3-af9f-318cda37d714",
+      "name": "SLA Table Missing?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1120,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "foi-process-audit",
+        "columns": {
+          "column": [
+            {
+              "name": "execution_id"
+            },
+            {
+              "name": "process_type"
+            },
+            {
+              "name": "event"
+            },
+            {
+              "name": "event_id"
+            },
+            {
+              "name": "raw_request_id"
+            },
+            {
+              "name": "foi_request_id"
+            },
+            {
+              "name": "ministry_request_id"
+            },
+            {
+              "name": "status"
+            },
+            {
+              "name": "metadata"
+            },
+            {
+              "name": "comments"
+            },
+            {
+              "name": "occurred_at"
+            }
+          ]
+        },
+        "options": {
+          "createIfNotExists": true
+        }
+      },
+      "id": "e622d415-a419-47f3-aaaf-d9acede6652f",
+      "name": "Create Audit Table",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1344,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "foi-payment-sla",
+        "columns": {
+          "column": [
+            {
+              "name": "sla_type"
+            },
+            {
+              "name": "sla_status"
+            },
+            {
+              "name": "foi_request_id"
+            },
+            {
+              "name": "ministry_request_id"
+            },
+            {
+              "name": "file_number"
+            },
+            {
+              "name": "service_key"
+            },
+            {
+              "name": "template_name"
+            },
+            {
+              "name": "prev_status"
+            },
+            {
+              "name": "next_state_name"
+            },
+            {
+              "name": "applicant_correspondence_id"
+            },
+            {
+              "name": "payment_status"
+            },
+            {
+              "name": "payment_url"
+            },
+            {
+              "name": "form_id"
+            },
+            {
+              "name": "submission_id"
+            },
+            {
+              "name": "payment_expiry_date"
+            },
+            {
+              "name": "expires_at",
+              "type": "date"
+            },
+            {
+              "name": "started_execution_id"
+            },
+            {
+              "name": "completed_execution_id"
+            },
+            {
+              "name": "completed_at",
+              "type": "date"
+            },
+            {
+              "name": "metadata"
+            },
+            {
+              "name": "comments"
+            }
+          ]
+        },
+        "options": {
+          "createIfNotExists": true
+        }
+      },
+      "id": "51aca7db-a2a6-4786-bef2-366069e6de64",
+      "name": "Create SLA Table",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1344,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "table",
+              "type": "string",
+              "value": "foi-process-audit"
+            },
+            {
+              "id": "a2",
+              "name": "action",
+              "type": "string",
+              "value": "skipped-already-exists"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7678e838-a415-46c6-9ed6-02171667ebf3",
+      "name": "Audit Table Already Exists",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b1",
+              "name": "table",
+              "type": "string",
+              "value": "foi-payment-sla"
+            },
+            {
+              "id": "b2",
+              "name": "action",
+              "type": "string",
+              "value": "skipped-already-exists"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b296784b-eaed-4069-b2e3-c3f451dcbbfe",
+      "name": "SLA Table Already Exists",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        784
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "f5bc751a-a955-4ebd-b33a-9485be5d7f4e",
+      "name": "When clicking ‘Execute workflow’",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        448,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI Initialize Data Tables\n\n**Purpose:**\nSetup utility that makes sure the three n8n data tables used by the FOI workflows exist: `foi-process-audit` (audit trail written by every FOI workflow) `foi-payment-sla` (tracks active online payments and their expiry) and `foi-execution-errors` (one row per failed execution, written by FOI Error Handler).\n\n**Trigger/Entry:**\nManual (\"Execute workflow\"). Run once per environment before enabling the FOI workflows. Safe to re-run.\n\n**Processing:**\nLists the existing data tables, checks for each required table, creates any that are missing with the expected columns, and marks existing ones as skipped.\n\n**Integration/Outcome:**\nn8n Data Tables only. Returns a summary (`status`, `ranAt`, and each table with action `created` or `skipped-already-exists`).",
+        "height": 520,
+        "width": 620,
+        "color": 4
+      },
+      "id": "35d365fa-91f3-4b0e-a316-cfe2d9743bb2",
+      "name": "Developer Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c3",
+              "leftValue": "={{$json.errorsTableExists}}",
+              "operator": {
+                "operation": "equals",
+                "type": "boolean"
+              },
+              "rightValue": false
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "83334d99-9277-481d-8931-ffb8437c1416",
+      "name": "Errors Table Missing?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1120,
+        1136
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "foi-execution-errors",
+        "columns": {
+          "column": [
+            {
+              "name": "execution_id"
+            },
+            {
+              "name": "execution_url"
+            },
+            {
+              "name": "workflow_id"
+            },
+            {
+              "name": "workflow_name"
+            },
+            {
+              "name": "failed_node"
+            },
+            {
+              "name": "error_message"
+            },
+            {
+              "name": "event_id"
+            },
+            {
+              "name": "event"
+            },
+            {
+              "name": "raw_request_id"
+            },
+            {
+              "name": "foi_request_id"
+            },
+            {
+              "name": "ministry_request_id"
+            },
+            {
+              "name": "status"
+            }
+          ]
+        },
+        "options": {
+          "createIfNotExists": true
+        }
+      },
+      "id": "590b2ca3-1c48-4b1a-a6b1-17ef70d09b05",
+      "name": "Create Errors Table",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1344,
+        1056
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d1",
+              "name": "table",
+              "type": "string",
+              "value": "foi-execution-errors"
+            },
+            {
+              "id": "d2",
+              "name": "action",
+              "type": "string",
+              "value": "skipped-already-exists"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7b70d4ef-c433-430d-9845-4e7e5b442185",
+      "name": "Errors Table Already Exists",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        1216
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Compute Table Status": {
+      "main": [
+        [
+          {
+            "node": "Audit Table Missing?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "SLA Table Missing?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Errors Table Missing?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Existing Data Tables": {
+      "main": [
+        [
+          {
+            "node": "Compute Table Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tag As Created": {
+      "main": [
+        [
+          {
+            "node": "Build Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit Table Missing?": {
+      "main": [
+        [
+          {
+            "node": "Create Audit Table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit Table Already Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SLA Table Missing?": {
+      "main": [
+        [
+          {
+            "node": "Create SLA Table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SLA Table Already Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Audit Table": {
+      "main": [
+        [
+          {
+            "node": "Tag As Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create SLA Table": {
+      "main": [
+        [
+          {
+            "node": "Tag As Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit Table Already Exists": {
+      "main": [
+        [
+          {
+            "node": "Build Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SLA Table Already Exists": {
+      "main": [
+        [
+          {
+            "node": "Build Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "List Existing Data Tables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Errors Table Missing?": {
+      "main": [
+        [
+          {
+            "node": "Create Errors Table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Errors Table Already Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Errors Table": {
+      "main": [
+        [
+          {
+            "node": "Tag As Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Errors Table Already Exists": {
+      "main": [
+        [
+          {
+            "node": "Build Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3c1291bf-84bb-4a91-a755-16df0ecea818",
+  "meta": {
+    "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
+  },
+  "nodeGroups": [],
+  "id": "Woi9tCgTdJy9r6uu",
+  "tags": []
+}

@@ -1,0 +1,785 @@
+{
+  "name": "FOI Error Handler",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "f8f08c37-3b75-47d2-9622-95973923638f",
+      "name": "FOI Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        816,
+        384
+      ],
+      "notes": "Starts when FOI Request Routing or FOI Payment Expiry SLA Job fails (Settings > Error workflow). Sub-workflow failures bubble up to these two parents. Only automatic runs trigger it, not manual test runs."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Recipients come from the n8n variables foiErrorAlertEmails (To list) and foiErrorAlertFromEmail (sender).\n// n8n variables are always strings, so the list may be a JSON array ('[\"a@gov.bc.ca\",\"b@gov.bc.ca\"]')\n// or a comma/semicolon separated string. Invalid entries are dropped; an empty list skips the alert.\nconst raw = $vars.foiErrorAlertEmails;\nconst fromEmail = $vars.foiErrorAlertFromEmail;\nlet list = [];\nif (Array.isArray(raw)) {\n  list = raw;\n} else if (typeof raw === 'string' && raw.trim()) {\n  const text = raw.trim();\n  if (text.startsWith('[')) {\n    try { list = JSON.parse(text); } catch (e) { list = []; }\n  }\n  if (!Array.isArray(list) || list.length === 0) list = text.replace(/^\\[|\\]$/g, '').split(/[,;]/);\n}\nconst emails = [...new Set(list.map((e) => String(e).trim().replace(/^[\"']|[\"']$/g, '')).filter((e) => /^[^\\s@,;]+@[^\\s@,;]+\\.[^\\s@,;]+$/.test(e)))];\nreturn [{ json: { toEmail: emails.join(','), recipientCount: emails.length, fromEmail: String(fromEmail ?? '').trim() } }];"
+      },
+      "id": "2ce88706-e4fb-43c7-be81-0bae55afca20",
+      "name": "Alert Recipients",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        384
+      ],
+      "notes": "Reads the n8n variables foiErrorAlertEmails (the To list: a JSON array string or comma separated) and foiErrorAlertFromEmail (sender). No recipients or no sender = the alert email is skipped; the failure is still recorded and the outbox row still marked FAILED."
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI Error Handler\n\n**Purpose:**\nMakes failed n8n runs visible. FOI Request Routing answers the API before it runs, so the API never sees a failure inside n8n. This workflow records the failure, marks the API outbox row FAILED (so it can be replayed) and alerts people.\n\n**Trigger/Entry:**\nError Trigger. Set as the **Error workflow** (workflow settings) of FOI Request Routing and FOI Payment Expiry SLA Job. Sub-workflow failures bubble up to those parents.\n\n**Processing:**\n1. Looks up `event_id` and the request ids with `GET /api/foiworkflow/executions/{id}/event` (through FOI Backend API Manager, `foi-event-by-execution`). The API outbox row knows the execution because FOI Request Routing recorded it when it claimed the event. It no longer reads `foi-process-audit`.\n2. Writes one row to the `foi-execution-errors` Data Table.\n3. If there is an `event_id`: calls `PUT /api/foiworkflow/events/{event_id}` with FAILED, the error and the failed execution id, through FOI Backend API Manager V2 (`foi-event-ack`).\n4. Sends one alert email (SMTP, credential `gov email smtp`) to every address in the n8n variable `foiErrorAlertEmails`, from `foiErrorAlertFromEmail`. `Alert Recipients` accepts a JSON array string or a comma separated list.\n\n**Integration/Outcome:**\nEvery step after the lookup continues on error, so one failing step never blocks the others. A run with no `event_id` (the SLA job, or a run that failed before the claim) is still recorded and alerted, just without an outbox update. If this workflow itself fails, nothing reports it: the API sweeper flags the outbox row as NO_OUTCOME after `N8N_OUTBOX_NO_OUTCOME_MINUTES`.\n\n**Setup:** run FOI - Initialize Data Tables, select `foi-execution-errors` in `Record Failure`, select the `gov email smtp` credential in `Send Alert Email`, create the variables `foiErrorAlertEmails` and `foiErrorAlertFromEmail`, then set this workflow as the Error workflow of the two parents.",
+        "height": 700,
+        "width": 620,
+        "color": 4
+      },
+      "id": "363bd4b1-013c-4b06-ade7-2f0963a40703",
+      "name": "Developer Overview1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "FFcmyrvP4ZMPlmzU",
+          "mode": "list",
+          "cachedResultName": "foi-execution-errors",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/FFcmyrvP4ZMPlmzU"
+        },
+        "columns": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "execution_id",
+              "id": "execution_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "execution_url",
+              "id": "execution_url",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "workflow_id",
+              "id": "workflow_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "workflow_name",
+              "id": "workflow_name",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "failed_node",
+              "id": "failed_node",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "error_message",
+              "id": "error_message",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "event_id",
+              "id": "event_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "event",
+              "id": "event",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "raw_request_id",
+              "id": "raw_request_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "foi_request_id",
+              "id": "foi_request_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "ministry_request_id",
+              "id": "ministry_request_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "status",
+              "id": "status",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "execution_id": "={{ $('Build Error Record').first().json.execution_id }}",
+            "execution_url": "={{ $('Build Error Record').first().json.execution_url }}",
+            "workflow_id": "={{ $('Build Error Record').first().json.workflow_id }}",
+            "workflow_name": "={{ $('Build Error Record').first().json.workflow_name }}",
+            "failed_node": "={{ $('Build Error Record').first().json.failed_node }}",
+            "error_message": "={{ $('Build Error Record').first().json.error_message }}",
+            "event_id": "={{ $('Build Error Record').first().json.event_id }}",
+            "event": "={{ $('Build Error Record').first().json.event }}",
+            "raw_request_id": "={{ $('Build Error Record').first().json.raw_request_id }}",
+            "foi_request_id": "={{ $('Build Error Record').first().json.foi_request_id }}",
+            "ministry_request_id": "={{ $('Build Error Record').first().json.ministry_request_id }}",
+            "status": "={{ $('Build Error Record').first().json.status }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "abce2df1-e935-4cec-acc1-625b5943017e",
+      "name": "Record Failure",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1712,
+        384
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "One row per failed execution in foi-execution-errors (create it with FOI - Initialize Data Tables, then select it here). A failure to write must not stop the outbox update or the alert."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine what n8n passes to an error workflow with the request ids recorded by FOI Request Routing.\nconst t = $('FOI Error Trigger').first().json;\nconst audit = $input.first()?.json ?? {};\nconst ex = t.execution ?? {};\nconst wf = t.workflow ?? {};\nconst str = (v) => (v === undefined || v === null || v === '' ? null : String(v));\n\n// Execution errors carry execution.*; a trigger that failed to start carries trigger.error instead.\nconst errorMessage = String(ex.error?.message ?? t.trigger?.error?.message ?? 'Unknown error').slice(0, 1500);\nconst failedNode = str(ex.lastNodeExecuted ?? ex.error?.node?.name);\nconst workflowName = str(wf.name) ?? 'unknown workflow';\n\n// event_id is only known for runs of FOI Request Routing that got as far as 'Audit: Event Received'.\n// Anything else (e.g. FOI Payment Expiry SLA Job, or a run that failed before that audit row) has none.\nconst eventId = str(audit.event_id);\n\nconst requestIds = [\n  audit.foi_request_id ? 'FOI request ' + audit.foi_request_id : null,\n  audit.ministry_request_id ? 'ministry request ' + audit.ministry_request_id : null,\n  audit.raw_request_id ? 'raw request ' + audit.raw_request_id : null,\n].filter(Boolean).join(', ');\n\nconst alertLines = [\n  'A FOI n8n workflow run failed.',\n  'Workflow: ' + workflowName,\n  'Failed step: ' + (failedNode ?? 'n/a'),\n  'Event: ' + (str(audit.event) ?? 'n/a') + (eventId ? ' (' + eventId + ')' : ''),\n  requestIds ? 'Request: ' + requestIds : null,\n  'Error: ' + errorMessage.slice(0, 500),\n  'Execution: ' + (str(ex.url) ?? str(ex.id) ?? 'n/a'),\n  eventId ? 'Outbox: marked FAILED, available for replay.' : 'Outbox: no event_id for this run, nothing to mark FAILED.',\n].filter(Boolean);\n\n// Params for the Notify MJML template. Notify rejects a missing key, so every key is always a string ('' when unknown).\nconst notifyParams = {\n  environment: 'DEV', // change per environment\n  failed_at: $now.setZone('America/Vancouver').toFormat('yyyy-LL-dd HH:mm ZZZZ'),\n  workflow_name: workflowName,\n  workflow_id: str(wf.id) ?? '',\n  failed_node: failedNode ?? '',\n  error_message: errorMessage,\n  execution_id: str(ex.id) ?? '',\n  execution_url: str(ex.url) ?? '',\n  event: str(audit.event) ?? '',\n  event_id: eventId ?? '',\n  foi_request_id: str(audit.foi_request_id) ?? '',\n  ministry_request_id: str(audit.ministry_request_id) ?? '',\n  raw_request_id: str(audit.raw_request_id) ?? '',\n};\n\nreturn [{\n  json: {\n    execution_id: str(ex.id),\n    execution_url: str(ex.url),\n    workflow_id: str(wf.id),\n    workflow_name: workflowName,\n    failed_node: failedNode,\n    error_message: errorMessage,\n    event_id: eventId,\n    event: str(audit.event),\n    raw_request_id: str(audit.raw_request_id),\n    foi_request_id: str(audit.foi_request_id),\n    ministry_request_id: str(audit.ministry_request_id),\n    status: str(audit.status),\n    outbox_error: (workflowName + (failedNode ? ' > ' + failedNode : '') + ': ' + errorMessage).slice(0, 1900),\n    alert_subject: 'FOI n8n workflow failed: ' + workflowName + (failedNode ? ' > ' + failedNode : ''),\n    notify_params: notifyParams,\n    alert_text: alertLines.join('\\n'),\n  },\n}];"
+      },
+      "id": "970c3e35-9f77-4013-b13e-a6062a7aee50",
+      "name": "Build Error Record",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        384
+      ],
+      "notes": "Never throws on missing data: a missing event_id, missing audit row or a trigger-level error all produce a record with nulls."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "h1",
+              "leftValue": "={{ $('Build Error Record').first().json.event_id }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              },
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "eafb9209-fc40-4533-9bad-b03a4d6acb47",
+      "name": "Has event_id?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1936,
+        384
+      ],
+      "notes": "Only events from the outbox have an event_id. Without one there is no outbox row to update."
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "iMchipXgogUVPriD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/iMchipXgogUVPriD",
+          "cachedResultName": "FOI-DEV — FOI Backend API Manager"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "category": "foi-event-ack",
+            "eventId": "={{ $('Build Error Record').first().json.event_id }}",
+            "eventError": "={{ $('Build Error Record').first().json.error_message }}",
+            "eventExecutionId": "={{ $('Build Error Record').first().json.execution_id }}",
+            "eventStatus": "FAILED"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawRequestId",
+              "displayName": "rawRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "foiRequestId",
+              "displayName": "foiRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ministryRequestId",
+              "displayName": "ministryRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawReqPayload",
+              "displayName": "rawReqPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reqPayload",
+              "displayName": "reqPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "servicekey",
+              "displayName": "servicekey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "saveDataPayload",
+              "displayName": "saveDataPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "eventId",
+              "displayName": "eventId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventStatus",
+              "displayName": "eventStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventError",
+              "displayName": "eventError",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventExecutionId",
+              "displayName": "eventExecutionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "claimPayload",
+              "displayName": "claimPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "a9e5de7c-d986-40ae-8a4b-704ef2440661",
+      "name": "Report Failure to Outbox",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "retryOnFail": false,
+      "position": [
+        2160,
+        304
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "PUT /api/foiworkflow/events/{event_id} with FAILED, the error and the failed run's execution id (DELIVERED -> FAILED), through FOI Backend API Manager V2. If this call fails the alert still goes out and the API sweeper later flags the row as NO_OUTCOME."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a1",
+              "leftValue": "={{ $('Alert Recipients').first().json.toEmail && $('Alert Recipients').first().json.fromEmail ? 'send' : '' }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              },
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "f734a26b-d8ba-4a89-979f-4ad24ada0416",
+      "name": "Alert Configured?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2384,
+        384
+      ],
+      "notes": "True when there is at least one valid recipient and a sender."
+    },
+    {
+      "parameters": {},
+      "id": "ca1b3db6-ee88-4845-bc4a-0a5060113a00",
+      "name": "End",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2832,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "iMchipXgogUVPriD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/iMchipXgogUVPriD",
+          "cachedResultName": "FOI Backend API Manager"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "category": "foi-event-by-execution",
+            "eventExecutionId": "={{ String($('FOI Error Trigger').first().json.execution?.id ?? '') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawRequestId",
+              "displayName": "rawRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "foiRequestId",
+              "displayName": "foiRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ministryRequestId",
+              "displayName": "ministryRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawReqPayload",
+              "displayName": "rawReqPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reqPayload",
+              "displayName": "reqPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "servicekey",
+              "displayName": "servicekey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "saveDataPayload",
+              "displayName": "saveDataPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "eventId",
+              "displayName": "eventId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventStatus",
+              "displayName": "eventStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventError",
+              "displayName": "eventError",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventExecutionId",
+              "displayName": "eventExecutionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "claimPayload",
+              "displayName": "claimPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "b2c3d4e5-0006-4b00-8000-000000000006",
+      "name": "Lookup Event By Execution",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "alwaysOutputData": true,
+      "retryOnFail": false,
+      "position": [
+        1264,
+        384
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "n8n does not pass request data to an error workflow. FOI Request Routing's claim (POST /api/foiworkflow/events/{event_id}/claim) records the execution id, event id and request ids on the API outbox row; this call reads them back with GET /api/foiworkflow/executions/{id}/event. found=false = the run has no event_id (SLA job, or it failed before the claim); the handler carries on without one."
+    },
+    {
+      "parameters": {
+        "operation": "sendEmail",
+        "emailPayload": "={\n  \"recipients\": {\n    \"to\": {{ JSON.stringify(String($vars.foiErrorAlertEmails ?? '').replace(/[\\[\\]\"']/g, '').split(/[,;]/).map((email) => email.trim()).filter(Boolean)) }}\n  },\n  \"content\": {\n    \"templateId\": \"226b7318-3d8b-47e4-bc28-d88abe5247cc\"\n  },\n  \"params\": {{ JSON.stringify($('Build Error Record').first().json.notify_params) }}\n}",
+        "requestOptions": {}
+      },
+      "id": "0572461c-a5e2-4bd4-81db-9045d3af2bd0",
+      "name": "Send an email",
+      "type": "CUSTOM.notify",
+      "typeVersion": 1,
+      "position": [
+        2608,
+        304
+      ],
+      "credentials": {
+        "notifyApi": {
+          "id": "Jr9vsNVB4AuFSOmN",
+          "name": "Notify account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "FOI Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Alert Recipients",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Failure": {
+      "main": [
+        [
+          {
+            "node": "Has event_id?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Error Record": {
+      "main": [
+        [
+          {
+            "node": "Record Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has event_id?": {
+      "main": [
+        [
+          {
+            "node": "Report Failure to Outbox",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Alert Configured?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Report Failure to Outbox": {
+      "main": [
+        [
+          {
+            "node": "Alert Configured?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert Configured?": {
+      "main": [
+        [
+          {
+            "node": "Send an email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert Recipients": {
+      "main": [
+        [
+          {
+            "node": "Lookup Event By Execution",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup Event By Execution": {
+      "main": [
+        [
+          {
+            "node": "Build Error Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an email": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6fb4a954-1d7d-4a16-b645-667bca3517dd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
+  },
+  "nodeGroups": [],
+  "id": "gH0MQxHnSI99SV1m",
+  "tags": []
+}

@@ -1,0 +1,531 @@
+{
+  "name": "FOI Payment Expiry SLA Job",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "012PySsVgvdHQbkn",
+          "mode": "list",
+          "cachedResultName": "foi-payment-sla",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/012PySsVgvdHQbkn"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "sla_type",
+              "keyValue": "payment-expiry"
+            },
+            {
+              "keyName": "sla_status",
+              "keyValue": "ACTIVE"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "id": "7d7e469a-f522-4e81-921d-1ef407232867",
+      "name": "Get Expired Payment SLAs",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        816,
+        592
+      ],
+      "notes": "ACTIVE payment-expiry rows whose expires_at has passed. Replaces the 20-day timeout on the old 'Wait Payment Outcome' node."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Same expiry point as the Camunda foi-fee-processing daily timer (Flow_03lwez1 + Gateway_0xwy934):\n// Camunda marked a payment EXPIRED on the first daily run where floor(|now - paymentExpiryDate| / 1 day) == 0,\n// i.e. from 1 day before the expiry date onwards.\n// Camunda only matched that one-day window, so a run missed on that day was never recovered. Here every\n// ACTIVE row at or past that point is expired (\">= window start\", not \"== window\"), so a missed or failed run\n// is caught up by the next one. A row leaves ACTIVE once FOI Fee Processing closes it as EXPIRED, so it is\n// never processed twice.\n// If the row has no usable payment_expiry_date, expires_at (the 20-day default set when the SLA row was\n// registered) is used instead.\nconst DAY_MS = 1000 * 60 * 60 * 24;\nconst now = new Date();\n\nreturn $input.all().filter((item) => {\n  const sla = item.json || {};\n  const sentOn = String(sla.payment_expiry_date ?? '').trim() || String(sla.expires_at ?? '').trim();\n  const expiry = new Date(sentOn);\n  if (Number.isNaN(expiry.getTime())) return false; // no usable date at all: nothing to compare\n  return (now - expiry) > -DAY_MS;\n});"
+      },
+      "id": "45694b4e-3d8e-4f83-8341-43152928dc34",
+      "name": "Apply BPMN Expiry Window",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// One independent foi-payment-expired event per expired payment SLA.\nconst parseJson = (value) => {\n  if (value && typeof value === 'object') return value;\n  if (typeof value === 'string' && value.trim()) {\n    try { return JSON.parse(value); } catch (e) {\n      try { return JSON.parse(value.replace(/'/g, '\"')); } catch (e2) { return {}; }\n    }\n  }\n  return {};\n};\n// Each row carries its own metadata: parse it per row (a single parse of $json.metadata would reuse the first row's\n// rawRequestId / status for every event). The row metadata stores foiRequestMetaData as a JSON string, so it is parsed twice.\nreturn $input.all().map((item) => {\n  const sla = item.json;\n  const metadata = parseJson(sla.metadata);\n  const foiRequestMetaData = parseJson(metadata?.foiRequestMetaData);\n  const payload = {\n    event: 'foi-payment-expired',\n    source: 'FOI Payment Expiry SLA Job',\n    slaId: sla.id,\n    rawRequestId: foiRequestMetaData?.rawRequestId ?? metadata?.rawRequestId,\n    foiRequestId: sla.foi_request_id,\n    ministryRequestId: sla.ministry_request_id,\n    fileNumber: sla.file_number,\n    status: foiRequestMetaData?.status ?? metadata?.status,\n    paymentExpiryDate: sla.payment_expiry_date,\n    expiresAt: sla.expires_at,\n    applicantCorrespondenceId: sla.applicant_correspondence_id,\n    templateName: sla.template_name,\n  };\n  return {\n    json: {\n      event: 'foi-payment-expired',\n      feeAction: 'expire',\n      category: 'foi-payment-expired',\n      paymentSlaId: sla.id,\n      foiRequestId: sla.foi_request_id,\n      ministryRequestId: sla.ministry_request_id,\n      fileNumber: sla.file_number,\n      serviceKey: sla.service_key,  \n      previousStatus: sla.prev_status,      \n      paymentExpiryDate: sla.payment_expiry_date,\n      paymentStatus: 'EXPIRED',\n      payload,\n      metadata: JSON.stringify(payload)\n    }\n  };\n});\n"
+      },
+      "id": "85e2307b-e5c4-4068-9e81-808555fbe7e1",
+      "name": "Build Payment Expired Events",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "FWq4KLVI9kGZCRmx",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/FWq4KLVI9kGZCRmx",
+          "cachedResultName": "FOI-DEV — FOI Fee Processing"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "event": "={{ $json.event }}",
+            "eventId": "={{ $json.eventId }}",
+            "occurredAt": "={{ $json.occurredAt }}",
+            "feeAction": "={{ $json.feeAction }}",
+            "triggeredBy": "={{ $json.triggeredBy }}",
+            "category": "={{ $json.category }}",
+            "paymentStatus": "={{ $json.paymentStatus }}",
+            "serviceKey": "={{ $json.serviceKey }}",
+            "templateName": "={{ $json.templateName }}",
+            "applicantCorrespondenceId": "={{ $json.applicantCorrespondenceId }}",
+            "rawRequestId": "={{ $json.rawRequestId }}",
+            "foiRequestId": "={{ $json.foiRequestId }}",
+            "ministryRequestId": "={{ $json.ministryRequestId }}",
+            "fileNumber": "={{ $json.fileNumber }}",
+            "status": "={{ $json.status }}",
+            "previousStatus": "={{ $json.previousStatus }}",
+            "assignedTo": "={{ $json.assignedTo }}",
+            "assignedGroup": "={{ $json.assignedGroup }}",
+            "isPaymentActive": "={{ $json.isPaymentActive }}",
+            "isSync": "={{ $json.isSync }}",
+            "isOfflinePayment": "={{ $json.isOfflinePayment }}",
+            "paymentExpiryDate": "={{ $json.paymentExpiryDate }}",
+            "metadata": "={{ $json.metadata }}",
+            "executionId": "={{ $json.executionId }}",
+            "paymentSlaId": "={{ $json.paymentSlaId }}",
+            "paymentUrl": "={{ $json.paymentUrl }}",
+            "slaPaymentExpiryDate": "={{ $json.slaPaymentExpiryDate }}",
+            "saveDataPayload": "={{ $json.saveDataPayload }}",
+            "feeflow": "={{ $json.feeflow }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventId",
+              "displayName": "eventId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "occurredAt",
+              "displayName": "occurredAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "feeAction",
+              "displayName": "feeAction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "triggeredBy",
+              "displayName": "triggeredBy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "paymentStatus",
+              "displayName": "paymentStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "serviceKey",
+              "displayName": "serviceKey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "templateName",
+              "displayName": "templateName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "applicantCorrespondenceId",
+              "displayName": "applicantCorrespondenceId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rawRequestId",
+              "displayName": "rawRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "foiRequestId",
+              "displayName": "foiRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ministryRequestId",
+              "displayName": "ministryRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fileNumber",
+              "displayName": "fileNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "previousStatus",
+              "displayName": "previousStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "assignedTo",
+              "displayName": "assignedTo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "assignedGroup",
+              "displayName": "assignedGroup",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "isPaymentActive",
+              "displayName": "isPaymentActive",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isSync",
+              "displayName": "isSync",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isOfflinePayment",
+              "displayName": "isOfflinePayment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentExpiryDate",
+              "displayName": "paymentExpiryDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "executionId",
+              "displayName": "executionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentSlaId",
+              "displayName": "paymentSlaId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentUrl",
+              "displayName": "paymentUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "slaPaymentExpiryDate",
+              "displayName": "slaPaymentExpiryDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "saveDataPayload",
+              "displayName": "saveDataPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "feeflow",
+              "displayName": "feeflow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "07b91396-e53c-4c2a-b3a5-2db0485d26f0",
+      "name": "Call 'FOI Fee Processing - Simplified'",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1488,
+        592
+      ],
+      "notes": "Runs the expiry processing once per expired payment."
+    },
+    {
+      "parameters": {},
+      "id": "543016db-289b-4fba-9f6e-bbc8c4f99767",
+      "name": "End",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        592
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI Payment Expiry SLA Job\n\n**Purpose:**\nExpires online fee payments that the applicant didn't complete by the payment expiry date. It replaces the old long-running Wait (20-day timeout).\n\n**Trigger/Entry:**\nSchedule trigger, every day 1 PM(runs only while the workflow is active).\n\n**Processing:**\nReads the `foi-payment-sla` rows where sla_type = payment-expiry and sla_status = ACTIVE, then keeps the rows that have reached the point where the Camunda timer expired them (now > payment_expiry_date - 1 day; falls back to expires_at when the row has no payment_expiry_date). Unlike Camunda's one-day window, every ACTIVE row past that point is kept, so a missed or failed daily run is caught up by the next one. Builds one `foi-payment-expired` event per row (feeAction = expire, paymentStatus = EXPIRED), each from its own row's metadata.\n\n**Integration/Outcome:**\nCalls FOI Fee Processing once per expired payment. That workflow first checks the latest payment version: an unpaid, not cancelled payment gets the expiry notification and its SLA row is marked EXPIRED; an already paid or cancelled payment has its row closed as PAID / CANCELLED with no notification.",
+        "height": 568,
+        "width": 620,
+        "color": 4
+      },
+      "id": "08897511-709a-4c86-848e-00c6cf863f03",
+      "name": "Developer Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 13 * * *"
+            }
+          ]
+        }
+      },
+      "id": "ef61afd7-d75c-42ce-8b70-6a6071a605e0",
+      "name": "Every Day 1 PM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        592,
+        592
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Build Payment Expired Events": {
+      "main": [
+        [
+          {
+            "node": "Call 'FOI Fee Processing - Simplified'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'FOI Fee Processing - Simplified'": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Expired Payment SLAs": {
+      "main": [
+        [
+          {
+            "node": "Apply BPMN Expiry Window",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every Day 1 PM": {
+      "main": [
+        [
+          {
+            "node": "Get Expired Payment SLAs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply BPMN Expiry Window": {
+      "main": [
+        [
+          {
+            "node": "Build Payment Expired Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "errorWorkflow": "gH0MQxHnSI99SV1m",
+    "callerPolicy": "workflowsFromSameOwner",
+    "timeSavedMode": "fixed",
+    "availableInMCP": false,
+    "timezone": "Etc/UTC"
+  },
+  "versionId": "a363da14-e5e4-4ae7-ac19-2327994ef311",
+  "meta": {
+    "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
+  },
+  "nodeGroups": [],
+  "id": "EHw4Yr4Bhiv47JeK",
+  "tags": []
+}

@@ -1,0 +1,197 @@
+{
+  "name": "FOI Audit Retention",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 2 * * 0"
+            }
+          ]
+        }
+      },
+      "id": "c3d4e5f6-0007-4c00-8000-000000000007",
+      "name": "Every Sunday 2 AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "r1",
+              "name": "auditRetentionDays",
+              "value": 180,
+              "type": "number"
+            },
+            {
+              "id": "r2",
+              "name": "errorRetentionDays",
+              "value": 365,
+              "type": "number"
+            },
+            {
+              "id": "r3",
+              "name": "auditCutoff",
+              "value": "={{ $now.minus({ days: $json.auditRetentionDays }).toUTC().toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "r4",
+              "name": "errorCutoff",
+              "value": "={{ $now.minus({ days: $json.errorRetentionDays }).toUTC().toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c3d4e5f6-0008-4c00-8000-000000000008",
+      "name": "Retention Settings",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "notes": "PLACEHOLDER retention periods. The FOI records owners must decide them (roadmap D1) before this workflow is activated. Rows older than the cutoff are deleted: nothing in the event flow depends on them (idempotency, ordering and error mapping live in the API outbox). Export the tables first if the old rows must be kept."
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "createdAt",
+              "condition": "lt",
+              "keyValue": "={{ $json.auditCutoff }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c3d4e5f6-0009-4c00-8000-000000000009",
+      "name": "Delete Old Audit Rows",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "alwaysOutputData": true,
+      "position": [
+        448,
+        0
+      ],
+      "notes": "Deletes foi-process-audit rows created before the audit cutoff."
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "FFcmyrvP4ZMPlmzU",
+          "mode": "list",
+          "cachedResultName": "foi-execution-errors",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/FFcmyrvP4ZMPlmzU"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "createdAt",
+              "condition": "lt",
+              "keyValue": "={{ $('Retention Settings').first().json.errorCutoff }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c3d4e5f6-0010-4c00-8000-000000000010",
+      "name": "Delete Old Error Rows",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        0
+      ],
+      "notes": "Deletes foi-execution-errors rows created before the error cutoff. foi-payment-sla is never purged here: a late payment needs its old row."
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI Audit Retention\n\n**Purpose:** keeps `foi-process-audit` and `foi-execution-errors` from growing without limit (the n8n Data Tables share an instance-wide size cap).\n\n**Trigger:** every Sunday 2 AM. Created INACTIVE: activate only after the FOI records owners set the retention periods in `Retention Settings` (placeholders: audit 180 days, errors 365 days).\n\n**Processing:** deletes rows older than the cutoff by `createdAt`. This is safe because nothing in the event flow reads these tables any more: duplicate and ordering checks and the failed-execution lookup use the API outbox in Postgres. The event payload stays in the outbox until its own retention (N8N_OUTBOX_SCRUB_AFTER_DAYS / N8N_OUTBOX_PURGE_AFTER_DAYS).\n\n**Not purged:** `foi-payment-sla` (a late payment still needs its row).\n\n**Failures** go to FOI Error Handler (error workflow).",
+        "height": 332,
+        "width": 620,
+        "color": 4
+      },
+      "id": "c3d4e5f6-0011-4c00-8000-000000000011",
+      "name": "Developer Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -368
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Every Sunday 2 AM": {
+      "main": [
+        [
+          {
+            "node": "Retention Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retention Settings": {
+      "main": [
+        [
+          {
+            "node": "Delete Old Audit Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Old Audit Rows": {
+      "main": [
+        [
+          {
+            "node": "Delete Old Error Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "errorWorkflow": "gH0MQxHnSI99SV1m"
+  },
+  "versionId": "58e174de-3c1a-44c3-9f79-254afc79a197",
+  "meta": {
+    "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
+  },
+  "nodeGroups": [],
+  "id": "dnhbGGLKQRuX71HU",
+  "tags": []
+}

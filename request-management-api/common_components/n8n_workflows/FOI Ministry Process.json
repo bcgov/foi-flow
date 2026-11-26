@@ -1,0 +1,535 @@
+{
+  "name": "FOI Ministry Process",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "69a0bfa9-7777-4ea5-aab4-061f20a16e03",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        608
+      ],
+      "notes": "Called by FOI Request Routing for the `ministry` category. Receives the complete original event payload."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalises the incoming FOI event so this workflow can be executed on its own.\n// Accepts: the item passed by FOI Request Routing (normalised fields + `payload` + `metadata`),\n// an item passed by another FOI sub-workflow, or a raw request-management-api payload.\n// `metadata` always carries the COMPLETE original event payload (never reduced to normalised fields).\ntry {\n  const input = $input.first().json || {};\n  const event = input.event;\n  const eventId = input.eventId;\n  const occurredAt = input.occurredAt;\n\n  if (!event || typeof event !== 'string') {\n    throw new Error('Required field \"body.event\" is missing or invalid.');\n  }\n\n  // The COMPLETE original event payload - never reduced to the normalised fields.\n  let metadata = input.metadata;\n  if (typeof metadata === 'string') {\n    try {\n      metadata = JSON.parse(metadata);\n    } catch (e) {\n      metadata = null;\n    }\n  }  \n  const executionId = $execution.id;\n\n  // foiRequestMetaData arrives as an object (intake events) or as a JSON string (IAO / ministry events).\n  let foiRequestMetaData = metadata.foiRequestMetaData;\n  if (typeof foiRequestMetaData === 'string') {\n    try {\n      foiRequestMetaData = JSON.parse(foiRequestMetaData);\n    } catch (e) {\n      foiRequestMetaData = null;\n    }\n  }\n  let metadataString = \"\";\n  if (!metadata || typeof metadata === 'string') {   \n      metadataString = metadata;    \n  } else if (!metadata || typeof metadata === 'object') {\n      metadataString = JSON.stringify(metadata);\n    }\n  const MINISTRY_EVENTS = ['foi-ministry-assignment', 'foi-ministry-complete'];\n  if (MINISTRY_EVENTS.includes(event)) {\n    const first = (...values) => {\n      for (const v of values) { if (v !== undefined && v !== null && v !== '') return v; }\n      return null;\n    };\n  \n    return {\n      json: {\n        event,\n        eventId,\n        occurredAt,\n        rawRequestId: first(foiRequestMetaData.rawRequestId),\n        foiRequestId: first(foiRequestMetaData.foiRequestID, foiRequestMetaData.foiRequestId),\n        ministryRequestId: first(foiRequestMetaData.ministryRequestID, foiRequestMetaData.ministryRequestId),\n        status: foiRequestMetaData.status,\n        assignedTo: foiRequestMetaData.assignedTo,\n        assignedGroup: foiRequestMetaData.assignedGroup,\n        assignedMinistryGroup: foiRequestMetaData.assignedministrygroup,\n        fileNumber: foiRequestMetaData.id,\n        metadata: metadataString,\n        executionId,\n      },\n    };\n  }\n\n} catch (error) {\n   const input = $input.first().json || {};\n  return {\n    json: {\n      event: '',\n      eventId: (input && typeof input === 'object' && typeof input.eventId === 'string') ? input.eventId : null,\n      receivedEvent: (input && typeof input === 'object' && typeof input.event === 'string') ? input.event : null,\n      error: true,\n      errorMessage: error.message,\n      metadata: input.metadata ?? null,\n      executionId: $execution.id,\n    },\n  };\n}"
+      },
+      "id": "cfb74c61-3c3a-44cf-a56c-c94365daf68a",
+      "name": "Set Event Variables",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d880e677-7908-43d0-9d12-0eeca238121f",
+                    "leftValue": "={{ $('Set Event Variables').item.json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-ministry-assignment"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ministry-assignment"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c2f63fb5-9d45-438b-940a-067419909c22",
+                    "leftValue": "={{ $('Set Event Variables').item.json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-ministry-complete"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "ministry-complete"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "other"
+        }
+      },
+      "id": "404543df-900d-48b4-b7ce-bd6daf6c0227",
+      "name": "Ministry Event Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        592
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "446b7a03-40b0-4979-a55f-d8befb349906",
+      "name": "End (Ministry Assignment Recorded)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        896,
+        416
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "491c5997-f175-43fa-bba7-6f091bafc5a0",
+      "name": "End (Unsupported Ministry Event)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        672,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'Ministry assignment for ministry request ' + ($('Set Event Variables').item.json.fileNumber || $('Set Event Variables').item.json.ministryRequestId || 'n/a') + '. Status: ' + ($('Set Event Variables').item.json.status || 'n/a') + ', assigned group: ' + ($('Set Event Variables').item.json.assignedGroup || 'n/a') + ', assigned to: ' + ($('Set Event Variables').item.json.assignedTo || 'n/a') + ', ministry group: ' + ($('Set Event Variables').item.json.assignedMinistryGroup || 'n/a') + '.' }}",
+            "event": "={{ $('Set Event Variables').item.json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $('Set Event Variables').item.json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $('Set Event Variables').item.json.ministryRequestId || null }}",
+            "process_type": "ministry-request-process",
+            "raw_request_id": "={{ $('Set Event Variables').item.json.rawRequestId || null }}",
+            "status": "={{ $('Set Event Variables').item.json.status || null }}",
+            "event_id": "={{ $('Set Event Variables').item.json.eventId }}",
+            "occurred_at": "={{ $('Set Event Variables').item.json.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "fc84195d-a87e-4b08-b200-c47f158bf25b",
+      "name": "Audit: Ministry Assignment",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        416
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'Ministry task completed : Ministry event ' + $('Set Event Variables').item.json.event + ' for ministry request ' + ($('Set Event Variables').item.json.fileNumber || $('Set Event Variables').item.json.ministryRequestId || 'n/a') + '. Status: ' + ($('Set Event Variables').item.json.status || 'n/a') + ', assigned group: ' + ($('Set Event Variables').item.json.assignedGroup || 'n/a') + ', assigned to: ' + ($('Set Event Variables').item.json.assignedTo || 'n/a') + ', ministry group: ' + ($('Set Event Variables').item.json.assignedMinistryGroup || 'n/a') + '.' }}",
+            "event": "={{ $('Set Event Variables').item.json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $('Set Event Variables').item.json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $('Set Event Variables').item.json.ministryRequestId || null }}",
+            "process_type": "ministry-request-process",
+            "raw_request_id": "={{ $('Set Event Variables').item.json.rawRequestId || null }}",
+            "status": "={{ $('Set Event Variables').item.json.status || null }}",
+            "event_id": "={{ $('Set Event Variables').item.json.eventId }}",
+            "occurred_at": "={{ $('Set Event Variables').item.json.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "b91c349a-fee2-476f-9ed3-a46c7a7854fe",
+      "name": "Audit: Ministry Complete",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        608
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "fee98358-b9cb-4caf-829b-751d1a36d795",
+      "name": "End (Ministry Complete Recorded)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        912,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI Ministry Process\n\n**Purpose:**\nHandles ministry-team events on a ministry request: ministry assignment and ministry task completion.\n\n**Trigger/Entry:**\nSub-workflow called by FOI Request Routing for the `ministry` category (`foi-ministry-assignment`, `foi-ministry-complete`).\n\n**Processing:**\nReads the event payload into standard fields (IDs, status, assigned group and person, ministry group, file number). `Ministry Event Switch` then routes:\n- assignment → audit \"Ministry assignment\"\n- complete → audit \"Ministry task completed\"\n- other → end, no action\n\n**Integration/Outcome:**\nAudit only in the current wiring. Writes a `foi-process-audit` row (process_type = ministry-request-process). No API calls.",
+        "height": 520,
+        "width": 620,
+        "color": 4
+      },
+      "id": "da3c206d-8e58-4294-936a-1fef20b92d49",
+      "name": "Developer Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        -864
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Ministry Event Switch": {
+      "main": [
+        [
+          {
+            "node": "Audit: Ministry Assignment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: Ministry Complete",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "End (Unsupported Ministry Event)",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Set Event Variables": {
+      "main": [
+        [
+          {
+            "node": "Ministry Event Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Set Event Variables",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Audit: Ministry Assignment": {
+      "main": [
+        [
+          {
+            "node": "End (Ministry Assignment Recorded)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: Ministry Complete": {
+      "main": [
+        [
+          {
+            "node": "End (Ministry Complete Recorded)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b99f3d3e-eea2-4c7c-a9e2-90dd412c0aa1",
+  "meta": {
+    "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
+  },
+  "nodeGroups": [],
+  "id": "vqKyw9orVmfynqIz",
+  "tags": []
+}

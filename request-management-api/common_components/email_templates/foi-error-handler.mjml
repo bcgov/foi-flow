@@ -1,0 +1,96 @@
+<mjml>
+  <mj-head>
+    <mj-title>FOI workflow alert</mj-title>
+    <mj-preview>{{workflow_name}} failed{{#with failed_node}} at {{.}}{{/with}}: {{error_message}}</mj-preview>
+    <mj-attributes>
+      <mj-all font-family="'BC Sans', 'Noto Sans', Arial, sans-serif" />
+      <mj-text color="#2D2D2D" font-size="14px" line-height="21px" padding="0" />
+      <mj-section background-color="#FFFFFF" padding="0 32px" />
+      <mj-column padding="0" />
+    </mj-attributes>
+    <mj-style inline="inline">
+      td.k { padding:9px 12px 9px 0; width:150px; color:#606060; font-size:13px; vertical-align:top; border-bottom:1px solid #ECEAE8; }
+      td.v { padding:9px 0; font-weight:bold; vertical-align:top; word-break:break-word; border-bottom:1px solid #ECEAE8; }
+      .h { font-size:12px; font-weight:bold; letter-spacing:1px; color:#013366; }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#F2F2F2" width="640px">
+
+    <!-- Header -->
+    <mj-section background-color="#013366" padding="22px 32px" border-bottom="4px solid #FCBA19">
+      <mj-column>
+        <mj-text color="#FFFFFF" font-size="20px" font-weight="bold" line-height="26px">FOI Workflow Alerts</mj-text>
+        <mj-text color="#C1DDFC" font-size="12px">Freedom of Information · n8n automation · {{environment}}</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Failure banner -->
+    <mj-section padding="24px 32px 0">
+      <mj-column background-color="#FBEDED" border-left="5px solid #CE3E39" padding="16px 20px">
+        <mj-text color="#A12622" font-size="12px" font-weight="bold" letter-spacing="1px">&#9888; WORKFLOW RUN FAILED</mj-text>
+        <mj-text font-size="20px" font-weight="bold" line-height="27px" padding="6px 0 0">{{workflow_name}}</mj-text>
+        {{#with failed_node}}
+        <mj-text padding="4px 0 0">Failed at step <strong>{{.}}</strong></mj-text>
+        {{/with}}
+        <mj-text color="#606060" font-size="12px" padding="8px 0 0">{{failed_at}}</mj-text>
+      </mj-column>
+    </mj-section>
+
+    <!-- Error message -->
+    <mj-section padding="24px 32px 0">
+      <mj-column>
+        <mj-text padding="0 0 8px"><span class="h">ERROR MESSAGE</span></mj-text>
+        <mj-table padding="0">
+          <tr><td bgcolor="#1E2430" style="background-color:#1E2430;border-radius:6px;padding:14px 16px;"><div style="color:#F5F5F5;font-family:Consolas,'Courier New',monospace;font-size:12px;line-height:19px;white-space:pre-wrap;word-break:break-word;">{{error_message}}</div></td></tr>
+        </mj-table>
+      </mj-column>
+    </mj-section>
+
+    <!-- Button -->
+    {{#with execution_url}}
+    <mj-section padding="20px 32px 0">
+      <mj-column>
+        <mj-button href="{{.}}" background-color="#013366" color="#FFFFFF" border-radius="4px" font-size="14px" font-weight="bold" inner-padding="12px 28px" padding="0" align="left">View failed execution &#8594;</mj-button>
+      </mj-column>
+    </mj-section>
+    {{/with}}
+
+    <!-- Details -->
+    <mj-section padding="26px 32px 0">
+      <mj-column>
+        <mj-text padding="0 0 4px"><span class="h">RUN DETAILS</span></mj-text>
+        <mj-table padding="0" color="#2D2D2D" font-size="14px" line-height="20px">
+          <tr><td class="k">Workflow ID</td><td class="v">{{workflow_id}}</td></tr>
+          <tr><td class="k">Execution ID</td><td class="v">{{execution_id}}</td></tr>
+          {{#with event}}<tr><td class="k">Event</td><td class="v">{{.}}</td></tr>{{/with}}
+          {{#with event_id}}<tr><td class="k">Event ID</td><td class="v">{{.}}</td></tr>{{/with}}
+          {{#with foi_request_id}}<tr><td class="k">FOI request ID</td><td class="v">{{.}}</td></tr>{{/with}}
+          {{#with ministry_request_id}}<tr><td class="k">Ministry request ID</td><td class="v">{{.}}</td></tr>{{/with}}
+          {{#with raw_request_id}}<tr><td class="k">Raw request ID</td><td class="v">{{.}}</td></tr>{{/with}}
+        </mj-table>
+      </mj-column>
+    </mj-section>
+
+    <!-- Outbox and next steps -->
+    <mj-section padding="24px 32px 28px">
+      <mj-column background-color="#FEF8E8" border="1px solid #F8D47A" border-radius="6px" padding="16px 20px">
+        <mj-text><span class="h">NEXT STEPS</span></mj-text>
+        {{#with event_id}}
+        <mj-text padding="8px 0 0">The error handler tried to mark this event <strong>FAILED</strong> in the API outbox.</mj-text>
+        <mj-text padding="8px 0 0">1. Open the failed execution and find the cause.<br />2. Fix the cause.<br />3. Confirm the outbox row is FAILED, then replay the event.</mj-text>
+        {{else}}
+        <mj-text padding="8px 0 0">No event ID was found for this run, so <strong>no outbox row was updated</strong>.</mj-text>
+        <mj-text padding="8px 0 0">1. Open the failed execution and find the cause.<br />2. Fix the cause.<br />3. Check whether any work must be re-run manually.</mj-text>
+        {{/with}}
+      </mj-column>
+    </mj-section>
+
+    <!-- Footer -->
+    <mj-section background-color="#013366" padding="16px 32px" border-top="4px solid #FCBA19">
+      <mj-column>
+        <mj-text color="#FFFFFF" font-size="12px" line-height="18px" align="center">Automated message from the FOI Error Handler workflow. Please do not reply.<br /><span style="color:#C1DDFC;">For internal use. Do not forward outside the FOI support team.</span></mj-text>
+      </mj-column>
+    </mj-section>
+
+  </mj-body>
+</mjml>

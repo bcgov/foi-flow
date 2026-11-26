@@ -1,0 +1,1440 @@
+{
+  "name": "FOI RawRequest Processing",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "a33a738d-32bf-4886-b5a6-b822f7f21fb0",
+      "name": "Raw Request Intake Processing: Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        464,
+        592
+      ],
+      "notes": "Receives event, rawRequestId, foiRequestId, ministryRequestId, assignedGroup, assignedTo, status, ministries, metadata (complete original webhook payload) and executionId from the parent."
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "se1",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-intake-assignment"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "claim"
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "se2",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-intake-complete"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "complete"
+            },
+            {
+              "conditions": {
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "id": "se3",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-intake-reopen"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "reopen"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "other"
+        }
+      },
+      "id": "1b4ba8e3-2304-4572-a2b1-2f39d9c65a62",
+      "name": "Intake Event Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        912,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'Raw Request intake assignment received (status: ' + ($json.status || 'n/a') + '). Assigned group: ' + ($json.assignedGroup || 'n/a') + ', assigned to: ' + ($json.assignedTo || 'n/a') + '. Sending the assignment status update to the request-management API.' }}",
+            "event": "={{ $json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $json.ministryRequestId || null }}",
+            "process_type": "raw-request-process",
+            "raw_request_id": "={{ $json.rawRequestId }}",
+            "status": "={{ $json.status }}",
+            "event_id": "={{ $json.eventId }}",
+            "occurred_at": "={{ $json.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "1d644f87-69a8-4819-8ece-1f5b65d2a9eb",
+      "name": "Audit: Intake Assignment",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1136,
+        272
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "c3e22080-489b-4d30-bd91-5bb1a1e8eaf9",
+      "name": "End (Intake Assigned)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'Raw Request intake completed with status \\'' + ($json.status || 'n/a') + '\\'. Archiving the Raw Request via the API Manager and routing on status.' }}",
+            "event": "={{ $json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $json.ministryRequestId || null }}",
+            "process_type": "raw-request-process",
+            "raw_request_id": "={{ $json.rawRequestId }}",
+            "status": "={{ $json.status }}",
+            "event_id": "={{ $json.eventId }}",
+            "occurred_at": "={{ $json.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "81f10070-a720-4239-836e-ff35b9631f36",
+      "name": "Audit: Intake Complete",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1136,
+        480
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "Returns the inserted row including its `id`. The status branches update THIS row (matched on id) instead of inserting duplicates."
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "s1",
+                    "leftValue": "={{ ($('Raw Request Intake Processing: Start').first().json.status || '').toString().trim().toLowerCase() }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "open"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "open"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "s2",
+                    "leftValue": "={{ ($('Raw Request Intake Processing: Start').first().json.status || '').toString().trim().toLowerCase() }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "closed"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "closed"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "other status"
+        }
+      },
+      "id": "1c18b767-ec85-47f1-8325-6810d31721da",
+      "name": "Route On Status",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1360,
+        464
+      ],
+      "notes": "Status is read from the original webhook payload and lower-cased so both `Open` and `open` route correctly."
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const data = $('Intake: Set Process Variables').first().json;\n  const event = data.event ?? null;\n  const eventId = data.eventId ?? null;\n  const occurredAt = data.occurredAt ?? null;\n  const foiRequestId = data.foiRequestId ?? null;\n  const rawRequestId = data.rawRequestId ?? null;\n  const status = data.status ?? null;\n  const ministries = data.ministries ?? null;\n  const assignedGroup = data.assignedGroup ?? null;\n  const assignedTo = data.assignedTo ?? null;\n  const metadata = data.metadata ?? null;\n\n  return [{\n    json: {\n      event: event,\n      eventId: eventId,\n      occurredAt: occurredAt,\n      foiRequestId: foiRequestId,\n      rawRequestId: rawRequestId,\n      status: status,\n      ministries: ministries,\n      assignedGroup: assignedGroup,\n      assignedTo: assignedTo,\n      metadata: metadata\n    }\n  }];\n\n} catch (error) {\n  return [{\n    json: {\n      error: true,\n      errorMessage: error.message\n    }\n  }];\n}"
+      },
+      "id": "8ded1cc5-921f-497a-a65f-11d65d78b0c4",
+      "name": "Parse foiRequestMetaData",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1872,
+        256
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "df1fdbb4-9cd1-4899-b52a-2e8bea6daa8a",
+      "name": "End (Opened)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        256
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "704c8769-246a-4358-8448-281ce57f4b75",
+      "name": "End (Closed at Intake)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        480
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "ea49bdd7-4622-4436-958f-5dd54d846796",
+      "name": "End (Unhandled Status)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        672
+      ],
+      "notes": "Statuses other than open/closed/redirect stop here. The `foi-intake-complete` audit row already records the received status."
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'Raw Request has been re-opened (status: ' + ($json.status || 'n/a') + '). The previous closure is superseded and intake will be re-run from the request-management API. Assigned group: ' + ($json.assignedGroup || 'n/a') + ', assigned to: ' + ($json.assignedTo || 'n/a') + '.' }}",
+            "event": "={{ $json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $json.ministryRequestId || null }}",
+            "process_type": "raw-request-process",
+            "raw_request_id": "={{ $json.rawRequestId }}",
+            "status": "={{ $json.status }}",
+            "event_id": "={{ $json.eventId }}",
+            "occurred_at": "={{ $json.occurredAt }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "4c48c725-bda1-40c0-8f89-2546d832edd3",
+      "name": "Audit: Intake Reopen",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1136,
+        688
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "8a87e4d9-624c-45ef-aff9-474aea410a66",
+      "name": "End (Reopened)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        688
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "0a680b2c-672c-4f33-b8c4-fac650b656d5",
+      "name": "Other Intake Event",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        880
+      ],
+      "notes": "Unrecognised intake event - no processing defined yet."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b59eba45-0001-4411-91c8-1db80adb5c6f",
+              "name": "event",
+              "type": "string",
+              "value": "={{ $json.event != null ? String($json.event) : '' }}"
+            },
+            {
+              "id": "a2ed6e80-1cfa-4dbb-9fe2-e0e1d25c76f4",
+              "name": "eventId",
+              "value": "={{ $json.eventId != null ? String($json.eventId) : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "e8db6ab6-3ae3-4c21-9af5-06adc94893f9",
+              "name": "occurredAt",
+              "value": "={{ $json.occurredAt != null ? String($json.occurredAt) : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "b59eba45-7f89-4411-91c8-1db80adb5c6f",
+              "name": "rawRequestId",
+              "type": "string",
+              "value": "={{$json.rawRequestId != null ? String($json.rawRequestId) : '' }}"
+            },
+            {
+              "id": "b59eba45-0002-4411-91c8-1db80adb5c6f",
+              "name": "foiRequestId",
+              "type": "string",
+              "value": "={{ $json.foiRequestId != null ? String($json.foiRequestId) : '' }}"
+            },
+            {
+              "id": "b59eba45-0003-4411-91c8-1db80adb5c6f",
+              "name": "ministryRequestId",
+              "type": "string",
+              "value": "={{ $json.body && $json.body.ministryRequestId != null ? String($json.body.ministryRequestId) : '' }}"
+            },
+            {
+              "id": "a8723e44-cbff-45e7-b4af-4659eb8118c1",
+              "name": "assignedGroup",
+              "type": "string",
+              "value": "={{ $json.assignedGroup != null ? String($json.assignedGroup) : '' }}"
+            },
+            {
+              "id": "62183b59-ef9b-4e59-b81b-0d55e153f7b0",
+              "name": "assignedTo",
+              "type": "string",
+              "value": "={{ $json.assignedTo != null ? String($json.assignedTo) : '' }}"
+            },
+            {
+              "id": "b59eba45-0004-4411-91c8-1db80adb5c6f",
+              "name": "status",
+              "type": "string",
+              "value": "={{ $json.status != null ? String($json.status) : '' }}"
+            },
+            {
+              "id": "b59eba45-0005-4411-91c8-1db80adb5c6f",
+              "name": "ministries",
+              "type": "string",
+              "value": "={{ $json.ministries == null ? '' : (typeof $json.ministries === 'string' ? $json.ministries : JSON.stringify($json.ministries)) }}"
+            },
+            {
+              "id": "b59eba45-0006-4411-91c8-1db80adb5c6f",
+              "name": "metadata",
+              "type": "string",
+              "value": "={{ JSON.stringify($json.metadata || {}) }}"
+            },
+            {
+              "id": "88410a6f-0912-4030-8a3d-35c31440f202",
+              "name": "executionId",
+              "type": "string",
+              "value": "={{ $execution.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b0d4e8a9-efed-4c5f-a2bb-692dbcc91432",
+      "name": "Intake: Set Process Variables",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        592
+      ],
+      "notes": "Normalises the webhook payload. `metadata` always holds the COMPLETE original webhook body so nothing is lost downstream or in the audit table. Fields that are absent for a given event resolve to '' instead of undefined."
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "Request is opened and FOI Request processing has been started.",
+            "event": "={{ $json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $json.foi_request_id || null }}",
+            "ministry_request_id": "={{ $json.ministry_request_id || null }}",
+            "process_type": "foi-request-process",
+            "raw_request_id": "={{ $json.raw_request_id }}",
+            "status": "={{ $json.status }}",
+            "event_id": "={{ $json.event_id }}",
+            "occurred_at": "={{ $json.occurred_at}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "c5578e1d-d4ce-44af-8e66-472f4cbb20ac",
+      "name": "Audit: Intake Open",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1648,
+        256
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "Returns the inserted row including its `id`. The status branches update THIS row (matched on id) instead of inserting duplicates."
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "Request is closed. FOI Request processing will not be started",
+            "event": "={{ $json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $json.foi_request_id || null }}",
+            "ministry_request_id": "={{ $json.ministry_request_id || null }}",
+            "process_type": "raw-request-process",
+            "raw_request_id": "={{ $json.raw_request_id }}",
+            "status": "={{ $json.status }}",
+            "event_id": "={{ $json.event_id }}",
+            "occurred_at": "={{ $json.occurred_at }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "6af8be6a-aa41-4770-81e6-62616a169c50",
+      "name": "Audit: Intake Closed",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1584,
+        480
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "Returns the inserted row including its `id`. The status branches update THIS row (matched on id) instead of inserting duplicates."
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "pPO6edSrMP62iCbT",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/pPO6edSrMP62iCbT",
+          "cachedResultName": "FOI Request Processing"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "event": "={{ $('Parse foiRequestMetaData').first().json.event }}",
+            "rawRequestId": "={{ $('Parse foiRequestMetaData').first().json.rawRequestId }}",
+            "foiRequestId": "={{ $('Parse foiRequestMetaData').first().json.foiRequestId }}",
+            "status": "={{ $('Parse foiRequestMetaData').first().json.status }}",
+            "ministries": "={{ $('Parse foiRequestMetaData').first().json.ministries }}",
+            "assignedGroup": "={{ $('Parse foiRequestMetaData').first().json.assignedGroup }}",
+            "assignedTo": "={{ $('Parse foiRequestMetaData').first().json.assignedTo }}",
+            "metadata": "={{ $('Parse foiRequestMetaData').first().json.metadata }}",
+            "eventId": "={{ $('Parse foiRequestMetaData').first().json.eventId }}",
+            "occurredAt": "={{ $('Parse foiRequestMetaData').first().json.occurredAt }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventId",
+              "displayName": "eventId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawRequestId",
+              "displayName": "rawRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "foiRequestId",
+              "displayName": "foiRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ministries",
+              "displayName": "ministries",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "assignedGroup",
+              "displayName": "assignedGroup",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "assignedTo",
+              "displayName": "assignedTo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "occurredAt",
+              "displayName": "occurredAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "c40499a0-12a6-4895-92e0-b04710c55dfa",
+      "name": "Call 'FOI Request Processing - Simplified'",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "retryOnFail": false,
+      "position": [
+        2096,
+        256
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI RawRequest Processing\n\n**Purpose:**\nHandles the intake (raw request) stage of an FOI request: Intake team assignment, intake completion and reopen.\n\n**Trigger/Entry:**\nSub-workflow called by FOI Request Routing for intake events: `foi-intake-assignment`, `foi-intake-complete`, `foi-intake-reopen`.\n\n**Processing:**\n- Assignment: audit, then set the raw request status to \"Intake in Progress\".\n- Complete: audit, archive the raw request, then route on status. Open → audit and start FOI Request Processing with the list of ministries. Closed → audit only. Other statuses stop.\n- Reopen: audit only.\n\n**Integration/Outcome:**\nOpen requests start FOI Request Processing(async). Every step writes to `foi-process-audit`.",
+        "height": 520,
+        "width": 620,
+        "color": 4
+      },
+      "id": "090e952c-91ff-412c-bbec-29d3f6a9cab8",
+      "name": "Developer Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Audit: Intake Assignment": {
+      "main": [
+        [
+          {
+            "node": "End (Intake Assigned)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: Intake Complete": {
+      "main": [
+        [
+          {
+            "node": "Route On Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: Intake Reopen": {
+      "main": [
+        [
+          {
+            "node": "End (Reopened)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intake Event Switch": {
+      "main": [
+        [
+          {
+            "node": "Audit: Intake Assignment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: Intake Complete",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: Intake Reopen",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Other Intake Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse foiRequestMetaData": {
+      "main": [
+        [
+          {
+            "node": "Call 'FOI Request Processing - Simplified'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Raw Request Intake Processing: Start": {
+      "main": [
+        [
+          {
+            "node": "Intake: Set Process Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route On Status": {
+      "main": [
+        [
+          {
+            "node": "Audit: Intake Open",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: Intake Closed",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "End (Unhandled Status)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Intake: Set Process Variables": {
+      "main": [
+        [
+          {
+            "node": "Intake Event Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: Intake Open": {
+      "main": [
+        [
+          {
+            "node": "Parse foiRequestMetaData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: Intake Closed": {
+      "main": [
+        [
+          {
+            "node": "End (Closed at Intake)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'FOI Request Processing - Simplified'": {
+      "main": [
+        [
+          {
+            "node": "End (Opened)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "454c1263-fbbb-4576-b40a-a4b24fe9cbbc",
+  "meta": {
+    "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
+  },
+  "nodeGroups": [],
+  "id": "Nmy2CI0KnrNOtnH0",
+  "tags": []
+}
