@@ -47,6 +47,9 @@ class paymentformservice:
         created = client.createsubmission(
             formid,
             {
+                # The form's Pay button builds the PayBC return route from foiRequestID; the landing page then
+                # completes the payment with it. getpaymentdetails has checked it owns the ministry request.
+                "foiRequestID": str(requestid),
                 "ministryRequestID": str(ministryrequestid),
                 "balanceDue": balancedue,
                 "axisRequestId": details.get("axisRequestId"),
