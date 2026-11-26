@@ -30,83 +30,79 @@ jobs:
         contents: read
         pull-requests: read
       runs-on: ubuntu-latest
-      env:
-      
       outputs:
         environment: ${{ steps.generate.outputs.environment }}
         matrix: ${{ steps.generate.outputs.matrix }}
         release_label: ${{ steps.generate.outputs.release_label }}
-        run_migrations: ${{ steps.generate.outputs.run_migrations }}
-  
       steps:
         - name: Checkout
           uses: actions/checkout@v6
-  
         - name: Install yq
           run: |
             sudo wget -qO /usr/local/bin/yq \
               https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
             sudo chmod +x /usr/local/bin/yq
-  
         - name: Generate Deployment Configuration
           id: generate
           shell: bash
           env:
             PR_BODY: ${{ github.event.pull_request.body }}
-            GH_TOKEN: ${{ github.token }}
-  
+            GH_TOKEN: ${{ github.token }} 
           run: |
+            # Map Git branch to deployment environment.
+            # dev branch deploys automatically to dev.
+            # main branch deploys to test.
             if [[ "${{ github.event.pull_request.base.ref }}" == "dev" ]]; then
               TARGET_ENVIRONMENT="dev"
             else
               TARGET_ENVIRONMENT="test"
             fi
-  
+            # Release label is required only for main -> test deployments.
             RELEASE_LABEL=""
             if [[ "$TARGET_ENVIRONMENT" == "test" ]]; then
               RELEASE_LABEL=$(grep '^Release Label:' <<< "$PR_BODY" \
                 | cut -d':' -f2- \
                 | xargs)
-  
               if [[ -z "$RELEASE_LABEL" ]]; then
                 echo "::error::Release label is required for main deployments."
                 exit 1
               fi
             fi
-  
             echo "release_label=${RELEASE_LABEL}" >> "$GITHUB_OUTPUT"
-  
+            # Get files changed in the merged PR.
+            # Used to determine which services need deployment.
             CHANGED_FILES=$(gh api \
               repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
               --paginate \
               --jq '.[].filename')
-  
+
+            # Build deployment matrix from service catalog.
+            # Only services with changed files will be deployed.
             MATRIX='{"include":['
             FIRST=true
-            RUN_MIGRATIONS=false
-  
             COUNT=$(yq '.services | length' .github/configuration/service-catalog.yaml)
-  
+
             for ((i=0;i<COUNT;i++))
             do
               NAME=$(yq ".services[$i].name" .github/configuration/service-catalog.yaml)
               PATH_VALUE=$(yq ".services[$i].path" .github/configuration/service-catalog.yaml)
               IMAGE=$(yq ".services[$i].image" .github/configuration/service-catalog.yaml)
               KIND=$(yq ".services[$i].kind // \"deployment\"" .github/configuration/service-catalog.yaml)
-              LARGEFILES=$(yq ".services[$i].largefiles // false" .github/configuration/service-catalog.yaml)
-  
+              # Some services also deploy a companion "-largefiles" deployment
+              # using the same container image.
+              LARGEFILES=$(yq ".services[$i].largefiles // false" \
+                .github/configuration/service-catalog.yaml)
               if echo "$CHANGED_FILES" | grep -q "^${PATH_VALUE}/"; then
-                if [[ "$NAME" == "request-management-api" ]]; then
-                  RUN_MIGRATIONS=true
-                fi
-  
+
                 if [[ "$FIRST" == false ]]; then
                   MATRIX="${MATRIX},"
                 fi
-  
+
+                # Primary deployment.
                 MATRIX="${MATRIX}{\"name\":\"${NAME}\",\"path\":\"${PATH_VALUE}\",\"image\":\"${IMAGE}\",\"kind\":\"${KIND}\"}"
                 FIRST=false
   
+                # Companion largefiles deployment.
                 if [[ "$LARGEFILES" == "true" ]]; then
                   MATRIX="${MATRIX},"
                   MATRIX="${MATRIX}{\"name\":\"${NAME}-largefiles\",\"path\":\"${PATH_VALUE}\",\"image\":\"${IMAGE}\",\"kind\":\"${KIND}\"}"
@@ -115,26 +111,44 @@ jobs:
             done
   
             MATRIX="${MATRIX}]}"
-  
+
             echo "environment=${TARGET_ENVIRONMENT}" >> "$GITHUB_OUTPUT"
             echo "matrix=$(echo "$MATRIX" | jq -c .)" >> "$GITHUB_OUTPUT"
-            echo "run_migrations=${RUN_MIGRATIONS}" >> "$GITHUB_OUTPUT"
+
+  check-migration-changes:
+    name: Check API Migration Changes
+    runs-on: ubuntu-latest
+    outputs:
+      migrations_changed: ${{ steps.filter.outputs.migrations }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Detect Migration Changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            migrations:
+              - 'request-management-api/migrations/**'
 
   # ---------------------------------------------------------------------------
   # Runs database migrations IFF request-management-api is being deployed.
   # ---------------------------------------------------------------------------
   run-api-migrations:
     name: Run API Migrations
-    needs: prepare-deployment
-    if: needs.prepare-deployment.outputs.run_migrations == 'true'
+    needs: check-migration-changes
+    if: needs.check-migration-changes.outputs.migrations_changed == 'true'
     runs-on: ubuntu-latest
+
+    env:
+      MANIFEST_REPO_DEPLOY_KEY: ${{ secrets.MANIFEST_REPO_DEPLOY_KEY }}
+      OPENSHIFT4_LOGIN_REGISTRY: ${{ secrets.OPENSHIFT4_LOGIN_REGISTRY }}
+      OPENSHIFT4_SA_TOKEN: ${{ secrets.OPENSHIFT4_SA_TOKEN }}
+
     steps:
       - name: Setup SSH
         shell: bash
-        env:
-          MANIFEST_REPO_DEPLOY_KEY: ${{ secrets.MANIFEST_REPO_DEPLOY_KEY }}
-          OPENSHIFT4_LOGIN_REGISTRY: ${{ secrets.OPENSHIFT4_LOGIN_REGISTRY }}
-          OPENSHIFT4_SA_TOKEN: ${{ secrets.OPENSHIFT4_SA_TOKEN }}
         run: |
           mkdir -p ~/.ssh
           echo "${MANIFEST_REPO_DEPLOY_KEY}" > ~/.ssh/id_rsa
@@ -259,9 +273,9 @@ jobs:
           ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
       - name: Update GitOps manifests
-
         shell: bash
-
+        env:
+           MIGRATIONS_CHANGED: ${{ needs.check-migration-changes.outputs.migrations_changed }}
         run: |
 
           # Clone GitOps repository containing Helm values.
@@ -313,6 +327,11 @@ jobs:
                 ".${GITOPS_SECTION}.${NAME}.labels.release-label = \"${{ needs.prepare-deployment.outputs.release_label }}\"" \
                 -i "$VALUES_FILE"
 
+              if [[ "${MIGRATIONS_CHANGED}" == "true" && "${NAME}" == "request-management-api" ]]; then
+                yq e \
+                  ".${GITOPS_SECTION}.${NAME}.labels.migration-required = true" \
+                  -i "$VALUES_FILE"
+              fi
             fi
 
           done

@@ -1,0 +1,351 @@
+name: Release to Prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_label:
+        description: Release label (you provided in PR to main for example 1.2.0)
+        required: true
+        type: string
+
+      release_version:
+        description: Semantic version to publish to prod (for example v1.2.0)
+        required: true
+        type: string
+
+jobs:
+
+  release:
+    name: Promote Release To Production
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq \
+            https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+     # Add deploy key to runner
+      - name: Setup SSH
+        shell: bash
+        env:
+          MANIFEST_REPO_DEPLOY_KEY: ${{ secrets.MANIFEST_REPO_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "${MANIFEST_REPO_DEPLOY_KEY}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
+      # Checkout Gitops repo 
+      - name: Checkout Gitops
+        shell: bash
+        run: |
+          git clone git@github.com:bcgov-c/tenant-gitops-d7abee.git -b main
+
+      # Find services for the given release label in values-test.yaml
+      - name: Find release services
+        id: services
+        working-directory: tenant-gitops-d7abee
+        env:
+          RELEASE_LABEL: ${{ inputs.release_label }}
+          VALUES_FILE: "foi-flow/values-test.yaml"
+        run: |
+
+          services=$(yq -o=json '
+            pick(["deployments","cronJobs"])
+            | to_entries
+            | map(
+                .key as $kind
+                | .value
+                | to_entries
+                | map(
+                    select(.value.labels."release-label" == env(RELEASE_LABEL))
+                    | {
+                        "kind": $kind,
+                        "name": .key,
+                        "imagestream": (.value.image.repository | split("/") | .[-1]),
+                        "tag": .value.image.tag,
+                        "backup-required": (.value.labels."db-backup-required" == "true"),
+                        "migration-required": (.value.labels."migration-required" == "true")
+                      }
+                  )
+              )
+            | flatten
+          ' "$VALUES_FILE")
+
+
+          if [ "$(echo "$services" | jq length)" -eq 0 ]; then
+            echo "No services found"
+            exit 1
+          fi
+
+
+          echo "$services" | jq
+
+          echo "services=$(echo "$services" | jq -c .)" >> "$GITHUB_OUTPUT"
+
+          MIGRATION_REQUIRED=$(echo "$services" | jq -r '
+          [.[] | select(.kind == "deployments" and .name == "request-management-api")]
+          | if length == 0 then
+              "false"
+            elif length > 1 then
+              error("Multiple request-management-api entries found")
+            else
+              .[0]["migration-required"]
+            end
+          ')
+
+          echo "migration_required=${MIGRATION_REQUIRED}" >> "$GITHUB_OUTPUT"
+
+      # login to tool's registry
+
+     # Install OC CLI
+      - name: Install OC CLI
+        uses: redhat-actions/oc-installer@35b60c3f9757ae4301521556e1b75ff6f59f8d7c
+        with:
+          oc_version: '4.6'
+
+      # Login and verify every service from the deployment matrix.
+      - name: Login to OpenShift
+        run: |
+          oc login \
+            --server="${{ secrets.OPENSHIFT4_LOGIN_REGISTRY }}" \
+            --token="${{ secrets.OPENSHIFT4_SA_TOKEN }}"
+
+      # Perform DB backup if release touches api
+      - name: Perform DB backup if release touches api
+        env: 
+          SERVICES: ${{ steps.services.outputs.services }}
+          NAMESPACE: d7abee-prod
+          BACKUP_DEPLOYMENT: foi-bkup
+        run: |
+          
+          # Check if any service in the JSON array has db_backup_required set to true
+          BACKUP_NEEDED=$(echo "$SERVICES" | jq -r 'any(.[]; .["backup-required"] == true)')
+
+          if [ "$BACKUP_NEEDED" = "true" ]; then
+            echo "DB backup is required for this release."
+            # 1. Target the correct namespace
+            oc project ${NAMESPACE}
+
+            echo "Locating running pod for deployment ${BACKUP_DEPLOYMENT}"
+
+            # 2. Find the active running pod name for the deployment
+            BACKUP_POD=$(oc get pods -n "${NAMESPACE}" \
+              -l "name=${BACKUP_DEPLOYMENT}" \
+              --field-selector=status.phase=Running \
+              -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)
+
+            if [ -z "$BACKUP_POD" ]; then
+              echo "No running '${BACKUP_DEPLOYMENT}' pod found in namespace '${NAMESPACE}'!"
+              exit 1
+            fi
+
+            echo "Found backup pod: $BACKUP_POD"
+
+            # 3. Execute the backup script inside the pod
+            # Replace '/app/backup.sh' with the actual script path inside your container
+            oc exec -n "${NAMESPACE}" "$BACKUP_POD" -- /bin/sh -c "/backup.sh -1"
+
+            echo "Database backup completed successfully!"
+
+          else
+            echo "No DB backup is required for this release."
+          fi
+
+          
+      # retal all the service imagestreams to resease version
+
+      - name: Retag images in Imagestream
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ inputs.release_version }}
+          NAMESPACE: ${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}
+          SERVICES: ${{ steps.services.outputs.services }}
+        run: |
+          set -euo pipefail
+
+          oc project "$NAMESPACE"
+
+          printf '%s\n' "$SERVICES" |
+            jq -c '.[]' |
+            while IFS= read -r service; do
+              IMAGE_NAME=$(echo "$service" | jq -r '.imagestream')
+              CURRENT_TAG=$(echo "$service" | jq -r '.tag')
+
+              echo "Tagging ${IMAGE_NAME}:${CURRENT_TAG} -> ${IMAGE_NAME}:${RELEASE_VERSION}"
+
+              oc tag \
+                "${IMAGE_NAME}:${CURRENT_TAG}" \
+                "${IMAGE_NAME}:${RELEASE_VERSION}"
+            done
+
+
+      - name: Update CronJob in GitOps Manifests
+        if: steps.services.outputs.migration_required == 'true'
+        working-directory: tenant-gitops-d7abee
+        shell: bash
+        env:
+          IMAGE_TAG: ${{ inputs.release_version }}
+        run: |
+          set -euo pipefail
+
+          VALUES_FILE="foi-flow/values-prod.yaml"
+          CRONJOB_NAME="request-management-api-migrations"
+
+          echo "Updating ${CRONJOB_NAME} to image tag ${IMAGE_TAG}"
+
+          yq e \
+            '.cronJobs."request-management-api-migrations".image.tag = strenv(IMAGE_TAG)' \
+            -i "$VALUES_FILE"
+
+          git config user.email "manish.sihag@gov.bc.ca"
+          git config user.name "ManishSihag"
+
+          git add "$VALUES_FILE"
+
+          if git diff --cached --quiet; then
+            echo "CronJob already has the requested image tag."
+            exit 0
+          fi
+
+          git commit -m "Update ${CRONJOB_NAME} to tag ${IMAGE_TAG} [skip ci]"
+
+          RETRY_DELAYS=(15 30 60 120 240)
+
+          for attempt in $(seq 1 5); do
+            if git push origin main; then
+              echo "CronJob GitOps update pushed successfully."
+              exit 0
+            fi
+
+            if [ "$attempt" -eq 5 ]; then
+              echo "::error::Failed to push CronJob update after 5 attempts."
+              exit 1
+            fi
+
+            sleep "${RETRY_DELAYS[$((attempt-1))]}"
+            git pull --rebase origin main
+          done
+
+     
+      - name: Trigger Migration Job for Request Management API and Wait
+        if: steps.services.outputs.migration_required == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          NAMESPACE="d7abee-prod"
+          CRONJOB="request-management-api-migrations"
+          JOB_NAME="migration-prod-${{ github.run_id }}-${{ github.run_attempt }}"
+          EXPECTED_TAG="${{ inputs.release_version }}"
+
+          oc project "${NAMESPACE}"
+
+          echo "Waiting for ArgoCD to sync the CronJob image tag..."
+
+          for i in {1..30}; do
+            CURRENT_IMAGE=$(oc get cronjob "${CRONJOB}" \
+              -o jsonpath='{.spec.jobTemplate.spec.template.spec.containers[0].image}' \
+              2>/dev/null || true)
+
+            CURRENT_TAG="${CURRENT_IMAGE##*:}"
+
+            if [[ "${CURRENT_TAG}" == "${EXPECTED_TAG}" ]]; then
+              echo "CronJob updated to ${EXPECTED_TAG}."
+              break
+            fi
+
+            if [[ "$i" -eq 30 ]]; then
+              echo "::error::Timed out waiting for CronJob image update."
+              exit 1
+            fi
+
+            sleep 10
+          done
+
+          echo "Creating migration job: ${JOB_NAME}"
+
+          oc create job --from="cronjob/${CRONJOB}" "${JOB_NAME}"
+
+          echo "Waiting for migration job to complete..."
+
+          if ! oc wait --for=condition=complete \
+            "job/${JOB_NAME}" --timeout=600s; then
+
+            echo "::error::Migration job failed or timed out."
+            oc logs "job/${JOB_NAME}" --all-containers=true || true
+            oc describe "job/${JOB_NAME}" || true
+            exit 1
+          fi
+
+          echo "Migration completed successfully."
+
+
+
+      - name: Promote images in GitOps
+        working-directory: tenant-gitops-d7abee
+        env:
+          RELEASE_VERSION: ${{ inputs.release_version }}
+          RELEASE_LABEL: ${{ inputs.release_label }}
+          VALUES_FILE: "foi-flow/values-prod.yaml"
+          SERVICES: ${{ steps.services.outputs.services }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          printf '%s\n' "$SERVICES" |
+          jq -c '.[]' |
+          while IFS= read -r service; do
+
+            export KIND=$(echo "$service" | jq -r '.kind')
+            export NAME=$(echo "$service" | jq -r '.name')
+
+            echo "Promoting ${KIND}/${NAME} to ${RELEASE_VERSION}"
+
+            yq e \
+              '.[strenv(KIND)][strenv(NAME)].image.tag = strenv(RELEASE_VERSION)' \
+              -i "$VALUES_FILE"
+
+          done
+
+          # Reset the production migration flag only after successful migration
+          if [[ "${{ steps.services.outputs.migration_required }}" == "true" ]]; then
+            yq e \
+              '.deployments."request-management-api".labels."migration-required" = "false"' \
+              -i "$VALUES_FILE"
+
+            echo "Reset production migration-required label to false."
+          fi
+
+          git config user.email "manish.sihag@gov.bc.ca"
+          git config user.name "ManishSihag"
+
+          git add "$VALUES_FILE"
+
+          if git diff --cached --quiet; then
+            echo "No GitOps changes."
+            exit 0
+          fi
+
+          git commit -m "Release ${RELEASE_VERSION} (from ${RELEASE_LABEL})"
+
+          MAX_RETRIES=5
+          RETRY_DELAY=15
+
+          for ((i=1; i<=MAX_RETRIES; i++)); do
+            if git push origin main; then
+              echo "Production GitOps changes pushed successfully."
+              exit 0
+            fi
+
+            if [[ "$i" -eq "$MAX_RETRIES" ]]; then
+              echo "::error::Failed to push production GitOps changes."
+              exit 1
+            fi
+
+            sleep "$RETRY_DELAY"
+            git pull --rebase origin main
+          done
