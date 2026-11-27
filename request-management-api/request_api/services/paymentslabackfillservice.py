@@ -12,8 +12,9 @@ Sources of truth
 - n8n Data Table: existing rows, so a rerun never duplicates, resets a deadline or revives a closed row.
 
 Camunda keeps an instance waiting after it has expired and notified (``expirycounter`` >= 1). Backfilling such a
-payment as ``ACTIVE`` would make the n8n expiry job notify the applicant a second time, so it is reported
-separately and only written, as ``EXPIRED``, when ``include_expired`` is set.
+payment as ``ACTIVE`` could make the n8n expiry job send the expiry notification a second time (when a run still
+falls within 24 hours of the expiry date), so it is reported separately and only written, as ``EXPIRED``, when
+``include_expired`` is set.
 """
 
 import csv
@@ -24,17 +25,16 @@ import logging
 import os
 import re
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from urllib.parse import quote, urlencode
 
-from zoneinfo import ZoneInfo
 import requests
 
 FEE_PROCESS_KEY = 'foi-fee-processing'
 PAYMENT_WAIT_ACTIVITY = 'Gateway_1771ld6'  # event based gateway: waits for foi-manage-payment or the daily timer
 SLA_TYPE = 'payment-expiry'
 SLA_TABLE_NAME = 'foi-payment-sla'
-VANCOUVER = ZoneInfo('America/Vancouver')
+EXPIRY_RUN_HOUR_UTC = 13  # daily schedule of the n8n FOI Payment Expiry SLA Job (cron 0 13 * * *, Etc/UTC)
 
 # Only these Camunda variables are requested. The instances also hold credentials and tokens.
 CAMUNDA_VARIABLES = (
@@ -108,10 +108,11 @@ def parse_payment_url(url):
 
 
 def compute_expires_at(expiry_date):
-    """Same rule as the ``Build Payment SLA`` node: the end of the expiry day in America/Vancouver, as UTC.
+    """Same rule as the ``Build Payment SLA`` node: the end of the expiry day in UTC (Camunda runs with TZ=UTC).
 
-    A date-only value means 23:59:59.999 local time. Returns ``None`` for a missing or invalid date. There is
-    no 20 day fallback: a payment whose deadline is unknown is reported, not given an invented one.
+    A date-only value means 23:59:59.999 UTC, and a date-time without an offset is read as UTC. Returns ``None``
+    for a missing or invalid date. There is no 20 day fallback: a payment whose deadline is unknown is reported,
+    not given an invented one.
     """
     raw = _clean(expiry_date)
     if not raw:
@@ -123,7 +124,7 @@ def compute_expires_at(expiry_date):
     if len(raw) <= 10:
         parsed = parsed.replace(hour=23, minute=59, second=59, microsecond=999000)
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=VANCOUVER)  # after the end-of-day replace, so a DST change day stays right
+        parsed = parsed.replace(tzinfo=timezone.utc)
     utc = parsed.astimezone(timezone.utc)
     return utc.strftime('%Y-%m-%dT%H:%M:%S.') + '%03dZ' % (utc.microsecond // 1000)
 
@@ -148,20 +149,24 @@ def _initiate_metadata(variables):
     return {}
 
 
-def payment_expiry_reached(payment_expiry_date, expires_at, now):
+def next_expiry_run(now):
+    """The first run of the FOI Payment Expiry SLA Job after ``now``. It runs daily at 13:00 UTC."""
+    run = now.astimezone(timezone.utc).replace(hour=EXPIRY_RUN_HOUR_UTC, minute=0, second=0, microsecond=0)
+    return run if run > now else run + timedelta(days=1)
+
+
+def in_expiry_window(payment_expiry_date, run_at):
     """Same test as the ``Apply BPMN Expiry Window`` node of the FOI Payment Expiry SLA Job.
 
-    The job expires an ACTIVE row once ``now - expiry > -1 day`` (Camunda's first daily run inside the one-day
-    window around the expiry date, and every run after it), where ``expiry`` is ``payment_expiry_date`` parsed
-    like JavaScript ``new Date()`` (a date-only value is midnight UTC) and ``expires_at`` is only the fallback.
+    As in the Camunda timer, a run expires an ACTIVE row only when ``floor(|run_at - expiry| / 1 day) == 0``,
+    i.e. it is less than 24 hours before or after ``expiry``: ``payment_expiry_date`` parsed like JavaScript
+    ``new Date()`` (a date-only value is midnight UTC). A row without a usable date never expires.
     """
-    raw = _clean(payment_expiry_date) or _clean(expires_at)
-    expiry = None
-    if raw:
-        if len(raw) <= 10:
-            raw += 'T00:00:00+00:00'
-        expiry = _parse_utc(raw)
-    return expiry is not None and (now - expiry).total_seconds() > -86400
+    raw = _clean(payment_expiry_date)
+    if len(raw) <= 10:
+        raw += 'T00:00:00+00:00'
+    expiry = _parse_utc(raw)
+    return expiry is not None and abs((run_at - expiry).total_seconds()) < 86400
 
 
 def _parse_utc(value):
@@ -704,9 +709,9 @@ class PaymentSlaBackfill:
         missing_now = [r for r in active_needed if r['outcome'] != ALREADY_VALID
                        and not (written and r['outcome'] == CREATE)]
         missing_after_apply = [r for r in active_needed if r['outcome'] not in covered]
-        now = self.clock()
-        overdue = [r for r in active_needed if r['outcome'] in covered
-                   and payment_expiry_reached(r['_raw_expiry'], r['expires_at'], now)]
+        next_run = next_expiry_run(self.clock())
+        due_next_run = [r for r in active_needed if r['outcome'] in covered
+                        and in_expiry_window(r['_raw_expiry'], next_run)]
         covered_ids = {r['ministry_request_id'] for r in records if r['_waiting']}
         db_only = None
         try:
@@ -733,7 +738,7 @@ class PaymentSlaBackfill:
             'errors': by_outcome.get(ERROR, 0),
             'eligible_active_payments_still_missing_active_row': len(missing_now),
             'eligible_active_payments_missing_active_row_after_apply': len(missing_after_apply),
-            'active_rows_past_deadline_notified_at_next_expiry_run': len(overdue),
+            'active_rows_past_deadline_notified_at_next_expiry_run': len(due_next_run),
             'database_unpaid_payments_without_camunda_instance': db_only,
         }
         review = [r for r in records if r['outcome'] in MANUAL_REVIEW]

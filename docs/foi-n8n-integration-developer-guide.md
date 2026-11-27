@@ -169,7 +169,7 @@ Key columns:
 | `ministry_request_id`, `foi_request_id`, `file_number` | Which request. Rows are looked up by `ministry_request_id`. |
 | `form_id`, `submission_id`, `payment_url` | The Form.io payment submission and the link sent to the applicant. |
 | `payment_expiry_date` | The date the applicant must pay by. |
-| `expires_at` | Fallback deadline (UTC). End of `payment_expiry_date` in Vancouver time, or 20 days after creation when no valid date was sent. |
+| `expires_at` | Reference deadline in UTC: the end of `payment_expiry_date`, or 20 days after creation when no valid date was sent. The expiry job does not use it. |
 | `next_state_name` | The request status to move to once the payment is made. |
 | `applicant_correspondence_id`, `template_name`, `service_key`, `prev_status` | Used for the notification emails. |
 | `started_execution_id`, `completed_execution_id`, `completed_at` | n8n executions that opened and closed the row. |
@@ -189,7 +189,7 @@ flowchart TB
     A["<b>ACTIVE</b><br/>waiting for the applicant"]:::active
     A ==>|"paid"| PD["<b>PAID</b>"]:::paid
     A -->|"request leaves On Hold"| CN["<b>CANCELLED</b>"]:::cancelled
-    A -->|"daily job: past expiry"| EX["<b>EXPIRED</b>"]:::expired
+    A -->|"daily job: within 24 h of expiry date"| EX["<b>EXPIRED</b>"]:::expired
     EX -. "late payment still handled" .-> PD
 
     classDef start fill:#eef2ff,stroke:#6366f1,color:#312e81,stroke-width:2px
@@ -208,8 +208,8 @@ Step by step (all steps are done by the **FOI Fee Processing** workflow unless n
 1. **Start.** When the IAO moves a request to On Hold with an online payment, **FOI IAO Complete Process** starts Fee Processing. It adds a `PENDING` row, creates the Form.io payment submission, saves `form_id`, `submission_id` and `payment_url` on the row, emails the applicant and promotes the row to `ACTIVE`. If this step is run again (replay), it reuses the stored Form.io ids instead of creating a second submission.
 2. **Paid.** The API sends a `foi-manage-payment` event (through the outbox). Fee Processing finds the newest `ACTIVE` row for the request, updates the form, sends the confirmation, closes the row as `PAID`, then posts `foi-iao-complete` with `next_state_name` to move the request on.
 3. **Cancelled.** If the request leaves On Hold while the payment is `ACTIVE`, the payment is cancelled and the row becomes `CANCELLED`.
-4. **Expired.** The **FOI Payment Expiry SLA Job** runs every day at 1 PM. It takes every `ACTIVE` row where today is within one day of `payment_expiry_date` or later (or `expires_at` when there is no date). For each one it sends an expiry event to Fee Processing, which emails the applicant and sets the row to `EXPIRED`. Because it takes *every* overdue row, a missed run is caught up the next day. The job only runs while the workflow is active in n8n.
-5. **Late events.** A PAID or CANCELLED event after expiry still finds the `EXPIRED` row and is handled normally. This is why rows must never be deleted.
+4. **Expired.** The **FOI Payment Expiry SLA Job** runs every day at 13:00 UTC. As in the Camunda timer, it takes an `ACTIVE` row only when the run is less than 24 hours before or after `payment_expiry_date` (read as midnight UTC). For each one it sends an expiry event to Fee Processing, which posts the expiry comment and notification for staff (the applicant is not emailed) and sets the row to `EXPIRED`. A window that passes without a run is not caught up, and a row without a `payment_expiry_date` never expires. The job only runs while the workflow is active in n8n.
+5. **Late events.** A PAID or CANCELLED event after expiry still finds the `EXPIRED` row and is handled normally. This is why rows are kept after they close: **FOI Audit Retention** deletes `EXPIRED`, `PAID` and `CANCELLED` rows only when their `completed_at` is older than the `paymentRetentionDays` n8n variable (365 days expected), and never deletes rows still in progress. An event that arrives after its row is deleted won't find it.
 
 A one-time Camunda-to-n8n backfill (admin endpoints in the API, enabled by `PAYMENT_SLA_BACKFILL_ENABLED`) created rows for payments that were already waiting in Camunda. Those rows have `comments` starting with `BACKFILL(camunda)`.
 
@@ -218,10 +218,10 @@ A one-time Camunda-to-n8n backfill (admin endpoints in the API, enabled by `PAYM
 | Symptom | What to check |
 |---|---|
 | Applicant paid but the request is still On Hold | 1) Outbox: is the `foi-manage-payment` event `COMPLETED`? 2) Audit table: does the `event_id` have a `fee-process` step row? 3) SLA row: is it `PAID`? |
-| Applicant got no expiry email | Is the row `ACTIVE`? Does it have a `payment_expiry_date` or `expires_at`? Is **FOI Payment Expiry SLA Job** active, and did its 1 PM execution succeed? |
+| Staff got no expiry notification | Is the row `ACTIVE`? Does it have a `payment_expiry_date`? Was **FOI Payment Expiry SLA Job** active, and did a 13:00 UTC execution succeed within 24 hours of that date? |
 | Row stuck in `PENDING` | Payment setup failed part way. `comments` and `started_execution_id` point to the execution. Re-running the start is safe. |
 | Two open rows for one request | `comments` will say "Other non-terminal rows found". Fee Processing uses the newest `ACTIVE` row. |
-| Need to expire a payment now | Set `payment_expiry_date` to a past date. The next 1 PM run expires it. Do this only with the team's agreement. |
+| Need to expire a payment at the next run | Make sure the row is `ACTIVE` and **FOI Payment Expiry SLA Job** is active. Set `payment_expiry_date` (`YYYY-MM-DD`) to the UTC date of the next 13:00 UTC run, which expires an unpaid payment. An older date never expires. Do this only with the team's agreement. |
 
 ---
 
@@ -400,7 +400,7 @@ Payloads can contain personal information. Query them only when needed and do no
 
 - `event_id` and `occurred_at` are set once, when the event is created, and stored in the payload. Never regenerate them on retry or replay: the duplicate and ordering checks depend on them.
 - Never make a workflow decision from `foi-process-audit`. It is a diary that gets purged. Anything n8n needs to decide goes through the claim or the outbox.
-- Never delete `foi-payment-sla` rows. A late payment needs the old row.
+- Don't delete `foi-payment-sla` rows by hand: a late payment needs the old row. Only **FOI Audit Retention** removes them, and only closed rows past the retention period.
 - Change outbox rows through the service or the replay endpoints, not by hand. If you must reset a row by hand, set `status='PENDING'`, `attempts=0`, `claimedat=NULL`, `nextattemptat=(now() at time zone 'utc')` and add 1 to `replaycount`, which is exactly what a replay does.
 - A new event type needs a branch in the `Route Event` node of FOI Request Routing. If it changes request state, also add it to the lists in the `Build Claim Request` node, otherwise it is treated as an action event and is never skipped as stale.
 - A new outbox status needs: the `OutboxStatus` enum, a migration for the table's check constraint, the rules in `acknowledge()` and `replay()`, and an update to this guide.

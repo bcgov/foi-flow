@@ -28,26 +28,20 @@
             {
               "id": "r1",
               "name": "auditRetentionDays",
-              "value": 180,
+              "value": "={{ $vars.auditRetentionDays }}",
               "type": "number"
             },
             {
               "id": "r2",
               "name": "errorRetentionDays",
-              "value": 365,
+              "value": "={{ $vars.errorRetentionDays }}",
               "type": "number"
             },
             {
-              "id": "r3",
-              "name": "auditCutoff",
-              "value": "={{ $now.minus({ days: $json.auditRetentionDays }).toUTC().toISO() }}",
-              "type": "string"
-            },
-            {
-              "id": "r4",
-              "name": "errorCutoff",
-              "value": "={{ $now.minus({ days: $json.errorRetentionDays }).toUTC().toISO() }}",
-              "type": "string"
+              "id": "r5",
+              "name": "paymentRetentionDays",
+              "value": "={{ $vars.paymentRetentionDays }}",
+              "type": "number"
             }
           ]
         },
@@ -61,7 +55,22 @@
         224,
         0
       ],
-      "notes": "PLACEHOLDER retention periods. The FOI records owners must decide them (roadmap D1) before this workflow is activated. Rows older than the cutoff are deleted: nothing in the event flow depends on them (idempotency, ordering and error mapping live in the API outbox). Export the tables first if the old rows must be kept."
+      "notes": "Retention periods in days, read from the n8n variables auditRetentionDays, errorRetentionDays and paymentRetentionDays; change them there. Expected: audit 180, errors 365, closed payments 365, still to be confirmed by the FOI records owners (roadmap D1). Rows older than the cutoff are deleted permanently: export the tables first if the old rows must be kept."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Turns the retention periods into cutoff dates.\n// Both values are checked before anything is deleted.\nconst MIN_DAYS = 30;\nconst settings = $input.first().json;\n\nfunction cutoffFor(name) {\n  const days = settings[name];\n  if (!Number.isInteger(days) || days < MIN_DAYS) {\n    throw new Error(`${name} must be a whole number of at least ${MIN_DAYS} days, got ${JSON.stringify(days)}. Nothing was deleted.`);\n  }\n  return $now.minus({ days }).toUTC().toISO();\n}\n\nreturn [{\n  json: {\n    ...settings,\n    auditCutoff: cutoffFor('auditRetentionDays'),\n    errorCutoff: cutoffFor('errorRetentionDays'),\n    paymentCutoff: cutoffFor('paymentRetentionDays'),\n  },\n}];"
+      },
+      "id": "8b1f3c6e-2d4a-4f7b-9c15-6a0e2b7d9f41",
+      "name": "Compute Cutoffs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ],
+      "notes": "Why Code: a Set node can calculate the dates but cannot stop the run. A missing or invalid retention value must never reach a delete node."
     },
     {
       "parameters": {
@@ -91,7 +100,7 @@
       "typeVersion": 1.1,
       "alwaysOutputData": true,
       "position": [
-        448,
+        672,
         0
       ],
       "notes": "Deletes foi-process-audit rows created before the audit cutoff."
@@ -112,7 +121,7 @@
             {
               "keyName": "createdAt",
               "condition": "lt",
-              "keyValue": "={{ $('Retention Settings').first().json.errorCutoff }}"
+              "keyValue": "={{ $('Compute Cutoffs').first().json.errorCutoff }}"
             }
           ]
         },
@@ -123,15 +132,94 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        672,
+        896,
         0
       ],
-      "notes": "Deletes foi-execution-errors rows created before the error cutoff. foi-payment-sla is never purged here: a late payment needs its old row."
+      "notes": "Deletes foi-execution-errors rows created before the error cutoff.",
+      "executeOnce": true,
+      "alwaysOutputData": true
     },
     {
       "parameters": {
-        "content": "## Developer Overview – FOI Audit Retention\n\n**Purpose:** keeps `foi-process-audit` and `foi-execution-errors` from growing without limit (the n8n Data Tables share an instance-wide size cap).\n\n**Trigger:** every Sunday 2 AM. Created INACTIVE: activate only after the FOI records owners set the retention periods in `Retention Settings` (placeholders: audit 180 days, errors 365 days).\n\n**Processing:** deletes rows older than the cutoff by `createdAt`. This is safe because nothing in the event flow reads these tables any more: duplicate and ordering checks and the failed-execution lookup use the API outbox in Postgres. The event payload stays in the outbox until its own retention (N8N_OUTBOX_SCRUB_AFTER_DAYS / N8N_OUTBOX_PURGE_AFTER_DAYS).\n\n**Not purged:** `foi-payment-sla` (a late payment still needs its row).\n\n**Failures** go to FOI Error Handler (error workflow).",
-        "height": 332,
+        "assignments": {
+          "assignments": [
+            {
+              "id": "p1",
+              "name": "slaStatus",
+              "value": "={{ ['PAID', 'CANCELLED', 'EXPIRED'] }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3d7a9e52-1b64-4c8e-a0f3-5e2c8d9b4a17",
+      "name": "Closed Payment Statuses",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        0
+      ],
+      "executeOnce": true,
+      "notes": "The only payment statuses that may be purged. Never add PENDING, ACTIVE or a *_PENDING_SIDE_EFFECTS status: those payments are still in progress."
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "slaStatus",
+        "options": {}
+      },
+      "id": "c94b2f08-7e1d-4a36-b5c9-0d8f6a3e1b72",
+      "name": "Split Payment Statuses",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1344,
+        0
+      ],
+      "notes": "One item per status, because a data table delete cannot combine 'any of these statuses' with 'older than the cutoff'."
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "012PySsVgvdHQbkn",
+          "mode": "list",
+          "cachedResultName": "foi-payment-sla",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/012PySsVgvdHQbkn"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "sla_status",
+              "condition": "eq",
+              "keyValue": "={{ $json.slaStatus }}"
+            },
+            {
+              "keyName": "completed_at",
+              "condition": "lt",
+              "keyValue": "={{ $('Compute Cutoffs').first().json.paymentCutoff }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e1f58a6b-9c27-4d03-8b4e-72a0c5d9f386",
+      "name": "Delete Old Payment Rows",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1568,
+        0
+      ],
+      "notes": "Deletes foi-payment-sla rows of this status that were closed (completed_at) before the payment cutoff. Rows without completed_at are kept."
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI Audit Retention\n\n**Purpose:** keeps `foi-process-audit`, `foi-execution-errors` and `foi-payment-sla` from growing without limit (the n8n Data Tables share an instance-wide size cap).\n\n**Trigger:** every Sunday 2 AM UTC (workflow time zone `Etc/UTC`). `Retention Settings` reads the retention periods from the n8n variables `auditRetentionDays`, `errorRetentionDays` and `paymentRetentionDays` (expected: 180, 365 and 365 days, still to be confirmed by the FOI records owners). A missing variable stops the run before any delete.\n\n**Processing:** `Compute Cutoffs` turns the periods into dates and stops the run before any delete if a period is not a whole number of at least 30 days. Keep it a separate node: a Set node cannot read a field that it creates itself, which made the cutoff equal to the run time and deleted every row.\n\nAudit and error rows older than the cutoff by `createdAt` are then deleted. This is safe because nothing in the event flow reads these tables any more: duplicate and ordering checks and the failed-execution lookup use the API outbox in Postgres. The event payload stays in the outbox until its own retention (N8N_OUTBOX_SCRUB_AFTER_DAYS / N8N_OUTBOX_PURGE_AFTER_DAYS).\n\n**Payments:** `foi-payment-sla` rows are deleted only when they are `PAID`, `CANCELLED` or `EXPIRED` and `completed_at` is older than the cutoff. `PENDING`, `ACTIVE` and `*_PENDING_SIDE_EFFECTS` rows are always kept. A payment that arrives after its `EXPIRED` row has been purged will not find a row.\n\n**Failures** go to FOI Error Handler (error workflow).",
+        "height": 480,
         "width": 620,
         "color": 4
       },
@@ -162,7 +250,7 @@
       "main": [
         [
           {
-            "node": "Delete Old Audit Rows",
+            "node": "Compute Cutoffs",
             "type": "main",
             "index": 0
           }
@@ -179,15 +267,60 @@
           }
         ]
       ]
+    },
+    "Compute Cutoffs": {
+      "main": [
+        [
+          {
+            "node": "Delete Old Audit Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Old Error Rows": {
+      "main": [
+        [
+          {
+            "node": "Closed Payment Statuses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Closed Payment Statuses": {
+      "main": [
+        [
+          {
+            "node": "Split Payment Statuses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Payment Statuses": {
+      "main": [
+        [
+          {
+            "node": "Delete Old Payment Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1",
     "binaryMode": "separate",
-    "errorWorkflow": "gH0MQxHnSI99SV1m"
+    "errorWorkflow": "gH0MQxHnSI99SV1m",
+    "timezone": "Etc/UTC"
   },
-  "versionId": "58e174de-3c1a-44c3-9f79-254afc79a197",
+  "versionId": "77db2e38-94fb-4222-b58c-8fdc3f4ef3cd",
   "meta": {
     "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
   },

@@ -18,8 +18,8 @@ Tests: `request-management-api/tests/services/test_payment_sla_backfill.py`.
 
 | Situation | Result |
 |---|---|
-| Waiting, not yet expired in Camunda (`expirycounter` = 0) | insert `ACTIVE`, `payment_expiry_date` = `paymentExpiryDate`, `expires_at` = end of that date in America/Vancouver (same rule as `Build Payment SLA`; no 20-day fallback). The expiry job decides on `payment_expiry_date` (from one day before it onwards), `expires_at` is only its fallback. `next_state_name` and `metadata.foiRequestMetaData` are copied from Camunda's `foiRequestMetaData`, so a later PAID can post `foi-iao-complete` |
-| Already expired and notified in Camunda (`expirycounter` >= 1) | reported; with `--include-expired` an `EXPIRED` row is inserted so a late PAID/CANCELLED still finds it. Never `ACTIVE`: the n8n expiry job would email the applicant a second time |
+| Waiting, not yet expired in Camunda (`expirycounter` = 0) | insert `ACTIVE`, `payment_expiry_date` = `paymentExpiryDate`, `expires_at` = end of that date in UTC, as Camunda runs with `TZ=UTC` (same rule as `Build Payment SLA`; no 20-day fallback). The expiry job decides on `payment_expiry_date` only, with the Camunda timer window: it notifies when its daily 13:00 UTC run is less than 24 hours before or after that date (read as midnight UTC). A row whose window has passed gets no notification and stays `ACTIVE`; `expires_at` is not used. `next_state_name` and `metadata.foiRequestMetaData` are copied from Camunda's `foiRequestMetaData`, so a later PAID can post `foi-iao-complete` |
+| Already expired and notified in Camunda (`expirycounter` >= 1) | reported; with `--include-expired` an `EXPIRED` row is inserted so a late PAID/CANCELLED still finds it. Never `ACTIVE`: if a run still fell inside the window, the n8n expiry job would send staff a second expiry notification |
 | Valid row for the same payment already present | kept untouched |
 | Terminal (`PAID`/`CANCELLED`/`EXPIRED`) or `PENDING` row for the same payment, or an open row for a different payment | conflict, reported, not touched |
 | Paid/cancelled in the FOI DB or Camunda, offline payment, not waiting, stale duplicate instance | skipped with a reason |
@@ -86,7 +86,7 @@ URL of DEV n8n) and `N8N_API_KEY` in that shell only. Write the reports to `/tmp
 
 1. Dry run, review `manual_review_required` and the exception list; fix or accept each.
 2. Decide on `--include-expired` (recommended: without it a late payment after cutover has no row to close).
-3. Check `active_rows_past_deadline_notified_at_next_expiry_run`: rows the expiry job already treats as expired (now > `payment_expiry_date` minus 1 day); those applicants are emailed at the next 13:00 run.
+3. Check `active_rows_past_deadline_notified_at_next_expiry_run`: despite its name, it counts the `ACTIVE` rows (present or planned) whose 24-hour window includes the first 13:00 UTC run after the report; staff get the expiry notification for those payments at that run. The expiry job must be active for it: a window that passes without a run is not caught up. The count does not cover payments whose window has already passed (never notified) or opens later.
 4. `--apply --confirm-plan <plan hash of the reviewed dry run>`, then rerun the dry run:
    `eligible_active_payments_still_missing_active_row` must be 0 and
    `sla_rows_would_be_created` 0.

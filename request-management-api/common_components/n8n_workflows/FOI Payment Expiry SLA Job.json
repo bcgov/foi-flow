@@ -34,11 +34,11 @@
         816,
         592
       ],
-      "notes": "ACTIVE payment-expiry rows whose expires_at has passed. Replaces the 20-day timeout on the old 'Wait Payment Outcome' node."
+      "notes": "All ACTIVE payment-expiry rows. 'Apply BPMN Expiry Window' keeps only those due for an expiry notice today."
     },
     {
       "parameters": {
-        "jsCode": "// Same expiry point as the Camunda foi-fee-processing daily timer (Flow_03lwez1 + Gateway_0xwy934):\n// Camunda marked a payment EXPIRED on the first daily run where floor(|now - paymentExpiryDate| / 1 day) == 0,\n// i.e. from 1 day before the expiry date onwards.\n// Camunda only matched that one-day window, so a run missed on that day was never recovered. Here every\n// ACTIVE row at or past that point is expired (\">= window start\", not \"== window\"), so a missed or failed run\n// is caught up by the next one. A row leaves ACTIVE once FOI Fee Processing closes it as EXPIRED, so it is\n// never processed twice.\n// If the row has no usable payment_expiry_date, expires_at (the 20-day default set when the SLA row was\n// registered) is used instead.\nconst DAY_MS = 1000 * 60 * 60 * 24;\nconst now = new Date();\n\nreturn $input.all().filter((item) => {\n  const sla = item.json || {};\n  const sentOn = String(sla.payment_expiry_date ?? '').trim() || String(sla.expires_at ?? '').trim();\n  const expiry = new Date(sentOn);\n  if (Number.isNaN(expiry.getTime())) return false; // no usable date at all: nothing to compare\n  return (now - expiry) > -DAY_MS;\n});"
+        "jsCode": "// Same rule as the Camunda foi-fee-processing daily timer:\n//   diffDays = floor(|now - paymentExpiryDate| / 1 day)\n//   expire when diffDays == 0 && expirycounter < 1\n// A payment expires only when the run is within 24 hours of its payment_expiry_date, before or after it.\n// Outside that window no notice is sent and the row stays ACTIVE, as the Camunda instance keeps waiting, so a\n// later payment or cancellation is still processed. A date whose window was missed is not caught up.\n// expirycounter < 1 (notify once): only ACTIVE rows are read, and FOI Fee Processing closes the row once it has\n// handled the expiry.\n// As in Camunda, a row without a usable payment_expiry_date never expires (expires_at is not used).\n// A date-only value such as 2026-11-25 is read as midnight UTC, as in Camunda.\nconst DAY_MS = 1000 * 60 * 60 * 24;\nconst now = new Date();\n\nreturn $input.all().filter((item) => {\n  const sentOn = String(item.json.payment_expiry_date ?? '').trim();\n  const diffDays = Math.floor(Math.abs(now - new Date(sentOn)) / DAY_MS); // NaN when there is no usable date\n  return diffDays === 0;\n});"
       },
       "id": "45694b4e-3d8e-4f83-8341-43152928dc34",
       "name": "Apply BPMN Expiry Window",
@@ -418,7 +418,7 @@
     },
     {
       "parameters": {
-        "content": "## Developer Overview – FOI Payment Expiry SLA Job\n\n**Purpose:**\nExpires online fee payments that the applicant didn't complete by the payment expiry date. It replaces the old long-running Wait (20-day timeout).\n\n**Trigger/Entry:**\nSchedule trigger, every day 1 PM(runs only while the workflow is active).\n\n**Processing:**\nReads the `foi-payment-sla` rows where sla_type = payment-expiry and sla_status = ACTIVE, then keeps the rows that have reached the point where the Camunda timer expired them (now > payment_expiry_date - 1 day; falls back to expires_at when the row has no payment_expiry_date). Unlike Camunda's one-day window, every ACTIVE row past that point is kept, so a missed or failed daily run is caught up by the next one. Builds one `foi-payment-expired` event per row (feeAction = expire, paymentStatus = EXPIRED), each from its own row's metadata.\n\n**Integration/Outcome:**\nCalls FOI Fee Processing once per expired payment. That workflow first checks the latest payment version: an unpaid, not cancelled payment gets the expiry notification and its SLA row is marked EXPIRED; an already paid or cancelled payment has its row closed as PAID / CANCELLED with no notification.",
+        "content": "## Developer Overview – FOI Payment Expiry SLA Job\n\n**Purpose:**\nExpires online fee payments that the applicant didn't complete by the payment expiry date. It replaces the old long-running Wait (20-day timeout).\n\n**Trigger/Entry:**\nSchedule trigger, every day 1 PM(runs only while the workflow is active).\n\n**Processing:**\nReads the `foi-payment-sla` rows where sla_type = payment-expiry and sla_status = ACTIVE, then applies the Camunda timer rule: keep a row only when floor(|now - payment_expiry_date| / 1 day) == 0, i.e. the run is within 24 hours of that date, before or after (confirmed by the FOI team). Older payments get no expiry notice and stay ACTIVE, so a late payment or cancellation is still processed. A missed window is not caught up, and a row without a payment_expiry_date never expires. Each payment is notified once, because an expired row is no longer ACTIVE. Builds one `foi-payment-expired` event per row (feeAction = expire, paymentStatus = EXPIRED), each from its own row's metadata.\n\n**Integration/Outcome:**\nCalls FOI Fee Processing once per expired payment. That workflow first checks the latest payment version: an unpaid, not cancelled payment gets the expiry notification and its SLA row is marked EXPIRED; an already paid or cancelled payment has its row closed as PAID / CANCELLED with no notification.",
         "height": 568,
         "width": 620,
         "color": 4
@@ -521,7 +521,7 @@
     "availableInMCP": false,
     "timezone": "Etc/UTC"
   },
-  "versionId": "a363da14-e5e4-4ae7-ac19-2327994ef311",
+  "versionId": "b29f76d6-e915-40df-be7b-e65bd711e757",
   "meta": {
     "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
   },

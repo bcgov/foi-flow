@@ -109,7 +109,7 @@ class FakeStore:
         self.rows = [r for r in self.rows if r['id'] != row_id]
 
 
-def sla_row(status='ACTIVE', ministry=100, sub=SUB, form=FORM, expires='2030-01-11T07:59:59.999Z', row_id=1):
+def sla_row(status='ACTIVE', ministry=100, sub=SUB, form=FORM, expires='2030-01-10T23:59:59.999Z', row_id=1):
     return {'id': row_id, 'sla_type': 'payment-expiry', 'sla_status': status, 'ministry_request_id': str(ministry),
             'form_id': form, 'submission_id': sub, 'expires_at': expires, 'payment_expiry_date': '2030-01-10'}
 
@@ -155,7 +155,7 @@ def test_eligible_payment_without_row_is_planned_in_a_dry_run_and_inserted_when_
     assert (row['form_id'], row['submission_id']) == (FORM, SUB)
     assert (row['ministry_request_id'], row['foi_request_id'], row['file_number']) == ('100', '10', 'EDU-2030-100')
     assert row['payment_expiry_date'] == '2030-01-10'
-    assert row['expires_at'] == '2030-01-11T07:59:59.999Z'  # end of 10 Jan in Vancouver (PST) as UTC
+    assert row['expires_at'] == '2030-01-10T23:59:59.999Z'  # end of 10 Jan in UTC
     assert row['payment_url'] == url()
     assert row['service_key'] == 'payonline'
     assert row['applicant_correspondence_id'] == '7'
@@ -209,7 +209,7 @@ def test_expired_and_notified_payment_is_not_written_as_active():
     report, store = backfill([instance(counter=1, expiry='2023-01-10')], apply=True)
     record = only(report)
     assert (record['outcome'], record['reason']) == (EXPIRED_NOTIFIED, 'expired_and_notified_in_camunda')
-    assert store.rows == []  # an ACTIVE row would make n8n notify the applicant a second time
+    assert store.rows == []  # an ACTIVE row could make n8n send the expiry notification a second time
     assert report['summary']['eligible_expired_and_notified_in_camunda'] == 1
     assert report['summary']['eligible_active_payments_still_missing_active_row'] == 0
 
@@ -487,13 +487,11 @@ def test_reports_are_written_as_json_and_csv(tmp_path):
 # --- expiry timestamp --------------------------------------------------------------------------------------------
 
 @pytest.mark.parametrize('raw, expected', [
-    ('2030-01-10', '2030-01-11T07:59:59.999Z'),     # PST, UTC-8
-    ('2026-07-15', '2026-07-16T06:59:59.999Z'),     # PDT, UTC-7
-    ('2026-03-08', '2026-03-09T06:59:59.999Z'),     # the day DST starts: end of day is already PDT
-    ('2026-11-01', '2026-11-02T07:59:59.999Z'),     # the day DST ends: end of day is PST
+    ('2030-01-10', '2030-01-10T23:59:59.999Z'),     # end of the day in UTC
+    ('2026-07-15', '2026-07-15T23:59:59.999Z'),     # the same in summer: no daylight saving shift
     ('2030-01-10T12:00:00Z', '2030-01-10T12:00:00.000Z'),
     ('2030-01-10T12:00:00-08:00', '2030-01-10T20:00:00.000Z'),
-    ('2030-01-10T12:00:00', '2030-01-10T20:00:00.000Z'),  # naive date-time is Vancouver time
+    ('2030-01-10T12:00:00', '2030-01-10T12:00:00.000Z'),  # naive date-time is UTC
 ])
 def test_expires_at_follows_the_n8n_build_payment_sla_rule(raw, expected):
     assert compute_expires_at(raw) == expected
@@ -502,6 +500,42 @@ def test_expires_at_follows_the_n8n_build_payment_sla_rule(raw, expected):
 @pytest.mark.parametrize('raw', ['', None, 'undefined', 'garbage', '2030-13-45'])
 def test_expires_at_is_none_for_a_missing_or_invalid_date(raw):
     assert compute_expires_at(raw) is None
+
+
+@pytest.mark.parametrize('expiry_date, run_at, due', [
+    ('2026-11-25', '2026-11-23T13:00:00Z', False),  # two days before
+    ('2026-11-25', '2026-11-24T13:00:00Z', True),   # the day before
+    ('2026-11-25', '2026-11-25T13:00:00Z', True),   # on the date
+    ('2026-11-25', '2026-11-26T13:00:00Z', False),  # the day after: the window has passed
+    ('2026-11-25', '2026-12-02T13:00:00Z', False),
+    ('2026-11-25', '2026-11-24T00:00:00Z', False),      # exactly 24 hours before
+    ('2026-11-25', '2026-11-24T00:00:00.001Z', True),
+    ('2026-11-25', '2026-11-25T23:59:59.999Z', True),
+    ('2026-11-25', '2026-11-26T00:00:00Z', False),      # exactly 24 hours after
+    ('', '2026-11-25T13:00:00Z', False),
+    (None, '2026-11-25T13:00:00Z', False),
+    ('soon', '2026-11-25T13:00:00Z', False),
+])
+def test_expiry_window_follows_the_n8n_apply_bpmn_expiry_window_node(expiry_date, run_at, due):
+    assert svc.in_expiry_window(expiry_date, datetime.fromisoformat(run_at.replace('Z', '+00:00'))) is due
+
+
+@pytest.mark.parametrize('now, expected', [
+    ((2026, 10, 30, 12, 59), (2026, 10, 30, 13)),
+    ((2026, 10, 30, 13, 0), (2026, 10, 31, 13)),
+    ((2026, 10, 30, 20, 0), (2026, 10, 31, 13)),
+    ((2026, 12, 31, 23, 0), (2027, 1, 1, 13)),
+])
+def test_next_expiry_run_is_the_next_13_00_utc(now, expected):
+    assert svc.next_expiry_run(datetime(*now, tzinfo=timezone.utc)) == datetime(*expected, tzinfo=timezone.utc)
+
+
+def test_summary_counts_only_the_active_rows_the_next_expiry_run_will_notify():
+    # The report runs at NOW (30 Oct 20:00 UTC), so the next run is 31 Oct 13:00 UTC.
+    dates = ['2026-10-29', '2026-10-30', '2026-10-31', '2026-11-01', '2026-11-02']
+    report, _ = backfill([instance('p%d' % n, 100 + n, expiry=date) for n, date in enumerate(dates)])
+    assert report['summary']['active_rows_would_be_created'] == 5
+    assert report['summary']['active_rows_past_deadline_notified_at_next_expiry_run'] == 2  # 31 Oct and 1 Nov
 
 
 def test_payment_url_ids_are_parsed_from_both_url_shapes():
