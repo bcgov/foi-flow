@@ -1,0 +1,2323 @@
+{
+  "name": "FOI IAO Complete Process",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "1d60d5cd-e119-42fe-a230-79d68e68b8c9",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -944,
+        1296
+      ],
+      "notes": "Handles foi-iao-complete (Call For Records parallel phase)."
+    },
+    {
+      "parameters": {},
+      "id": "d1aef543-ee80-43fc-a54a-8468b9ec74cb",
+      "name": "End (Unsupported Event)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        1584
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9c216e8f-eba7-4934-9a08-90d06ade39fa",
+                    "leftValue": "={{ $('Set Event Variables').item.json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-open-complete"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "open-complete"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9735bfbd-4295-4673-bc7c-2af0c6fed357",
+                    "leftValue": "={{ $('Set Event Variables').item.json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-complete"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "iao-complete"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5aab4e1b-a743-43dd-9f29-d815ba9744be",
+                    "leftValue": "={{ $('Set Event Variables').item.json.event }}",
+                    "rightValue": "foi-iao-reopen",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "iao-reopen"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "other"
+        }
+      },
+      "id": "422d99e2-1f84-4965-8ea9-b6fc6827cb2d",
+      "name": "Complete Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -496,
+        1264
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const input = $input.first().json || {};\n  const event = input.event;\n  const eventId = input.eventId;\n  const occurredAt = input.occurredAt;\n  \n  if (!event || typeof event !== 'string') {\n    throw new Error('Required field \"body.event\" is missing or invalid.');\n  }\n\n  // The COMPLETE original event payload - never reduced to the normalised fields.\n  let metadata = input.metadata;\n  if (typeof metadata === 'string') {\n    try {\n      metadata = JSON.parse(metadata);\n    } catch (e) {\n      metadata = null;\n    }\n  }  \n  const executionId = $execution.id;\n\n  // foiRequestMetaData arrives as an object (intake events) or as a JSON string (IAO / ministry events).\n  let foiRequestMetaData = metadata.foiRequestMetaData;\n  if (typeof foiRequestMetaData === 'string') {\n    try {\n      foiRequestMetaData = JSON.parse(foiRequestMetaData);\n    } catch (e) {\n      foiRequestMetaData = null;\n    }\n  }\n  let metadataString = \"\";\n  if (!metadata || typeof metadata === 'string') {   \n      metadataString = metadata;    \n  } else if (!metadata || typeof metadata === 'object') {\n      metadataString = JSON.stringify(metadata);\n    }\n  const IAO_COMPLETE_EVENTS = ['foi-iao-open-complete', 'foi-iao-complete', 'foi-iao-reopen'];\n  if (IAO_COMPLETE_EVENTS.includes(event)) {\n    const first = (...values) => {\n      for (const v of values) { if (v !== undefined && v !== null && v !== '') return v; }\n      return null;\n    };\n  \n    return {\n      json: {\n        event,\n        eventId,\n        occurredAt,\n        rawRequestId: first(foiRequestMetaData.rawRequestId),\n        foiRequestId: first(foiRequestMetaData.foiRequestID, foiRequestMetaData.foiRequestId),\n        ministryRequestId: first(foiRequestMetaData.ministryRequestID, foiRequestMetaData.ministryRequestId),\n        status: foiRequestMetaData.status,\n        assignedTo: foiRequestMetaData.assignedTo,\n        assignedGroup: foiRequestMetaData.assignedGroup,\n        fileNumber: foiRequestMetaData?.id,\n        previousStatus: foiRequestMetaData?.previousstatus,\n        isPaymentActive: foiRequestMetaData?.isPaymentActive,\n        isSync: foiRequestMetaData?.issync,\n        isOfflinePayment: foiRequestMetaData?.isofflinepayment,\n        paymentExpiryDate: foiRequestMetaData?.paymentExpiryDate,\n        metadata: metadataString,\n        executionId,\n      },\n    };\n  }\n\n} catch (error) {\n   const input = $input.first().json || {};\n  return {\n    json: {\n      event: '',\n      eventId: (input && typeof input === 'object' && typeof input.eventId === 'string') ? input.eventId : null,\n      receivedEvent: (input && typeof input === 'object' && typeof input.event === 'string') ? input.event : null,\n      error: true,\n      errorMessage: error.message,\n      metadata: input.metadata ?? null,\n      executionId: $execution.id,\n    },\n  };\n}"
+      },
+      "id": "4f0ad775-ea6a-429a-bc51-896fc112584d",
+      "name": "Set Event Variables",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        1296
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'IAO task completed for ministry request ' + ($('Set Event Variables').item.json.fileNumber || $('Set Event Variables').item.json.ministryRequestId || 'n/a') + ' (' + ($('Set Event Variables').item.json.previousStatus || 'n/a') + ' -> ' + ($('Set Event Variables').item.json.status || 'n/a') + ', isPaymentActive: ' + $('Set Event Variables').item.json.isPaymentActive + ', isSync: ' + $('Set Event Variables').item.json.isSync + ', isOfflinePayment: ' + $('Set Event Variables').item.json.isOfflinePayment + '). Applying the on-hold fee rules.' }}",
+            "event": "={{ $('Set Event Variables').item.json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $('Set Event Variables').item.json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $('Set Event Variables').item.json.ministryRequestId || null }}",
+            "process_type": "ministry-request-process",
+            "raw_request_id": "={{ $('Set Event Variables').item.json.rawRequestId || null }}",
+            "status": "={{ $('Set Event Variables').item.json.status || null }}",
+            "event_id": "={{ $('Set Event Variables').item.json.eventId }}",
+            "occurred_at": "={{ $('Set Event Variables').item.json.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "b4a1a9fb-aba2-4dde-a2c9-5e900f7fe97a",
+      "name": "Audit: IAO Complete",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -272,
+        1200
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "0a6bde00-883c-42cf-89d1-b5b0b4c453d1",
+      "name": "End (Open Complete Recorded)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        176,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "g2",
+                    "leftValue": "={{ $json.status }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "Call For Records"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "CFR"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "g3",
+                    "leftValue": "={{ $json.status }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "Closed"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Closed"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Other"
+        }
+      },
+      "id": "0fe1f705-1e10-405a-a6d9-cc22757acdb0",
+      "name": "Open Outcome Gateway",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -272,
+        704
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'Request moved to ' + ($('Set Event Variables').item.json.status || 'n/a') +'. Awaiting foi-iao-* and foi-ministry-* events.' }}",
+            "event": "={{ $('Set Event Variables').item.json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $('Set Event Variables').item.json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $('Set Event Variables').item.json.ministryRequestId || null }}",
+            "process_type": "ministry-request-process",
+            "raw_request_id": "={{ $('Set Event Variables').item.json.rawRequestId || null }}",
+            "status": "={{ $('Set Event Variables').item.json.status || null }}",
+            "event_id": "={{ $('Set Event Variables').item.json.eventId }}",
+            "occurred_at": "={{ $('Set Event Variables').item.json.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "82e09470-6c60-4964-820f-450b399e98c1",
+      "name": "Audit: IAO Open Complete",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        624
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'Ministry request ' + ($('Set Event Variables').item.json.fileNumber || $('Set Event Variables').item.json.ministryRequestId || 'n/a') + ' is Closed (triggered by ' + $('Set Event Variables').item.json.event + ').' }}",
+            "event": "={{ $('Set Event Variables').item.json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $('Set Event Variables').item.json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $('Set Event Variables').item.json.ministryRequestId || null }}",
+            "process_type": "ministry-request-process",
+            "raw_request_id": "={{ $('Set Event Variables').item.json.rawRequestId || null }}",
+            "status": "={{ $('Set Event Variables').item.json.status || null }}",
+            "event_id": "={{ $('Set Event Variables').item.json.eventId }}",
+            "occurred_at": "={{ $('Set Event Variables').item.json.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "aba205e9-5c4a-448a-8373-e0b274340d27",
+      "name": "Audit: IAO Open Closed",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -48,
+        816
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c0",
+              "leftValue": "={{ $('Set Event Variables').item.json.status }}",
+              "operator": {
+                "operation": "equals",
+                "type": "string"
+              },
+              "rightValue": "On Hold"
+            },
+            {
+              "id": "c1",
+              "leftValue": "={{ $('Set Event Variables').item.json.isSync }}",
+              "operator": {
+                "operation": "false",
+                "singleValue": true,
+                "type": "boolean"
+              },
+              "rightValue": ""
+            },
+            {
+              "id": "c2",
+              "leftValue": "={{ $('Set Event Variables').item.json.isOfflinePayment }}",
+              "operator": {
+                "operation": "false",
+                "singleValue": true,
+                "type": "boolean"
+              },
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "98b671fb-6022-41af-b27a-64b043f0254e",
+      "name": "IAO Complete - On Hold Fee Check",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -48,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'IAO complete moved the request to On Hold (previous status: ' + ($('Set Event Variables').item.json.previousStatus || 'n/a') + '). Fee payment is required (feeflow ONGOING, payment status NOT PAID) - starting FOI Fee Processing.' }}",
+            "event": "={{ $('Set Event Variables').item.json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $('Set Event Variables').item.json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $('Set Event Variables').item.json.ministryRequestId || null }}",
+            "process_type": "ministry-request-process",
+            "raw_request_id": "={{ $('Set Event Variables').item.json.rawRequestId || null }}",
+            "status": "={{ $('Set Event Variables').item.json.status || null }}",
+            "event_id": "={{ $('Set Event Variables').item.json.eventId }}",
+            "occurred_at": "={{ $('Set Event Variables').item.json.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "0f31048e-1387-4e68-8777-ecd1fc1324e0",
+      "name": "Audit: Fee Payment Triggered",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        176,
+        1008
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Same inputs the previous 'IAO Complete: Trigger Fee Payment' node sent (category foi-fee-payment, NOT PAID).\ntry {\n  const input = $('Set Event Variables').first().json || {};\n  return [{\n    json: {\n      ...input,\n      event: 'foi-fee-payment',\n      feeAction: 'initiate',\n      triggeredBy: input.event,\n      category: 'foi-fee-payment',\n      paymentStatus: 'NOT PAID',\n      isSync: input.isSync,\n      isOfflinePayment: input.isOfflinePayment,\n      isPaymentActive: input.isPaymentActive,\n      rawRequestId: input.rawRequestId,\n      foiRequestId: input.foiRequestId,\n      ministryRequestId: input.ministryRequestId,\n      fileNumber: input.fileNumber,\n      paymentExpiryDate: input.paymentExpiryDate,\n      previousStatus: input.previousStatus\n    }\n  }];\n  } catch (error) {\n   const input = $('Set Event Variables').first().json || {};\n    return {\n      json: {\n        event: '',\n        receivedEvent: (input && typeof input === 'object' && typeof input.event === 'string') ? input.event : null,\n        error: true,\n        errorMessage: error.message,\n        metadata: input.metadata ?? null,\n        executionId: $execution.id,\n      },\n    };\n}\n"
+      },
+      "id": "cdc7d022-068e-4b98-b5ca-68bb2092cde0",
+      "name": "Build Fee Payment Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        1008
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "FWq4KLVI9kGZCRmx",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/FWq4KLVI9kGZCRmx",
+          "cachedResultName": "FOI Fee Processing"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "event": "={{ $json.event }}",
+            "eventId": "={{ $json.eventId }}",
+            "occurredAt": "={{ $json.occurredAt }}",
+            "feeAction": "={{ $json.feeAction }}",
+            "triggeredBy": "={{ $json.triggeredBy }}",
+            "category": "={{ $json.category }}",
+            "paymentStatus": "={{ $json.paymentStatus }}",
+            "serviceKey": "={{ $json.serviceKey }}",
+            "templateName": "={{ $json.templateName }}",
+            "applicantCorrespondenceId": "={{ $json.applicantCorrespondenceId }}",
+            "rawRequestId": "={{ $json.rawRequestId }}",
+            "foiRequestId": "={{ $json.foiRequestId }}",
+            "ministryRequestId": "={{ $json.ministryRequestId }}",
+            "fileNumber": "={{ $json.fileNumber }}",
+            "status": "={{ $json.status }}",
+            "previousStatus": "={{ $json.previousStatus }}",
+            "assignedTo": "={{ $json.assignedTo }}",
+            "assignedGroup": "={{ $json.assignedGroup }}",
+            "isPaymentActive": "={{ $json.isPaymentActive }}",
+            "isSync": "={{ $json.isSync }}",
+            "isOfflinePayment": "={{ $json.isOfflinePayment }}",
+            "paymentExpiryDate": "={{ $json.paymentExpiryDate }}",
+            "metadata": "={{ $json.metadata }}",
+            "executionId": "={{ $json.executionId }}",
+            "paymentSlaId": "={{ $json.paymentSlaId }}",
+            "paymentUrl": "={{ $json.paymentUrl }}",
+            "slaPaymentExpiryDate": "={{ $json.slaPaymentExpiryDate }}",
+            "saveDataPayload": "={{ $json.saveDataPayload }}",
+            "feeflow": "={{ $json.feeflow }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventId",
+              "displayName": "eventId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "occurredAt",
+              "displayName": "occurredAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "feeAction",
+              "displayName": "feeAction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "triggeredBy",
+              "displayName": "triggeredBy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "paymentStatus",
+              "displayName": "paymentStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "serviceKey",
+              "displayName": "serviceKey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "templateName",
+              "displayName": "templateName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "applicantCorrespondenceId",
+              "displayName": "applicantCorrespondenceId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rawRequestId",
+              "displayName": "rawRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "foiRequestId",
+              "displayName": "foiRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ministryRequestId",
+              "displayName": "ministryRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fileNumber",
+              "displayName": "fileNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "previousStatus",
+              "displayName": "previousStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "assignedTo",
+              "displayName": "assignedTo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "assignedGroup",
+              "displayName": "assignedGroup",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "isPaymentActive",
+              "displayName": "isPaymentActive",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isSync",
+              "displayName": "isSync",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isOfflinePayment",
+              "displayName": "isOfflinePayment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentExpiryDate",
+              "displayName": "paymentExpiryDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "executionId",
+              "displayName": "executionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentSlaId",
+              "displayName": "paymentSlaId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentUrl",
+              "displayName": "paymentUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "slaPaymentExpiryDate",
+              "displayName": "slaPaymentExpiryDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "saveDataPayload",
+              "displayName": "saveDataPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "feeflow",
+              "displayName": "feeflow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "e3081ee8-664e-4328-8cb7-43a0070d7976",
+      "name": "IAO Complete: Trigger Fee Payment",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "retryOnFail": false,
+      "position": [
+        624,
+        1008
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "9eb15987-1d76-4085-9a83-c46601a761ed",
+      "name": "End (Fee Payment Started)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        848,
+        1008
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-payment-sla",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/012PySsVgvdHQbkn",
+          "mode": "list",
+          "value": "012PySsVgvdHQbkn"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ministry_request_id",
+              "keyValue": "={{ String($('Set Event Variables').item.json.ministryRequestId) }}"
+            },
+            {
+              "keyName": "sla_type",
+              "keyValue": "payment-expiry"
+            },
+            {
+              "keyName": "sla_status",
+              "keyValue": "ACTIVE"
+            }
+          ]
+        },
+        "limit": 1,
+        "orderBy": true
+      },
+      "id": "034f1f68-ac0b-4c74-978b-3d14fadfe5a4",
+      "name": "Get Active Payment SLA",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "alwaysOutputData": true,
+      "position": [
+        176,
+        1296
+      ],
+      "notes": "An ACTIVE payment-expiry row replaces feeflow = ONGOING from foi_process_instances."
+    },
+    {
+      "parameters": {
+        "jsCode": "const eventVariables = $('Set Event Variables').first().json;\nconst sla = $input.first().json || {};\nreturn [{ \n  json: { \n    ...eventVariables, \n    feeflow: sla.sla_status === 'ACTIVE' ? 'ONGOING' : 'NA', \n    paymentSlaId: sla.id ?? null, \n    paymentUrl: sla.payment_url ?? '', \n    slaPaymentExpiryDate: sla.payment_expiry_date ?? '' \n  } \n}];\n"
+      },
+      "id": "ce914fff-35d0-4efd-b0f7-d0e945867652",
+      "name": "Set Fee Flow",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        1296
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "7f16f1cf-3f45-4c88-b192-277ced737464",
+              "leftValue": "={{ $json.status }}",
+              "operator": {
+                "operation": "notEquals",
+                "type": "string"
+              },
+              "rightValue": "On Hold"
+            },
+            {
+              "id": "8241b292-cfd2-43cc-82c1-9686aed3d61a",
+              "leftValue": "={{ $json.feeflow }}",
+              "operator": {
+                "operation": "equals",
+                "type": "string"
+              },
+              "rightValue": "ONGOING"
+            },
+            {
+              "id": "82d53087-67c0-490d-9488-5b43213acfef",
+              "leftValue": "={{ $json.isPaymentActive === true }}",
+              "operator": {
+                "operation": "true",
+                "singleValue": true,
+                "type": "boolean"
+              },
+              "rightValue": ""
+            },
+            {
+              "id": "3aad0dcd-7e7c-4bd7-88f2-3ea67172cd64",
+              "leftValue": "={{ $json.isSync === false }}",
+              "operator": {
+                "operation": "true",
+                "singleValue": true,
+                "type": "boolean"
+              },
+              "rightValue": ""
+            }
+          ],
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          }
+        },
+        "options": {}
+      },
+      "id": "820b6ef6-df83-49db-babb-71555ddca33a",
+      "name": "Cancel Payment Check",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        1296
+      ],
+      "notes": "Preserved rule: status != On Hold AND feeflow ONGOING AND is_payment_active AND not is_sync -> cancel the outstanding payment (e.g. On Hold -> Call For Records)."
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'IAO complete moved the request from ' + ($('Set Fee Flow').item.json.previousStatus || 'n/a') + ' to ' + ($('Set Fee Flow').item.json.status || 'n/a') + ' while an online payment is still active (isPaymentActive = true, feeflow ONGOING). Cancelling the payment via FOI Fee Processing.' }}",
+            "event": "={{ $('Set Fee Flow').item.json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $('Set Fee Flow').item.json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $('Set Fee Flow').item.json.ministryRequestId || null }}",
+            "process_type": "ministry-request-process",
+            "raw_request_id": "={{ $('Set Fee Flow').item.json.rawRequestId || null }}",
+            "status": "={{ $('Set Fee Flow').item.json.status || null }}",
+            "event_id": "={{ $('Set Event Variables').item.json.eventId }}",
+            "occurred_at": "={{ $('Set Event Variables').item.json.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "238cc473-238c-4759-b5c2-c7971972b8ba",
+      "name": "Audit: Payment Cancellation Triggered",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        848,
+        1200
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Replaces 'Update Instance: Payment Status' + 'Parse Payment Data' + 'Cancel Payment' (HTTP resume of the fee Wait).\ntry {\n  const input = $('Set Fee Flow').first().json || {};\n  const saveDataPayload = JSON.stringify({ paymenturl: input.paymentUrl, paymentexpirydate: input.slaPaymentExpiryDate || input.paymentExpiryDate })\n  return [{\n    json: {\n      ...input,\n      event: 'foi-manage-payment',\n      feeAction: 'cancel',\n      triggeredBy: input.event,\n      category: 'foi-manage-payment',\n      paymentStatus: 'CANCELLED',\n      isSync: input.isSync,\n      isOfflinePayment: input.isOfflinePayment,\n      isPaymentActive: input.isPaymentActive,\n      rawRequestId: input.rawRequestId,\n      foiRequestId: input.foiRequestId,\n      ministryRequestId: input.ministryRequestId,\n      fileNumber: input.fileNumber,\n      paymentExpiryDate: input.paymentExpiryDate,\n      previousStatus: input.previousStatus,\n      saveDataPayload: saveDataPayload\n    }\n  }];\n  } catch (error) {\n   const input = $('Set Fee Flow').first().json || {};\n    return {\n      json: {\n        event: '',\n        receivedEvent: (input && typeof input === 'object' && typeof input.event === 'string') ? input.event : null,\n        error: true,\n        errorMessage: error.message,\n        metadata: input.metadata ?? null,\n        executionId: $execution.id,\n      },\n    };\n}\n"
+      },
+      "id": "cc57bd9b-53c3-4b2d-930d-b749a3b87b6f",
+      "name": "Build Cancel Payment Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "FWq4KLVI9kGZCRmx",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/FWq4KLVI9kGZCRmx",
+          "cachedResultName": "FOI Fee Processing"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "event": "={{ $json.event }}",
+            "eventId": "={{ $json.eventId }}",
+            "occurredAt": "={{ $json.occurredAt }}",
+            "feeAction": "={{ $json.feeAction }}",
+            "triggeredBy": "={{ $json.triggeredBy }}",
+            "category": "={{ $json.category }}",
+            "paymentStatus": "={{ $json.paymentStatus }}",
+            "serviceKey": "={{ $json.serviceKey }}",
+            "templateName": "={{ $json.templateName }}",
+            "applicantCorrespondenceId": "={{ $json.applicantCorrespondenceId }}",
+            "rawRequestId": "={{ $json.rawRequestId }}",
+            "foiRequestId": "={{ $json.foiRequestId }}",
+            "ministryRequestId": "={{ $json.ministryRequestId }}",
+            "fileNumber": "={{ $json.fileNumber }}",
+            "status": "={{ $json.status }}",
+            "previousStatus": "={{ $json.previousStatus }}",
+            "assignedTo": "={{ $json.assignedTo }}",
+            "assignedGroup": "={{ $json.assignedGroup }}",
+            "isPaymentActive": "={{ $json.isPaymentActive }}",
+            "isSync": "={{ $json.isSync }}",
+            "isOfflinePayment": "={{ $json.isOfflinePayment }}",
+            "paymentExpiryDate": "={{ $json.paymentExpiryDate }}",
+            "metadata": "={{ $json.metadata }}",
+            "executionId": "={{ $json.executionId }}",
+            "paymentSlaId": "={{ $json.paymentSlaId }}",
+            "paymentUrl": "={{ $json.paymentUrl }}",
+            "slaPaymentExpiryDate": "={{ $json.slaPaymentExpiryDate }}",
+            "saveDataPayload": "={{ $json.saveDataPayload }}",
+            "feeflow": "={{ $json.feeflow }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventId",
+              "displayName": "eventId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "occurredAt",
+              "displayName": "occurredAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "feeAction",
+              "displayName": "feeAction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "triggeredBy",
+              "displayName": "triggeredBy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "paymentStatus",
+              "displayName": "paymentStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "serviceKey",
+              "displayName": "serviceKey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "templateName",
+              "displayName": "templateName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "applicantCorrespondenceId",
+              "displayName": "applicantCorrespondenceId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rawRequestId",
+              "displayName": "rawRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "foiRequestId",
+              "displayName": "foiRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ministryRequestId",
+              "displayName": "ministryRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fileNumber",
+              "displayName": "fileNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "previousStatus",
+              "displayName": "previousStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "assignedTo",
+              "displayName": "assignedTo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "assignedGroup",
+              "displayName": "assignedGroup",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "isPaymentActive",
+              "displayName": "isPaymentActive",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isSync",
+              "displayName": "isSync",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isOfflinePayment",
+              "displayName": "isOfflinePayment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentExpiryDate",
+              "displayName": "paymentExpiryDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "executionId",
+              "displayName": "executionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentSlaId",
+              "displayName": "paymentSlaId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentUrl",
+              "displayName": "paymentUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "slaPaymentExpiryDate",
+              "displayName": "slaPaymentExpiryDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "saveDataPayload",
+              "displayName": "saveDataPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "feeflow",
+              "displayName": "feeflow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "f4641b37-80a6-4441-bc10-7dfa36057680",
+      "name": "Sub: Cancel Payment",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "retryOnFail": false,
+      "position": [
+        1296,
+        1200
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "fb745cb7-3cc4-47af-b896-b04f390ce26f",
+      "name": "End (Payment Cancellation Started)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        1200
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "071b3e00-7872-42b8-b60d-f4cc268f0fd7",
+      "name": "End (No Fee Action)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        848,
+        1392
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'Request re-opened into status ' + ($('Set Event Variables').item.json.status || 'n/a') + '.' }}",
+            "event": "={{ $('Set Event Variables').item.json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $('Set Event Variables').item.json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $('Set Event Variables').item.json.ministryRequestId || null }}",
+            "process_type": "ministry-request-process",
+            "raw_request_id": "={{ $('Set Event Variables').item.json.rawRequestId || null }}",
+            "status": "={{ $('Set Event Variables').item.json.status || null }}",
+            "event_id": "={{ $('Set Event Variables').item.json.eventId }}",
+            "occurred_at": "={{ $('Set Event Variables').item.json.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "d2675cef-bc50-4385-8210-255ae612092a",
+      "name": "Audit: Reopened",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -272,
+        1392
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "a9217ae3-2e3b-4f2c-b72a-d0983545f76f",
+      "name": "End (Reopened)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        1392
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI IAO Complete Process\n\n**Purpose:**\nHandles IAO task completion and state changes on a ministry request, including starting or cancelling the applicant fee payment.\n\n**Trigger/Entry:**\nSub-workflow called by FOI IAO Process for `foi-iao-open-complete`, `foi-iao-complete` and `foi-iao-reopen`.\n\n**Processing:**\n- Open complete: audit the new state (Call For Records, which then waits for IAO/ministry events, or Closed).\n- IAO complete: audit, then check fees:\n  - Moved to On Hold (online payment, not sync) → start a fee payment (feeAction = initiate).\n  - Otherwise, look up the ACTIVE row in `foi-payment-sla`. If the request left On Hold while an online payment is still active → cancel it (feeAction = cancel).\n- Reopen: audit only.\n\n**Integration/Outcome:**\nStarts FOI Fee Processing (async) to initiate or cancel payments. Reads `foi-payment-sla` and writes to `foi-process-audit`.",
+        "height": 584,
+        "width": 620,
+        "color": 4
+      },
+      "id": "a4fdca2c-8ad1-44e5-9dbe-bb5408f23ca3",
+      "name": "Developer Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1712,
+        688
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Set Event Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Complete Type": {
+      "main": [
+        [
+          {
+            "node": "Open Outcome Gateway",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: IAO Complete",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: Reopened",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "End (Unsupported Event)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Event Variables": {
+      "main": [
+        [
+          {
+            "node": "Complete Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: IAO Complete": {
+      "main": [
+        [
+          {
+            "node": "IAO Complete - On Hold Fee Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Open Outcome Gateway": {
+      "main": [
+        [
+          {
+            "node": "Audit: IAO Open Complete",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: IAO Open Closed",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: IAO Open Complete",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: IAO Open Complete": {
+      "main": [
+        [
+          {
+            "node": "End (Open Complete Recorded)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: IAO Open Closed": {
+      "main": [
+        [
+          {
+            "node": "End (Open Complete Recorded)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IAO Complete - On Hold Fee Check": {
+      "main": [
+        [
+          {
+            "node": "Audit: Fee Payment Triggered",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Active Payment SLA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Fee Payment Input": {
+      "main": [
+        [
+          {
+            "node": "IAO Complete: Trigger Fee Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IAO Complete: Trigger Fee Payment": {
+      "main": [
+        [
+          {
+            "node": "End (Fee Payment Started)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: Fee Payment Triggered": {
+      "main": [
+        [
+          {
+            "node": "Build Fee Payment Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Active Payment SLA": {
+      "main": [
+        [
+          {
+            "node": "Set Fee Flow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Fee Flow": {
+      "main": [
+        [
+          {
+            "node": "Cancel Payment Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cancel Payment Check": {
+      "main": [
+        [
+          {
+            "node": "Audit: Payment Cancellation Triggered",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "End (No Fee Action)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: Payment Cancellation Triggered": {
+      "main": [
+        [
+          {
+            "node": "Build Cancel Payment Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Cancel Payment Input": {
+      "main": [
+        [
+          {
+            "node": "Sub: Cancel Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sub: Cancel Payment": {
+      "main": [
+        [
+          {
+            "node": "End (Payment Cancellation Started)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: Reopened": {
+      "main": [
+        [
+          {
+            "node": "End (Reopened)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c1e0db60-05c9-4b5e-a57a-0eebd3de4837",
+  "meta": {
+    "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
+  },
+  "nodeGroups": [],
+  "id": "8xzAZLP6PpJy5Ll6",
+  "tags": []
+}

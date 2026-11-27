@@ -1,0 +1,415 @@
+{
+  "name": "FOI Request Processing",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "dcf75dff-3635-4526-851b-8e4874532373",
+      "name": "Loop Over Ministries",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -48,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const event = $('Set Process Variables').item.json.event;\n  const eventId = $('Set Process Variables').item.json.eventId;\n  const occurredAt = $('Set Process Variables').item.json.occurredAt;  \n  const rawRequestId = $('Set Process Variables').item.json.rawRequestId;\n  const assignedTo = $('Set Process Variables').item.json.assignedTo;\n  const assignedGroup = $('Set Process Variables').item.json.assignedGroup;\n  const metadata = $('Set Process Variables').item.json.metadata;\n  const ministriesString = $('Set Process Variables').item.json.ministries;\n  const ministries =  ministriesString\n    ? JSON.parse(ministriesString)\n    : {};\n  return ministries.map(ministry => ({\n    json: {\n      event: event,\n      eventId: eventId,\n      occurredAt: occurredAt,\n      processType: 'ministry-request-process',\n      rawRequestId: rawRequestId,\n      foiRequestId: ministry.foirequestid,\n      ministryRequestId: ministry.id,\n      // fileNumber: ministry.filenumber,\n      status: \"Open\",    \n      assignedTo: assignedTo,\n      assignedGroup: assignedGroup,\n      // axisRequestId: ministry.axisrequestid,\n      assignedMinistryGroup: ministry?.assignedgroup,\n      metadata: metadata\n    }\n  }));\n\n} catch (error) {\n  return [{\n    json: {\n      error: true,\n      errorMessage: error.message\n    }\n  }];\n}"
+      },
+      "id": "474cef95-8fea-45a8-8c47-8ae708d609c0",
+      "name": "Load Ministries",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "alwaysOutputData": true,
+      "position": [
+        -272,
+        960
+      ],
+      "notes": "Reads the fileNumbers array cached by Build Per-Ministry Registration Rows instead of re-parsing/re-iterating the raw ministries JSON."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "09735a4b-14ca-4c6e-84db-f671a1bf9adb",
+              "name": "rawRequestId",
+              "value": "={{ $json.rawRequestId }}",
+              "type": "string"
+            },
+            {
+              "id": "e87e3dcc-44b4-4523-87a8-07b51efea46a",
+              "name": "foiRequestId",
+              "value": "={{ $json.foiRequestId }}",
+              "type": "string"
+            },
+            {
+              "id": "0f2a9348-15d3-4acf-a7f3-029fa98aa043",
+              "name": "assignedTo",
+              "value": "={{ $json.assignedTo }}",
+              "type": "string"
+            },
+            {
+              "id": "4c648872-fc2c-45e3-8496-05e7a23dadd2",
+              "name": "assignedGroup",
+              "value": "={{ $json.assignedGroup }}",
+              "type": "string"
+            },
+            {
+              "id": "2731ce88-2f20-4d81-97ad-9eaa0b43071a",
+              "name": "ministries",
+              "value": "={{ $json.ministries }}",
+              "type": "string"
+            },
+            {
+              "id": "d13cb322-fe9d-4460-981e-4196e038c381",
+              "name": "event",
+              "value": "={{ $json.event }}",
+              "type": "string"
+            },
+            {
+              "id": "0f442077-ab96-4e41-8bce-5fb456b36a29",
+              "name": "status",
+              "value": "={{ $json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "7e786d91-7813-474a-93b1-195edbcf4bbd",
+              "name": "metadata",
+              "value": "={{ $json.metadata }}",
+              "type": "string"
+            },
+            {
+              "id": "e05c948b-56af-4ec2-9fa3-3f42f76d6adf",
+              "name": "eventId",
+              "value": "={{ $json.eventId }}",
+              "type": "string"
+            },
+            {
+              "id": "c34d79fd-0ceb-415d-8abc-1a2fcc2c441d",
+              "name": "occurredAt",
+              "value": "={{ $json.occurredAt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "ae15cb76-263d-4385-80e9-62b3907754d7",
+      "name": "Set Process Variables",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -496,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "event"
+            },
+            {
+              "name": "eventId"
+            },
+            {
+              "name": "rawRequestId"
+            },
+            {
+              "name": "foiRequestId"
+            },
+            {
+              "name": "status"
+            },
+            {
+              "name": "ministries"
+            },
+            {
+              "name": "assignedGroup"
+            },
+            {
+              "name": "assignedTo"
+            },
+            {
+              "name": "metadata"
+            },
+            {
+              "name": "occurredAt"
+            }
+          ]
+        }
+      },
+      "id": "d5007109-3d04-47d7-afe2-96bcde5740b3",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "alwaysOutputData": true,
+      "position": [
+        -720,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'Ministry request has been created for the raw request ' + ($json.rawRequestId || 'n/a') + ' and FOI request ID ' + ($json.foiRequestId || 'n/a') + ' with ministry request ID ' + ($json.ministryRequestId || 'n/a') + ', file number ' + ($json.fileNumber || 'n/a') + '.' }}",
+            "event": "={{  $json?.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $json?.foiRequestId || null }}",
+            "ministry_request_id": "={{ $json?.ministryRequestId || null }}",
+            "process_type": "={{ $json?.processType }}",
+            "raw_request_id": "={{ $json?.rawRequestId }}",
+            "status": "={{ $json?.status }}",
+            "event_id": "={{  $json?.eventId }}",
+            "occurred_at": "={{  $json?.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "a0cdf22c-00eb-432f-beb8-828a0c397aca",
+      "name": "Audit: Save Ministry Request",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        176,
+        1008
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "Returns the inserted row including its `id`. The status branches update THIS row (matched on id) instead of inserting duplicates."
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI Request Processing\n\n**Purpose:**\nStarts FOI request processing once a raw request is opened by recording one ministry request for each ministry assigned to the FOI request.\n\n**Trigger/Entry:**\nSub-workflow started (async) by FOI RawRequest Processing when `foi-intake-complete` arrives with status Open. The input includes the `ministries` JSON array.\n\n**Processing:**\n`Load Ministries` splits the ministries array into one item per ministry (FOI request ID, ministry request ID, file number, status, AXIS request ID, assigned ministry group). Each item is looped through and audited.\n\n**Integration/Outcome:**\nWrites one `foi-process-audit` row per ministry request (process_type = ministry-request-process). No API calls on this path. Later IAO and ministry events for each request arrive separately through FOI Request Routing.",
+        "height": 520,
+        "width": 620,
+        "color": 4
+      },
+      "id": "1a72a856-be08-4427-a969-068895256a50",
+      "name": "Developer Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1328,
+        432
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "1c536733-382f-4b3c-b7fd-023e4587ff28",
+      "name": "End",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        176,
+        816
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Loop Over Ministries": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: Save Ministry Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Ministries": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Ministries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Process Variables": {
+      "main": [
+        [
+          {
+            "node": "Load Ministries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Set Process Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: Save Ministry Request": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Ministries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "2c530df5-c50f-4137-9473-581480035e75",
+  "meta": {
+    "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
+  },
+  "nodeGroups": [],
+  "id": "pPO6edSrMP62iCbT",
+  "tags": []
+}

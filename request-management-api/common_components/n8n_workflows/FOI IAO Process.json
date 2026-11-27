@@ -1,0 +1,546 @@
+{
+  "name": "FOI IAO Process",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "69a2f97d-6b37-432c-b559-550cefdbdfc8",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        320
+      ],
+      "notes": "Called by FOI Request Routing for the `iao` category. Receives the complete original event payload."
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const input = $input.first().json || {};\n  const event = input.event;\n  const eventId = input.eventId;\n  const occurredAt = input.occurredAt;\n\n  if (!event || typeof event !== 'string') {\n    throw new Error('Required field \"body.event\" is missing or invalid.');\n  }\n\n  // The COMPLETE original event payload - never reduced to the normalised fields.\n  let metadata = input.metadata;\n  if (typeof metadata === 'string') {\n    try {\n      metadata = JSON.parse(metadata);\n    } catch (e) {\n      metadata = null;\n    }\n  }  \n  const executionId = $execution.id;\n\n  // foiRequestMetaData arrives as an object (intake events) or as a JSON string (IAO / ministry events).\n  let foiRequestMetaData = metadata.foiRequestMetaData;\n  if (typeof foiRequestMetaData === 'string') {\n    try {\n      foiRequestMetaData = JSON.parse(foiRequestMetaData);\n    } catch (e) {\n      foiRequestMetaData = null;\n    }\n  }\n  let metadataString = \"\";\n  if (!metadata || typeof metadata === 'string') {   \n      metadataString = metadata;    \n  } else if (!metadata || typeof metadata === 'object') {\n      metadataString = JSON.stringify(metadata);\n    }\n  const IAO_EVENTS = ['foi-iao-open-assignment', 'foi-iao-open-complete', 'foi-iao-assignment', 'foi-iao-complete', 'foi-iao-reopen', 'foi-iao-correnspodence'];\n  if (IAO_EVENTS.includes(event)) {\n    const first = (...values) => {\n      for (const v of values) { if (v !== undefined && v !== null && v !== '') return v; }\n      return null;\n    };\n  \n    return {\n      json: {\n        event,\n        eventId,\n        occurredAt,\n        rawRequestId: first(foiRequestMetaData.rawRequestId),\n        foiRequestId: first(foiRequestMetaData.foiRequestID, foiRequestMetaData.foiRequestId),\n        ministryRequestId: first(foiRequestMetaData.ministryRequestID, foiRequestMetaData.ministryRequestId),\n        status: foiRequestMetaData.status,\n        assignedTo: foiRequestMetaData.assignedTo,\n        assignedGroup: foiRequestMetaData.assignedGroup,\n        metadata: metadataString,\n        executionId,\n      },\n    };\n  }\n\n} catch (error) {\n   const input = $input.first().json || {};\n  return {\n    json: {\n      event: '',\n      receivedEvent: (input && typeof input === 'object' && typeof input.event === 'string') ? input.event : null,\n      error: true,\n      errorMessage: error.message,\n      metadata: input.metadata ?? null,\n      executionId: $execution.id,\n    },\n  };\n}"
+      },
+      "id": "8924f848-3a15-42fc-83c3-afe7e67404e8",
+      "name": "Set Event Variables",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "3d723058-629c-46ba-aacf-64d84fdc5b0c",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-open-assignment"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "iao-open-assignment"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "21af10d4-43a7-463e-9516-88ee973462d7",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-open-complete"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "iao-open-complete"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a21efb2c-7337-4159-8000-ec0ce5b7f758",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-assignment"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "iao-assignment"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ec9e365d-75a6-43dc-a5d7-cfd66f7f630a",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-complete"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "iao-complete"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "268963e4-1d9d-40d5-ad58-dcf323703e31",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-reopen"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "iao-reopen"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c0ef5a57-25dc-4622-b0a4-7fcf08df459d",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-correnspodence"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "iao-correnspodence"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "other"
+        }
+      },
+      "id": "155f69bb-8e15-4193-8134-037962232a03",
+      "name": "IAO Event Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1168,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "RvOqZYKkLvQpriCC",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/RvOqZYKkLvQpriCC",
+          "cachedResultName": "FOI IAO Assignment Process"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [],
+          "value": {}
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "64bb59dc-c1c9-4963-8053-c546aea85ae8",
+      "name": "Call 'FOI IAO Assignment Process'",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "retryOnFail": false,
+      "position": [
+        1392,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "8xzAZLP6PpJy5Ll6",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/8xzAZLP6PpJy5Ll6",
+          "cachedResultName": "FOI IAO Complete Process"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [],
+          "value": {}
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "b65abe2a-7e0d-4e3f-8d25-5f40561ff2e7",
+      "name": "Call 'FOI IAO Complete Process'",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "retryOnFail": false,
+      "position": [
+        1392,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "DZDGg30hiXeWJidp",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/DZDGg30hiXeWJidp",
+          "cachedResultName": "FOI IAO Correspondence Process"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [],
+          "value": {}
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "c1105f3f-17b8-403e-8dac-1ac354ee321f",
+      "name": "Call 'FOI IAO Correspondence Process'",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "retryOnFail": false,
+      "position": [
+        1392,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "execution_id",
+              "id": "execution_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "process_type",
+              "id": "process_type",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "event",
+              "id": "event",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "raw_request_id",
+              "id": "raw_request_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "foi_request_id",
+              "id": "foi_request_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "ministry_request_id",
+              "id": "ministry_request_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "status",
+              "id": "status",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "metadata",
+              "id": "metadata",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "comments",
+              "id": "comments",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "comments": "={{ 'IAO event ' + ($json.event || 'n/a') + ' has no processing defined.' }}",
+            "event": "={{ $json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $json.ministryRequestId || null }}",
+            "process_type": "ministry-request",
+            "raw_request_id": "={{ $json.rawRequestId || null }}",
+            "status": "={{ $json.status || null }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "58dbcf05-2506-44d0-8fc6-aff42a2c692b",
+      "name": "Audit: Unsupported IAO Event",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1392,
+        608
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "0cb00a5d-d9be-4f16-a763-8179c161c65f",
+      "name": "End (Unsupported IAO Event)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1616,
+        608
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI IAO Process\n\n**Purpose:**\nDispatcher for all IAO team events on a ministry request.\n\n**Trigger/Entry:**\nSub-workflow called by FOI Request Routing for the `iao` event category.\n\n**Processing:**\n`Set Event Variables` reads the full event payload (`metadata.foiRequestMetaData`) into standard IDs, status and assignee fields. `IAO Event Switch` then routes by event.\n\n**Integration/Outcome:**\nSub-workflows run synchronously:\n- foi-iao-open-assignment, foi-iao-assignment → FOI IAO Assignment Process\n- foi-iao-open-complete, foi-iao-complete, foi-iao-reopen → FOI IAO Complete Process (which branches on the event)\n- foi-iao-correnspodence (the existing event spelling) → FOI IAO Correspondence Process\n- anything else → audit row \"no processing defined\"",
+        "height": 568,
+        "width": 620,
+        "color": 4
+      },
+      "id": "0c100ef9-2bd3-480f-9bea-ccd7944c8f73",
+      "name": "Developer Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Audit: Unsupported IAO Event": {
+      "main": [
+        [
+          {
+            "node": "End (Unsupported IAO Event)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IAO Event Switch": {
+      "main": [
+        [
+          {
+            "node": "Call 'FOI IAO Assignment Process'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'FOI IAO Complete Process'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'FOI IAO Assignment Process'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'FOI IAO Complete Process'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'FOI IAO Complete Process'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call 'FOI IAO Correspondence Process'",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: Unsupported IAO Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Event Variables": {
+      "main": [
+        [
+          {
+            "node": "IAO Event Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Set Event Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c78e263f-cb8e-4c04-b6e5-07ccba29dab2",
+  "meta": {
+    "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
+  },
+  "nodeGroups": [],
+  "id": "sEZPxk3Q7F1FSP6q",
+  "tags": []
+}

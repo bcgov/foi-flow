@@ -1,0 +1,2283 @@
+{
+  "name": "FOI Request Routing",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "v1",
+              "leftValue": "={{ $('Parse Request Body').first().json.error }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "312ba081-a1ef-4dad-9c0d-9ca1ab1b6561",
+      "name": "Invalid Payload?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1456,
+        720
+      ],
+      "notes": "True = Parse Request Body flagged the payload as malformed (missing/invalid body, event, event_id or occurred_at) -> 400. False = valid, acknowledged and processed."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ accepted: false, error: $json.errorMessage }) }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "5437fe62-a5da-4b72-bf96-daf798802589",
+      "name": "Respond: Rejected (400)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        2800,
+        144
+      ],
+      "notes": "Malformed event -> 400 so the API treats it as non-retryable. Nothing is routed; the rejection is audited via Audit: Other Event."
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ accepted: true, event_id: $json.eventId }) }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "b3ac7abe-19b5-46c9-8a28-5e322922f8b6",
+      "name": "Respond: Accepted (202)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1680,
+        1296
+      ],
+      "notes": "Respond on receipt (Q11): the API gets its answer now; the rest of the run (dedupe, routing, sub-workflows) continues afterwards."
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "execution_id": "={{ $execution.id }}",
+            "event_id": "={{ $('Parse Request Body').first().json.eventId || null }}",
+            "process_type": "event-duplicate",
+            "event": "={{ $('Parse Request Body').first().json.event || null }}",
+            "raw_request_id": "={{ $('Parse Request Body').first().json.rawRequestId != null ? String($('Parse Request Body').first().json.rawRequestId) : null }}",
+            "foi_request_id": "={{ $('Parse Request Body').first().json.foiRequestId != null ? String($('Parse Request Body').first().json.foiRequestId) : null }}",
+            "ministry_request_id": "={{ $('Parse Request Body').first().json.ministryRequestId != null ? String($('Parse Request Body').first().json.ministryRequestId) : null }}",
+            "status": "={{ $('Parse Request Body').first().json.status != null ? String($('Parse Request Body').first().json.status) : null }}",
+            "comments": "Duplicate event_id skipped: an earlier run already completed.",
+            "occurred_at": "={{ $('Parse Request Body').first().json.occurredAt || null }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "fe7694af-7ad2-42b0-a141-78ccea0b9945",
+      "name": "Audit: Duplicate Skipped",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3024,
+        336
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "Records that a redelivered event was not processed again."
+    },
+    {
+      "parameters": {
+        "jsCode": "// The data-table nodes above replaced the item; restore the parsed event for routing.\nreturn [{ json: $('Parse Request Body').first().json }];"
+      },
+      "id": "38c17ea8-5ec1-41da-a8a6-f1e644515a27",
+      "name": "Restore Event Item",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2576,
+        720
+      ],
+      "notes": "Route Event and the sub-workflows expect the parsed event item, not the audit row."
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI Request Routing\n\n**Purpose:**\nCentral entry point for the whole FOI workflow. Every FOI event from request-management-api arrives here and is routed to the sub-workflow that owns that event category. This is the only FOI workflow called from outside n8n.\n\n**Trigger/Entry:**\nPOST webhook `foi-request-routing` (header auth `x-n8n-auth`). The body must contain `event` and `event_id` (UUID, unchanged on every retry and replay) and usually `foiRequestMetaData`. The API also sends `occurred_at`.\n\n**Processing:**\n1. `Parse Request Body` validates the payload and pulls out the key IDs, status and assignee (a malformed payload is answered 400 and audited).\n2. A valid event is answered 202 immediately (respond on receipt).\n3. `Build Claim Request` + `Claim Event` call `POST /api/foiworkflow/events/{event_id}/claim` through FOI Backend API Manager. The API decides in one transaction (outbox row + ordering watermark in Postgres): `proceed`, `duplicate` (an earlier run already completed it), `stale` (a newer state event was already applied for the request; payment and correspondence events are never stale) or `in_progress` (another execution holds the claim). Nothing in this flow reads `foi-process-audit` any more.\n4. `Claim Decision` routes: proceed → `Route Event`; duplicate / stale → audit row, then acknowledge; in_progress → audit row, no acknowledgement (the running execution reports the outcome); anything else stops the run.\n5. `Route Event` classifies the event and runs the sub-workflow. When it finishes, `Event Ack` calls `PUT /api/foiworkflow/events/{event_id}` once so the outbox row becomes COMPLETED. A failed run is reported by FOI Error Handler, which maps the execution to its event with `GET /api/foiworkflow/executions/{id}/event`.\n\n`foi-process-audit` is now a write-only, slim audit log (one row per step, no payload copy, plus skip rows): it can be purged. The event payload stays in the API outbox by `event_id` while it is retained.\n\n**Integration/Outcome:**\n- intake (foi-intake-assignment / complete / reopen) → FOI RawRequest Processing\n- iao (foi-iao-*) → FOI IAO Process\n- ministry (foi-ministry-assignment / complete) → FOI Ministry Process\n- payment (foi-fee-payment, foi-manage-payment) → FOI Fee Processing\n- unknown or invalid → audit row in `foi-process-audit` (process_type = other)\nEach event is processed independently (no Wait nodes or resume URLs).",
+        "height": 872,
+        "width": 620,
+        "color": 4
+      },
+      "id": "7858e3a7-d517-4624-8579-0cd602055896",
+      "name": "Developer Overview1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "foi-request-routing-dev",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a83a8c4b-594d-47b0-be82-e77462c4d58b",
+      "name": "Start FOI Request Processing",
+      "webhookId": "51ddd4c6-2941-4afc-a4e2-8d10f96ce00c",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "retryOnFail": true,
+      "position": [
+        784,
+        720
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "eDSjuhuuk3SKT3xo",
+          "name": "x-n8n-auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const input = $input.item.json;\n  const body = input?.body;\n\n  // Validate webhook body\n  if (!body || typeof body !== 'object') {\n    throw new Error('Webhook body is missing or invalid.');\n  }\n\n  const event = body.event;\n\n  if (!event || typeof event !== 'string') {\n    throw new Error('Required field \"body.event\" is missing or invalid.');\n  }\n\n  // eventId (uuid4 from request-management-api) is required: the claim call that makes processing idempotent\n  // is keyed by it. It must be a UUID string.\n  const rawEventId = body.event_id;\n  let eventId = null;\n  if (rawEventId === undefined || rawEventId === null) {\n    throw new Error('Required field \"body.event_id\" is missing.');\n  }\n  {\n    if (typeof rawEventId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawEventId)) {\n      throw new Error('Field \"body.event_id\" must be a UUID string.');\n    }\n    eventId = rawEventId.toLowerCase();\n  }\n\n  // occurred_at (UTC ISO-8601 with microseconds) is stamped once by request-management-api and re-sent unchanged on\n  // every retry and replay; \"Check Event Order\" uses it to skip a state event older than one already applied.\n  // Optional so events queued before it existed still run (they just cannot be ordered); when present it must be\n  // exactly the fixed-width format the API sends, because it is compared as a string.\n  const rawOccurredAt = body.occurred_at;\n  let occurredAt = null;\n  if (rawOccurredAt !== undefined && rawOccurredAt !== null) {\n    if (typeof rawOccurredAt !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}\\+00:00$/.test(rawOccurredAt)) {\n      throw new Error('Field \"body.occurred_at\" must be a UTC ISO-8601 timestamp with microseconds when present.');\n    }\n    occurredAt = rawOccurredAt;\n  }\n\n  // The COMPLETE original event payload - never reduced to the normalised fields.\n  const metadata = JSON.stringify(body);\n  const executionId = $execution.id;\n\n  // foiRequestMetaData arrives as an object (intake events) or as a JSON string (IAO / ministry events).\n  let foiRequestMetaData = body.foiRequestMetaData;\n  if (typeof foiRequestMetaData === 'string') {\n    try {\n      foiRequestMetaData = JSON.parse(foiRequestMetaData);\n    } catch (e) {\n      foiRequestMetaData = null;\n    }\n  }\n\n  const INTAKE_EVENTS = ['foi-intake-assignment', 'foi-intake-complete', 'foi-intake-reopen'];\n\n  /*\n   * Intake events -> FOI RawRequest Processing - Simplified\n   * (output shape unchanged: that workflow must not be modified)\n   */\n  if (INTAKE_EVENTS.includes(event)) {\n    if (!foiRequestMetaData || typeof foiRequestMetaData !== 'object') {\n      throw new Error(\n        'Required field \"body.foiRequestMetaData\" is missing or invalid.'\n      );\n    }\n\n    const status = foiRequestMetaData.status ?? null;\n    const assignedTo = foiRequestMetaData.assignedTo ?? null;\n    const assignedGroup = foiRequestMetaData.assignedGroup ?? null;\n\n    let rawRequestId = null;\n    let foiRequestId = null;\n    let ministries = null;\n    const ministryRequestId = null;\n\n    /*\n     * FOI Intake Complete + Open\n     * --------------------------------\n     * foiRequestMetaData.id -> foiRequestId\n     * ministries is available\n     */\n    if (event === 'foi-intake-complete' && status === 'Open') {\n      foiRequestId = foiRequestMetaData.id ?? null;\n      rawRequestId = foiRequestMetaData.rawRequestId ?? null;\n\n      if (foiRequestId === null) {\n        throw new Error(\n          'foiRequestMetaData.id is required for foi-intake-complete with status Open.'\n        );\n      }\n\n      if (!Array.isArray(foiRequestMetaData.ministries)) {\n        throw new Error(\n          'foiRequestMetaData.ministries is required and must be an array for foi-intake-complete with status Open.'\n        );\n      }\n\n      ministries = JSON.stringify(foiRequestMetaData.ministries);\n    }\n\n    /*\n     * FOI Intake Complete / Assignment + non-Open\n     * --------------------------------------------\n     * foiRequestMetaData.id -> rawRequestId\n     * ministries is not expected\n     */\n    else if (\n      (event === 'foi-intake-complete' || event === 'foi-intake-assignment') &&\n      status !== 'Open'\n    ) {\n      rawRequestId = foiRequestMetaData.id ?? null;\n\n      if (rawRequestId === null) {\n        throw new Error(\n          `foiRequestMetaData.id is required for event \"${event}\" with status \"${status}\".`\n        );\n      }\n    }\n\n    /*\n     * FOI Intake Reopen\n     * --------------------------------------------\n     * foiRequestMetaData.rawRequestId (or id) -> rawRequestId\n     */\n    else if (event === 'foi-intake-reopen') {\n      rawRequestId = foiRequestMetaData.rawRequestId ?? foiRequestMetaData.id ?? null;\n\n      if (rawRequestId === null) {\n        throw new Error('foiRequestMetaData.rawRequestId or id is required for foi-intake-reopen.');\n      }\n    }\n\n    /*\n     * Unsupported intake event/status combination\n     */\n    else {\n      throw new Error(\n        `Unsupported event/status combination: event=\"${event}\", status=\"${status}\".`\n      );\n    }\n\n    return {\n      json: {\n        event,\n        eventId,\n        occurredAt,\n        rawRequestId,\n        foiRequestId,\n        ministryRequestId,\n        status,\n        assignedTo,\n        assignedGroup,\n        ministries,\n        metadata,\n        executionId,\n      },\n    };\n  }\n\n  /*\n   * IAO / Ministry / Payment / unknown events\n   * --------------------------------------------\n   * Only the identifiers needed for routing and audit are normalised here. The complete payload is\n   * passed on as `payload` (object) and `metadata` (string); each category sub-workflow normalises\n   * the event itself so it can also be executed independently.\n   */\n  const meta = (foiRequestMetaData && typeof foiRequestMetaData === 'object') ? foiRequestMetaData : {};\n  const first = (...values) => {\n    for (const v of values) { if (v !== undefined && v !== null && v !== '') return v; }\n    return null;\n  };\n\n  return {\n    json: {\n      event,\n      eventId,\n      occurredAt,\n      rawRequestId: first(meta.rawRequestId, meta.rawRequestID, body.rawRequestId),\n      foiRequestId: first(meta.foiRequestID, meta.foiRequestId, meta.foirequestid, body.foiRequestID, body.foiRequestId),\n      ministryRequestId: first(meta.ministryRequestID, meta.ministryRequestId, body.ministryRequestID, body.ministryRequestId),\n      status: first(meta.status, body.status),\n      assignedTo: first(meta.assignedTo, body.assignedTo),\n      assignedGroup: first(meta.assignedGroup, body.assignedGroup),\n      metadata,\n      executionId,\n    },\n  };\n\n} catch (error) {\n  const body = $input.item.json?.body;\n  return {\n    json: {\n      event: '',\n      eventId: (body && typeof body === 'object' && typeof body.event_id === 'string') ? body.event_id : null,\n      receivedEvent: (body && typeof body === 'object' && typeof body.event === 'string') ? body.event : null,\n      error: true,\n      errorMessage: error.message,\n      metadata: JSON.stringify(body ?? null),\n      executionId: $execution.id,\n    },\n  };\n}"
+      },
+      "id": "98be3afc-83db-4623-97a2-af85673061f9",
+      "name": "Parse Request Body",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        720
+      ],
+      "notes": "Identifies the event and keeps the complete original payload in `metadata`. Validates `body.event` and the optional `body.event_id` (UUID). Intake output is unchanged apart from `eventId`; other events also carry `payload` and `foiRequestMetaData`. Invalid payloads carry `error: true` and are answered with 400."
+    },
+    {
+      "parameters": {
+        "dataToSave": {
+          "values": [
+            {
+              "key": "event",
+              "value": "={{ $json.event || $json.receivedEvent }}"
+            },
+            {
+              "key": "eventId",
+              "value": "={{ $json.eventId }}"
+            },
+            {
+              "key": "occurredAt",
+              "value": "={{ $json.occurredAt }}"
+            },
+            {
+              "key": "rawRequestId",
+              "value": "={{ $json.rawRequestId }}"
+            },
+            {
+              "key": "foiRequestId",
+              "value": "={{ $json.foiRequestId }}"
+            },
+            {
+              "key": "ministryRequestId",
+              "value": "={{ $json.ministryRequestId }}"
+            },
+            {
+              "key": "status",
+              "value": "={{ $json.status }}"
+            },
+            {
+              "key": "executionId",
+              "value": "={{ $json.executionId }}"
+            }
+          ]
+        }
+      },
+      "id": "84e3498d-d244-417d-94cd-5468b8894d55",
+      "name": "Execution Data",
+      "type": "n8n-nodes-base.executionData",
+      "typeVersion": 1.1,
+      "position": [
+        1232,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "combinator": "or",
+                "conditions": [
+                  {
+                    "id": "ev-intake-1",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-intake-assignment"
+                  },
+                  {
+                    "id": "ev-intake-2",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-intake-complete"
+                  },
+                  {
+                    "id": "ev-intake-3",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-intake-reopen"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "intake"
+            },
+            {
+              "conditions": {
+                "combinator": "or",
+                "conditions": [
+                  {
+                    "id": "ev-iao-1",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-open-assignment"
+                  },
+                  {
+                    "id": "ev-iao-2",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-open-complete"
+                  },
+                  {
+                    "id": "ev-iao-3",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-assignment"
+                  },
+                  {
+                    "id": "ev-iao-4",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-complete"
+                  },
+                  {
+                    "id": "ev-iao-5",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-reopen"
+                  },
+                  {
+                    "id": "ev-iao-6",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-correnspodence"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "iao"
+            },
+            {
+              "conditions": {
+                "combinator": "or",
+                "conditions": [
+                  {
+                    "id": "ev-min-1",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-ministry-assignment"
+                  },
+                  {
+                    "id": "ev-min-2",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-ministry-complete"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "ministry"
+            },
+            {
+              "conditions": {
+                "combinator": "or",
+                "conditions": [
+                  {
+                    "id": "ev-pay-1",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-fee-payment"
+                  },
+                  {
+                    "id": "ev-pay-2",
+                    "leftValue": "={{ $json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-manage-payment"
+                  }
+                ],
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                }
+              },
+              "renameOutput": true,
+              "outputKey": "payment"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "other"
+        }
+      },
+      "id": "18ffa90c-87f5-4791-8f81-a645892e4746",
+      "name": "Route Event",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "alwaysOutputData": false,
+      "position": [
+        2800,
+        672
+      ],
+      "notes": "Event category switch: intake / iao / ministry / payment / other. Each category calls exactly one sub-workflow and passes the complete event item. To support a new event, add it to a rule here and to the switch in the category sub-workflow."
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ $json.error ? ('Event could not be routed: ' + $json.errorMessage) : ('Event ' + $json.event + ' has no processing defined - routed to other.') }}",
+            "event": "={{ $json.event || $json.receivedEvent || null }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $json.foiRequestId != null ? String($json.foiRequestId) : null }}",
+            "metadata": "={{ $json.metadata }}",
+            "ministry_request_id": "={{ $json.ministryRequestId != null ? String($json.ministryRequestId) : null }}",
+            "process_type": "other",
+            "raw_request_id": "={{ $json.rawRequestId != null ? String($json.rawRequestId) : null }}",
+            "status": "={{ $json.status != null ? String($json.status) : null }}",
+            "event_id": "={{ $json.eventId || null }}",
+            "occurred_at": "={{ $json.occurredAt || null }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "70a69051-c803-43f8-8327-0c85e9ba3b99",
+      "name": "Audit: Other Event",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3024,
+        144
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "3522a652-6e26-429d-b7f2-ac52880b7390",
+      "name": "Other Event (No Processing)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3248,
+        144
+      ],
+      "notes": "Unknown or invalid events. Recorded in foi-process-audit (process_type = other)."
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Nmy2CI0KnrNOtnH0",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Nmy2CI0KnrNOtnH0",
+          "cachedResultName": "FOI RawRequest Processing"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "0b0aa5cb-b173-40c9-acd8-592ff7d83881",
+      "name": "Raw Request Intake Processing",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "alwaysOutputData": true,
+      "retryOnFail": false,
+      "position": [
+        3024,
+        528
+      ],
+      "notes": "intake: foi-intake-assignment / foi-intake-complete / foi-intake-reopen -> FOI RawRequest Processing. Passes every normalised variable plus the original `metadata` payload."
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "sEZPxk3Q7F1FSP6q",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/sEZPxk3Q7F1FSP6q",
+          "cachedResultName": "FOI IAO Process"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "6cb3ae90-c1ca-4c07-b15e-39c0fd9a4ddb",
+      "name": "IAO Request Processing",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "alwaysOutputData": true,
+      "retryOnFail": false,
+      "position": [
+        3024,
+        720
+      ],
+      "notes": "iao: foi-iao-open-assignment / foi-iao-open-complete / foi-iao-assignment / foi-iao-complete / foi-iao-reopen / foi-iao-correnspodence -> FOI IAO Process, which switches on the event and calls the focused IAO sub-workflow."
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "cachedResultName": "FOI Ministry Process",
+          "cachedResultUrl": "/workflow/vqKyw9orVmfynqIz",
+          "mode": "list",
+          "value": "vqKyw9orVmfynqIz"
+        },
+        "workflowInputs": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [],
+          "value": {}
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "b5a874f7-3ad4-492a-adf2-9d89ab51acb6",
+      "name": "Ministry Request Processing",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "alwaysOutputData": true,
+      "retryOnFail": false,
+      "position": [
+        3024,
+        912
+      ],
+      "notes": "ministry: foi-ministry-assignment / foi-ministry-complete -> FOI Ministry Process."
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "FWq4KLVI9kGZCRmx",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/FWq4KLVI9kGZCRmx",
+          "cachedResultName": "FOI Fee Processing"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "event": "={{ $json.event }}",
+            "eventId": "={{ $json.eventId }}",
+            "occurredAt": "={{ $json.occurredAt }}",
+            "feeAction": "={{ $json.feeAction }}",
+            "triggeredBy": "={{ $json.triggeredBy }}",
+            "category": "={{ $json.category }}",
+            "paymentStatus": "={{ $json.paymentStatus }}",
+            "serviceKey": "={{ $json.serviceKey }}",
+            "templateName": "={{ $json.templateName }}",
+            "applicantCorrespondenceId": "={{ $json.applicantCorrespondenceId }}",
+            "rawRequestId": "={{ $json.rawRequestId }}",
+            "foiRequestId": "={{ $json.foiRequestId }}",
+            "ministryRequestId": "={{ $json.ministryRequestId }}",
+            "fileNumber": "={{ $json.fileNumber }}",
+            "status": "={{ $json.status }}",
+            "previousStatus": "={{ $json.previousStatus }}",
+            "assignedTo": "={{ $json.assignedTo }}",
+            "assignedGroup": "={{ $json.assignedGroup }}",
+            "isPaymentActive": "={{ $json.isPaymentActive }}",
+            "isSync": "={{ $json.isSync }}",
+            "isOfflinePayment": "={{ $json.isOfflinePayment }}",
+            "paymentExpiryDate": "={{ $json.paymentExpiryDate }}",
+            "metadata": "={{ $json.metadata }}",
+            "executionId": "={{ $json.executionId }}",
+            "paymentSlaId": "={{ $json.paymentSlaId }}",
+            "paymentUrl": "={{ $json.paymentUrl }}",
+            "slaPaymentExpiryDate": "={{ $json.slaPaymentExpiryDate }}",
+            "saveDataPayload": "={{ $json.saveDataPayload }}",
+            "feeflow": "={{ $json.feeflow }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventId",
+              "displayName": "eventId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "occurredAt",
+              "displayName": "occurredAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "feeAction",
+              "displayName": "feeAction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "triggeredBy",
+              "displayName": "triggeredBy",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "paymentStatus",
+              "displayName": "paymentStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "serviceKey",
+              "displayName": "serviceKey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "templateName",
+              "displayName": "templateName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "applicantCorrespondenceId",
+              "displayName": "applicantCorrespondenceId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rawRequestId",
+              "displayName": "rawRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "foiRequestId",
+              "displayName": "foiRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ministryRequestId",
+              "displayName": "ministryRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fileNumber",
+              "displayName": "fileNumber",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "previousStatus",
+              "displayName": "previousStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "assignedTo",
+              "displayName": "assignedTo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "assignedGroup",
+              "displayName": "assignedGroup",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "isPaymentActive",
+              "displayName": "isPaymentActive",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isSync",
+              "displayName": "isSync",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "isOfflinePayment",
+              "displayName": "isOfflinePayment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentExpiryDate",
+              "displayName": "paymentExpiryDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "executionId",
+              "displayName": "executionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentSlaId",
+              "displayName": "paymentSlaId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "paymentUrl",
+              "displayName": "paymentUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "slaPaymentExpiryDate",
+              "displayName": "slaPaymentExpiryDate",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "saveDataPayload",
+              "displayName": "saveDataPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "feeflow",
+              "displayName": "feeflow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "036492f7-2a97-431e-b616-aa8cd5515101",
+      "name": "Payment Processing",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "alwaysOutputData": true,
+      "retryOnFail": false,
+      "position": [
+        3024,
+        1104
+      ],
+      "notes": "payment: foi-fee-payment / foi-manage-payment -> FOI Fee Processing (event-driven fee/payment sub-workflow)."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "h1",
+              "leftValue": "={{ $('Parse Request Body').first().json.eventId }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              },
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "328dbe22-6734-4fa1-ab94-ed0a623af701",
+      "name": "Has event_id?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "executeOnce": true,
+      "position": [
+        3248,
+        864
+      ],
+      "notes": "Events queued before event_id existed have nothing to acknowledge."
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "iMchipXgogUVPriD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/iMchipXgogUVPriD",
+          "cachedResultName": "FOI Backend API Manager"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "category": "foi-event-ack",
+            "eventId": "={{ $('Parse Request Body').first().json.eventId || null }}",
+            "eventExecutionId": "={{ $execution.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawRequestId",
+              "displayName": "rawRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "foiRequestId",
+              "displayName": "foiRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ministryRequestId",
+              "displayName": "ministryRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawReqPayload",
+              "displayName": "rawReqPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reqPayload",
+              "displayName": "reqPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "servicekey",
+              "displayName": "servicekey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "saveDataPayload",
+              "displayName": "saveDataPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "eventId",
+              "displayName": "eventId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventStatus",
+              "displayName": "eventStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventError",
+              "displayName": "eventError",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventExecutionId",
+              "displayName": "eventExecutionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "3d9673a5-a3b7-4a5a-b785-e3e94e2a6ad3",
+      "name": "Event Ack",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "retryOnFail": false,
+      "position": [
+        3472,
+        800
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "0edc9d47-bcd7-4395-a894-383391feb620",
+      "name": "End",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3696,
+        1232
+      ],
+      "notes": "Unknown or invalid events. Recorded in foi-process-audit (process_type = other)."
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "mappingMode": "defineBelow",
+          "matchingColumns": [],
+          "schema": [
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "execution_id",
+              "id": "execution_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "event_id",
+              "id": "event_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "process_type",
+              "id": "process_type",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "event",
+              "id": "event",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "raw_request_id",
+              "id": "raw_request_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "foi_request_id",
+              "id": "foi_request_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "ministry_request_id",
+              "id": "ministry_request_id",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "status",
+              "id": "status",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "metadata",
+              "id": "metadata",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "comments",
+              "id": "comments",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            },
+            {
+              "defaultMatch": false,
+              "display": true,
+              "displayName": "occurred_at",
+              "id": "occurred_at",
+              "readOnly": false,
+              "removed": false,
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "value": {
+            "execution_id": "={{ $execution.id }}",
+            "event_id": "={{ $('Parse Request Body').first().json.eventId || null }}",
+            "process_type": "event-stale-skipped",
+            "event": "={{ $('Parse Request Body').first().json.event || null }}",
+            "raw_request_id": "={{ $('Parse Request Body').first().json.rawRequestId != null ? String($('Parse Request Body').first().json.rawRequestId) : null }}",
+            "foi_request_id": "={{ $('Parse Request Body').first().json.foiRequestId != null ? String($('Parse Request Body').first().json.foiRequestId) : null }}",
+            "ministry_request_id": "={{ $('Parse Request Body').first().json.ministryRequestId != null ? String($('Parse Request Body').first().json.ministryRequestId) : null }}",
+            "status": "={{ $('Parse Request Body').first().json.status != null ? String($('Parse Request Body').first().json.status) : null }}",
+            "comments": "Stale event skipped: a newer state event was already applied for this request.",
+            "occurred_at": "={{ $('Parse Request Body').first().json.occurredAt || null }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "19ce3931-9fd7-439d-b958-c197bce9adbf",
+      "name": "Audit: Stale Skipped",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3024,
+        1296
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "Records that an out-of-order state event was not processed. It does not write event-received, so it never moves the order watermark. The event is then acknowledged COMPLETED so its outbox row is closed, not left DELIVERED."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Builds the body of POST /api/foiworkflow/events/{event_id}/claim.\n// State events (the request changes) are order-checked by the API against the newest occurred_at already\n// allowed to run for the request (kept on the outbox rows); action events (payment, correspondence) and anything\n// unrecognised are always processed.\n// Intake events are ordered per raw request. Ministry-level events are ordered per ministry request (so one\n// ministry's event never makes another ministry's look stale); the claim also records the raw request id on the\n// row, which is what makes a late intake event stale.\nconst ev = $('Parse Request Body').first().json;\n\nconst INTAKE_STATE_EVENTS = ['foi-intake-assignment', 'foi-intake-complete', 'foi-intake-reopen'];\nconst MINISTRY_STATE_EVENTS = [\n  'foi-iao-open-assignment', 'foi-iao-open-complete', 'foi-iao-assignment', 'foi-iao-complete', 'foi-iao-reopen',\n  'foi-ministry-assignment', 'foi-ministry-complete',\n];\nconst text = (v) => (v === undefined || v === null || v === '' ? null : String(v));\n\nlet kind = 'action';\nlet scope = null;\nlet scopekey = null;\nif (INTAKE_STATE_EVENTS.includes(ev.event)) {\n  kind = 'state';\n  scope = 'raw_request_id';\n  scopekey = text(ev.rawRequestId);\n} else if (MINISTRY_STATE_EVENTS.includes(ev.event)) {\n  kind = 'state';\n  scope = 'ministry_request_id';\n  scopekey = text(ev.ministryRequestId);\n}\n\nconst claim = {\n  executionid: String($execution.id),\n  kind,\n  scope,\n  scopekey,\n  occurred_at: ev.occurredAt || null,\n  requestids: {\n    rawrequestid: text(ev.rawRequestId),\n    foirequestid: text(ev.foiRequestId),\n    ministryrequestid: text(ev.ministryRequestId),\n    status: text(ev.status),\n  },\n};\nreturn [{ json: { eventId: ev.eventId, claimPayload: JSON.stringify(claim) } }];"
+      },
+      "id": "a1b2c3d4-0001-4a00-8000-000000000001",
+      "name": "Build Claim Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1904,
+        1296
+      ],
+      "notes": "Why Code: the event-type lists and the scope choice branch over several fields; no single native node expresses it. Same ordering rules as the old Check Event Order node, minus the audit-table lookups."
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "iMchipXgogUVPriD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/iMchipXgogUVPriD",
+          "cachedResultName": "FOI Backend API Manager"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "category": "foi-event-claim",
+            "eventId": "={{ $json.eventId }}",
+            "eventExecutionId": "={{ $execution.id }}",
+            "claimPayload": "={{ $json.claimPayload }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawRequestId",
+              "displayName": "rawRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "foiRequestId",
+              "displayName": "foiRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ministryRequestId",
+              "displayName": "ministryRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawReqPayload",
+              "displayName": "rawReqPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reqPayload",
+              "displayName": "reqPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "servicekey",
+              "displayName": "servicekey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "saveDataPayload",
+              "displayName": "saveDataPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "eventId",
+              "displayName": "eventId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventStatus",
+              "displayName": "eventStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventError",
+              "displayName": "eventError",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventExecutionId",
+              "displayName": "eventExecutionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "claimPayload",
+              "displayName": "claimPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "a1b2c3d4-0002-4a00-8000-000000000002",
+      "name": "Claim Event",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "retryOnFail": false,
+      "position": [
+        2128,
+        1296
+      ],
+      "notes": "Asks the API whether this execution may process the event (decision: proceed, duplicate, in_progress or stale). Replaces the audit-table duplicate check and ordering lookups. If the API call fails the run fails: an event is never processed without the idempotency guard; the API sweeper flags it NO_OUTCOME and an admin replays it."
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d-proceed",
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "proceed",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "proceed"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d-duplicate",
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "duplicate",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "duplicate"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d-stale",
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "stale",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "stale"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d-inprogress",
+                    "leftValue": "={{ $json.decision }}",
+                    "rightValue": "in_progress",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "in_progress"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Unexpected"
+        }
+      },
+      "id": "a1b2c3d4-0003-4a00-8000-000000000003",
+      "name": "Claim Decision",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2352,
+        1248
+      ],
+      "notes": "proceed: process the event. duplicate: an earlier run already completed it (acknowledge again, nothing is applied twice). stale: a newer state event was already applied (acknowledge, skip). in_progress: another execution holds the claim (do nothing; that execution reports the outcome). Anything else stops the run."
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{ 'Unexpected claim decision from the API: ' + JSON.stringify($json) }}"
+      },
+      "id": "a1b2c3d4-0004-4a00-8000-000000000004",
+      "name": "Unexpected Claim Decision",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        2576,
+        1440
+      ],
+      "notes": "The API answered with something other than proceed, duplicate, stale or in_progress. Fail the run (the sweeper flags the event NO_OUTCOME; replay after the API is fixed)."
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "execution_id": "={{ $execution.id }}",
+            "event_id": "={{ $('Parse Request Body').first().json.eventId || null }}",
+            "process_type": "event-in-progress",
+            "event": "={{ $('Parse Request Body').first().json.event || null }}",
+            "raw_request_id": "={{ $('Parse Request Body').first().json.rawRequestId != null ? String($('Parse Request Body').first().json.rawRequestId) : null }}",
+            "foi_request_id": "={{ $('Parse Request Body').first().json.foiRequestId != null ? String($('Parse Request Body').first().json.foiRequestId) : null }}",
+            "ministry_request_id": "={{ $('Parse Request Body').first().json.ministryRequestId != null ? String($('Parse Request Body').first().json.ministryRequestId) : null }}",
+            "status": "={{ $('Parse Request Body').first().json.status != null ? String($('Parse Request Body').first().json.status) : null }}",
+            "comments": "Event skipped: another execution already holds the claim and will report the outcome.",
+            "occurred_at": "={{ $('Parse Request Body').first().json.occurredAt || null }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0005-4a00-8000-000000000005",
+      "name": "Audit: In Progress Skipped",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        3472,
+        1584
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "Records that a redelivery was not processed because the first execution is still running. No acknowledgement: the running execution reports the outcome (or the sweeper flags NO_OUTCOME after the lease)."
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Invalid Payload?": {
+      "main": [
+        [
+          {
+            "node": "Respond: Rejected (400)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond: Accepted (202)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond: Rejected (400)": {
+      "main": [
+        [
+          {
+            "node": "Audit: Other Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Restore Event Item": {
+      "main": [
+        [
+          {
+            "node": "Route Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start FOI Request Processing": {
+      "main": [
+        [
+          {
+            "node": "Parse Request Body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Request Body": {
+      "main": [
+        [
+          {
+            "node": "Execution Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execution Data": {
+      "main": [
+        [
+          {
+            "node": "Invalid Payload?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Event": {
+      "main": [
+        [
+          {
+            "node": "Raw Request Intake Processing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IAO Request Processing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ministry Request Processing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Payment Processing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: Other Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: Other Event": {
+      "main": [
+        [
+          {
+            "node": "Other Event (No Processing)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: Duplicate Skipped": {
+      "main": [
+        [
+          {
+            "node": "Has event_id?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has event_id?": {
+      "main": [
+        [
+          {
+            "node": "Event Ack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Event Ack": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: Stale Skipped": {
+      "main": [
+        [
+          {
+            "node": "Has event_id?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond: Accepted (202)": {
+      "main": [
+        [
+          {
+            "node": "Build Claim Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Claim Request": {
+      "main": [
+        [
+          {
+            "node": "Claim Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim Event": {
+      "main": [
+        [
+          {
+            "node": "Claim Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claim Decision": {
+      "main": [
+        [
+          {
+            "node": "Restore Event Item",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: Duplicate Skipped",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: Stale Skipped",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: In Progress Skipped",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unexpected Claim Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: In Progress Skipped": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Raw Request Intake Processing": {
+      "main": [
+        [
+          {
+            "node": "Has event_id?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IAO Request Processing": {
+      "main": [
+        [
+          {
+            "node": "Has event_id?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ministry Request Processing": {
+      "main": [
+        [
+          {
+            "node": "Has event_id?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Payment Processing": {
+      "main": [
+        [
+          {
+            "node": "Has event_id?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "errorWorkflow": "gH0MQxHnSI99SV1m",
+    "callerPolicy": "workflowsFromSameOwner",
+    "timeSavedMode": "fixed",
+    "availableInMCP": false
+  },
+  "versionId": "128609b5-a34b-47ca-b31e-fc7664b1baf1",
+  "meta": {
+    "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
+  },
+  "nodeGroups": [],
+  "id": "k7uNDsIHdIXgkBvL",
+  "tags": []
+}

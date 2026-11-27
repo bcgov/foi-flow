@@ -1,0 +1,1188 @@
+{
+  "name": "FOI Backend API Manager",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "category"
+            },
+            {
+              "name": "rawRequestId"
+            },
+            {
+              "name": "foiRequestId"
+            },
+            {
+              "name": "ministryRequestId"
+            },
+            {
+              "name": "rawReqPayload",
+              "type": "any"
+            },
+            {
+              "name": "reqPayload",
+              "type": "any"
+            },
+            {
+              "name": "servicekey",
+              "type": "any"
+            },
+            {
+              "name": "saveDataPayload",
+              "type": "any"
+            },
+            {
+              "name": "eventId"
+            },
+            {
+              "name": "eventStatus"
+            },
+            {
+              "name": "eventError"
+            },
+            {
+              "name": "eventExecutionId"
+            },
+            {
+              "name": "claimPayload",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "c417ad01-0cee-4c31-9172-f61ad97af1fc",
+      "name": "When Executed by Parent",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -896,
+        1344
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c3",
+                    "leftValue": "={{ $('Set Process Variables').item.json.category }}",
+                    "rightValue": "payonline",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "payonline"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c4",
+                    "leftValue": "={{ $('Set Process Variables').item.json.category }}",
+                    "rightValue": "foipayment-save",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "foipayment-save"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c5",
+                    "leftValue": "={{ $('Set Process Variables').item.json.category }}",
+                    "rightValue": "foipayment-cancel",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "foipayment-cancel"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c6",
+                    "leftValue": "={{ $('Set Process Variables').item.json.category }}",
+                    "rightValue": "foiemail",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "foiemail"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c7",
+                    "leftValue": "={{ $('Set Process Variables').item.json.category }}",
+                    "rightValue": "foinotifications-expiry",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "foinotifications-expiry"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c8",
+                    "leftValue": "={{ $('Set Process Variables').item.json.category }}",
+                    "rightValue": "foiemail-ack",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "foiemail-ack"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c9",
+                    "leftValue": "={{ $('Set Process Variables').item.json.category }}",
+                    "rightValue": "foi-cache-refresh",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "foi-cache-refresh"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c10",
+                    "leftValue": "={{ $('Set Process Variables').item.json.category }}",
+                    "rightValue": "foi-duedate-reminder",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "foi-duedate-reminder"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "10d62c4c-aeac-4f01-9bf6-cc4e00177a8a",
+                    "leftValue": "={{ $('Set Process Variables').item.json.category }}",
+                    "rightValue": "foi-event-ack",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "event-ack"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c11",
+                    "leftValue": "={{ $('Set Process Variables').item.json.category }}",
+                    "rightValue": "foi-event-claim",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "event-claim"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c12",
+                    "leftValue": "={{ $('Set Process Variables').item.json.category }}",
+                    "rightValue": "foi-event-by-execution",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "event-by-execution"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c13",
+                    "leftValue": "={{ $('Set Process Variables').item.json.category }}",
+                    "rightValue": "foipayment-get",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "foipayment-get"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c14",
+                    "leftValue": "={{ $('Set Process Variables').item.json.category }}",
+                    "rightValue": "foipayment-formsubmission-create",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "foipayment-formsubmission-create"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c15",
+                    "leftValue": "={{ $('Set Process Variables').item.json.category }}",
+                    "rightValue": "foipayment-formsubmission-update",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "foipayment-formsubmission-update"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Unrecognized Category"
+        }
+      },
+      "id": "1e246d2d-6df3-4e90-9a28-69f92dddfa92",
+      "name": "Category Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -224,
+        1136
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Set Process Variables').item.json.foi_api_url }}/api/foirequests/{{ $('Set Process Variables').item.json.foi_request_id }}/ministryrequest/{{ $('Set Process Variables').item.json.ministry_request_id }}/payonline",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "cc5d22c5-00d4-4d28-978a-3add7059d4f5",
+      "name": "GET Payment Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set Process Variables').item.json.foi_api_url }}/api/foipayment/{{ $('Set Process Variables').item.json.foi_request_id }}/ministryrequest/{{ $('Set Process Variables').item.json.ministry_request_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $('Set Process Variables').item.json.save_data_payload }}",
+        "options": {}
+      },
+      "id": "ef9399cc-8f97-452a-906f-4abcbb8ada75",
+      "name": "POST Save Payment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "position": [
+        0,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set Process Variables').item.json.foi_api_url }}/api/foipayment/{{ $('Set Process Variables').item.json.foi_request_id }}/ministryrequest/{{ $('Set Process Variables').item.json.ministry_request_id }}/cancel",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $('Set Process Variables').item.json.save_data_payload }}",
+        "options": {}
+      },
+      "id": "9cd76aa0-ff57-4cc3-9777-b0024f31d5fb",
+      "name": "POST Cancel Payment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "position": [
+        0,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set Process Variables').item.json.foi_api_url }}/api/foiemail/{{ $('Set Process Variables').item.json.foi_request_id }}/ministryrequest/{{ $('Set Process Variables').item.json.ministry_request_id }}/{{ $('Set Process Variables').item.json.servicekey }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $('Set Process Variables').item.json.save_data_payload }}",
+        "options": {}
+      },
+      "id": "593446b9-ecf4-4126-be6f-21b1f4fc2b9b",
+      "name": "POST Notify Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "position": [
+        0,
+        576
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set Process Variables').item.json.foi_api_url }}/api/foinotifications/{{ $('Set Process Variables').item.json.foi_request_id }}/ministryrequest/{{ $('Set Process Variables').item.json.ministry_request_id }}/payment/expiry",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ece7816b-0261-4b39-8874-b13eda352afd",
+      "name": "POST Expiry Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "position": [
+        0,
+        768
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set Process Variables').item.json.foi_api_url }}/api/foiemail/{{ $('Set Process Variables').item.json.foi_request_id }}/ministryrequest/{{ $('Set Process Variables').item.json.ministry_request_id }}/{{ $('Set Process Variables').item.json.servicekey }}/acknowledge",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6ae68735-a254-4fc4-ae32-829268968e6f",
+      "name": "POST Notify Email Ack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "position": [
+        0,
+        960
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set Process Variables').item.json.foi_api_url }}/api/foiflow/cache/refresh",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "74196b18-d947-4c2e-8cd5-6f99c0c03e08",
+      "name": "Invoke Cache Refresh API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "position": [
+        0,
+        1152
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set Process Variables').item.json.foi_api_url }}/api/foinotifications/reminder",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "da87a355-13b5-4077-a8aa-5d844e23ebe0",
+      "name": "Invoke Reminder API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": false,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "position": [
+        0,
+        1344
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "=Unrecognized category '{{ $('Set Process Variables').item.json.category }}' received by FOI Request API Manager."
+      },
+      "id": "bf8da485-af49-49fe-a7f9-61940c6ac849",
+      "name": "Unrecognized Category",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        0,
+        1728
+      ]
+    },
+    {
+      "parameters": {
+        "processingMode": "verify",
+        "scope": "=",
+        "clockTolerance": 30
+      },
+      "id": "301bc02f-0e1a-4c84-a029-7582d1a4b368",
+      "name": "FOI OIDC Token",
+      "type": "CUSTOM.oidcToken",
+      "typeVersion": 1,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "position": [
+        -448,
+        1344
+      ],
+      "credentials": {
+        "oidcToken": {
+          "id": "ZorFhF5FYHZqnUF6",
+          "name": "FOI OIDC"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "94c58b14-d784-4435-9bd1-80b3628d6068",
+              "name": "category",
+              "value": "={{ $json.category }}",
+              "type": "string"
+            },
+            {
+              "id": "d7fd774d-5f63-4f01-b5d2-84c9f52d509c",
+              "name": "raw_request_id",
+              "value": "={{ $json.rawRequestId }}",
+              "type": "string"
+            },
+            {
+              "id": "dc2b2ecd-c9fa-4ff1-85a4-3c34bf44255a",
+              "name": "foi_request_id",
+              "value": "={{ $json.foiRequestId }}",
+              "type": "string"
+            },
+            {
+              "id": "ddb83081-0fc8-40f9-ba89-7969187ce3ac",
+              "name": "ministry_request_id",
+              "value": "={{ $json.ministryRequestId }}",
+              "type": "string"
+            },
+            {
+              "id": "e6c200fa-4a07-44ec-9795-7311c59043be",
+              "name": "raw_req_payload",
+              "value": "={{ $json.rawReqPayload }}",
+              "type": "string"
+            },
+            {
+              "id": "d2568c1d-a3b5-4a96-921c-a92256e5f7fb",
+              "name": "req_payload",
+              "value": "={{ $json.reqPayload }}",
+              "type": "string"
+            },
+            {
+              "id": "63c65d2f-8512-49b8-ae7d-a090753d945e",
+              "name": "servicekey",
+              "value": "={{ $json.servicekey }}",
+              "type": "string"
+            },
+            {
+              "id": "9fd5eff3-0d58-4636-b1e7-c17923abf6bf",
+              "name": "save_data_payload",
+              "value": "={{ $json.saveDataPayload }}",
+              "type": "string"
+            },
+            {
+              "id": "5c505c85-9aef-472d-b86e-979cf90f0ec0",
+              "name": "eventId",
+              "value": "={{ $json.eventId }}",
+              "type": "string"
+            },
+            {
+              "id": "7ceecb92-5777-42ae-aeee-2c61eb746a68",
+              "name": "eventStatus",
+              "value": "={{ $json.eventStatus }}",
+              "type": "string"
+            },
+            {
+              "id": "16e61c0d-d1e1-4d07-a3b8-0ec172093a05",
+              "name": "eventError",
+              "value": "={{ $json.eventError }}",
+              "type": "string"
+            },
+            {
+              "id": "dc046467-9fb8-4114-823c-4aa2de4e8bc3",
+              "name": "eventExecutionId",
+              "value": "={{ $json.eventExecutionId }}",
+              "type": "string"
+            },
+            {
+              "id": "6fad3eb1-6fab-4469-a775-8364f1031934",
+              "name": "claimPayload",
+              "value": "={{ $json.claimPayload }}",
+              "type": "string"
+            },
+            {
+              "id": "4d87af8a-a4c4-48d3-a926-fa3d72196d4b",
+              "name": "foi_api_url",
+              "value": "={{ $vars.FOI_API_URL }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "42210745-22db-494b-9ebc-e419fea3b0ef",
+      "name": "Set Process Variables",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -672,
+        1344
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI Backend API Manager\n\n**Purpose:**\nShared gateway for every call the FOI n8n workflows make to the FOI request-management API. Callers pass a `category` and this workflow makes the matching authenticated REST call.\n\n**Trigger/Entry:**\nSub-workflow only. Inputs: `category`, `rawRequestId`, `foiRequestId`, `ministryRequestId`, `rawReqPayload`, `reqPayload`, `servicekey`, `saveDataPayload`, `eventId`, and (for `foi-event-ack` only) the optional `eventStatus` (default COMPLETED; FOI Error Handler sends FAILED), `eventError` and `eventExecutionId`.\n\n**Processing:**\nMaps the inputs and the API base URL (`foi_api_url`), gets a bearer token from FOI OIDC, then `Category Router` picks one HTTP call (each retries up to 3 times).\n\n**Integration/Outcome:**\nCategories: `payonline` (payment details), `foipayment-save`, `foipayment-cancel`, `foipayment-get` (latest payment version, read-only), `foiemail`, `foiemail-ack`, `foinotifications-expiry`, `foi-cache-refresh`, `foi-duedate-reminder`, `foi-event-ack`, `foipayment-formsubmission-create` (POST, `reqPayload` `{formType: payonline | payoutstanding}`, returns `formId`, `submissionId`, `paymentUrl`; never retried because each call makes a new submission), `foipayment-formsubmission-update` (PATCH, `reqPayload` `{formId, submissionId, paymentStatus: PAID | CANCELLED, status?}`). Returns the API response to the caller. An unknown category stops with an error.",
+        "height": 568,
+        "width": 620,
+        "color": 4
+      },
+      "id": "0fe85048-62e5-4708-952a-91fe42a9ac91",
+      "name": "Developer Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1712,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $('Set Process Variables').item.json.foi_api_url }}/api/foiworkflow/events/{{ $('Set Process Variables').first().json.eventId }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({ status: $('Set Process Variables').first().json.eventStatus || 'COMPLETED', executionid: $('Set Process Variables').first().json.eventExecutionId || $execution.id, error: $('Set Process Variables').first().json.eventError || undefined }) }}",
+        "options": {}
+      },
+      "id": "e836a646-8438-49b6-a0f0-04d0a93ec5fa",
+      "name": "Acknowledge: Outcome",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "position": [
+        0,
+        1536
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "Reports the outcome to the API outbox. Default is COMPLETED (DELIVERED -> COMPLETED), called by FOI Request Routing. FOI Error Handler passes eventStatus=FAILED, eventError and the failed run's id (DELIVERED -> FAILED). Idempotent PUT, so retry is safe. Also runs for skipped duplicates so a replayed event that had already completed is closed. A failure here is not a business failure: it continues, and the API sweeper flags an event with no outcome."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set Process Variables').item.json.foi_api_url }}/api/foiworkflow/events/{{ $('Set Process Variables').first().json.eventId }}/claim",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $('Set Process Variables').item.json.claimPayload }}",
+        "options": {}
+      },
+      "id": "7d1c2b90-3f4a-4c6e-9a51-0b8e6f2a1c01",
+      "name": "POST Claim Event",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 1000,
+      "position": [
+        0,
+        1920
+      ],
+      "notes": "Why HTTP: no node for the FOI API. Asks the API whether this execution may process the event: proceed, duplicate, in_progress or stale (one transaction on the outbox row and the ordering watermark). Retry is safe: the same execution id may claim again. Fails the run on error (never process without the idempotency guard); the API sweeper flags the event NO_OUTCOME and an admin replays it."
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Set Process Variables').item.json.foi_api_url }}/api/foiworkflow/executions/{{ $('Set Process Variables').first().json.eventExecutionId }}/event",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8e2d3ca1-4a5b-4d7f-8b62-1c9f7a3b2d02",
+      "name": "GET Event By Execution",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000,
+      "position": [
+        0,
+        2112
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "Why HTTP: no node for the FOI API. Maps a failed n8n execution id to the event it claimed (event_id, event, raw_request_id, foi_request_id, ministry_request_id, status; found=false when the run failed before claiming). Used by FOI Error Handler. Continues on error so the failure is still recorded and alerted."
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Set Process Variables').item.json.foi_api_url }}/api/foipayment/{{ $('Set Process Variables').item.json.foi_request_id }}/ministryrequest/{{ $('Set Process Variables').item.json.ministry_request_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "28522bdb-ffad-4e0a-b3d3-ad0e18fa4d03",
+      "name": "GET FOI Payment",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "position": [
+        0,
+        2304
+      ],
+      "notes": "Why HTTP: no node for the FOI API. Read-only: latest payment version of the ministry request (paidamount, createdby, version). Used by FOI Fee Payment Outcome to verify a payment is unpaid and not System_Cancel before expiring it (R09). The API returns the record as a JSON string."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set Process Variables').item.json.foi_api_url }}/api/foipayment/{{ $('Set Process Variables').item.json.foi_request_id }}/ministryrequest/{{ $('Set Process Variables').item.json.ministry_request_id }}/formsubmission",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $('Set Process Variables').item.json.req_payload }}",
+        "options": {}
+      },
+      "id": "3b9e6a52-7c1d-4f0a-9b34-5e2a8d6c4f11",
+      "name": "POST Create Payment Form Submission",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": false,
+      "position": [
+        0,
+        2496
+      ],
+      "notes": "Why HTTP: no node for the FOI API. Creates the applicant's Form.io payment submission (the API holds the Form.io login) and returns formId, submissionId and paymentUrl. NOT idempotent: every call makes a new submission, so never turn on retries."
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "={{ $('Set Process Variables').item.json.foi_api_url }}/api/foipayment/{{ $('Set Process Variables').item.json.foi_request_id }}/ministryrequest/{{ $('Set Process Variables').item.json.ministry_request_id }}/formsubmission",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ $('Set Process Variables').item.json.req_payload }}",
+        "options": {}
+      },
+      "id": "c47d2f08-1a6b-4e93-8d25-9f0b7a3e6c22",
+      "name": "PATCH Update Payment Form Submission",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "position": [
+        0,
+        2688
+      ],
+      "notes": "Why HTTP: no node for the FOI API. Sets paymentstatus (PAID or CANCELLED) and optionally status on the applicant's payment submission. Safe to retry."
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Parent": {
+      "main": [
+        [
+          {
+            "node": "Set Process Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Category Router": {
+      "main": [
+        [
+          {
+            "node": "GET Payment Details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "POST Save Payment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "POST Cancel Payment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "POST Notify Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "POST Expiry Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "POST Notify Email Ack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invoke Cache Refresh API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Invoke Reminder API",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Acknowledge: Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "POST Claim Event",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GET Event By Execution",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GET FOI Payment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "POST Create Payment Form Submission",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "PATCH Update Payment Form Submission",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unrecognized Category",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FOI OIDC Token": {
+      "main": [
+        [
+          {
+            "node": "Category Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Process Variables": {
+      "main": [
+        [
+          {
+            "node": "FOI OIDC Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e0c9a04d-32e0-4ac1-bf00-754c10040985",
+  "meta": {
+    "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
+  },
+  "nodeGroups": [],
+  "id": "iMchipXgogUVPriD",
+  "tags": []
+}

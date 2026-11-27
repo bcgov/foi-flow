@@ -1,0 +1,2885 @@
+{
+  "name": "FOI Fee Initiation",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "event"
+            },
+            {
+              "name": "eventId"
+            },
+            {
+              "name": "occurredAt"
+            },
+            {
+              "name": "feeAction"
+            },
+            {
+              "name": "triggeredBy"
+            },
+            {
+              "name": "category"
+            },
+            {
+              "name": "paymentStatus"
+            },
+            {
+              "name": "serviceKey"
+            },
+            {
+              "name": "templateName"
+            },
+            {
+              "name": "applicantCorrespondenceId",
+              "type": "any"
+            },
+            {
+              "name": "rawRequestId",
+              "type": "any"
+            },
+            {
+              "name": "foiRequestId",
+              "type": "any"
+            },
+            {
+              "name": "ministryRequestId",
+              "type": "any"
+            },
+            {
+              "name": "fileNumber"
+            },
+            {
+              "name": "status"
+            },
+            {
+              "name": "previousStatus"
+            },
+            {
+              "name": "assignedTo"
+            },
+            {
+              "name": "assignedGroup"
+            },
+            {
+              "name": "isPaymentActive",
+              "type": "any"
+            },
+            {
+              "name": "isSync",
+              "type": "any"
+            },
+            {
+              "name": "isOfflinePayment",
+              "type": "any"
+            },
+            {
+              "name": "paymentExpiryDate"
+            },
+            {
+              "name": "metadata",
+              "type": "any"
+            },
+            {
+              "name": "executionId",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "d410aec6-8213-4bd4-bdbb-b54746ed8226",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        240,
+        544
+      ],
+      "notes": "Executed by FOI Fee Processing (router) for feeAction = initiate. Fixed fields match the foi-fee-payment event items sent by FOI IAO Complete Process / FOI IAO Correspondence Process."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalises a fee / payment event so this workflow can be executed on its own.\n// Accepts: foi-fee-payment / foi-manage-payment items from FOI Request Routing (normalised fields +\n// `payload` + `metadata`), the snake_case inputs sent by the IAO sub-workflows (feeAction initiate/cancel),\n// and foi-payment-expired items from FOI Payment Expiry SLA Job.\n// Replaces the old Wait-based model: each outcome (PAID / CANCELLED / EXPIRED) is its own execution.\ntry {\n\nconst src = $input.first().json || {};\n\nconst parseJson = (value) => {\n  if (value && typeof value === 'object') return value;\n  if (typeof value === 'string' && value.trim()) {\n    try { return JSON.parse(value); } catch (e) {\n      try { return JSON.parse(value.replace(/'/g, '\"')); } catch (e2) { return {}; }\n    }\n  }\n  return {};\n};\nconst first = (...values) => {\n  for (const v of values) { if (v !== undefined && v !== null && v !== '') return v; }\n  return null;\n};\n// const str = (v) => (v === undefined || v === null ? '' : String(v));\nconst str = (v) =>\n  v === undefined || v === null\n    ? ''\n    : typeof v === 'object'\n      ? JSON.stringify(v)\n      : typeof v === 'string'\n        ? v\n        : String(v);\n\nconst bool = (v) => v === true || (typeof v === 'string' && v.trim().toLowerCase() === 'true');\n\nconst metadata = parseJson(src.metadata);\nconst foiRequestMetaData = parseJson(metadata?.foiRequestMetaData);\nconst event = str(src.event);\nconst eventId = str(src.eventId);\nconst occurredAt = str(src.occurredAt);\nconst status = str(first(src?.status, metadata?.status));\nconst category = str(src.category);\nconst paymentStatus = str(first(src.paymentStatus, metadata?.paymentstatus)).toUpperCase();\n\nlet feeAction = str(src.feeAction);\nif (!feeAction) {\n  if (event === 'foi-fee-payment' || category === 'foi-fee-payment') {\n    feeAction = 'initiate';\n  } else if (event === 'foi-payment-expired') {\n    feeAction = 'expire';\n  } else if (event === 'foi-manage-payment' || category === 'foi-manage-payment') {\n    feeAction = paymentStatus === 'PAID' ? 'paid' : (paymentStatus === 'CANCELLED' ? 'cancel' : (paymentStatus === 'EXPIRED' ? 'expire' : 'unsupported'));\n  } else {\n    feeAction = 'unsupported';\n  }\n}\n\nconst fileNumber = str(src.fileNumber);\nconst applicantCorrespondenceId = str(first(src.applicantCorrespondenceId, foiRequestMetaData?.applicantcorrespondenceid, metadata?.applicantCorrespondenceId));\nconst templateName = str(first(src.templateName, foiRequestMetaData?.templatename, metadata?.templateName));\nconst paymentExpiryDate = str(first(src.paymentExpiryDate, foiRequestMetaData?.paymentExpiryDate));\n\nreturn [{\n  json: {\n    event,\n    eventId,\n    occurredAt,\n    feeAction,\n    category,\n    applicantCorrespondenceId,\n    templateName,\n    paymentStatus: paymentStatus,\n    isOfflinePayment: bool(src.isOfflinePayment),\n    isSync: bool(src.isSync),\n    isPaymentActive: bool(src.isPaymentActive),\n    rawRequestId: str(first(src.rawRequestId,metadata?.rawRequestId)),\n    foiRequestId: str(src.foiRequestId),\n    ministryRequestId: str(src.ministryRequestId),\n    serviceKey: str(src?.serviceKey),\n    paymentExpiryDate,\n    status,\n    previousStatus: str(src.previousStatus),\n    nextStateName: str(foiRequestMetaData?.nextStateName),\n    fileNumber: fileNumber,\n    triggeredBy: str(first(src.triggeredBy, src?.event)),\n    metadata: str(metadata),\n    executionId: $execution.id\n  }\n}];\n  \n} catch (error) {\n  const src = $input.first().json || {};\n    return {\n      json: {\n        event: '',\n        eventId: (src && typeof src === 'object' && typeof src.eventId === 'string') ? src.eventId : null,\n        receivedEvent: (src && typeof src === 'object' && typeof src.event === 'string') ? src.event : null,\n        error: true,\n        errorMessage: error.message,\n        metadata: src.metadata ?? null,\n        executionId: $execution.id,\n      },\n    };\n}\n\n"
+      },
+      "id": "6ae2d220-588b-4b38-8e20-0632f593e10f",
+      "name": "Set Event Variables",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c123dbea-bca3-441d-8cf9-dc342ab817d5",
+              "name": "FORMSFLOW_API_URL",
+              "type": "string",
+              "value": "={{ $vars.FORMSFLOW_API_URL }}"
+            },
+            {
+              "id": "46edb0be-3f56-48c0-a1d5-bf3a6e81cfb5",
+              "name": "=FORMIO_URL",
+              "value": "={{ $vars.FORMIO_URL }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "fb763426-c1cd-47b2-8af1-fd55517981c9",
+      "name": "Set Process Vars",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        688,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'Fee payment requested' + ($('Set Event Variables').item.json.triggeredBy ? ' by ' + $('Set Event Variables').item.json.triggeredBy : '') + ' (service key: ' + ($('Set Event Variables').item.json.serviceKey || 'n/a') + ', template: ' + ($('Set Event Variables').item.json.templateName || 'n/a') + ', previous status: ' + ($('Set Event Variables').item.json.previousStatus || 'n/a') + ', payment expiry date: ' + ($('Set Event Variables').item.json.paymentExpiryDate || 'n/a') + '). Retrieving payment details to create the online payment.' }}",
+            "event": "={{ $('Set Event Variables').item.json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $('Set Event Variables').item.json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $('Set Event Variables').item.json.ministryRequestId || null }}",
+            "process_type": "fee-process",
+            "status": "={{ $('Set Event Variables').item.json.status || null }}",
+            "raw_request_id": "={{ $('Set Event Variables').item.json.rawRequestId }}",
+            "event_id": "={{ $('Set Event Variables').item.json.eventId }}",
+            "occurred_at": "={{ $('Set Event Variables').item.json.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "d4b2eafe-c8b7-4a4c-a0d0-c0f42a0c8081",
+      "name": "Audit: Fee Payment Initiated",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        912,
+        544
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "iMchipXgogUVPriD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/iMchipXgogUVPriD",
+          "cachedResultName": "FOI-DEV — FOI Backend API Manager"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "category": "payonline",
+            "foiRequestId": "={{ $('Set Event Variables').item.json.foiRequestId || null }}",
+            "ministryRequestId": "={{ $('Set Event Variables').item.json.ministryRequestId || null }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawRequestId",
+              "displayName": "rawRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "foiRequestId",
+              "displayName": "foiRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ministryRequestId",
+              "displayName": "ministryRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawReqPayload",
+              "displayName": "rawReqPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reqPayload",
+              "displayName": "reqPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "servicekey",
+              "displayName": "servicekey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "saveDataPayload",
+              "displayName": "saveDataPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "eventId",
+              "displayName": "eventId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventStatus",
+              "displayName": "eventStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventError",
+              "displayName": "eventError",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventExecutionId",
+              "displayName": "eventExecutionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "claimPayload",
+              "displayName": "claimPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "96df6bbe-1dcd-4da2-b250-8090a809d2c7",
+      "name": "GET Payment Details",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "retryOnFail": true,
+      "position": [
+        1136,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Only what this workflow needs: the online payment gate and the payment form type.\n// The API fills in the submission itself (FOI Backend API Manager, foipayment-formsubmission-create).\ntry {\n  const resp = $json.body;\n  const balanceDueRaw = (resp.cfrfee && resp.cfrfee.feedata) ? resp.cfrfee.feedata.balanceDue : undefined;\n  \n  const previousStatus = $('Set Event Variables').item.json.previousStatus;\n  const templateName = $('Set Event Variables').item.json.templateName;\n  const formType = (previousStatus === 'Response' || (templateName && templateName.toLowerCase() === 'payoutstanding'))\n    ? 'payoutstanding'\n    : 'payonline';\n  \n  return {\n    json: {\n      fee: parseFloat(balanceDueRaw),\n      hasEmail: resp.hasEmail === true,\n      isOfflinePayment: resp.isofflinepayment,\n      formType\n    }\n  };\n} catch (error) {\n  const input = $('Set Event Variables').first().json || {};\n    return {\n      json: {\n        event: '',\n        receivedEvent: (input && typeof input === 'object' && typeof input.event === 'string') ? input.event : null,\n        error: true,\n        errorMessage: error.message,\n        metadata: input.metadata ?? null,\n        executionId: $execution.id,\n      },\n    };\n}"
+      },
+      "id": "3d0c9570-362e-4a5b-97d5-96e80f994571",
+      "name": "Compute Payment Vars",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b1",
+              "leftValue": "={{ $json.fee }}",
+              "operator": {
+                "operation": "gt",
+                "type": "number"
+              },
+              "rightValue": 0
+            },
+            {
+              "id": "b2",
+              "leftValue": "={{ $json.hasEmail }}",
+              "operator": {
+                "operation": "true",
+                "singleValue": true,
+                "type": "boolean"
+              },
+              "rightValue": ""
+            },
+            {
+              "id": "b3",
+              "leftValue": "={{ $json.isOfflinePayment }}",
+              "operator": {
+                "operation": "false",
+                "singleValue": true,
+                "type": "boolean"
+              },
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "d6d7243d-796a-4858-b575-2e0406b30aa1",
+      "name": "Balance Due > 0?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1584,
+        544
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "99e8279d-8b80-49f1-9f12-90a917f52a60",
+      "name": "End (No Online Payment)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2032,
+        640
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'No online payment created: balance due ' + $('Compute Payment Vars').item.json.fee + ', applicant email ' + ($('Compute Payment Vars').item.json.hasEmail ? 'present' : 'missing') + ', offline payment ' + $('Compute Payment Vars').item.json.isOfflinePayment + '.' }}",
+            "execution_id": "={{ $execution.id }}",
+            "process_type": "fee-process",
+            "event": "={{ $('Set Event Variables').item.json.event }}",
+            "raw_request_id": "={{ $('Set Event Variables').item.json.rawRequestId || null }}",
+            "foi_request_id": "={{ $('Set Event Variables').item.json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $('Set Event Variables').item.json.ministryRequestId || null }}",
+            "status": "={{ $('Set Event Variables').item.json.status || null }}",
+            "event_id": "={{ $('Set Event Variables').item.json.eventId }}",
+            "occurred_at": "={{ $('Set Event Variables').item.json.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "9b9b0c50-03e5-4c12-9a99-940528960944",
+      "name": "Audit: No Online Payment",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1808,
+        640
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-payment-sla",
+          "mode": "list",
+          "value": "012PySsVgvdHQbkn",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/012PySsVgvdHQbkn"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ministry_request_id",
+              "keyValue": "={{ $('Set Event Variables').item.json.ministryRequestId }}"
+            },
+            {
+              "keyName": "sla_type",
+              "keyValue": "payment-expiry"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "id": "38a72127-e48c-4965-8dee-4dffff3d8d1f",
+      "name": "Get Initiation SLA Rows",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "alwaysOutputData": true,
+      "position": [
+        1808,
+        448
+      ],
+      "notes": "G12: reads every payment-expiry row of the ministry request so Plan Payment SLA can find an open (PENDING / ACTIVE) one."
+    },
+    {
+      "parameters": {
+        "jsCode": "// G12: plans the PENDING payment SLA row for an initiation, before anything is created in Form.io.\n// At most one non-terminal (PENDING or ACTIVE) row exists per ministry request: it is reused, never duplicated.\n// A PENDING row left by an earlier run of the SAME initiation (same correspondence, template and expiry date) keeps\n// its Form.io ids, so a replay does not create a second submission. A different initiation, or an ACTIVE row that a\n// new initiation supersedes, starts a fresh submission on the same row.\nconst rows = $input.all()\n  .map((item) => item.json)\n  .filter((row) => row && row.id !== undefined && row.id !== null && row.id !== '');\nconst vars = $('Set Event Variables').first().json;\n\nconst clean = (value) => {\n  const text = String(value ?? '').trim();\n  return text === 'undefined' || text === 'null' ? '' : text;\n};\nconst newestFirst = (a, b) => {\n  const byCreated = String(b.createdAt ?? '').localeCompare(String(a.createdAt ?? ''));\n  return byCreated !== 0 ? byCreated : Number(b.id) - Number(a.id);\n};\n\nconst open = rows.filter((row) => row.sla_status === 'PENDING' || row.sla_status === 'ACTIVE').sort(newestFirst);\nconst current = open[0] || null;\n\nconst sameInitiation = Boolean(current)\n  && current.sla_status === 'PENDING'\n  && clean(current.applicant_correspondence_id) === clean(vars.applicantCorrespondenceId)\n  && clean(current.template_name) === clean(vars.templateName)\n  && clean(current.payment_expiry_date) === clean(vars.paymentExpiryDate);\nconst reuseIds = sameInitiation && ['form_id', 'submission_id', 'payment_url'].every((name) => Boolean(clean(current[name])));\n\nconst serviceKey = vars.serviceKey === 'correspondence'\n  ? 'correspondence'\n  : (vars.previousStatus === 'Response' ? 'payoutstanding' : 'payonline');\n\nreturn [{\n  json: {\n    openRowId: current ? current.id : null,\n    openStatus: current ? current.sla_status : '',\n    duplicateOpenIds: open.slice(1).map((row) => row.id),\n    reuseIds,\n    formId: reuseIds ? clean(current.form_id) : '',\n    submissionId: reuseIds ? clean(current.submission_id) : '',\n    paymentUrl: reuseIds ? clean(current.payment_url) : '',\n    slaType: 'payment-expiry',\n    foiRequestId: String(vars.foiRequestId || ''),\n    ministryRequestId: String(vars.ministryRequestId || ''),\n    fileNumber: String(vars.fileNumber || ''),\n    serviceKey,\n    templateName: String(vars.templateName || ''),\n    previousStatus: String(vars.previousStatus || ''),\n    nextStateName: String(vars.nextStateName || ''),\n    applicantCorrespondenceId: String(vars.applicantCorrespondenceId || ''),\n    paymentExpiryDate: String(vars.paymentExpiryDate || ''),\n    metadata: vars.metadata\n  },\n  pairedItem: { item: 0 }\n}];\n"
+      },
+      "id": "3269ab50-dccf-494b-8d27-ae6b75294192",
+      "name": "Plan Payment SLA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        448
+      ],
+      "notes": "G12: reuses the open row (and the Form.io ids of a PENDING row from the same initiation) or plans a new one. Never more than one non-terminal row per ministry request."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "de41640c-2173-4603-9d80-59147f8d88a2",
+              "leftValue": "={{ $json.openRowId !== null && $json.openRowId !== undefined }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "2f9979fa-3fc9-4c1d-bcef-1b0305dd0b40",
+      "name": "Open SLA Row Exists?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2256,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-payment-sla",
+          "mode": "list",
+          "value": "012PySsVgvdHQbkn",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/012PySsVgvdHQbkn"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "applicant_correspondence_id": "={{ $('Plan Payment SLA').item.json.applicantCorrespondenceId }}",
+            "comments": "={{ 'PENDING: payment initiation started in execution ' + $execution.id + ($('Plan Payment SLA').item.json.reuseIds ? ' (replay: reusing Form.io submission ' + $('Plan Payment SLA').item.json.submissionId + ').' : '.') + ($('Plan Payment SLA').item.json.duplicateOpenIds.length ? ' Other non-terminal rows found: ' + $('Plan Payment SLA').item.json.duplicateOpenIds.join(', ') + '.' : '') }}",
+            "file_number": "={{ $('Plan Payment SLA').item.json.fileNumber }}",
+            "foi_request_id": "={{ $('Plan Payment SLA').item.json.foiRequestId }}",
+            "metadata": "={{ $('Plan Payment SLA').item.json.metadata }}",
+            "ministry_request_id": "={{ $('Plan Payment SLA').item.json.ministryRequestId }}",
+            "next_state_name": "={{ $('Plan Payment SLA').item.json.nextStateName }}",
+            "payment_expiry_date": "={{ $('Plan Payment SLA').item.json.paymentExpiryDate }}",
+            "payment_status": "NOT PAID",
+            "prev_status": "={{ $('Plan Payment SLA').item.json.previousStatus }}",
+            "service_key": "={{ $('Plan Payment SLA').item.json.serviceKey }}",
+            "sla_status": "PENDING",
+            "sla_type": "={{ $('Plan Payment SLA').item.json.slaType }}",
+            "started_execution_id": "={{ $execution.id }}",
+            "template_name": "={{ $('Plan Payment SLA').item.json.templateName }}"
+          },
+          "matchingColumns": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "5d79b11f-4e6a-4030-8b6d-3ac8e1f4f261",
+      "name": "Register Pending Payment SLA",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        2480,
+        544
+      ],
+      "notes": "G12: the payment is tracked as PENDING before the Form.io submission exists, so a failure leaves a detectable row."
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-payment-sla",
+          "mode": "list",
+          "value": "012PySsVgvdHQbkn",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/012PySsVgvdHQbkn"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ministry_request_id",
+              "keyValue": "={{ $('Plan Payment SLA').item.json.ministryRequestId }}"
+            },
+            {
+              "keyName": "sla_type",
+              "keyValue": "payment-expiry"
+            },
+            {
+              "keyValue": "={{ $('Plan Payment SLA').item.json.openRowId ?? -1 }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "applicant_correspondence_id": "={{ $('Plan Payment SLA').item.json.applicantCorrespondenceId }}",
+            "comments": "={{ 'PENDING: payment initiation started in execution ' + $execution.id + ($('Plan Payment SLA').item.json.reuseIds ? ' (replay: reusing Form.io submission ' + $('Plan Payment SLA').item.json.submissionId + ').' : '.') + ($('Plan Payment SLA').item.json.duplicateOpenIds.length ? ' Other non-terminal rows found: ' + $('Plan Payment SLA').item.json.duplicateOpenIds.join(', ') + '.' : '') }}",
+            "file_number": "={{ $('Plan Payment SLA').item.json.fileNumber }}",
+            "foi_request_id": "={{ $('Plan Payment SLA').item.json.foiRequestId }}",
+            "metadata": "={{ $('Plan Payment SLA').item.json.metadata }}",
+            "ministry_request_id": "={{ $('Plan Payment SLA').item.json.ministryRequestId }}",
+            "next_state_name": "={{ $('Plan Payment SLA').item.json.nextStateName }}",
+            "payment_expiry_date": "={{ $('Plan Payment SLA').item.json.paymentExpiryDate }}",
+            "payment_status": "NOT PAID",
+            "prev_status": "={{ $('Plan Payment SLA').item.json.previousStatus }}",
+            "service_key": "={{ $('Plan Payment SLA').item.json.serviceKey }}",
+            "sla_status": "PENDING",
+            "sla_type": "={{ $('Plan Payment SLA').item.json.slaType }}",
+            "started_execution_id": "={{ $execution.id }}",
+            "template_name": "={{ $('Plan Payment SLA').item.json.templateName }}",
+            "form_id": "={{ $('Plan Payment SLA').item.json.formId }}",
+            "payment_url": "={{ $('Plan Payment SLA').item.json.paymentUrl }}",
+            "submission_id": "={{ $('Plan Payment SLA').item.json.submissionId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "sla_type",
+              "displayName": "sla_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "sla_status",
+              "displayName": "sla_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "file_number",
+              "displayName": "file_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry",
+              "displayName": "ministry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "service_key",
+              "displayName": "service_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "template_name",
+              "displayName": "template_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "prev_status",
+              "displayName": "prev_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "next_state_name",
+              "displayName": "next_state_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "applicant_correspondence_id",
+              "displayName": "applicant_correspondence_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "payment_status",
+              "displayName": "payment_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "payment_url",
+              "displayName": "payment_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "form_id",
+              "displayName": "form_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "submission_id",
+              "displayName": "submission_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "payment_expiry_date",
+              "displayName": "payment_expiry_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "expires_at",
+              "displayName": "expires_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "started_execution_id",
+              "displayName": "started_execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "completed_execution_id",
+              "displayName": "completed_execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "completed_at",
+              "displayName": "completed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "b150c7e8-376e-4d00-b74e-f95c8e293366",
+      "name": "Update Pending Payment SLA",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "alwaysOutputData": true,
+      "position": [
+        2480,
+        352
+      ],
+      "notes": "G12: re-uses the open row. The Form.io ids are kept only for a replay of the same initiation; otherwise they are cleared."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Both the insert and the update branch end here: take the id of the PENDING row that was written.\nconst plan = $('Plan Payment SLA').first().json;\nconst written = $input.first().json || {};\nconst slaId = written.id ?? plan.openRowId;\nif (slaId === undefined || slaId === null || slaId === '') {\n  throw new Error('The PENDING payment SLA row was not written (no row id returned).');\n}\nreturn [{ json: { ...plan, slaId }, pairedItem: { item: 0 } }];\n"
+      },
+      "id": "db4248a7-fe3c-43ba-9d32-65f2fbfb2740",
+      "name": "Pending SLA Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2704,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9ae7f56c-e76c-4bc5-86cc-494c891756c3",
+              "leftValue": "={{ $json.reuseIds === true }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "952cd02c-2dcc-4003-997d-0acc3872dad3",
+      "name": "Has Stored Form Ids?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2928,
+        448
+      ],
+      "notes": "G12: true on a replay of an initiation whose Form.io submission already exists."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "de5ca557-3d8d-4055-9903-194de4cf2fde",
+              "name": "formId",
+              "type": "string",
+              "value": "={{ $('Create Payment Form Submission').isExecuted ? $('Create Payment Form Submission').first().json.formId : $json.formId }}"
+            },
+            {
+              "id": "4c246dee-55fe-463b-9bba-8eeb9037d37a",
+              "name": "submissionId",
+              "type": "string",
+              "value": "={{ $('Create Payment Form Submission').isExecuted ? $('Create Payment Form Submission').first().json.submissionId : $json.submissionId }}"
+            },
+            {
+              "id": "9b1f6a2c-0d4e-4c7a-8f35-6e2d1a9b7c40",
+              "name": "paymentUrl",
+              "type": "string",
+              "value": "={{ $('Create Payment Form Submission').isExecuted ? $('Create Payment Form Submission').first().json.paymentUrl : $json.paymentUrl }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "76604772-1dc1-4bf6-a8c2-b97563dd74f0",
+      "name": "Resolve Form Ids",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3824,
+        448
+      ],
+      "notes": "The submission ids and payment URL, from the stored PENDING row (replay) or from the submission just created."
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// The payment URL comes from the API (new submission) or from the PENDING SLA row (replay).\n// No try/catch on purpose: a missing value must fail the run, so an empty payment URL is never saved or emailed.\nconst missing = ['formId', 'submissionId', 'paymentUrl'].filter((name) => !$json[name]);\nif (missing.length) {\n  throw new Error('The payment form submission is incomplete (missing ' + missing.join(', ') + ') for ministry request ' + $('Set Event Variables').item.json.ministryRequestId + '.');\n}\n\nreturn {\n  json: {\n    ...$json,\n    saveDataPayload: JSON.stringify({\n      paymenturl: $json.paymentUrl,\n      paymentexpirydate: $('Set Event Variables').item.json.paymentExpiryDate\n    })\n  }\n};\n"
+      },
+      "id": "efeddf72-b1c7-4293-ae49-7fa22914bf52",
+      "name": "Build Save Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4048,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-payment-sla",
+          "mode": "list",
+          "value": "012PySsVgvdHQbkn",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/012PySsVgvdHQbkn"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ministry_request_id",
+              "keyValue": "={{ $('Set Event Variables').item.json.ministryRequestId }}"
+            },
+            {
+              "keyName": "sla_type",
+              "keyValue": "payment-expiry"
+            },
+            {
+              "keyValue": "={{ $('Pending SLA Row').first().json.slaId ?? -1 }}"
+            },
+            {
+              "keyName": "sla_status",
+              "keyValue": "PENDING"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "form_id": "={{ $('Build Save Payload').first().json.formId }}",
+            "payment_url": "={{ $('Build Save Payload').first().json.paymentUrl }}",
+            "submission_id": "={{ $('Build Save Payload').first().json.submissionId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "service_key",
+              "displayName": "service_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "template_name",
+              "displayName": "template_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "sla_status",
+              "displayName": "sla_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "sla_type",
+              "displayName": "sla_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "form_id",
+              "displayName": "form_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "submission_id",
+              "displayName": "submission_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "payment_expiry_date",
+              "displayName": "payment_expiry_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "expires_at",
+              "displayName": "expires_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "payment_url",
+              "displayName": "payment_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "payment_status",
+              "displayName": "payment_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "started_execution_id",
+              "displayName": "started_execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "completed_execution_id",
+              "displayName": "completed_execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "completed_at",
+              "displayName": "completed_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "applicant_correspondence_id",
+              "displayName": "applicant_correspondence_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "next_state_name",
+              "displayName": "next_state_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "prev_status",
+              "displayName": "prev_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry",
+              "displayName": "ministry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "file_number",
+              "displayName": "file_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "48fc861b-e6c9-4f6a-a061-9bf0e38fcfdc",
+      "name": "Store Form Ids On Pending SLA",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "alwaysOutputData": true,
+      "position": [
+        4272,
+        448
+      ],
+      "notes": "G12: writes form_id, submission_id and the payment URL onto the PENDING row. Does nothing if the row is no longer PENDING."
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "iMchipXgogUVPriD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/iMchipXgogUVPriD",
+          "cachedResultName": "FOI Backend API Manager"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "category": "foipayment-save",
+            "foiRequestId": "={{ $('Set Event Variables').item.json.foiRequestId }}",
+            "ministryRequestId": "={{ $('Set Event Variables').item.json.ministryRequestId }}",
+            "saveDataPayload": "={{ $('Build Save Payload').item.json.saveDataPayload }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawRequestId",
+              "displayName": "rawRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "foiRequestId",
+              "displayName": "foiRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ministryRequestId",
+              "displayName": "ministryRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawReqPayload",
+              "displayName": "rawReqPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reqPayload",
+              "displayName": "reqPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "servicekey",
+              "displayName": "servicekey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "saveDataPayload",
+              "displayName": "saveDataPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "eventId",
+              "displayName": "eventId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventStatus",
+              "displayName": "eventStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventError",
+              "displayName": "eventError",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventExecutionId",
+              "displayName": "eventExecutionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "69e823cd-6069-49bc-bd13-efa3f8598369",
+      "name": "Save Payment",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "retryOnFail": false,
+      "position": [
+        4496,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "np1",
+              "name": "serviceKey",
+              "type": "string",
+              "value": "={{ $('Set Event Variables').item.json.serviceKey === 'correspondence' ? 'correspondence' : ($('Set Event Variables').item.json.previousStatus === 'Response' ? 'payoutstanding' : 'payonline') }}"
+            },
+            {
+              "id": "np2",
+              "name": "templateName",
+              "type": "string",
+              "value": "={{ $('Set Event Variables').item.json.templateName }}"
+            },
+            {
+              "id": "np3",
+              "name": "previousStatus",
+              "type": "string",
+              "value": "={{ $('Set Event Variables').item.json.previousStatus }}"
+            },
+            {
+              "id": "np4",
+              "name": "foiRequestId",
+              "type": "string",
+              "value": "={{ $('Set Event Variables').item.json.foiRequestId }}"
+            },
+            {
+              "id": "np5",
+              "name": "ministryRequestId",
+              "type": "string",
+              "value": "={{ $('Set Event Variables').item.json.ministryRequestId }}"
+            },
+            {
+              "id": "np6",
+              "name": "applicantCorrespondenceId",
+              "type": "string",
+              "value": "={{ $('Set Event Variables').item.json.applicantCorrespondenceId }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "5a4b9115-edc7-4eab-9895-f5c2ca680b29",
+      "name": "Set Notify Payment Vars",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4720,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "eEJIqueH0XPZduz7",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/eEJIqueH0XPZduz7",
+          "cachedResultName": "FOI Email Processing"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "templateName": "={{ $json.templateName }}",
+            "previousStatus": "={{ $json.previousStatus }}",
+            "serviceKey": "={{ $json.serviceKey }}",
+            "foiRequestId": "={{ $json.foiRequestId }}",
+            "ministryRequestId": "={{ $json.ministryRequestId }}",
+            "applicantCorrespondenceId": "={{ $json.applicantCorrespondenceId }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "templateName",
+              "displayName": "templateName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "previousStatus",
+              "displayName": "previousStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "serviceKey",
+              "displayName": "serviceKey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "foiRequestId",
+              "displayName": "foiRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ministryRequestId",
+              "displayName": "ministryRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "applicantCorrespondenceId",
+              "displayName": "applicantCorrespondenceId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "b58f5234-9034-412f-8278-f41ce25f8e5a",
+      "name": "Notify Payment - foi-email-processing",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "retryOnFail": false,
+      "position": [
+        4944,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Replaces the 20-day 'Wait Payment Outcome' timeout with an SLA row that FOI Payment Expiry SLA Job checks.\n// Expiry = end of the payment expiry date sent with the fee event, in UTC (Camunda runs with TZ=UTC); if no\n// valid date was sent, the previous 20-day wait is used.\ntry {\n  const vars = $('Set Event Variables').first().json;\n  const save = $('Build Save Payload').first().json;\n  const notify = $('Set Notify Payment Vars').first().json;\n  const PAYMENT_WAIT_DAYS = 20;\n  \n  let expiresAt = null;\n  let expirySource = 'payment_expiry_date';\n  const raw = String(vars.paymentExpiryDate || '').trim();\n  if (raw) {\n    const parsed = DateTime.fromISO(raw, { zone: 'utc' });\n    if (parsed.isValid) expiresAt = raw.length <= 10 ? parsed.endOf('day') : parsed;\n  }\n  if (!expiresAt) {\n    expiresAt = DateTime.utc().plus({ days: PAYMENT_WAIT_DAYS });\n    expirySource = `default ${PAYMENT_WAIT_DAYS} days`;\n  }\n  \n  return [{\n    json: {\n      slaType: 'payment-expiry',\n      slaStatus: 'ACTIVE',\n      foiRequestId: String(vars.foiRequestId || ''),\n      ministryRequestId: String(vars.ministryRequestId || ''),\n      fileNumber: String(vars.fileNumber || ''),\n      serviceKey: String(notify.serviceKey || ''),\n      templateName: String(vars.templateName || ''),\n      previousStatus: String(vars.previousStatus || ''),\n      nextStateName: String(vars.nextStateName || ''),\n      applicantCorrespondenceId: String(vars.applicantCorrespondenceId || ''),\n      paymentStatus: String(vars.paymentStatus || 'NOT PAID'),\n      paymentUrl: String(save.paymentUrl || ''),\n      formId: String(save.formId || ''),\n      submissionId: String(save.submissionId || ''),\n      paymentExpiryDate: raw,\n      expiresAt: expiresAt.toUTC().toISO(),\n      expirySource,\n      metadata: vars.metadata\n    }\n  }];\n  \n} catch (error) {\n  const input = $('Set Event Variables').first().json;\n  return {\n    json: {\n      event: '',\n      receivedEvent: (input && typeof input === 'object' && typeof input.event === 'string') ? input.event : null,\n      error: true,\n      errorMessage: error.message,\n      metadata: input.metadata ?? null,\n      executionId: $execution.id,\n    },\n  };\n}\n\n"
+      },
+      "id": "adc49042-a7db-4b9a-8ad4-0b190a94728c",
+      "name": "Build Payment SLA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        5168,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-payment-sla",
+          "mode": "list",
+          "value": "012PySsVgvdHQbkn",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/012PySsVgvdHQbkn"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ministry_request_id",
+              "keyValue": "={{ $('Set Event Variables').item.json.ministryRequestId }}"
+            },
+            {
+              "keyName": "sla_type",
+              "keyValue": "payment-expiry"
+            },
+            {
+              "keyValue": "={{ $('Pending SLA Row').first().json.slaId ?? -1 }}"
+            },
+            {
+              "keyName": "sla_status",
+              "keyValue": "PENDING"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "id": "6d45d326-4287-46ac-b5d0-da898b80db04",
+      "name": "Check Row Still Pending",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "alwaysOutputData": true,
+      "position": [
+        5392,
+        448
+      ],
+      "notes": "G12: the row is promoted only if it is still PENDING (it may have been CANCELLED while the payment was being created)."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0fbc4ef8-3959-4fed-bc10-550f69ba58c2",
+              "leftValue": "={{ $json.id !== undefined && $json.id !== null && $json.id !== '' }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "rightValue": ""
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "726379cd-7790-42d0-8770-6eaa5062b4ef",
+      "name": "Still Pending?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        5616,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-payment-sla",
+          "mode": "list",
+          "value": "012PySsVgvdHQbkn",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/012PySsVgvdHQbkn"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ministry_request_id",
+              "keyValue": "={{ $('Set Event Variables').item.json.ministryRequestId }}"
+            },
+            {
+              "keyName": "sla_type",
+              "keyValue": "payment-expiry"
+            },
+            {
+              "keyValue": "={{ $('Pending SLA Row').first().json.slaId ?? -1 }}"
+            },
+            {
+              "keyName": "sla_status",
+              "keyValue": "PENDING"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'Online payment created and applicant notified. Expires at ' + $('Build Payment SLA').first().json.expiresAt + ' (' + $('Build Payment SLA').first().json.expirySource + ').' }}",
+            "expires_at": "={{ $('Build Payment SLA').first().json.expiresAt }}",
+            "form_id": "={{ $('Build Payment SLA').first().json.formId }}",
+            "next_state_name": "={{ $('Build Payment SLA').first().json.nextStateName }}",
+            "payment_expiry_date": "={{ $('Build Payment SLA').first().json.paymentExpiryDate }}",
+            "payment_status": "={{ $('Build Payment SLA').first().json.paymentStatus }}",
+            "payment_url": "={{ $('Build Payment SLA').first().json.paymentUrl }}",
+            "service_key": "={{ $('Build Payment SLA').first().json.serviceKey }}",
+            "sla_status": "={{ $('Build Payment SLA').first().json.slaStatus }}",
+            "started_execution_id": "={{ $execution.id }}",
+            "submission_id": "={{ $('Build Payment SLA').first().json.submissionId }}"
+          },
+          "matchingColumns": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "bd205bf1-8d9e-4ac3-80be-edd61e17e248",
+      "name": "Promote Payment SLA",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "alwaysOutputData": true,
+      "position": [
+        5840,
+        352
+      ],
+      "notes": "G12: PENDING becomes ACTIVE only after Save Payment and the notification email succeeded."
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'Payment SLA #' + $('Pending SLA Row').first().json.slaId + ' was no longer PENDING after the applicant was notified (cancelled while the payment was being created); it was not promoted to ACTIVE.' }}",
+            "execution_id": "={{ $execution.id }}",
+            "process_type": "fee-process",
+            "event": "={{ $('Set Event Variables').item.json.event }}",
+            "raw_request_id": "={{ $('Set Event Variables').item.json.rawRequestId || null }}",
+            "foi_request_id": "={{ $('Set Event Variables').item.json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $('Set Event Variables').item.json.ministryRequestId || null }}",
+            "status": "={{ $('Set Event Variables').item.json.status || null }}",
+            "occurred_at": "={{ $('Set Event Variables').item.json.occurredAt}}",
+            "event_id": "={{ $('Set Event Variables').item.json.eventId}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "96084ef3-0603-4e23-a947-d892bfd0d5f8",
+      "name": "Audit: Promotion Skipped",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        5840,
+        544
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "82380414-f751-48aa-b6e1-0e952469c7fc",
+      "name": "End (Promotion Skipped)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        6064,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'Online payment created and applicant notified. Payment SLA #' + $('Pending SLA Row').first().json.slaId + ' promoted from PENDING to ACTIVE in foi-payment-sla - expires at ' + $('Build Payment SLA').first().json.expiresAt + ' (' + $('Build Payment SLA').first().json.expirySource + '). Awaiting foi-manage-payment.' }}",
+            "execution_id": "={{ $execution.id }}",
+            "process_type": "fee-process",
+            "event": "={{ $('Set Event Variables').item.json.event }}",
+            "raw_request_id": "={{ $('Set Event Variables').item.json.rawRequestId || null }}",
+            "foi_request_id": "={{ $('Set Event Variables').item.json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $('Set Event Variables').item.json.ministryRequestId || null }}",
+            "status": "={{ $('Set Event Variables').item.json.status || null }}",
+            "occurred_at": "={{ $('Set Event Variables').item.json.occurredAt}}",
+            "event_id": "={{ $('Set Event Variables').item.json.eventId}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "2ba6a3a2-9248-45f6-9609-8f929fcf8125",
+      "name": "Audit : Payment Pending",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        6064,
+        352
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "e6923964-ced7-4727-9fe4-35e80a30d6e7",
+      "name": "End",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        6288,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## formsflow application record\n'Create Application Record' registers each new payment submission with POST {FORMSFLOW_API_URL}/application/create, as Camunda's ExternalSubmissionListener did. The request-management API creates the Form.io submission but does not do this, so it stays here.\n\nIt is best effort: if the token or the call fails, the payment carries on. A replay that reuses a stored submission does not register it again.\n\nFORMIO_URL (Set Process Vars) is only used to build the formUrl sent in this call; n8n holds no Form.io login. In foi-initial-payment-submission.bpmn the returned applicationId is not read by any later step.",
+        "height": 400,
+        "width": 580
+      },
+      "id": "dd0f992b-cca8-4444-b4db-7984fe2f9271",
+      "name": "Note - Application Record",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4768,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI Fee Initiation\n\n**Purpose:**\nCreates the applicant's online fee payment for a request (feeAction = initiate).\n\n**Trigger/Entry:**\nSub-workflow called by **FOI Fee Processing** (router). Start node has fixed fields, so it can also be run on its own with a foi-fee-payment item (see the Start node note). `Set Event Variables` normalises the fields.\n\n**Processing:**\nGet payment details. If balance due > 0, the applicant has an email and payment is not offline: register (or reuse) a PENDING row in `foi-payment-sla`, create the payment submission through the API, register it as a formsflow application (best effort), store its ids and payment URL on that row, save the payment URL and expiry date, notify the applicant, then promote the row to ACTIVE if it is still PENDING. A replay reuses the stored ids instead of creating a second submission; a row cancelled while PENDING is not promoted. Otherwise audit \"no online payment\".\n\n**Integration/Outcome:**\nCalls FOI Backend API Manager (payonline, foipayment-formsubmission-create, foipayment-save), the formsflow API (/application/create) and FOI Email Processing. n8n does not log in to Form.io. Uses `foi-payment-sla` and `foi-process-audit` (process_type = fee-process).",
+        "height": 480,
+        "width": 700,
+        "color": 4
+      },
+      "id": "2690a84e-7f7b-4726-8aa1-7a990c326aca",
+      "name": "Developer Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "iMchipXgogUVPriD",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/iMchipXgogUVPriD",
+          "cachedResultName": "FOI-DEV — FOI Backend API Manager"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "category": "foipayment-formsubmission-create",
+            "foiRequestId": "={{ $('Set Event Variables').first().json.foiRequestId }}",
+            "ministryRequestId": "={{ $('Set Event Variables').first().json.ministryRequestId }}",
+            "reqPayload": "={{ JSON.stringify({ formType: $('Compute Payment Vars').first().json.formType }) }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawRequestId",
+              "displayName": "rawRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "foiRequestId",
+              "displayName": "foiRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "ministryRequestId",
+              "displayName": "ministryRequestId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "rawReqPayload",
+              "displayName": "rawReqPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "reqPayload",
+              "displayName": "reqPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "servicekey",
+              "displayName": "servicekey",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "saveDataPayload",
+              "displayName": "saveDataPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "eventId",
+              "displayName": "eventId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventStatus",
+              "displayName": "eventStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventError",
+              "displayName": "eventError",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "eventExecutionId",
+              "displayName": "eventExecutionId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "claimPayload",
+              "displayName": "claimPayload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "id": "5f2c8a19-3d74-4b6e-a0c9-7e1b4d92f633",
+      "name": "Create Payment Form Submission",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "retryOnFail": false,
+      "position": [
+        3152,
+        384
+      ],
+      "notes": "Creates the applicant's payment submission through FOI Backend API Manager. Returns formId, submissionId and paymentUrl. NOT idempotent: never turn on retries; a replay reuses the ids stored on the PENDING SLA row."
+    },
+    {
+      "parameters": {
+        "processingMode": "verify"
+      },
+      "id": "a81d4e57-9c02-4f38-b6a1-2d5e8f40c744",
+      "name": "FOI-OIDC",
+      "type": "CUSTOM.oidcToken",
+      "typeVersion": 1,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "position": [
+        3376,
+        384
+      ],
+      "credentials": {
+        "oidcToken": {
+          "id": "ZorFhF5FYHZqnUF6",
+          "name": "FOI OIDC"
+        }
+      },
+      "onError": "continueErrorOutput",
+      "notes": "Token for the formsflow API. On failure the application record is skipped; the payment still continues."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Set Process Vars').first().json.FORMSFLOW_API_URL }}/application/create",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ formUrl: $('Set Process Vars').first().json.FORMIO_URL + '/form/' + $('Create Payment Form Submission').first().json.formId + '/submission/' + $('Create Payment Form Submission').first().json.submissionId, formId: $('Create Payment Form Submission').first().json.formId, submissionId: $('Create Payment Form Submission').first().json.submissionId, processInstanceId: $execution.id }) }}",
+        "options": {}
+      },
+      "id": "e04b7c93-5a18-4d2f-8c67-1f9a3b6d8e55",
+      "name": "Create Application Record",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "retryOnFail": false,
+      "position": [
+        3600,
+        304
+      ],
+      "onError": "continueRegularOutput",
+      "notes": "Why HTTP: no node for the formsflow API. Registers the new submission as a formsflow application (as Camunda's ExternalSubmissionListener did). The request-management API does not do this. Best effort: a failure does not stop the payment."
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Audit: Fee Payment Initiated": {
+      "main": [
+        [
+          {
+            "node": "GET Payment Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Balance Due > 0?": {
+      "main": [
+        [
+          {
+            "node": "Get Initiation SLA Rows",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: No Online Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Payment SLA": {
+      "main": [
+        [
+          {
+            "node": "Check Row Still Pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Save Payload": {
+      "main": [
+        [
+          {
+            "node": "Store Form Ids On Pending SLA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compute Payment Vars": {
+      "main": [
+        [
+          {
+            "node": "Balance Due > 0?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET Payment Details": {
+      "main": [
+        [
+          {
+            "node": "Compute Payment Vars",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify Payment - foi-email-processing": {
+      "main": [
+        [
+          {
+            "node": "Build Payment SLA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Payment": {
+      "main": [
+        [
+          {
+            "node": "Set Notify Payment Vars",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Notify Payment Vars": {
+      "main": [
+        [
+          {
+            "node": "Notify Payment - foi-email-processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit : Payment Pending": {
+      "main": [
+        [
+          {
+            "node": "End",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: No Online Payment": {
+      "main": [
+        [
+          {
+            "node": "End (No Online Payment)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Initiation SLA Rows": {
+      "main": [
+        [
+          {
+            "node": "Plan Payment SLA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Plan Payment SLA": {
+      "main": [
+        [
+          {
+            "node": "Open SLA Row Exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Open SLA Row Exists?": {
+      "main": [
+        [
+          {
+            "node": "Update Pending Payment SLA",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Register Pending Payment SLA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Pending Payment SLA": {
+      "main": [
+        [
+          {
+            "node": "Pending SLA Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Register Pending Payment SLA": {
+      "main": [
+        [
+          {
+            "node": "Pending SLA Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pending SLA Row": {
+      "main": [
+        [
+          {
+            "node": "Has Stored Form Ids?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Stored Form Ids?": {
+      "main": [
+        [
+          {
+            "node": "Resolve Form Ids",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Payment Form Submission",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve Form Ids": {
+      "main": [
+        [
+          {
+            "node": "Build Save Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Form Ids On Pending SLA": {
+      "main": [
+        [
+          {
+            "node": "Save Payment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Row Still Pending": {
+      "main": [
+        [
+          {
+            "node": "Still Pending?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Still Pending?": {
+      "main": [
+        [
+          {
+            "node": "Promote Payment SLA",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: Promotion Skipped",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Promote Payment SLA": {
+      "main": [
+        [
+          {
+            "node": "Audit : Payment Pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: Promotion Skipped": {
+      "main": [
+        [
+          {
+            "node": "End (Promotion Skipped)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Set Event Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Event Variables": {
+      "main": [
+        [
+          {
+            "node": "Set Process Vars",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Process Vars": {
+      "main": [
+        [
+          {
+            "node": "Audit: Fee Payment Initiated",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Payment Form Submission": {
+      "main": [
+        [
+          {
+            "node": "FOI-OIDC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FOI-OIDC": {
+      "main": [
+        [
+          {
+            "node": "Create Application Record",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Resolve Form Ids",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Application Record": {
+      "main": [
+        [
+          {
+            "node": "Resolve Form Ids",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "b6fd35fe-8ad8-4379-9b49-ef3ced7b7b40",
+  "meta": {
+    "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
+  },
+  "nodeGroups": [],
+  "id": "ABcwwsX7lK5KpEJi",
+  "tags": []
+}

@@ -130,40 +130,84 @@ class requestservicegetter:
     
     def getrequestdetails(self,foirequestid, foiministryrequestid, documentsetid=None):
         requestdetails = self.getrequest(foirequestid, foiministryrequestid)
-        approvedcfrfee = cfrfeeservice().getapprovedcfrfee(foiministryrequestid)
-        cfrfee = cfrfeeservice().getcfrfee(foiministryrequestid)
-        payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
         if documentsetid is not None:
             record_groups = recordgroupservice().fetch_records_by_documentsetid(documentsetid)
             requestdetails['recordgroups'] = record_groups
-        
-        if approvedcfrfee is not None and approvedcfrfee != {}:
+        approvedcfrfee = self.__prepareapprovedcfrfee(foirequestid, foiministryrequestid)
+        if approvedcfrfee is not None:
             requestdetails['cfrfee'] = approvedcfrfee
-
-            #_totaldue = float(approvedcfrfee['feedata']['actualtotaldue']) if 'actualtotaldue' in approvedcfrfee['feedata'] and float(approvedcfrfee['feedata']['actualtotaldue']) > 0 else float(approvedcfrfee['feedata']['estimatedtotaldue'])
-            if 'actualtotaldue' in approvedcfrfee['feedata'] and float(approvedcfrfee['feedata']['actualtotaldue']) > 0:
-                _totaldue = float(approvedcfrfee['feedata']['actualtotaldue'])
-            elif 'estimatedtotaldue' in approvedcfrfee['feedata']:
-                _totaldue = float(approvedcfrfee['feedata']['estimatedtotaldue'])
-            else:
-                _totaldue = 0
-                
-            _balancedue = _totaldue - (float(cfrfee['feedata']['amountpaid']) + float(approvedcfrfee['feedata']['feewaiveramount']))
-            requestdetails['cfrfee']['feedata']['amountpaid'] = cfrfee['feedata']['amountpaid']
-            requestdetails['cfrfee']['feedata']["balanceDue"] = '{:.2f}'.format(_balancedue)
-            if 'actualtotaldue' in approvedcfrfee['feedata'] and approvedcfrfee['feedata']['actualtotaldue']:
-                requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["actualtotaldue"])
-            else:
-                requestdetails['cfrfee']['feedata']["totalamountdue"] = '{:.2f}'.format(requestdetails['cfrfee']['feedata']["estimatedtotaldue"])
-            
-            if payment is not None and payment != {}:
-                paidamount = float(payment['paidamount']) if payment['paidamount'] != None else 0
-                requestdetails['cfrfee']['feedata']['paidamount'] = '{:.2f}'.format(paidamount)
-                # depositpaid field is only accurate and used for outstanding email and receipts
-                requestdetails['cfrfee']['feedata']['depositpaid'] = '{:.2f}'.format(float(cfrfee['feedata']['amountpaid']) - paidamount)
-                requestdetails['cfrfee']['feedata']['paymenturl'] = payment['paymenturl']            
-                requestdetails['cfrfee']['feedata']['paymentdate'] = payment['created_at'][:10]
         return requestdetails
+
+    def getpaymentdetails(self, foirequestid, foiministryrequestid, includeemail=True):
+        """Only the fields the workflow engine (Camunda or n8n) needs to set up an online payment (FOIMOD-5523).
+
+        Same keys, nesting and JSON types as getrequestdetails, so both engines read it unchanged: idNumber,
+        axisRequestId, email, isofflinepayment and cfrfee.feedata.balanceDue (Camunda,
+        foi-initial-payment-submission.bpmn), plus currentState (n8n "FOI Fee Initiation", written to the Form.io
+        payment submission as status). Like getrequestdetails, 'email' is absent when the request has no email
+        contact and 'cfrfee' is absent when there is no approved fee.
+
+        hasEmail (always present, boolean) tells the engine whether the applicant has an email address, which is
+        all the workflow needs: no email, no online payment. The FOI API sends the emails itself and looks the
+        address up in its own database. 'email' (the address) is included only when includeemail is True, which
+        the resource sets for Camunda, whose BPMN reads it; n8n gets hasEmail only.
+        Returns None when the ministry request does not belong to the FOI request."""
+        requestministry = FOIMinistryRequest.getrequestbyministryrequestid(foiministryrequestid)
+        if requestministry and requestministry.get('foirequest_id') not in (None, foirequestid):
+            return None
+        paymentdetails = {
+            'idNumber': requestministry["filenumber"],
+            'axisRequestId': requestministry["axisrequestid"],
+            'currentState': requestministry['requeststatus.name'],
+            'isofflinepayment': FOIMinistryRequest.getofflinepaymentflag(foiministryrequestid),
+        }
+        request = FOIRequest.getrequest(foirequestid)
+        for contactinfo in FOIRequestContactInformation.getrequestcontactinformation(foirequestid, request['version']):
+            if contactinfo['contacttype.name'] == 'Email':
+                paymentdetails['email'] = contactinfo['contactinformation']
+        paymentdetails['hasEmail'] = bool(paymentdetails.get('email'))
+        if not includeemail:
+            paymentdetails.pop('email', None)
+        approvedcfrfee = self.__prepareapprovedcfrfee(foirequestid, foiministryrequestid)
+        if approvedcfrfee is not None:
+            paymentdetails['cfrfee'] = {'feedata': {'balanceDue': approvedcfrfee['feedata']['balanceDue']}}
+        return paymentdetails
+
+    def __prepareapprovedcfrfee(self, foirequestid, foiministryrequestid):
+        """The approved CFR fee with balanceDue and the payment fields worked out, or None when there is none.
+        Shared by getrequestdetails and getpaymentdetails so both compute the balance the same way."""
+        approvedcfrfee = cfrfeeservice().getapprovedcfrfee(foiministryrequestid)
+        cfrfee = cfrfeeservice().getcfrfee(foiministryrequestid)
+        payment = paymentservice().getpayment(foirequestid, foiministryrequestid)
+        if approvedcfrfee is None or approvedcfrfee == {}:
+            return None
+        feedata = approvedcfrfee['feedata']
+        amountpaid = cfrfee['feedata']['amountpaid']
+        balancedue = self.__gettotaldue(feedata) - (float(amountpaid) + float(feedata['feewaiveramount']))
+        feedata['amountpaid'] = amountpaid
+        feedata['balanceDue'] = '{:.2f}'.format(balancedue)
+        totalamountdue = feedata['actualtotaldue'] if 'actualtotaldue' in feedata and feedata['actualtotaldue'] else feedata['estimatedtotaldue']
+        feedata['totalamountdue'] = '{:.2f}'.format(totalamountdue)
+        if payment is not None and payment != {}:
+            self.__addpaymentfields(feedata, amountpaid, payment)
+        return approvedcfrfee
+
+    def __gettotaldue(self, feedata):
+        """Actual total when it is above zero, otherwise the estimated total, otherwise 0."""
+        if 'actualtotaldue' in feedata and float(feedata['actualtotaldue']) > 0:
+            return float(feedata['actualtotaldue'])
+        if 'estimatedtotaldue' in feedata:
+            return float(feedata['estimatedtotaldue'])
+        return 0
+
+    def __addpaymentfields(self, feedata, amountpaid, payment):
+        paidamount = float(payment['paidamount']) if payment['paidamount'] is not None else 0
+        feedata['paidamount'] = '{:.2f}'.format(paidamount)
+        # depositpaid field is only accurate and used for outstanding email and receipts
+        feedata['depositpaid'] = '{:.2f}'.format(float(amountpaid) - paidamount)
+        feedata['paymenturl'] = payment['paymenturl']
+        feedata['paymentdate'] = payment['created_at'][:10]
+        feedata['paymentexpirydate'] = payment['paymentexpirydate'][:10] if payment['paymentexpirydate'] is not None else None
 
     def getrawrequestidbyfoirequestid(self, foirequestid):
         return FOIRequest.getrawrequestidbyfoirequestid(foirequestid)

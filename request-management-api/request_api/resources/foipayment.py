@@ -94,3 +94,67 @@ class GetFOIPayment(Resource):
         except BusinessException as exception:            
             return {'status': exception.status_code, 'message':exception.message}, 500
 
+
+
+import logging
+from marshmallow import ValidationError
+from request_api.services.external.formioservice import FormioError, FormioNotConfigured
+from request_api.services.paymentformservice import PaymentFormError, paymentformservice
+from request_api.schemas.foipayment import PaymentFormSubmissionCreateSchema, PaymentFormSubmissionUpdateSchema
+
+logger = logging.getLogger(__name__)
+
+
+def _formsubmissionerror(exception):
+    """Fixed messages only: never echo field values, Form.io details or setting names."""
+    if isinstance(exception, ValidationError):
+        return {'status': False, 'message': 'Invalid request'}, 400
+    if isinstance(exception, PaymentFormError):
+        return {'status': False, 'message': exception.message}, exception.status_code
+    if isinstance(exception, FormioNotConfigured):
+        return {'status': False, 'message': 'Payment form service is not configured'}, 503
+    return {'status': False, 'message': 'Payment form service unavailable'}, 502
+
+
+@cors_preflight('POST,PATCH,OPTIONS')
+@API.route('/foipayment/<int:requestid>/ministryrequest/<int:ministryrequestid>/formsubmission')
+class FOIPaymentFormSubmission(Resource):
+    """Workflow-only (n8n/Camunda client): creates and updates the applicant's Form.io payment submission
+    so the workflow never holds Form.io credentials (FOIMOD-5525)."""
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isworkflowclient(enforce=True)
+    def post(requestid, ministryrequestid):
+        formtype = None
+        try:
+            body = PaymentFormSubmissionCreateSchema().load(request.get_json(silent=True) or {})
+            formtype = body['formType']
+            result = paymentformservice().createpaymentformsubmission(requestid, ministryrequestid, formtype)
+            response = result, 201
+        except (ValidationError, PaymentFormError, FormioNotConfigured, FormioError) as exception:
+            response = _formsubmissionerror(exception)
+        logger.info("formsubmission create request=%s ministryrequest=%s formType=%s http=%s",
+                    requestid, ministryrequestid, formtype, response[1])
+        return response
+
+    @staticmethod
+    @TRACER.trace()
+    @cross_origin(origins=allowedorigins())
+    @auth.require
+    @auth.isworkflowclient(enforce=True)
+    def patch(requestid, ministryrequestid):
+        paymentstatus = None
+        try:
+            body = PaymentFormSubmissionUpdateSchema().load(request.get_json(silent=True) or {})
+            paymentstatus = body['paymentStatus']
+            result = paymentformservice().updatepaymentformsubmission(
+                ministryrequestid, body['formId'], body['submissionId'], paymentstatus, body['status'])
+            response = result, 200
+        except (ValidationError, PaymentFormError, FormioNotConfigured, FormioError) as exception:
+            response = _formsubmissionerror(exception)
+        logger.info("formsubmission update request=%s ministryrequest=%s paymentStatus=%s http=%s",
+                    requestid, ministryrequestid, paymentstatus, response[1])
+        return response

@@ -190,6 +190,9 @@ class requestservice:
             foirequestid, foiministryrequestid,documentsetid
         )
 
+    def getpaymentdetails(self, foirequestid, foiministryrequestid, includeemail=True):
+        return requestservicegetter().getpaymentdetails(foirequestid, foiministryrequestid, includeemail)
+
     def getrequestid(self, foiministryrequestid):
         return FOIMinistryRequest.getrequest(foiministryrequestid)["foirequest_id"]
 

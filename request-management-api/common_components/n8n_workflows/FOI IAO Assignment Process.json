@@ -1,0 +1,535 @@
+{
+  "name": "FOI IAO Assignment Process",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "7455ff77-ad36-48ed-a7d6-b594e6ec5599",
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        352
+      ],
+      "notes": "Handles foi-iao-open-assignment and foi-iao-assignment."
+    },
+    {
+      "parameters": {
+        "jsCode": "try {\n  const input = $input.first().json || {};\n  const event = input.event;\n  const eventId = input.eventId;\n  const occurredAt = input.occurredAt;\n\n  if (!event || typeof event !== 'string') {\n    throw new Error('Required field \"body.event\" is missing or invalid.');\n  }\n\n  // The COMPLETE original event payload - never reduced to the normalised fields.\n  let metadata = input.metadata;\n  if (typeof metadata === 'string') {\n    try {\n      metadata = JSON.parse(metadata);\n    } catch (e) {\n      metadata = null;\n    }\n  }  \n  const executionId = $execution.id;\n\n  // foiRequestMetaData arrives as an object (intake events) or as a JSON string (IAO / ministry events).\n  let foiRequestMetaData = metadata.foiRequestMetaData;\n  if (typeof foiRequestMetaData === 'string') {\n    try {\n      foiRequestMetaData = JSON.parse(foiRequestMetaData);\n    } catch (e) {\n      foiRequestMetaData = null;\n    }\n  }\n  let metadataString = \"\";\n  if (!metadata || typeof metadata === 'string') {   \n      metadataString = metadata;    \n  } else if (!metadata || typeof metadata === 'object') {\n      metadataString = JSON.stringify(metadata);\n    }\n  const IAO_ASSIGNMENT_EVENTS = ['foi-iao-open-assignment', 'foi-iao-assignment'];\n  if (IAO_ASSIGNMENT_EVENTS.includes(event)) {\n    const first = (...values) => {\n      for (const v of values) { if (v !== undefined && v !== null && v !== '') return v; }\n      return null;\n    };\n  \n    return {\n      json: {\n        event,\n        eventId,\n        occurredAt,\n        rawRequestId: first(foiRequestMetaData.rawRequestId),\n        foiRequestId: first(foiRequestMetaData.foiRequestID, foiRequestMetaData.foiRequestId),\n        ministryRequestId: first(foiRequestMetaData.ministryRequestID, foiRequestMetaData.ministryRequestId),\n        status: foiRequestMetaData.status,\n        assignedTo: foiRequestMetaData.assignedTo,\n        assignedGroup: foiRequestMetaData.assignedGroup,\n        fileNumber: foiRequestMetaData?.id,\n        metadata: metadataString,\n        executionId,\n      },\n    };\n  }\n\n} catch (error) {\n   const input = $input.first().json || {};\n  return {\n    json: {\n      event: '',\n      eventId: (input && typeof input === 'object' && typeof input.eventId === 'string') ? input.eventId : null,\n      receivedEvent: (input && typeof input === 'object' && typeof input.event === 'string') ? input.event : null,\n      error: true,\n      errorMessage: error.message,\n      metadata: input.metadata ?? null,\n      executionId: $execution.id,\n    },\n  };\n}"
+      },
+      "id": "8c0ec455-338f-43d8-9398-ab5e8b712f92",
+      "name": "Set Event Variables",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9c216e8f-eba7-4934-9a08-90d06ade39fa",
+                    "leftValue": "={{ $('Set Event Variables').item.json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-open-assignment"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "open-assignment"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9735bfbd-4295-4673-bc7c-2af0c6fed357",
+                    "leftValue": "={{ $('Set Event Variables').item.json.event }}",
+                    "operator": {
+                      "operation": "equals",
+                      "type": "string"
+                    },
+                    "rightValue": "foi-iao-assignment"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "other-assignment"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "other"
+        }
+      },
+      "id": "30072235-45e2-421b-8410-ff9fb685ac04",
+      "name": "Assignment Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        336
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "0cf19eb1-2c7e-4c9c-a606-0085c202d654",
+      "name": "End (Open Assignment Recorded)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        896,
+        160
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "cdb63f78-9601-4481-b9ca-cc1962286cb4",
+      "name": "End (Unsupported Event)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        672,
+        544
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'IAO team open-state assignment' + ' for ministry request ' + ($json.fileNumber || $json.ministryRequestId || 'n/a') + '. Status: ' + ($json.status || 'n/a') + ', assigned group: ' + ($json.assignedGroup || 'n/a') + ', assigned to: ' + ($json.assignedTo || 'n/a') + '.' }}",
+            "event": "={{ $json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $json.ministryRequestId || null }}",
+            "process_type": "ministry-request-process",
+            "raw_request_id": "={{ $json.rawRequestId || null }}",
+            "status": "={{ $json.status || null }}",
+            "event_id": "={{ $json.eventId }}",
+            "occurred_at": "={{ $json.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "1ec09114-ed18-4f83-81bf-03b28479adf9",
+      "name": "Audit: IAO Open Assignment",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        160
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "cachedResultName": "foi-process-audit",
+          "cachedResultUrl": "/projects/CeytGDNs0Ylp3zu1/datatables/RK0xzpLfp9c1oM87",
+          "mode": "list",
+          "value": "RK0xzpLfp9c1oM87"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "comments": "={{ 'IAO assignment during Call For Records or Other states' + ' for ministry request ' + ($json.fileNumber || $json.ministryRequestId || 'n/a') + '. Status: ' + ($json.status || 'n/a') + ', assigned group: ' + ($json.assignedGroup || 'n/a') + ', assigned to: ' + ($json.assignedTo || 'n/a') + '.' }}",
+            "event": "={{ $json.event }}",
+            "execution_id": "={{ $execution.id }}",
+            "foi_request_id": "={{ $json.foiRequestId || null }}",
+            "ministry_request_id": "={{ $json.ministryRequestId || null }}",
+            "process_type": "ministry-request-process",
+            "raw_request_id": "={{ $json.rawRequestId || null }}",
+            "status": "={{ $json.status || null }}",
+            "event_id": "={{ $json.eventId }}",
+            "occurred_at": "={{ $json.occurredAt}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "process_type",
+              "displayName": "process_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "occurred_at",
+              "displayName": "occurred_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "raw_request_id",
+              "displayName": "raw_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "foi_request_id",
+              "displayName": "foi_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ministry_request_id",
+              "displayName": "ministry_request_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "comments",
+              "displayName": "comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "metadata",
+              "displayName": "metadata",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "72edba41-5b68-41d6-81be-f07a1b9c0f2a",
+      "name": "Audit: IAO Assignment",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        352
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {},
+      "id": "b7e5720e-94dc-4b69-9223-b2160ed4dde7",
+      "name": "End (Other Assignment Recorded)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        896,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Developer Overview – FOI IAO Assignment Process\n\n**Purpose:**\nRecords IAO team assignment changes on a ministry request.\n\n**Trigger/Entry:**\nSub-workflow called by FOI IAO Process for `foi-iao-open-assignment` and `foi-iao-assignment`.\n\n**Processing:**\nReads the event payload into standard fields, then branches:\n- foi-iao-open-assignment (request in Open state) → audit \"IAO team open-state assignment\"\n- foi-iao-assignment (Call For Records or other states) → audit \"IAO assignment\"\n- other events → end, no action\n\n**Integration/Outcome:**\nAudit only. Writes a `foi-process-audit` row (process_type = ministry-request-process) with the status, assigned group and assigned person. No API calls.",
+        "height": 520,
+        "width": 620,
+        "color": 4
+      },
+      "id": "a046af21-fad7-4813-9fa9-e2d7586a010c",
+      "name": "Developer Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -272
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Assignment Type": {
+      "main": [
+        [
+          {
+            "node": "Audit: IAO Open Assignment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audit: IAO Assignment",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "index": 0,
+            "node": "End (Unsupported Event)",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Set Event Variables": {
+      "main": [
+        [
+          {
+            "node": "Assignment Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "index": 0,
+            "node": "Set Event Variables",
+            "type": "main"
+          }
+        ]
+      ]
+    },
+    "Audit: IAO Open Assignment": {
+      "main": [
+        [
+          {
+            "node": "End (Open Assignment Recorded)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit: IAO Assignment": {
+      "main": [
+        [
+          {
+            "node": "End (Other Assignment Recorded)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "81fea221-5473-4d7e-b0a6-e21206aa5c21",
+  "meta": {
+    "instanceId": "5a16c0d2c676e8e93c747edb5faef4e8ba72f7d4a91471ae870f2d9c41fcfb55"
+  },
+  "nodeGroups": [],
+  "id": "RvOqZYKkLvQpriCC",
+  "tags": []
+}
